@@ -96,60 +96,62 @@ const float cs4031_device::m_dma_clock_divider[] =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(cs4031_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("dma1", AM9517A, 0)
-	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma2", am9517a_device, dreq0_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(cs4031_device, dma1_eop_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(cs4031_device, dma_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(cs4031_device, dma_write_byte))
-	MCFG_I8237_IN_IOR_0_CB(READ8(cs4031_device, dma1_ior0_r))
-	MCFG_I8237_IN_IOR_1_CB(READ8(cs4031_device, dma1_ior1_r))
-	MCFG_I8237_IN_IOR_2_CB(READ8(cs4031_device, dma1_ior2_r))
-	MCFG_I8237_IN_IOR_3_CB(READ8(cs4031_device, dma1_ior3_r))
-	MCFG_I8237_OUT_IOW_0_CB(WRITE8(cs4031_device, dma1_iow0_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(cs4031_device, dma1_iow1_w))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(cs4031_device, dma1_iow2_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(cs4031_device, dma1_iow3_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(cs4031_device, dma1_dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(cs4031_device, dma1_dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(cs4031_device, dma1_dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(cs4031_device, dma1_dack3_w))
-	MCFG_DEVICE_ADD("dma2", AM9517A, 0)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(cs4031_device, dma2_hreq_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(cs4031_device, dma_read_word))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(cs4031_device, dma_write_word))
-	MCFG_I8237_IN_IOR_1_CB(READ8(cs4031_device, dma2_ior1_r))
-	MCFG_I8237_IN_IOR_2_CB(READ8(cs4031_device, dma2_ior2_r))
-	MCFG_I8237_IN_IOR_3_CB(READ8(cs4031_device, dma2_ior3_r))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(cs4031_device, dma2_iow1_w))
-	MCFG_I8237_OUT_IOW_2_CB(WRITE8(cs4031_device, dma2_iow2_w))
-	MCFG_I8237_OUT_IOW_3_CB(WRITE8(cs4031_device, dma2_iow3_w))
-	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(cs4031_device, dma2_dack0_w))
-	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(cs4031_device, dma2_dack1_w))
-	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(cs4031_device, dma2_dack2_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(cs4031_device, dma2_dack3_w))
+void cs4031_device::device_add_mconfig(machine_config &config)
+{
+	AM9517A(config, m_dma1, 0);
+	m_dma1->out_hreq_callback().set(m_dma2, FUNC(am9517a_device::dreq0_w));
+	m_dma1->out_eop_callback().set(FUNC(cs4031_device::dma1_eop_w));
+	m_dma1->in_memr_callback().set(FUNC(cs4031_device::dma_read_byte));
+	m_dma1->out_memw_callback().set(FUNC(cs4031_device::dma_write_byte));
+	m_dma1->in_ior_callback<0>().set(FUNC(cs4031_device::dma1_ior0_r));
+	m_dma1->in_ior_callback<1>().set(FUNC(cs4031_device::dma1_ior1_r));
+	m_dma1->in_ior_callback<2>().set(FUNC(cs4031_device::dma1_ior2_r));
+	m_dma1->in_ior_callback<3>().set(FUNC(cs4031_device::dma1_ior3_r));
+	m_dma1->out_iow_callback<0>().set(FUNC(cs4031_device::dma1_iow0_w));
+	m_dma1->out_iow_callback<1>().set(FUNC(cs4031_device::dma1_iow1_w));
+	m_dma1->out_iow_callback<2>().set(FUNC(cs4031_device::dma1_iow2_w));
+	m_dma1->out_iow_callback<3>().set(FUNC(cs4031_device::dma1_iow3_w));
+	m_dma1->out_dack_callback<0>().set(FUNC(cs4031_device::dma1_dack0_w));
+	m_dma1->out_dack_callback<1>().set(FUNC(cs4031_device::dma1_dack1_w));
+	m_dma1->out_dack_callback<2>().set(FUNC(cs4031_device::dma1_dack2_w));
+	m_dma1->out_dack_callback<3>().set(FUNC(cs4031_device::dma1_dack3_w));
 
-	MCFG_DEVICE_ADD("intc1", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(cs4031_device, intc1_int_w))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(cs4031_device, intc1_slave_ack_r))
+	AM9517A(config, m_dma2, 0);
+	m_dma2->out_hreq_callback().set(FUNC(cs4031_device::dma2_hreq_w));
+	m_dma2->in_memr_callback().set(FUNC(cs4031_device::dma_read_word));
+	m_dma2->out_memw_callback().set(FUNC(cs4031_device::dma_write_word));
+	m_dma2->in_ior_callback<1>().set(FUNC(cs4031_device::dma2_ior1_r));
+	m_dma2->in_ior_callback<2>().set(FUNC(cs4031_device::dma2_ior2_r));
+	m_dma2->in_ior_callback<3>().set(FUNC(cs4031_device::dma2_ior3_r));
+	m_dma2->out_iow_callback<1>().set(FUNC(cs4031_device::dma2_iow1_w));
+	m_dma2->out_iow_callback<2>().set(FUNC(cs4031_device::dma2_iow2_w));
+	m_dma2->out_iow_callback<3>().set(FUNC(cs4031_device::dma2_iow3_w));
+	m_dma2->out_dack_callback<0>().set(FUNC(cs4031_device::dma2_dack0_w));
+	m_dma2->out_dack_callback<1>().set(FUNC(cs4031_device::dma2_dack1_w));
+	m_dma2->out_dack_callback<2>().set(FUNC(cs4031_device::dma2_dack2_w));
+	m_dma2->out_dack_callback<3>().set(FUNC(cs4031_device::dma2_dack3_w));
 
-	MCFG_DEVICE_ADD("intc2", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("intc1", pic8259_device, ir2_w))
-	MCFG_PIC8259_IN_SP_CB(GND)
+	PIC8259(config, m_intc1, 0);
+	m_intc1->out_int_callback().set(FUNC(cs4031_device::intc1_int_w));
+	m_intc1->in_sp_callback().set_constant(1);
+	m_intc1->read_slave_ack_callback().set(FUNC(cs4031_device::intc1_slave_ack_r));
 
-	MCFG_DEVICE_ADD("ctc", PIT8254, 0)
-	MCFG_PIT8253_CLK0(XTAL(14'318'181) / 12.0)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("intc1", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(14'318'181) / 12.0)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(cs4031_device, ctc_out1_w))
-	MCFG_PIT8253_CLK2(XTAL(14'318'181) / 12.0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(cs4031_device, ctc_out2_w))
+	PIC8259(config, m_intc2, 0);
+	m_intc2->out_int_callback().set(m_intc1, FUNC(pic8259_device::ir2_w));
+	m_intc2->in_sp_callback().set_constant(0);
 
-	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(cs4031_device, rtc_irq_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
-MACHINE_CONFIG_END
+	PIT8254(config, m_ctc, 0);
+	m_ctc->set_clk<0>(XTAL(14'318'181) / 12.0);
+	m_ctc->out_handler<0>().set(m_intc1, FUNC(pic8259_device::ir0_w));
+	m_ctc->set_clk<1>(XTAL(14'318'181) / 12.0);
+	m_ctc->out_handler<1>().set(FUNC(cs4031_device::ctc_out1_w));
+	m_ctc->set_clk<2>(XTAL(14'318'181) / 12.0);
+	m_ctc->out_handler<2>().set(FUNC(cs4031_device::ctc_out2_w));
+
+	DS12885(config, m_rtc);
+	m_rtc->irq().set(m_intc2, FUNC(pic8259_device::ir0_w));
+	m_rtc->set_century_index(0x32);
+}
 
 
 //**************************************************************************
@@ -171,6 +173,13 @@ cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, dev
 	m_write_cpureset(*this),
 	m_write_a20m(*this),
 	m_write_spkr(*this),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_keybc(*this, finder_base::DUMMY_TAG),
+	m_isa(*this, finder_base::DUMMY_TAG),
+	m_bios(*this, finder_base::DUMMY_TAG),
+	m_space(nullptr),
+	m_space_io(nullptr),
+	m_ram(nullptr),
 	m_dma1(*this, "dma1"),
 	m_dma2(*this, "dma2"),
 	m_intc1(*this, "intc1"),
@@ -237,13 +246,8 @@ void cs4031_device::device_start()
 	save_item(NAME(m_address_valid));
 	save_item(NAME(m_registers));
 
-	device_t *cpu = machine().device(m_cputag);
-	m_space = &cpu->memory().space(AS_PROGRAM);
-	m_space_io = &cpu->memory().space(AS_IO);
-
-	m_isa = machine().root_device().memregion(m_isatag)->base();
-	m_bios = machine().root_device().memregion(m_biostag)->base();
-	m_keybc = downcast<at_keyboard_controller_device *>(machine().device(m_keybctag));
+	m_space = &m_cpu->memory().space(AS_PROGRAM);
+	m_space_io = &m_cpu->memory().space(AS_IO);
 
 	m_ram = ram_dev->pointer();
 	uint32_t ram_size = ram_dev->size();
@@ -260,17 +264,17 @@ void cs4031_device::device_start()
 
 	// install i/o accesses
 	m_space_io->install_readwrite_handler(0x0000, 0x000f, read8_delegate(FUNC(am9517a_device::read), &(*m_dma1)), write8_delegate(FUNC(am9517a_device::write), &(*m_dma1)), 0xffffffff);
-	m_space_io->install_readwrite_handler(0x0020, 0x0023, read8_delegate(FUNC(pic8259_device::read), &(*m_intc1)), write8_delegate(FUNC(pic8259_device::write), &(*m_intc1)), 0x0000ffff);
+	m_space_io->install_readwrite_handler(0x0020, 0x0023, read8sm_delegate(FUNC(pic8259_device::read), &(*m_intc1)), write8sm_delegate(FUNC(pic8259_device::write), &(*m_intc1)), 0x0000ffff);
 	m_space_io->install_write_handler(0x0020, 0x0023, write8_delegate(FUNC(cs4031_device::config_address_w), this), 0x00ff0000);
 	m_space_io->install_readwrite_handler(0x0020, 0x0023, read8_delegate(FUNC(cs4031_device::config_data_r), this), write8_delegate(FUNC(cs4031_device::config_data_w), this), 0xff000000);
-	m_space_io->install_readwrite_handler(0x0040, 0x0043, read8_delegate(FUNC(pit8254_device::read), &(*m_ctc)), write8_delegate(FUNC(pit8254_device::write), &(*m_ctc)), 0xffffffff);
+	m_space_io->install_readwrite_handler(0x0040, 0x0043, read8sm_delegate(FUNC(pit8254_device::read), &(*m_ctc)), write8sm_delegate(FUNC(pit8254_device::write), &(*m_ctc)), 0xffffffff);
 	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(cs4031_device::keyb_data_r), this), write8_delegate(FUNC(cs4031_device::keyb_data_w), this), 0x000000ff);
 	m_space_io->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(cs4031_device::portb_r), this), write8_delegate(FUNC(cs4031_device::portb_w), this), 0x0000ff00);
 	m_space_io->install_readwrite_handler(0x0064, 0x0067, read8_delegate(FUNC(cs4031_device::keyb_status_r), this), write8_delegate(FUNC(cs4031_device::keyb_command_w), this), 0x000000ff);
 	m_space_io->install_readwrite_handler(0x0070, 0x0073, read8_delegate(FUNC(mc146818_device::read), &(*m_rtc)), write8_delegate(FUNC(cs4031_device::rtc_w), this), 0x0000ffff);
 	m_space_io->install_readwrite_handler(0x0080, 0x008f, read8_delegate(FUNC(cs4031_device::dma_page_r), this), write8_delegate(FUNC(cs4031_device::dma_page_w), this), 0xffffffff);
 	m_space_io->install_readwrite_handler(0x0090, 0x0093, read8_delegate(FUNC(cs4031_device::sysctrl_r), this), write8_delegate(FUNC(cs4031_device::sysctrl_w), this), 0x00ff0000);
-	m_space_io->install_readwrite_handler(0x00a0, 0x00a3, read8_delegate(FUNC(pic8259_device::read), &(*m_intc2)), write8_delegate(FUNC(pic8259_device::write), &(*m_intc2)), 0x0000ffff);
+	m_space_io->install_readwrite_handler(0x00a0, 0x00a3, read8sm_delegate(FUNC(pic8259_device::read), &(*m_intc2)), write8sm_delegate(FUNC(pic8259_device::write), &(*m_intc2)), 0x0000ffff);
 	m_space_io->install_readwrite_handler(0x00c0, 0x00df, read8_delegate(FUNC(cs4031_device::dma2_r),this), write8_delegate(FUNC(cs4031_device::dma2_w),this), 0xffffffff);
 }
 
@@ -416,7 +420,7 @@ void cs4031_device::update_dma_clock()
 
     Not emulated here: Parity check NMI
  */
-void cs4031_device::nmi()
+void cs4031_device::trigger_nmi()
 {
 	if (m_nmi_mask & BIT(m_portb, 6))
 	{
@@ -433,11 +437,6 @@ READ8_MEMBER( cs4031_device::intc1_slave_ack_r )
 	return 0x00;
 }
 
-WRITE_LINE_MEMBER( cs4031_device::rtc_irq_w )
-{
-	m_intc2->ir0_w(state ? 0 : 1); // inverted?
-}
-
 WRITE_LINE_MEMBER( cs4031_device::iochck_w )
 {
 	LOGIO("cs4031_device::iochck_w: %u\n", state);
@@ -448,7 +447,7 @@ WRITE_LINE_MEMBER( cs4031_device::iochck_w )
 		{
 			// set channel check latch
 			m_portb |= 1 << 6;
-			nmi();
+			trigger_nmi();
 		}
 
 		m_iochck = state;
@@ -550,7 +549,7 @@ WRITE8_MEMBER( cs4031_device::config_data_w )
 			break;
 
 		case SOFT_RESET_AND_GATEA20:
-			a20m();
+			update_a20m();
 			break;
 		}
 	}
@@ -653,7 +652,7 @@ void cs4031_device::update_write_regions()
 //  KEYBOARD / 8042
 //**************************************************************************
 
-void cs4031_device::a20m()
+void cs4031_device::update_a20m()
 {
 	// external signal is ignored when emulation is on
 	if (BIT(m_registers[SOFT_RESET_AND_GATEA20], 5))
@@ -677,20 +676,20 @@ void cs4031_device::emulated_gatea20(int state)
 	if (BIT(m_registers[SOFT_RESET_AND_GATEA20], 5))
 	{
 		m_emu_gatea20 = state;
-		a20m();
+		update_a20m();
 	}
 }
 
 void cs4031_device::fast_gatea20(int state)
 {
 	m_fast_gatea20 = state;
-	a20m();
+	update_a20m();
 }
 
 void cs4031_device::keyboard_gatea20(int state)
 {
 	m_ext_gatea20 = state;
-	a20m();
+	update_a20m();
 }
 
 READ8_MEMBER( cs4031_device::keyb_status_r )

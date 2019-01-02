@@ -52,8 +52,8 @@ Ver. 2.2 should exist
 class mgavegas_state : public driver_device
 {
 public:
-	mgavegas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mgavegas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ay(*this, "aysnd"),
 		m_msm(*this, "5205"),
@@ -62,7 +62,13 @@ public:
 		m_filter2(*this, "filter2")
 	{ }
 
+	void mgavegas(machine_config &config);
 
+	void init_mgavegas();
+	void init_mgavegas21();
+	void init_mgavegas133();
+
+private:
 	uint8_t m_int;
 
 	//OUT1
@@ -136,16 +142,9 @@ public:
 	DECLARE_READ8_MEMBER(ay8910_a_r);
 	DECLARE_READ8_MEMBER(ay8910_b_r);
 
-	DECLARE_DRIVER_INIT(mgavegas);
-	DECLARE_DRIVER_INIT(mgavegas21);
-	DECLARE_DRIVER_INIT(mgavegas133);
-
 	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
 
-
-	void mgavegas(machine_config &config);
 	void mgavegas_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -159,9 +158,6 @@ protected:
 	virtual void machine_reset() override;
 	void update_custom();
 	void update_lamp();
-
-
-private:
 };
 
 
@@ -353,7 +349,7 @@ WRITE8_MEMBER(mgavegas_state::csoki_w)
 	if (LOG_MSM5205)
 		logerror("MSM5205 write to %04X data = %02X \n",offset+0xc800,data);
 	m_msm->reset_w(data&0x10>>4);
-	m_msm->data_w(data&0x0f);
+	m_msm->write_data(data&0x0f);
 }
 
 
@@ -426,10 +422,10 @@ void mgavegas_state::mgavegas_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram().share("nvram");
-	map(0xa000, 0xa003).rw(this, FUNC(mgavegas_state::r_a0), FUNC(mgavegas_state::w_a0));            // AY-3-8910
-	map(0xc000, 0xc001).w(this, FUNC(mgavegas_state::cso1_w));                   // /CSout1
-	map(0xc400, 0xc401).w(this, FUNC(mgavegas_state::cso2_w));                   // /CSout2
-	map(0xc800, 0xc801).rw(this, FUNC(mgavegas_state::csoki_r), FUNC(mgavegas_state::csoki_w));      // /CSoki
+	map(0xa000, 0xa003).rw(FUNC(mgavegas_state::r_a0), FUNC(mgavegas_state::w_a0));            // AY-3-8910
+	map(0xc000, 0xc001).w(FUNC(mgavegas_state::cso1_w));                   // /CSout1
+	map(0xc400, 0xc401).w(FUNC(mgavegas_state::cso2_w));                   // /CSout2
+	map(0xc800, 0xc801).rw(FUNC(mgavegas_state::csoki_r), FUNC(mgavegas_state::csoki_w));      // /CSoki
 	//AM_RANGE(0xcc00, 0xcc01) AM_READWRITE(cso3_r,cso3_w)      // /CSout3 unused
 	//AM_RANGE(0xe000, 0xe003) AM_READWRITE(r_e0,w_e0)          // /CSaux unused
 }
@@ -558,13 +554,13 @@ void mgavegas_state::machine_reset()
 *   machine init             *
 ******************************/
 
-DRIVER_INIT_MEMBER(mgavegas_state,mgavegas21)
+void mgavegas_state::init_mgavegas21()
 {
 	//hack to clear the irq on reti instruction
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00ea, 0x00ea, read8_delegate(FUNC(mgavegas_state::start_read), this));
 }
 
-DRIVER_INIT_MEMBER(mgavegas_state,mgavegas)
+void mgavegas_state::init_mgavegas()
 {
 	//hack to clear the irq on reti instruction
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00e2, 0x00e2, read8_delegate(FUNC(mgavegas_state::start_read), this));
@@ -578,7 +574,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( mgavegas_state::int_0 )
 	}
 }
 
-DRIVER_INIT_MEMBER(mgavegas_state,mgavegas133)
+void mgavegas_state::init_mgavegas133()
 {
 	//hack to clear the irq on reti instruction
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00dd, 0x00dd, read8_delegate(FUNC(mgavegas_state::start_read), this));
@@ -591,36 +587,36 @@ DRIVER_INIT_MEMBER(mgavegas_state,mgavegas133)
 
 MACHINE_CONFIG_START(mgavegas_state::mgavegas)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLK)
-	MCFG_CPU_PROGRAM_MAP(mgavegas_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLK)
+	MCFG_DEVICE_PROGRAM_MAP(mgavegas_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_0", mgavegas_state, int_0, attotime::from_hz(6000))  //6KHz from MSM5205 /VCK
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_TICKET_DISPENSER_ADD("hopper",attotime::from_msec(200),TICKET_MOTOR_ACTIVE_HIGH,TICKET_STATUS_ACTIVE_LOW);
 
 	/* sound hardware */
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(mgavegas_state, ay8910_a_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(mgavegas_state, ay8910_b_r))
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, m_ay, AY_CLK);
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.3);
+	m_ay->port_a_read_callback().set(FUNC(mgavegas_state::ay8910_a_r));
+	m_ay->port_b_read_callback().set(FUNC(mgavegas_state::ay8910_b_r));
 
-	MCFG_SOUND_ADD("5205", MSM5205, MSM_CLK)
+	MCFG_DEVICE_ADD("5205", MSM5205, MSM_CLK)
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 2.0)
 
 
-	MCFG_FILTER_RC_ADD("filter1", 0)
+	MCFG_DEVICE_ADD("filter1", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2",2.0)
-	MCFG_FILTER_RC_ADD("filter2", 0)
+	MCFG_DEVICE_ADD("filter2", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_mgavegas)
+	config.set_default_layout(layout_mgavegas);
 
 MACHINE_CONFIG_END
 
@@ -659,6 +655,6 @@ ROM_END
 *      Game Drivers      *
 *************************/
 //    YEAR  NAME            PARENT      MACHINE   INPUT     STATE           INIT        ROT     COMPANY   FULLNAME                                      FLAGS
-GAME( 1985, mgavegas,       0,          mgavegas, mgavegas, mgavegas_state, mgavegas,   ROT0,   "MGA",    "Vegas 1 (Ver 2.3 dual coin pulse, shorter)", MACHINE_MECHANICAL )
-GAME( 1985, mgavegas21,     mgavegas,   mgavegas, mgavegas, mgavegas_state, mgavegas21, ROT0,   "MGA",    "Vegas 1 (Ver 2.1 dual coin pulse, longer)",  MACHINE_MECHANICAL )
-GAME( 1985, mgavegas133,    mgavegas,   mgavegas, mgavegas, mgavegas_state, mgavegas133,ROT0,   "MGA",    "Vegas 1 (Ver 1.33 single coin pulse)",       MACHINE_MECHANICAL )
+GAME( 1985, mgavegas,       0,          mgavegas, mgavegas, mgavegas_state, init_mgavegas,   ROT0,   "MGA",    "Vegas 1 (Ver 2.3 dual coin pulse, shorter)", MACHINE_MECHANICAL )
+GAME( 1985, mgavegas21,     mgavegas,   mgavegas, mgavegas, mgavegas_state, init_mgavegas21, ROT0,   "MGA",    "Vegas 1 (Ver 2.1 dual coin pulse, longer)",  MACHINE_MECHANICAL )
+GAME( 1985, mgavegas133,    mgavegas,   mgavegas, mgavegas, mgavegas_state, init_mgavegas133,ROT0,   "MGA",    "Vegas 1 (Ver 1.33 single coin pulse)",       MACHINE_MECHANICAL )

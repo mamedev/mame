@@ -74,50 +74,61 @@ TODO:
 
 ***************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8255.h"
 #include "machine/ins8154.h"
 #include "sound/ay8910.h"
+#include "video/dp8350.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-struct vega_obj
-{
-	int m_x, m_y, m_enable, m_type;
-};
-
-enum
-{
-	OBJ_0,
-	OBJ_1,
-	OBJ_2,
-	OBJ_PLAYER,
-
-	NUM_OBJ
-};
-
 class vega_state : public driver_device
 {
 public:
-
 	vega_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_i8255(*this, "ppi8255")
 		, m_ins8154(*this, "ins8154")
 		, m_ay8910(*this, "ay8910")
+		, m_crtc(*this, "crtc")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 	{
 	}
 
-	required_device<cpu_device>     m_maincpu;
+	void vega(machine_config &config);
+
+	void init_vega();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	struct vega_obj
+	{
+		int m_x, m_y, m_enable, m_type;
+	};
+
+	enum
+	{
+		OBJ_0,
+		OBJ_1,
+		OBJ_2,
+		OBJ_PLAYER,
+
+		NUM_OBJ
+	};
+
+	required_device<i8035_device>   m_maincpu;
 	required_device<i8255_device>   m_i8255;
 	required_device<ins8154_device> m_ins8154;
 	required_device<ay8910_device>  m_ay8910;
+	required_device<dp8350_device>  m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -160,15 +171,9 @@ public:
 	DECLARE_READ8_MEMBER(ay8910_pb_r);
 	DECLARE_WRITE8_MEMBER(ay8910_pb_w);
 
-	DECLARE_DRIVER_INIT(vega);
-
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(vega);
+	void vega_palette(palette_device &palette) const;
 	void draw_tilemap(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
-	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vega(machine_config &config);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vega_io_map(address_map &map);
 	void vega_map(address_map &map);
 };
@@ -182,7 +187,7 @@ WRITE8_MEMBER(vega_state::extern_w)
 		case 0:  /* 00-03 */
 		{
 			/* PPI 8255 /CS */
-			m_i8255->write(space, (m_p2_data>>6)&3, data);
+			m_i8255->write((m_p2_data>>6)&3, data);
 		}
 		break;
 
@@ -311,7 +316,7 @@ READ8_MEMBER(vega_state::extern_r)
 	{
 		case 0: /* PPI 8255 /CS */
 		{
-			return m_i8255->read( space, m_p2_data>>6); /* A6,A7 -> A0,A1 */
+			return m_i8255->read(m_p2_data>>6); /* A6,A7 -> A0,A1 */
 		}
 
 		case 1: /* 04-07 */
@@ -391,12 +396,12 @@ WRITE8_MEMBER(vega_state::rombank_w)
 void vega_state::vega_map(address_map &map)
 {
 	map(0x000, 0x7ff).bankr("bank1");
-	map(0x800, 0xfff).rom();
+	map(0x800, 0xfff).rom().region("mb1", 0);
 }
 
 void vega_state::vega_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(vega_state::extern_r), FUNC(vega_state::extern_w));
+	map(0x00, 0xff).rw(FUNC(vega_state::extern_r), FUNC(vega_state::extern_w));
 }
 
 
@@ -477,10 +482,9 @@ INPUT_PORTS_END
 
 
 
-PALETTE_INIT_MEMBER(vega_state, vega)
+void vega_state::vega_palette(palette_device &palette) const
 {
-	int i;
-	for(i=0;i<8;++i)
+	for(int i=0;i<8;++i)
 	{
 		palette.set_pen_color( 2*i, rgb_t(0x00, 0x00, 0x00) );
 		palette.set_pen_color( 2*i+1, rgb_t( (i&1)?0xff:0x00, (i&2)?0xff:0x00, (i&4)?0xff:0x00) );
@@ -490,7 +494,6 @@ PALETTE_INIT_MEMBER(vega_state, vega)
 
 void vega_state::draw_tilemap(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
-	{
 	uint8_t *map_lookup = memregion("tilemaps")->base();
 
 	int offset_y=m_tilemap_offset_y;
@@ -527,23 +530,16 @@ void vega_state::draw_tilemap(screen_device& screen, bitmap_ind16& bitmap, const
 				{
 					//for(int x=0;x<4;++x)
 					{
-						m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, num, 0, 1,flip?1:0,  x*4+x0-offset_x, (flip?(3-y):y)*8+y0-offset_y, 0);
+						m_gfxdecode->gfx(1)->zoom_transpen(bitmap,cliprect, num, 0, 1,flip?1:0,  (x*4+x0-offset_x)*2, (flip?(3-y):y)*8+y0-offset_y, 0x20000, 0x10000, 0);
 						++num;
 					}
 				}
 			}
 		}
 	}
-
-
-	}
-
-
-
-
 }
 
-uint32_t vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vega_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	++m_frame_counter;
 
@@ -553,12 +549,11 @@ uint32_t vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bit
 
 
 	{
-		int x,y;
 		int idx=0;
 		uint8_t *color_lookup = memregion("proms")->base() + 0x200;
 
-		for(y=0;y<25;++y)
-			for(x=0;x<40;++x)
+		for(int y=0;y<25;++y)
+			for(int x=0;x<40;++x)
 			{
 				int character=m_txt_ram[idx];
 				//int color=bitswap<8>(color_lookup[character],7,6,5,4,0,1,2,3)>>1;
@@ -576,32 +571,27 @@ uint32_t vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bit
 
 			//  if(color==0) color=0xf;
 
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, character, color, 0, 0, x*7, y*10,0);
+					m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect, character, color, 0, 0, x*14, y*10, 0x20000, 0x10000, 0);
 
 				++idx;
 			}
 
 	}
 
+	for(int i=OBJ_0;i<OBJ_PLAYER;++i)
 	{
-		for(int i=OBJ_0;i<OBJ_PLAYER;++i)
-		{
-			int x0=255-m_obj[i].m_x;
-			int y0=255-m_obj[i].m_y;
-			int num=m_obj[i].m_type&7;
-			int flip=m_obj[i].m_type&8;
+		int x0=255-m_obj[i].m_x;
+		int y0=255-m_obj[i].m_y;
+		int num=m_obj[i].m_type&7;
+		int flip=m_obj[i].m_type&8;
 
-			num*=4*8;
-			for(int x=0;x<8;++x)
+		num*=4*8;
+		for(int x=0;x<8;++x)
 			for(int y=0;y<4;++y)
 			{
-				//for(int x=0;x<4;++x)
-				{
-						m_gfxdecode->gfx(2)->transpen(bitmap,cliprect, num, 0, 1, flip?1:0, x*4+x0, (flip?(3-y):y)*8+y0, 0);
-					++num;
-				}
+				m_gfxdecode->gfx(2)->zoom_transpen(bitmap,cliprect, num, 0, 1, flip?1:0, (x*4+x0)*2, (flip?(3-y):y)*8+y0, 0x20000, 0x10000, 0);
+				++num;
 			}
-		}
 	}
 
 /*
@@ -615,31 +605,29 @@ uint32_t vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bit
 */
 
 
+	if(BIT(m_obj[OBJ_PLAYER].m_type,5))
 	{
-		if(BIT(m_obj[OBJ_PLAYER].m_type,5))
+		int x0=m_obj[OBJ_PLAYER].m_x;
+		int y0=255-m_obj[OBJ_PLAYER].m_y-32;
+
+		uint8_t *sprite_lookup = memregion("proms")->base();
+
+
+		for(int x=0;x<16;++x)
 		{
-			int x0=m_obj[OBJ_PLAYER].m_x;
-			int y0=255-m_obj[OBJ_PLAYER].m_y-32;
+			int prom_data=sprite_lookup[ ((m_obj[OBJ_PLAYER].m_type&0xf)<<2)|((x>>2)&3)|(((m_frame_counter>>1)&3)<<6) ];
 
-			uint8_t *sprite_lookup = memregion("proms")->base();
+			int xor_line=( ! (( ! ((BIT(prom_data,1))&(BIT(prom_data,2))&(BIT(prom_data,3))&(BIT(x,2)) ) ) &
+							( (BIT(prom_data,2)) | (BIT(prom_data,3)) | ( BIT(m_obj[OBJ_PLAYER].m_type,4)) ) ));
 
+			int strip_num=((prom_data)&0x7)|(   ((x&3)^(xor_line?0x3:0))  <<3)|((BIT(prom_data,3))<<5);
 
-			for(int x=0;x<16;++x)
+			strip_num<<=2;
+
+			for(int y=0;y<4;++y)
 			{
-				int prom_data=sprite_lookup[ ((m_obj[OBJ_PLAYER].m_type&0xf)<<2)|((x>>2)&3)|(((m_frame_counter>>1)&3)<<6) ];
-
-				int xor_line=( ! (( ! ((BIT(prom_data,1))&(BIT(prom_data,2))&(BIT(prom_data,3))&(BIT(x,2)) ) ) &
-								( (BIT(prom_data,2)) | (BIT(prom_data,3)) | ( BIT(m_obj[OBJ_PLAYER].m_type,4)) ) ));
-
-				int strip_num=((prom_data)&0x7)|(   ((x&3)^(xor_line?0x3:0))  <<3)|((BIT(prom_data,3))<<5);
-
-				strip_num<<=2;
-
-				for(int y=0;y<4;++y)
-				{
-						m_gfxdecode->gfx(3)->transpen(bitmap,cliprect, strip_num, 0, !xor_line, 0, x*4+x0, y*8+y0, 0);
-					++strip_num;
-				}
+				m_gfxdecode->gfx(3)->zoom_transpen(bitmap,cliprect, strip_num, 0, !xor_line, 0, (x*4+x0)*2, y*8+y0, 0x20000, 0x10000, 0);
+				++strip_num;
 			}
 		}
 	}
@@ -696,7 +684,7 @@ static const gfx_layout tile_layout3 =
 };
 
 
-static GFXDECODE_START( test_decode )
+static GFXDECODE_START( gfx_test_decode )
 	GFXDECODE_ENTRY( "gfx1", 0,  text_charlayout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0,  tile_layout2, 16, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0,  tile_layout3, 16, 1 )
@@ -794,63 +782,62 @@ void vega_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(vega_state::vega)
-	MCFG_CPU_ADD("maincpu", I8035, 4000000)
-	MCFG_CPU_PROGRAM_MAP(vega_map)
-	MCFG_CPU_IO_MAP(vega_io_map)
-	MCFG_MCS48_PORT_P1_IN_CB(IOPORT("DSW"))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(vega_state, rombank_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(vega_state, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(vega_state, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(vega_state, t1_r))
-	MCFG_MCS48_PORT_PROG_OUT_CB(NOOP) /* prog - inputs CLK */
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vega_state, irq0_line_hold)
+void vega_state::vega(machine_config &config)
+{
+	I8035(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vega_state::vega_map);
+	m_maincpu->set_addrmap(AS_IO, &vega_state::vega_io_map);
+	m_maincpu->p1_in_cb().set_ioport("DSW");
+	m_maincpu->p1_out_cb().set(FUNC(vega_state::rombank_w));
+	m_maincpu->p2_in_cb().set(FUNC(vega_state::p2_r));
+	m_maincpu->p2_out_cb().set(FUNC(vega_state::p2_w));
+	m_maincpu->t1_in_cb().set(FUNC(vega_state::t1_r));
+	m_maincpu->prog_out_cb().set_nop(); /* prog - inputs CLK */
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(vega_state, txtram_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(vega_state, txtram_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(vega_state, ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(vega_state, randomizer))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(vega_state, ppi_pc_w))
+	I8255A(config, m_i8255);
+	m_i8255->in_pa_callback().set(FUNC(vega_state::txtram_r));
+	m_i8255->in_pb_callback().set_ioport("IN0");
+	m_i8255->in_pc_callback().set(FUNC(vega_state::randomizer));
+	m_i8255->out_pa_callback().set(FUNC(vega_state::txtram_w));
+	m_i8255->out_pb_callback().set(FUNC(vega_state::ppi_pb_w));
+	m_i8255->out_pc_callback().set(FUNC(vega_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD( "ins8154", INS8154, 0 )
-	MCFG_INS8154_IN_A_CB(READ8(vega_state, ins8154_pa_r))
-	MCFG_INS8154_OUT_A_CB(WRITE8(vega_state, ins8154_pa_w))
-	MCFG_INS8154_IN_B_CB(READ8(vega_state, ins8154_pb_r))
-	MCFG_INS8154_OUT_B_CB(WRITE8(vega_state, ins8154_pb_w))
+	INS8154(config, m_ins8154);
+	m_ins8154->in_a().set(FUNC(vega_state::ins8154_pa_r));
+	m_ins8154->out_a().set(FUNC(vega_state::ins8154_pa_w));
+	m_ins8154->in_b().set(FUNC(vega_state::ins8154_pb_r));
+	m_ins8154->out_b().set(FUNC(vega_state::ins8154_pb_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 280, 0*8, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(vega_state, screen_update_vega)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(vega_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(vega_state, vega)
+	DP8350(config, m_crtc, 10920000); // pins 21/22 connected to XTAL, 3 to GND
+	m_crtc->set_screen("screen");
+	m_crtc->refresh_control(0);
+	m_crtc->vblank_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ); // inverse of pin 2?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", test_decode)
+	PALETTE(config, m_palette, FUNC(vega_state::vega_palette), 0x100);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_test_decode);
 
 	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ay8910", AY8910, 1500000 )
-	MCFG_AY8910_PORT_A_READ_CB(READ8(vega_state, ay8910_pa_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(vega_state, ay8910_pb_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(vega_state, ay8910_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(vega_state, ay8910_pb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-MACHINE_CONFIG_END
+	AY8910(config, m_ay8910, 1500000);
+	m_ay8910->port_a_read_callback().set(FUNC(vega_state::ay8910_pa_r));
+	m_ay8910->port_b_read_callback().set(FUNC(vega_state::ay8910_pb_r));
+	m_ay8910->port_a_write_callback().set(FUNC(vega_state::ay8910_pa_w));
+	m_ay8910->port_b_write_callback().set(FUNC(vega_state::ay8910_pb_w));
+	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 ROM_START( vega )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rom9.bin",         0x0800, 0x0800, CRC(191c73cd) SHA1(17b1c3790f82b276e55d25ea8a38a3c9cf20bf12) )
-	ROM_LOAD( "rom10a.bin",       0x1000, 0x1000, CRC(fca9a570) SHA1(598772db11b32518ed6bf5155a19f4f1761a4831) )
+	ROM_REGION( 0x01000, "mb0", 0 )
+	ROM_LOAD( "rom10a.bin",       0x0000, 0x1000, CRC(fca9a570) SHA1(598772db11b32518ed6bf5155a19f4f1761a4831) )
+
+	ROM_REGION( 0x00800, "mb1", 0 )
+	ROM_LOAD( "rom9.bin",         0x0000, 0x0800, CRC(191c73cd) SHA1(17b1c3790f82b276e55d25ea8a38a3c9cf20bf12) )
 
 	ROM_REGION( 0x01000, "gfx1", ROMREGION_INVERT  )
 	ROM_LOAD( "rom8.bin",         0x0000, 0x0800, CRC(ccb8598c) SHA1(8c4a702f0653bb189db7d8ac4c2a06aacecc0de0) )
@@ -881,10 +868,10 @@ ROM_START( vega )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(vega_state, vega)
+void vega_state::init_vega()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 2, &ROM[0x1000], 0x800);
+	uint8_t *ROM = memregion("mb0")->base();
+	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x800);
 }
 
-GAME( 1982, vega,   0, vega, vega, vega_state, vega, ROT270, "Olympia", "Vega", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1982, vega,   0, vega, vega, vega_state, init_vega, ROT270, "Olympia", "Vega", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

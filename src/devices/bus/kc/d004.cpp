@@ -34,21 +34,21 @@ void kc_d004_device::kc_d004_io(address_map &map)
 	map.global_mask(0xff);
 	map(0xf0, 0xf1).m(UPD765_TAG, FUNC(upd765a_device::map));
 	map(0xf2, 0xf3).rw(UPD765_TAG, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
-	map(0xf4, 0xf4).r(this, FUNC(kc_d004_device::hw_input_gate_r));
-	map(0xf6, 0xf7).w(this, FUNC(kc_d004_device::fdd_select_w));
-	map(0xf8, 0xf9).w(this, FUNC(kc_d004_device::hw_terminal_count_w));
+	map(0xf4, 0xf4).r(FUNC(kc_d004_device::hw_input_gate_r));
+	map(0xf6, 0xf7).w(FUNC(kc_d004_device::fdd_select_w));
+	map(0xf8, 0xf9).w(FUNC(kc_d004_device::hw_terminal_count_w));
 	map(0xfc, 0xff).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
 void kc_d004_gide_device::kc_d004_gide_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(kc_d004_gide_device::gide_r), FUNC(kc_d004_gide_device::gide_w));
+	map(0x0000, 0xffff).rw(FUNC(kc_d004_gide_device::gide_r), FUNC(kc_d004_gide_device::gide_w));
 	map(0x00f0, 0x00f1).mirror(0xff00).m(UPD765_TAG, FUNC(upd765a_device::map));
 	map(0x00f2, 0x00f3).mirror(0xff00).rw(UPD765_TAG, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
-	map(0x00f4, 0x00f4).mirror(0xff00).r(this, FUNC(kc_d004_gide_device::hw_input_gate_r));
-	map(0x00f6, 0x00f7).mirror(0xff00).w(this, FUNC(kc_d004_gide_device::fdd_select_w));
-	map(0x00f8, 0x00f9).mirror(0xff00).w(this, FUNC(kc_d004_gide_device::hw_terminal_count_w));
+	map(0x00f4, 0x00f4).mirror(0xff00).r(FUNC(kc_d004_gide_device::hw_input_gate_r));
+	map(0x00f6, 0x00f7).mirror(0xff00).w(FUNC(kc_d004_gide_device::fdd_select_w));
+	map(0x00f8, 0x00f9).mirror(0xff00).w(FUNC(kc_d004_gide_device::hw_terminal_count_w));
 	map(0x00fc, 0x00ff).mirror(0xff00).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
@@ -56,9 +56,10 @@ FLOPPY_FORMATS_MEMBER( kc_d004_device::floppy_formats )
 	FLOPPY_KC85_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( kc_d004_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void kc_d004_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 static const z80_daisy_config kc_d004_daisy_chain[] =
 {
@@ -74,15 +75,15 @@ ROM_END
 ROM_START( kc_d004_gide )
 	ROM_REGION(0x2000, Z80_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "v33_4", "ver 3.3 (KC 85/4)")
-	ROMX_LOAD("d004v33_4.bin",  0x0000, 0x2000, CRC(1451efd7) SHA1(9db201af408adb02254094dc7aa7185bf5a7b9b1), ROM_BIOS(1) ) // KC85/4-5
+	ROMX_LOAD("d004v33_4.bin",  0x0000, 0x2000, CRC(1451efd7) SHA1(9db201af408adb02254094dc7aa7185bf5a7b9b1), ROM_BIOS(0) ) // KC85/4-5
 	ROM_SYSTEM_BIOS(1, "v33_3", "ver 3.3 (KC 85/3)")
-	ROMX_LOAD( "d004v33_3.bin", 0x0000, 0x2000, CRC(945f3e4b) SHA1(cce5d9eea82582270660c8275336b15bf9906253), ROM_BIOS(2) ) // KC85/3
+	ROMX_LOAD( "d004v33_3.bin", 0x0000, 0x2000, CRC(945f3e4b) SHA1(cce5d9eea82582270660c8275336b15bf9906253), ROM_BIOS(1) ) // KC85/3
 	ROM_SYSTEM_BIOS(2, "v30", "ver 3.0")
-	ROMX_LOAD("d004v30.bin",    0x0000, 0x2000, CRC(6fe0a283) SHA1(5582b2541a34a90c7a9516a6a222d4961fc54fcf), ROM_BIOS(3) ) // KC85/4-5
+	ROMX_LOAD("d004v30.bin",    0x0000, 0x2000, CRC(6fe0a283) SHA1(5582b2541a34a90c7a9516a6a222d4961fc54fcf), ROM_BIOS(2) ) // KC85/4-5
 	ROM_SYSTEM_BIOS(3, "v31", "ver 3.1")
-	ROMX_LOAD("d004v31.bin",    0x0000, 0x2000, CRC(712547de) SHA1(38b3164dce23573375fc0237f348d9a699fc6f9f), ROM_BIOS(4) ) // KC85/4-5
+	ROMX_LOAD("d004v31.bin",    0x0000, 0x2000, CRC(712547de) SHA1(38b3164dce23573375fc0237f348d9a699fc6f9f), ROM_BIOS(3) ) // KC85/4-5
 	ROM_SYSTEM_BIOS(4, "v32", "ver 3.2")
-	ROMX_LOAD("d004v32.bin",    0x0000, 0x2000, CRC(9a3d3511) SHA1(8232adb5e5f0b25b52f9873cff14831da3a0398a), ROM_BIOS(5) ) // KC85/4-5
+	ROMX_LOAD("d004v32.bin",    0x0000, 0x2000, CRC(9a3d3511) SHA1(8232adb5e5f0b25b52f9873cff14831da3a0398a), ROM_BIOS(4) ) // KC85/4-5
 ROM_END
 
 
@@ -149,25 +150,28 @@ void kc_d004_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(kc_d004_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(kc_d004_mem)
-	MCFG_CPU_IO_MAP(kc_d004_io)
-	MCFG_Z80_DAISY_CHAIN(kc_d004_daisy_chain)
+void kc_d004_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_cpu, 8_MHz_XTAL / 2);
+	m_cpu->set_addrmap(AS_PROGRAM, &kc_d004_device::kc_d004_mem);
+	m_cpu->set_addrmap(AS_IO, &kc_d004_device::kc_d004_io);
+	m_cpu->set_daisy_config(kc_d004_daisy_chain);
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(8'000'000)/2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, 0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg2))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	z80ctc_device &ctc(Z80CTC(config, Z80CTC_TAG, 8_MHz_XTAL / 2));
+	ctc.intr_callback().set_inputline(Z80_TAG, 0);
+	ctc.zc_callback<0>().set(Z80CTC_TAG, FUNC(z80ctc_device::trg1));
+	ctc.zc_callback<1>().set(Z80CTC_TAG, FUNC(z80ctc_device::trg2));
+	ctc.zc_callback<2>().set(Z80CTC_TAG, FUNC(z80ctc_device::trg3));
 
-	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(kc_d004_device, fdc_irq))
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
-MACHINE_CONFIG_END
+	UPD765A(config, m_fdc, 8_MHz_XTAL);
+	m_fdc->set_ready_line_connected(false);
+	m_fdc->set_select_lines_connected(false);
+	m_fdc->intrq_wr_callback().set(FUNC(kc_d004_device::fdc_irq));
+	FLOPPY_CONNECTOR(config, m_floppy0, kc_d004_floppies, "525qd", kc_d004_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, kc_d004_floppies, "525qd", kc_d004_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy2, kc_d004_floppies, "525qd", kc_d004_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy3, kc_d004_floppies, "525qd", kc_d004_device::floppy_formats);
+}
 
 //-------------------------------------------------
 //  device_rom_region
@@ -373,14 +377,14 @@ kc_d004_gide_device::kc_d004_gide_device(const machine_config &mconfig, const ch
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(kc_d004_gide_device::device_add_mconfig)
+void kc_d004_gide_device::device_add_mconfig(machine_config &config)
+{
 	kc_d004_device::device_add_mconfig(config);
 
-	MCFG_CPU_MODIFY(Z80_TAG)
-	MCFG_CPU_IO_MAP(kc_d004_gide_io)
+	m_cpu->set_addrmap(AS_IO, &kc_d004_gide_device::kc_d004_gide_io);
 
-	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", nullptr, false)
-MACHINE_CONFIG_END
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+}
 
 
 //-------------------------------------------------

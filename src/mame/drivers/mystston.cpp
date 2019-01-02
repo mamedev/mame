@@ -19,7 +19,6 @@
 #include "includes/mystston.h"
 
 #include "cpu/m6502/m6502.h"
-#include "sound/ay8910.h"
 #include "speaker.h"
 
 
@@ -80,14 +79,14 @@ WRITE8_MEMBER(mystston_state::mystston_ay8910_select_w)
 	if (((*m_ay8910_select & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 	{
 		/* bit 4 goes to the 8910 #0 BC1 pin */
-		machine().device<ay8910_device>("ay1")->data_address_w(space, *m_ay8910_select >> 4, *m_ay8910_data);
+		m_ay8910[0]->data_address_w(space, *m_ay8910_select >> 4, *m_ay8910_data);
 	}
 
 	/* bit 7 goes to 8910 #1 BDIR pin */
 	if (((*m_ay8910_select & 0x80) == 0x80) && ((data & 0x80) == 0x00))
 	{
 		/* bit 6 goes to the 8910 #1 BC1 pin */
-		machine().device<ay8910_device>("ay2")->data_address_w(space, *m_ay8910_select >> 6, *m_ay8910_data);
+		m_ay8910[1]->data_address_w(space, *m_ay8910_select >> 6, *m_ay8910_data);
 	}
 
 	*m_ay8910_select = data;
@@ -108,11 +107,11 @@ void mystston_state::main_map(address_map &map)
 	map(0x07e0, 0x0fff).ram();
 	map(0x1000, 0x17ff).ram().share("fg_videoram");
 	map(0x1800, 0x1fff).ram().share("bg_videoram");
-	map(0x2000, 0x2000).mirror(0x1f8f).portr("IN0").w(this, FUNC(mystston_state::mystston_video_control_w)).share("video_control");
-	map(0x2010, 0x2010).mirror(0x1f8f).portr("IN1").w(this, FUNC(mystston_state::irq_clear_w));
+	map(0x2000, 0x2000).mirror(0x1f8f).portr("IN0").w(FUNC(mystston_state::mystston_video_control_w)).share("video_control");
+	map(0x2010, 0x2010).mirror(0x1f8f).portr("IN1").w(FUNC(mystston_state::irq_clear_w));
 	map(0x2020, 0x2020).mirror(0x1f8f).portr("DSW0").writeonly().share("scroll");
 	map(0x2030, 0x2030).mirror(0x1f8f).portr("DSW1").writeonly().share("ay8910_data");
-	map(0x2040, 0x2040).mirror(0x1f8f).nopr().w(this, FUNC(mystston_state::mystston_ay8910_select_w)).share("ay8910_select");
+	map(0x2040, 0x2040).mirror(0x1f8f).nopr().w(FUNC(mystston_state::mystston_ay8910_select_w)).share("ay8910_select");
 	map(0x2050, 0x2050).mirror(0x1f8f).noprw();
 	map(0x2060, 0x207f).mirror(0x1f80).ram().share("paletteram");
 	map(0x4000, 0xffff).rom();
@@ -195,20 +194,18 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(mystston_state::mystston)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	/* video hardware */
 	mystston_video(config);
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, AY8910_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, m_ay8910[0], AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_SOUND_ADD("ay2", AY8910, AY8910_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, m_ay8910[1], AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 
@@ -321,6 +318,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, mystston,   0,        mystston, mystston, mystston_state, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. John's Adventure",              MACHINE_SUPPORTS_SAVE )
-GAME( 1984, myststono,  mystston, mystston, mystston, mystston_state, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure",             MACHINE_SUPPORTS_SAVE )
-GAME( 1984, myststonoi, mystston, mystston, mystston, mystston_state, 0, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure (Itisa PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mystston,   0,        mystston, mystston, mystston_state, empty_init, ROT270, "Technos Japan", "Mysterious Stones - Dr. John's Adventure",              MACHINE_SUPPORTS_SAVE )
+GAME( 1984, myststono,  mystston, mystston, mystston, mystston_state, empty_init, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure",             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, myststonoi, mystston, mystston, mystston, mystston_state, empty_init, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure (Itisa PCB)", MACHINE_SUPPORTS_SAVE )

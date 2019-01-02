@@ -242,19 +242,19 @@ void kim1_state::machine_reset()
 
 MACHINE_CONFIG_START(kim1_state::kim1)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
-	MCFG_CPU_PROGRAM_MAP(kim1_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(kim1_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	// video hardware
-	MCFG_DEFAULT_LAYOUT( layout_kim1 )
+	config.set_default_layout(layout_kim1);
 
 	// devices
 	MCFG_DEVICE_ADD("miot_u2", MOS6530, 1000000)
-	MCFG_MOS6530_IN_PA_CB(READ8(kim1_state, kim1_u2_read_a))
-	MCFG_MOS6530_OUT_PA_CB(WRITE8(kim1_state, kim1_u2_write_a))
-	MCFG_MOS6530_IN_PB_CB(READ8(kim1_state, kim1_u2_read_b))
-	MCFG_MOS6530_OUT_PB_CB(WRITE8(kim1_state, kim1_u2_write_b))
+	MCFG_MOS6530_IN_PA_CB(READ8(*this, kim1_state, kim1_u2_read_a))
+	MCFG_MOS6530_OUT_PA_CB(WRITE8(*this, kim1_state, kim1_u2_write_a))
+	MCFG_MOS6530_IN_PB_CB(READ8(*this, kim1_state, kim1_u2_read_b))
+	MCFG_MOS6530_OUT_PB_CB(WRITE8(*this, kim1_state, kim1_u2_write_b))
 
 	MCFG_DEVICE_ADD("miot_u3", MOS6530, 1000000)
 
@@ -285,5 +285,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  CLASS           INIT  COMPANY             FULLNAME  FLAGS
-COMP( 1975, kim1,     0,        0,      kim1,     kim1,  kim1_state,     0,    "MOS Technologies", "KIM-1" , MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME  FLAGS
+COMP( 1975, kim1, 0,      0,      kim1,    kim1,  kim1_state, empty_init, "MOS Technologies", "KIM-1",  MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)

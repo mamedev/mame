@@ -116,7 +116,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0x07:      mnemonic("ADD"); arg_IR(B0); arg_IM(B1); bytes(3);      break;
 			case 0x08:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0x09:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0x0a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0x0a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0x0b:      mnemonic("JR"); arg_cc; arg_RA; bytes(2);               break;
 			case 0x0c:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0x0d:      mnemonic("JP"); arg_cc; arg_DA; bytes(3);               break;
@@ -133,7 +133,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0x17:      mnemonic("ADC"); arg_IR(B0); arg_IM(B1); bytes(3);      break;
 			case 0x18:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0x19:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0x1a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0x1a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0x1b:      mnemonic("JR"); arg_cc; arg_RA; bytes(2);               break;
 			case 0x1c:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0x1d:      mnemonic("JP"); arg_cc; arg_DA; bytes(3);               break;
@@ -150,7 +150,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0x27:      mnemonic("SUB"); arg_IR(B0); arg_IM(B1); bytes(3);      break;
 			case 0x28:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0x29:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0x2a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0x2a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0x2b:      mnemonic("JR"); arg_cc; arg_RA; bytes(2);               break;
 			case 0x2c:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0x2d:      mnemonic("JP"); arg_cc; arg_DA; bytes(3);               break;
@@ -158,7 +158,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0x2f:      illegal;                                                break;
 
 			case 0x30:      mnemonic("JP"); arg_IRR(B0); bytes(2);                  break;
-			case 0x31:      mnemonic("SRP"); arg_IM(B0); bytes(2);                 break;
+			case 0x31:      mnemonic("SRP"); arg_IM(B0); bytes(2);                  break;
 			case 0x32:      mnemonic("SBC"); arg_r(B0H); arg_r(B0L); bytes(2);      break;
 			case 0x33:      mnemonic("SBC"); arg_r(B0H); arg_Ir(B0L); bytes(2);     break;
 			case 0x34:      mnemonic("SBC"); arg_R(B1); arg_R(B0); bytes(3);        break;
@@ -167,7 +167,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0x37:      mnemonic("SBC"); arg_IR(B0); arg_IM(B1); bytes(3);      break;
 			case 0x38:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0x39:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0x3a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0x3a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0x3b:      mnemonic("JR"); arg_cc; arg_RA; bytes(2);               break;
 			case 0x3c:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0x3d:      mnemonic("JP"); arg_cc; arg_DA; bytes(3);               break;
@@ -184,7 +184,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0x47:      mnemonic("OR"); arg_IR(B0); arg_IM(B1); bytes(3);       break;
 			case 0x48:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0x49:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0x4a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0x4a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0x4b:      mnemonic("JR"); arg_cc; arg_RA; bytes(2);               break;
 			case 0x4c:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0x4d:      mnemonic("JP"); arg_cc; arg_DA; bytes(3);               break;
@@ -201,7 +201,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0x57:      mnemonic("AND"); arg_IR(B0); arg_IM(B1); bytes(3);      break;
 			case 0x58:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0x59:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0x5a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0x5a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0x5b:      mnemonic("JR"); arg_cc; arg_RA; bytes(2);               break;
 			case 0x5c:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0x5d:      mnemonic("JP"); arg_cc; arg_DA; bytes(3);               break;
@@ -218,7 +218,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0x67:      mnemonic("TCM"); arg_IR(B0); arg_IM(B1); bytes(3);      break;
 			case 0x68:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0x69:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0x6a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0x6a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0x6b:      mnemonic("JR"); arg_cc; arg_RA; bytes(2);               break;
 			case 0x6c:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0x6d:      mnemonic("JP"); arg_cc; arg_DA; bytes(3);               break;
@@ -235,7 +235,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0x77:      mnemonic("TM"); arg_IR(B0); arg_IM(B1); bytes(3);       break;
 			case 0x78:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0x79:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0x7a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0x7a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0x7b:      mnemonic("JR"); arg_cc; arg_RA; bytes(2);               break;
 			case 0x7c:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0x7d:      mnemonic("JP"); arg_cc; arg_DA; bytes(3);               break;
@@ -252,7 +252,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0x87:      illegal;                                                break;
 			case 0x88:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0x89:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0x8a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0x8a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0x8b:      mnemonic("JR"); arg_RA; bytes(2);                       break;
 			case 0x8c:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0x8d:      mnemonic("JP"); arg_DA; bytes(3);                       break;
@@ -269,7 +269,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0x97:      illegal;                                                break;
 			case 0x98:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0x99:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0x9a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0x9a:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0x9b:      mnemonic("JR"); arg_cc; arg_RA; bytes(2);               break;
 			case 0x9c:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0x9d:      mnemonic("JP"); arg_cc; arg_DA; bytes(3);               break;
@@ -286,7 +286,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0xa7:      mnemonic("CP"); arg_IR(B0); arg_IM(B1); bytes(3);       break;
 			case 0xa8:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0xa9:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0xaa:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0xaa:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0xab:      mnemonic("JR"); arg_cc; arg_RA; bytes(2);               break;
 			case 0xac:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0xad:      mnemonic("JP"); arg_cc; arg_DA; bytes(3);               break;
@@ -303,7 +303,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0xb7:      mnemonic("XOR"); arg_IR(B0); arg_IM(B1); bytes(3);      break;
 			case 0xb8:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0xb9:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0xba:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0xba:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0xbb:      mnemonic("JR"); arg_cc; arg_RA; bytes(2);               break;
 			case 0xbc:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0xbd:      mnemonic("JP"); arg_cc; arg_DA; bytes(3);               break;
@@ -320,7 +320,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0xc7:      mnemonic("LD"); arg_r(B0H); arg_X(B1, B0L); bytes(3);   break;
 			case 0xc8:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0xc9:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0xca:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0xca:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0xcb:      mnemonic("JR"); arg_cc; arg_RA; bytes(2);               break;
 			case 0xcc:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0xcd:      mnemonic("JP"); arg_cc; arg_DA; bytes(3);               break;
@@ -337,7 +337,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0xd7:      mnemonic("LD"); arg_r(B0L); arg_X(B1, B0H); bytes(3);   break;
 			case 0xd8:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0xd9:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0xda:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0xda:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0xdb:      mnemonic("JR"); arg_cc; arg_RA; bytes(2);               break;
 			case 0xdc:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0xdd:      mnemonic("JP"); arg_cc; arg_DA; bytes(3);               break;
@@ -354,7 +354,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0xe7:      mnemonic("LD"); arg_IR(B0); arg_IM(B1); bytes(3);       break;
 			case 0xe8:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0xe9:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0xea:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0xea:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0xeb:      mnemonic("JR"); arg_cc; arg_RA; bytes(2);               break;
 			case 0xec:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0xed:      mnemonic("JP"); arg_cc; arg_DA; bytes(3);               break;
@@ -371,7 +371,7 @@ offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 			case 0xf7:      illegal;                                                break;
 			case 0xf8:      mnemonic("LD"); arg_r(OPH); arg_R(B0); bytes(2);        break;
 			case 0xf9:      mnemonic("LD"); arg_R(B0); arg_r(OPH); bytes(2);        break;
-			case 0xfa:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2);         break;
+			case 0xfa:      mnemonic("DJNZ"); arg_r(OPH); arg_RA; bytes(2); step_over; break;
 			case 0xfb:      mnemonic("JR"); arg_cc; arg_RA; bytes(2);               break;
 			case 0xfc:      mnemonic("LD"); arg_r(OPH); arg_IM(B0); bytes(2);       break;
 			case 0xfd:      mnemonic("JP"); arg_cc; arg_DA; bytes(3);               break;

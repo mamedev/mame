@@ -36,32 +36,6 @@
 
 #pragma once
 
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ISBX_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, ISBX_SLOT, _clock) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-#define MCFG_ISBX_SLOT_MINTR0_CALLBACK(_mintr0) \
-	downcast<isbx_slot_device *>(device)->set_mintr0_callback(DEVCB_##_mintr0);
-
-#define MCFG_ISBX_SLOT_MINTR1_CALLBACK(_mintr1) \
-	downcast<isbx_slot_device *>(device)->set_mintr1_callback(DEVCB_##_mintr1);
-
-#define MCFG_ISBX_SLOT_MDRQT_CALLBACK(_mdrqt) \
-	downcast<isbx_slot_device *>(device)->set_mdrqt_callback(DEVCB_##_mdrqt);
-
-#define MCFG_ISBX_SLOT_MWAIT_CALLBACK(_mwait) \
-	downcast<isbx_slot_device *>(device)->set_mwait_callback(DEVCB_##_mwait);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -101,12 +75,21 @@ class isbx_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	isbx_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
+		: isbx_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	isbx_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> void set_mintr0_callback(Object &&cb) { m_write_mintr0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> void set_mintr1_callback(Object &&cb) { m_write_mintr1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> void set_mdrqt_callback(Object &&cb) { m_write_mdrqt.set_callback(std::forward<Object>(cb)); }
-	template <class Object> void set_mwait_callback(Object &&cb) { m_write_mwait.set_callback(std::forward<Object>(cb)); }
+	auto mintr0() { return m_write_mintr0.bind(); }
+	auto mintr1() { return m_write_mintr1.bind(); }
+	auto mdrqt() { return m_write_mdrqt.bind(); }
+	auto mwait() { return m_write_mwait.bind(); }
 
 	// computer interface
 	DECLARE_READ8_MEMBER( mcs0_r ) { return m_card ? m_card->mcs0_r(space, offset) : 0xff; }
@@ -147,7 +130,7 @@ protected:
 DECLARE_DEVICE_TYPE(ISBX_SLOT, isbx_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( isbx_cards );
+void isbx_cards(device_slot_interface &device);
 
 
 #endif // MAME_BUS_ISBX_ISBX_SLOT_H

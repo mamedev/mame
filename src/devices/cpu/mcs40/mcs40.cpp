@@ -102,7 +102,7 @@ mcs40_cpu_device_base::mcs40_cpu_device_base(
 			{ "ramport", ENDIANNESS_LITTLE, 8, u8(5),             0 },
 			{ "program", ENDIANNESS_LITTLE, 8, u8(rom_width - 3), 0 }, }
 	, m_spaces{ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }
-	, m_direct(nullptr)
+	, m_cache(nullptr)
 	, m_bus_cycle_cb()
 	, m_sync_cb(*this)
 	, m_cm_rom_cb{ { *this }, { *this } }
@@ -142,7 +142,7 @@ void mcs40_cpu_device_base::device_start()
 	m_spaces[AS_RAM_STATUS]     = &space(AS_RAM_STATUS);
 	m_spaces[AS_RAM_PORTS]      = &space(AS_RAM_PORTS);
 	m_spaces[AS_PROGRAM_MEMORY] = &space(AS_PROGRAM_MEMORY);
-	m_direct = m_spaces[AS_ROM]->direct<0>();
+	m_cache = m_spaces[AS_ROM]->cache<0, 0, ENDIANNESS_LITTLE>();
 
 	m_bus_cycle_cb.bind_relative_to(*owner());
 	m_sync_cb.resolve_safe();
@@ -229,9 +229,9 @@ void mcs40_cpu_device_base::device_start()
 	save_item(NAME(m_4289_first));
 	save_item(NAME(m_a));
 	save_item(NAME(m_c));
-	save_pointer(NAME(m_addr_stack.get()), m_stack_ptr_mask + 1);
+	save_pointer(NAME(m_addr_stack), m_stack_ptr_mask + 1);
 	save_item(NAME(m_stack_ptr));
-	save_pointer(NAME(m_index_regs.get()), m_index_reg_cnt >> 1);
+	save_pointer(NAME(m_index_regs), m_index_reg_cnt >> 1);
 	save_item(NAME(m_index_reg_bank));
 	save_item(NAME(m_cr));
 	save_item(NAME(m_pending_cr3));
@@ -637,7 +637,7 @@ inline void mcs40_cpu_device_base::do_m1()
 		update_cm_rom(0x0fU);
 	}
 	// TODO: just read the high nybble here - MAME doesn't support this
-	u8 const read = m_direct->read_byte(rom_bank() | m_rom_addr);
+	u8 const read = m_cache->read_byte(rom_bank() | m_rom_addr);
 	if (cycle::OP == m_cycle)
 	{
 		m_opr = (m_stop_ff) ? 0x0U : (read >> 4);
@@ -655,7 +655,7 @@ inline void mcs40_cpu_device_base::do_m1()
 inline void mcs40_cpu_device_base::do_m2()
 {
 	// TODO: just read the low nybble here - MAME doesn't support this
-	u8 const read = m_direct->read_byte(rom_bank() | m_rom_addr);
+	u8 const read = m_cache->read_byte(rom_bank() | m_rom_addr);
 	if (cycle::OP == m_cycle)
 		m_opa = (m_stop_ff) ? 0x0U : (read & 0x0fU);
 	else

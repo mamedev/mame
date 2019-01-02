@@ -47,13 +47,13 @@ void cbuster_state::update_palette(int offset)
 	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
-WRITE16_MEMBER(cbuster_state::cbuster_palette_w)
+WRITE16_MEMBER(cbuster_state::palette_w)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
 	update_palette(offset);
 }
 
-WRITE16_MEMBER(cbuster_state::cbuster_palette_ext_w)
+WRITE16_MEMBER(cbuster_state::palette_ext_w)
 {
 	COMBINE_DATA(&m_paletteram_ext[offset]);
 	update_palette(offset);
@@ -68,7 +68,6 @@ uint32_t cbuster_state::screen_update_twocrude(screen_device &screen, bitmap_rgb
 	m_sprgen->set_flip_screen(!BIT(flip, 7));
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
-
 
 	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
 	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2], m_pf_rowscroll[3]);

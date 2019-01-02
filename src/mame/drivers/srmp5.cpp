@@ -38,7 +38,8 @@ This is not a bug (real machine behaves the same).
 
 #include "emu.h"
 #include "machine/st0016.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
+#include "emupal.h"
 
 #define DEBUG_CHAR
 
@@ -76,9 +77,15 @@ public:
 		, m_chrbank(0)
 	{
 	}
+
+	void srmp5(machine_config &config);
+
+	void init_srmp5();
+
+private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<r3051_device> m_maincpu;
 	required_device<st0016_cpu_device> m_soundcpu;
 
 	required_region_ptr<uint16_t> m_chrrom;
@@ -119,12 +126,9 @@ public:
 	DECLARE_READ8_MEMBER(cmd2_r);
 	DECLARE_READ8_MEMBER(cmd_stat8_r);
 	virtual void machine_start() override;
-	DECLARE_DRIVER_INIT(srmp5);
 	uint32_t screen_update_srmp5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-
 	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
-	void srmp5(machine_config &config);
 	void srmp5_mem(address_map &map);
 	void st0016_io(address_map &map);
 	void st0016_mem(address_map &map);
@@ -255,10 +259,10 @@ void srmp5_state::machine_start()
 	save_item(NAME(m_cmd2));
 	save_item(NAME(m_cmd_stat));
 	save_item(NAME(m_chrbank));
-	save_pointer(NAME(m_tileram.get()), 0x100000/2);
-	save_pointer(NAME(m_sprram.get()), 0x80000/2);
+	save_pointer(NAME(m_tileram), 0x100000/2);
+	save_pointer(NAME(m_sprram), 0x80000/2);
 #ifdef DEBUG_CHAR
-	save_pointer(NAME(m_tileduty.get()), 0x2000);
+	save_pointer(NAME(m_tileduty), 0x2000);
 #endif
 	save_item(NAME(m_vidregs));
 }
@@ -358,7 +362,7 @@ WRITE32_MEMBER(srmp5_state::srmp5_vidregs_w)
 
 READ32_MEMBER(srmp5_state::irq_ack_clear)
 {
-	m_maincpu->set_input_line(R3000_IRQ4, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
 	return 0;
 }
 
@@ -370,27 +374,27 @@ void srmp5_state::srmp5_mem(address_map &map)
 	map(0x01800000, 0x01800003).ram(); //?1
 	map(0x01800004, 0x01800007).portr("DSW1");
 	map(0x01800008, 0x0180000b).portr("DSW2");
-	map(0x0180000c, 0x0180000f).w(this, FUNC(srmp5_state::bank_w));
-	map(0x01800010, 0x01800013).r(this, FUNC(srmp5_state::srmp5_inputs_r)); //multiplexed controls (selected by writes to 1c)
+	map(0x0180000c, 0x0180000f).w(FUNC(srmp5_state::bank_w));
+	map(0x01800010, 0x01800013).r(FUNC(srmp5_state::srmp5_inputs_r)); //multiplexed controls (selected by writes to 1c)
 	map(0x01800014, 0x01800017).portr("TEST");
-	map(0x0180001c, 0x0180001f).w(this, FUNC(srmp5_state::input_select_w));//c1 c2 c4 c8 => mahjong inputs (at $10) - bits 0-3
+	map(0x0180001c, 0x0180001f).w(FUNC(srmp5_state::input_select_w));//c1 c2 c4 c8 => mahjong inputs (at $10) - bits 0-3
 	map(0x01800200, 0x01800203).ram();  //sound related ? only few writes after boot
-	map(0x01802000, 0x01802003).w(this, FUNC(srmp5_state::cmd1_w));
-	map(0x01802004, 0x01802007).w(this, FUNC(srmp5_state::cmd2_w));
-	map(0x01802008, 0x0180200b).r(this, FUNC(srmp5_state::cmd_stat32_r));
-	map(0x01a00000, 0x01bfffff).r(this, FUNC(srmp5_state::chrrom_r));
+	map(0x01802000, 0x01802003).w(FUNC(srmp5_state::cmd1_w));
+	map(0x01802004, 0x01802007).w(FUNC(srmp5_state::cmd2_w));
+	map(0x01802008, 0x0180200b).r(FUNC(srmp5_state::cmd_stat32_r));
+	map(0x01a00000, 0x01bfffff).r(FUNC(srmp5_state::chrrom_r));
 	map(0x01c00000, 0x01c00003).nopr(); // debug? 'Toru'
 
-	map(0x0a000000, 0x0a0fffff).rw(this, FUNC(srmp5_state::spr_r), FUNC(srmp5_state::spr_w));
+	map(0x0a000000, 0x0a0fffff).rw(FUNC(srmp5_state::spr_r), FUNC(srmp5_state::spr_w));
 	map(0x0a100000, 0x0a17ffff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	//0?N???A?????????i??????????
-	map(0x0a180000, 0x0a18011f).rw(this, FUNC(srmp5_state::srmp5_vidregs_r), FUNC(srmp5_state::srmp5_vidregs_w));
+	map(0x0a180000, 0x0a18011f).rw(FUNC(srmp5_state::srmp5_vidregs_r), FUNC(srmp5_state::srmp5_vidregs_w));
 	map(0x0a180000, 0x0a180003).nopr(); // write 0x00000400
-	map(0x0a200000, 0x0a3fffff).rw(this, FUNC(srmp5_state::tileram_r), FUNC(srmp5_state::tileram_w));
+	map(0x0a200000, 0x0a3fffff).rw(FUNC(srmp5_state::tileram_r), FUNC(srmp5_state::tileram_w));
 	map(0x0fc00000, 0x0fdfffff).mirror(0x10000000).rom().region("maincpu", 0);
 
 	map(0x1eff0000, 0x1eff001f).writeonly();
-	map(0x1eff003c, 0x1eff003f).r(this, FUNC(srmp5_state::irq_ack_clear));
+	map(0x1eff003c, 0x1eff003f).r(FUNC(srmp5_state::irq_ack_clear));
 }
 
 void srmp5_state::st0016_mem(address_map &map)
@@ -429,11 +433,11 @@ void srmp5_state::st0016_io(address_map &map)
 {
 	map.global_mask(0xff);
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
-	map(0xc0, 0xc0).r(this, FUNC(srmp5_state::cmd1_r));
-	map(0xc1, 0xc1).r(this, FUNC(srmp5_state::cmd2_r));
-	map(0xc2, 0xc2).r(this, FUNC(srmp5_state::cmd_stat8_r));
-	map(0xe1, 0xe1).w(this, FUNC(srmp5_state::st0016_rom_bank_w));
-	map(0xe7, 0xe7).w(this, FUNC(srmp5_state::st0016_rom_bank_w));
+	map(0xc0, 0xc0).r(FUNC(srmp5_state::cmd1_r));
+	map(0xc1, 0xc1).r(FUNC(srmp5_state::cmd2_r));
+	map(0xc2, 0xc2).r(FUNC(srmp5_state::cmd_stat8_r));
+	map(0xe1, 0xe1).w(FUNC(srmp5_state::st0016_rom_bank_w));
+	map(0xe7, 0xe7).w(FUNC(srmp5_state::st0016_rom_bank_w));
 	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
 }
 
@@ -557,7 +561,7 @@ static const gfx_layout tile_16x16x8_layout =
 };
 #endif
 
-static GFXDECODE_START( srmp5 )
+static GFXDECODE_START( gfx_srmp5 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x8x8_layout,  0x0, 0x800  )
 	//GFXDECODE_ENTRY( "gfx1", 0, tile_16x16x8_layout, 0x0, 0x800  )
 GFXDECODE_END
@@ -565,15 +569,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(srmp5_state::srmp5)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3051, 25000000)
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_CPU_PROGRAM_MAP(srmp5_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp5_state,  irq4_line_assert)
+	R3051(config, m_maincpu, 25000000);
+	m_maincpu->set_endianness(ENDIANNESS_LITTLE);
+	m_maincpu->set_addrmap(AS_PROGRAM, &srmp5_state::srmp5_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(srmp5_state::irq4_line_assert));
 
-	MCFG_CPU_ADD("soundcpu",ST0016_CPU,8000000)
-	MCFG_CPU_PROGRAM_MAP(st0016_mem)
-	MCFG_CPU_IO_MAP(st0016_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp5_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("soundcpu",ST0016_CPU,8000000)
+	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)
+	MCFG_DEVICE_IO_MAP(st0016_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp5_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -584,12 +588,11 @@ MACHINE_CONFIG_START(srmp5_state::srmp5)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(srmp5_state, screen_update_srmp5)
 
-	MCFG_PALETTE_ADD("palette", 0x10000) // 0x20000? only first 0x1800 entries seem to be used outside memory test
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(16)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000); // 0x20000? only first 0x1800 entries seem to be used outside memory test
+	m_palette->set_membits(16);
 
 #ifdef DEBUG_CHAR
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srmp5 )
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_srmp5);
 #endif
 
 MACHINE_CONFIG_END
@@ -619,7 +622,7 @@ ROM_START( srmp5 )
 #endif
 ROM_END
 
-DRIVER_INIT_MEMBER(srmp5_state,srmp5)
+void srmp5_state::init_srmp5()
 {
 	m_soundcpu->set_st0016_game_flag(9);
 
@@ -630,4 +633,4 @@ DRIVER_INIT_MEMBER(srmp5_state,srmp5)
 #endif
 }
 
-GAME( 1994, srmp5,  0,    srmp5,    srmp5, srmp5_state,    srmp5,    ROT0, "Seta",  "Super Real Mahjong P5", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, srmp5, 0, srmp5, srmp5, srmp5_state, init_srmp5, ROT0, "Seta", "Super Real Mahjong P5", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

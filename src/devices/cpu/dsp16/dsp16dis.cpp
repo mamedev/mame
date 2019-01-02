@@ -333,7 +333,7 @@ dsp16_disassembler::result dsp16_disassembler::dasm_int(u16 op)
 
 dsp16_disassembler::result dsp16_disassembler::dasm_con(u16 op)
 {
-	u16 const con(op & 0x000fU);
+	u16 const con(op & 0x001fU);
 	switch (con)
 	{
 	case 0x00: return result{ false, false, "mi" };

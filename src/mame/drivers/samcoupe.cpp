@@ -43,8 +43,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SAMCOUPE_XTAL_X1  XTAL(24'000'000)
-#define SAMCOUPE_XTAL_X2  XTAL(4'433'619)
+#define SAMCOUPE_XTAL_X1  24_MHz_XTAL
+#define SAMCOUPE_XTAL_X2  4.433619_MHz_XTAL
 
 
 /***************************************************************************
@@ -84,15 +84,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_disk_r)
 	m_fdc->set_floppy(floppy);
 
 	/* bit 1 and 2 select the controller register */
-	switch (offset & 0x03)
-	{
-	case 0: return m_fdc->status_r();
-	case 1: return m_fdc->track_r();
-	case 2: return m_fdc->sector_r();
-	case 3: return m_fdc->data_r();
-	}
-
-	return 0xff;
+	return m_fdc->read(offset & 0x03);
 }
 
 WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
@@ -106,13 +98,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
 	m_fdc->set_floppy(floppy);
 
 	/* bit 1 and 2 select the controller register */
-	switch (offset & 0x03)
-	{
-	case 0: m_fdc->cmd_w(data);     break;
-	case 1: m_fdc->track_w(data);   break;
-	case 2: m_fdc->sector_w(data);  break;
-	case 3: m_fdc->data_w(data);    break;
-	}
+	return m_fdc->write(offset & 0x03, data);
 }
 
 READ8_MEMBER(samcoupe_state::samcoupe_pen_r)
@@ -305,28 +291,28 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_lpt2_strobe_w)
 
 void samcoupe_state::samcoupe_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().rw(this, FUNC(samcoupe_state::sam_bank1_r), FUNC(samcoupe_state::sam_bank1_w)); // AM_RAMBANK("bank1")
-	map(0x4000, 0x7fff).ram().rw(this, FUNC(samcoupe_state::sam_bank2_r), FUNC(samcoupe_state::sam_bank2_w)); // AM_RAMBANK("bank2")
-	map(0x8000, 0xbfff).ram().rw(this, FUNC(samcoupe_state::sam_bank3_r), FUNC(samcoupe_state::sam_bank3_w)); // AM_RAMBANK("bank3")
-	map(0xc000, 0xffff).ram().rw(this, FUNC(samcoupe_state::sam_bank4_r), FUNC(samcoupe_state::sam_bank4_w)); // AM_RAMBANK("bank4")
+	map(0x0000, 0x3fff).ram().rw(FUNC(samcoupe_state::sam_bank1_r), FUNC(samcoupe_state::sam_bank1_w)); // AM_RAMBANK("bank1")
+	map(0x4000, 0x7fff).ram().rw(FUNC(samcoupe_state::sam_bank2_r), FUNC(samcoupe_state::sam_bank2_w)); // AM_RAMBANK("bank2")
+	map(0x8000, 0xbfff).ram().rw(FUNC(samcoupe_state::sam_bank3_r), FUNC(samcoupe_state::sam_bank3_w)); // AM_RAMBANK("bank3")
+	map(0xc000, 0xffff).ram().rw(FUNC(samcoupe_state::sam_bank4_r), FUNC(samcoupe_state::sam_bank4_w)); // AM_RAMBANK("bank4")
 }
 
 void samcoupe_state::samcoupe_io(address_map &map)
 {
-	map(0x0080, 0x0081).select(0xff00).w(this, FUNC(samcoupe_state::samcoupe_ext_mem_w));
-	map(0x00e0, 0x00e7).select(0xff10).rw(this, FUNC(samcoupe_state::samcoupe_disk_r), FUNC(samcoupe_state::samcoupe_disk_w));
-	map(0x00e8, 0x00e8).select(0xff00).w("lpt1_data_out", FUNC(output_latch_device::write));
-	map(0x00e9, 0x00e9).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_lpt1_busy_r), FUNC(samcoupe_state::samcoupe_lpt1_strobe_w));
-	map(0x00ea, 0x00ea).select(0xff00).w("lpt2_data_out", FUNC(output_latch_device::write));
-	map(0x00eb, 0x00eb).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_lpt2_busy_r), FUNC(samcoupe_state::samcoupe_lpt2_strobe_w));
-	map(0x00f8, 0x00f8).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_pen_r), FUNC(samcoupe_state::samcoupe_clut_w));
-	map(0x00f9, 0x00f9).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_status_r), FUNC(samcoupe_state::samcoupe_line_int_w));
-	map(0x00fa, 0x00fa).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_lmpr_r), FUNC(samcoupe_state::samcoupe_lmpr_w));
-	map(0x00fb, 0x00fb).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_hmpr_r), FUNC(samcoupe_state::samcoupe_hmpr_w));
-	map(0x00fc, 0x00fc).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_vmpr_r), FUNC(samcoupe_state::samcoupe_vmpr_w));
-	map(0x00fd, 0x00fd).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_midi_r), FUNC(samcoupe_state::samcoupe_midi_w));
-	map(0x00fe, 0x00fe).select(0xff00).rw(this, FUNC(samcoupe_state::samcoupe_keyboard_r), FUNC(samcoupe_state::samcoupe_border_w));
-	map(0x00ff, 0x00ff).select(0xff00).r(this, FUNC(samcoupe_state::samcoupe_attributes_r));
+	map(0x0080, 0x0081).select(0xff00).w(FUNC(samcoupe_state::samcoupe_ext_mem_w));
+	map(0x00e0, 0x00e7).select(0xff10).rw(FUNC(samcoupe_state::samcoupe_disk_r), FUNC(samcoupe_state::samcoupe_disk_w));
+	map(0x00e8, 0x00e8).select(0xff00).w("lpt1_data_out", FUNC(output_latch_device::bus_w));
+	map(0x00e9, 0x00e9).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_lpt1_busy_r), FUNC(samcoupe_state::samcoupe_lpt1_strobe_w));
+	map(0x00ea, 0x00ea).select(0xff00).w("lpt2_data_out", FUNC(output_latch_device::bus_w));
+	map(0x00eb, 0x00eb).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_lpt2_busy_r), FUNC(samcoupe_state::samcoupe_lpt2_strobe_w));
+	map(0x00f8, 0x00f8).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_pen_r), FUNC(samcoupe_state::samcoupe_clut_w));
+	map(0x00f9, 0x00f9).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_status_r), FUNC(samcoupe_state::samcoupe_line_int_w));
+	map(0x00fa, 0x00fa).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_lmpr_r), FUNC(samcoupe_state::samcoupe_lmpr_w));
+	map(0x00fb, 0x00fb).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_hmpr_r), FUNC(samcoupe_state::samcoupe_hmpr_w));
+	map(0x00fc, 0x00fc).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_vmpr_r), FUNC(samcoupe_state::samcoupe_vmpr_w));
+	map(0x00fd, 0x00fd).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_midi_r), FUNC(samcoupe_state::samcoupe_midi_w));
+	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(samcoupe_state::samcoupe_keyboard_r), FUNC(samcoupe_state::samcoupe_border_w));
+	map(0x00ff, 0x00ff).select(0xff00).r(FUNC(samcoupe_state::samcoupe_attributes_r));
 	map(0x00ff, 0x00ff).select(0xfe00).w("saa1099", FUNC(saa1099_device::data_w));
 	map(0x01ff, 0x01ff).select(0xfe00).w("saa1099", FUNC(saa1099_device::control_w));
 }
@@ -486,22 +472,16 @@ INPUT_PORTS_END
          nothing   G+4     R+4     B+4    ALL+1    G+2     R+2     B+2
 
 */
-PALETTE_INIT_MEMBER(samcoupe_state, samcoupe)
+void samcoupe_state::samcoupe_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 128; i++)
 	{
-		uint8_t b = BIT(i, 0) * 2 + BIT(i, 4) * 4 + BIT(i, 3);
-		uint8_t r = BIT(i, 1) * 2 + BIT(i, 5) * 4 + BIT(i, 3);
-		uint8_t g = BIT(i, 2) * 2 + BIT(i, 6) * 4 + BIT(i, 3);
+		uint8_t const b = bitswap<3>(i, 4, 0, 3);
+		uint8_t const r = bitswap<3>(i, 5, 1, 3);
+		uint8_t const g = bitswap<3>(i, 6, 2, 3);
 
-		r <<= 5;
-		g <<= 5;
-		b <<= 5;
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		palette.set_pen_color(i, pal3bit(r), pal3bit(g), pal3bit(b));
 	}
-
-	palette.palette()->normalize_range(0, 127);
 }
 
 
@@ -513,65 +493,62 @@ FLOPPY_FORMATS_MEMBER( samcoupe_state::floppy_formats )
 	FLOPPY_MGT_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( samcoupe_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void samcoupe_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
-
-MACHINE_CONFIG_START(samcoupe_state::samcoupe)
+void samcoupe_state::samcoupe(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1 / 4) /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(samcoupe_mem)
-	MCFG_CPU_IO_MAP(samcoupe_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", samcoupe_state,  samcoupe_frame_interrupt)
-
+	Z80(config, m_maincpu, SAMCOUPE_XTAL_X1 / 4); /* 6 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &samcoupe_state::samcoupe_mem);
+	m_maincpu->set_addrmap(AS_IO, &samcoupe_state::samcoupe_io);
+	m_maincpu->set_vblank_int("screen", FUNC(samcoupe_state::samcoupe_frame_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(SAMCOUPE_XTAL_X1/2, SAM_TOTAL_WIDTH, 0, SAM_BORDER_LEFT + SAM_SCREEN_WIDTH + SAM_BORDER_RIGHT, SAM_TOTAL_HEIGHT, 0, SAM_BORDER_TOP + SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM)
-	MCFG_SCREEN_UPDATE_DRIVER(samcoupe_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(SAMCOUPE_XTAL_X1/2, SAM_TOTAL_WIDTH,  0, SAM_BORDER_LEFT + SAM_SCREEN_WIDTH + SAM_BORDER_RIGHT,
+										  SAM_TOTAL_HEIGHT, 0, SAM_BORDER_TOP + SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM);
+	m_screen->set_screen_update(FUNC(samcoupe_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 128)
-	MCFG_PALETTE_INIT_OWNER(samcoupe_state, samcoupe)
+	PALETTE(config, "palette", FUNC(samcoupe_state::samcoupe_palette), 128);
 
 	/* devices */
-	MCFG_CENTRONICS_ADD("lpt1", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(samcoupe_state, write_lpt1_busy))
+	CENTRONICS(config, m_lpt1, centronics_devices, "printer");
+	m_lpt1->busy_handler().set(FUNC(samcoupe_state::write_lpt1_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt1_data_out", "lpt1")
+	output_latch_device &lpt1_data_out(OUTPUT_LATCH(config, "lpt1_data_out"));
+	m_lpt1->set_output_latch(lpt1_data_out);
 
-	MCFG_CENTRONICS_ADD("lpt2", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(samcoupe_state, write_lpt2_busy))
+	CENTRONICS(config, m_lpt2, centronics_devices, "printer");
+	m_lpt2->busy_handler().set(FUNC(samcoupe_state::write_lpt2_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt2_data_out", "lpt2")
+	output_latch_device &lpt2_data_out(OUTPUT_LATCH(config, "lpt2_data_out"));
+	m_lpt2->set_output_latch(lpt2_data_out);
 
-	MCFG_DEVICE_ADD("sambus_clock", MSM6242, XTAL(32'768))
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(tzx_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("samcoupe_cass")
+	MSM6242(config, m_rtc, 32.768_kHz_XTAL);
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","samcoupe_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(tzx_cassette_formats);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED));
+	m_cassette->set_interface("samcoupe_cass");
+	SOFTWARE_LIST(config, "cass_list").set_original("samcoupe_cass");
 
-	MCFG_WD1772_ADD("wd1772", SAMCOUPE_XTAL_X1/3)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","samcoupe_flop")
+	WD1772(config, m_fdc, SAMCOUPE_XTAL_X1/3);
+	FLOPPY_CONNECTOR(config, "wd1772:0", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1772:1", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("samcoupe_flop");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SAA1099_ADD("saa1099", SAMCOUPE_XTAL_X1/3) /* 8 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SAA1099(config, "saa1099", SAMCOUPE_XTAL_X1/3).add_route(ALL_OUTPUTS, "mono", 0.50); /* 8 MHz */
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("256K,1280K,1536K,2304K,2560K,3328K,3584K,4352K,4608K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("256K,1280K,1536K,2304K,2560K,3328K,3584K,4352K,4608K");
+}
 
 
 /***************************************************************************
@@ -586,38 +563,38 @@ MACHINE_CONFIG_END
 ROM_START( samcoupe )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0,  "31",  "v3.1" )
-	ROMX_LOAD( "rom31.z5",  0x0000, 0x8000, CRC(0b7e3585) SHA1(c86601633fb61a8c517f7657aad9af4e6870f2ee), ROM_BIOS(1) )
+	ROMX_LOAD( "rom31.z5",  0x0000, 0x8000, CRC(0b7e3585) SHA1(c86601633fb61a8c517f7657aad9af4e6870f2ee), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1,  "30",  "v3.0" )
-	ROMX_LOAD( "rom30.z5",  0x0000, 0x8000, CRC(e535c25d) SHA1(d390f0be420dfb12b1e54a4f528b5055d7d97e2a), ROM_BIOS(2) )
+	ROMX_LOAD( "rom30.z5",  0x0000, 0x8000, CRC(e535c25d) SHA1(d390f0be420dfb12b1e54a4f528b5055d7d97e2a), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2,  "25",  "v2.5" )
-	ROMX_LOAD( "rom25.z5",  0x0000, 0x8000, CRC(ddadd358) SHA1(a25ed85a0f1134ac3a481a3225f24a8bd3a790cf), ROM_BIOS(3) )
+	ROMX_LOAD( "rom25.z5",  0x0000, 0x8000, CRC(ddadd358) SHA1(a25ed85a0f1134ac3a481a3225f24a8bd3a790cf), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3,  "24",  "v2.4" )
-	ROMX_LOAD( "rom24.z5",  0x0000, 0x8000, CRC(bb23fee4) SHA1(10cd911ba237dd2cf0c2637be1ad6745b7cc89b9), ROM_BIOS(4) )
+	ROMX_LOAD( "rom24.z5",  0x0000, 0x8000, CRC(bb23fee4) SHA1(10cd911ba237dd2cf0c2637be1ad6745b7cc89b9), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4,  "21",  "v2.1" )
-	ROMX_LOAD( "rom21.z5",  0x0000, 0x8000, CRC(f6804b46) SHA1(11dcac5fdea782cdac03b4d0d7ac25d88547eefe), ROM_BIOS(5) )
+	ROMX_LOAD( "rom21.z5",  0x0000, 0x8000, CRC(f6804b46) SHA1(11dcac5fdea782cdac03b4d0d7ac25d88547eefe), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 5,  "20",  "v2.0" )
-	ROMX_LOAD( "rom20.z5",  0x0000, 0x8000, CRC(eaf32054) SHA1(41736323f0236649f2d5fe111f900def8db93a13), ROM_BIOS(6) )
+	ROMX_LOAD( "rom20.z5",  0x0000, 0x8000, CRC(eaf32054) SHA1(41736323f0236649f2d5fe111f900def8db93a13), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 6,  "181", "v1.81" )
-	ROMX_LOAD( "rom181.z5", 0x0000, 0x8000, CRC(d25e1de1) SHA1(cb0fa79e4d5f7df0b57ede08ea7ecc9ae152f534), ROM_BIOS(7) )
+	ROMX_LOAD( "rom181.z5", 0x0000, 0x8000, CRC(d25e1de1) SHA1(cb0fa79e4d5f7df0b57ede08ea7ecc9ae152f534), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 7,  "18",  "v1.8" )
-	ROMX_LOAD( "rom18.z5",  0x0000, 0x8000, CRC(f626063f) SHA1(485e7d9e9a4f8a70c0f93cd6e69ff12269438829), ROM_BIOS(8) )
+	ROMX_LOAD( "rom18.z5",  0x0000, 0x8000, CRC(f626063f) SHA1(485e7d9e9a4f8a70c0f93cd6e69ff12269438829), ROM_BIOS(7) )
 	ROM_SYSTEM_BIOS( 8,  "14",  "v1.4" )
-	ROMX_LOAD( "rom14.z5",  0x0000, 0x8000, CRC(08799596) SHA1(b4e596051f2748dee9481ea4af7d15ccddc1e1b5), ROM_BIOS(9) )
+	ROMX_LOAD( "rom14.z5",  0x0000, 0x8000, CRC(08799596) SHA1(b4e596051f2748dee9481ea4af7d15ccddc1e1b5), ROM_BIOS(8) )
 	ROM_SYSTEM_BIOS( 9,  "13",  "v1.3" )
-	ROMX_LOAD( "rom13.z5",  0x0000, 0x8000, CRC(2093768c) SHA1(af8d348fd080b18a4cbe9ed69d254be7be330146), ROM_BIOS(10) )
+	ROMX_LOAD( "rom13.z5",  0x0000, 0x8000, CRC(2093768c) SHA1(af8d348fd080b18a4cbe9ed69d254be7be330146), ROM_BIOS(9) )
 	ROM_SYSTEM_BIOS( 10, "12",  "v1.2" )
-	ROMX_LOAD( "rom12.z5",  0x0000, 0x8000, CRC(7fe37dd8) SHA1(9339a0c1f72e8512c6f32dec15ab7d6c3bb04151), ROM_BIOS(11) )
+	ROMX_LOAD( "rom12.z5",  0x0000, 0x8000, CRC(7fe37dd8) SHA1(9339a0c1f72e8512c6f32dec15ab7d6c3bb04151), ROM_BIOS(10) )
 	ROM_SYSTEM_BIOS( 11, "10",  "v1.0" )
-	ROMX_LOAD( "rom10.z5",  0x0000, 0x8000, CRC(3659d31f) SHA1(d3de7bb74e04d5b4dc7477f70de54d540b1bcc07), ROM_BIOS(12) )
+	ROMX_LOAD( "rom10.z5",  0x0000, 0x8000, CRC(3659d31f) SHA1(d3de7bb74e04d5b4dc7477f70de54d540b1bcc07), ROM_BIOS(11) )
 	ROM_SYSTEM_BIOS( 12, "04",  "v0.4" )
-	ROMX_LOAD( "rom04.z5",  0x0000, 0x8000, CRC(f439e84e) SHA1(8bc457a5c764b0bb0aa7008c57f28c30248fc6a4), ROM_BIOS(13) )
+	ROMX_LOAD( "rom04.z5",  0x0000, 0x8000, CRC(f439e84e) SHA1(8bc457a5c764b0bb0aa7008c57f28c30248fc6a4), ROM_BIOS(12) )
 	ROM_SYSTEM_BIOS( 13, "01",  "v0.1" )
-	ROMX_LOAD( "rom01.z5",  0x0000, 0x8000, CRC(c04acfdf) SHA1(8976ed005c14905eec1215f0a5c28aa686a7dda2), ROM_BIOS(14) )
+	ROMX_LOAD( "rom01.z5",  0x0000, 0x8000, CRC(c04acfdf) SHA1(8976ed005c14905eec1215f0a5c28aa686a7dda2), ROM_BIOS(13) )
 ROM_END
 
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY                        FULLNAME     FLAGS
-COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, 0,    "Miles Gordon Technology plc", "SAM Coupe", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                        FULLNAME     FLAGS
+COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, empty_init, "Miles Gordon Technology plc", "SAM Coupe", 0 )

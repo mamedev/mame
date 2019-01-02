@@ -50,13 +50,15 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void ez2d(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void ez2d(machine_config &config);
 	void ez2d_map(address_map &map);
 };
 
@@ -88,8 +90,8 @@ void ez2d_state::machine_reset()
 MACHINE_CONFIG_START(ez2d_state::ez2d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 533 MHz
-	MCFG_CPU_PROGRAM_MAP(ez2d_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 533 MHz
+	MCFG_DEVICE_PROGRAM_MAP(ez2d_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -117,4 +119,4 @@ ROM_START( ez2d2m )
 	DISK_IMAGE( "ez2d2m", 0, SHA1(431f0bef3b81f83dad3818bca8994faa8ce9d5b7) )
 ROM_END
 
-GAME( 2001, ez2d2m,  0,   ez2d, ez2d, ez2d_state,  0, ROT0, "Amuse World", "Ez2dancer 2nd Move",  MACHINE_IS_SKELETON )
+GAME( 2001, ez2d2m, 0, ez2d, ez2d, ez2d_state, empty_init, ROT0, "Amuse World", "Ez2dancer 2nd Move",  MACHINE_IS_SKELETON )

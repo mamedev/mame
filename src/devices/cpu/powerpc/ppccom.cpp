@@ -231,6 +231,10 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 		set_vtlb_fixed_entries(PPC603_FIXED_TLB_ENTRIES);
 }
 
+ppc_device::~ppc_device()
+{
+}
+
 //ppc403_device::ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 //  : ppc_device(mconfig, PPC403, "PPC403", tag, owner, clock, "ppc403", 32?, 64?)
 //{
@@ -278,7 +282,7 @@ ppc604_device::ppc604_device(const machine_config &mconfig, const char *tag, dev
 
 void ppc4xx_device::internal_ppc4xx(address_map &map)
 {
-	map(0x40000000, 0x4000000f).rw(this, FUNC(ppc4xx_device::ppc4xx_spu_r), FUNC(ppc4xx_device::ppc4xx_spu_w));
+	map(0x40000000, 0x4000000f).rw(FUNC(ppc4xx_device::ppc4xx_spu_r), FUNC(ppc4xx_device::ppc4xx_spu_w));
 }
 
 ppc4xx_device::ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor)
@@ -694,7 +698,6 @@ void ppc_device::device_start()
 	m_pit_reload = 0;
 	m_irqstate = 0;
 	memset(m_buffered_dma_rate, 0, sizeof(m_buffered_dma_rate));
-	m_codexor = 0;
 	m_system_clock = 0;
 	m_cpu_clock = 0;
 	m_tb_zero_cycles = 0;
@@ -711,15 +714,36 @@ void ppc_device::device_start()
 	m_cache_line_size = 32;
 	m_cpu_clock = clock();
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	if(m_cap & PPCCAP_4XX)
+	{
+		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	}
+	else
+	{
+		auto cache = m_program->cache<3, 0, ENDIANNESS_BIG>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		if(space_config()->m_endianness != ENDIANNESS_NATIVE)
+			m_prptr = [cache](offs_t address) -> const void * {
+				const u32 *ptr = static_cast<u32 *>(cache->read_ptr(address & ~7));
+				if(!(address & 4))
+					ptr++;
+				return ptr;
+			};
+		else
+			m_prptr = [cache](offs_t address) -> const void * {
+				const u32 *ptr = static_cast<u32 *>(cache->read_ptr(address & ~7));
+				if(address & 4)
+					ptr++;
+				return ptr;
+			};
+	}
 	m_system_clock = c_bus_frequency != 0 ? c_bus_frequency : clock();
 	m_dcr_read_func = read32_delegate();
 	m_dcr_write_func = write32_delegate();
 
 	m_tb_divisor = (m_tb_divisor * clock() + m_system_clock / 2 - 1) / m_system_clock;
-	m_codexor = 0;
-	if (!(m_cap & PPCCAP_4XX) && space_config()->m_endianness != ENDIANNESS_NATIVE)
-		m_codexor = 4;
 
 	/* allocate a timer for the compare interrupt */
 	if ((m_cap & PPCCAP_OEA) && (m_tb_divisor))
@@ -1138,7 +1162,10 @@ void ppc_device::device_reset()
 
 	/* initialize the 602 HID0 register */
 	if (m_flavor == PPC_MODEL_602)
+	{
+		m_core->spr[SPR602_ESASRR] = 0;
 		m_core->spr[SPR603_HID0] = 1;
+	}
 
 	/* time base starts here */
 	m_tb_zero_cycles = total_cycles();
@@ -1301,6 +1328,15 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, offs_t &ad
 			}
 		}
 	}
+
+#if 1
+	/* 602-specific Protection-Only mode */
+	if (m_flavor == PPC_MODEL_602 && m_core->spr[SPR603_HID0] & 0x00000080)
+	{
+		// TODO
+		return 0x001;
+	}
+#endif
 
 	/* look up the segment register */
 	segreg = m_core->sr[address >> 28];
@@ -1484,6 +1520,9 @@ void ppc_device::ppccom_execute_tlbl()
 	vtlb_entry flags;
 	int entrynum;
 
+	if (m_flavor == PPC_MODEL_602) // TODO
+		return;
+
 	/* determine entry number; we use machine().rand() for associativity */
 	entrynum = ((address >> 12) & 0x1f) | (machine().rand() & 0x20) | (isitlb ? 0x40 : 0);
 
@@ -1561,6 +1600,23 @@ void ppc_device::ppccom_execute_mfspr()
 			/* decrementer */
 			case SPROEA_DEC:
 				m_core->param1 = get_decrementer();
+				return;
+		}
+	}
+
+	/* handle 602 SPRs */
+	if (m_flavor == PPC_MODEL_602)
+	{ // TODO: Which are read/write only?
+		switch (m_core->param0)
+		{
+			case SPR602_TCR:
+			case SPR602_IBR:
+			case SPR602_ESASRR:
+			case SPR602_SEBR:
+			case SPR602_SER:
+			case SPR602_SP:
+			case SPR602_LT:
+				m_core->param1 = m_core->spr[m_core->param0];
 				return;
 		}
 	}
@@ -1687,6 +1743,23 @@ void ppc_device::ppccom_execute_mtspr()
 			/* decrementer */
 			case SPROEA_DEC:
 				set_decrementer(m_core->param1);
+				return;
+		}
+	}
+
+	/* handle 602 SPRs */
+	if (m_flavor == PPC_MODEL_602)
+	{
+		switch (m_core->param0)
+		{ // TODO: Which are read/write only?
+			case SPR602_TCR:
+			case SPR602_IBR:
+			case SPR602_ESASRR:
+			case SPR602_SEBR:
+			case SPR602_SER:
+			case SPR602_SP:
+			case SPR602_LT:
+				m_core->spr[m_core->param0] = m_core->param1;
 				return;
 		}
 	}
@@ -2611,7 +2684,7 @@ void ppc_device::ppc4xx_spu_timer_reset()
 		attotime charperiod = clockperiod * (divisor * 16 * bpc);
 		m_spu.timer->adjust(charperiod, 0, charperiod);
 		if (PRINTF_SPU)
-			printf("ppc4xx_spu_timer_reset: baud rate = %.0f\n", ATTOSECONDS_TO_HZ(charperiod.attoseconds()) * bpc);
+			printf("ppc4xx_spu_timer_reset: baud rate = %.0f\n", charperiod.as_hz() * bpc);
 	}
 
 	/* otherwise, disable the timer */

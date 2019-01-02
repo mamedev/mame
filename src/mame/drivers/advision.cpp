@@ -20,8 +20,6 @@
 #include "emu.h"
 #include "includes/advision.h"
 
-#include "cpu/mcs48/mcs48.h"
-#include "cpu/cop400/cop400.h"
 #include "sound/volt_reg.h"
 #include "screen.h"
 #include "softlist.h"
@@ -39,12 +37,12 @@ READ8_MEMBER( advision_state::rom_r )
 void advision_state::program_map(address_map &map)
 {
 	map(0x0000, 0x03ff).bankr("bank1");
-	map(0x0400, 0x0fff).r(this, FUNC(advision_state::rom_r));
+	map(0x0400, 0x0fff).r(FUNC(advision_state::rom_r));
 }
 
 void advision_state::io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(advision_state::ext_ram_r), FUNC(advision_state::ext_ram_w));
+	map(0x00, 0xff).rw(FUNC(advision_state::ext_ram_r), FUNC(advision_state::ext_ram_w));
 }
 
 /* Input Ports */
@@ -63,46 +61,48 @@ INPUT_PORTS_END
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(advision_state::advision)
+void advision_state::advision(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL(11'000'000))
-	MCFG_CPU_PROGRAM_MAP(program_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(advision_state, controller_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(advision_state, bankswitch_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(advision_state, av_control_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(advision_state, vsync_r))
+	I8048(config, m_maincpu, XTAL(11'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &advision_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &advision_state::io_map);
+	m_maincpu->p1_in_cb().set(FUNC(advision_state::controller_r));
+	m_maincpu->p1_out_cb().set(FUNC(advision_state::bankswitch_w));
+	m_maincpu->p2_out_cb().set(FUNC(advision_state::av_control_w));
+	m_maincpu->t1_in_cb().set(FUNC(advision_state::vsync_r));
 
-	MCFG_CPU_ADD(COP411_TAG, COP411, 52631*4) // COP411L-KCN/N, R11=82k, C8=56pF
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_RAM_POWER_SUPPLY, false)
-	MCFG_COP400_READ_L_CB(READ8(advision_state, sound_cmd_r))
-	MCFG_COP400_WRITE_G_CB(WRITE8(advision_state, sound_g_w))
-	MCFG_COP400_WRITE_D_CB(WRITE8(advision_state, sound_d_w))
+	COP411(config, m_soundcpu, 52631*4); // COP411L-KCN/N, R11=82k, C8=56pF
+	m_soundcpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_RAM_POWER_SUPPLY, false);
+	m_soundcpu->read_l().set(FUNC(advision_state::sound_cmd_r));
+	m_soundcpu->write_g().set(FUNC(advision_state::sound_g_w));
+	m_soundcpu->write_d().set(FUNC(advision_state::sound_d_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(4*15)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(advision_state, screen_update)
-	MCFG_SCREEN_SIZE(320, 200)
-	MCFG_SCREEN_VISIBLE_AREA(84, 235, 60, 142)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(advision_state, advision)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(4*15);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(advision_state::screen_update));
+	screen.set_size(320, 200);
+	screen.set_visarea(84, 235, 60, 142);
+	screen.set_palette(m_palette);
+
+	PALETTE(config, m_palette, FUNC(advision_state::advision_palette), 8);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_2BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	SPEAKER(config, "speaker").front_center();
+	DAC_2BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "advision_cart")
-	MCFG_GENERIC_MANDATORY
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "advision_cart").set_must_be_loaded(true);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","advision")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("advision");
+}
 
 /* ROMs */
 
@@ -116,5 +116,5 @@ ROM_END
 
 /* Game Driver */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT     STATE            INIT  COMPANY  FULLNAME            FLAGS */
-CONS( 1982, advision,   0,      0,      advision, advision, advision_state,  0,    "Entex", "Adventure Vision", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME            FLAGS */
+CONS( 1982, advision, 0,      0,      advision, advision, advision_state, empty_init, "Entex", "Adventure Vision", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

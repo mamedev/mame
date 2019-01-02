@@ -62,17 +62,6 @@ enum
 #define SATURN_WAKEUP_LINE 2
 
 
-#define MCFG_SATURN_CONFIG(_out, _in, _reset, _config, _unconfig, _id, _crc, _rsi) \
-	downcast<saturn_device &>(*device).set_out_func(DEVCB_##_out); \
-	downcast<saturn_device &>(*device).set_in_func(DEVCB_##_in); \
-	downcast<saturn_device &>(*device).set_reset_func(DEVCB_##_reset); \
-	downcast<saturn_device &>(*device).set_config_func(DEVCB_##_config); \
-	downcast<saturn_device &>(*device).set_unconfig_func(DEVCB_##_unconfig); \
-	downcast<saturn_device &>(*device).set_id_func(DEVCB_##_id); \
-	downcast<saturn_device &>(*device).set_crc_func(DEVCB_##_crc); \
-	downcast<saturn_device &>(*device).set_rsi_func(DEVCB_##_rsi);
-
-
 class saturn_device : public cpu_device, public saturn_disassembler::config
 {
 public:
@@ -80,14 +69,14 @@ public:
 	saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_out_func(Object &&cb) { return m_out_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_func(Object &&cb) { return m_in_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_reset_func(Object &&cb) { return m_reset_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_config_func(Object &&cb) { return m_config_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_unconfig_func(Object &&cb) { return m_unconfig_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_id_func(Object &&cb) { return m_id_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_crc_func(Object &&cb) { return m_crc_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_rsi_func(Object &&cb) { return m_rsi_func.set_callback(std::forward<Object>(cb)); }
+	auto out_func() { return m_out_func.bind(); }
+	auto in_func() { return m_in_func.bind(); }
+	auto reset_func() { return m_reset_func.bind(); }
+	auto config_func() { return m_config_func.bind(); }
+	auto unconfig_func() { return m_unconfig_func.bind(); }
+	auto id_func() { return m_id_func.bind(); }
+	auto crc_func() { return m_crc_func.bind(); }
+	auto rsi_func() { return m_rsi_func.bind(); }
 
 protected:
 	// device-level overrides
@@ -149,7 +138,7 @@ typedef uint8_t Saturn64[16];
 	int     m_monitor_id;
 	int     m_monitor_in;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	int m_icount;
 	int64_t m_debugger_temp;
 

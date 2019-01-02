@@ -31,6 +31,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -38,15 +39,25 @@
 class drw80pkr_state : public driver_device
 {
 public:
-	drw80pkr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	drw80pkr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_aysnd(*this, "aysnd"),
+		m_mainbank(*this, "mainbank")
+	{ }
 
+	void init_drw80pkr();
+	void drw80pkr(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_t0;
 	uint8_t m_t1;
-	uint8_t m_p0;
 	uint8_t m_p1;
 	uint8_t m_p2;
 	uint8_t m_prog;
@@ -56,28 +67,30 @@ public:
 	uint8_t m_pkr_io_ram[0x100];
 	uint16_t m_video_ram[0x0400];
 	uint8_t m_color_ram[0x0400];
+
+	required_device<i8039_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<ay8912_device> m_aysnd;
+	required_memory_bank m_mainbank;
+
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_WRITE8_MEMBER(p2_w);
 	DECLARE_WRITE_LINE_MEMBER(prog_w);
 	DECLARE_WRITE8_MEMBER(bus_w);
-	DECLARE_WRITE8_MEMBER(drw80pkr_io_w);
+	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_READ_LINE_MEMBER(t1_r);
 	DECLARE_READ8_MEMBER(p1_r);
 	DECLARE_READ8_MEMBER(p2_r);
 	DECLARE_READ8_MEMBER(bus_r);
-	DECLARE_READ8_MEMBER(drw80pkr_io_r);
-	DECLARE_DRIVER_INIT(drw80pkr);
+	DECLARE_READ8_MEMBER(io_r);
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(drw80pkr);
-	uint32_t screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	void drw80pkr(machine_config &config);
-	void drw80pkr_io_map(address_map &map);
-	void drw80pkr_map(address_map &map);
+	void drw80pkr_palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void io_map(address_map &map);
+	void map(address_map &map);
 };
 
 
@@ -87,7 +100,7 @@ public:
 
 void drw80pkr_state::machine_start()
 {
-	machine().device<nvram_device>("nvram")->set_base(m_pkr_io_ram, sizeof(m_pkr_io_ram));
+	subdevice<nvram_device>("nvram")->set_base(m_pkr_io_ram, sizeof(m_pkr_io_ram));
 }
 
 /*****************
@@ -113,7 +126,7 @@ WRITE_LINE_MEMBER(drw80pkr_state::prog_w)
 	{
 		m_active_bank = m_active_bank ^ 0x01;
 
-		membank("bank1")->set_entry(m_active_bank);
+		m_mainbank->set_entry(m_active_bank);
 	}
 }
 
@@ -122,7 +135,7 @@ WRITE8_MEMBER(drw80pkr_state::bus_w)
 	m_bus = data;
 }
 
-WRITE8_MEMBER(drw80pkr_state::drw80pkr_io_w)
+WRITE8_MEMBER(drw80pkr_state::io_w)
 {
 	uint16_t n_offs;
 
@@ -188,11 +201,11 @@ WRITE8_MEMBER(drw80pkr_state::drw80pkr_io_w)
 
 		// ay8910 control port
 		if (m_p1 == 0xfc)
-			machine().device<ay8910_device>("aysnd")->address_w(space, 0, data);
+			m_aysnd->address_w(space, 0, data);
 
 		// ay8910_write_port_0_w
 		if (m_p1 == 0xfe)
-			machine().device<ay8910_device>("aysnd")->data_w(space, 0, data);
+			m_aysnd->data_w(space, 0, data);
 	}
 }
 
@@ -225,7 +238,7 @@ READ8_MEMBER(drw80pkr_state::bus_r)
 	return m_bus;
 }
 
-READ8_MEMBER(drw80pkr_state::drw80pkr_io_r)
+READ8_MEMBER(drw80pkr_state::io_r)
 {
 	uint8_t ret;
 	uint16_t kbdin;
@@ -326,36 +339,31 @@ void drw80pkr_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(drw80pkr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 27);
 }
 
-uint32_t drw80pkr_state::screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t drw80pkr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(drw80pkr_state, drw80pkr)
+void drw80pkr_state::drw80pkr_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int j;
-
-	for (j = 0; j < palette.entries(); j++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int j = 0; j < palette.entries(); j++)
 	{
-		int r, g, b, tr, tg, tb, i;
+		int const i = BIT(color_prom[j], 3);
 
-		i = (color_prom[j] >> 3) & 0x01;
-		//i = color_prom[j];
+		// red component
+		int const tr = 0xf0 - (0xf0 * BIT(color_prom[j], 0));
+		int const r = tr - (i * (tr / 5));
 
-		/* red component */
-		tr = 0xf0 - (0xf0 * ((color_prom[j] >> 0) & 0x01));
-		r = tr - (i * (tr / 5));
+		// green component
+		int const tg = 0xf0 - (0xf0 * BIT(color_prom[j], 1));
+		int const g = tg - (i * (tg / 5));
 
-		/* green component */
-		tg = 0xf0 - (0xf0 * ((color_prom[j] >> 1) & 0x01));
-		g = tg - (i * (tg / 5));
-
-		/* blue component */
-		tb = 0xf0 - (0xf0 * ((color_prom[j] >> 2) & 0x01));
-		b = tb - (i * (tb / 5));
+		// blue component
+		int const tb = 0xf0 - (0xf0 * BIT(color_prom[j], 2));
+		int const b = tb - (i * (tb / 5));
 
 		palette.set_pen_color(j, rgb_t(r, g, b));
 	}
@@ -382,7 +390,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( drw80pkr )
+static GFXDECODE_START( gfx_drw80pkr )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -391,9 +399,9 @@ GFXDECODE_END
 * Driver Init *
 ***************/
 
-DRIVER_INIT_MEMBER(drw80pkr_state,drw80pkr)
+void drw80pkr_state::init_drw80pkr()
 {
-	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base(), 0x1000);
+	m_mainbank->configure_entries(0, 2, memregion("maincpu")->base(), 0x1000);
 }
 
 
@@ -401,14 +409,14 @@ DRIVER_INIT_MEMBER(drw80pkr_state,drw80pkr)
 * Memory map information *
 *************************/
 
-void drw80pkr_state::drw80pkr_map(address_map &map)
+void drw80pkr_state::map(address_map &map)
 {
-	map(0x0000, 0x0fff).bankr("bank1");
+	map(0x0000, 0x0fff).bankr("mainbank");
 }
 
-void drw80pkr_state::drw80pkr_io_map(address_map &map)
+void drw80pkr_state::io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(drw80pkr_state::drw80pkr_io_r), FUNC(drw80pkr_state::drw80pkr_io_w));
+	map(0x00, 0xff).rw(FUNC(drw80pkr_state::io_r), FUNC(drw80pkr_state::io_w));
 }
 
 /*************************
@@ -445,42 +453,38 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I8039, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(drw80pkr_map)
-	MCFG_CPU_IO_MAP(drw80pkr_io_map)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(drw80pkr_state, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(drw80pkr_state, t1_r))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(drw80pkr_state, p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(drw80pkr_state, p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(drw80pkr_state, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(drw80pkr_state, p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(drw80pkr_state, prog_w))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(drw80pkr_state, bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(drw80pkr_state, bus_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", drw80pkr_state,  irq0_line_hold)
-
+	I8039(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &drw80pkr_state::map);
+	m_maincpu->set_addrmap(AS_IO, &drw80pkr_state::io_map);
+	m_maincpu->t0_in_cb().set(FUNC(drw80pkr_state::t0_r));
+	m_maincpu->t1_in_cb().set(FUNC(drw80pkr_state::t1_r));
+	m_maincpu->p1_in_cb().set(FUNC(drw80pkr_state::p1_r));
+	m_maincpu->p1_out_cb().set(FUNC(drw80pkr_state::p1_w));
+	m_maincpu->p2_in_cb().set(FUNC(drw80pkr_state::p2_r));
+	m_maincpu->p2_out_cb().set(FUNC(drw80pkr_state::p2_w));
+	m_maincpu->prog_out_cb().set(FUNC(drw80pkr_state::prog_w));
+	m_maincpu->bus_in_cb().set(FUNC(drw80pkr_state::bus_r));
+	m_maincpu->bus_out_cb().set(FUNC(drw80pkr_state::bus_w));
+	m_maincpu->set_vblank_int("screen", FUNC(drw80pkr_state::irq0_line_hold));
 
 	// video hardware
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE((31+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 27*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(drw80pkr_state, screen_update_drw80pkr)
+	MCFG_SCREEN_UPDATE_DRIVER(drw80pkr_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drw80pkr)
-	MCFG_PALETTE_ADD("palette", 16*16)
-	MCFG_PALETTE_INIT_OWNER(drw80pkr_state, drw80pkr)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_drw80pkr)
+	PALETTE(config, "palette", FUNC(drw80pkr_state::drw80pkr_palette), 16 * 16);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, 20000000/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	AY8912(config, m_aysnd, 20000000/12).add_route(ALL_OUTPUTS, "mono", 0.75);
 MACHINE_CONFIG_END
 
 /*************************
@@ -517,6 +521,6 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT    COMPANY                                FULLNAME                FLAGS
-GAME( 1982, drw80pkr, 0,      drw80pkr, drw80pkr, drw80pkr_state, drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker",        MACHINE_NOT_WORKING )
-GAME( 1983, drw80pk2, 0,      drw80pkr, drw80pkr, drw80pkr_state, drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker - Minn", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT    COMPANY                                FULLNAME                FLAGS
+GAME( 1982, drw80pkr, 0,      drw80pkr, drw80pkr, drw80pkr_state, init_drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker",        MACHINE_NOT_WORKING )
+GAME( 1983, drw80pk2, 0,      drw80pkr, drw80pkr, drw80pkr_state, init_drw80pkr, ROT0,  "IGT - International Game Technology", "Draw 80 Poker - Minn", MACHINE_NOT_WORKING )

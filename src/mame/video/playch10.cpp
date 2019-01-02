@@ -17,52 +17,48 @@ WRITE8_MEMBER(playch10_state::playch10_videoram_w)
 	}
 }
 
-PALETTE_INIT_MEMBER(playch10_state, playch10)
+void playch10_state::playch10_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 256; i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b;
+		int bit0, bit1, bit2, bit3;
 
-		/* red component */
+		// red component
+		bit0 = BIT(~color_prom[0], 0);
+		bit1 = BIT(~color_prom[0], 1);
+		bit2 = BIT(~color_prom[0], 2);
+		bit3 = BIT(~color_prom[0], 3);
 
-		bit0 = ~(color_prom[0] >> 0) & 0x01;
-		bit1 = ~(color_prom[0] >> 1) & 0x01;
-		bit2 = ~(color_prom[0] >> 2) & 0x01;
-		bit3 = ~(color_prom[0] >> 3) & 0x01;
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// green component
+		bit0 = BIT(~color_prom[256], 0);
+		bit1 = BIT(~color_prom[256], 1);
+		bit2 = BIT(~color_prom[256], 2);
+		bit3 = BIT(~color_prom[256], 3);
 
-		/* green component */
-		bit0 = ~(color_prom[256] >> 0) & 0x01;
-		bit1 = ~(color_prom[256] >> 1) & 0x01;
-		bit2 = ~(color_prom[256] >> 2) & 0x01;
-		bit3 = ~(color_prom[256] >> 3) & 0x01;
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// blue component
+		bit0 = BIT(~color_prom[2 * 256], 0);
+		bit1 = BIT(~color_prom[2 * 256], 1);
+		bit2 = BIT(~color_prom[2 * 256], 2);
+		bit3 = BIT(~color_prom[2 * 256], 3);
 
-		/* blue component */
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		bit0 = ~(color_prom[2*256] >> 0) & 0x01;
-		bit1 = ~(color_prom[2*256] >> 1) & 0x01;
-		bit2 = ~(color_prom[2*256] >> 2) & 0x01;
-		bit3 = ~(color_prom[2*256] >> 3) & 0x01;
-
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 
 		color_prom++;
 	}
-
-	m_ppu->init_palette_rgb(palette, 256);
 }
 
-void playch10_state::ppu_irq(int *ppu_regs)
+WRITE_LINE_MEMBER(playch10_state::int_detect_w)
 {
-	machine().device("cart")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
-	m_pc10_int_detect = 1;
+	if (state)
+		m_pc10_int_detect = 1;
 }
 
 TILE_GET_INFO_MEMBER(playch10_state::get_bg_tile_info)
@@ -99,7 +95,7 @@ VIDEO_START_MEMBER(playch10_state,playch10_hboard)
 
 ***************************************************************************/
 
-uint32_t playch10_state::screen_update_playch10_single(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t playch10_state::screen_update_playch10_single(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rectangle top_monitor = screen.visible_area();
 
@@ -125,7 +121,7 @@ uint32_t playch10_state::screen_update_playch10_single(screen_device &screen, bi
 	return 0;
 }
 
-uint32_t playch10_state::screen_update_playch10_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t playch10_state::screen_update_playch10_top(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* Single Monitor version */
 	if (m_pc10_bios != 1)
@@ -140,7 +136,7 @@ uint32_t playch10_state::screen_update_playch10_top(screen_device &screen, bitma
 	return 0;
 }
 
-uint32_t playch10_state::screen_update_playch10_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t playch10_state::screen_update_playch10_bottom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* Single Monitor version */
 	if (m_pc10_bios != 1)

@@ -214,7 +214,9 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void _4enlinea(machine_config &config);
 
+private:
 	required_device<ay8910_device> m_ay;
 
 	DECLARE_READ8_MEMBER(serial_r);
@@ -233,7 +235,6 @@ public:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 
-	void _4enlinea(machine_config &config);
 	void audio_map(address_map &map);
 	void audio_portmap(address_map &map);
 	void main_map(address_map &map);
@@ -356,7 +357,7 @@ void _4enlinea_state::main_map(address_map &map)
 //  AM_RANGE(0x8000, 0xbfff) AM_RAM // CGA VRAM
 	map(0xc000, 0xdfff).ram();
 
-	map(0xe000, 0xe001).r(this, FUNC(_4enlinea_state::serial_r));
+	map(0xe000, 0xe001).r(FUNC(_4enlinea_state::serial_r));
 }
 
 void _4enlinea_state::main_portmap(address_map &map)
@@ -394,10 +395,10 @@ void _4enlinea_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xf800, 0xfbff).ram();
-	map(0xfc24, 0xfc24).r(this, FUNC(_4enlinea_state::hack_r));
-	map(0xfc28, 0xfc28).r(this, FUNC(_4enlinea_state::hack_r));
-	map(0xfc30, 0xfc31).w(this, FUNC(_4enlinea_state::serial_w));
-	map(0xfc32, 0xfc32).rw(this, FUNC(_4enlinea_state::serial_status_r), FUNC(_4enlinea_state::serial_status_w));
+	map(0xfc24, 0xfc24).r(FUNC(_4enlinea_state::hack_r));
+	map(0xfc28, 0xfc28).r(FUNC(_4enlinea_state::hack_r));
+	map(0xfc30, 0xfc31).w(FUNC(_4enlinea_state::serial_w));
+	map(0xfc32, 0xfc32).rw(FUNC(_4enlinea_state::serial_status_r), FUNC(_4enlinea_state::serial_status_w));
 	map(0xfc48, 0xfc49).rw(m_ay, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 
 }
@@ -475,16 +476,17 @@ void _4enlinea_state::machine_reset()
 *         Machine Drivers          *
 ***********************************/
 
-SLOT_INTERFACE_START( 4enlinea_isa8_cards )
-	SLOT_INTERFACE_INTERNAL("4enlinea",  ISA8_CGA_4ENLINEA)
-SLOT_INTERFACE_END
+void _4enlinea_isa8_cards(device_slot_interface &device)
+{
+	device.option_add_internal("4enlinea",  ISA8_CGA_4ENLINEA);
+}
 
 /* TODO: irq sources are unknown */
 INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_irq)
 {
 	if(m_irq_count == 0)
 	{
-		//device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		//device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	else
 		device.execute().set_input_line(0, HOLD_LINE);
@@ -501,20 +503,21 @@ INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_audio_irq)
 MACHINE_CONFIG_START(_4enlinea_state::_4enlinea)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, PRG_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(_4enlinea_state, _4enlinea_irq, 60) //TODO
-//  MCFG_CPU_PERIODIC_INT_DRIVER(_4enlinea_state, irq0_line_hold, 4*35)
+	MCFG_DEVICE_ADD("maincpu", Z80, PRG_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(_4enlinea_state, _4enlinea_irq, 60) //TODO
+//  MCFG_DEVICE_PERIODIC_INT_DRIVER(_4enlinea_state, irq0_line_hold, 4*35)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SND_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_IO_MAP(audio_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(_4enlinea_state, _4enlinea_audio_irq, 60) //TODO
+	MCFG_DEVICE_ADD("audiocpu", Z80, SND_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_IO_MAP(audio_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(_4enlinea_state, _4enlinea_audio_irq, 60) //TODO
 
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU(":maincpu")
-	MCFG_ISA8_SLOT_ADD("isa", "isa1", 4enlinea_isa8_cards, "4enlinea", true)
+	// FIXME: determine ISA bus clock
+	ISA8(config, "isa", 0).set_cputag("maincpu");
+
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", _4enlinea_isa8_cards, "4enlinea", true)
 
 
 /*  6845 clock is a guess, since it's a UM6845R embedded in the UM487F.
@@ -527,11 +530,11 @@ MACHINE_CONFIG_START(_4enlinea_state::_4enlinea)
 */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, SND_AY_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN-P2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN-P1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, m_ay, SND_AY_CLOCK);
+	m_ay->port_a_read_callback().set_ioport("IN-P2");
+	m_ay->port_b_read_callback().set_ioport("IN-P1");
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 
@@ -558,5 +561,5 @@ ROM_END
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME       PARENT   MACHINE    INPUT     STATE            INIT   ROT   COMPANY       FULLNAME           FLAGS  */
-GAME( 1991, 4enlinea,  0,       _4enlinea, 4enlinea, _4enlinea_state, 0,     ROT0, "Compumatic", "Cuatro en Linea", MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT  MACHINE    INPUT     CLASS            INIT        ROT   COMPANY       FULLNAME           FLAGS  */
+GAME( 1991, 4enlinea, 0,      _4enlinea, 4enlinea, _4enlinea_state, empty_init, ROT0, "Compumatic", "Cuatro en Linea", MACHINE_NOT_WORKING )

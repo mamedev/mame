@@ -137,6 +137,9 @@ public:
 		, m_s3520cf(*this, "s3520cf")
 	{ }
 
+	void sfcbox(machine_config &config);
+
+private:
 	required_device<cpu_device> m_bios;
 	required_device<mb90082_device> m_mb90082;
 	required_device<s3520cf_device> m_s3520cf;
@@ -154,7 +157,6 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
-	void sfcbox(machine_config &config);
 	void sfcbox_io(address_map &map);
 	void sfcbox_map(address_map &map);
 	void snes_map(address_map &map);
@@ -169,9 +171,9 @@ uint32_t sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 
 void sfcbox_state::snes_map(address_map &map)
 {
-	map(0x000000, 0x7dffff).rw(this, FUNC(sfcbox_state::snes_r_bank1), FUNC(sfcbox_state::snes_w_bank1));
+	map(0x000000, 0x7dffff).rw(FUNC(sfcbox_state::snes_r_bank1), FUNC(sfcbox_state::snes_w_bank1));
 	map(0x7e0000, 0x7fffff).ram();                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	map(0x800000, 0xffffff).rw(this, FUNC(sfcbox_state::snes_r_bank2), FUNC(sfcbox_state::snes_w_bank2));    /* Mirror and ROM */
+	map(0x800000, 0xffffff).rw(FUNC(sfcbox_state::snes_r_bank2), FUNC(sfcbox_state::snes_w_bank2));    /* Mirror and ROM */
 }
 
 READ8_MEMBER(sfcbox_state::spc_ram_100_r)
@@ -188,7 +190,7 @@ void sfcbox_state::spc_mem(address_map &map)
 {
 	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
 	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
-	map(0x0100, 0xffff).rw(this, FUNC(sfcbox_state::spc_ram_100_r), FUNC(sfcbox_state::spc_ram_100_w));
+	map(0x0100, 0xffff).rw(FUNC(sfcbox_state::spc_ram_100_r), FUNC(sfcbox_state::spc_ram_100_w));
 }
 
 void sfcbox_state::sfcbox_map(address_map &map)
@@ -290,17 +292,17 @@ void sfcbox_state::sfcbox_io(address_map &map)
 {
 	map(0x00, 0x3f).ram(); // internal i/o
 	map(0x0b, 0x0b).w(m_mb90082, FUNC(mb90082_device::write));
-	map(0x80, 0x80).portr("KEY").w(this, FUNC(sfcbox_state::port_80_w)); // Keyswitch and Button Inputs / SNES Transfer and Misc Output
-	map(0x81, 0x81).rw(this, FUNC(sfcbox_state::port_81_r), FUNC(sfcbox_state::port_81_w)); // SNES Transfer and Misc Input / Misc Output
+	map(0x80, 0x80).portr("KEY").w(FUNC(sfcbox_state::port_80_w)); // Keyswitch and Button Inputs / SNES Transfer and Misc Output
+	map(0x81, 0x81).rw(FUNC(sfcbox_state::port_81_r), FUNC(sfcbox_state::port_81_w)); // SNES Transfer and Misc Input / Misc Output
 //  AM_RANGE(0x82, 0x82) // Unknown/unused
-	map(0x83, 0x83).rw(this, FUNC(sfcbox_state::port_83_r), FUNC(sfcbox_state::port_83_w)); // Joypad Input/Status / Joypad Output/Control
+	map(0x83, 0x83).rw(FUNC(sfcbox_state::port_83_r), FUNC(sfcbox_state::port_83_w)); // Joypad Input/Status / Joypad Output/Control
 //  AM_RANGE(0x84, 0x84) // Joypad 1, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
 //  AM_RANGE(0x85, 0x85) // Joypad 1, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
 //  AM_RANGE(0x86, 0x86) // Joypad 2, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
 //  AM_RANGE(0x87, 0x87) // Joypad 2, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
 	map(0xa0, 0xa0).portr("RTC_R").portw("RTC_W"); //  Real Time Clock
-	map(0xc0, 0xc0).w(this, FUNC(sfcbox_state::snes_map_0_w)); // SNES Mapping Register 0
-	map(0xc1, 0xc1).w(this, FUNC(sfcbox_state::snes_map_1_w)); // SNES Mapping Register 1
+	map(0xc0, 0xc0).w(FUNC(sfcbox_state::snes_map_0_w)); // SNES Mapping Register 0
+	map(0xc1, 0xc1).w(FUNC(sfcbox_state::snes_map_1_w)); // SNES Mapping Register 1
 }
 
 
@@ -457,41 +459,42 @@ void sfcbox_state::machine_reset()
 MACHINE_CONFIG_START(sfcbox_state::sfcbox)
 
 	/* base snes hardware */
-	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
-	MCFG_CPU_PROGRAM_MAP(snes_map)
+	MCFG_DEVICE_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(snes_map)
 
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	MCFG_CPU_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
-	MCFG_CPU_PROGRAM_MAP(spc_mem)
+	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
+	MCFG_DEVICE_PROGRAM_MAP(spc_mem)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* sfcbox hardware */
-	MCFG_CPU_ADD("bios", Z180, XTAL(12'000'000) / 2)  /* HD64180RF6X */
-	MCFG_CPU_PROGRAM_MAP(sfcbox_map)
-	MCFG_CPU_IO_MAP(sfcbox_io)
+	MCFG_DEVICE_ADD("bios", Z180, XTAL(12'000'000) / 2)  /* HD64180RF6X */
+	MCFG_DEVICE_PROGRAM_MAP(sfcbox_map)
+	MCFG_DEVICE_IO_MAP(sfcbox_io)
 
 	MCFG_MB90082_ADD("mb90082",XTAL(12'000'000) / 2) /* TODO: correct clock */
-	MCFG_S3520CF_ADD("s3520cf") /* RTC */
+	S3520CF(config, m_s3520cf); /* RTC */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("spc700", SNES, 0)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("spc700", SNES_SOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	// SNES PPU
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 
-	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(snes_state, snes_open_bus_r))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	SNES_PPU(config, m_ppu, MCLK_NTSC);
+	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
+	m_ppu->set_screen("screen");
 
 	// SFCBOX
 	MCFG_SCREEN_ADD("osd", RASTER)
@@ -584,8 +587,8 @@ ROM_START( pss64 )
 ROM_END
 
 
-GAME( 1994, sfcbox, 0,      sfcbox, snes, sfcbox_state, snes, ROT0, "Nintendo",               "Super Famicom Box BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
-GAME( 1994, pss61,  sfcbox, sfcbox, snes, sfcbox_state, snes, ROT0, "Nintendo",               "Super Mario Kart / Super Mario Collection / Star Fox (Super Famicom Box)", MACHINE_NOT_WORKING )
-GAME( 1994, pss62,  sfcbox, sfcbox, snes, sfcbox_state, snes, ROT0, "T&E Soft / I'Max",       "New Super 3D Golf Simulation - Waialae No Kiseki / Super Mahjong 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
-GAME( 1994, pss63,  sfcbox, sfcbox, snes, sfcbox_state, snes, ROT0, "Nintendo / BPS",         "Super Donkey Kong / Super Tetris 2 + Bombliss (Super Famicom Box)", MACHINE_NOT_WORKING )
-GAME( 199?, pss64,  sfcbox, sfcbox, snes, sfcbox_state, snes, ROT0, "Nintendo / Hudson Soft", "Super Donkey Kong / Super Bomberman 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 1994, sfcbox, 0,      sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo",               "Super Famicom Box BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+GAME( 1994, pss61,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo",               "Super Mario Kart / Super Mario Collection / Star Fox (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 1994, pss62,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "T&E Soft / I'Max",       "New Super 3D Golf Simulation - Waialae No Kiseki / Super Mahjong 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 1994, pss63,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo / BPS",         "Super Donkey Kong / Super Tetris 2 + Bombliss (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 199?, pss64,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo / Hudson Soft", "Super Donkey Kong / Super Bomberman 2 (Super Famicom Box)", MACHINE_NOT_WORKING )

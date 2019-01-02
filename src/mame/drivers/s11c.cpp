@@ -18,7 +18,7 @@ void s11c_state::s11c_main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("nvram");
 	map(0x2100, 0x2103).mirror(0x00fc).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).mirror(0x01ff).w(this, FUNC(s11c_state::sol3_w)); // solenoids
+	map(0x2200, 0x2200).mirror(0x01ff).w(FUNC(s11c_state::sol3_w)); // solenoids
 	map(0x2400, 0x2403).mirror(0x03fc).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).mirror(0x03fc).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x2c00, 0x2c03).mirror(0x03fc).rw(m_pia2c, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
@@ -30,7 +30,7 @@ void s11c_state::s11c_main_map(address_map &map)
 void s11c_state::s11c_audio_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x0800).ram();
-	map(0x1000, 0x1fff).w(this, FUNC(s11c_state::bank_w));
+	map(0x1000, 0x1fff).w(FUNC(s11c_state::bank_w));
 	map(0x2000, 0x2003).mirror(0x0ffc).rw("pias", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8000, 0xbfff).bankr("bank0");
 	map(0xc000, 0xffff).bankr("bank1");
@@ -41,9 +41,9 @@ void s11c_state::s11c_bg_map(address_map &map)
 	map(0x0000, 0x07ff).ram();
 	map(0x2000, 0x2001).mirror(0x1ffe).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x4000, 0x4003).mirror(0x1ffc).rw("pia40", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x6000, 0x67ff).w(this, FUNC(s11c_state::bg_speech_digit_w));
-	map(0x6800, 0x6fff).w(this, FUNC(s11c_state::bg_speech_clock_w));
-	map(0x7800, 0x7fff).w(this, FUNC(s11c_state::bgbank_w));
+	map(0x6000, 0x67ff).w(FUNC(s11c_state::bg_speech_digit_w));
+	map(0x6800, 0x6fff).w(FUNC(s11c_state::bg_speech_clock_w));
+	map(0x7800, 0x7fff).w(FUNC(s11c_state::bgbank_w));
 	map(0x8000, 0xffff).bankr("bgbank");
 }
 
@@ -135,14 +135,14 @@ WRITE8_MEMBER( s11c_state::bgbank_w )
 //  popmessage("BG bank set to %02x (%i)",data,bank);
 }
 */
-MACHINE_RESET_MEMBER( s11c_state, s11c )
+void s11c_state::machine_reset()
 {
 //  membank("bgbank")->set_entry(0);
 	// reset the CPUs again, so that the CPUs are starting with the right vectors (otherwise sound may die on reset)
-//  m_bgcpu->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+//  m_bgcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-DRIVER_INIT_MEMBER(s11c_state,s11c)
+void s11c_state::init_s11c()
 {
 	emu_timer* timer = timer_alloc(TIMER_IRQ);
 //  uint8_t *BGROM = memregion("bgcpu")->base();
@@ -153,74 +153,74 @@ DRIVER_INIT_MEMBER(s11c_state,s11c)
 	timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
 }
 
-MACHINE_CONFIG_START(s11c_state::s11c)
+void s11c_state::s11c(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(s11c_main_map)
-	MCFG_MACHINE_RESET_OVERRIDE(s11c_state, s11c)
+	M6808(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &s11c_state::s11c_main_map);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_s11c)
+	config.set_default_layout(layout_s11c);
 
 	/* Sound */
 	genpin_audio(config);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia21", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s11_state, sound_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, sound_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, sol2_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s11_state, pia21_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia21_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	PIA6821(config, m_pia21, 0);
+	m_pia21->readpa_handler().set(FUNC(s11_state::sound_r));
+	m_pia21->writepa_handler().set(FUNC(s11_state::sound_w));
+	m_pia21->writepb_handler().set(FUNC(s11_state::sol2_w));
+	m_pia21->ca2_handler().set(FUNC(s11_state::pia21_ca2_w));
+	m_pia21->cb2_handler().set(FUNC(s11_state::pia21_cb2_w));
+	m_pia21->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia21->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia24", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, lamp0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, lamp1_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia24_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	PIA6821(config, m_pia24, 0);
+	m_pia24->writepa_handler().set(FUNC(s11_state::lamp0_w));
+	m_pia24->writepb_handler().set(FUNC(s11_state::lamp1_w));
+	m_pia24->cb2_handler().set(FUNC(s11_state::pia24_cb2_w));
+	m_pia24->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia24->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia28", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s11_state, pia28_w7_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11a_state, dig0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11b_state, dig1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s11_state, pia28_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia28_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	PIA6821(config, m_pia28, 0);
+	m_pia28->readpa_handler().set(FUNC(s11_state::pia28_w7_r));
+	m_pia28->writepa_handler().set(FUNC(s11a_state::dig0_w));
+	m_pia28->writepb_handler().set(FUNC(s11b_state::dig1_w));
+	m_pia28->ca2_handler().set(FUNC(s11_state::pia28_ca2_w));
+	m_pia28->cb2_handler().set(FUNC(s11_state::pia28_cb2_w));
+	m_pia28->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia28->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia2c", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11b_state, pia2c_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11b_state, pia2c_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	PIA6821(config, m_pia2c, 0);
+	m_pia2c->writepa_handler().set(FUNC(s11b_state::pia2c_pa_w));
+	m_pia2c->writepb_handler().set(FUNC(s11b_state::pia2c_pb_w));
+	m_pia2c->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia2c->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia30", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s11_state, switch_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, switch_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia30_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	PIA6821(config, m_pia30, 0);
+	m_pia30->readpa_handler().set(FUNC(s11_state::switch_r));
+	m_pia30->writepb_handler().set(FUNC(s11_state::switch_w));
+	m_pia30->cb2_handler().set(FUNC(s11_state::pia30_cb2_w));
+	m_pia30->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia30->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia34", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11b_state, pia34_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, pia34_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia34_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	PIA6821(config, m_pia34, 0);
+	m_pia34->writepa_handler().set(FUNC(s11b_state::pia34_pa_w));
+	m_pia34->writepb_handler().set(FUNC(s11b_state::pia34_pb_w));
+	m_pia34->cb2_handler().set(FUNC(s11b_state::pia34_cb2_w));
+	m_pia34->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia34->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// generic sound board is not used in System 11C, except for Star Trax
 
 	/* Add the background music card */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("bgm", S11C_BG, 0)
-	MCFG_S11C_BG_ROM_REGION(":bgcpu")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "speaker").front_center();
+	S11C_BG(config, m_bg);
+	m_bg->set_romregion("bgcpu");
+	m_bg->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 /*--------------------
 / Bugs Bunny Birthday Ball 11/90
@@ -260,7 +260,7 @@ ROM_END
 
 ROM_START(diner_l3)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u26-la3.rom", 0x4000, 0x4000, CRC(8b6aa22e) SHA1(6b802a85fc2babf5a183fb434df11597363c1c9d))
+	ROM_LOAD("dinr_u26.l2", 0x4000, 0x4000, CRC(8b6aa22e) SHA1(6b802a85fc2babf5a183fb434df11597363c1c9d))
 	ROM_LOAD("u27-la3.rom", 0x8000, 0x8000, CRC(4171451a) SHA1(818e330245691d9ef3181b885c9342880f89d912))
 	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("dinr_u4.l1", 0x10000, 0x10000, CRC(3bd28368) SHA1(41eec2f5f863039deaabfae8aece4b1cf15e4b78))
@@ -270,8 +270,18 @@ ROM_END
 
 ROM_START(diner_l2)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u26-la3.rom", 0x4000, 0x4000, CRC(8b6aa22e) SHA1(6b802a85fc2babf5a183fb434df11597363c1c9d))
+	ROM_LOAD("dinr_u26.l2", 0x4000, 0x4000, CRC(8b6aa22e) SHA1(6b802a85fc2babf5a183fb434df11597363c1c9d))
 	ROM_LOAD("dinr_u27.lu2", 0x8000, 0x8000, CRC(ea72f6aa) SHA1(58df02e8353dd9be2ecfbcdc78fc54981dd001e1))
+	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dinr_u4.l1", 0x10000, 0x10000, CRC(3bd28368) SHA1(41eec2f5f863039deaabfae8aece4b1cf15e4b78))
+	ROM_LOAD("dinr_u19.l1", 0x20000, 0x10000, CRC(278b9a30) SHA1(41e59adb8b6c08caee46c3dd73256480b4041619))
+	ROM_LOAD("dinr_u20.l1", 0x30000, 0x10000, CRC(511fb260) SHA1(e6e25b464c5c38f3c0492436f1e8aa2be33dd278))
+ROM_END
+
+ROM_START(diner_f2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("dinr_u26.l2", 0x4000, 0x4000, CRC(8b6aa22e) SHA1(6b802a85fc2babf5a183fb434df11597363c1c9d))
+	ROM_LOAD("dinr_u27.lf2", 0x8000, 0x8000, CRC(343af291) SHA1(ecf30dd828537cd68dc6c9f97256a38c820b9afc))
 	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("dinr_u4.l1", 0x10000, 0x10000, CRC(3bd28368) SHA1(41eec2f5f863039deaabfae8aece4b1cf15e4b78))
 	ROM_LOAD("dinr_u19.l1", 0x20000, 0x10000, CRC(278b9a30) SHA1(41e59adb8b6c08caee46c3dd73256480b4041619))
@@ -282,6 +292,16 @@ ROM_START(diner_l1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("u26-lu1.rom", 0x4000, 0x4000, CRC(259b302f) SHA1(d7e19c2d2ad7805d9158178c24d180d158a59b0c))
 	ROM_LOAD("u27-lu1.rom", 0x8000, 0x8000, CRC(35fafbb3) SHA1(0db3d0c9421f4fdcf4d376d543626559e1bf2daa))
+	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dinr_u4.l1", 0x10000, 0x10000, CRC(3bd28368) SHA1(41eec2f5f863039deaabfae8aece4b1cf15e4b78))
+	ROM_LOAD("dinr_u19.l1", 0x20000, 0x10000, CRC(278b9a30) SHA1(41e59adb8b6c08caee46c3dd73256480b4041619))
+	ROM_LOAD("dinr_u20.l1", 0x30000, 0x10000, CRC(511fb260) SHA1(e6e25b464c5c38f3c0492436f1e8aa2be33dd278))
+ROM_END
+
+ROM_START(diner_p0)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("dinr_u26.pa0", 0x4000, 0x4000, CRC(dbf5de09) SHA1(55ca30bdf6e6e482f3ce5891b866103492fa3754))
+	ROM_LOAD("dinr_u27.pa0", 0x8000, 0x8000, CRC(9875d16e) SHA1(fbbab61cc9e8e3f7a1bf1428ad50ad3c13f0f120))
 	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("dinr_u4.l1", 0x10000, 0x10000, CRC(3bd28368) SHA1(41eec2f5f863039deaabfae8aece4b1cf15e4b78))
 	ROM_LOAD("dinr_u19.l1", 0x20000, 0x10000, CRC(278b9a30) SHA1(41e59adb8b6c08caee46c3dd73256480b4041619))
@@ -518,7 +538,27 @@ ROM_END
 /*--------------------
 / The Bally Game Show 4/90
 /--------------------*/
-ROM_START(gs_l3)
+ROM_START(gs_lu4)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gshw_u26.l3", 0x4000, 0x4000, CRC(3419bfb2) SHA1(7ce294a3118d20c7cdc3d5cd946e4c43090c5151))
+	ROM_LOAD("u27-lu4.rom", 0x8000, 0x8000, CRC(ba265978) SHA1(66ac8e83e35cdfd72f1d3aa8ce6d92c2c833f304))
+	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gshw_u4.l2", 0x10000, 0x10000, CRC(e89e0116) SHA1(e96bee143d1662d078f21531f405d838fdace693))
+	ROM_LOAD("gshw_u19.l1", 0x20000, 0x10000, CRC(8bae0813) SHA1(a2b1beca13796892d8ee1533e395cabdbbb11f88))
+	ROM_LOAD("gshw_u20.l1", 0x30000, 0x10000, CRC(75ccbdf7) SHA1(7dce8ae427a621919caad8d8b08b06bb0adad850))
+ROM_END
+
+ROM_START(gs_lu3)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("gameshow_u26-lu3.rom", 0x4000, 0x4000, CRC(4fa15683) SHA1(789bac55090a54d5b5180a0ef49c3903238f407f))
+	ROM_LOAD("gameshow_u27-lu3.rom", 0x8000, 0x8000, CRC(22270bd2) SHA1(a24a5e199179fd7c7ae8cd1b24c1d21b2fadf8da))
+	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gshw_u4.l2", 0x10000, 0x10000, CRC(e89e0116) SHA1(e96bee143d1662d078f21531f405d838fdace693))
+	ROM_LOAD("gshw_u19.l1", 0x20000, 0x10000, CRC(8bae0813) SHA1(a2b1beca13796892d8ee1533e395cabdbbb11f88))
+	ROM_LOAD("gshw_u20.l1", 0x30000, 0x10000, CRC(75ccbdf7) SHA1(7dce8ae427a621919caad8d8b08b06bb0adad850))
+ROM_END
+
+ROM_START(gs_la3)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("gshw_u26.l3", 0x4000, 0x4000, CRC(3419bfb2) SHA1(7ce294a3118d20c7cdc3d5cd946e4c43090c5151))
 	ROM_LOAD("gshw_u27.l3", 0x8000, 0x8000, CRC(4f3babb6) SHA1(87091a6786fc6817529cfed7f60396babe153d8d))
@@ -528,10 +568,10 @@ ROM_START(gs_l3)
 	ROM_LOAD("gshw_u20.l1", 0x30000, 0x10000, CRC(75ccbdf7) SHA1(7dce8ae427a621919caad8d8b08b06bb0adad850))
 ROM_END
 
-ROM_START(gs_l4)
+ROM_START(gs_lg6)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("gshw_u26.l3", 0x4000, 0x4000, CRC(3419bfb2) SHA1(7ce294a3118d20c7cdc3d5cd946e4c43090c5151))
-	ROM_LOAD("u27-lu4.rom", 0x8000, 0x8000, CRC(ba265978) SHA1(66ac8e83e35cdfd72f1d3aa8ce6d92c2c833f304))
+	ROM_LOAD("u27-lg6.bin", 0x8000, 0x8000, CRC(02c75b24) SHA1(29bc0404c8598393cb1d0f17fb157e84f3b9a794))
 	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gshw_u4.l2", 0x10000, 0x10000, CRC(e89e0116) SHA1(e96bee143d1662d078f21531f405d838fdace693))
 	ROM_LOAD("gshw_u19.l1", 0x20000, 0x10000, CRC(8bae0813) SHA1(a2b1beca13796892d8ee1533e395cabdbbb11f88))
@@ -557,33 +597,37 @@ ROM_START(strax_p7)
 ROM_END
 
 
-GAME(1990,  bbnny_l2,   0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Bugs Bunny Birthday Ball (L-2)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  bbnny_lu,   bbnny_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Bugs Bunny Birthday Ball (LU-2) European",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l4,   0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Diner (L-4)",                                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l3,   diner_l4,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Diner (L-3)",                                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l2,   diner_l4,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Diner (L-2)",                                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l1,   diner_l4,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Diner (L-1) Europe",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  dd_l2,      0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Dr. Dude (LA-2)",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  dd_p6,      dd_l2,      s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Dr. Dude (PA-6)",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  pool_l7,    0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Pool Sharks (LA-7)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  pool_l6,    pool_l7,    s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Pool Sharks (LA-6)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  pool_l5,    pool_l7,    s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Pool Sharks (LA-5)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  pool_le2,   pool_l7,    s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Pool Sharks (LE-2)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989,  pool_p7,    pool_l7,    s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Pool Sharks (PA-7)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  radcl_l1,   0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Radical! (L-1)",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  radcl_g1,   radcl_l1,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Radical! (G-1)",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  radcl_p3,   radcl_l1,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "Radical! (P-3)",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rvrbt_l3,   0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Riverboat Gambler (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rvrbt_p7,   rvrbt_l3,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Riverboat Gambler (PA-7)",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rollr_l2,   0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (L-2)",                            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  rollr_ex,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (EXPERIMENTAL)",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  rollr_e1,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (PU-1)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  rollr_p2,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (PA-2 / PA-1 Sound)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rollr_l3,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (LU-3) Europe",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rollr_g3,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (LG-3) Germany",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  rollr_f2,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (LF-2) French",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rollr_f3,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (LF-3) French",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  rollr_d2,   rollr_l2,   s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Rollergames (AD-2) Prototype",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  gs_l3,      gs_l4,      s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "The Bally Game Show (L-3)",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  gs_l4,      0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Bally",                "The Bally Game Show (L-4)",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  strax_p7,   0,          s11c,   s11c, s11c_state,   s11c,   ROT0,   "Williams",             "Star Trax (domestic prototype)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  bbnny_l2,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Bugs Bunny Birthday Ball (L-2)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  bbnny_lu,   bbnny_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Bugs Bunny Birthday Ball (LU-2) European",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_l4,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LA-4)",                                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_l3,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LA-3)",                                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_l2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LU-2) Europe",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_f2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LF-2) French",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_l1,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LU-1) Europe",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_p0,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (PA-0 prototype)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  dd_l2,      0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Dr. Dude (LA-2)",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  dd_p6,      dd_l2,      s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Dr. Dude (PA-6)",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  pool_l7,    0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Pool Sharks (LA-7)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  pool_l6,    pool_l7,    s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Pool Sharks (LA-6)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  pool_l5,    pool_l7,    s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Pool Sharks (LA-5)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  pool_le2,   pool_l7,    s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Pool Sharks (LE-2)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989,  pool_p7,    pool_l7,    s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Pool Sharks (PA-7)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  radcl_l1,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Radical! (L-1)",                               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  radcl_g1,   radcl_l1,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Radical! (G-1)",                               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  radcl_p3,   radcl_l1,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Radical! (P-3)",                               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rvrbt_l3,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Riverboat Gambler (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rvrbt_p7,   rvrbt_l3,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Riverboat Gambler (PA-7)",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rollr_l2,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (L-2)",                            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  rollr_ex,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (EXPERIMENTAL)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  rollr_e1,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (PU-1)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  rollr_p2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (PA-2 / PA-1 Sound)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rollr_l3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (LU-3) Europe",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rollr_g3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (LG-3) Germany",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  rollr_f2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (LF-2) French",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rollr_f3,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (LF-3) French",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  rollr_d2,   rollr_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Rollergames (AD-2) Prototype",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  gs_lu4,     0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (LU-4) Europe",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  gs_lu3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (LU-3) Europe",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  gs_la3,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (LA-3)",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  gs_lg6,     gs_lu4,     s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "The Bally Game Show (LG-6) Germany",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  strax_p7,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Star Trax (domestic prototype)",               MACHINE_IS_SKELETON_MECHANICAL)

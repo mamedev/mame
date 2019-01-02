@@ -105,6 +105,11 @@ public:
 	{
 	}
 
+	void seibucats(machine_config &config);
+
+	void init_seibucats();
+
+private:
 	// screen updates
 //  uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 //  IRQ_CALLBACK_MEMBER(spi_irq_callback);
@@ -114,19 +119,15 @@ public:
 	DECLARE_WRITE16_MEMBER(input_select_w);
 	DECLARE_WRITE16_MEMBER(output_latch_w);
 	DECLARE_WRITE16_MEMBER(aux_rtc_w);
-	DECLARE_DRIVER_INIT(seibucats);
 
-	void seibucats(machine_config &config);
 	void seibucats_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 //  virtual void video_start() override;
 
-
-private:
 	uint16_t m_input_select;
 
 //  optional_ioport_array<5> m_key;
@@ -168,27 +169,25 @@ void seibucats_state::seibucats_map(address_map &map)
 	// TODO: map devices
 	map(0x00000000, 0x0003ffff).ram().share("mainram");
 
-	map(0x00000010, 0x00000010).r(this, FUNC(seibucats_state::spi_status_r));
-	map(0x00000400, 0x00000401).w(this, FUNC(seibucats_state::input_select_w));
-	map(0x00000404, 0x00000405).w(this, FUNC(seibucats_state::output_latch_w));
-	map(0x00000484, 0x00000487).w(this, FUNC(seibucats_state::palette_dma_start_w));
-	map(0x00000490, 0x00000493).w(this, FUNC(seibucats_state::video_dma_length_w));
-	map(0x00000494, 0x00000497).w(this, FUNC(seibucats_state::video_dma_address_w));
-	map(0x00000562, 0x00000563).w(this, FUNC(seibucats_state::sprite_dma_start_w));
+	map(0x00000010, 0x00000010).r(FUNC(seibucats_state::spi_status_r));
+	map(0x00000400, 0x00000401).w(FUNC(seibucats_state::input_select_w));
+	map(0x00000404, 0x00000405).w(FUNC(seibucats_state::output_latch_w));
+	map(0x00000484, 0x00000487).w(FUNC(seibucats_state::palette_dma_start_w));
+	map(0x00000490, 0x00000493).w(FUNC(seibucats_state::video_dma_length_w));
+	map(0x00000494, 0x00000497).w(FUNC(seibucats_state::video_dma_address_w));
+	map(0x00000562, 0x00000563).w(FUNC(seibucats_state::sprite_dma_start_w));
 
-	map(0x00000600, 0x00000607).r(this, FUNC(seibucats_state::input_mux_r)).umask32(0x0000ffff);
+	map(0x00000600, 0x00000607).r(FUNC(seibucats_state::input_mux_r)).umask32(0x0000ffff);
 
 	map(0x00200000, 0x003fffff).rom().region("ipl", 0).nopw(); // emjjoshi attempts to write there?
 	// following are likely to be Seibu CATS specific
 	map(0x01200000, 0x01200007).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x000000ff);
 	map(0x01200100, 0x01200107).nopw(); // YMF721-S MIDI data
 	map(0x01200104, 0x01200107).nopr(); // YMF721-S MIDI status
-	map(0x01200200, 0x01200200).rw("usart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01200204, 0x01200204).rw("usart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x01200300, 0x01200300).rw("usart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01200304, 0x01200304).rw("usart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x01200200, 0x01200207).rw("usart1", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask32(0x000000ff);
+	map(0x01200300, 0x01200307).rw("usart2", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask32(0x000000ff);
 	map(0xa0000000, 0xa1ffffff).noprw(); // NVRAM on ROM board
-	map(0xa2000000, 0xa2000001).w(this, FUNC(seibucats_state::aux_rtc_w));
+	map(0xa2000000, 0xa2000001).w(FUNC(seibucats_state::aux_rtc_w));
 	map(0xffe00000, 0xffffffff).rom().region("ipl", 0);
 }
 
@@ -265,7 +264,7 @@ static const gfx_layout sys386f_spritelayout =
 };
 
 
-static GFXDECODE_START( seibucats )
+static GFXDECODE_START( gfx_seibucats )
 	GFXDECODE_ENTRY( "gfx1", 0, sys386f_spritelayout,   5632, 16 ) // Not used, legacy charlayout
 	GFXDECODE_ENTRY( "gfx2", 0, sys386f_spritelayout,   4096, 24 ) // Not used, legacy tilelayout
 	GFXDECODE_ENTRY( "gfx3", 0, sys386f_spritelayout,   0, 96 )
@@ -297,14 +296,14 @@ IRQ_CALLBACK_MEMBER(seibucats_state::spi_irq_callback)
 MACHINE_CONFIG_START(seibucats_state::seibucats)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I386, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(seibucats_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state, spi_irq_callback)
+	MCFG_DEVICE_ADD("maincpu",I386, MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(seibucats_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state, spi_irq_callback)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	//MCFG_JRC6355E_ADD("rtc", XTAL(32'768))
+	//JRC6355E(config, m_rtc, XTAL(32'768));
 
 	MCFG_DEVICE_ADD("usart1", I8251, 0)
 	MCFG_DEVICE_ADD("usart2", I8251, 0)
@@ -315,16 +314,17 @@ MACHINE_CONFIG_START(seibucats_state::seibucats)
 	MCFG_SCREEN_UPDATE_DRIVER(seibuspi_state, screen_update_sys386f)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seibucats)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seibucats)
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 8192)
+	MCFG_DEVICE_ADD(m_palette, PALETTE, palette_device::BLACK, 8192);
 //  MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	//MCFG_PALETTE_INIT_OWNER(seibucats_state, seibucats)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'384'000))
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'384'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -397,18 +397,17 @@ ROM_START( emjtrapz )
 	DISK_IMAGE_READONLY( "trap zone sktp-00009", 0, SHA1(b4a51f42eeaeefc329031651859caa108418a96e) )
 ROM_END
 
-DRIVER_INIT_MEMBER(seibucats_state,seibucats)
+void seibucats_state::init_seibucats()
 {
-	int i, j;
 	uint16_t *src = (uint16_t *)memregion("gfx3")->base();
 	uint16_t tmp[0x40 / 2], offset;
 
 	// sprite_reorder() only
-	for (i = 0; i < memregion("gfx3")->bytes() / 0x40; i++)
+	for (int i = 0; i < memregion("gfx3")->bytes() / 0x40; i++)
 	{
 		memcpy(tmp, src, 0x40);
 
-		for (j = 0; j < 0x40 / 2; j++)
+		for (int j = 0; j < 0x40 / 2; j++)
 		{
 			offset = (j >> 1) | (j << 4 & 0x10);
 			*src++ = tmp[offset];
@@ -420,12 +419,12 @@ DRIVER_INIT_MEMBER(seibucats_state,seibucats)
 // Gravure Collection
 // Pakkun Ball TV
 /* 01 */ // Mahjong Shichau zo!
-/* 02 */ GAME( 1999, emjjoshi,  0,   seibucats,  seibucats, seibucats_state,  seibucats,       ROT0, "Seibu Kaihatsu / CATS",      "E-Touch Mahjong Series #2: Joshiryou de NE! (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/* 02 */ GAME( 1999, emjjoshi,  0,   seibucats,  seibucats, seibucats_state, init_seibucats, ROT0, "Seibu Kaihatsu / CATS", "E-Touch Mahjong Series #2: Joshiryou de NE! (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 /* 03 */ // Lingerie DE Ikou
 /* 04 */ // Marumie Network
 /* 05 */ // BINKAN Lips
-/* 06 */ GAME( 2001, emjscanb,  0,   seibucats,  seibucats, seibucats_state,  seibucats,       ROT0, "Seibu Kaihatsu / CATS",      "E-Touch Mahjong Series #6: Scandal Blue - Midara na Daishou (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-/* 07 */ GAME( 2001, emjtrapz,  0,   seibucats,  seibucats, seibucats_state,  seibucats,       ROT0, "Seibu Kaihatsu / CATS",      "E-Touch Mahjong Series #7: Trap Zone - Yokubou no Kaisoku Densha (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/* 06 */ GAME( 2001, emjscanb,  0,   seibucats,  seibucats, seibucats_state, init_seibucats, ROT0, "Seibu Kaihatsu / CATS", "E-Touch Mahjong Series #6: Scandal Blue - Midara na Daishou (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/* 07 */ GAME( 2001, emjtrapz,  0,   seibucats,  seibucats, seibucats_state, init_seibucats, ROT0, "Seibu Kaihatsu / CATS", "E-Touch Mahjong Series #7: Trap Zone - Yokubou no Kaisoku Densha (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 /* 08 */ // Poison
 /* 09 */ // Nurse Call
 /* 10 */ // Secret Love

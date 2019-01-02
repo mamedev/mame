@@ -17,6 +17,7 @@ public:
 		, m_tlc34076(*this, "tlc34076")
 		, m_main2dsp(*this, "main2dsp")
 		, m_dsp2main(*this, "dsp2main")
+		, m_nvram_timer(*this, "nvram_timer")
 		, m_vram_base(*this, "vram_base")
 		, m_nvram(*this, "nvram")
 		, m_dsp_rom(*this, "dspdata")
@@ -28,6 +29,8 @@ public:
 
 	required_device<generic_latch_16_device> m_main2dsp;
 	required_device<generic_latch_16_device> m_dsp2main;
+
+	required_device<timer_device> m_nvram_timer;
 
 	required_shared_ptr<uint16_t> m_vram_base;
 	required_shared_ptr<uint16_t> m_nvram;
@@ -65,9 +68,9 @@ public:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(amerdart_scanline);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(coolpool_scanline);
-	DECLARE_DRIVER_INIT(coolpool);
-	DECLARE_DRIVER_INIT(amerdart);
-	DECLARE_DRIVER_INIT(9ballsht);
+	void init_coolpool();
+	void init_amerdart();
+	void init_9ballsht();
 	DECLARE_MACHINE_RESET(amerdart);
 	DECLARE_MACHINE_RESET(coolpool);
 	TIMER_DEVICE_CALLBACK_MEMBER(nvram_write_timeout);

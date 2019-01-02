@@ -41,15 +41,17 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void pro80(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(segment_w);
 	DECLARE_READ8_MEMBER(kp_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 
-	void pro80(machine_config &config);
 	void pro80_io(address_map &map);
 	void pro80_mem(address_map &map);
-private:
+
 	uint8_t m_digit_sel;
 	uint8_t m_cass_in;
 	uint16_t m_cass_data[4];
@@ -128,9 +130,9 @@ void pro80_state::pro80_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x40, 0x43).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x44, 0x47).r(this, FUNC(pro80_state::kp_r));
-	map(0x48, 0x4b).w(this, FUNC(pro80_state::digit_w));
-	map(0x4c, 0x4f).w(this, FUNC(pro80_state::segment_w));
+	map(0x44, 0x47).r(FUNC(pro80_state::kp_r));
+	map(0x48, 0x4b).w(FUNC(pro80_state::digit_w));
+	map(0x4c, 0x4f).w(FUNC(pro80_state::segment_w));
 }
 
 /* Input ports */
@@ -175,21 +177,20 @@ void pro80_state::machine_reset()
 
 MACHINE_CONFIG_START(pro80_state::pro80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(pro80_mem)
-	MCFG_CPU_IO_MAP(pro80_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(pro80_mem)
+	MCFG_DEVICE_IO_MAP(pro80_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pro80)
+	config.set_default_layout(layout_pro80);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(4'000'000) / 2)
+	Z80PIO(config, "pio", XTAL(4'000'000) / 2);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", pro80_state, timer_p, attotime::from_hz(40000)) // cass read
 MACHINE_CONFIG_END
 
@@ -202,5 +203,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT  COMPANY   FULLNAME  FLAGS
-COMP( 1981, pro80,  0,      0,      pro80,    pro80, pro80_state, 0,    "Protec", "Pro-80", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME  FLAGS
+COMP( 1981, pro80, 0,      0,      pro80,   pro80, pro80_state, empty_init, "Protec", "Pro-80", MACHINE_NOT_WORKING )

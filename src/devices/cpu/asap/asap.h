@@ -238,7 +238,7 @@ protected:
 	uint8_t               m_irq_state;
 	int                 m_icount;
 	address_space *     m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
 
 	// src2val table, registers are at the end
 	uint32_t              m_src2val[65536];

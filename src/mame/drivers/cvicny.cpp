@@ -86,9 +86,9 @@ void cvicny_state::cvicny_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).rom(); // 1 x 2716
 	map(0x0800, 0x0bff).ram().mirror(0x400); // 2x 2114 static ram
-	map(0x1000, 0x17ff).r(this, FUNC(cvicny_state::key_r));
-	map(0x1800, 0x1fff).w(this, FUNC(cvicny_state::digit_w));
-	map(0x2000, 0x27ff).w(this, FUNC(cvicny_state::segment_w));
+	map(0x1000, 0x17ff).r(FUNC(cvicny_state::key_r));
+	map(0x1800, 0x1fff).w(FUNC(cvicny_state::digit_w));
+	map(0x2000, 0x27ff).w(FUNC(cvicny_state::segment_w));
 }
 
 
@@ -137,11 +137,11 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(cvicny_state::cvicny)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(cvicny_mem)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(cvicny_mem)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_cvicny)
+	config.set_default_layout(layout_cvicny);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -152,5 +152,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT   COMPANY      FULLNAME        FLAGS
-COMP( 1984, cvicny, 0,      0,       cvicny,    cvicny, cvicny_state,  0,     "<unknown>", "Practice-z80", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME        FLAGS
+COMP( 1984, cvicny, 0,      0,      cvicny,  cvicny, cvicny_state, empty_init, "<unknown>", "Practice-z80", MACHINE_NO_SOUND_HW)

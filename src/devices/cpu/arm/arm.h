@@ -16,10 +16,6 @@
  *  PUBLIC FUNCTIONS
  ***************************************************************************************************/
 
-#define MCFG_ARM_COPRO(_type) \
-	downcast<arm_cpu_device &>(*device).set_copro_type(arm_cpu_device::copro_type::_type);
-
-
 class arm_cpu_device : public cpu_device
 {
 public:
@@ -74,7 +70,7 @@ protected:
 	uint8_t m_pendingIrq;
 	uint8_t m_pendingFiq;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	std::function<u32 (offs_t)> m_pr32;
 	endianness_t m_endian;
 	copro_type m_copro_type;
 

@@ -1,34 +1,37 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
+#ifndef MAME_INCLUDES_LUCKY74_H
+#define MAME_INCLUDES_LUCKY74_H
+
+#pragma once
+
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class lucky74_state : public driver_device
 {
 public:
-	lucky74_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	lucky74_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_fg_colorram(*this, "fg_colorram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_bg_colorram(*this, "bg_colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
-	uint8_t m_ym2149_portb;
-	uint8_t m_usart_8251;
-	uint8_t m_copro_sm7831;
-	int m_adpcm_pos;
-	int m_adpcm_end;
-	int m_adpcm_data;
-	uint8_t m_adpcm_reg[6];
-	uint8_t m_adpcm_busy_line;
-	required_shared_ptr<uint8_t> m_fg_videoram;
-	required_shared_ptr<uint8_t> m_fg_colorram;
-	required_shared_ptr<uint8_t> m_bg_videoram;
-	required_shared_ptr<uint8_t> m_bg_colorram;
-	tilemap_t *m_fg_tilemap;
-	tilemap_t *m_bg_tilemap;
+	void lucky74(machine_config &config);
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+	virtual void machine_reset() override;
+	virtual void sound_start() override;
+
+private:
 	DECLARE_READ8_MEMBER(custom_09R81P_port_r);
 	DECLARE_WRITE8_MEMBER(custom_09R81P_port_w);
 	DECLARE_READ8_MEMBER(usart_8251_r);
@@ -44,17 +47,31 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_b_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
-	virtual void machine_reset() override;
-	virtual void sound_start() override;
-	DECLARE_PALETTE_INIT(lucky74);
+	void lucky74_palette(palette_device &palette) const;
 	uint32_t screen_update_lucky74(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nmi_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(lucky74_adpcm_int);
+	void lucky74_map(address_map &map);
+	void lucky74_portmap(address_map &map);
+
+	uint8_t m_ym2149_portb;
+	uint8_t m_usart_8251;
+	uint8_t m_copro_sm7831;
+	int m_adpcm_pos;
+	int m_adpcm_end;
+	int m_adpcm_data;
+	uint8_t m_adpcm_reg[6];
+	uint8_t m_adpcm_busy_line;
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_fg_colorram;
+	required_shared_ptr<uint8_t> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_bg_colorram;
+	tilemap_t *m_fg_tilemap;
+	tilemap_t *m_bg_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void lucky74(machine_config &config);
-	void lucky74_map(address_map &map);
-	void lucky74_portmap(address_map &map);
+	output_finder<12> m_lamps;
 };
+
+#endif // MAME_INCLUDES_LUCKY74_H

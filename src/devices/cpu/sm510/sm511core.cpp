@@ -5,7 +5,7 @@
   Sharp SM511 MCU core implementation
 
   TODO:
-  - undocumented/guessed opcodes:
+  - verify undocumented/guessed opcodes:
     * $01 is guessed as DIV to ACC transfer, unknown which bits
     * $5d is certainly CEND
     * $65 is certainly divider reset, but not sure if it behaves same as on SM510
@@ -55,7 +55,7 @@ std::unique_ptr<util::disasm_interface> sm511_device::create_disassembler()
 
 // device definitions
 sm511_device::sm511_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-  : sm511_device(mconfig, SM511, tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, address_map_constructor(FUNC(sm511_device::program_4k), this), 7 /* data width */, address_map_constructor(FUNC(sm511_device::data_96_32x4), this))
+	: sm511_device(mconfig, SM511, tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, address_map_constructor(FUNC(sm511_device::program_4k), this), 7 /* data width */, address_map_constructor(FUNC(sm511_device::data_96_32x4), this))
 {
 }
 
@@ -65,7 +65,7 @@ sm511_device::sm511_device(const machine_config &mconfig, device_type type, cons
 }
 
 sm512_device::sm512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-  : sm511_device(mconfig, SM512, tag, owner, clock, 2, 12, address_map_constructor(FUNC(sm512_device::program_4k), this), 7, address_map_constructor(FUNC(sm512_device::data_80_48x4), this))
+	: sm511_device(mconfig, SM512, tag, owner, clock, 2, 12, address_map_constructor(FUNC(sm512_device::program_4k), this), 7, address_map_constructor(FUNC(sm512_device::data_80_48x4), this))
 {
 }
 

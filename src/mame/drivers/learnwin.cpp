@@ -58,13 +58,15 @@ public:
 	{
 	}
 
+	void learnwin(machine_config &config);
+
+private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	{
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
-	void learnwin(machine_config &config);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -147,7 +149,7 @@ MACHINE_CONFIG_START(learnwin_state::learnwin)
 //    MCFG_SCREEN_VISIBLE_AREA(0,47,0,31)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 
@@ -202,8 +204,8 @@ ROM_START( spielmast )
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1986, learnwin,  0,        0, learnwin, learnwin, learnwin_state, 0, "VTech", "Learning-Window Teaching Machine (Rev 3)", MACHINE_IS_SKELETON )
-COMP( 1986, learnwin2, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "VTech", "Learning-Window Teaching Machine (Rev 2)", MACHINE_IS_SKELETON )
-COMP( 1986, learnwin1, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "VTech", "Learning-Window Teaching Machine (Rev 1)", MACHINE_IS_SKELETON )
-COMP( 1986, learnwinf, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "VTech", "Learning-Window Teaching Machine (French)", MACHINE_IS_SKELETON )
-COMP( 1986, spielmast, learnwin, 0, learnwin, learnwin, learnwin_state, 0, "Yuvo",   "Spiel Master (German)", MACHINE_IS_SKELETON )
+COMP( 1986, learnwin,  0,        0, learnwin, learnwin, learnwin_state, empty_init, "VTech", "Learning-Window Teaching Machine (Rev 3)",  MACHINE_IS_SKELETON )
+COMP( 1986, learnwin2, learnwin, 0, learnwin, learnwin, learnwin_state, empty_init, "VTech", "Learning-Window Teaching Machine (Rev 2)",  MACHINE_IS_SKELETON )
+COMP( 1986, learnwin1, learnwin, 0, learnwin, learnwin, learnwin_state, empty_init, "VTech", "Learning-Window Teaching Machine (Rev 1)",  MACHINE_IS_SKELETON )
+COMP( 1986, learnwinf, learnwin, 0, learnwin, learnwin, learnwin_state, empty_init, "VTech", "Learning-Window Teaching Machine (French)", MACHINE_IS_SKELETON )
+COMP( 1986, spielmast, learnwin, 0, learnwin, learnwin, learnwin_state, empty_init, "Yuvo",  "Spiel Master (German)",                     MACHINE_IS_SKELETON )

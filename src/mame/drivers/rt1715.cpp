@@ -22,6 +22,7 @@
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -35,29 +36,30 @@ public:
 	{
 	}
 
+	void rt1715(machine_config &config);
+	void rt1715w(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(rt1715_floppy_enable);
 	DECLARE_READ8_MEMBER(k7658_led1_r);
 	DECLARE_READ8_MEMBER(k7658_led2_r);
 	DECLARE_READ8_MEMBER(k7658_data_r);
 	DECLARE_WRITE8_MEMBER(k7658_data_w);
 	DECLARE_WRITE8_MEMBER(rt1715_rom_disable);
-	DECLARE_PALETTE_INIT(rt1715);
+	void rt1715_palette(palette_device &palette) const;
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
-	void rt1715(machine_config &config);
-	void rt1715w(machine_config &config);
 	void k7658_io(address_map &map);
 	void k7658_mem(address_map &map);
 	void rt1715_io(address_map &map);
 	void rt1715_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	int m_led1_val;
 	int m_led2_val;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
 };
 
@@ -167,7 +169,7 @@ static const gfx_layout rt1715_charlayout =
 	8                   /* every char takes 1 x 16 bytes */
 };
 
-static GFXDECODE_START( rt1715 )
+static GFXDECODE_START( gfx_rt1715 )
 	GFXDECODE_ENTRY("gfx", 0x0000, rt1715_charlayout, 0, 1)
 	GFXDECODE_ENTRY("gfx", 0x0800, rt1715_charlayout, 0, 1)
 GFXDECODE_END
@@ -177,11 +179,11 @@ GFXDECODE_END
     PALETTE
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(rt1715_state, rt1715)
+void rt1715_state::rt1715_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); /* black */
-	palette.set_pen_color(1, rgb_t(0x00, 0x7f, 0x00)); /* low intensity */
-	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); /* high intensitiy */
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // black
+	palette.set_pen_color(1, rgb_t(0x00, 0x7f, 0x00)); // low intensity
+	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // high intensitiy
 }
 
 
@@ -204,21 +206,21 @@ void rt1715_state::rt1715_io(address_map &map)
 	map(0x08, 0x0b).rw("a30", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).rw("a29", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x18, 0x19).rw("a26", FUNC(i8275_device::read), FUNC(i8275_device::write));
-	map(0x20, 0x20).w(this, FUNC(rt1715_state::rt1715_floppy_enable));
-	map(0x28, 0x28).w(this, FUNC(rt1715_state::rt1715_rom_disable));
+	map(0x20, 0x20).w(FUNC(rt1715_state::rt1715_floppy_enable));
+	map(0x28, 0x28).w(FUNC(rt1715_state::rt1715_rom_disable));
 }
 
 void rt1715_state::k7658_mem(address_map &map)
 {
-	map(0x0000, 0xffff).w(this, FUNC(rt1715_state::k7658_data_w));
+	map(0x0000, 0xffff).w(FUNC(rt1715_state::k7658_data_w));
 	map(0x0000, 0x07ff).mirror(0xf800).rom();
 }
 
 void rt1715_state::k7658_io(address_map &map)
 {
-	map(0x2000, 0x2000).mirror(0x8000).r(this, FUNC(rt1715_state::k7658_led1_r));
-	map(0x4000, 0x4000).mirror(0x8000).r(this, FUNC(rt1715_state::k7658_led2_r));
-	map(0x8000, 0x9fff).r(this, FUNC(rt1715_state::k7658_data_r));
+	map(0x2000, 0x2000).mirror(0x8000).r(FUNC(rt1715_state::k7658_led1_r));
+	map(0x4000, 0x4000).mirror(0x8000).r(FUNC(rt1715_state::k7658_led2_r));
+	map(0x8000, 0x9fff).r(FUNC(rt1715_state::k7658_data_r));
 }
 
 
@@ -284,45 +286,40 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 
 MACHINE_CONFIG_START(rt1715_state::rt1715)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(2'457'600))
-	MCFG_CPU_PROGRAM_MAP(rt1715_mem)
-	MCFG_CPU_IO_MAP(rt1715_io)
-	MCFG_Z80_DAISY_CHAIN(rt1715_daisy_chain)
-
+	Z80(config, m_maincpu, 9.832_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rt1715_state::rt1715_mem);
+	m_maincpu->set_addrmap(AS_IO, &rt1715_state::rt1715_io);
+	m_maincpu->set_daisy_config(rt1715_daisy_chain);
 
 	/* keyboard */
-	MCFG_CPU_ADD("keyboard", Z80, 683000)
-	MCFG_CPU_PROGRAM_MAP(k7658_mem)
-	MCFG_CPU_IO_MAP(k7658_io)
+	MCFG_DEVICE_ADD("keyboard", Z80, 683000)
+	MCFG_DEVICE_PROGRAM_MAP(k7658_mem)
+	MCFG_DEVICE_IO_MAP(k7658_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE("a26", i8275_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(78*6, 30*10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
+	MCFG_SCREEN_RAW_PARAMS(13.824_MHz_XTAL, 864, 0, 624, 320, 0, 300) // ?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rt1715)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(rt1715_state, rt1715)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_rt1715);
+	PALETTE(config, "palette", FUNC(rt1715_state::rt1715_palette), 3);
 
-	MCFG_DEVICE_ADD("a26", I8275, XTAL(2'457'600))
+	MCFG_DEVICE_ADD("a26", I8275, 13.824_MHz_XTAL / 8)
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(rt1715_state, crtc_display_pixels)
 
-	MCFG_DEVICE_ADD("a30", Z80CTC, XTAL(10'000'000)/4 /* ? */)
+	z80ctc_device& ctc(Z80CTC(config, "a30", 9.832_MHz_XTAL / 4));
+	ctc.zc_callback<0>().set("a29", FUNC(z80sio_device::txca_w));
+	ctc.zc_callback<2>().set("a29", FUNC(z80sio_device::rxtxcb_w));
 
-	MCFG_DEVICE_ADD("a29", Z80SIO, XTAL(10'000'000)/4 /* ? */)
+	Z80SIO(config, "a29", 9.832_MHz_XTAL / 4);
 
 	/* floppy */
-	MCFG_DEVICE_ADD("a71", Z80PIO, XTAL(10'000'000)/4 /* ? */)
-	MCFG_DEVICE_ADD("a72", Z80PIO, XTAL(10'000'000)/4 /* ? */)
+	Z80PIO(config, "a71", 9.832_MHz_XTAL / 4);
+	Z80PIO(config, "a72", 9.832_MHz_XTAL / 4);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rt1715_state::rt1715w)
@@ -389,7 +386,7 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  STATE         INIT  COMPANY     FULLNAME                             FLAGS
-COMP( 1986, rt1715,   0,      0,      rt1715,  k7658, rt1715_state, 0,    "Robotron", "Robotron PC-1715",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658, rt1715_state, 0,    "Robotron", "Robotron PC-1715 (latin/cyrillic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, k7658, rt1715_state, 0,    "Robotron", "Robotron PC-1715W",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY     FULLNAME                             FLAGS
+COMP( 1986, rt1715,   0,      0,      rt1715,  k7658, rt1715_state, empty_init, "Robotron", "Robotron PC-1715",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658, rt1715_state, empty_init, "Robotron", "Robotron PC-1715 (latin/cyrillic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, k7658, rt1715_state, empty_init, "Robotron", "Robotron PC-1715W",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -53,8 +53,8 @@ WRITE8_MEMBER(battlane_state::battlane_cpu_command_w)
 	/*
 	if (~m_cpu_control & 0x08)
 	{
-	    m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	    m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	    m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	    m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	*/
 
@@ -88,8 +88,8 @@ INTERRUPT_GEN_MEMBER(battlane_state::battlane_cpu1_interrupt)
 	/* See note in battlane_cpu_command_w */
 	if (~m_cpu_control & 0x08)
 	{
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -103,15 +103,15 @@ INTERRUPT_GEN_MEMBER(battlane_state::battlane_cpu1_interrupt)
 void battlane_state::battlane_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");
-	map(0x1000, 0x17ff).ram().w(this, FUNC(battlane_state::battlane_tileram_w)).share("tileram");
-	map(0x1800, 0x18ff).ram().w(this, FUNC(battlane_state::battlane_spriteram_w)).share("spriteram");
-	map(0x1c00, 0x1c00).portr("P1").w(this, FUNC(battlane_state::battlane_video_ctrl_w));
-	map(0x1c01, 0x1c01).portr("P2").w(this, FUNC(battlane_state::battlane_scrollx_w));
-	map(0x1c02, 0x1c02).portr("DSW1").w(this, FUNC(battlane_state::battlane_scrolly_w));
-	map(0x1c03, 0x1c03).portr("DSW2").w(this, FUNC(battlane_state::battlane_cpu_command_w));
+	map(0x1000, 0x17ff).ram().w(FUNC(battlane_state::battlane_tileram_w)).share("tileram");
+	map(0x1800, 0x18ff).ram().w(FUNC(battlane_state::battlane_spriteram_w)).share("spriteram");
+	map(0x1c00, 0x1c00).portr("P1").w(FUNC(battlane_state::battlane_video_ctrl_w));
+	map(0x1c01, 0x1c01).portr("P2").w(FUNC(battlane_state::battlane_scrollx_w));
+	map(0x1c02, 0x1c02).portr("DSW1").w(FUNC(battlane_state::battlane_scrolly_w));
+	map(0x1c03, 0x1c03).portr("DSW2").w(FUNC(battlane_state::battlane_cpu_command_w));
 	map(0x1c04, 0x1c05).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
-	map(0x1e00, 0x1e3f).w(this, FUNC(battlane_state::battlane_palette_w));
-	map(0x2000, 0x3fff).ram().w(this, FUNC(battlane_state::battlane_bitmap_w)).share("share4");
+	map(0x1e00, 0x1e3f).w(FUNC(battlane_state::battlane_palette_w));
+	map(0x2000, 0x3fff).ram().w(FUNC(battlane_state::battlane_bitmap_w)).share("share4");
 	map(0x4000, 0xffff).rom();
 }
 
@@ -246,7 +246,7 @@ static const gfx_layout tilelayout2 =
 };
 
 
-static GFXDECODE_START( battlane )
+static GFXDECODE_START( gfx_battlane )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0, 2 )   /* colors 0x00-0x0f */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   32, 4 )   /* colors 0x20-0x3f */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2,  32, 4 )   /* colors 0x20-0x3f */
@@ -271,39 +271,37 @@ void battlane_state::machine_reset()
 	m_cpu_control = 0;
 }
 
-MACHINE_CONFIG_START(battlane_state::battlane)
-
+void battlane_state::battlane(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(battlane_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", battlane_state,  battlane_cpu1_interrupt)
+	M6809(config, m_maincpu, 1500000);		/* 1.5 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &battlane_state::battlane_map);
+	m_maincpu->set_vblank_int("screen", FUNC(battlane_state::battlane_cpu1_interrupt));
 
-	MCFG_CPU_ADD("sub", M6809, 1500000)        /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(battlane_map)
+	M6809(config, m_subcpu, 1500000);		/* 1.5 MHz ? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &battlane_state::battlane_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32 * 8, 32 * 8)
-	MCFG_SCREEN_VISIBLE_AREA(1 * 8, 31 * 8 - 1, 0 * 8, 32 * 8 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(battlane_state, screen_update_battlane)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32 * 8, 32 * 8);
+	screen.set_visarea(1 * 8, 31 * 8 - 1, 0 * 8, 32 * 8 - 1);
+	screen.set_screen_update(FUNC(battlane_state::screen_update_battlane));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", battlane)
-	MCFG_PALETTE_ADD("palette", 64)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_battlane);
+	PALETTE(config, m_palette).set_entries(64);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", 3000000));
+	ymsnd.irq_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*************************************
@@ -403,6 +401,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, battlane,  0,        battlane, battlane, battlane_state, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, battlane2, battlane, battlane, battlane, battlane_state, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, battlane3, battlane, battlane, battlane, battlane_state, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, battlane,  0,        battlane, battlane, battlane_state, empty_init, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, battlane2, battlane, battlane, battlane, battlane_state, empty_init, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, battlane3, battlane, battlane, battlane, battlane_state, empty_init, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 3)", MACHINE_SUPPORTS_SAVE )

@@ -7,16 +7,21 @@
     Gals Pinball
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_GALSPNBL_H
+#define MAME_INCLUDES_GALSPNBL_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "video/tecmo_spr.h"
+#include "emupal.h"
 #include "screen.h"
 
 class galspnbl_state : public driver_device
 {
 public:
-	galspnbl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	galspnbl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
@@ -29,8 +34,11 @@ public:
 		m_sprgen(*this, "spritegen"),
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch")
-		{ }
+	{ }
 
+	void galspnbl(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_colorram;
@@ -49,7 +57,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(soundcommand_w);
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(galspnbl);
+	void galspnbl_palette(palette_device &palette) const;
 	uint32_t screen_update_galspnbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	bitmap_ind16 m_sprite_bitmap;
@@ -57,7 +65,8 @@ public:
 
 	void mix_sprite_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 
-	void galspnbl(machine_config &config);
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GALSPNBL_H

@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Farfetch'd, David Haywood
-
 #ifndef MAME_INCLUDES_GSTRIKER_H
 #define MAME_INCLUDES_GSTRIKER_H
+
+#pragma once
 
 #include "machine/6850acia.h"
 #include "machine/gen_latch.h"
@@ -10,6 +11,7 @@
 #include "video/vsystem_spr.h"
 #include "video/mb60553.h"
 #include "video/vs920a.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -17,8 +19,8 @@
 class gstriker_state : public driver_device
 {
 public:
-	gstriker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	gstriker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_spr(*this, "vsystem_spr"),
@@ -35,6 +37,21 @@ public:
 		m_mixerregs(*this, "mixerregs")
 	{ }
 
+	void base(machine_config &config);
+	void twc94(machine_config &config);
+	void gstriker(machine_config &config);
+	void vgoal(machine_config &config);
+
+	void init_vgoalsoc();
+	void init_twcup94();
+	void init_twcup94a();
+	void init_twcup94b();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<vsystem_spr_device> m_spr;
@@ -72,24 +89,14 @@ public:
 	DECLARE_READ16_MEMBER(vbl_toggle_r);
 	DECLARE_WRITE16_MEMBER(vbl_toggle_w);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(vgoalsoc);
-	DECLARE_DRIVER_INIT(twcup94);
-	DECLARE_DRIVER_INIT(twcup94a);
-	DECLARE_DRIVER_INIT(twcup94b);
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void mcu_init();
-	void twc94(machine_config &config);
-	void gstriker(machine_config &config);
-	void vgoal(machine_config &config);
 	void gstriker_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
 	void twcup94_map(address_map &map);
 };
 
-#endif
+#endif // MAME_INCLUDES_GSTRIKER_H

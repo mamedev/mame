@@ -71,10 +71,10 @@ TODO :
 
 #include "emu.h"
 
-#include "cpu/tms9900/ti990_10.h"
-#include "sound/beep.h"
 #include "bus/ti99x/990_hd.h"
 #include "bus/ti99x/990_tap.h"
+#include "cpu/tms9900/ti990_10.h"
+#include "sound/beep.h"
 #include "video/911_vdt.h"
 
 
@@ -82,31 +82,37 @@ class ti990_10_state : public driver_device
 {
 public:
 	ti990_10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu"),
-		m_intlines(0),
-		m_ckon_state(0) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "vdt911")
+		, m_intlines(0)
+		, m_ckon_state(0) { }
 
-	device_t *m_terminal;
-	DECLARE_DRIVER_INIT(ti990_10);
+	void init_ti990_10();
+
+	void ti990_10(machine_config &config);
+
+protected:
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 
-	DECLARE_WRITE_LINE_MEMBER( key_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( line_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( tape_interrupt );
-	void ti990_set_int_line(int line, int state);
+private:
+	WRITE_LINE_MEMBER( key_interrupt );
+	WRITE_LINE_MEMBER( line_interrupt );
+	WRITE_LINE_MEMBER( tape_interrupt );
 	WRITE_LINE_MEMBER(ti990_set_int13);
-	TIMER_CALLBACK_MEMBER(clear_load);
-	void ti990_hold_load();
 	WRITE_LINE_MEMBER(ti990_ckon_ckof_callback);
 	READ8_MEMBER( ti990_panel_read );
 	WRITE8_MEMBER( ti990_panel_write );
 
+	TIMER_CALLBACK_MEMBER(clear_load);
+
+	void ti990_hold_load();
+	void ti990_set_int_line(int line, int state);
+
 	required_device<cpu_device> m_maincpu;
+	required_device<vdt911_device> m_terminal;
 	uint16_t m_intlines;
 	int m_ckon_state;
-	void ti990_10(machine_config &config);
 	void ti990_10_io(address_map &map);
 	void ti990_10_memmap(address_map &map);
 };
@@ -263,11 +269,6 @@ void ti990_10_state::lrex_callback)
     We emulate a single VDT911 CRT terminal.
 */
 
-void ti990_10_state::video_start()
-{
-	m_terminal = machine().device("vdt911");
-}
-
 WRITE_LINE_MEMBER(ti990_10_state::key_interrupt)
 {
 	// set_int10(state);
@@ -297,14 +298,14 @@ void ti990_10_state::ti990_10_memmap(address_map &map)
 
 void ti990_10_state::ti990_10_io(address_map &map)
 {
-	map(0x10, 0x11).r("vdt911", FUNC(vdt911_device::cru_r));
-	map(0x80, 0x8f).w("vdt911", FUNC(vdt911_device::cru_w));
+	map(0x10, 0x11).r(m_terminal, FUNC(vdt911_device::cru_r));
+	map(0x80, 0x8f).w(m_terminal, FUNC(vdt911_device::cru_w));
 	map(0x1fa, 0x1fb).noprw(); // AM_READ(ti990_10_mapper_cru_r)
 	map(0x1fc, 0x1fd).noprw(); // AM_READ(ti990_10_eir_cru_r)
-	map(0x1fe, 0x1ff).r(this, FUNC(ti990_10_state::ti990_panel_read));
+	map(0x1fe, 0x1ff).r(FUNC(ti990_10_state::ti990_panel_read));
 	map(0xfd0, 0xfdf).noprw(); // AM_WRITE(ti990_10_mapper_cru_w)
 	map(0xfe0, 0xfef).noprw(); // AM_WRITE(ti990_10_eir_cru_w)
-	map(0xff0, 0xfff).w(this, FUNC(ti990_10_state::ti990_panel_write));
+	map(0xff0, 0xfff).w(FUNC(ti990_10_state::ti990_panel_write));
 
 }
 
@@ -319,20 +320,20 @@ WRITE_LINE_MEMBER(ti990_10_state::tape_interrupt)
 MACHINE_CONFIG_START(ti990_10_state::ti990_10)
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
-	MCFG_TMS99xx_ADD("maincpu", TI990_10, 4000000, ti990_10_memmap, ti990_10_io )
+	TI990_10(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti990_10_state::ti990_10_memmap);
+	m_maincpu->set_addrmap(AS_IO, &ti990_10_state::ti990_10_io);
 
 	// VDT 911 terminal
-	MCFG_DEVICE_ADD("vdt911", VDT911, 0)
-	MCFG_VDT911_KEYINT_HANDLER(WRITELINE(ti990_10_state, key_interrupt))
-	MCFG_VDT911_LINEINT_HANDLER(WRITELINE(ti990_10_state, line_interrupt))
+	VDT911(config, m_terminal, 0);
+	m_terminal->keyint_cb().set(FUNC(ti990_10_state::key_interrupt));
+	m_terminal->lineint_cb().set(FUNC(ti990_10_state::line_interrupt));
 
 	// Hard disk
-	MCFG_DEVICE_ADD("hdc", TI990_HDC, 0)
-	MCFG_TI990_HDC_INT_CALLBACK(WRITELINE(ti990_10_state, ti990_set_int13))
+	TI990_HDC(config, "hdc", 0).int_cb().set(FUNC(ti990_10_state::ti990_set_int13));
 
 	// Tape controller
-	MCFG_DEVICE_ADD("tpc", TI990_TAPE_CTRL, 0)
-	MCFG_TI990_TAPE_INT_HANDLER(WRITELINE(ti990_10_state, tape_interrupt))
+	TI990_TAPE_CTRL(config, "tpc", 0).int_cb().set(FUNC(ti990_10_state::tape_interrupt));
 MACHINE_CONFIG_END
 
 
@@ -380,7 +381,7 @@ ROM_START(ti990_10)
 
 ROM_END
 
-DRIVER_INIT_MEMBER(ti990_10_state,ti990_10)
+void ti990_10_state::init_ti990_10()
 {
 #if 0
 	/* load specific ti990/12 rom page */
@@ -390,5 +391,5 @@ DRIVER_INIT_MEMBER(ti990_10_state,ti990_10)
 #endif
 }
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  STATE           INIT      COMPANY              FULLNAME                               FLAGS
-COMP( 1975, ti990_10,   0,      0,      ti990_10,   0,     ti990_10_state, ti990_10, "Texas Instruments", "TI Model 990/10 Minicomputer System", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT           COMPANY              FULLNAME                               FLAGS
+COMP( 1975, ti990_10, 0,      0,      ti990_10, 0,     ti990_10_state, init_ti990_10, "Texas Instruments", "TI Model 990/10 Minicomputer System", MACHINE_NOT_WORKING )

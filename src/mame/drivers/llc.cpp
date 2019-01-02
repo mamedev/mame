@@ -51,6 +51,7 @@
 #include "includes/llc.h"
 
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -87,10 +88,10 @@ void llc_state::llc2_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0xE0, 0xE3).w(this, FUNC(llc_state::llc2_rom_disable_w));
+	map(0xE0, 0xE3).w(FUNC(llc_state::llc2_rom_disable_w));
 	map(0xE4, 0xE7).rw("z80pio2", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0xE8, 0xEB).rw("z80pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0xEC, 0xEC).w(this, FUNC(llc_state::llc2_basic_enable_w));
+	map(0xEC, 0xEC).w(FUNC(llc_state::llc2_basic_enable_w));
 	map(0xF8, 0xFB).rw("z80ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
@@ -190,21 +191,21 @@ static const gfx_layout llc2_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( llc1 )
+static GFXDECODE_START( gfx_llc1 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, llc1_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( llc2 )
+static GFXDECODE_START( gfx_llc2 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, llc2_charlayout, 0, 1 )
 GFXDECODE_END
 
 /* Machine driver */
 MACHINE_CONFIG_START(llc_state::llc1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'000'000))
-	MCFG_Z80_DAISY_CHAIN(llc1_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(llc1_mem)
-	MCFG_CPU_IO_MAP(llc1_io)
+	Z80(config, m_maincpu, XTAL(3'000'000));
+	m_maincpu->set_daisy_config(llc1_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &llc_state::llc1_mem);
+	m_maincpu->set_addrmap(AS_IO, &llc_state::llc1_io);
 
 	MCFG_MACHINE_START_OVERRIDE(llc_state, llc1 )
 	MCFG_MACHINE_RESET_OVERRIDE(llc_state, llc1 )
@@ -218,37 +219,37 @@ MACHINE_CONFIG_START(llc_state::llc1)
 	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", llc1)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_DEFAULT_LAYOUT(layout_llc1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_llc1)
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+	config.set_default_layout(layout_llc1);
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(3'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(llc_state, llc1_port1_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(llc_state, llc1_port1_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(llc_state, llc1_port1_b_w))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(3'000'000)));
+	pio1.in_pa_callback().set(FUNC(llc_state::llc1_port1_a_r));
+	pio1.out_pa_callback().set(FUNC(llc_state::llc1_port1_a_w));
+	pio1.out_pb_callback().set(FUNC(llc_state::llc1_port1_b_w));
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(3'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(llc_state, llc1_port2_a_r))
-	MCFG_Z80PIO_IN_PB_CB(READ8(llc_state, llc1_port2_b_r))
+	z80pio_device& pio2(Z80PIO(config, "z80pio2", XTAL(3'000'000)));
+	pio2.in_pa_callback().set(FUNC(llc_state::llc1_port2_a_r));
+	pio2.in_pb_callback().set(FUNC(llc_state::llc1_port2_b_r));
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(3'000'000))
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(3'000'000)));
 	// timer 0 irq does digit display, and timer 3 irq does scan of the
 	// monitor keyboard.
 	// No idea how the CTC is connected, so guessed.
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
+	ctc.zc_callback<1>().set("z80ctc", FUNC(z80ctc_device::trg3));
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(llc_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(llc_state::kbd_put));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(llc_state::llc2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'000'000))
-	MCFG_Z80_DAISY_CHAIN(llc2_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(llc2_mem)
-	MCFG_CPU_IO_MAP(llc2_io)
+	Z80(config, m_maincpu, XTAL(3'000'000));
+	m_maincpu->set_daisy_config(llc2_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &llc_state::llc2_mem);
+	m_maincpu->set_addrmap(AS_IO, &llc_state::llc2_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(llc_state, llc2 )
 
@@ -261,29 +262,28 @@ MACHINE_CONFIG_START(llc_state::llc2)
 	MCFG_SCREEN_UPDATE_DRIVER(llc_state, screen_update_llc2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", llc2)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_llc2)
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(3'000'000))
-	MCFG_Z80PIO_IN_PA_CB(DEVREAD8(K7659_KEYBOARD_TAG, k7659_keyboard_device, read))
-	MCFG_Z80PIO_IN_PB_CB(READ8(llc_state, llc2_port1_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(llc_state, llc2_port1_b_w))
+	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(3'000'000)));
+	pio1.in_pa_callback().set(K7659_KEYBOARD_TAG, FUNC(k7659_keyboard_device::read));
+	pio1.in_pb_callback().set(FUNC(llc_state::llc2_port1_b_r));
+	pio1.out_pb_callback().set(FUNC(llc_state::llc2_port1_b_w));
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(3'000'000))
-	MCFG_Z80PIO_IN_PA_CB(READ8(llc_state, llc2_port2_a_r))
+	z80pio_device& pio2(Z80PIO(config, "z80pio2", XTAL(3'000'000)));
+	pio2.in_pa_callback().set(FUNC(llc_state::llc2_port2_a_r));
 
 	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(3'000'000))
 
-	MCFG_K7659_KEYBOARD_ADD()
+	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG, 0);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 /* ROM definition */
 
@@ -311,6 +311,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT     COMPANY    FULLNAME  FLAGS */
-COMP( 1984, llc1,   0,      0,      llc1,    llc1,  llc_state,  llc1,    "SCCH",    "LLC-1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1984, llc2,   llc1,   0,      llc2,    llc2,  llc_state,  llc2,    "SCCH",    "LLC-2",  0 )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT       COMPANY  FULLNAME  FLAGS */
+COMP( 1984, llc1, 0,      0,      llc1,    llc1,  llc_state, init_llc1, "SCCH",  "LLC-1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1984, llc2, llc1,   0,      llc2,    llc2,  llc_state, init_llc2, "SCCH",  "LLC-2",  0 )

@@ -6,9 +6,10 @@
 #define LOG_GENERAL (1U << 0)
 #define LOG_STATE   (1U << 1)
 #define LOG_CONTROL (1U << 2)
+#define LOG_DATA    (1U << 3)
 
-//#define VERBOSE (LOG_GENERAL | LOG_STATE | LOG_CONTROL)
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL | LOG_STATE | LOG_CONTROL | LOG_DATA)
+#define VERBOSE 0
 
 #include "logmacro.h"
 
@@ -49,7 +50,7 @@ void nscsi_bus_device::regen_data()
 
 void nscsi_bus_device::regen_ctrl(int refid)
 {
-	static const char *phase[8] = {
+	static char const *const phase[8] = {
 		"dout", "din ", "cmd ", "stat", "4   ", "5   ", "mout", "min "
 	};
 
@@ -244,6 +245,8 @@ void nscsi_full_device::device_reset()
 	scsi_state = scsi_substate = IDLE;
 	buf_control_rpos = buf_control_wpos = 0;
 	scsi_identify = 0;
+	data_buffer_size = 0;
+	data_buffer_pos = 0;
 	scsi_bus->data_w(scsi_refid, 0);
 	scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
 	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
@@ -364,8 +367,13 @@ void nscsi_full_device::step(bool timeout)
 			data_buffer_id = ctl->param1;
 			data_buffer_size = ctl->param2;
 			data_buffer_pos = 0;
-			scsi_state = TARGET_WAIT_DATA_IN_BYTE;
-			target_send_buffer_byte();
+			if (data_buffer_size > 0) {
+				scsi_state = TARGET_WAIT_DATA_IN_BYTE;
+			}
+			else {
+				scsi_state = TARGET_NEXT_CONTROL;
+			}
+			step(false);
 			break;
 
 		case BC_DATA_OUT:
@@ -373,8 +381,13 @@ void nscsi_full_device::step(bool timeout)
 			data_buffer_id = ctl->param1;
 			data_buffer_size = ctl->param2;
 			data_buffer_pos = 0;
-			scsi_state = TARGET_WAIT_DATA_OUT_BYTE;
-			target_recv_byte();
+			if (data_buffer_size > 0) {
+				scsi_state = TARGET_WAIT_DATA_OUT_BYTE;
+			}
+			else {
+				scsi_state = TARGET_NEXT_CONTROL;
+			}
+			step(false);
 			break;
 
 		case BC_MESSAGE_1:
@@ -465,6 +478,7 @@ uint8_t nscsi_full_device::scsi_get_data(int id, int pos)
 {
 	switch(id) {
 	case SBUF_MAIN:
+		LOGMASKED(LOG_DATA, "scsi_get_data MAIN, id:%d pos:%d data:%02x %c\n", id, pos, scsi_cmdbuf[pos], scsi_cmdbuf[pos] >= 0x20 && scsi_cmdbuf[pos] < 0x7f ? (char)scsi_cmdbuf[pos] : ' ');
 		return scsi_cmdbuf[pos];
 	case SBUF_SENSE:
 		return scsi_sense_buffer[pos];
@@ -477,6 +491,7 @@ void nscsi_full_device::scsi_put_data(int id, int pos, uint8_t data)
 {
 	switch(id) {
 	case SBUF_MAIN:
+		LOGMASKED(LOG_DATA, "nscsi_bus: scsi_put_data MAIN, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
 		scsi_cmdbuf[pos] = data;
 		break;
 	case SBUF_SENSE:
@@ -563,11 +578,13 @@ void nscsi_full_device::scsi_data_out(int buf, int size)
 	c->param2 = size;
 }
 
-void nscsi_full_device::sense(bool deferred, uint8_t key)
+void nscsi_full_device::sense(bool deferred, uint8_t key, uint8_t asc, uint8_t ascq)
 {
 	memset(scsi_sense_buffer, 0, sizeof(scsi_sense_buffer));
 	scsi_sense_buffer[0] = deferred ? 0x71 : 0x70;
 	scsi_sense_buffer[2] = key;
+	scsi_sense_buffer[12] = asc;
+	scsi_sense_buffer[13] = ascq;
 }
 
 void nscsi_full_device::scsi_unknown_command()
@@ -586,7 +603,11 @@ void nscsi_full_device::scsi_command()
 	switch(scsi_cmdbuf[0]) {
 	case SC_REQUEST_SENSE:
 		LOG("command REQUEST SENSE\n");
-		scsi_data_in(SBUF_SENSE, 8);
+		/*
+		 * Targets shall be capable of returning eighteen bytes of data in
+		 * response to a REQUEST SENSE command.
+		 */
+		scsi_data_in(SBUF_SENSE, 18);
 		scsi_status_complete(SS_GOOD);
 		break;
 	default:
@@ -611,14 +632,17 @@ void nscsi_full_device::scsi_message()
 int nscsi_full_device::get_lun(int def)
 {
 	if(scsi_identify & 0x80)
-		return scsi_identify & 0x7f;
+		// lower 3 bits contain LUNTRN
+		return scsi_identify & 0x07;
 	return def;
 }
 
 void nscsi_full_device::bad_lun()
 {
 	scsi_status_complete(SS_CHECK_CONDITION);
-	sense(false, 2);
+
+	// key:illegal request, asc:logical unit not supported
+	sense(false, 5, 0x25);
 }
 
 // Arbitration delay (2.4us)

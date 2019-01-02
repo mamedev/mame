@@ -14,7 +14,7 @@
 #include "abcbus.h"
 #include "bus/scsi/scsi.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80dma.h"
 
 
@@ -80,7 +80,7 @@ private:
 	void luxor_55_21056_io(address_map &map);
 	void luxor_55_21056_mem(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
 	required_device<scsi_port_device> m_sasibus;
 	required_device<output_latch_device> m_sasi_data_out;

@@ -5,23 +5,34 @@
 #include "screen.h"
 #include "audio/nichisnd.h"
 #include "machine/nb1413m3.h"
+#include "emupal.h"
 
 #define VRAM_MAX    3
 
 class niyanpai_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BLITTER
-	};
-
 	niyanpai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_tmp68301(*this, "tmp68301"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
+
+	void musobana(machine_config &config);
+	void zokumahj(machine_config &config);
+	void mhhonban(machine_config &config);
+	void niyanpai(machine_config &config);
+
+	void init_niyanpai();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(musobana_outcoin_flag_r);
+
+private:
+	enum
+	{
+		TIMER_BLITTER
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
@@ -81,9 +92,6 @@ public:
 	DECLARE_READ16_MEMBER(musobana_inputport_0_r);
 	DECLARE_WRITE16_MEMBER(musobana_inputport_w);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(musobana_outcoin_flag_r);
-
-	DECLARE_DRIVER_INIT(niyanpai);
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(musobana);
 
@@ -98,14 +106,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
-	void musobana(machine_config &config);
-	void zokumahj(machine_config &config);
-	void mhhonban(machine_config &config);
-	void niyanpai(machine_config &config);
 	void mhhonban_map(address_map &map);
 	void musobana_map(address_map &map);
 	void niyanpai_map(address_map &map);
 	void zokumahj_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

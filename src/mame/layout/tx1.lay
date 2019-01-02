@@ -59,7 +59,7 @@
 			<bounds x="1280" y="0" width="640" height="480" />
 		</screen>
 
-<bezel element="shifter" inputtag="PPI_PORTC" inputmask="0x08">
+<bezel element="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 
 			<bounds x="1886" y="414" width="32" height="64" />
 			<color alpha="0.6" />
@@ -76,7 +76,7 @@
 			<bounds x="1280" y="0" width="640" height="480" />
 		</screen>
 
-<bezel element="shifter" inputtag="PPI_PORTC" inputmask="0x08">
+<bezel element="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 
 			<bounds x="2" y="414" width="32" height="64" />
 			<color alpha="0.6" />
@@ -87,7 +87,7 @@
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
 
-<bezel element="shifter" inputtag="PPI_PORTC" inputmask="0x08">
+<bezel element="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 
 			<bounds x="606" y="414" width="32" height="64" />
 			<color alpha="0.6" />
@@ -98,7 +98,7 @@
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
 
-<bezel element="shifter" inputtag="PPI_PORTC" inputmask="0x08">
+<bezel element="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
 
 			<bounds x="2" y="414" width="32" height="64" />
 			<color alpha="0.6" />

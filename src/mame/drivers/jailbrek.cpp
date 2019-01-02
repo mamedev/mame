@@ -120,7 +120,7 @@ WRITE_LINE_MEMBER(jailbrek_state::vblank_irq)
 INTERRUPT_GEN_MEMBER(jailbrek_state::interrupt_nmi)
 {
 	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -138,8 +138,8 @@ WRITE8_MEMBER(jailbrek_state::speech_w)
 
 void jailbrek_state::jailbrek_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(this, FUNC(jailbrek_state::colorram_w)).share("colorram");
-	map(0x0800, 0x0fff).ram().w(this, FUNC(jailbrek_state::videoram_w)).share("videoram");
+	map(0x0000, 0x07ff).ram().w(FUNC(jailbrek_state::colorram_w)).share("colorram");
+	map(0x0800, 0x0fff).ram().w(FUNC(jailbrek_state::videoram_w)).share("videoram");
 	map(0x1000, 0x10bf).ram().share("spriteram");
 	map(0x10c0, 0x14ff).ram(); /* ??? */
 	map(0x1500, 0x1fff).ram(); /* work ram */
@@ -148,17 +148,17 @@ void jailbrek_state::jailbrek_map(address_map &map)
 	map(0x2041, 0x2041).nopw(); /* ??? */
 	map(0x2042, 0x2042).ram().share("scroll_dir"); /* bit 2 = scroll direction */
 	map(0x2043, 0x2043).nopw(); /* ??? */
-	map(0x2044, 0x2044).w(this, FUNC(jailbrek_state::ctrl_w)); /* irq, nmi enable, screen flip */
-	map(0x3000, 0x3000).w(this, FUNC(jailbrek_state::coin_w));
-	map(0x3100, 0x3100).portr("DSW2").w("snsnd", FUNC(sn76489a_device::write));
+	map(0x2044, 0x2044).w(FUNC(jailbrek_state::ctrl_w)); /* irq, nmi enable, screen flip */
+	map(0x3000, 0x3000).w(FUNC(jailbrek_state::coin_w));
+	map(0x3100, 0x3100).portr("DSW2").w("snsnd", FUNC(sn76489a_device::command_w));
 	map(0x3200, 0x3200).portr("DSW3").nopw(); /* mirror of the previous? */
 	map(0x3300, 0x3300).portr("SYSTEM").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3301, 0x3301).portr("P1");
 	map(0x3302, 0x3302).portr("P2");
 	map(0x3303, 0x3303).portr("DSW1");
-	map(0x4000, 0x4000).w(this, FUNC(jailbrek_state::speech_w)); /* speech pins */
+	map(0x4000, 0x4000).w(FUNC(jailbrek_state::speech_w)); /* speech pins */
 	map(0x5000, 0x5000).w(m_vlm, FUNC(vlm5030_device::data_w)); /* speech data */
-	map(0x6000, 0x6000).r(this, FUNC(jailbrek_state::speech_r));
+	map(0x6000, 0x6000).r(FUNC(jailbrek_state::speech_r));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -243,7 +243,7 @@ static const gfx_layout spritelayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( jailbrek )
+static GFXDECODE_START( gfx_jailbrek )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 ) /* characters */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 ) /* sprites */
 GFXDECODE_END
@@ -264,31 +264,29 @@ void jailbrek_state::machine_reset()
 MACHINE_CONFIG_START(jailbrek_state::jailbrek)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK/12)
-	MCFG_CPU_PROGRAM_MAP(jailbrek_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(jailbrek_state, interrupt_nmi,  500) /* ? */
+	MCFG_DEVICE_ADD("maincpu", KONAMI1, MASTER_CLOCK/12)
+	MCFG_DEVICE_PROGRAM_MAP(jailbrek_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(jailbrek_state, interrupt_nmi,  500) /* ? */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jailbrek)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(jailbrek_state, jailbrek)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jailbrek);
+	PALETTE(config, m_palette, FUNC(jailbrek_state::jailbrek_palette), 512, 32);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 396, 8, 248, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(jailbrek_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(jailbrek_state, vblank_irq))
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jailbrek_state, vblank_irq))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, MASTER_CLOCK/12)
+	MCFG_DEVICE_ADD("snsnd", SN76489A, MASTER_CLOCK/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, VOICE_CLOCK)
+	MCFG_DEVICE_ADD("vlm", VLM5030, VOICE_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 MACHINE_CONFIG_END
@@ -423,6 +421,6 @@ ROM_START( jailbrekb )
 	ROM_LOAD( "k8.bin",  0x0000, 0x0001, NO_DUMP ) /* PAL16L8 */
 ROM_END
 
-GAME( 1986, jailbrek,  0,        jailbrek, jailbrek, jailbrek_state, 0, ROT0, "Konami",  "Jail Break",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, jailbrekb, jailbrek, jailbrek, jailbrek, jailbrek_state, 0, ROT0, "bootleg", "Jail Break (bootleg)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, manhatan,  jailbrek, jailbrek, jailbrek, jailbrek_state, 0, ROT0, "Konami",  "Manhattan 24 Bunsyo (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jailbrek,  0,        jailbrek, jailbrek, jailbrek_state, empty_init, ROT0, "Konami",  "Jail Break",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jailbrekb, jailbrek, jailbrek, jailbrek, jailbrek_state, empty_init, ROT0, "bootleg", "Jail Break (bootleg)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, manhatan,  jailbrek, jailbrek, jailbrek, jailbrek_state, empty_init, ROT0, "Konami",  "Manhattan 24 Bunsyo (Japan)", MACHINE_SUPPORTS_SAVE )

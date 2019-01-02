@@ -415,8 +415,8 @@ void lazercmd_state::lazercmd_map(address_map &map)
 	map(0x0000, 0x0bff).rom();
 	map(0x1c00, 0x1c1f).ram();
 	map(0x1c20, 0x1eff).ram().share("videoram");
-	map(0x1f00, 0x1f03).w(this, FUNC(lazercmd_state::lazercmd_hardware_w));
-	map(0x1f00, 0x1f07).r(this, FUNC(lazercmd_state::lazercmd_hardware_r));
+	map(0x1f00, 0x1f03).w(FUNC(lazercmd_state::lazercmd_hardware_w));
+	map(0x1f00, 0x1f07).r(FUNC(lazercmd_state::lazercmd_hardware_r));
 }
 
 
@@ -426,8 +426,8 @@ void lazercmd_state::medlanes_map(address_map &map)
 	map(0x1000, 0x17ff).rom();
 	map(0x1c00, 0x1c1f).ram();
 	map(0x1c20, 0x1eff).ram().share("videoram");
-	map(0x1f00, 0x1f03).w(this, FUNC(lazercmd_state::medlanes_hardware_w));
-	map(0x1f00, 0x1f07).r(this, FUNC(lazercmd_state::lazercmd_hardware_r));
+	map(0x1f00, 0x1f03).w(FUNC(lazercmd_state::medlanes_hardware_w));
+	map(0x1f00, 0x1f07).r(FUNC(lazercmd_state::lazercmd_hardware_r));
 }
 
 
@@ -436,15 +436,15 @@ void lazercmd_state::bbonk_map(address_map &map)
 	map(0x0000, 0x0bff).rom();
 	map(0x1c00, 0x1c1f).ram();
 	map(0x1c20, 0x1eff).ram().share("videoram");
-	map(0x1f00, 0x1f03).w(this, FUNC(lazercmd_state::bbonk_hardware_w));
-	map(0x1f00, 0x1f07).r(this, FUNC(lazercmd_state::lazercmd_hardware_r));
+	map(0x1f00, 0x1f03).w(FUNC(lazercmd_state::bbonk_hardware_w));
+	map(0x1f00, 0x1f07).r(FUNC(lazercmd_state::lazercmd_hardware_r));
 }
 
 
 void lazercmd_state::lazercmd_portmap(address_map &map)
 {
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(lazercmd_state::lazercmd_ctrl_port_r), FUNC(lazercmd_state::lazercmd_ctrl_port_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(lazercmd_state::lazercmd_data_port_r), FUNC(lazercmd_state::lazercmd_data_port_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(lazercmd_state::lazercmd_ctrl_port_r), FUNC(lazercmd_state::lazercmd_ctrl_port_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(lazercmd_state::lazercmd_data_port_r), FUNC(lazercmd_state::lazercmd_data_port_w));
 }
 
 
@@ -591,19 +591,19 @@ static const gfx_layout charlayout =
 	10*8                    /* every char takes 10 bytes */
 };
 
-static GFXDECODE_START( lazercmd )
+static GFXDECODE_START( gfx_lazercmd )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 2 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(lazercmd_state, lazercmd)
+void lazercmd_state::lazercmd_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0xb0, 0xb0, 0xb0)); /* white */
-	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); /* black */
+	palette.set_pen_color(0, rgb_t(0xb0, 0xb0, 0xb0)); // white
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // black
 
-	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0x00)); /* black */
-	palette.set_pen_color(3, rgb_t(0xb0, 0xb0, 0xb0)); /* white */
+	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0x00)); // black
+	palette.set_pen_color(3, rgb_t(0xb0, 0xb0, 0xb0)); // white
 
-	palette.set_pen_color(4, rgb_t(0xff, 0xff, 0xff)); /* bright white */
+	palette.set_pen_color(4, rgb_t(0xff, 0xff, 0xff)); // bright white
 }
 
 
@@ -629,13 +629,13 @@ void lazercmd_state::machine_reset()
 MACHINE_CONFIG_START(lazercmd_state::lazercmd)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz? */
+	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz? */
 /*  Main Clock is 8MHz divided by 12
     but memory and IO access is only possible
     within the line and frame blanking period
     thus requiring an extra loading of approx 3-5 */
-	MCFG_CPU_PROGRAM_MAP(lazercmd_map)
-	MCFG_CPU_DATA_MAP(lazercmd_portmap)
+	MCFG_DEVICE_PROGRAM_MAP(lazercmd_map)
+	MCFG_DEVICE_DATA_MAP(lazercmd_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lazercmd_state, lazercmd_timer, "screen", 0, 1)
 
 	/* video hardware */
@@ -645,36 +645,35 @@ MACHINE_CONFIG_START(lazercmd_state::lazercmd)
 	MCFG_SCREEN_SIZE(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR + 16)
 	MCFG_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lazercmd)
-	MCFG_PALETTE_ADD("palette", 5)
-	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lazercmd);
+	PALETTE(config, m_palette, FUNC(lazercmd_state::lazercmd_palette), 5);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac0", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_SOUND_ADD("dac1", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_SOUND_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_SOUND_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac0", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac1", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(lazercmd_state::medlanes)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz */
+	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz */
 /*  Main Clock is 8MHz divided by 12
     but memory and IO access is only possible
     within the line and frame blanking period
     thus requiring an extra loading of approx 3-5 */
-	MCFG_CPU_PROGRAM_MAP(medlanes_map)
-	MCFG_CPU_DATA_MAP(lazercmd_portmap)
+	MCFG_DEVICE_PROGRAM_MAP(medlanes_map)
+	MCFG_DEVICE_DATA_MAP(lazercmd_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lazercmd_state, lazercmd_timer, "screen", 0, 1)
 
 	/* video hardware */
@@ -686,30 +685,29 @@ MACHINE_CONFIG_START(lazercmd_state::medlanes)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lazercmd)
-	MCFG_PALETTE_ADD("palette", 5)
-	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lazercmd);
+	PALETTE(config, m_palette, FUNC(lazercmd_state::lazercmd_palette), 5);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_SOUND_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(lazercmd_state::bbonk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz */
+	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK/12) /* 666 kHz */
 /*  Main Clock is 8MHz divided by 12
     but memory and IO access is only possible
     within the line and frame blanking period
     thus requiring an extra loading of approx 3-5 */
-	MCFG_CPU_PROGRAM_MAP(bbonk_map)
-	MCFG_CPU_DATA_MAP(lazercmd_portmap)
+	MCFG_DEVICE_PROGRAM_MAP(bbonk_map)
+	MCFG_DEVICE_DATA_MAP(lazercmd_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lazercmd_state, bbonk_timer, "screen", 0, 1)
 
 	/* video hardware */
@@ -721,17 +719,16 @@ MACHINE_CONFIG_START(lazercmd_state::bbonk)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lazercmd)
-	MCFG_PALETTE_ADD("palette", 5)
-	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lazercmd);
+	PALETTE(config, m_palette, FUNC(lazercmd_state::lazercmd_palette), 5);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_SOUND_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -783,9 +780,8 @@ ROM_START( bbonk )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(lazercmd_state,lazercmd)
+void lazercmd_state::init_lazercmd()
 {
-	int i, y;
 	uint8_t *gfx = memregion("gfx1")->base();
 
 /******************************************************************
@@ -796,12 +792,12 @@ DRIVER_INIT_MEMBER(lazercmd_state,lazercmd)
  * character generator only contains 8 rows, so we expand the
  * font to 8x10.
  ******************************************************************/
-	for (i = 0; i < 0x40; i++)
+	for (int i = 0; i < 0x40; i++)
 	{
 		uint8_t *d = &gfx[0 * 64 * 10 + i * VERT_CHR];
 		uint8_t *s = &gfx[4 * 64 * 10 + i * VERT_FNT];
 
-		for (y = 0; y < VERT_CHR; y++)
+		for (int y = 0; y < VERT_CHR; y++)
 		{
 			d[0 * 64 * 10] = (y < VERT_FNT) ? *s++ : 0xff;
 			d[1 * 64 * 10] = (y == VERT_CHR - 1) ? 0 : *d;
@@ -814,6 +810,6 @@ DRIVER_INIT_MEMBER(lazercmd_state,lazercmd)
 
 
 
-GAMEL( 1976, lazercmd, 0, lazercmd, lazercmd, lazercmd_state, lazercmd, ROT0, "Meadows Games, Inc.", "Lazer Command", MACHINE_SUPPORTS_SAVE, layout_lazercmd )
-GAMEL( 1977, medlanes, 0, medlanes, medlanes, lazercmd_state, lazercmd, ROT0, "Meadows Games, Inc.", "Meadows Lanes", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_medlanes )
-GAME ( 1976, bbonk,    0, bbonk,    bbonk,    lazercmd_state, lazercmd, ROT0, "Meadows Games, Inc.", "Bigfoot Bonkers", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1976, lazercmd, 0, lazercmd, lazercmd, lazercmd_state, init_lazercmd, ROT0, "Meadows Games, Inc.", "Lazer Command", MACHINE_SUPPORTS_SAVE, layout_lazercmd )
+GAMEL( 1977, medlanes, 0, medlanes, medlanes, lazercmd_state, init_lazercmd, ROT0, "Meadows Games, Inc.", "Meadows Lanes", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_medlanes )
+GAME(  1976, bbonk,    0, bbonk,    bbonk,    lazercmd_state, init_lazercmd, ROT0, "Meadows Games, Inc.", "Bigfoot Bonkers", MACHINE_SUPPORTS_SAVE )

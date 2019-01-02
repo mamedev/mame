@@ -25,7 +25,7 @@ m6509_device::m6509_device(const machine_config &mconfig, const char *tag, devic
 
 void m6509_device::device_start()
 {
-	if(direct_disabled)
+	if(cache_disabled)
 		mintf = std::make_unique<mi_6509_nd>(this);
 	else
 		mintf = std::make_unique<mi_6509_normal>(this);
@@ -72,7 +72,7 @@ uint8_t m6509_device::mi_6509_normal::read(uint16_t adr)
 
 uint8_t m6509_device::mi_6509_normal::read_sync(uint16_t adr)
 {
-	uint8_t res = sdirect->read_byte(base->adr_in_bank_i(adr));
+	uint8_t res = scache->read_byte(base->adr_in_bank_i(adr));
 	if(adr == 0x0000)
 		res = base->bank_i_r();
 	else if(adr == 0x0001)
@@ -82,7 +82,7 @@ uint8_t m6509_device::mi_6509_normal::read_sync(uint16_t adr)
 
 uint8_t m6509_device::mi_6509_normal::read_arg(uint16_t adr)
 {
-	uint8_t res = direct->read_byte(base->adr_in_bank_i(adr));
+	uint8_t res = cache->read_byte(base->adr_in_bank_i(adr));
 	if(adr == 0x0000)
 		res = base->bank_i_r();
 	else if(adr == 0x0001)

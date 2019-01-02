@@ -43,23 +43,25 @@ FLOPPY_FORMATS_MEMBER( compis_fdc_device::floppy_formats )
 	FLOPPY_CPIS_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( compis_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void compis_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(compis_fdc_device::device_add_mconfig)
-	MCFG_I8272A_ADD(I8272_TAG, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(compis_fdc_device, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(compis_fdc_device, fdc_drq))
-	MCFG_FLOPPY_DRIVE_ADD(I8272_TAG":0", compis_floppies, "525qd", compis_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(I8272_TAG":1", compis_floppies, "525qd", compis_fdc_device::floppy_formats)
-MACHINE_CONFIG_END
+void compis_fdc_device::device_add_mconfig(machine_config &config)
+{
+	I8272A(config, m_fdc, 8'000'000, true);
+	m_fdc->intrq_wr_callback().set(FUNC(compis_fdc_device::fdc_irq));
+	m_fdc->drq_wr_callback().set(FUNC(compis_fdc_device::fdc_drq));
+	FLOPPY_CONNECTOR(config, m_floppy0, compis_floppies, "525qd", compis_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, compis_floppies, "525qd", compis_fdc_device::floppy_formats);
+}
 
 
 

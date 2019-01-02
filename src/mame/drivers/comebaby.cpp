@@ -185,6 +185,7 @@ Nearly everything.
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -237,9 +238,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(comebaby_state::comebaby)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, (66666666*19)/2) /* Actually a Celeron */
-	MCFG_CPU_PROGRAM_MAP(comebaby_map)
-	MCFG_CPU_IO_MAP(comebaby_io)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM2, (66666666*19)/2) /* Actually a Celeron */
+	MCFG_DEVICE_PROGRAM_MAP(comebaby_map)
+	MCFG_DEVICE_IO_MAP(comebaby_io)
 
 	pcat_common(config);
 
@@ -265,4 +266,4 @@ ROM_START(comebaby)
 ROM_END
 
 
-GAME( 2000, comebaby,  0,   comebaby,  comebaby, comebaby_state,  0,  ROT0,  "ExPotato",    "Come On Baby",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2000, comebaby, 0, comebaby, comebaby, comebaby_state, empty_init, ROT0, "ExPotato", "Come On Baby", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

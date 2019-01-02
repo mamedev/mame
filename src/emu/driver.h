@@ -121,8 +121,8 @@ public:
 	void set_game_driver(const game_driver &game);
 	static void static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback);
 
-	// dummy driver_init callbacks
-	void init_0() { }
+	// dummy driver_init callback
+	void empty_init();
 
 	// memory helpers
 	address_space &generic_space() const { return machine().dummy_space(); }
@@ -157,9 +157,7 @@ public:
 	void irq7_line_hold(device_t &device);
 	void irq7_line_assert(device_t &device);
 
-
-	// generic input port helpers
-	DECLARE_CUSTOM_INPUT_MEMBER( custom_port_read );
+	virtual void driver_init();
 
 protected:
 	// helpers called at startup
@@ -194,8 +192,8 @@ private:
 	void updateflip();
 
 	// internal state
-	const game_driver *         m_system;               // pointer to the game driver
-	driver_callback_delegate    m_callbacks[CB_COUNT];  // start/reset callbacks
+	const game_driver        *m_system;               // pointer to the game driver
+	driver_callback_delegate  m_callbacks[CB_COUNT];  // start/reset callbacks
 
 	// generic video
 	u8                          m_flip_screen_x;

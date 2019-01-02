@@ -244,9 +244,6 @@ Who Dunit            1988  6809
 /* constants */
 
 #define MAIN_CPU_CLOCK      (EXIDY440_MASTER_CLOCK / 8)
-#define EXIDY440_AUDIO_CLOCK    (XTAL(12'979'200) / 4)
-#define EXIDY440_MC3418_CLOCK   (EXIDY440_AUDIO_CLOCK / 4 / 16)
-#define EXIDY440_MC3417_CLOCK   (EXIDY440_AUDIO_CLOCK / 4 / 32)
 
 
 
@@ -451,7 +448,7 @@ void exidy440_state::machine_start()
 	/* the EEROM lives in the uppermost 8k of the top bank */
 	uint8_t *rom = memregion("maincpu")->base();
 
-	machine().device<nvram_device>("nvram")->set_base(&rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
+	subdevice<nvram_device>("nvram")->set_base(&rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
 }
 
 void exidy440_state::machine_reset()
@@ -471,46 +468,24 @@ void exidy440_state::machine_reset()
 void exidy440_state::exidy440_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("imageram");
-	map(0x2000, 0x209f).ram().w(this, FUNC(exidy440_state::exidy440_spriteram_w)).share("spriteram");
+	map(0x2000, 0x209f).ram().w(FUNC(exidy440_state::exidy440_spriteram_w)).share("spriteram");
 	map(0x20a0, 0x29ff).ram();
-	map(0x2a00, 0x2aff).rw(this, FUNC(exidy440_state::exidy440_videoram_r), FUNC(exidy440_state::exidy440_videoram_w));
-	map(0x2b00, 0x2b00).r(this, FUNC(exidy440_state::exidy440_vertical_pos_r));
-	map(0x2b01, 0x2b01).rw(this, FUNC(exidy440_state::exidy440_horizontal_pos_r), FUNC(exidy440_state::exidy440_interrupt_clear_w));
+	map(0x2a00, 0x2aff).rw(FUNC(exidy440_state::exidy440_videoram_r), FUNC(exidy440_state::exidy440_videoram_w));
+	map(0x2b00, 0x2b00).r(FUNC(exidy440_state::exidy440_vertical_pos_r));
+	map(0x2b01, 0x2b01).rw(FUNC(exidy440_state::exidy440_horizontal_pos_r), FUNC(exidy440_state::exidy440_interrupt_clear_w));
 	map(0x2b02, 0x2b02).ram().share("scanline");
-	map(0x2b03, 0x2b03).portr("IN0").w(this, FUNC(exidy440_state::exidy440_control_w));
-	map(0x2c00, 0x2dff).rw(this, FUNC(exidy440_state::exidy440_paletteram_r), FUNC(exidy440_state::exidy440_paletteram_w));
-	map(0x2e00, 0x2e1f).ram().w(this, FUNC(exidy440_state::sound_command_w));
-	map(0x2e20, 0x2e3f).rw(this, FUNC(exidy440_state::exidy440_input_port_3_r), FUNC(exidy440_state::exidy440_input_port_3_w));
-	map(0x2e40, 0x2e5f).nopr().w(this, FUNC(exidy440_state::exidy440_coin_counter_w));   /* read: clear coin counters I/O2 */
+	map(0x2b03, 0x2b03).portr("IN0").w(FUNC(exidy440_state::exidy440_control_w));
+	map(0x2c00, 0x2dff).rw(FUNC(exidy440_state::exidy440_paletteram_r), FUNC(exidy440_state::exidy440_paletteram_w));
+	map(0x2e00, 0x2e1f).ram().w(FUNC(exidy440_state::sound_command_w));
+	map(0x2e20, 0x2e3f).rw(FUNC(exidy440_state::exidy440_input_port_3_r), FUNC(exidy440_state::exidy440_input_port_3_w));
+	map(0x2e40, 0x2e5f).nopr().w(FUNC(exidy440_state::exidy440_coin_counter_w));   /* read: clear coin counters I/O2 */
 	map(0x2e60, 0x2e7f).portr("IN1").nopw();
 	map(0x2e80, 0x2e9f).portr("IN2").nopw();
-	map(0x2ea0, 0x2ebf).r(this, FUNC(exidy440_state::sound_command_ack_r)).nopw();
+	map(0x2ea0, 0x2ebf).r(FUNC(exidy440_state::sound_command_ack_r)).nopw();
 	map(0x2ec0, 0x2eff).noprw();
 	map(0x3000, 0x3fff).ram();
-	map(0x4000, 0x7fff).bankr("bank1").w(this, FUNC(exidy440_state::bankram_w));
+	map(0x4000, 0x7fff).bankr("bank1").w(FUNC(exidy440_state::bankram_w));
 	map(0x8000, 0xffff).rom();
-}
-
-
-/*************************************
- *
- *  Audio CPU memory handlers
- *
- *************************************/
-
-void exidy440_state::exidy440_audio_map(address_map &map)
-{
-	map(0x0000, 0x7fff).noprw();
-	map(0x8000, 0x801f).mirror(0x03e0).rw(m_custom, FUNC(exidy440_sound_device::m6844_r), FUNC(exidy440_sound_device::m6844_w));
-	map(0x8400, 0x840f).mirror(0x03f0).rw(m_custom, FUNC(exidy440_sound_device::sound_volume_r), FUNC(exidy440_sound_device::sound_volume_w));
-	map(0x8800, 0x8800).mirror(0x03ff).r(m_custom, FUNC(exidy440_sound_device::sound_command_r)).nopw();
-	map(0x8c00, 0x93ff).noprw();
-	map(0x9400, 0x9403).mirror(0x03fc).nopr().w(m_custom, FUNC(exidy440_sound_device::sound_banks_w));
-	map(0x9800, 0x9800).mirror(0x03ff).nopr().w(m_custom, FUNC(exidy440_sound_device::sound_interrupt_clear_w));
-	map(0x9c00, 0x9fff).noprw();
-	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xdfff).noprw();
-	map(0xe000, 0xffff).rom();
 }
 
 
@@ -1024,37 +999,21 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(exidy440_state::exidy440)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(exidy440_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", exidy440_state,  exidy440_vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(exidy440_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	exidy440_video(config);
 
 	/* audio hardware */
-	MCFG_CPU_ADD("audiocpu", MC6809, EXIDY440_AUDIO_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(exidy440_audio_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", driver_device, irq0_line_assert)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("custom", EXIDY440, EXIDY440_MC3418_CLOCK)
+	MCFG_DEVICE_ADD("440audio", EXIDY440, EXIDY440_MC3418_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-//  MCFG_SOUND_ADD("cvsd1", MC3418, EXIDY440_MC3418_CLOCK)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-
-//  MCFG_SOUND_ADD("cvsd2", MC3418, EXIDY440_MC3418_CLOCK)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-
-//  MCFG_SOUND_ADD("cvsd3", MC3417, EXIDY440_MC3417_CLOCK)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-
-//  MCFG_SOUND_ADD("cvsd4", MC3417, EXIDY440_MC3417_CLOCK)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1109,10 +1068,10 @@ ROM_START( crossbow )
 	ROM_LOAD( "xbl-1.3b",   0x42000, 0x2000, CRC(4a03c2c9) SHA1(dd60cd629f60d15dd0596bde44fea4b4f1d65ae2) )
 	ROM_LOAD( "xbl-1.4b",   0x44000, 0x2000, CRC(7e21c624) SHA1(9e0c1297413f9d440106f6cef25f48fad60e4c85) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "xba-11.1h",  0x0e000, 0x2000, CRC(1b61d0c1) SHA1(de1028a3295dc0413756d4751ca577a03431583e) )
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "xba-11.1h",  0x00000, 0x2000, CRC(1b61d0c1) SHA1(de1028a3295dc0413756d4751ca577a03431583e) )
 
-	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
 	ROM_LOAD( "xba-1.2k",   0x00000, 0x2000, CRC(b6e57685) SHA1(ee690cb966af126bfb0bafa804e0ad5490cab1db) )
 	ROM_LOAD( "xba-1.2l",   0x02000, 0x2000, CRC(2c24cb35) SHA1(4ea16998f477d6429a92ca05ef74daa21315e695) )
 	ROM_LOAD( "xba-1.2m",   0x04000, 0x2000, CRC(f3a4f2be) SHA1(f0ab8a0a6fbb2911d99c961a65035835e54924de) )
@@ -1178,10 +1137,10 @@ ROM_START( cheyenne )
 	ROM_LOAD( "cyl-1.8b",   0x4a000, 0x2000, CRC(c0653d3e) SHA1(489e61d1e0a18fca47b906d80b88c47fdb927d36) )
 	ROM_LOAD( "cyl-1.10b",  0x4c000, 0x2000, CRC(7fc67d19) SHA1(48307d50066c02376522e8fee0298c16f758b61d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "cya-1.1h",   0x0e000, 0x2000, CRC(5aed3d8c) SHA1(d04ddd09df471cd2a8dd87c47c7b55eca5d7ac15) )
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "cya-1.1h",   0x00000, 0x2000, CRC(5aed3d8c) SHA1(d04ddd09df471cd2a8dd87c47c7b55eca5d7ac15) )
 
-	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
 	ROM_LOAD( "cya-1.2k",   0x00000, 0x2000, CRC(dc2b716d) SHA1(ae588954431f8c4ecc7075f4964c3b8cc7ae0569) )
 	ROM_LOAD( "cya-1.2l",   0x02000, 0x2000, CRC(091ad047) SHA1(edab4472f39a1f19614737c6c5722677f4afd68c) )
 	ROM_LOAD( "cya-1.2m",   0x04000, 0x2000, CRC(59085362) SHA1(d4d7182ccdec17a29c556810b1d24aa6726f3826) )
@@ -1239,10 +1198,10 @@ ROM_START( combat )
 	ROM_LOAD( "8b",   0x4a000, 0x2000, CRC(ae977f4c) SHA1(a4cc9cae10482f03879b64c2b40fc8999b8a2b71) )
 	ROM_LOAD( "10b",  0x4c000, 0x2000, CRC(502da003) SHA1(f4c579b2f997208f71b24590794275d87b06e25c) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "1h",  0x0e000, 0x2000, CRC(8f3dd350) SHA1(9e329c2f502f63fcdbebeb40bf732e4a07a463c1) )
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "1h",  0x00000, 0x2000, CRC(8f3dd350) SHA1(9e329c2f502f63fcdbebeb40bf732e4a07a463c1) )
 
-	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
 	ROM_LOAD( "2k",          0x00000, 0x2000, CRC(1c9df8b5) SHA1(12e82f585aee01f1e2ea7396a6b013c894f7b98d) )
 	ROM_LOAD( "2l",          0x02000, 0x2000, CRC(6b733306) SHA1(a41cc2e646392d71642abe2ab8d72f2d56214c02) )
 	ROM_LOAD( "2m",          0x04000, 0x2000, CRC(dc074733) SHA1(29a036d4057b813f584373493cb5b69b711840ae) )
@@ -1300,10 +1259,10 @@ ROM_START( catch22 )
 	ROM_LOAD( "8b",   0x4a000, 0x2000, CRC(ae977f4c) SHA1(a4cc9cae10482f03879b64c2b40fc8999b8a2b71) )
 	ROM_LOAD( "10b",  0x4c000, 0x2000, CRC(502da003) SHA1(f4c579b2f997208f71b24590794275d87b06e25c) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "1h",  0x0e000, 0x2000, CRC(8f3dd350) SHA1(9e329c2f502f63fcdbebeb40bf732e4a07a463c1) )
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "1h",  0x00000, 0x2000, CRC(8f3dd350) SHA1(9e329c2f502f63fcdbebeb40bf732e4a07a463c1) )
 
-	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
 	ROM_LOAD( "2k",          0x00000, 0x2000, CRC(1c9df8b5) SHA1(12e82f585aee01f1e2ea7396a6b013c894f7b98d) )
 	ROM_LOAD( "2l",          0x02000, 0x2000, CRC(6b733306) SHA1(a41cc2e646392d71642abe2ab8d72f2d56214c02) )
 	ROM_LOAD( "2m",          0x04000, 0x2000, CRC(dc074733) SHA1(29a036d4057b813f584373493cb5b69b711840ae) )
@@ -1357,10 +1316,10 @@ ROM_START( cracksht )
 	ROM_LOAD( "csl2.8b",   0x4a000, 0x2000, CRC(af1c8cb8) SHA1(d753539a2afa4f6b0a79b9c7364d9814eb5ec3c0) )
 	ROM_LOAD( "csl2.10b",  0x4c000, 0x2000, CRC(8a0d6ad0) SHA1(024a8cebb56404c9efae0594e0b1d4a341ba9893) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "csa3.1h",   0x0e000, 0x2000, CRC(5ba8b4ac) SHA1(04d9d4bb7a5994c5ffe97ca22a43e7a1cbdef559) )
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "csa3.1h",   0x00000, 0x2000, CRC(5ba8b4ac) SHA1(04d9d4bb7a5994c5ffe97ca22a43e7a1cbdef559) )
 
-	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
 	ROM_LOAD( "csa3.2k",   0x00000, 0x2000, CRC(067a4f71) SHA1(301b44bcb0c7145dbc2dfbaf5c7d9cc5aa0e2118) )
 	ROM_LOAD( "csa3.2l",   0x02000, 0x2000, CRC(5716c59e) SHA1(8adb601ba04bbc27295afe993cdc0576a39c7a71) )
 	ROM_LOAD( "csa3.2m",   0x04000, 0x2000, CRC(b3ff659b) SHA1(295b5153ad41d92ee53b53ed454b2487aea7f355) )
@@ -1408,10 +1367,10 @@ ROM_START( claypign )
 	ROM_LOAD( "claypige.7b",   0x48000, 0x2000, CRC(6140b026) SHA1(16949d1bcaec3c0c398df50a731da3bb44fa8e5b) )
 	ROM_LOAD( "claypige.8b",   0x4a000, 0x2000, CRC(d0f9d170) SHA1(db4285a280a7d539aab91280c57db9c460468a69) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "claypige.h1",   0x0e000, 0x2000, CRC(9eedc68d) SHA1(966542a10e19f7afe065614bdb7dd8a9ad9d3c3d) )
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "claypige.h1",   0x00000, 0x2000, CRC(9eedc68d) SHA1(966542a10e19f7afe065614bdb7dd8a9ad9d3c3d) )
 
-	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
 	ROM_LOAD( "claypige.k2",   0x00000, 0x2000, CRC(0dd93c6c) SHA1(630397dbc54923a713bef1d99b08df8d2668b8ea) )
 	ROM_LOAD( "claypige.l2",   0x02000, 0x2000, CRC(e1d67c42) SHA1(8021432493cd9d5096b534505d469bb88a20e31f) )
 	ROM_LOAD( "claypige.m2",   0x04000, 0x2000, CRC(b56d8bd5) SHA1(45ac65a0f066791bb50535705d502957bfffbd53) )
@@ -1469,10 +1428,10 @@ ROM_START( chiller )
 	ROM_LOAD( "chl3.8b",   0x4a000, 0x2000, CRC(6172b12f) SHA1(f23e88103ed6b67eefade835cbdb1e3260d07d92) )
 	ROM_LOAD( "chl3.10b",  0x4c000, 0x2000, CRC(5d15342a) SHA1(74216b78a8f0bb44911b9cc74587b3edbacbbf01) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "cha3.1h",   0x0f000, 0x1000, CRC(b195cbba) SHA1(a74d14464ef0f07bfc83500483dd552f38fd55c8) )
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "cha3.1h",   0x01000, 0x1000, CRC(b195cbba) SHA1(a74d14464ef0f07bfc83500483dd552f38fd55c8) )
 
-	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
 	ROM_LOAD( "cha3.2k",   0x00000, 0x2000, CRC(814a1c6e) SHA1(f7b22bc5a7d0b8fb9914b000520d68cc87c43957) )
 	ROM_LOAD( "cha3.2l",   0x02000, 0x2000, CRC(b326007f) SHA1(c636f28f18697673d0a9b47a1494ea4060ca012f) )
 	ROM_LOAD( "cha3.2m",   0x04000, 0x2000, CRC(11075e8c) SHA1(f87cb92126ddb3899fc95b3a20a1c7109fc2a60d) )
@@ -1542,10 +1501,10 @@ ROM_START( topsecex )
 	ROM_LOAD( "tsl1.b8",   0x4a000, 0x2000, CRC(cc770802) SHA1(3830a7cb22e30e7af5a693fac3dad0f306a88c2b) )
 	ROM_LOAD( "tsl1.b10",  0x4c000, 0x2000, CRC(079d0a1d) SHA1(91ee751e27b963b98774181f5037e3e88b4877df) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "tsa1.1h",   0x0e000, 0x2000, CRC(35a1dd40) SHA1(2a18b166f9ad2b6afc9e8448287228cd81d34f94) )
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "tsa1.1h",   0x00000, 0x2000, CRC(35a1dd40) SHA1(2a18b166f9ad2b6afc9e8448287228cd81d34f94) )
 
-	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
 	ROM_LOAD( "tsa1.2k",   0x00000, 0x2000, CRC(c0b7c8f9) SHA1(1d54da254d2524f3df49df6ad6961770852a663e) )
 	ROM_LOAD( "tsa1.2l",   0x02000, 0x2000, CRC(d46f2f23) SHA1(6d3f9cf9f9d05faea86323a7752eea9467d6edc5) )
 	ROM_LOAD( "tsa1.2m",   0x04000, 0x2000, CRC(04722ee4) SHA1(ab5d730330b98365fc02c38eb8545e5e1de4e93f) )
@@ -1605,10 +1564,10 @@ ROM_START( hitnmiss )
 	ROM_LOAD( "hml3.b8",   0x4a000, 0x2000, CRC(e0a5a6aa) SHA1(b012a1e23fd0acf9972714ed8aea0cedbb079a31) )
 	ROM_LOAD( "hml3.b10",  0x4c000, 0x2000, CRC(de65dfdc) SHA1(c1105ff41596ee5f4c79143552eab87fcbe93d1e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "hma3.1h",  0x0e000, 0x2000, CRC(f718da36) SHA1(6c878725e679e0c553494c621bee059fe8b67ae8) )
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "hma3.1h",  0x00000, 0x2000, CRC(f718da36) SHA1(6c878725e679e0c553494c621bee059fe8b67ae8) )
 
-	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
 	ROM_LOAD( "hm2.2k",   0x00000, 0x2000, CRC(d3583b62) SHA1(99be3a858ab6b1c950ef684202adec4f5e60a361) )
 	ROM_LOAD( "hm2.2l",   0x02000, 0x2000, CRC(c059d51e) SHA1(ddf437cdff6168e76c6a65078e0a2e2862805ca7) )
 	ROM_LOAD( "hma.2m",   0x04000, 0x2000, CRC(09bb8495) SHA1(ea817cbbd89aa18d81f6025a856965d466efadff) )
@@ -1666,10 +1625,10 @@ ROM_START( hitnmiss2 )
 	ROM_LOAD( "hml2.b8",   0x4a000, 0x2000, CRC(9c2db94a) SHA1(aa90181c0cc3e130f872ff5beb2be340e7851e1a) )
 	ROM_LOAD( "hml2.b10",  0x4c000, 0x2000, CRC(f01bd7d4) SHA1(169139c89582852b6141fd37e75486753674c557) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "hma2.1h",  0x0e000, 0x2000, CRC(9be48f45) SHA1(360138e3996828509b4bd1b3efccd61f05d215f0) )
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "hma2.1h",  0x00000, 0x2000, CRC(9be48f45) SHA1(360138e3996828509b4bd1b3efccd61f05d215f0) )
 
-	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
 	ROM_LOAD( "hm2.2k",   0x00000, 0x2000, CRC(d3583b62) SHA1(99be3a858ab6b1c950ef684202adec4f5e60a361) )
 	ROM_LOAD( "hm2.2l",   0x02000, 0x2000, CRC(c059d51e) SHA1(ddf437cdff6168e76c6a65078e0a2e2862805ca7) )
 	ROM_LOAD( "hma.2m",   0x04000, 0x2000, CRC(09bb8495) SHA1(ea817cbbd89aa18d81f6025a856965d466efadff) )
@@ -1735,10 +1694,10 @@ ROM_START( whodunit ) /* Version 9 */
 	ROM_LOAD( "wdl-9_8-b.8b",   0x4a000, 0x2000, CRC(33792758) SHA1(408da288288f54f7446b083b14dc74d43ef4ab9f) )
 	ROM_LOAD( "wdl-9_10-b.10b", 0x4c000, 0x2000, CRC(c5ab5805) SHA1(fd7c47e50eb4005b81309a73afae2e04a823d00b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "wda-9_h-1.h1",  0x0e000, 0x2000, CRC(dc4b36f0) SHA1(1ddd47dbd7f3e360aae830b67a13dd6a1d7a6497) ) // This ROM is a 2764 eprom
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "wda-9_h-1.h1",  0x00000, 0x2000, CRC(dc4b36f0) SHA1(1ddd47dbd7f3e360aae830b67a13dd6a1d7a6497) ) // This ROM is a 2764 eprom
 
-	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
 	ROM_LOAD( "wda-9_2-k.2k",  0x00000, 0x2000, CRC(d4951375) SHA1(88616a7cb587748b366ece6126185a85e7375659) ) // all these ROMs are 2764 eproms
 	ROM_LOAD( "wda-9_2-l.2l",  0x02000, 0x2000, CRC(be8dcf07) SHA1(9a6e9b256da07be50feb81b27e53d86b3f016f4e) )
 	ROM_LOAD( "wda-9_2-m.2m",  0x04000, 0x2000, CRC(fb389e2d) SHA1(8ee1be233429d6b7cbb56a13586e2db49dffaca1) )
@@ -1807,10 +1766,10 @@ ROM_START( whodunit8 ) /* Version 8 */
 	ROM_LOAD( "wdl8.8b",   0x4a000, 0x2000, CRC(33792758) SHA1(408da288288f54f7446b083b14dc74d43ef4ab9f) )
 	ROM_LOAD( "wdl6.10b",  0x4c000, 0x2000, CRC(2f48cfdb) SHA1(b546da26b7bdc52c454ff32e4503ef5e45e4b360) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "wda8.h1",  0x0e000, 0x2000, CRC(0090e5a7) SHA1(c97e4c83d507d1375320aa9cae07b9fa1ee442c8) )
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "wda8.h1",  0x00000, 0x2000, CRC(0090e5a7) SHA1(c97e4c83d507d1375320aa9cae07b9fa1ee442c8) )
 
-	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
 	ROM_LOAD( "wda6.k2",   0x00000, 0x2000, CRC(d4951375) SHA1(88616a7cb587748b366ece6126185a85e7375659) )
 	ROM_LOAD( "wda6.l2",   0x02000, 0x2000, CRC(be8dcf07) SHA1(9a6e9b256da07be50feb81b27e53d86b3f016f4e) )
 	ROM_LOAD( "wda6.m2",   0x04000, 0x2000, CRC(fb389e2d) SHA1(8ee1be233429d6b7cbb56a13586e2db49dffaca1) )
@@ -1873,10 +1832,10 @@ ROM_START( showdown )
 	ROM_LOAD( "sld-5_8-b.8b",   0x4a000, 0x2000, CRC(024fe6ee) SHA1(4287091e65c58aec75c54e320c534d41def951f9) )
 	ROM_LOAD( "sld-5_10-b.10b", 0x4c000, 0x2000, CRC(0b318dfe) SHA1(feb65530ea3aea6b0786875dc48d96e07d579636) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "sda-5_h-1.h1",   0x0e000, 0x2000, CRC(6a10ff47) SHA1(ee57de74ab9a5cfe5726212a9b905e91e6461225) )
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "sda-5_h-1.h1",   0x00000, 0x2000, CRC(6a10ff47) SHA1(ee57de74ab9a5cfe5726212a9b905e91e6461225) )
 
-	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
 	ROM_LOAD( "sda-5_k-2.k2",   0x00000, 0x2000, CRC(67a86f7f) SHA1(a4f70aab90acd2502e8f3f39efdafcd71b1a22b4) )
 	ROM_LOAD( "sda-5_l-2.l2",   0x02000, 0x2000, CRC(0bb8874b) SHA1(8b643dbd5412a713b3e2831dd1ba2b7d1f613ac2) )
 	ROM_LOAD( "sda-5_m-2.m2",   0x04000, 0x2000, CRC(8b77eac8) SHA1(d70038cd6655e71c6488c555ecb1d1a424d00d49) )
@@ -1908,6 +1867,71 @@ ROM_START( showdown )
 	ROM_LOAD( "xbl.8k",     0x00800, 0x0100, CRC(9d434cb1) SHA1(c3390bc1c02fe74ff2067f7fccfd1ad2c30b54a9) )
 ROM_END
 
+ROM_START( showdown4 )
+	ROM_REGION( 0x50000, "maincpu", 0 )     /* 64k for code for the first CPU, plus lots of banked ROMs */
+	ROM_LOAD( "sld-4_1-a.1a",   0x08000, 0x2000, CRC(674e078e) SHA1(35540ce394f3cb03d9a6b49dabf071b7c1dd7194) ) // only different ROM from the parent, label not verified
+	ROM_LOAD( "sld-5_3-a.3a",   0x0a000, 0x2000, CRC(e7de171e) SHA1(881a2b596949de3b4bb1263e2aa08faeb3051a6e) )
+	ROM_LOAD( "sld-5_4-a.4a",   0x0c000, 0x2000, CRC(5c8683c9) SHA1(81d0880fcbd3c1662ea4dd1662d6987adbdb4f71) )
+	ROM_LOAD( "sld-5_6-a.6a",   0x0e000, 0x2000, CRC(4a408379) SHA1(1ec83b7416f948bc31bafa8ddaa87c23490bce16) )
+	ROM_LOAD( "sld-5_11-e.11e", 0x1e000, 0x2000, CRC(1c6b34e5) SHA1(ae5ddd80d5fdc89274f44a30c4ec1aa325b26cc7) )
+	ROM_LOAD( "sld-5_1-d.1d",   0x20000, 0x2000, CRC(db4c8cf6) SHA1(11fb37afb87b926f94f23abf90fb537a3a867aec) )
+	ROM_LOAD( "sld-5_3-d.3d",   0x22000, 0x2000, CRC(24242867) SHA1(aa109231cad5fcb9e24578b567ff0fe50a72be44) )
+	ROM_LOAD( "sld-5_4-d.4d",   0x24000, 0x2000, CRC(36f247e9) SHA1(749f5ea3307bfc02bced9535ebd733bb1297a0ae) )
+	ROM_LOAD( "sld-5_6-d.6d",   0x26000, 0x2000, CRC(c9b14d8d) SHA1(48e66f5a4dc63c3948e32aeb0a151c8f9d2082b2) )
+	ROM_LOAD( "sld-5_7-d.7d",   0x28000, 0x2000, CRC(fd054cd2) SHA1(a7fcedd30c088d2cb9fe013eaa1214b48f3569ab) )
+	ROM_LOAD( "sld-5_8-d.8d",   0x2a000, 0x2000, CRC(8bf32822) SHA1(91a1ab0bc6aac3dfe7b7e60e3d35e7d4909aa09d) )
+	ROM_LOAD( "sld-5_10-d.10d", 0x2c000, 0x2000, CRC(a2051da2) SHA1(f879459a90a00c9dc4ba0b1e8895bc1352286a8a) )
+	ROM_LOAD( "sld-5_11-d.11d", 0x2e000, 0x2000, CRC(0748f345) SHA1(c435cd0769aa44162b3f7aa1bc230cadf572ca73) )
+	ROM_LOAD( "sld-5_1-c.1c",   0x30000, 0x2000, CRC(c016cf73) SHA1(30221e5f878354933b8caf8c644f2c6f1e5dcd30) )
+	ROM_LOAD( "sld-5_3-c.3c",   0x32000, 0x2000, CRC(652503ee) SHA1(90c76bb5d59ce0626d1d7f3feaea05ef984f9551) )
+	ROM_LOAD( "sld-5_4-c.4c",   0x34000, 0x2000, CRC(b4dab193) SHA1(e028d2c865e7607f43bb7b4f2afe75082618a47b) )
+	ROM_LOAD( "sld-5_6-c.6c",   0x36000, 0x2000, CRC(a1e6a2b3) SHA1(b75a0355e1245a8ca0dc438c66a96c064b7ab40a) )
+	ROM_LOAD( "sld-5_7-c.7c",   0x38000, 0x2000, CRC(bc1bea93) SHA1(77fcfef6c509186af394f0ad67717c11ca447fb7) )
+	ROM_LOAD( "sld-5_8-c.8c",   0x3a000, 0x2000, CRC(337dd7fa) SHA1(4df916968f5a2e12cdc8bab585f58b6f6a9d2f4c) )
+	ROM_LOAD( "sld-5_10-c.10c", 0x3c000, 0x2000, CRC(3ad32d71) SHA1(1a032eb136c56b97305e64572730a40c40d9c52b) )
+	ROM_LOAD( "sld-5_11-c.11c", 0x3e000, 0x2000, CRC(5fe91932) SHA1(f4f880c55e72159a6754f7c939b4dbb16522e3ad) )
+	ROM_LOAD( "sld-5_1-b.1b",   0x40000, 0x2000, CRC(54ff987e) SHA1(ea50a6e2b6c409403cec035f96f4672814e153e2) )
+	ROM_LOAD( "sld-5_3-b.3b",   0x42000, 0x2000, CRC(e302e915) SHA1(cb2413c24503fd2363f6e717e8de558f771427a4) )
+	ROM_LOAD( "sld-5_4-b.4b",   0x44000, 0x2000, CRC(1b981516) SHA1(16c417c9c1918a00dee976f3513925f8f28e6f41) )
+	ROM_LOAD( "sld-5_6-b.6b",   0x46000, 0x2000, CRC(4ee00996) SHA1(7201aef40f6ea3b73d0c009117c174f19d97b98e) )
+	ROM_LOAD( "sld-5_7-b.7b",   0x48000, 0x2000, CRC(018b7c00) SHA1(04879f476687e087d21bd8d5f439f3e45d39d142) )
+	ROM_LOAD( "sld-5_8-b.8b",   0x4a000, 0x2000, CRC(024fe6ee) SHA1(4287091e65c58aec75c54e320c534d41def951f9) )
+	ROM_LOAD( "sld-5_10-b.10b", 0x4c000, 0x2000, CRC(0b318dfe) SHA1(feb65530ea3aea6b0786875dc48d96e07d579636) )
+
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "sda-5_h-1.h1",   0x00000, 0x2000, CRC(6a10ff47) SHA1(ee57de74ab9a5cfe5726212a9b905e91e6461225) )
+
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
+	ROM_LOAD( "sda-5_k-2.k2",   0x00000, 0x2000, CRC(67a86f7f) SHA1(a4f70aab90acd2502e8f3f39efdafcd71b1a22b4) )
+	ROM_LOAD( "sda-5_l-2.l2",   0x02000, 0x2000, CRC(0bb8874b) SHA1(8b643dbd5412a713b3e2831dd1ba2b7d1f613ac2) )
+	ROM_LOAD( "sda-5_m-2.m2",   0x04000, 0x2000, CRC(8b77eac8) SHA1(d70038cd6655e71c6488c555ecb1d1a424d00d49) )
+	ROM_LOAD( "sda-5_n-2.n2",   0x06000, 0x2000, CRC(78e6eed6) SHA1(d9218745fc497a67373b0f6fd82caeef33bb4b3e) )
+	ROM_LOAD( "sda-5_p-2.p2",   0x08000, 0x2000, CRC(03a13435) SHA1(1965d26a2f294e883cc6a13bc89bf0c28e30d28e) )
+	ROM_LOAD( "sda-5_r-2.r2",   0x0a000, 0x2000, CRC(1b6b7eac) SHA1(b30965203807d8b863e8b2863a222d2e614eee2d) )
+	ROM_LOAD( "sda-5_s-2.s2",   0x0c000, 0x2000, CRC(b88aeb82) SHA1(62d87430c7aec1aec892a15e45fb257206d8cf94) )
+	ROM_LOAD( "sda-5_t-2.t2",   0x0e000, 0x2000, CRC(5c801f4d) SHA1(e6dbb2d2815b9d848c0580cff47d1f0d10c1906d) )
+	ROM_LOAD( "sda-5_k-1.k1",   0x10000, 0x2000, CRC(4e1f4f15) SHA1(cf075e09eaeab1e630b5b2e28c806d4c34eece48) )
+	ROM_LOAD( "sda-5_l-1.l1",   0x12000, 0x2000, CRC(6779a745) SHA1(de7d8e39f053eaa45238844e477732295d9af494) )
+	ROM_LOAD( "sda-5_m-1.m1",   0x14000, 0x2000, CRC(9cebd8ea) SHA1(ff8121c16e8fe93a59c49c20459287f6b002bbbc) )
+	ROM_LOAD( "sda-5_n-1.n1",   0x16000, 0x2000, CRC(689d8a3f) SHA1(aa592b9edcac8d264c9c89871283dfeebce2300e) )
+	ROM_LOAD( "sda-5_p-1.p1",   0x18000, 0x2000, CRC(862b350d) SHA1(12e6c92ba424df578eac5a820a68aaaffd73c577) )
+	ROM_LOAD( "sda-5_r-1.r1",   0x1a000, 0x2000, CRC(95b099ed) SHA1(1327852712ade3fc96bd8192045c081c4d32f4ba) )
+	ROM_LOAD( "sda-5_s-1.s1",   0x1c000, 0x2000, CRC(8f230881) SHA1(daa8efc355fb042b2fce89a0d2950a90e56a806f) )
+	ROM_LOAD( "sda-5_t-1.t1",   0x1e000, 0x2000, CRC(70e724c7) SHA1(df2905f91038693c87452813216aa86bbb81521b) )
+
+	ROM_REGION( 0x00900, "user1", 0 )
+	/* vertical sync timing */
+	ROM_LOAD( "xbl.12h",    0x00000, 0x0100, CRC(375c8bfc) SHA1(2602dde6961cc6b63d1652e2f3e4cfae2d8a34d9) )
+	/* horizontal sync timing */
+	ROM_LOAD( "xbl.9h",     0x00100, 0x0100, CRC(2e7d5562) SHA1(7cd51fad8236b9853eff2eb84b474838ae1b44e8) )
+	ROM_LOAD( "xbl.2h",     0x00200, 0x0100, CRC(b078c1e4) SHA1(13834da4384ad43bc1671366fd428520cc3d1c1a) )
+	ROM_LOAD( "xml-3k_mmi_6331.bin", 0x00300, 0x0020, CRC(afa289d1) SHA1(703f3e433ebe0b9c2f1be31bef0d01b8007d48ea) )
+	ROM_LOAD( "xbl.4k",     0x00400, 0x0100, CRC(31a9549c) SHA1(5bfba7ef3f3f5fc59bc03feca39bb16d54a92778) )
+	ROM_LOAD( "xbl.5k",     0x00500, 0x0100, CRC(1379bb2a) SHA1(51e9e21aeb0db8727f58fda708ddea8fb53378d9) )
+	ROM_LOAD( "xbl.6k",     0x00600, 0x0100, CRC(588969f7) SHA1(316db275c4026e3a24e44f39f160e10189d310a3) )
+	ROM_LOAD( "xbl.7k",     0x00700, 0x0100, CRC(eda360b8) SHA1(79d84207e28c1289210cebd96abad6cfe1b4c1d0) )
+	ROM_LOAD( "xbl.8k",     0x00800, 0x0100, CRC(9d434cb1) SHA1(c3390bc1c02fe74ff2067f7fccfd1ad2c30b54a9) )
+ROM_END
 
 ROM_START( yukon )
 	ROM_REGION( 0x50000, "maincpu", 0 )     /* 64k for code for the first CPU, plus lots of banked ROMs */
@@ -1936,10 +1960,10 @@ ROM_START( yukon )
 	ROM_LOAD( "yul-1.7b",   0x48000, 0x2000, CRC(30a62d8f) SHA1(8b2cefd5c7393ec238d2d7b53320c08cce43c93b) )
 	ROM_LOAD( "yul-1.8b",   0x4a000, 0x2000, CRC(fa85b58e) SHA1(11c18bff9f473281bcf6677ffffd499496af7b9d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "yua-1.1h",   0x0e000, 0x2000, CRC(f0df665a) SHA1(1fac03007563f569fdf57d5b16a0501e9a4dff01) )
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "yua-1.1h",   0x00000, 0x2000, CRC(f0df665a) SHA1(1fac03007563f569fdf57d5b16a0501e9a4dff01) )
 
-	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
 	ROM_LOAD( "yua-1.2k",   0x00000, 0x2000, CRC(67a86f7f) SHA1(a4f70aab90acd2502e8f3f39efdafcd71b1a22b4) )
 	ROM_LOAD( "yua-1.2l",   0x02000, 0x2000, CRC(0bb8874b) SHA1(8b643dbd5412a713b3e2831dd1ba2b7d1f613ac2) )
 	ROM_LOAD( "yua-1.2m",   0x04000, 0x2000, CRC(8b77eac8) SHA1(d70038cd6655e71c6488c555ecb1d1a424d00d49) )
@@ -1999,10 +2023,10 @@ ROM_START( yukon1 )
 	ROM_LOAD( "yul-1.7b",   0x48000, 0x2000, CRC(30a62d8f) SHA1(8b2cefd5c7393ec238d2d7b53320c08cce43c93b) )
 	ROM_LOAD( "yul-1.8b",   0x4a000, 0x2000, CRC(fa85b58e) SHA1(11c18bff9f473281bcf6677ffffd499496af7b9d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "yua-1.1h",   0x0e000, 0x2000, CRC(f0df665a) SHA1(1fac03007563f569fdf57d5b16a0501e9a4dff01) )
+	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
+	ROM_LOAD( "yua-1.1h",   0x00000, 0x2000, CRC(f0df665a) SHA1(1fac03007563f569fdf57d5b16a0501e9a4dff01) )
 
-	ROM_REGION( 0x20000, "cvsd", 0 )
+	ROM_REGION( 0x20000, "440audio:samples", 0 )
 	ROM_LOAD( "yua-1.2k",   0x00000, 0x2000, CRC(67a86f7f) SHA1(a4f70aab90acd2502e8f3f39efdafcd71b1a22b4) )
 	ROM_LOAD( "yua-1.2l",   0x02000, 0x2000, CRC(0bb8874b) SHA1(8b643dbd5412a713b3e2831dd1ba2b7d1f613ac2) )
 	ROM_LOAD( "yua-1.2m",   0x04000, 0x2000, CRC(8b77eac8) SHA1(d70038cd6655e71c6488c555ecb1d1a424d00d49) )
@@ -2042,22 +2066,22 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(exidy440_state,exidy440)
+void exidy440_state::init_exidy440()
 {
 	m_showdown_bank_data[0] = m_showdown_bank_data[1] = nullptr;
 }
 
 
-DRIVER_INIT_MEMBER(exidy440_state,claypign)
+void exidy440_state::init_claypign()
 {
-	DRIVER_INIT_CALL(exidy440);
+	init_exidy440();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec0, 0x2ec3, read8_delegate(FUNC(exidy440_state::claypign_protection_r),this));
 }
 
 
-DRIVER_INIT_MEMBER(topsecex_state,topsecex)
+void topsecex_state::init_topsecex()
 {
-	DRIVER_INIT_CALL(exidy440);
+	init_exidy440();
 
 	/* extra input ports and scrolling */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec5, 0x2ec5, read8_delegate(FUNC(topsecex_state::topsecex_input_port_5_r),this));
@@ -2068,7 +2092,7 @@ DRIVER_INIT_MEMBER(topsecex_state,topsecex)
 }
 
 
-DRIVER_INIT_MEMBER(exidy440_state,showdown)
+void exidy440_state::init_showdown()
 {
 	static const uint8_t bankdata0[0x18] =
 	{
@@ -2083,7 +2107,7 @@ DRIVER_INIT_MEMBER(exidy440_state,showdown)
 		0xc5,0x8c,0x4e,0x86,0x1a,0xda,0x50,0xd1
 	};
 
-	DRIVER_INIT_CALL(exidy440);
+	init_exidy440();
 
 	/* set up the fake PLD */
 	m_showdown_bank_data[0] = bankdata0;
@@ -2091,7 +2115,7 @@ DRIVER_INIT_MEMBER(exidy440_state,showdown)
 }
 
 
-DRIVER_INIT_MEMBER(exidy440_state,yukon)
+void exidy440_state::init_yukon()
 {
 	static const uint8_t bankdata0[0x18] =
 	{
@@ -2106,7 +2130,7 @@ DRIVER_INIT_MEMBER(exidy440_state,yukon)
 		0xd1,0x94,0x56,0x92,0x26,0xe6,0x60,0xe1
 	};
 
-	DRIVER_INIT_CALL(exidy440);
+	init_exidy440();
 
 	/* set up the fake PLD */
 	m_showdown_bank_data[0] = bankdata0;
@@ -2121,18 +2145,19 @@ DRIVER_INIT_MEMBER(exidy440_state,yukon)
  *
  *************************************/
 
-GAME( 1983, crossbow, 0,        exidy440, crossbow, exidy440_state, exidy440, ROT0, "Exidy", "Crossbow (version 2.0)",           0 )
-GAME( 1984, cheyenne, 0,        exidy440, cheyenne, exidy440_state, exidy440, ROT0, "Exidy", "Cheyenne (version 1.0)",           0 )
-GAME( 1985, combat,   0,        exidy440, combat,   exidy440_state, exidy440, ROT0, "Exidy", "Combat (version 3.0)",             0 )
-GAME( 1985, catch22,  combat,   exidy440, catch22,  exidy440_state, exidy440, ROT0, "Exidy", "Catch-22 (version 8.0)",           0 )
-GAME( 1985, cracksht, 0,        exidy440, cracksht, exidy440_state, exidy440, ROT0, "Exidy", "Crackshot (version 2.0)",          0 )
-GAME( 1986, claypign, 0,        exidy440, claypign, exidy440_state, claypign, ROT0, "Exidy", "Clay Pigeon (version 2.0)",        0 )
-GAME( 1986, chiller,  0,        exidy440, chiller,  exidy440_state, exidy440, ROT0, "Exidy", "Chiller (version 3.0)",            0 )
-GAME( 1986, topsecex, 0,        topsecex, topsecex, topsecex_state, topsecex, ROT0, "Exidy", "Top Secret (Exidy) (version 1.0)", 0 )
-GAME( 1987, hitnmiss, 0,        exidy440, hitnmiss, exidy440_state, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 3.0)",        0 )
-GAME( 1987, hitnmiss2,hitnmiss, exidy440, hitnmiss, exidy440_state, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 2.0)",        0 )
-GAME( 1988, whodunit, 0,        exidy440, whodunit, exidy440_state, exidy440, ROT0, "Exidy", "Who Dunit (version 9.0)",          0 )
-GAME( 1988, whodunit8,whodunit, exidy440, whodunit, exidy440_state, exidy440, ROT0, "Exidy", "Who Dunit (version 8.0)",          0 )
-GAME( 1988, showdown, 0,        exidy440, showdown, exidy440_state, showdown, ROT0, "Exidy", "Showdown (version 5.0)",           0 )
-GAME( 1989, yukon,    0,        exidy440, showdown, exidy440_state, yukon,    ROT0, "Exidy", "Yukon (version 2.0)",              0 )
-GAME( 1989, yukon1,   yukon,    exidy440, showdown, exidy440_state, yukon,    ROT0, "Exidy", "Yukon (version 1.0)",              0 )
+GAME( 1983, crossbow,  0,        exidy440, crossbow, exidy440_state, init_exidy440, ROT0, "Exidy", "Crossbow (version 2.0)",           0 )
+GAME( 1984, cheyenne,  0,        exidy440, cheyenne, exidy440_state, init_exidy440, ROT0, "Exidy", "Cheyenne (version 1.0)",           0 )
+GAME( 1985, combat,    0,        exidy440, combat,   exidy440_state, init_exidy440, ROT0, "Exidy", "Combat (version 3.0)",             0 )
+GAME( 1985, catch22,   combat,   exidy440, catch22,  exidy440_state, init_exidy440, ROT0, "Exidy", "Catch-22 (version 8.0)",           0 )
+GAME( 1985, cracksht,  0,        exidy440, cracksht, exidy440_state, init_exidy440, ROT0, "Exidy", "Crackshot (version 2.0)",          0 )
+GAME( 1986, claypign,  0,        exidy440, claypign, exidy440_state, init_claypign, ROT0, "Exidy", "Clay Pigeon (version 2.0)",        0 )
+GAME( 1986, chiller,   0,        exidy440, chiller,  exidy440_state, init_exidy440, ROT0, "Exidy", "Chiller (version 3.0)",            0 )
+GAME( 1986, topsecex,  0,        topsecex, topsecex, topsecex_state, init_topsecex, ROT0, "Exidy", "Top Secret (Exidy) (version 1.0)", 0 )
+GAME( 1987, hitnmiss,  0,        exidy440, hitnmiss, exidy440_state, init_exidy440, ROT0, "Exidy", "Hit 'n Miss (version 3.0)",        0 )
+GAME( 1987, hitnmiss2, hitnmiss, exidy440, hitnmiss, exidy440_state, init_exidy440, ROT0, "Exidy", "Hit 'n Miss (version 2.0)",        0 )
+GAME( 1988, whodunit,  0,        exidy440, whodunit, exidy440_state, init_exidy440, ROT0, "Exidy", "Who Dunit (version 9.0)",          0 )
+GAME( 1988, whodunit8, whodunit, exidy440, whodunit, exidy440_state, init_exidy440, ROT0, "Exidy", "Who Dunit (version 8.0)",          0 )
+GAME( 1988, showdown,  0,        exidy440, showdown, exidy440_state, init_showdown, ROT0, "Exidy", "Showdown (version 5.0)",           0 )
+GAME( 1988, showdown4, showdown, exidy440, showdown, exidy440_state, init_showdown, ROT0, "Exidy", "Showdown (version 4.0)",           MACHINE_NOT_WORKING ) // different PAL, expects different values
+GAME( 1989, yukon,     0,        exidy440, showdown, exidy440_state, init_yukon,    ROT0, "Exidy", "Yukon (version 2.0)",              0 )
+GAME( 1989, yukon1,    yukon,    exidy440, showdown, exidy440_state, init_yukon,    ROT0, "Exidy", "Yukon (version 1.0)",              0 )

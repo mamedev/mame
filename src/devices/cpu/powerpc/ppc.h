@@ -164,10 +164,6 @@ enum
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-#define MCFG_PPC_BUS_FREQUENCY(_frequency) \
-	downcast<ppc_device &>(*device).set_bus_frequency(_frequency);
-
-
 class ppc_device : public cpu_device, public device_vtlb_interface
 {
 protected:
@@ -210,6 +206,9 @@ protected:
 	ppc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int address_bits, int data_bits, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor, address_map_constructor internal_map);
 
 public:
+	virtual ~ppc_device() override;
+
+	void set_cache_dirty() { m_cache_dirty = true; }
 	void set_bus_frequency(uint32_t bus_frequency) { c_bus_frequency = bus_frequency; }
 	void set_bus_frequency(const XTAL &xtal) { set_bus_frequency(xtal.value()); }
 
@@ -229,6 +228,7 @@ public:
 	void ppc_cfunc_printf_debug();
 	void ppc_cfunc_printf_probe();
 	void ppc_cfunc_unimplemented();
+	void ppc_cfunc_ppccom_mismatch();
 	void ppccom_tlb_fill();
 	void ppccom_update_fprf();
 	void ppccom_dcstore_callback();
@@ -488,8 +488,9 @@ protected:
 	int             m_buffered_dma_rate[4];
 
 	/* internal stuff */
-	direct_read_data<0> *m_direct;
-	offs_t          m_codexor;
+	std::function<u32 (offs_t)> m_pr32;
+	std::function<const void * (offs_t)> m_prptr;
+
 	uint32_t          m_system_clock;
 	uint32_t          m_cpu_clock;
 	uint64_t          m_tb_zero_cycles;
@@ -795,7 +796,7 @@ DECLARE_DEVICE_TYPE(PPC603R,   ppc603r_device)
 DECLARE_DEVICE_TYPE(PPC604,    ppc604_device)
 DECLARE_DEVICE_TYPE(MPC8240,   mpc8240_device)
 DECLARE_DEVICE_TYPE(PPC403GA,  ppc403ga_device)
-DECLARE_DEVICE_TYPE(PPC403GCX, ppc403ga_device)
+DECLARE_DEVICE_TYPE(PPC403GCX, ppc403gcx_device)
 DECLARE_DEVICE_TYPE(PPC405GP,  ppc405gp_device)
 
 #endif  // MAME_CPU_POWERPC_PPC_H

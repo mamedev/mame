@@ -15,71 +15,53 @@
 #include "machine/deco146.h"
 #include "machine/deco104.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 
 class cninja_state : public driver_device
 {
 public:
 	cninja_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_ioprot(*this, "ioprot"),
-		m_deco_tilegen1(*this, "tilegen1"),
-		m_deco_tilegen2(*this, "tilegen2"),
-		m_oki2(*this, "oki2"),
-		m_sprgen(*this, "spritegen"),
-		m_sprgen1(*this, "spritegen1"),
-		m_sprgen2(*this, "spritegen2"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
-		m_spriteram(*this, "spriteram"),
-		m_spriteram2(*this, "spriteram2") ,
-		m_pf1_rowscroll(*this, "pf1_rowscroll"),
-		m_pf2_rowscroll(*this, "pf2_rowscroll"),
-		m_pf3_rowscroll(*this, "pf3_rowscroll"),
-		m_pf4_rowscroll(*this, "pf4_rowscroll"),
-		m_ram(*this, "ram"),
-		m_okibank(*this, "okibank")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_ioprot(*this, "ioprot")
+		, m_deco_tilegen(*this, "tilegen%u", 1U)
+		, m_oki2(*this, "oki2")
+		, m_sprgen(*this, "spritegen%u", 1U)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+		, m_spriteram(*this, "spriteram%u", 1U)
+		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1U)
+		, m_okibank(*this, "okibank")
 	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<deco_146_base_device> m_ioprot;
-	required_device<deco16ic_device> m_deco_tilegen1;
-	required_device<deco16ic_device> m_deco_tilegen2;
+	required_device_array<deco16ic_device, 2> m_deco_tilegen;
 	optional_device<okim6295_device> m_oki2;
-	optional_device<decospr_device> m_sprgen;
-	optional_device<decospr_device> m_sprgen1;
-	optional_device<decospr_device> m_sprgen2;
+	optional_device_array<decospr_device, 2> m_sprgen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
-	required_device<buffered_spriteram16_device> m_spriteram;
-	optional_device<buffered_spriteram16_device> m_spriteram2;
+	optional_device_array<buffered_spriteram16_device, 2> m_spriteram;
 
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_pf1_rowscroll;
-	required_shared_ptr<uint16_t> m_pf2_rowscroll;
-	required_shared_ptr<uint16_t> m_pf3_rowscroll;
-	required_shared_ptr<uint16_t> m_pf4_rowscroll;
-	optional_shared_ptr<uint16_t> m_ram;
+	required_shared_ptr_array<uint16_t, 4> m_pf_rowscroll;
 	optional_memory_bank m_okibank;
 
 	uint16_t m_priority;
 
-	DECLARE_WRITE16_MEMBER(cninja_sound_w);
-	DECLARE_WRITE16_MEMBER(stoneage_sound_w);
-	DECLARE_WRITE16_MEMBER(cninja_pf12_control_w);
-	DECLARE_WRITE16_MEMBER(cninja_pf34_control_w);
+	template<int Chip> DECLARE_WRITE16_MEMBER(cninja_pf_control_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(cninjabl2_oki_bank_w);
-	DECLARE_DRIVER_INIT(mutantf);
-	DECLARE_DRIVER_INIT(cninjabl2);
+	void init_mutantf();
+	void init_cninjabl2();
 	DECLARE_MACHINE_START(robocop2);
 	DECLARE_MACHINE_RESET(robocop2);
 	DECLARE_VIDEO_START(stoneage);
@@ -99,10 +81,10 @@ public:
 
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
-	DECLARE_READ16_MEMBER( sshangha_protection_region_6_146_r );
-	DECLARE_WRITE16_MEMBER( sshangha_protection_region_6_146_w );
-	DECLARE_READ16_MEMBER( sshangha_protection_region_8_146_r );
-	DECLARE_WRITE16_MEMBER( sshangha_protection_region_8_146_w );
+	DECLARE_READ16_MEMBER( edrandy_protection_region_6_146_r );
+	DECLARE_WRITE16_MEMBER( edrandy_protection_region_6_146_w );
+	DECLARE_READ16_MEMBER( edrandy_protection_region_8_146_r );
+	DECLARE_WRITE16_MEMBER( edrandy_protection_region_8_146_w );
 
 	DECLARE_READ16_MEMBER( mutantf_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( mutantf_protection_region_0_146_w );

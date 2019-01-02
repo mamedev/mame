@@ -33,7 +33,7 @@ atapi_fixed_cdrom_device::atapi_fixed_cdrom_device(const machine_config &mconfig
 MACHINE_CONFIG_START(atapi_cdrom_device::device_add_mconfig)
 	MCFG_CDROM_ADD("image")
 	MCFG_CDROM_INTERFACE("cdrom")
-	MCFG_SOUND_ADD("cdda", CDDA, 0)
+	MCFG_DEVICE_ADD("cdda", CDDA)
 MACHINE_CONFIG_END
 
 void atapi_cdrom_device::device_start()

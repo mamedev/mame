@@ -32,15 +32,6 @@ device_spectrum_expansion_interface::device_spectrum_expansion_interface(const m
 }
 
 
-//-------------------------------------------------
-//  ~device_spectrum_expansion_interface - destructor
-//-------------------------------------------------
-
-device_spectrum_expansion_interface::~device_spectrum_expansion_interface()
-{
-}
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -52,18 +43,10 @@ device_spectrum_expansion_interface::~device_spectrum_expansion_interface()
 spectrum_expansion_slot_device::spectrum_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SPECTRUM_EXPANSION_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
+	m_io(nullptr),
 	m_card(nullptr),
 	m_irq_handler(*this),
 	m_nmi_handler(*this)
-{
-}
-
-
-//-------------------------------------------------
-//  expansion_slot_device - destructor
-//-------------------------------------------------
-
-spectrum_expansion_slot_device::~spectrum_expansion_slot_device()
 {
 }
 
@@ -101,6 +84,15 @@ void spectrum_expansion_slot_device::device_start()
 
 void spectrum_expansion_slot_device::device_reset()
 {
+}
+
+//-------------------------------------------------
+//  set_io_space - set address space we are attached to
+//-------------------------------------------------
+
+void spectrum_expansion_slot_device::set_io_space(address_space *io)
+{
+	m_io = io;
 }
 
 //-------------------------------------------------
@@ -169,28 +161,31 @@ WRITE8_MEMBER(spectrum_expansion_slot_device::mreq_w)
 #include "uspeech.h"
 
 
-SLOT_INTERFACE_START( spectrum_expansion_devices )
-	SLOT_INTERFACE("intf1", SPECTRUM_INTF1)
-	SLOT_INTERFACE("intf2", SPECTRUM_INTF2)
-	SLOT_INTERFACE("fuller", SPECTRUM_FULLER)
-	SLOT_INTERFACE("kempjoy", SPECTRUM_KEMPJOY)
-	SLOT_INTERFACE("melodik", SPECTRUM_MELODIK)
-	SLOT_INTERFACE("mikroplus", SPECTRUM_MIKROPLUS)
-	SLOT_INTERFACE("protek", SPECTRUM_PROTEK)
-	SLOT_INTERFACE("uslot", SPECTRUM_USLOT)
-	SLOT_INTERFACE("usource", SPECTRUM_USOURCE)
-	SLOT_INTERFACE("uspeech", SPECTRUM_USPEECH)
-SLOT_INTERFACE_END
+void spectrum_expansion_devices(device_slot_interface &device)
+{
+	device.option_add("intf1", SPECTRUM_INTF1);
+	device.option_add("intf2", SPECTRUM_INTF2);
+	device.option_add("fuller", SPECTRUM_FULLER);
+	device.option_add("kempjoy", SPECTRUM_KEMPJOY);
+	device.option_add("melodik", SPECTRUM_MELODIK);
+	device.option_add("mikroplus", SPECTRUM_MIKROPLUS);
+	device.option_add("protek", SPECTRUM_PROTEK);
+	device.option_add("uslot", SPECTRUM_USLOT);
+	device.option_add("usource", SPECTRUM_USOURCE);
+	device.option_add("uspeech", SPECTRUM_USPEECH);
+}
 
-SLOT_INTERFACE_START( spec128_expansion_devices )
-	SLOT_INTERFACE("intf1", SPECTRUM_INTF1)
-	SLOT_INTERFACE("intf2", SPECTRUM_INTF2)
-	SLOT_INTERFACE("kempjoy", SPECTRUM_KEMPJOY)
-	SLOT_INTERFACE("mikroplus", SPECTRUM_MIKROPLUS)
-	SLOT_INTERFACE("plus2test", SPECTRUM_PLUS2TEST)
-	SLOT_INTERFACE("protek", SPECTRUM_PROTEK)
-SLOT_INTERFACE_END
+void spec128_expansion_devices(device_slot_interface &device)
+{
+	device.option_add("intf1", SPECTRUM_INTF1);
+	device.option_add("intf2", SPECTRUM_INTF2);
+	device.option_add("kempjoy", SPECTRUM_KEMPJOY);
+	device.option_add("mikroplus", SPECTRUM_MIKROPLUS);
+	device.option_add("plus2test", SPECTRUM_PLUS2TEST);
+	device.option_add("protek", SPECTRUM_PROTEK);
+}
 
-SLOT_INTERFACE_START( specpls3_expansion_devices )
-SLOT_INTERFACE_END
+void specpls3_expansion_devices(device_slot_interface &device)
+{
+}
 

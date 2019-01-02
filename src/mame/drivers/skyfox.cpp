@@ -37,16 +37,16 @@ WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 {
 	switch (offset)
 	{
-		case 0:
-			m_bg_ctrl = data;
-			break;
+	case 0:
+		m_bg_ctrl = data;
+		break;
 
-		case 1:
-			m_soundlatch->write(space, 0, data);
-			break;
+	case 1:
+		m_soundlatch->write(space, 0, data);
+		break;
 
-		default:
-			break;
+	default:
+		break;
 	}
 }
 
@@ -59,7 +59,7 @@ void skyfox_state::skyfox_map(address_map &map)
 	map(0xe000, 0xe000).portr("INPUTS");
 	map(0xe001, 0xe001).portr("DSW0");
 	map(0xe002, 0xe002).portr("DSW1");
-	map(0xe008, 0xe00f).w(this, FUNC(skyfox_state::skyfox_vregs_w));
+	map(0xe008, 0xe00f).w(FUNC(skyfox_state::skyfox_vregs_w));
 	map(0xf001, 0xf001).portr("DSW2");
 }
 
@@ -191,7 +191,7 @@ static const gfx_layout layout_8x8x8 =
 	8*8*8
 };
 
-static GFXDECODE_START( skyfox )
+static GFXDECODE_START( gfx_skyfox )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8, 0, 1 ) // [0] Sprites
 GFXDECODE_END
 
@@ -225,12 +225,12 @@ void skyfox_state::machine_reset()
 MACHINE_CONFIG_START(skyfox_state::skyfox)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2) /* Verified at 4MHz */
-	MCFG_CPU_PROGRAM_MAP(skyfox_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", skyfox_state, skyfox_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2) /* Verified at 4MHz */
+	MCFG_DEVICE_PROGRAM_MAP(skyfox_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skyfox_state, skyfox_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
-	MCFG_CPU_PROGRAM_MAP(skyfox_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
+	MCFG_DEVICE_PROGRAM_MAP(skyfox_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -239,21 +239,20 @@ MACHINE_CONFIG_START(skyfox_state::skyfox)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0+0x60, 320-1+0x60, 0+16, 256-1-16) // from $30*2 to $CC*2+8
 	MCFG_SCREEN_UPDATE_DRIVER(skyfox_state, screen_update_skyfox)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skyfox)
-	MCFG_PALETTE_ADD("palette", 256+256) /* 256 static colors (+256 for the background??) */
-	MCFG_PALETTE_INIT_OWNER(skyfox_state, skyfox)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skyfox);
+	PALETTE(config, m_palette, FUNC(skyfox_state::skyfox_palette), 256+256); // 256 static colors (+256 for the background??)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -401,7 +400,7 @@ ROM_END
 
 
 /* Untangle the graphics: cut each 32x32x8 tile in 16 8x8x8 tiles */
-DRIVER_INIT_MEMBER(skyfox_state,skyfox)
+void skyfox_state::init_skyfox()
 {
 	uint8_t *rom = memregion("gfx1")->base();
 	uint8_t *end = rom + memregion("gfx1")->bytes();
@@ -418,6 +417,6 @@ DRIVER_INIT_MEMBER(skyfox_state,skyfox)
 }
 
 
-GAME( 1987, skyfox,    0,      skyfox, skyfox, skyfox_state, skyfox, ROT90, "Jaleco (Nichibutsu USA license)", "Sky Fox", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exerizer,  skyfox, skyfox, skyfox, skyfox_state, skyfox, ROT90, "Jaleco", "Exerizer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exerizerb, skyfox, skyfox, skyfox, skyfox_state, skyfox, ROT90, "bootleg", "Exerizer (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, skyfox,    0,      skyfox, skyfox, skyfox_state, init_skyfox, ROT90, "Jaleco (Nichibutsu USA license)", "Sky Fox", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exerizer,  skyfox, skyfox, skyfox, skyfox_state, init_skyfox, ROT90, "Jaleco", "Exerizer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exerizerb, skyfox, skyfox, skyfox, skyfox_state, init_skyfox, ROT90, "bootleg", "Exerizer (bootleg)", MACHINE_SUPPORTS_SAVE )

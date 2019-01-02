@@ -55,13 +55,15 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void sdk85(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
-	void sdk85(machine_config &config);
 	void sdk85_io(address_map &map);
 	void sdk85_mem(address_map &map);
-private:
+
 	u8 m_digit;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
@@ -148,44 +150,44 @@ READ8_MEMBER( sdk85_state::kbd_r )
 
 MACHINE_CONFIG_START(sdk85_state::sdk85)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(sdk85_mem)
-	MCFG_CPU_IO_MAP(sdk85_io)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(sdk85_mem)
+	MCFG_DEVICE_IO_MAP(sdk85_io)
 
-	MCFG_DEVICE_ADD("romio", I8355, 6.144_MHz_XTAL / 2) // Monitor ROM (A14)
+	I8355(config, "romio", 6.144_MHz_XTAL / 2); // Monitor ROM (A14)
 
-	MCFG_DEVICE_ADD("expromio", I8355, 6.144_MHz_XTAL / 2) // Expansion ROM (A15)
+	I8355(config, "expromio", 6.144_MHz_XTAL / 2); // Expansion ROM (A15)
 
-	MCFG_DEVICE_ADD("ramio", I8155, 6.144_MHz_XTAL / 2) // Basic RAM (A16)
-	MCFG_I8155_OUT_TIMEROUT_CB(INPUTLINE("maincpu", I8085_TRAP_LINE))
+	i8155_device &i8155(I8155(config, "ramio", 6.144_MHz_XTAL / 2)); // Basic RAM (A16)
+	i8155.out_to_callback().set_inputline(m_maincpu, I8085_TRAP_LINE);
 
-	MCFG_DEVICE_ADD("expramio", I8155, 6.144_MHz_XTAL / 2) // Expansion RAM (A17)
+	I8155(config, "expramio", 6.144_MHz_XTAL / 2); // Expansion RAM (A17)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sdk85)
+	config.set_default_layout(layout_sdk85);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("kdc", I8279, 6.144_MHz_XTAL / 2) // Keyboard/Display Controller (A13)
-	MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", I8085_RST55_LINE))   // irq
-	MCFG_I8279_OUT_SL_CB(WRITE8(sdk85_state, scanlines_w))          // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(sdk85_state, digit_w))            // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(sdk85_state, kbd_r))                  // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC)
+	i8279_device &kdc(I8279(config, "kdc", 6.144_MHz_XTAL / 2));        // Keyboard/Display Controller (A13)
+	kdc.out_irq_callback().set_inputline("maincpu", I8085_RST55_LINE);  // irq
+	kdc.out_sl_callback().set(FUNC(sdk85_state::scanlines_w));          // scan SL lines
+	kdc.out_disp_callback().set(FUNC(sdk85_state::digit_w));            // display A&B
+	kdc.in_rl_callback().set(FUNC(sdk85_state::kbd_r));                 // kbd RL lines
+	kdc.in_shift_callback().set_constant(1);                            // Shift key
+	kdc.in_ctrl_callback().set_constant(1);
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( sdk85 )
 	ROM_REGION( 0x800, "romio", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "default", "Default")
-	ROMX_LOAD( "sdk85.a14", 0x0000, 0x0800, CRC(9d5a983f) SHA1(54e218560fbec009ac3de5cfb64b920241ef2eeb), ROM_BIOS(1) )
+	ROMX_LOAD( "sdk85.a14", 0x0000, 0x0800, CRC(9d5a983f) SHA1(54e218560fbec009ac3de5cfb64b920241ef2eeb), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "mastermind", "Mastermind")
-	ROMX_LOAD( "mastermind.a14", 0x0000, 0x0800, CRC(36b694ae) SHA1(4d8a5ae5d10e8f72a6e349c7eeaf1aa00c4e45e1), ROM_BIOS(2) )
+	ROMX_LOAD( "mastermind.a14", 0x0000, 0x0800, CRC(36b694ae) SHA1(4d8a5ae5d10e8f72a6e349c7eeaf1aa00c4e45e1), ROM_BIOS(1) )
 
 	ROM_REGION( 0x800, "expromio", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY    FULLNAME  FLAGS */
-COMP( 1977, sdk85,  0,       0,      sdk85,     sdk85, sdk85_state,  0,    "Intel",   "MCS-85 System Design Kit", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS */
+COMP( 1977, sdk85, 0,      0,      sdk85,   sdk85, sdk85_state, empty_init, "Intel", "MCS-85 System Design Kit", MACHINE_NO_SOUND_HW)

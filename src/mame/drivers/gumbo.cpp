@@ -48,6 +48,7 @@ PCB Layout
 
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -60,8 +61,8 @@ void gumbo_state::gumbo_map(address_map &map)
 	map(0x1c0100, 0x1c0101).portr("P1_P2");
 	map(0x1c0200, 0x1c0201).portr("DSW");
 	map(0x1c0301, 0x1c0301).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x1e0000, 0x1e0fff).ram().w(this, FUNC(gumbo_state::gumbo_bg_videoram_w)).share("bg_videoram"); // bg tilemap
-	map(0x1f0000, 0x1f3fff).ram().w(this, FUNC(gumbo_state::gumbo_fg_videoram_w)).share("fg_videoram"); // fg tilemap
+	map(0x1e0000, 0x1e0fff).ram().w(FUNC(gumbo_state::gumbo_bg_videoram_w)).share("bg_videoram"); // bg tilemap
+	map(0x1f0000, 0x1f3fff).ram().w(FUNC(gumbo_state::gumbo_fg_videoram_w)).share("fg_videoram"); // fg tilemap
 }
 
 /* Miss Puzzle has a different memory map */
@@ -70,12 +71,12 @@ void gumbo_state::mspuzzle_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram(); // main ram
-	map(0x190000, 0x197fff).ram().w(this, FUNC(gumbo_state::gumbo_fg_videoram_w)).share("fg_videoram"); // fg tilemap
+	map(0x190000, 0x197fff).ram().w(FUNC(gumbo_state::gumbo_fg_videoram_w)).share("fg_videoram"); // fg tilemap
 	map(0x1a0000, 0x1a03ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x1b0100, 0x1b0101).portr("P1_P2");
 	map(0x1b0200, 0x1b0201).portr("DSW");
 	map(0x1b0301, 0x1b0301).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x1c0000, 0x1c1fff).ram().w(this, FUNC(gumbo_state::gumbo_bg_videoram_w)).share("bg_videoram"); // bg tilemap
+	map(0x1c0000, 0x1c1fff).ram().w(FUNC(gumbo_state::gumbo_bg_videoram_w)).share("bg_videoram"); // bg tilemap
 }
 
 void gumbo_state::dblpoint_map(address_map &map)
@@ -86,8 +87,8 @@ void gumbo_state::dblpoint_map(address_map &map)
 	map(0x1c0100, 0x1c0101).portr("P1_P2");
 	map(0x1c0200, 0x1c0201).portr("DSW");
 	map(0x1c0301, 0x1c0301).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x1e0000, 0x1e3fff).ram().w(this, FUNC(gumbo_state::gumbo_fg_videoram_w)).share("fg_videoram"); // fg tilemap
-	map(0x1f0000, 0x1f0fff).ram().w(this, FUNC(gumbo_state::gumbo_bg_videoram_w)).share("bg_videoram"); // bg tilemap
+	map(0x1e0000, 0x1e3fff).ram().w(FUNC(gumbo_state::gumbo_fg_videoram_w)).share("fg_videoram"); // fg tilemap
+	map(0x1f0000, 0x1f0fff).ram().w(FUNC(gumbo_state::gumbo_bg_videoram_w)).share("bg_videoram"); // bg tilemap
 }
 
 static INPUT_PORTS_START( gumbo )
@@ -230,7 +231,7 @@ static const gfx_layout gumbo2_layout =
 	4*16
 };
 
-static GFXDECODE_START( gumbo )
+static GFXDECODE_START( gfx_gumbo )
 	GFXDECODE_ENTRY( "gfx1", 0, gumbo_layout,   0x0, 2  ) /* bg tiles */
 	GFXDECODE_ENTRY( "gfx2", 0, gumbo2_layout,  0x0, 2  ) /* fg tiles */
 GFXDECODE_END
@@ -238,11 +239,11 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(gumbo_state::gumbo)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(14'318'181)/2)
-	MCFG_CPU_PROGRAM_MAP(gumbo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gumbo_state,  irq1_line_hold) // all the same
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(14'318'181)/2)
+	MCFG_DEVICE_PROGRAM_MAP(gumbo_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gumbo_state,  irq1_line_hold) // all the same
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gumbo)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_gumbo);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -252,12 +253,12 @@ MACHINE_CONFIG_START(gumbo_state::gumbo)
 	MCFG_SCREEN_UPDATE_DRIVER(gumbo_state, screen_update_gumbo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(14'318'181)/16, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -265,15 +266,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gumbo_state::mspuzzle)
 	gumbo(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mspuzzle_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mspuzzle_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gumbo_state::dblpoint)
 	gumbo(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dblpoint_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dblpoint_map)
 MACHINE_CONFIG_END
 
 ROM_START( gumbo )
@@ -402,10 +403,10 @@ ROM_START( dblpointd )
 	ROM_LOAD( "d15.bin", 0x40000, 0x40000, CRC(6b899a51) SHA1(04114ec9695caaac722800ac1a4ffb563ec433c9) )
 ROM_END
 
-GAME( 1994, gumbo,    0,        gumbo,    gumbo,    gumbo_state, 0, ROT0,  "Min Corp.",                     "Gumbo",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mspuzzleg,gumbo,    gumbo,    gumbo,    gumbo_state, 0, ROT0,  "Min Corp.",                     "Miss Puzzle (Clone of Gumbo)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1994, msbingo,  0,        mspuzzle, msbingo,  gumbo_state, 0, ROT0,  "Min Corp.",                     "Miss Bingo",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mspuzzle, 0,        mspuzzle, mspuzzle, gumbo_state, 0, ROT90, "Min Corp.",                     "Miss Puzzle",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mspuzzlen,mspuzzle, mspuzzle, mspuzzle, gumbo_state, 0, ROT90, "Min Corp.",                     "Miss Puzzle (Nudes)",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dblpoint, 0,        dblpoint, dblpoint, gumbo_state, 0, ROT0,  "Min Corp.",                     "Double Point",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dblpointd,dblpoint, dblpoint, dblpoint, gumbo_state, 0, ROT0,  "bootleg? (Dong Bang Electron)", "Double Point (Dong Bang Electron, bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gumbo,     0,        gumbo,    gumbo,    gumbo_state, empty_init, ROT0,  "Min Corp.",                     "Gumbo",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mspuzzleg, gumbo,    gumbo,    gumbo,    gumbo_state, empty_init, ROT0,  "Min Corp.",                     "Miss Puzzle (Clone of Gumbo)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1994, msbingo,   0,        mspuzzle, msbingo,  gumbo_state, empty_init, ROT0,  "Min Corp.",                     "Miss Bingo",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mspuzzle,  0,        mspuzzle, mspuzzle, gumbo_state, empty_init, ROT90, "Min Corp.",                     "Miss Puzzle",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mspuzzlen, mspuzzle, mspuzzle, mspuzzle, gumbo_state, empty_init, ROT90, "Min Corp.",                     "Miss Puzzle (Nudes)",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dblpoint,  0,        dblpoint, dblpoint, gumbo_state, empty_init, ROT0,  "Min Corp.",                     "Double Point",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dblpointd, dblpoint, dblpoint, dblpoint, gumbo_state, empty_init, ROT0,  "bootleg? (Dong Bang Electron)", "Double Point (Dong Bang Electron, bootleg?)", MACHINE_SUPPORTS_SAVE )

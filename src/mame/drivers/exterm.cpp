@@ -70,7 +70,6 @@
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "sound/ym2151.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -91,13 +90,13 @@ void exterm_state::machine_start()
  *
  *************************************/
 
-WRITE16_MEMBER(exterm_state::exterm_host_data_w)
+WRITE16_MEMBER(exterm_state::host_data_w)
 {
 	m_slave->host_w(space,offset / 0x0010000, data, 0xffff);
 }
 
 
-READ16_MEMBER(exterm_state::exterm_host_data_r)
+READ16_MEMBER(exterm_state::host_data_r)
 {
 	return m_slave->host_r(space,offset / 0x0010000, 0xffff);
 }
@@ -110,44 +109,32 @@ READ16_MEMBER(exterm_state::exterm_host_data_r)
  *
  *************************************/
 
-uint16_t exterm_state::exterm_trackball_port_r(int which, uint16_t mem_mask)
+template<uint8_t Which>
+READ16_MEMBER(exterm_state::trackball_port_r)
 {
 	uint16_t port;
 
 	/* Read the fake input port */
-	uint8_t trackball_pos = ioport(which ? "DIAL1" : "DIAL0")->read();
+	uint8_t trackball_pos = m_dial[Which]->read();
 
 	/* Calculate the change from the last position. */
-	uint8_t trackball_diff = m_trackball_old[which] - trackball_pos;
+	uint8_t trackball_diff = m_trackball_old[Which] - trackball_pos;
 
-	/* Store the new position for the next comparision. */
-	m_trackball_old[which] = trackball_pos;
+	/* Store the new position for the next comparison. */
+	m_trackball_old[Which] = trackball_pos;
 
 	/* Move the sign bit to the high bit of the 6-bit trackball count. */
 	if (trackball_diff & 0x80)
 		trackball_diff |= 0x20;
 
 	/* Keep adding the changes.  The counters will be reset later by a hardware write. */
-	m_aimpos[which] = (m_aimpos[which] + trackball_diff) & 0x3f;
+	m_aimpos[Which] = (m_aimpos[Which] + trackball_diff) & 0x3f;
 
 	/* Combine it with the standard input bits */
-	port = ioport(which ? "P2" : "P1")->read();
+	port = m_input[Which]->read();
 
-	return (port & 0xc0ff) | (m_aimpos[which] << 8);
+	return (port & 0xc0ff) | (m_aimpos[Which] << 8);
 }
-
-
-READ16_MEMBER(exterm_state::exterm_input_port_0_r)
-{
-	return exterm_trackball_port_r(0, mem_mask);
-}
-
-
-READ16_MEMBER(exterm_state::exterm_input_port_1_r)
-{
-	return exterm_trackball_port_r(1, mem_mask);
-}
-
 
 
 /*************************************
@@ -156,7 +143,7 @@ READ16_MEMBER(exterm_state::exterm_input_port_1_r)
  *
  *************************************/
 
-WRITE16_MEMBER(exterm_state::exterm_output_port_0_w)
+WRITE16_MEMBER(exterm_state::output_port_0_w)
 {
 	/* All the outputs are activated on the rising edge */
 
@@ -173,7 +160,7 @@ WRITE16_MEMBER(exterm_state::exterm_output_port_0_w)
 	{
 		/* Bit 13 = Resets the slave CPU */
 		if ((data & 0x2000) && !(m_last & 0x2000))
-			m_slave->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_slave->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 		/* Bits 14-15 = Coin counters */
 		machine().bookkeeping().coin_counter_w(0, data & 0x8000);
@@ -203,15 +190,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(exterm_state::master_sound_nmi_callback)
 {
 	/* bit 0 of the sound control determines if the NMI is actually delivered */
 	if (m_sound_control & 0x01)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
 WRITE8_MEMBER(exterm_state::ym2151_data_latch_w)
 {
-	ym2151_device *device = machine().device<ym2151_device>("ymsnd");
 	/* bit 7 of the sound control selects which port */
-	device->write(space, m_sound_control >> 7, data);
+	m_ym2151->write(space, m_sound_control >> 7, data);
 }
 
 
@@ -221,15 +207,14 @@ WRITE8_MEMBER(exterm_state::sound_nmi_rate_w)
 	/* this value is latched into up-counters, which are clocked at the */
 	/* input clock / 256 */
 	attotime nmi_rate = attotime::from_hz(4000000) * (4096 * (256 - data));
-	timer_device *nmi_timer = machine().device<timer_device>("snd_nmi_timer");
-	nmi_timer->adjust(nmi_rate, 0, nmi_rate);
+	m_nmi_timer->adjust(nmi_rate, 0, nmi_rate);
 }
 
 
 READ8_MEMBER(exterm_state::sound_nmi_to_slave_r)
 {
 	/* a read from here triggers an NMI pulse to the slave */
-	m_audioslave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audioslave->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	return 0xff;
 }
 
@@ -258,16 +243,16 @@ void exterm_state::master_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).mirror(0xfc700000).ram().share("master_videoram");
 	map(0x00800000, 0x00bfffff).mirror(0xfc400000).ram();
-	map(0x01000000, 0x013fffff).mirror(0xfc000000).rw(this, FUNC(exterm_state::exterm_host_data_r), FUNC(exterm_state::exterm_host_data_w));
-	map(0x01400000, 0x0143ffff).mirror(0xfc000000).r(this, FUNC(exterm_state::exterm_input_port_0_r));
-	map(0x01440000, 0x0147ffff).mirror(0xfc000000).r(this, FUNC(exterm_state::exterm_input_port_1_r));
+	map(0x01000000, 0x013fffff).mirror(0xfc000000).rw(FUNC(exterm_state::host_data_r), FUNC(exterm_state::host_data_w));
+	map(0x01400000, 0x0143ffff).mirror(0xfc000000).r(FUNC(exterm_state::trackball_port_r<0>));
+	map(0x01440000, 0x0147ffff).mirror(0xfc000000).r(FUNC(exterm_state::trackball_port_r<1>));
 	map(0x01480000, 0x014bffff).mirror(0xfc000000).portr("DSW");
-	map(0x01500000, 0x0153ffff).mirror(0xfc000000).w(this, FUNC(exterm_state::exterm_output_port_0_w));
-	map(0x01580000, 0x015bffff).mirror(0xfc000000).w(this, FUNC(exterm_state::sound_latch_w)).umask16(0x00ff);
+	map(0x01500000, 0x0153ffff).mirror(0xfc000000).w(FUNC(exterm_state::output_port_0_w));
+	map(0x01580000, 0x015bffff).mirror(0xfc000000).w(FUNC(exterm_state::sound_latch_w)).umask16(0x00ff);
 	map(0x015c0000, 0x015fffff).mirror(0xfc000000).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x01800000, 0x01807fff).mirror(0xfc7f8000).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x02800000, 0x02807fff).mirror(0xfc7f8000).ram().share("nvram");
-	map(0x03000000, 0x03ffffff).mirror(0xfc000000).rom().region("user1", 0);
+	map(0x03000000, 0x03ffffff).mirror(0xfc000000).rom().region("maincpu", 0);
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 }
 
@@ -290,23 +275,23 @@ void exterm_state::slave_map(address_map &map)
 void exterm_state::sound_master_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
-	map(0x4000, 0x5fff).w(this, FUNC(exterm_state::ym2151_data_latch_w));
-	map(0x6000, 0x67ff).w(this, FUNC(exterm_state::sound_nmi_rate_w));
-	map(0x6800, 0x6fff).r("soundlatch1", FUNC(generic_latch_8_device::read));
-	map(0x7000, 0x77ff).r(this, FUNC(exterm_state::sound_nmi_to_slave_r));
+	map(0x4000, 0x5fff).w(FUNC(exterm_state::ym2151_data_latch_w));
+	map(0x6000, 0x67ff).w(FUNC(exterm_state::sound_nmi_rate_w));
+	map(0x6800, 0x6fff).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0x7000, 0x77ff).r(FUNC(exterm_state::sound_nmi_to_slave_r));
 /*  AM_RANGE(0x7800, 0x7fff) unknown - to S4-13 */
 	map(0x8000, 0xffff).rom();
-	map(0xa000, 0xbfff).w(this, FUNC(exterm_state::sound_control_w));
+	map(0xa000, 0xbfff).w(FUNC(exterm_state::sound_control_w));
 }
 
 
 void exterm_state::sound_slave_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x3800).ram();
-	map(0x4000, 0x5fff).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0x4000, 0x5fff).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 	map(0x8000, 0xffff).rom();
-	map(0x8000, 0x8000).mirror(0x3ffe).w("dacvol", FUNC(dac_byte_interface::write));
-	map(0x8001, 0x8001).mirror(0x3ffe).w("dac", FUNC(dac_byte_interface::write));
+	map(0x8000, 0x8000).mirror(0x3ffe).w("dacvol", FUNC(dac_byte_interface::data_w));
+	map(0x8001, 0x8001).mirror(0x3ffe).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 
@@ -389,47 +374,39 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(exterm_state::exterm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, 40000000)
-	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(40000000/8) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(exterm_state, scanline_update)     /* scanline updater (indexed16) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(exterm_state, to_shiftreg_master)  /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(exterm_state, from_shiftreg_master) /* read from shiftreg function */
+	TMS34010(config, m_maincpu, 40000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &exterm_state::master_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(40000000/8);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_ind16_callback(FUNC(exterm_state::scanline_update));
+	m_maincpu->set_shiftreg_in_callback(FUNC(exterm_state::to_shiftreg_master));
+	m_maincpu->set_shiftreg_out_callback(FUNC(exterm_state::from_shiftreg_master));
 
-	MCFG_CPU_ADD("slave", TMS34010, 40000000)
-	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(40000000/8) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(exterm_state, to_shiftreg_slave)   /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(exterm_state, from_shiftreg_slave)  /* read from shiftreg function */
+	TMS34010(config, m_slave, 40000000);
+	m_slave->set_addrmap(AS_PROGRAM, &exterm_state::slave_map);
+	m_slave->set_halt_on_reset(true);
+	m_slave->set_pixel_clock(40000000/8);
+	m_slave->set_pixels_per_clock(1);
+	m_slave->set_shiftreg_in_callback(FUNC(exterm_state::to_shiftreg_slave));
+	m_slave->set_shiftreg_out_callback(FUNC(exterm_state::from_shiftreg_slave));
 
-	MCFG_CPU_ADD("audiocpu", M6502, 2000000)
-	MCFG_CPU_PROGRAM_MAP(sound_master_map)
+	M6502(config, m_audiocpu, 2000000).set_addrmap(AS_PROGRAM, &exterm_state::sound_master_map);
+	M6502(config, m_audioslave, 2000000).set_addrmap(AS_PROGRAM, &exterm_state::sound_slave_map);
 
-	MCFG_CPU_ADD("audioslave", M6502, 2000000)
-	MCFG_CPU_PROGRAM_MAP(sound_slave_map)
+	GENERIC_LATCH_8(config, m_soundlatch[0]).data_pending_callback().set_inputline(m_audiocpu, M6502_IRQ_LINE);
+	GENERIC_LATCH_8(config, m_soundlatch[1]).data_pending_callback().set_inputline(m_audioslave, M6502_IRQ_LINE);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audioslave", M6502_IRQ_LINE))
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	MCFG_TIMER_DRIVER_ADD(m_nmi_timer, exterm_state, master_sound_nmi_callback)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
-	MCFG_TIMER_DRIVER_ADD("snd_nmi_timer", exterm_state, master_sound_nmi_callback)
-
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 2048+32768)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_INIT_OWNER(exterm_state, exterm)
+	PALETTE(config, "palette", FUNC(exterm_state::exterm_palette)).set_format(palette_device::xRGB_555, 2048+32768);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(40000000/8, 318, 0, 256, 264, 0, 240)
@@ -438,16 +415,15 @@ MACHINE_CONFIG_START(exterm_state::exterm)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("dac", AD7528, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ad7528j.e2
-	MCFG_SOUND_ADD("dacvol", AD7528, 0) // ad7528j.e2
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_DEVICE_ADD("dac", AD7528, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ad7528j.e2
+	MCFG_DEVICE_ADD("dacvol", AD7528, 0) // ad7528j.e2
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	YM2151(config, m_ym2151, 4000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -465,7 +441,7 @@ ROM_START( exterm )
 	ROM_REGION( 0x10000, "audioslave", 0 )      /* 64k for DAC code */
 	ROM_LOAD( "v101d1", 0x8000, 0x8000, CRC(83268b7d) SHA1(a9139e80e2382122e9919c0555937e120d4414cf) )
 
-	ROM_REGION16_LE( 0x200000, "user1", 0 ) /* 2MB for 34010 code */
+	ROM_REGION16_LE( 0x200000, "maincpu", 0 ) /* 2MB for 34010 code */
 	ROM_LOAD16_BYTE( "v101bg0",  0x000000, 0x10000, CRC(8c8e72cf) SHA1(5e0fa805334f54f7e0293ea400bacb0e3e79ed56) )
 	ROM_LOAD16_BYTE( "v101bg1",  0x000001, 0x10000, CRC(cc2da0d8) SHA1(4ac23048d3ca771e315388603ad3b1b25030d6ff) )
 	ROM_LOAD16_BYTE( "v101bg2",  0x020000, 0x10000, CRC(2dcb3653) SHA1(2d74b58b02ae0587e3789d69feece268f582f226) )
@@ -496,4 +472,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1989, exterm, 0, exterm, exterm, exterm_state, 0, ROT0, "Gottlieb / Premier Technology", "Exterminator", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, exterm, 0, exterm, exterm, exterm_state, empty_init, ROT0, "Gottlieb / Premier Technology", "Exterminator", MACHINE_SUPPORTS_SAVE )

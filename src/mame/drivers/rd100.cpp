@@ -20,6 +20,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -32,13 +33,16 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_DRIVER_INIT(rd100);
+	void rd100(machine_config &config);
+
+	void init_rd100();
+
+private:
 	DECLARE_MACHINE_RESET(rd100);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void rd100(machine_config &config);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -89,7 +93,7 @@ uint32_t rd100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-DRIVER_INIT_MEMBER( rd100_state, rd100 )
+void rd100_state::init_rd100()
 {
 }
 
@@ -99,8 +103,8 @@ MACHINE_RESET_MEMBER( rd100_state, rd100 )
 
 MACHINE_CONFIG_START(rd100_state::rd100)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000)) // MC6809P???
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000)) // MC6809P???
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(rd100_state, rd100)
 
@@ -115,8 +119,8 @@ MACHINE_CONFIG_START(rd100_state::rd100)
 	MCFG_SCREEN_UPDATE_DRIVER(rd100_state, screen_update)
 	MCFG_SCREEN_SIZE(64*6, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	//MCFG_GFXDECODE_ADD("gfxdecode", "palette", rd100)
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rd100)
 MACHINE_CONFIG_END
 
 ROM_START( rd100 )
@@ -126,5 +130,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY      FULLNAME  FLAGS
-COMP( 1989, rd100,  0,      0,       rd100,     rd100,  rd100_state,   rd100,  "Data R.D.", "RD100",  MACHINE_IS_SKELETON )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1989, rd100, 0,      0,      rd100,   rd100, rd100_state, init_rd100, "Data R.D.", "RD100",  MACHINE_IS_SKELETON )

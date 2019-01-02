@@ -70,14 +70,17 @@ inline double usb_sound_device::g80_filter_state::step_cr(double input)
 
 DEFINE_DEVICE_TYPE(SEGASPEECH, speech_sound_device, "sega_speech_sound", "Sega Speech Sound Board")
 
+#define SEGASPEECH_REGION "speech"
+
 speech_sound_device::speech_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SEGASPEECH, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
+		m_int_cb(*this),
+		m_speech(*this, SEGASPEECH_REGION),
 		m_drq(0),
 		m_latch(0),
 		m_t0(0),
-		m_p2(0),
-		m_speech(nullptr)
+		m_p2(0)
 {
 }
 
@@ -87,12 +90,12 @@ speech_sound_device::speech_sound_device(const machine_config &mconfig, const ch
 
 void speech_sound_device::device_start()
 {
-		m_speech = machine().root_device().memregion("speech")->base();
+	m_int_cb.resolve();
 
-		save_item(NAME(m_latch));
-		save_item(NAME(m_t0));
-		save_item(NAME(m_p2));
-		save_item(NAME(m_drq));
+	save_item(NAME(m_latch));
+	save_item(NAME(m_t0));
+	save_item(NAME(m_p2));
+	save_item(NAME(m_drq));
 }
 
 
@@ -121,7 +124,7 @@ READ8_MEMBER( speech_sound_device::p1_r )
 
 READ8_MEMBER( speech_sound_device::rom_r )
 {
-	return m_speech[0x100 * (m_p2 & 0x3f) + offset];
+	return m_speech->base()[0x100 * (m_p2 & 0x3f) + offset];
 }
 
 WRITE8_MEMBER( speech_sound_device::p1_w )
@@ -165,7 +168,7 @@ TIMER_CALLBACK_MEMBER( speech_sound_device::delayed_speech_w )
 	m_latch = data;
 
 	/* the high bit goes directly to the INT line */
-	machine().device("audiocpu")->execute().set_input_line(0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	m_int_cb((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* a clock on the high bit clocks a 1 into T0 */
 	if (!(old & 0x80) && (data & 0x80))
@@ -193,6 +196,16 @@ void speech_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 {
 }
 
+/*************************************
+ *
+ *  Speech board functions
+ *
+ *************************************/
+
+WRITE_LINE_MEMBER(segag80snd_common::segaspeech_int_w)
+{
+	m_audiocpu->set_input_line(0, state);
+}
 
 /*************************************
  *
@@ -219,24 +232,24 @@ void segag80snd_common::speech_portmap(address_map &map)
  *
  *************************************/
 
-MACHINE_CONFIG_START(segag80snd_common::sega_speech_board)
-
+void segag80snd_common::sega_speech_board(machine_config &config)
+{
 	/* CPU for the speech board */
-	MCFG_CPU_ADD("audiocpu", I8035, SPEECH_MASTER_CLOCK)        /* divide by 15 in CPU */
-	MCFG_CPU_PROGRAM_MAP(speech_map)
-	MCFG_CPU_IO_MAP(speech_portmap)
-	MCFG_MCS48_PORT_P1_IN_CB(DEVREAD8("segaspeech", speech_sound_device, p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("segaspeech", speech_sound_device, p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(DEVWRITE8("segaspeech", speech_sound_device, p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("segaspeech", speech_sound_device, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(DEVREADLINE("segaspeech", speech_sound_device, t1_r))
+	i8035_device &audiocpu(I8035(config, m_audiocpu, SPEECH_MASTER_CLOCK));        /* divide by 15 in CPU */
+	audiocpu.set_addrmap(AS_PROGRAM, &segag80snd_common::speech_map);
+	audiocpu.set_addrmap(AS_IO, &segag80snd_common::speech_portmap);
+	audiocpu.p1_in_cb().set("segaspeech", FUNC(speech_sound_device::p1_r));
+	audiocpu.p1_out_cb().set("segaspeech", FUNC(speech_sound_device::p1_w));
+	audiocpu.p2_out_cb().set("segaspeech", FUNC(speech_sound_device::p2_w));
+	audiocpu.t0_in_cb().set("segaspeech", FUNC(speech_sound_device::t0_r));
+	audiocpu.t1_in_cb().set("segaspeech", FUNC(speech_sound_device::t1_r));
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("segaspeech", SEGASPEECH, 0)
-	MCFG_SOUND_ADD("speech", SP0250, SPEECH_MASTER_CLOCK)
-	MCFG_SP0250_DRQ_CALLBACK(DEVWRITELINE("segaspeech", speech_sound_device, drq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	SEGASPEECH(config, "segaspeech", 0).int_cb().set(FUNC(segag80snd_common::segaspeech_int_w));
+	sp0250_device &speech(SP0250(config, "speech", SPEECH_MASTER_CLOCK));
+	speech.drq().set("segaspeech", FUNC(speech_sound_device::drq_w));
+	speech.add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
 
@@ -250,6 +263,7 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, device_type ty
 	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_ourcpu(*this, "ourcpu"),
+		m_maincpu(*this, finder_base::DUMMY_TAG),
 		m_stream(nullptr),
 		m_in_latch(0),
 		m_out_latch(0),
@@ -276,13 +290,6 @@ usb_sound_device::usb_sound_device(const machine_config &mconfig, const char *ta
 
 void usb_sound_device::device_start()
 {
-	g80_filter_state temp;
-	int tchan, tgroup;
-
-	/* find the CPU we are associated with */
-	m_maincpu = machine().device("maincpu");
-	assert(m_maincpu != nullptr);
-
 	/* create a sound stream */
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE);
 
@@ -297,6 +304,7 @@ void usb_sound_device::device_start()
 		g.gate2.configure(2 * 100e3, 0.01e-6);
 	}
 
+	g80_filter_state temp;
 	temp.configure(100e3, 0.01e-6);
 	m_gate_rc1_exp[0] = temp.exponent;
 	temp.configure(1e3, 0.01e-6);
@@ -321,10 +329,10 @@ void usb_sound_device::device_start()
 	save_item(NAME(m_work_ram_bank));
 	save_item(NAME(m_t1_clock));
 
-	for (tgroup = 0; tgroup < 3; tgroup++)
+	for (int tgroup = 0; tgroup < 3; tgroup++)
 	{
 		timer8253 *group = &m_timer_group[tgroup];
-		for (tchan = 0; tchan < 3; tchan++)
+		for (int tchan = 0; tchan < 3; tchan++)
 		{
 			timer8253::channel *channel = &group->chan[tchan];
 			save_item(NAME(channel->holding), tgroup * 3 + tchan);
@@ -395,7 +403,7 @@ READ8_MEMBER( usb_sound_device::status_r )
 {
 	LOG("%s:usb_data_r = %02X\n", machine().describe_context(), (m_out_latch & 0x81) | (m_in_latch & 0x7e));
 
-	m_maincpu->execute().adjust_icount(-200);
+	m_maincpu->adjust_icount(-200);
 
 	/* only bits 0 and 7 are controlled by the I8035; the remaining */
 	/* bits 1-6 reflect the current input latch values */
@@ -855,7 +863,7 @@ void usb_sound_device::usb_map(address_map &map)
 
 void usb_sound_device::usb_portmap(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(usb_sound_device::workram_r), FUNC(usb_sound_device::workram_w)).share("workram");
+	map(0x00, 0xff).rw(FUNC(usb_sound_device::workram_r), FUNC(usb_sound_device::workram_w)).share("workram");
 }
 
 
@@ -863,19 +871,20 @@ void usb_sound_device::usb_portmap(address_map &map)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(usb_sound_device::device_add_mconfig)
-
+void usb_sound_device::device_add_mconfig(machine_config &config)
+{
 	/* CPU for the usb board */
-	MCFG_CPU_ADD("ourcpu", I8035, USB_MASTER_CLOCK)     /* divide by 15 in CPU */
-	MCFG_CPU_PROGRAM_MAP(usb_map)
-	MCFG_CPU_IO_MAP(usb_portmap)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(usb_sound_device, p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(usb_sound_device, p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(usb_sound_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(usb_sound_device, t1_r))
+	I8035(config, m_ourcpu, USB_MASTER_CLOCK);     /* divide by 15 in CPU */
+	m_ourcpu->set_addrmap(AS_PROGRAM, &usb_sound_device::usb_map);
+	m_ourcpu->set_addrmap(AS_IO, &usb_sound_device::usb_portmap);
+	m_ourcpu->p1_in_cb().set(FUNC(usb_sound_device::p1_r));
+	m_ourcpu->p1_out_cb().set(FUNC(usb_sound_device::p1_w));
+	m_ourcpu->p2_out_cb().set(FUNC(usb_sound_device::p2_w));
+	m_ourcpu->t1_in_cb().set(FUNC(usb_sound_device::t1_r));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("usb_timer", usb_sound_device, increment_t1_clock_timer_cb, attotime::from_hz(USB_2MHZ_CLOCK / 256))
-MACHINE_CONFIG_END
+	TIMER(config, "usb_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(usb_sound_device::increment_t1_clock_timer_cb), this)
+		, attotime::from_hz(USB_2MHZ_CLOCK / 256));
+}
 
 
 DEFINE_DEVICE_TYPE(SEGAUSBROM, usb_rom_sound_device, "segausbrom", "Sega Universal Sound Board with ROM")
@@ -890,10 +899,10 @@ void usb_sound_device::usb_map_rom(address_map &map)
 	map(0x0000, 0x0fff).rom().region(":usbcpu", 0);
 }
 
-MACHINE_CONFIG_START(usb_rom_sound_device::device_add_mconfig)
+void usb_rom_sound_device::device_add_mconfig(machine_config &config)
+{
 	usb_sound_device::device_add_mconfig(config);
 
 	/* CPU for the usb board */
-	MCFG_CPU_MODIFY("ourcpu")
-	MCFG_CPU_PROGRAM_MAP(usb_map_rom)
-MACHINE_CONFIG_END
+	m_ourcpu->set_addrmap(AS_PROGRAM, &usb_rom_sound_device::usb_map_rom);
+}

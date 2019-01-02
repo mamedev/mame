@@ -7,30 +7,15 @@
 
 #include "imagedev/floppy.h"
 
-#define MCFG_AMIGA_FDC_INDEX_CALLBACK(_write) \
-	devcb = &downcast<amiga_fdc_device &>(*device).set_index_wr_callback(DEVCB_##_write);
-
-#define MCFG_AMIGA_FDC_READ_DMA_CALLBACK(_read) \
-	devcb = &downcast<amiga_fdc_device &>(*device).set_dma_rd_callback(DEVCB_##_read);
-
-#define MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(_write) \
-	devcb = &downcast<amiga_fdc_device &>(*device).set_dma_wr_callback(DEVCB_##_write);
-
-#define MCFG_AMIGA_FDC_DSKBLK_CALLBACK(_write) \
-	devcb = &downcast<amiga_fdc_device &>(*device).set_dskblk_wr_callback(DEVCB_##_write);
-
-#define MCFG_AMIGA_FDC_DSKSYN_CALLBACK(_write) \
-	devcb = &downcast<amiga_fdc_device &>(*device).set_dsksyn_wr_callback(DEVCB_##_write);
-
 class amiga_fdc_device : public device_t {
 public:
 	amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_index_wr_callback(Object &&cb) { return m_write_index.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_rd_callback(Object &&cb) { return m_read_dma.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_wr_callback(Object &&cb) { return m_write_dma.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dskblk_wr_callback(Object &&cb) { return m_write_dskblk.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dsksyn_wr_callback(Object &&cb) { return m_write_dsksyn.set_callback(std::forward<Object>(cb)); }
+	auto index_callback() { return m_write_index.bind(); }
+	auto read_dma_callback() { return m_read_dma.bind(); }
+	auto write_dma_callback() { return m_write_dma.bind(); }
+	auto dskblk_callback() { return m_write_dskblk.bind(); }
+	auto dsksyn_callback() { return m_write_dsksyn.bind(); }
 
 	DECLARE_WRITE8_MEMBER(ciaaprb_w);
 
@@ -107,6 +92,7 @@ private:
 	devcb_write16 m_write_dma;
 	devcb_write_line m_write_dskblk;
 	devcb_write_line m_write_dsksyn;
+	output_finder<2> m_leds;
 
 	floppy_image_device *floppy;
 	floppy_image_device *floppy_devices[4];

@@ -220,6 +220,8 @@ int dvg_device::handler_1() // dvg_dmald
 
 void dvg_device::dvg_draw_to(int x, int y, int intensity)
 {
+	apply_flipping(&x, &y);
+
 	if (((x | y) & 0x400) == 0)
 		vg_add_point_buf((xmin + x - 512) << 16,
 							(ymin + 512 - y) << 16,
@@ -578,7 +580,7 @@ int avg_device::avg_common_strobe2()
 				 * loop. I.e. at one point the AVG jumps to address 0
 				 * and starts over again. The main CPU updates vector
 				 * RAM while AVG is running. The hardware takes care
-				 * that the AVG dosen't read vector RAM while the CPU
+				 * that the AVG doesn't read vector RAM while the CPU
 				 * writes to it. Usually we wait until the AVG stops
 				 * (halt flag) and then draw all vectors at once. This
 				 * doesn't work for Tempest and Quantum so we wait for
@@ -890,7 +892,7 @@ void avg_mhavoc_device::update_databus() // mhavoc_data
 
 	if (m_pc & 0x2000)
 	{
-		bank = &machine().root_device().memregion("alpha")->base()[0x18000];
+		bank = &machine().root_device().memregion("avgdvg")->base()[0];
 		m_data = bank[(m_map << 13) | ((m_pc ^ 1) & 0x1fff)];
 	}
 	else
@@ -1445,6 +1447,11 @@ void dvg_device::device_start()
 
 	xmin = visarea.min_x;
 	ymin = visarea.min_y;
+
+	xcenter = 512;
+	ycenter = 512;
+
+	flip_x = flip_y = 0;
 
 	vg_halt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device::vg_set_halt_callback),this));
 	vg_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device::run_state_machine),this));

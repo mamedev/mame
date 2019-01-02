@@ -24,7 +24,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "sound/beep.h"
@@ -54,7 +54,7 @@ public:
 private:
 	uint8_t m_port08;
 	uint8_t m_port09;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio1;
 	required_device<z80pio_device> m_pio2;
 	required_device<z80pio_device> m_pio3;
@@ -160,32 +160,32 @@ static const z80_daisy_config daisy_chain_intf[] =
 
 MACHINE_CONFIG_START(brandt8641_state::brandt8641)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000)) // U4 ,4MHz crystal on board
-	MCFG_CPU_PROGRAM_MAP(brandt8641_mem)
-	MCFG_CPU_IO_MAP(brandt8641_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
+	Z80(config, m_maincpu, XTAL(4'000'000)); // U4 ,4MHz crystal on board
+	m_maincpu->set_addrmap(AS_PROGRAM, &brandt8641_state::brandt8641_mem);
+	m_maincpu->set_addrmap(AS_IO, &brandt8641_state::brandt8641_io);
+	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 2000)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// Z80APIO U9
 	// Z80APIO U14
 	// Z80PIO U7 - unknown which is which
-	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_pio1, XTAL(4'000'000));
+	m_pio1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(brandt8641_state, port08_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(brandt8641_state, port08_w))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(brandt8641_state, port09_w))
+	Z80PIO(config, m_pio2, XTAL(4'000'000));
+	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio2->in_pa_callback().set(FUNC(brandt8641_state::port08_r));
+	m_pio2->out_pa_callback().set(FUNC(brandt8641_state::port08_w));
+	m_pio2->out_pb_callback().set(FUNC(brandt8641_state::port09_w));
 
-	MCFG_DEVICE_ADD("pio3", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_pio3, XTAL(4'000'000));
+	m_pio3->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000)) // Z80CTC U8
+	Z80CTC(config, "ctc", XTAL(4'000'000)); // Z80CTC U8
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -195,4 +195,4 @@ ROM_START( br8641 )
 ROM_END
 
 /* Driver */
-COMP( 1986, br8641, 0, 0, brandt8641, brandt8641, brandt8641_state, 0, "Brandt", "Brandt 8641", MACHINE_NOT_WORKING )
+COMP( 1986, br8641, 0, 0, brandt8641, brandt8641, brandt8641_state, empty_init, "Brandt", "Brandt 8641", MACHINE_NOT_WORKING )

@@ -30,8 +30,12 @@ There's a chance that certain bootlegs might have the different 8/20 MHz XTALS.
 #include "speaker.h"
 
 
-#define MAIN_CLOCK      XTAL(8'200'000)
-#define VIDEO_CLOCK     XTAL(19'600'000)
+namespace {
+
+constexpr XTAL MAIN_CLOCK  =  8.2_MHz_XTAL;
+constexpr XTAL VIDEO_CLOCK = 19.6_MHz_XTAL;
+
+} // anonymous namespace
 
 
 
@@ -49,20 +53,20 @@ READ8_MEMBER(mrdo_state::mrdo_SECRE_r)
 void mrdo_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram().w(this, FUNC(mrdo_state::mrdo_bgvideoram_w)).share("bgvideoram");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(mrdo_state::mrdo_fgvideoram_w)).share("fgvideoram");
+	map(0x8000, 0x87ff).ram().w(FUNC(mrdo_state::mrdo_bgvideoram_w)).share("bgvideoram");
+	map(0x8800, 0x8fff).ram().w(FUNC(mrdo_state::mrdo_fgvideoram_w)).share("fgvideoram");
 	map(0x9000, 0x90ff).writeonly().share("spriteram");
-	map(0x9800, 0x9800).w(this, FUNC(mrdo_state::mrdo_flipscreen_w));    /* screen flip + playfield priority */
-	map(0x9801, 0x9801).w("u8106_1", FUNC(u8106_device::write));
-	map(0x9802, 0x9802).w("u8106_2", FUNC(u8106_device::write));
-	map(0x9803, 0x9803).r(this, FUNC(mrdo_state::mrdo_SECRE_r));
+	map(0x9800, 0x9800).w(FUNC(mrdo_state::mrdo_flipscreen_w));    /* screen flip + playfield priority */
+	map(0x9801, 0x9801).w("u8106_1", FUNC(u8106_device::command_w));
+	map(0x9802, 0x9802).w("u8106_2", FUNC(u8106_device::command_w));
+	map(0x9803, 0x9803).r(FUNC(mrdo_state::mrdo_SECRE_r));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa001, 0xa001).portr("P2");
 	map(0xa002, 0xa002).portr("DSW1");
 	map(0xa003, 0xa003).portr("DSW2");
 	map(0xe000, 0xefff).ram();
-	map(0xf000, 0xf7ff).w(this, FUNC(mrdo_state::mrdo_scrollx_w));
-	map(0xf800, 0xffff).w(this, FUNC(mrdo_state::mrdo_scrolly_w));
+	map(0xf000, 0xf7ff).w(FUNC(mrdo_state::mrdo_scrollx_w));
+	map(0xf800, 0xffff).w(FUNC(mrdo_state::mrdo_scrolly_w));
 }
 
 
@@ -164,7 +168,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( mrdo )
+static GFXDECODE_START( gfx_mrdo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 64 )    /* colors 0-255 directly mapped */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,      0, 64 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 4*64, 16 )
@@ -174,28 +178,26 @@ GFXDECODE_END
 MACHINE_CONFIG_START(mrdo_state::mrdo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/2)  /* Verified */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mrdo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/2)  /* Verified */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mrdo_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/4, 312, 8, 248, 262, 32, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mrdo_state, screen_update_mrdo)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrdo)
-	MCFG_PALETTE_ADD("palette", 64*4+16*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(mrdo_state, mrdo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrdo);
+	PALETTE(config, m_palette, FUNC(mrdo_state::mrdo_palette), 64*4 + 16*4, 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("u8106_1", U8106, MAIN_CLOCK/2)  /* sn76489-equivalent?, Verified */
+	MCFG_DEVICE_ADD("u8106_1", U8106, MAIN_CLOCK/2)  /* sn76489-equivalent?, Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("u8106_2", U8106, MAIN_CLOCK/2)  /* sn76489-equivalent?, Verified */
+	MCFG_DEVICE_ADD("u8106_2", U8106, MAIN_CLOCK/2)  /* sn76489-equivalent?, Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -414,10 +416,10 @@ ROM_END
 
 
 
-GAME( 1982, mrdo,     0,    mrdo, mrdo, mrdo_state, 0, ROT270, "Universal",                 "Mr. Do!",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrdoy,    mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "Universal",                 "Mr. Do! (prototype)", MACHINE_SUPPORTS_SAVE ) /* aka "Yukidaruma" */
-GAME( 1982, mrdot,    mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "Universal (Taito license)", "Mr. Do! (Taito)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrdofix,  mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "Universal (Taito license)", "Mr. Do! (bugfixed)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrlo,     mrdo, mrlo, mrdo, mrdo_state, 0, ROT270, "bootleg",                   "Mr. Lo!",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mrdu,     mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "bootleg",                   "Mr. Du!",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, yankeedo, mrdo, mrdo, mrdo, mrdo_state, 0, ROT270, "hack",                      "Yankee DO!",          MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdo,     0,    mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal",                 "Mr. Do!",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdoy,    mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal",                 "Mr. Do! (prototype)", MACHINE_SUPPORTS_SAVE ) /* aka "Yukidaruma" */
+GAME( 1982, mrdot,    mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal (Taito license)", "Mr. Do! (Taito)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdofix,  mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "Universal (Taito license)", "Mr. Do! (bugfixed)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrlo,     mrdo, mrlo, mrdo, mrdo_state, empty_init, ROT270, "bootleg",                   "Mr. Lo!",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mrdu,     mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "bootleg",                   "Mr. Du!",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, yankeedo, mrdo, mrdo, mrdo, mrdo_state, empty_init, ROT270, "hack",                      "Yankee DO!",          MACHINE_SUPPORTS_SAVE )

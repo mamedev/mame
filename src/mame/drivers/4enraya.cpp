@@ -252,7 +252,7 @@ WRITE8_MEMBER(_4enraya_state::fenraya_custom_map_w)
 
 void _4enraya_state::main_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(_4enraya_state::fenraya_custom_map_r), FUNC(_4enraya_state::fenraya_custom_map_w));
+	map(0x0000, 0xffff).rw(FUNC(_4enraya_state::fenraya_custom_map_r), FUNC(_4enraya_state::fenraya_custom_map_w));
 }
 
 void _4enraya_state::main_portmap(address_map &map)
@@ -261,20 +261,20 @@ void _4enraya_state::main_portmap(address_map &map)
 	map(0x00, 0x00).portr("DSW");
 	map(0x01, 0x01).portr("INPUTS");
 	map(0x02, 0x02).portr("SYSTEM");
-	map(0x23, 0x23).w(this, FUNC(_4enraya_state::sound_data_w));
-	map(0x33, 0x33).w(this, FUNC(_4enraya_state::sound_control_w));
+	map(0x23, 0x23).w(FUNC(_4enraya_state::sound_data_w));
+	map(0x33, 0x33).w(FUNC(_4enraya_state::sound_control_w));
 }
 
 
-void _4enraya_state::unkpacg_main_map(address_map &map)
+void unk_gambl_state::unkpacg_main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
-	map(0x7000, 0x7fff).w(this, FUNC(_4enraya_state::fenraya_videoram_w));
+	map(0x7000, 0x7fff).w(FUNC(_4enraya_state::fenraya_videoram_w));
 	map(0x8000, 0x9fff).rom();
 }
 
-void _4enraya_state::unkpacg_main_portmap(address_map &map)
+void unk_gambl_state::unkpacg_main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("DSW1");
@@ -444,7 +444,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( 4enraya )
+static GFXDECODE_START( gfx_4enraya )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -473,10 +473,10 @@ void _4enraya_state::machine_reset()
 MACHINE_CONFIG_START(_4enraya_state::_4enraya )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(_4enraya_state, irq0_line_hold, 4*60) // unknown timing
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(_4enraya_state, irq0_line_hold, 4*60) // unknown timing
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -485,33 +485,32 @@ MACHINE_CONFIG_START(_4enraya_state::_4enraya )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_4enraya_state, screen_update_4enraya)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 4enraya)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_4enraya)
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4) /* guess */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, m_ay, MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.3); /* guess */
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(_4enraya_state::unkpacg)
+MACHINE_CONFIG_START(unk_gambl_state::unkpacg)
 	_4enraya(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(unkpacg_main_map)
-	MCFG_CPU_IO_MAP(unkpacg_main_portmap)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(unkpacg_main_map)
+	MCFG_DEVICE_IO_MAP(unkpacg_main_portmap)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
-//  MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_REPLACE("aysnd", AY8910, MAIN_CLOCK/4) /* guess */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+//  SPEAKER(config, "mono").front_center();
+	AY8910(config.replace(), m_ay, MAIN_CLOCK/4); /* guess */
+	m_ay->port_a_read_callback().set_ioport("DSW2");
+	m_ay->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -636,8 +635,10 @@ ROM_END
 *          Driver Init             *
 ***********************************/
 
-DRIVER_INIT_MEMBER(_4enraya_state, unkpacg)
+void unk_gambl_state::driver_init()
 {
+	_4enraya_state::driver_init();
+
 	// descramble rom
 	uint8_t *rom = memregion("maincpu")->base();
 	for (int i = 0x8000; i < 0xa000; i++)
@@ -649,9 +650,9 @@ DRIVER_INIT_MEMBER(_4enraya_state, unkpacg)
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT    STATE           INIT     ROT    COMPANY      FULLNAME                                         FLAGS  */
-GAME( 1990, 4enraya,  0,       _4enraya, 4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1990, 4enrayaa, 4enraya, _4enraya, 4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game",                MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksig,   0,       unkpacg,  unkfr,   _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksiga,  unksig,  unkpacg,  unkfr,   _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT   MACHINE   INPUT    CLASS            INIT        ROT   COMPANY      FULLNAME                                         FLAGS  */
+GAME( 1990, 4enraya,  0,       _4enraya, 4enraya, _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1990, 4enrayaa, 4enraya, _4enraya, 4enraya, _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, unk_gambl_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game",                MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksig,   0,       unkpacg,  unkfr,   unk_gambl_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksiga,  unksig,  unkpacg,  unkfr,   unk_gambl_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )

@@ -185,18 +185,20 @@ WRITE8_MEMBER(vme_slot_device::write8)
 /* The following two slot collections be combined once we intriduce capabilities for each board */
 /* Usually a VME firmware supports only a few boards so it will have its own slot collection defined */
 // Controller capable boards that can go into slot1 ( or has an embedded VME bus )
-SLOT_INTERFACE_START( vme_slot1 )
-//  SLOT_INTERFACE("mzr8105", VME_MZR8105)
-SLOT_INTERFACE_END
+void vme_slot1(device_slot_interface &device)
+{
+//  device.option_add("mzr8105", VME_MZR8105);
+}
 #endif
 
 // All boards that can be non-controller boards, eg not driving the VME CLK etc
-SLOT_INTERFACE_START( vme_slots )
-	SLOT_INTERFACE("mzr8300", VME_MZR8300)
-	SLOT_INTERFACE("mvme350", VME_MVME350)
-	SLOT_INTERFACE("fcisio1", VME_FCISIO1)
-	SLOT_INTERFACE("fcscsi1", VME_FCSCSI1)
-SLOT_INTERFACE_END
+void vme_slots(device_slot_interface &device)
+{
+	device.option_add("mzr8300", VME_MZR8300);
+	device.option_add("mvme350", VME_MVME350);
+	device.option_add("fcisio1", VME_FCISIO1);
+	device.option_add("fcscsi1", VME_FCSCSI1);
+}
 
 //
 // VME device P1
@@ -257,7 +259,7 @@ void vme_device::device_start()
 		LOG(" - using owner memory spaces for %s\n", m_cputag);
 		m_maincpu = owner()->subdevice<cpu_device>(m_cputag);
 		m_prgspace = &m_maincpu->space(AS_PROGRAM);
-		m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
+		m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->data_width();
 		LOG(" - Done at %d width\n", m_prgwidth);
 	}
 }

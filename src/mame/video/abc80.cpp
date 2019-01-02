@@ -32,7 +32,7 @@ static const gfx_layout charlayout =
 //  GFXDECODE( abc80 )
 //-------------------------------------------------
 
-static GFXDECODE_START( abc80 )
+static GFXDECODE_START( gfx_abc80 )
 	GFXDECODE_ENTRY( "chargen", 0,     charlayout, 0, 1 ) // normal characters
 	GFXDECODE_ENTRY( "chargen", 0x500, charlayout, 0, 1 ) // graphics characters
 GFXDECODE_END
@@ -198,6 +198,6 @@ MACHINE_CONFIG_START(abc80_state::abc80_video)
 
 	MCFG_SCREEN_RAW_PARAMS(XTAL(11'980'800)/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", abc80)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_abc80)
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 MACHINE_CONFIG_END

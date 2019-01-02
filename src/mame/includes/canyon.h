@@ -13,6 +13,7 @@
 #include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 
 /* Discrete Sound Input Nodes */
 #define CANYON_MOTOR1_DATA      NODE_01
@@ -45,11 +46,9 @@ protected:
 	DECLARE_READ8_MEMBER(canyon_switches_r);
 	DECLARE_READ8_MEMBER(canyon_options_r);
 	DECLARE_WRITE8_MEMBER(output_latch_w);
-	DECLARE_WRITE_LINE_MEMBER(led1_w);
-	DECLARE_WRITE_LINE_MEMBER(led2_w);
 	DECLARE_WRITE8_MEMBER(canyon_videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_PALETTE_INIT(canyon);
+	void canyon_palette(palette_device &palette) const;
 	uint32_t screen_update_canyon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(canyon_motor_w);
 	DECLARE_WRITE8_MEMBER(canyon_explode_w);
@@ -77,6 +76,6 @@ private:
 
 
 /*----------- defined in audio/canyon.c -----------*/
-DISCRETE_SOUND_EXTERN( canyon );
+DISCRETE_SOUND_EXTERN( canyon_discrete );
 
 #endif // MAME_INCLUDES_CANYON_H

@@ -27,7 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pce_joystick_w);
 	DECLARE_READ8_MEMBER(pce_joystick_r);
 
-	DECLARE_DRIVER_INIT(pce_common);
+	void init_pce_common();
 
 	required_device<h6280_device> m_maincpu;
 

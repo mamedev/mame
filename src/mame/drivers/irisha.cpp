@@ -23,6 +23,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -38,6 +39,9 @@ public:
 		, m_keyboard(*this, "LINE%u", 0)
 	{ }
 
+	void irisha(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(irisha_keyboard_r);
 	DECLARE_READ8_MEMBER(irisha_8255_portb_r);
 	DECLARE_READ8_MEMBER(irisha_8255_portc_r);
@@ -49,10 +53,9 @@ public:
 	uint32_t screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
 
-	void irisha(machine_config &config);
 	void irisha_io(address_map &map);
 	void irisha_mem(address_map &map);
-private:
+
 	bool m_sg1_line;
 	bool m_keypressed;
 	uint8_t m_keyboard_cnt;
@@ -79,9 +82,8 @@ void irisha_state::irisha_mem(address_map &map)
 
 void irisha_state::irisha_io(address_map &map)
 {
-	map(0x04, 0x05).r(this, FUNC(irisha_state::irisha_keyboard_r));
-	map(0x06, 0x06).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x07, 0x07).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x04, 0x05).r(FUNC(irisha_state::irisha_keyboard_r));
+	map(0x06, 0x07).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x08, 0x0B).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0C, 0x0F).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).mask(0x01);
 	map(0x10, 0x13).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -239,7 +241,7 @@ static const gfx_layout irisha_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( irisha )
+static GFXDECODE_START( gfx_irisha )
 	GFXDECODE_ENTRY( "maincpu", 0x3800, irisha_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -364,9 +366,9 @@ void irisha_state::machine_reset()
 /* Machine driver */
 MACHINE_CONFIG_START(irisha_state::irisha)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
-	MCFG_CPU_PROGRAM_MAP(irisha_mem)
-	MCFG_CPU_IO_MAP(irisha_io)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(irisha_mem)
+	MCFG_DEVICE_IO_MAP(irisha_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -377,35 +379,35 @@ MACHINE_CONFIG_START(irisha_state::irisha)
 	MCFG_SCREEN_UPDATE_DRIVER(irisha_state, screen_update_irisha)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", irisha)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_irisha)
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(16'000'000) / 9)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(16'000'000) / 9 / 8 / 8)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
-	MCFG_PIT8253_CLK2(XTAL(16'000'000) / 9)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(irisha_state, speaker_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(16_MHz_XTAL / 9);
+	m_pit->out_handler<0>().set("pic8259", FUNC(pic8259_device::ir0_w));
+	m_pit->set_clk<1>(16_MHz_XTAL / 9 / 8 / 8);
+	m_pit->out_handler<1>().set("uart", FUNC(i8251_device::write_txc));
+	m_pit->out_handler<1>().append("uart", FUNC(i8251_device::write_rxc));
+	m_pit->set_clk<2>(16_MHz_XTAL / 9);
+	m_pit->out_handler<2>().set(FUNC(irisha_state::speaker_w));
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(irisha_state, irisha_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(irisha_state, irisha_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(irisha_state, irisha_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(irisha_state, irisha_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(irisha_state, irisha_8255_portc_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(irisha_state::irisha_8255_porta_w));
+	ppi.in_pb_callback().set(FUNC(irisha_state::irisha_8255_portb_r));
+	ppi.out_pb_callback().set(FUNC(irisha_state::irisha_8255_portb_w));
+	ppi.in_pc_callback().set(FUNC(irisha_state::irisha_8255_portc_r));
+	ppi.out_pc_callback().set(FUNC(irisha_state::irisha_8255_portc_w));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	pic8259_device &pic8259(PIC8259(config, "pic8259", 0));
+	pic8259.out_int_callback().set_inputline(m_maincpu, 0);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -417,5 +419,5 @@ ROM_START( irisha )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   CLASS          INIT    COMPANY  FULLNAME   FLAGS
-COMP( 1983, irisha,      0,      0, irisha,     irisha, irisha_state,  0,      "MGU",   "Irisha",  MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME  FLAGS
+COMP( 1983, irisha,      0,      0, irisha,  irisha, irisha_state, empty_init, "MGU",   "Irisha", MACHINE_NOT_WORKING)

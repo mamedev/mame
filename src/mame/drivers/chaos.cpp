@@ -73,10 +73,10 @@ void chaos_state::mem_map(address_map &map)
 void chaos_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x1e, 0x1e).r(this, FUNC(chaos_state::port1e_r));
-	map(0x1f, 0x1f).rw(this, FUNC(chaos_state::port90_r), FUNC(chaos_state::port1f_w));
-	map(0x90, 0x90).r(this, FUNC(chaos_state::port90_r));
-	map(0x91, 0x91).r(this, FUNC(chaos_state::port91_r));
+	map(0x1e, 0x1e).r(FUNC(chaos_state::port1e_r));
+	map(0x1f, 0x1f).rw(FUNC(chaos_state::port90_r), FUNC(chaos_state::port1f_w));
+	map(0x90, 0x90).r(FUNC(chaos_state::port90_r));
+	map(0x91, 0x91).r(FUNC(chaos_state::port91_r));
 	map(0x92, 0x92).w(m_terminal, FUNC(generic_terminal_device::write));
 }
 
@@ -150,14 +150,14 @@ void chaos_state::machine_reset()
 
 MACHINE_CONFIG_START(chaos_state::chaos)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_DATA_MAP(data_map)
+	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_DATA_MAP(data_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(chaos_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(chaos_state::kbd_put));
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -171,5 +171,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT  COMPANY          FULLNAME   FLAGS
-COMP( 1983, chaos,  0,      0,      chaos,   chaos, chaos_state, 0,    "David Greaves", "Chaos 2", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME   FLAGS
+COMP( 1983, chaos, 0,      0,      chaos,   chaos, chaos_state, empty_init, "David Greaves", "Chaos 2", MACHINE_NO_SOUND_HW )

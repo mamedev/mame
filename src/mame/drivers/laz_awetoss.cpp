@@ -22,10 +22,12 @@ public:
 	//  ,m_maincpu(*this, "maincpu")
 	{ }
 
+	void awetoss(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void awetoss(machine_config &config);
 //  required_device<mcs51_cpu_device> m_maincpu;
 };
 
@@ -46,15 +48,15 @@ void awetoss_state::machine_reset()
 MACHINE_CONFIG_START(awetoss_state::awetoss)
 
 	/* basic machine hardware */
-//  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
-//  MCFG_CPU_PROGRAM_MAP(awetoss_map)
-//  MCFG_CPU_IO_MAP(awetoss_io)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", awetoss_state,  irq0_line_hold)
+//  MCFG_DEVICE_ADD("maincpu", ??, 8000000) // unknown
+//  MCFG_DEVICE_PROGRAM_MAP(awetoss_map)
+//  MCFG_DEVICE_IO_MAP(awetoss_io)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", awetoss_state,  irq0_line_hold)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // maybe
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // maybe
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -82,4 +84,4 @@ ROM_START( awetoss )
 	ROM_LOAD( "awsmtoss.u11", 0x30000, 0x10000, CRC(8ae9d4f0) SHA1(58d1d8972c8e4c9a7c63e9d63e267ea81515d22a) )
 ROM_END
 
-GAME( 19??, awetoss,  0,    awetoss, awetoss, awetoss_state,  0, ROT0, "Lazer-tron", "Awesome Toss'em (Lazer-tron)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, awetoss, 0, awetoss, awetoss, awetoss_state, empty_init, ROT0, "Lazer-tron", "Awesome Toss'em (Lazer-tron)", MACHINE_IS_SKELETON_MECHANICAL )

@@ -34,8 +34,11 @@ public:
 	void wpc_an_dd(machine_config &config);
 	void wpc_an(machine_config &config);
 	void wpc_an_base(machine_config &config);
+
+	void init_wpc_an();
+
+private:
 	void wpc_an_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -51,8 +54,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
-public:
-	DECLARE_DRIVER_INIT(wpc_an);
+
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
@@ -64,7 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(wpc_sound_data_w);
 	DECLARE_WRITE8_MEMBER(wpc_sound_s11_w);
 	DECLARE_WRITE8_MEMBER(wpc_rombank_w);
-private:
+
 	uint16_t m_vblank_count;
 	uint32_t m_irq_count;
 	uint8_t m_bankmask;
@@ -76,7 +78,7 @@ private:
 
 void wpc_an_state::wpc_an_map(address_map &map)
 {
-	map(0x0000, 0x2fff).rw(this, FUNC(wpc_an_state::ram_r), FUNC(wpc_an_state::ram_w));
+	map(0x0000, 0x2fff).rw(FUNC(wpc_an_state::ram_r), FUNC(wpc_an_state::ram_w));
 	map(0x3000, 0x3faf).ram();
 	map(0x3fb0, 0x3fff).rw(m_wpc, FUNC(wpc_device::read), FUNC(wpc_device::write)); // WPC device
 	map(0x4000, 0x7fff).bankr("cpubank");
@@ -306,57 +308,67 @@ void wpc_an_state::machine_reset()
 	m_irq_count = 0;
 }
 
-DRIVER_INIT_MEMBER(wpc_an_state,wpc_an)
+void wpc_an_state::init_wpc_an()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t *fixed = memregion("fixed")->base();
 	uint32_t codeoff = memregion("maincpu")->bytes() - 0x8000;
+
 	m_cpubank->configure_entries(0, 32, &ROM[0x10000], 0x4000);
 	m_cpubank->set_entry(0);
+
 	m_vblank_timer = timer_alloc(TIMER_VBLANK);
 	m_vblank_timer->adjust(attotime::from_hz(60),0,attotime::from_hz(60));
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_hz(976),0,attotime::from_hz(976));
+
 	m_bankmask = ((memregion("maincpu")->bytes()-0x10000) >> 14) - 1;
+
 	logerror("WPC: ROM bank mask = %02x\n",m_bankmask);
+
 	memset(m_ram,0,0x3000);
 	memcpy(fixed,&ROM[codeoff],0x8000);  // copy static code from end of U6 ROM.
 }
 
-MACHINE_CONFIG_START(wpc_an_state::wpc_an_base)
+void wpc_an_state::wpc_an_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(8'000'000) / 4) // 68B09E
-	MCFG_CPU_PROGRAM_MAP(wpc_an_map)
+	MC6809E(config, m_maincpu, XTAL(8'000'000) / 4); // 68B09E
+	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_an_state::wpc_an_map);
 
-	MCFG_WMS_WPC_ADD("wpc")
-	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(wpc_an_state,wpc_irq_w))
-	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(wpc_an_state,wpc_firq_w))
-	MCFG_WPC_ROMBANK(WRITE8(wpc_an_state,wpc_rombank_w))
-	MCFG_WPC_SOUND_CTRL(READ8(wpc_an_state,wpc_sound_ctrl_r),WRITE8(wpc_an_state,wpc_sound_ctrl_w))
-	MCFG_WPC_SOUND_DATA(READ8(wpc_an_state,wpc_sound_data_r),WRITE8(wpc_an_state,wpc_sound_data_w))
-	MCFG_WPC_SOUND_S11C(WRITE8(wpc_an_state,wpc_sound_s11_w))
+	WPCASIC(config, m_wpc, 0);
+	m_wpc->irq_callback().set(FUNC(wpc_an_state::wpc_irq_w));
+	m_wpc->firq_callback().set(FUNC(wpc_an_state::wpc_firq_w));
+	m_wpc->bank_write().set(FUNC(wpc_an_state::wpc_rombank_w));
+	m_wpc->sound_ctrl_read().set(FUNC(wpc_an_state::wpc_sound_ctrl_r));
+	m_wpc->sound_ctrl_write().set(FUNC(wpc_an_state::wpc_sound_ctrl_w));
+	m_wpc->sound_data_read().set(FUNC(wpc_an_state::wpc_sound_data_r));
+	m_wpc->sound_data_write().set(FUNC(wpc_an_state::wpc_sound_data_w));
+	m_wpc->sound_s11_write().set(FUNC(wpc_an_state::wpc_sound_s11_w));
 
-	MCFG_DEFAULT_LAYOUT(layout_wpc_an)
-MACHINE_CONFIG_END
+	config.set_default_layout(layout_wpc_an);
+}
 
-MACHINE_CONFIG_START(wpc_an_state::wpc_an)
+void wpc_an_state::wpc_an(machine_config &config)
+{
 	wpc_an_base(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("wpcsnd", WPCSND, 0)
-	MCFG_WPC_ROM_REGION(":sound1")
-	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(wpc_an_state,wpcsnd_reply_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "speaker").front_center();
+	WPCSND(config, m_wpcsnd);
+	m_wpcsnd->set_romregion("sound1");
+	m_wpcsnd->reply_callback().set(FUNC(wpc_an_state::wpcsnd_reply_w));
+	m_wpcsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-MACHINE_CONFIG_START(wpc_an_state::wpc_an_dd)
+void wpc_an_state::wpc_an_dd(machine_config &config)
+{
 	wpc_an_base(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("bg", S11C_BG, 0)
-	MCFG_S11C_BG_ROM_REGION(":sound1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "speaker").front_center();
+	S11C_BG(config, m_bg);
+	m_bg->set_romregion("sound1");
+	m_bg->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 /*-----------------
 /  Dr. Dude #2016
@@ -693,21 +705,21 @@ ROM_START(tfa_13)
 	ROM_FILL(0x0000,0x8000,0x00)
 ROM_END
 
-GAME(1990,  tfa_13,     0,      wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",     "WPC Test Fixture: Alphanumeric (1.3)",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  dd_p7,      dd_l2,  wpc_an_dd, wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",     "Dr. Dude (PA-7 WPC)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  dd_p06,     dd_l2,  wpc_an_dd, wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",     "Dr. Dude (PA-6 WPC)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  fh_l9,      0,      wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "Funhouse L-9 (SL-2m)",                                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  fh_l9b,     fh_l9,  wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "Funhouse L-9 (SL-2m) Bootleg Improved German translation", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  fh_905h,    fh_l9,  wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "Funhouse 9.05H",                                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  fh_l3,      fh_l9,  wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "Funhouse L-3",                                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  fh_l4,      fh_l9,  wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "Funhouse L-4",                                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  fh_l5,      fh_l9,  wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "Funhouse L-5",                                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  hd_l3,      0,      wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",     "Harley Davidson (L-3)",                                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  hd_l2,      hd_l3,  wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",     "Harley Davidson (L-2)",                                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  hd_l1,      hd_l3,  wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Bally",     "Harley Davidson (L-1)",                                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  bop_l7,     0,      wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "The Machine: Bride of Pinbot (L-7)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  bop_l6,     bop_l7, wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "The Machine: Bride of Pinbot (L-6)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  bop_l5,     bop_l7, wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "The Machine: Bride of Pinbot (L-5)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  bop_l4,     bop_l7, wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "The Machine: Bride of Pinbot (L-4)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  bop_l3,     bop_l7, wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "The Machine: Bride of Pinbot (L-3)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  bop_l2,     bop_l7, wpc_an,    wpc_an, wpc_an_state,   wpc_an, ROT0,   "Williams",  "The Machine: Bride of Pinbot (L-2)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  tfa_13,     0,      wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Bally",     "WPC Test Fixture: Alphanumeric (1.3)",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  dd_p7,      dd_l2,  wpc_an_dd, wpc_an, wpc_an_state, init_wpc_an, ROT0, "Bally",     "Dr. Dude (PA-7 WPC)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  dd_p06,     dd_l2,  wpc_an_dd, wpc_an, wpc_an_state, init_wpc_an, ROT0, "Bally",     "Dr. Dude (PA-6 WPC)",                                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  fh_l9,      0,      wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "Funhouse L-9 (SL-2m)",                                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  fh_l9b,     fh_l9,  wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "Funhouse L-9 (SL-2m) Bootleg Improved German translation", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  fh_905h,    fh_l9,  wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "Funhouse 9.05H",                                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  fh_l3,      fh_l9,  wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "Funhouse L-3",                                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  fh_l4,      fh_l9,  wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "Funhouse L-4",                                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  fh_l5,      fh_l9,  wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "Funhouse L-5",                                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  hd_l3,      0,      wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Bally",     "Harley Davidson (L-3)",                                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  hd_l2,      hd_l3,  wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Bally",     "Harley Davidson (L-2)",                                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  hd_l1,      hd_l3,  wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Bally",     "Harley Davidson (L-1)",                                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  bop_l7,     0,      wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "The Machine: Bride of Pinbot (L-7)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  bop_l6,     bop_l7, wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "The Machine: Bride of Pinbot (L-6)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  bop_l5,     bop_l7, wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "The Machine: Bride of Pinbot (L-5)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  bop_l4,     bop_l7, wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "The Machine: Bride of Pinbot (L-4)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  bop_l3,     bop_l7, wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "The Machine: Bride of Pinbot (L-3)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1991,  bop_l2,     bop_l7, wpc_an,    wpc_an, wpc_an_state, init_wpc_an, ROT0, "Williams",  "The Machine: Bride of Pinbot (L-2)",                       MACHINE_IS_SKELETON_MECHANICAL)

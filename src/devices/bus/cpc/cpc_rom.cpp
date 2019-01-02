@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(CPC_ROM, cpc_rom_device, "cpc_rom", "CPC ROM Box")
 
-SLOT_INTERFACE_EXTERN(cpc_exp_cards);
+void cpc_exp_cards(device_slot_interface &device);
 
 //**************************************************************************
 //  DEVICE CONFIG INTERFACE
@@ -29,12 +29,10 @@ MACHINE_CONFIG_START(cpc_rom_device::device_add_mconfig)
 	MCFG_CPC_ROMSLOT_ADD("rom8")
 
 	// pass-through
-	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
-	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
-
+	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", DERIVED_CLOCK(1, 1), cpc_exp_cards, nullptr));
+	exp.irq_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::irq_w));
+	exp.nmi_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::nmi_w));
+	exp.romdis_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::romdis_w));  // ROMDIS
 MACHINE_CONFIG_END
 
 

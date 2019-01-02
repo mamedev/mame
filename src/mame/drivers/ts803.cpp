@@ -48,13 +48,15 @@ PAGE SEL bit in PORT0 set to 1:
 #include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "imagedev/floppy.h"
+#include "machine/z80daisy.h"
 #include "machine/keyboard.h"
 #include "machine/timer.h"
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80sti.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -70,8 +72,13 @@ public:
 		, m_floppy1(*this, "fdc:1")
 		, m_p_chargen(*this, "chargen")
 		, m_io_dsw(*this, "DSW")
-		{ }
+	{ }
 
+	void ts803(machine_config &config);
+
+	void init_ts803();
+
+private:
 	DECLARE_READ8_MEMBER(port10_r);
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_READ8_MEMBER(porta0_r);
@@ -81,20 +88,18 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 	DECLARE_WRITE8_MEMBER( crtc_controlreg_w );
-	DECLARE_DRIVER_INIT(ts803);
 	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ts803(machine_config &config);
 	void ts803_io(address_map &map);
 	void ts803_mem(address_map &map);
-private:
+
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_56kram;
 	bool m_graphics_mode;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -137,15 +142,15 @@ void ts803_state::ts803_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0x00, 0x0f).portr("DSW");
-	map(0x10, 0x1f).rw(this, FUNC(ts803_state::port10_r), FUNC(ts803_state::port10_w));
+	map(0x10, 0x1f).rw(FUNC(ts803_state::port10_r), FUNC(ts803_state::port10_w));
 	map(0x20, 0x2f).rw("sti", FUNC(z80sti_device::read), FUNC(z80sti_device::write));
 	map(0x30, 0x33).rw("dart", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
 	map(0x80, 0x83).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
-	map(0x90, 0x9f).rw(this, FUNC(ts803_state::disk_0_control_r), FUNC(ts803_state::disk_0_control_w));
-	map(0xa0, 0xbf).rw(this, FUNC(ts803_state::porta0_r), FUNC(ts803_state::porta0_w));
+	map(0x90, 0x9f).rw(FUNC(ts803_state::disk_0_control_r), FUNC(ts803_state::disk_0_control_w));
+	map(0xa0, 0xbf).rw(FUNC(ts803_state::porta0_r), FUNC(ts803_state::porta0_w));
 	map(0xc0, 0xc0).rw("crtc", FUNC(sy6545_1_device::status_r), FUNC(sy6545_1_device::address_w));
 	map(0xc2, 0xc2).rw("crtc", FUNC(sy6545_1_device::register_r), FUNC(sy6545_1_device::register_w));
-	map(0xc4, 0xc4).w(this, FUNC(ts803_state::crtc_controlreg_w));
+	map(0xc4, 0xc4).w(FUNC(ts803_state::crtc_controlreg_w));
 }
 
 /* Input ports */
@@ -183,9 +188,10 @@ INPUT_PORTS_END
 
 /* disk drive */
 
-static SLOT_INTERFACE_START( ts803_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ts803_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 WRITE8_MEMBER( ts803_state::disk_0_control_w )
 {
@@ -372,8 +378,8 @@ Bit 2 = 0 alpha memory access (round off)
 void ts803_state::machine_start()
 {
 	//save these 2 so we can examine them in the debugger
-	save_pointer(NAME(m_videoram.get()), 0x8000);
-	save_pointer(NAME(m_56kram.get()), 0xc000);
+	save_pointer(NAME(m_videoram), 0x8000);
+	save_pointer(NAME(m_56kram), 0xc000);
 }
 
 void ts803_state::machine_reset()
@@ -385,7 +391,7 @@ void ts803_state::machine_reset()
 	membank("bank4")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER( ts803_state, ts803 )
+void ts803_state::init_ts803()
 {
 	m_videoram = std::make_unique<uint8_t[]>(0x8000);
 	m_56kram = std::make_unique<uint8_t[]>(0xc000);
@@ -417,10 +423,10 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 MACHINE_CONFIG_START(ts803_state::ts803)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(ts803_mem)
-	MCFG_CPU_IO_MAP(ts803_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ts803_state::ts803_mem);
+	m_maincpu->set_addrmap(AS_IO, &ts803_state::ts803_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -428,37 +434,38 @@ MACHINE_CONFIG_START(ts803_state::ts803)
 	MCFG_SCREEN_SIZE(640,240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* crtc */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 13608000 / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(ts803_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(ts803_state, crtc_update_addr)
+	sy6545_1_device &crtc(SY6545_1(config, "crtc", 13608000 / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(ts803_state::crtc_update_row), this);
+	crtc.set_on_update_addr_change_callback(FUNC(ts803_state::crtc_update_addr), this);
 
-	MCFG_DEVICE_ADD("sti_clock", CLOCK, XTAL(16'000'000) / 13)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sti", z80sti_device, tc_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sti", z80sti_device, rc_w))
+	clock_device &sti_clock(CLOCK(config, "sti_clock", 16_MHz_XTAL / 13));
+	sti_clock.signal_handler().set("sti", FUNC(z80sti_device::tc_w));
+	sti_clock.signal_handler().append("sti", FUNC(z80sti_device::rc_w));
 
-	MCFG_DEVICE_ADD("dart_clock", CLOCK, (XTAL(16'000'000) / 13) / 8)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("dart", z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxca_w))
+	clock_device &dart_clock(CLOCK(config, "dart_clock", 16_MHz_XTAL / 13 / 8));
+	dart_clock.signal_handler().set("dart", FUNC(z80dart_device::txca_w));
+	dart_clock.signal_handler().append("dart", FUNC(z80dart_device::rxca_w));
 
-	MCFG_DEVICE_ADD("sti", Z80STI, XTAL(16'000'000)/4)
-	MCFG_Z80STI_OUT_TBO_CB(DEVWRITELINE("dart", z80dart_device, rxtxcb_w))
-	MCFG_Z80STI_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80sti_device& sti(Z80STI(config, "sti", 16_MHz_XTAL / 4));
+	sti.out_tbo_cb().set("dart", FUNC(z80dart_device::rxtxcb_w));
+	sti.out_int_cb().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(16'000'000) / 4)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	z80dart_device& dart(Z80DART(config, "dart", 16_MHz_XTAL / 4));
+	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dart.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("dart", z80dart_device, rxa_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.rxd_handler().set("dart", FUNC(z80dart_device::rxa_w));
 
 	/* floppy disk */
-	MCFG_FD1793_ADD("fdc", XTAL(1'000'000))
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("sti", z80sti_device, i7_w))
+	FD1793(config, m_fdc, 1_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set("sti", FUNC(z80sti_device::i7_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ts803_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -479,5 +486,5 @@ ROM_END
 
 
 
-//   YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT    COMPANY     FULLNAME  FLAGS
-COMP(1983, ts803h,  0,      0,      ts803,     ts803, ts803_state, ts803, "Televideo", "TS803H", MACHINE_NOT_WORKING )
+//   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
+COMP(1983, ts803h, 0,      0,      ts803,   ts803, ts803_state, init_ts803, "Televideo", "TS803H", MACHINE_NOT_WORKING )

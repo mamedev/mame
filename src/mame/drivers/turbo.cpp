@@ -299,7 +299,7 @@ WRITE8_MEMBER(turbo_state::subroc3d_ppi0b_w)
 	/* bit 4 = FLIP (not really flip, just offset) */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
-	output().set_led_value(0, data & 0x04);
+	m_lamp = BIT(data, 2);
 	m_subroc3d_flip = (data >> 4) & 1;
 }
 
@@ -346,7 +346,7 @@ WRITE8_MEMBER(turbo_state::buckrog_ppi1c_w)
 	m_buckrog_obch = data & 0x07;
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
-	output().set_led_value(0, data & 0x40);
+	m_lamp = BIT(data, 6);
 }
 
 
@@ -416,7 +416,7 @@ WRITE_LINE_MEMBER(turbo_state::coin_meter_2_w)
 
 WRITE_LINE_MEMBER(turbo_state::start_lamp_w)
 {
-	machine().output().set_led_value(0, state);
+	m_lamp = state ? 1 : 0;
 }
 
 
@@ -469,7 +469,7 @@ READ8_MEMBER(turbo_state::buckrog_port_3_r)
 
 TIMER_CALLBACK_MEMBER(turbo_state::delayed_i8255_w)
 {
-	m_i8255_0->write(m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
+	m_i8255_0->write(param >> 8, param & 0xff);
 }
 
 
@@ -502,12 +502,12 @@ WRITE8_MEMBER(turbo_state::spriteram_w)
 void turbo_state::turbo_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0xa000, 0xa0ff).mirror(0x0700).rw(this, FUNC(turbo_state::spriteram_r), FUNC(turbo_state::spriteram_w));
+	map(0xa000, 0xa0ff).mirror(0x0700).rw(FUNC(turbo_state::spriteram_r), FUNC(turbo_state::spriteram_w));
 	map(0xa800, 0xa807).mirror(0x07f8).w("outlatch", FUNC(ls259_device::write_d0));
 	map(0xb000, 0xb3ff).mirror(0x0400).ram().share("spritepos");
-	map(0xb800, 0xbfff).w(this, FUNC(turbo_state::turbo_analog_reset_w));
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(turbo_state::turbo_videoram_w)).share("videoram");
-	map(0xe800, 0xefff).w(this, FUNC(turbo_state::turbo_collision_clear_w));
+	map(0xb800, 0xbfff).w(FUNC(turbo_state::turbo_analog_reset_w));
+	map(0xe000, 0xe7ff).ram().w(FUNC(turbo_state::turbo_videoram_w)).share("videoram");
+	map(0xe800, 0xefff).w(FUNC(turbo_state::turbo_collision_clear_w));
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf803).mirror(0x00fc).rw(m_i8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf900, 0xf903).mirror(0x00fc).rw(m_i8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -515,7 +515,7 @@ void turbo_state::turbo_map(address_map &map)
 	map(0xfb00, 0xfb03).mirror(0x00fc).rw(m_i8255_3, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfc00, 0xfc01).mirror(0x00fe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0xfd00, 0xfdff).portr("INPUT");
-	map(0xfe00, 0xfeff).r(this, FUNC(turbo_state::turbo_collision_r));
+	map(0xfe00, 0xfeff).r(FUNC(turbo_state::turbo_collision_r));
 }
 
 
@@ -537,7 +537,7 @@ void turbo_state::subroc3d_map(address_map &map)
 	map(0xa803, 0xa803).mirror(0x07fc).portr("DSW3");                 // INPUT 253
 	map(0xb000, 0xb7ff).ram();                                                 // SCRATCH
 	map(0xb800, 0xbfff);                                                        // HANDLE CL
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(turbo_state::turbo_videoram_w)).share("videoram");    // FIX PAGE
+	map(0xe000, 0xe7ff).ram().w(FUNC(turbo_state::turbo_videoram_w)).share("videoram");    // FIX PAGE
 	map(0xe800, 0xe803).mirror(0x07fc).rw(m_i8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf000, 0xf003).mirror(0x07fc).rw(m_i8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf800, 0xf801).mirror(0x07fe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
@@ -554,16 +554,16 @@ void turbo_state::subroc3d_map(address_map &map)
 void turbo_state::buckrog_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(turbo_state::turbo_videoram_w)).share("videoram");    // FIX PAGE
-	map(0xc800, 0xc803).mirror(0x07fc).r(m_i8255_0, FUNC(i8255_device::read)).w(this, FUNC(turbo_state::buckrog_i8255_0_w));    // 8255
+	map(0xc000, 0xc7ff).ram().w(FUNC(turbo_state::turbo_videoram_w)).share("videoram");    // FIX PAGE
+	map(0xc800, 0xc803).mirror(0x07fc).r(m_i8255_0, FUNC(i8255_device::read)).w(FUNC(turbo_state::buckrog_i8255_0_w));    // 8255
 	map(0xd000, 0xd003).mirror(0x07fc).rw(m_i8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));            // 8255
 	map(0xd800, 0xd801).mirror(0x07fe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0xe000, 0xe3ff).ram().share("spritepos");                           // CONT RAM
 	map(0xe400, 0xe7ff).ram().share("spriteram");                           // CONT RAM
 	map(0xe800, 0xe800).mirror(0x07fc).portr("IN0");                  // INPUT
 	map(0xe801, 0xe801).mirror(0x07fc).portr("IN1");
-	map(0xe802, 0xe802).mirror(0x07fc).r(this, FUNC(turbo_state::buckrog_port_2_r));
-	map(0xe803, 0xe803).mirror(0x07fc).r(this, FUNC(turbo_state::buckrog_port_3_r));
+	map(0xe802, 0xe802).mirror(0x07fc).r(FUNC(turbo_state::buckrog_port_2_r));
+	map(0xe803, 0xe803).mirror(0x07fc).r(FUNC(turbo_state::buckrog_port_3_r));
 	map(0xf000, 0xf000);
 	map(0xf800, 0xffff).ram();                                                 // SCRATCH
 }
@@ -576,7 +576,7 @@ void turbo_state::decrypted_opcodes_map(address_map &map)
 void turbo_state::buckrog_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x0000, 0xdfff).w(this, FUNC(turbo_state::buckrog_bitmap_w));
+	map(0x0000, 0xdfff).w(FUNC(turbo_state::buckrog_bitmap_w));
 	map(0xe000, 0xe7ff).mirror(0x1800).ram();
 }
 
@@ -584,7 +584,7 @@ void turbo_state::buckrog_cpu2_map(address_map &map)
 void turbo_state::buckrog_cpu2_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).r(this, FUNC(turbo_state::buckrog_cpu2_command_r));
+	map(0x00, 0xff).r(FUNC(turbo_state::buckrog_cpu2_command_r));
 }
 
 
@@ -831,7 +831,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static GFXDECODE_START( turbo )
+static GFXDECODE_START( gfx_turbo )
 	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x2_planar, 0, 64 )
 GFXDECODE_END
 
@@ -846,44 +846,43 @@ GFXDECODE_END
 MACHINE_CONFIG_START(turbo_state::turbo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(turbo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(turbo_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(turbo_state, turbo_ppi0a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(turbo_state, turbo_ppi0b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, turbo_ppi0c_w))
+	I8255(config, m_i8255_0);
+	m_i8255_0->out_pa_callback().set(FUNC(turbo_state::turbo_ppi0a_w));
+	m_i8255_0->out_pb_callback().set(FUNC(turbo_state::turbo_ppi0b_w));
+	m_i8255_0->out_pc_callback().set(FUNC(turbo_state::turbo_ppi0c_w));
 
-	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(turbo_state, turbo_ppi1a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(turbo_state, turbo_ppi1b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, turbo_ppi1c_w))
+	I8255(config, m_i8255_1);
+	m_i8255_1->out_pa_callback().set(FUNC(turbo_state::turbo_ppi1a_w));
+	m_i8255_1->out_pb_callback().set(FUNC(turbo_state::turbo_ppi1b_w));
+	m_i8255_1->out_pc_callback().set(FUNC(turbo_state::turbo_ppi1c_w));
 
-	MCFG_DEVICE_ADD("i8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(turbo_state, turbo_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(turbo_state, turbo_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, turbo_sound_c_w))
+	I8255(config, m_i8255_2);
+	m_i8255_2->out_pa_callback().set(FUNC(turbo_state::turbo_sound_a_w));
+	m_i8255_2->out_pb_callback().set(FUNC(turbo_state::turbo_sound_b_w));
+	m_i8255_2->out_pc_callback().set(FUNC(turbo_state::turbo_sound_c_w));
 
-	MCFG_DEVICE_ADD("i8255_3", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(turbo_state, turbo_analog_r))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, turbo_ppi3c_w))
+	I8255(config, m_i8255_3);
+	m_i8255_3->in_pa_callback().set(FUNC(turbo_state::turbo_analog_r));
+	m_i8255_3->in_pb_callback().set_ioport("DSW2");
+	m_i8255_3->out_pc_callback().set(FUNC(turbo_state::turbo_ppi3c_w));
 
-	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
-	MCFG_I8279_OUT_SL_CB(WRITE8(turbo_state, scanlines_w))    // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(turbo_state, digit_w))      // display A&B
-	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4)); // unknown clock
+	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w)); // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));   // display A&B
+	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // IC125 - outputs passed through CN5
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(turbo_state, coin_meter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(turbo_state, coin_meter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(turbo_state, start_lamp_w))
+	ls259_device &outlatch(LS259(config, "outlatch")); // IC125 - outputs passed through CN5
+	outlatch.q_out_cb<0>().set(FUNC(turbo_state::coin_meter_1_w));
+	outlatch.q_out_cb<1>().set(FUNC(turbo_state::coin_meter_2_w));
+	outlatch.q_out_cb<3>().set(FUNC(turbo_state::start_lamp_w));
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(turbo_state,turbo)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
+	PALETTE(config, "palette", FUNC(turbo_state::turbo_palette), 256);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -901,29 +900,28 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(turbo_state::subroc3d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(subroc3d_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(subroc3d_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(turbo_state, subroc3d_ppi0a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(turbo_state, subroc3d_ppi0b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, subroc3d_ppi0c_w))
+	I8255(config, m_i8255_0);
+	m_i8255_0->out_pa_callback().set(FUNC(turbo_state::subroc3d_ppi0a_w));
+	m_i8255_0->out_pb_callback().set(FUNC(turbo_state::subroc3d_ppi0b_w));
+	m_i8255_0->out_pc_callback().set(FUNC(turbo_state::subroc3d_ppi0c_w));
 
-	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(turbo_state, subroc3d_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(turbo_state, subroc3d_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, subroc3d_sound_c_w))
+	I8255(config, m_i8255_1);
+	m_i8255_1->out_pa_callback().set(FUNC(turbo_state::subroc3d_sound_a_w));
+	m_i8255_1->out_pb_callback().set(FUNC(turbo_state::subroc3d_sound_b_w));
+	m_i8255_1->out_pc_callback().set(FUNC(turbo_state::subroc3d_sound_c_w));
 
-	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
-	MCFG_I8279_OUT_SL_CB(WRITE8(turbo_state, scanlines_w))    // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(turbo_state, digit_w))      // display A&B
-	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4)); // unknown clock
+	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w)); // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));   // display A&B
+	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(turbo_state,subroc3d)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
+	PALETTE(config, "palette", FUNC(turbo_state::subroc3d_palette), 256);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -941,37 +939,36 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(turbo_state::buckrog)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(buckrog_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(buckrog_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(buckrog_cpu2_map)
-	MCFG_CPU_IO_MAP(buckrog_cpu2_portmap)
+	MCFG_DEVICE_ADD("subcpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(buckrog_cpu2_map)
+	MCFG_DEVICE_IO_MAP(buckrog_cpu2_portmap)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 	MCFG_MACHINE_RESET_OVERRIDE(turbo_state,buckrog)
 
-	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(turbo_state, buckrog_ppi0a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(turbo_state, buckrog_ppi0b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, buckrog_ppi0c_w))
+	I8255(config, m_i8255_0);
+	m_i8255_0->out_pa_callback().set(FUNC(turbo_state::buckrog_ppi0a_w));
+	m_i8255_0->out_pb_callback().set(FUNC(turbo_state::buckrog_ppi0b_w));
+	m_i8255_0->out_pc_callback().set(FUNC(turbo_state::buckrog_ppi0c_w));
 
-	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(turbo_state, buckrog_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(turbo_state, buckrog_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(turbo_state, buckrog_ppi1c_w))
+	I8255(config, m_i8255_1);
+	m_i8255_1->out_pa_callback().set(FUNC(turbo_state::buckrog_sound_a_w));
+	m_i8255_1->out_pb_callback().set(FUNC(turbo_state::buckrog_sound_b_w));
+	m_i8255_1->out_pc_callback().set(FUNC(turbo_state::buckrog_ppi1c_w));
 
-	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
-	MCFG_I8279_OUT_SL_CB(WRITE8(turbo_state, scanlines_w))    // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(turbo_state, digit_w))      // display A&B
-	MCFG_I8279_IN_RL_CB(IOPORT("DSW1"))                       // kbd RL lines
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4)); // unknown clock
+	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w)); // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));   // display A&B
+	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbo)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INIT_OWNER(turbo_state,buckrog)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
+	PALETTE(config, "palette", FUNC(turbo_state::buckrog_palette), 1024);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -987,21 +984,22 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(turbo_state::buckrogu)
 	buckrog(config);
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(turbo_state::buckroge)
+void turbo_state::buckroge(machine_config &config)
+{
 	buckrog(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5014, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(buckrog_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", turbo_state,  irq0_line_hold)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5014_device &maincpu(SEGA_315_5014(config.replace(), m_maincpu, MASTER_CLOCK/4));
+	maincpu.set_addrmap(AS_PROGRAM, &turbo_state::buckrog_map);
+	maincpu.set_addrmap(AS_OPCODES, &turbo_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(turbo_state::irq0_line_hold));
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+}
 
 /*************************************
  *
@@ -1780,13 +1778,13 @@ void turbo_state::turbo_rom_decode()
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(turbo_state,turbo_enc)
+void turbo_state::init_turbo_enc()
 {
 	save_item(NAME(m_alt_spriteram));
 	turbo_rom_decode();
 }
 
-DRIVER_INIT_MEMBER(turbo_state,turbo_noenc)
+void turbo_state::init_turbo_noenc()
 {
 	save_item(NAME(m_alt_spriteram));
 }
@@ -1800,16 +1798,16 @@ DRIVER_INIT_MEMBER(turbo_state,turbo_noenc)
  *
  *************************************/
 
-GAMEL( 1981, turbo,    0,       turbo,     turbo,    turbo_state, turbo_noenc, ROT270,             "Sega",    "Turbo (program 1513-1515)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turboa,   turbo,   turbo,     turbo,    turbo_state, turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1262-1264)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turbob,   turbo,   turbo,     turbo,    turbo_state, turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev B)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turboc,   turbo,   turbo,     turbo,    turbo_state, turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev A)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turbod,   turbo,   turbo,     turbo,    turbo_state, turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // but still reports 1262-1264 in the test mode?
-GAMEL( 1981, turbobl,  turbo,   turbo,     turbo,    turbo_state, turbo_noenc, ROT270,             "bootleg", "Indianapolis (bootleg of Turbo)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // decrypted bootleg of a 1262-1264 set
+GAMEL( 1981, turbo,     0,       turbo,    turbo,    turbo_state, init_turbo_noenc, ROT270,             "Sega",    "Turbo (program 1513-1515)", MACHINE_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turboa,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1262-1264)", MACHINE_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turbob,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev B)", MACHINE_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turboc,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev A)", MACHINE_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turbod,    turbo,   turbo,    turbo,    turbo_state, init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // but still reports 1262-1264 in the test mode?
+GAMEL( 1981, turbobl,   turbo,   turbo,    turbo,    turbo_state, init_turbo_noenc, ROT270,             "bootleg", "Indianapolis (bootleg of Turbo)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // decrypted bootleg of a 1262-1264 set
 
-GAMEL( 1982, subroc3d, 0,       subroc3d,  subroc3d, turbo_state, 0,           ORIENTATION_FLIP_X, "Sega",    "Subroc-3D", MACHINE_IMPERFECT_SOUND , layout_subroc3d )
+GAMEL( 1982, subroc3d,  0,       subroc3d, subroc3d, turbo_state, empty_init,       ORIENTATION_FLIP_X, "Sega",    "Subroc-3D", MACHINE_IMPERFECT_SOUND , layout_subroc3d )
 
-GAMEL( 1982, buckrog,  0,       buckroge,  buckrog,  turbo_state, 0,           ROT0,               "Sega",    "Buck Rogers: Planet of Zoom", MACHINE_IMPERFECT_SOUND , layout_buckrog )
-GAMEL( 1982, buckrogn, buckrog, buckrogu,  buckrog,  turbo_state, 0,           ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 1)", MACHINE_IMPERFECT_SOUND , layout_buckrog )
-GAMEL( 1982, buckrogn2,buckrog, buckrogu,  buckrog,  turbo_state, 0,           ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 2)", MACHINE_IMPERFECT_SOUND , layout_buckrog )
-GAMEL( 1982, zoom909,  buckrog, buckroge,  buckrog,  turbo_state, 0,           ROT0,               "Sega",    "Zoom 909", MACHINE_IMPERFECT_SOUND, layout_buckrog )
+GAMEL( 1982, buckrog,   0,       buckroge, buckrog,  turbo_state, empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom", MACHINE_IMPERFECT_SOUND , layout_buckrog )
+GAMEL( 1982, buckrogn,  buckrog, buckrogu, buckrog,  turbo_state, empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 1)", MACHINE_IMPERFECT_SOUND , layout_buckrog )
+GAMEL( 1982, buckrogn2, buckrog, buckrogu, buckrog,  turbo_state, empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 2)", MACHINE_IMPERFECT_SOUND , layout_buckrog )
+GAMEL( 1982, zoom909,   buckrog, buckroge, buckrog,  turbo_state, empty_init,       ROT0,               "Sega",    "Zoom 909", MACHINE_IMPERFECT_SOUND, layout_buckrog )

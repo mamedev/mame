@@ -5,18 +5,23 @@
     Karate Champ
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_KCHAMP_H
+#define MAME_INCLUDES_KCHAMP_H
+
+#pragma once
 
 #include "machine/74157.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "sound/dac.h"
+#include "emupal.h"
 
 class kchamp_state : public driver_device
 {
 public:
-	kchamp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kchamp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
@@ -29,8 +34,16 @@ public:
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
+	void kchamp(machine_config &config);
+	void kchampvs(machine_config &config);
+
+	void init_kchampvs();
+	void init_kchampvs2();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -65,12 +78,10 @@ public:
 	DECLARE_WRITE8_MEMBER(kchamp_colorram_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
-	DECLARE_DRIVER_INIT(kchampvs);
-	DECLARE_DRIVER_INIT(kchampvs2);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(kchamp);
+	void kchamp_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(kchampvs);
 	DECLARE_MACHINE_START(kchamp);
 	uint32_t screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -81,8 +92,6 @@ public:
 	void kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void decrypt_code();
 	DECLARE_WRITE_LINE_MEMBER(msmint);
-	void kchamp(machine_config &config);
-	void kchampvs(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void kchamp_io_map(address_map &map);
 	void kchamp_map(address_map &map);
@@ -93,3 +102,5 @@ public:
 	void kchampvs_sound_io_map(address_map &map);
 	void kchampvs_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_KCHAMP_H

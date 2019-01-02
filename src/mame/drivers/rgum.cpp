@@ -19,6 +19,7 @@ The ppi at 3000-3003 seems to be a dual port communication thing with the z80.
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -34,16 +35,19 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
+	void rgum(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(rgum_heartbeat_r);
+
+private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
 	uint8_t m_hbeat;
-	DECLARE_CUSTOM_INPUT_MEMBER(rgum_heartbeat_r);
 	virtual void video_start() override;
 	uint32_t screen_update_royalgum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void rgum(machine_config &config);
 	void rgum_map(address_map &map);
 };
 
@@ -236,15 +240,15 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( rgum )
+static GFXDECODE_START( gfx_rgum )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(rgum_state::rgum)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(rgum_map)
+	MCFG_DEVICE_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(rgum_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -255,23 +259,23 @@ MACHINE_CONFIG_START(rgum_state::rgum)
 	MCFG_SCREEN_UPDATE_DRIVER(rgum_state, screen_update_royalgum)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 24000000/16)   /* unknown clock & type, hand tuned to get ~50 fps (?) */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", 24000000/16));   /* unknown clock & type, hand tuned to get ~50 fps (?) */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.in_pc_callback().set_ioport("IN2");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rgum)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rgum)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 24000000/16) /* guessed to use the same xtal as the crtc */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, "aysnd", 24000000/16).add_route(ALL_OUTPUTS, "mono", 0.50); /* guessed to use the same xtal as the crtc */
 MACHINE_CONFIG_END
 
 
@@ -297,4 +301,4 @@ ROM_START( rgum )
 ROM_END
 
 
-GAME( 199?, rgum, 0, rgum, rgum, rgum_state, 0, ROT0, "<unknown>",         "Royal Gum (Italy)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, rgum, 0, rgum, rgum, rgum_state, empty_init, ROT0, "<unknown>", "Royal Gum (Italy)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

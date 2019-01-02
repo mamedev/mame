@@ -7,16 +7,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_TMS3615_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, TMS3615, _clock)
-#define MCFG_TMS3615_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, TMS3615, _clock)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -54,7 +44,6 @@ private:
 	int m_enable;                   // mask which tones to play
 };
 
-[[deprecated("Use TMS36XX instead")]]
-extern const device_type TMS3615;
+DECLARE_DEVICE_TYPE(TMS3615, tms3615_device)
 
 #endif // MAME_SOUND_TMS3615_H

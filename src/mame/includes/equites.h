@@ -10,13 +10,16 @@
 
 #pragma once
 
+#include "cpu/i8085/i8085.h"
+#include "machine/74259.h"
 #include "machine/alpha8201.h"
 #include "machine/gen_latch.h"
+#include "machine/i8155.h"
 #include "machine/timer.h"
-#include "machine/74259.h"
-#include "sound/samples.h"
-#include "sound/msm5232.h"
 #include "sound/dac.h"
+#include "sound/msm5232.h"
+#include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -31,6 +34,7 @@ public:
 		m_mcuram(*this, "mcuram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_audio8155(*this, "audio8155"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -72,7 +76,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<i8085a_cpu_device> m_audiocpu;
+	required_device<i8155_device> m_audio8155;
 	required_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -105,11 +110,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(equites_8910porta_w);
 	DECLARE_WRITE8_MEMBER(equites_8910portb_w);
-	DECLARE_DRIVER_INIT(equites);
+	void init_equites();
 	TILE_GET_INFO_MEMBER(equites_fg_info);
 	TILE_GET_INFO_MEMBER(equites_bg_info);
 	DECLARE_VIDEO_START(equites);
-	DECLARE_PALETTE_INIT(equites);
+	void equites_palette(palette_device &palette) const;
 	uint32_t screen_update_equites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(equites_8155_timer_pulse);
 	TIMER_CALLBACK_MEMBER(equites_frq_adjuster_callback);
@@ -153,7 +158,7 @@ class splndrbt_state : public equites_state
 {
 public:
 	using equites_state::equites_state;
-	DECLARE_DRIVER_INIT(splndrbt);
+	void init_splndrbt();
 	void splndrbt(machine_config &config);
 	void hvoltage(machine_config &config);
 
@@ -166,7 +171,7 @@ protected:
 	TILE_GET_INFO_MEMBER(splndrbt_fg_info);
 	TILE_GET_INFO_MEMBER(splndrbt_bg_info);
 	DECLARE_VIDEO_START(splndrbt);
-	DECLARE_PALETTE_INIT(splndrbt);
+	void splndrbt_palette(palette_device &palette) const;
 	uint32_t screen_update_splndrbt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_scanline);
 	void splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

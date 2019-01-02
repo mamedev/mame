@@ -14,7 +14,8 @@
 
 #include "bus/centronics/ctronics.h"
 #include "cpu/i86/i86.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
+#include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
@@ -26,6 +27,7 @@
 
 #include "debug/debugcon.h"
 #include "debugger.h"
+#include "emupal.h"
 
 #include "formats/pc_dsk.h"
 
@@ -71,12 +73,7 @@
 
 #define PPI8255_TAG     "ppi8255"
 #define PIC8259_TAG     "pic8259"
-
-// From tech manual clock c1 is fed from c0, but it approx 100Hz
 #define PIT8253_TAG     "pit8253"
-#define PIT_C0_CLOCK    78600
-#define PIT_C1_CLOCK    100
-#define PIT_C2_CLOCK    1789770
 
 #define MONO_TAG                "mono"
 #define I8251A_KB_TAG           "i8251a_kb"
@@ -95,78 +92,66 @@ struct keyboard_t
 class mbc55x_state : public driver_device
 {
 public:
-	mbc55x_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mbc55x_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
+		m_iodecode(*this, "iodecode"),
 		m_crtc(*this, VID_MC6845_NAME),
 		m_kb_uart(*this, I8251A_KB_TAG),
 		m_pit(*this, PIT8253_TAG),
 		m_ppi(*this, PPI8255_TAG),
 		m_pic(*this, PIC8259_TAG),
 		m_fdc(*this, FDC_TAG),
-		m_floppy0(*this, FDC_TAG ":0"),
-		m_floppy1(*this, FDC_TAG ":1"),
-		m_floppy2(*this, FDC_TAG ":2"),
-		m_floppy3(*this, FDC_TAG ":3"),
+		m_floppy(*this, FDC_TAG ":%u", 0U),
+		m_printer(*this, "printer"),
 		m_speaker(*this, "speaker"),
 		m_ram(*this, RAM_TAG),
 		m_palette(*this, "palette")
 	{
 	}
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	void mbc55x(machine_config &config);
 
-	//DECLARE_READ8_MEMBER(pic8259_r);
-	//DECLARE_WRITE8_MEMBER(pic8259_w);
-	//DECLARE_READ8_MEMBER(mbc55x_disk_r);
-	//DECLARE_WRITE8_MEMBER(mbc55x_disk_w);
-	DECLARE_READ8_MEMBER(mbc55x_usart_r);
-	DECLARE_WRITE8_MEMBER(mbc55x_usart_w);
-	//DECLARE_READ8_MEMBER(mbc55x_kb_usart_r);
-	//DECLARE_WRITE8_MEMBER(mbc55x_kb_usart_w);
-	DECLARE_READ8_MEMBER(vram_page_r);
-	DECLARE_WRITE8_MEMBER(vram_page_w);
-	DECLARE_READ8_MEMBER(ppi8255_r);
-	DECLARE_WRITE8_MEMBER(ppi8255_w);
-	//DECLARE_READ8_MEMBER(pit8253_r);
-	//DECLARE_WRITE8_MEMBER(pit8253_w);
-	DECLARE_READ8_MEMBER(mbc55x_ppi_porta_r);
-	DECLARE_READ8_MEMBER(mbc55x_ppi_portb_r);
-	DECLARE_READ8_MEMBER(mbc55x_ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(mbc55x_ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(mbc55x_ppi_portb_w);
-	DECLARE_WRITE8_MEMBER(mbc55x_ppi_portc_w);
-	DECLARE_WRITE_LINE_MEMBER(vid_hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vid_vsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(pit8253_t2);
+	void init_mbc55x();
 
-	DECLARE_READ8_MEMBER(mbcpic8259_r);
-	DECLARE_WRITE8_MEMBER(mbcpic8259_w);
-	DECLARE_READ8_MEMBER(mbcpit8253_r);
-	DECLARE_WRITE8_MEMBER(mbcpit8253_w);
-	DECLARE_READ8_MEMBER(mbc55x_disk_r);
-	DECLARE_WRITE8_MEMBER(mbc55x_disk_w);
-	DECLARE_READ8_MEMBER(mbc55x_kb_usart_r);
-	DECLARE_WRITE8_MEMBER(mbc55x_kb_usart_w);
-	DECLARE_DRIVER_INIT(mbc55x);
-
-	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_PALETTE_INIT(mbc55x);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mbc55x);
-	TIMER_CALLBACK_MEMBER(keyscan_callback);
-
-	required_device<cpu_device> m_maincpu;
-
+	required_device<i8086_cpu_device> m_maincpu;
+	required_device<address_map_bank_device> m_iodecode;
 	uint32_t      m_debug_machine;
 
-	void mbc55x(machine_config &config);
-	void mbc55x_io(address_map &map);
-	void mbc55x_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
+
+private:
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
+	DECLARE_READ8_MEMBER(iodecode_r);
+	DECLARE_WRITE8_MEMBER(iodecode_w);
+
+	DECLARE_READ8_MEMBER(mbc55x_kb_usart_r);
+	DECLARE_READ8_MEMBER(vram_page_r);
+	DECLARE_WRITE8_MEMBER(vram_page_w);
+	DECLARE_READ8_MEMBER(game_io_r);
+	DECLARE_WRITE8_MEMBER(game_io_w);
+	DECLARE_READ8_MEMBER(printer_status_r);
+	DECLARE_WRITE8_MEMBER(printer_data_w);
+	DECLARE_WRITE8_MEMBER(disk_select_w);
+	DECLARE_WRITE_LINE_MEMBER(printer_busy_w);
+	DECLARE_WRITE_LINE_MEMBER(printer_paper_end_w);
+	DECLARE_WRITE_LINE_MEMBER(printer_select_w);
+
+	DECLARE_WRITE_LINE_MEMBER(vid_hsync_changed);
+	DECLARE_WRITE_LINE_MEMBER(vid_vsync_changed);
+
+	MC6845_UPDATE_ROW(crtc_update_row);
+	void mbc55x_palette(palette_device &palette) const;
+	TIMER_CALLBACK_MEMBER(keyscan_callback);
+
+	void mbc55x_io(address_map &map);
+	void mbc55x_mem(address_map &map);
+	void mbc55x_iodecode(address_map &map);
 
 	void keyboard_reset();
 	void scan_keyboard();
@@ -178,10 +163,8 @@ protected:
 	required_device<i8255_device> m_ppi;
 	required_device<pic8259_device> m_pic;
 	required_device<fd1793_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppy;
+	required_device<centronics_device> m_printer;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
@@ -189,18 +172,13 @@ protected:
 	uint32_t      m_debug_video;
 	uint8_t       m_video_mem[VIDEO_MEM_SIZE];
 	uint8_t       m_vram_page;
+	uint8_t       m_printer_status;
 
 	keyboard_t  m_keyboard;
 
-private:
 	void debug_command(int ref, const std::vector<std::string> &params);
 	void video_debug(int ref, const std::vector<std::string> &params);
 };
-
-/*----------- defined in drivers/mbc55x.c -----------*/
-
-extern const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3];
-
 
 /*----------- defined in machine/mbc55x.c -----------*/
 
@@ -230,10 +208,6 @@ extern const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3];
 
 
 /*----------- defined in video/mbc55x.c -----------*/
-
-#define RED                     0
-#define GREEN                   1
-#define BLUE                    2
 
 #define LINEAR_ADDR(seg,ofs)    ((seg<<4)+ofs)
 

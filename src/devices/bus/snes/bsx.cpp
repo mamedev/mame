@@ -234,26 +234,30 @@ void sns_rom_bsx_device::bsx_base::write(uint32_t offset, uint8_t data)
 }
 
 
-static SLOT_INTERFACE_START(bsx_cart)
-	SLOT_INTERFACE_INTERNAL("bsmempak",  SNS_BSMEMPAK)
-SLOT_INTERFACE_END
+static void bsx_cart(device_slot_interface &device)
+{
+	device.option_add_internal("bsmempak",  SNS_BSMEMPAK);
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sns_rom_bsx_device::device_add_mconfig)
-	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, nullptr)
-MACHINE_CONFIG_END
+void sns_rom_bsx_device::device_add_mconfig(machine_config &config)
+{
+	SNS_BSX_CART_SLOT(config, m_slot, bsx_cart, nullptr);
+}
 
-MACHINE_CONFIG_START(sns_rom_bsxlo_device::device_add_mconfig)
-	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, nullptr)
-MACHINE_CONFIG_END
+void sns_rom_bsxlo_device::device_add_mconfig(machine_config &config)
+{
+	SNS_BSX_CART_SLOT(config, m_slot, bsx_cart, nullptr);
+}
 
-MACHINE_CONFIG_START(sns_rom_bsxhi_device::device_add_mconfig)
-	MCFG_SNS_BSX_CARTRIDGE_ADD("bs_slot", bsx_cart, nullptr)
-MACHINE_CONFIG_END
+void sns_rom_bsxhi_device::device_add_mconfig(machine_config &config)
+{
+	SNS_BSX_CART_SLOT(config, m_slot, bsx_cart, nullptr);
+}
 
 
 /*-------------------------------------------------

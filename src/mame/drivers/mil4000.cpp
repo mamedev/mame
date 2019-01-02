@@ -18,7 +18,7 @@
   - This game is supposed to have 3 kind of graphics: billiard/pool balls, numbers and cans.
     If you go to the settings mode (F2), and then in "Impostazioni del Gioco" you disable all
     3 graphics (Simboli Biliardo, Simboli Numeri, and Simboli Barattoli --> "Non Abilitato"),
-    The game will start using normal poker cards. A "illegal easter egg"... ;-)
+    the game will start using normal poker cards. An "illegal Easter egg"... ;-)
 
   - HW name (stamped on the pcb) is "CHP4";
 
@@ -111,6 +111,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -126,27 +127,42 @@
 class mil4000_state : public driver_device
 {
 public:
-	mil4000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mil4000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_sc0_vram(*this, "sc0_vram"),
 		m_sc1_vram(*this, "sc1_vram"),
 		m_sc2_vram(*this, "sc2_vram"),
 		m_sc3_vram(*this, "sc3_vram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
+	void chewheel(machine_config &config);
+	void mil4000(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
 	required_shared_ptr<uint16_t> m_sc0_vram;
 	required_shared_ptr<uint16_t> m_sc1_vram;
 	required_shared_ptr<uint16_t> m_sc2_vram;
 	required_shared_ptr<uint16_t> m_sc3_vram;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	output_finder<7> m_lamps;
+
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;
 	tilemap_t *m_sc3_tilemap;
 	uint16_t m_vblank;
 	uint16_t m_hblank;
-	uint8_t mcucomm;
-	uint8_t mcudata;
+	uint8_t m_mcucomm;
+	uint8_t m_mcudata;
+
 	DECLARE_READ16_MEMBER(hvretrace_r);
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_READ16_MEMBER(chewheel_mcu_r);
@@ -157,16 +173,14 @@ public:
 	DECLARE_WRITE16_MEMBER(sc2_vram_w);
 	DECLARE_WRITE16_MEMBER(sc3_vram_w);
 	DECLARE_WRITE16_MEMBER(output_w);
+
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc3_tile_info);
-	virtual void video_start() override;
-	uint32_t screen_update_mil4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	void chewheel(machine_config &config);
-	void mil4000(machine_config &config);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void chewheel_map(address_map &map);
 	void mil4000_map(address_map &map);
 };
@@ -220,6 +234,14 @@ TILE_GET_INFO_MEMBER(mil4000_state::get_sc3_tile_info)
 			0);
 }
 
+void mil4000_state::machine_start()
+{
+	m_lamps.resolve();
+
+	save_item(NAME(m_mcucomm));
+	save_item(NAME(m_mcudata));
+}
+
 void mil4000_state::video_start()
 {
 	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mil4000_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
@@ -230,9 +252,12 @@ void mil4000_state::video_start()
 	m_sc1_tilemap->set_transparent_pen(0);
 	m_sc2_tilemap->set_transparent_pen(0);
 	m_sc3_tilemap->set_transparent_pen(0);
+
+	save_item(NAME(m_vblank));
+	save_item(NAME(m_hblank));
 }
 
-uint32_t mil4000_state::screen_update_mil4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mil4000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_sc1_tilemap->draw(screen, bitmap, cliprect, 0,0);
@@ -301,18 +326,11 @@ WRITE16_MEMBER(mil4000_state::sc3_vram_w)
 */
 WRITE16_MEMBER(mil4000_state::output_w)
 {
-	int i;
-
-	for(i=0;i<3;i++)
+	for(int i = 0; i < 3; i++)
 		machine().bookkeeping().coin_counter_w(i, data & 0x2000);
 
-	output().set_lamp_value(0, (data) & 1);       /* HOLD1 */
-	output().set_lamp_value(1, (data >> 1) & 1);  /* HOLD2 */
-	output().set_lamp_value(2, (data >> 2) & 1);  /* HOLD3 */
-	output().set_lamp_value(3, (data >> 3) & 1);  /* HOLD4 */
-	output().set_lamp_value(4, (data >> 4) & 1);  /* HOLD5 */
-	output().set_lamp_value(5, (data >> 5) & 1);  /* START */
-	output().set_lamp_value(6, (data >> 6) & 1);  /* PREMIO */
+	for (int n = 0; n < 7; n++)
+			m_lamps[n] = BIT(data, n);
 
 //  popmessage("%04x\n",data);
 }
@@ -354,7 +372,7 @@ READ16_MEMBER(mil4000_state::chewheel_mcu_r)
    You can find a 1E-18 at start.
 
 */
-	switch( mcucomm )   /* MCU command */
+	switch( m_mcucomm )   /* MCU command */
 	{
 		case 0x11:  /* Idle - Null */
 		{
@@ -364,36 +382,36 @@ READ16_MEMBER(mil4000_state::chewheel_mcu_r)
 
 		case 0x1a:  /* Reels state - Control */
 		{
-			logerror("MCU feedback to command 0x1a with data: %02x\n", mcudata);
+			logerror("MCU feedback to command 0x1a with data: %02x\n", m_mcudata);
 			return (machine().rand() & 0x0b);
 		}
 
 		case 0x1b:  /* Unknown */
 		{
-			logerror("MCU feedback to command 0x1b with data: %02x\n", mcudata);
+			logerror("MCU feedback to command 0x1b with data: %02x\n", m_mcudata);
 			return 0x00;
 		}
 
 		case 0x1c:  /* Unknown. Always 00's? */
 		{
-			logerror("MCU feedback to command 0x1c with data: %02x\n", mcudata);
+			logerror("MCU feedback to command 0x1c with data: %02x\n", m_mcudata);
 			return 0x00;
 		}
 
 		case 0x1d:  /* Unknown */
 		{
-			logerror("MCU feedback to command 0x1d with data: %02x\n", mcudata);
+			logerror("MCU feedback to command 0x1d with data: %02x\n", m_mcudata);
 			return 0x00;
 		}
 
 		case 0x1e:  /* Unknown, only one at boot (1e 18) */
 		{
-			logerror("MCU feedback to command 0x1e with data: %02x\n", mcudata);
+			logerror("MCU feedback to command 0x1e with data: %02x\n", m_mcudata);
 			return 0x00;
 		}
 	}
 
-	logerror("MCU feedback to unknown command: %02x\n", mcucomm);
+	logerror("MCU feedback to unknown command: %02x\n", m_mcucomm);
 	return (machine().rand() & 0x0b);   // otherwise got corrupt gfx...
 }
 
@@ -401,12 +419,12 @@ WRITE16_MEMBER(mil4000_state::chewheel_mcu_w)
 {
 	if ((data == 0x11)||(data == 0x1a)||(data == 0x1b)||(data == 0x1c)||(data == 0x1d)||(data == 0x1e))
 	{
-		mcucomm = data;
+		m_mcucomm = data;
 		logerror("Writes command to MCU: %02x\n", data);
 	}
 	else
 	{
-		mcudata = data;
+		m_mcudata = data;
 		logerror("Writes data to MCU: %02x\n", data);
 	}
 }
@@ -428,15 +446,15 @@ WRITE16_MEMBER(mil4000_state::unk_w)
 void mil4000_state::mil4000_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x500000, 0x503fff).ram().w(this, FUNC(mil4000_state::sc0_vram_w)).share("sc0_vram");  // CY62256L-70, U77
-	map(0x504000, 0x507fff).ram().w(this, FUNC(mil4000_state::sc1_vram_w)).share("sc1_vram");  // CY62256L-70, U77
-	map(0x508000, 0x50bfff).ram().w(this, FUNC(mil4000_state::sc2_vram_w)).share("sc2_vram");  // CY62256L-70, U78
-	map(0x50c000, 0x50ffff).ram().w(this, FUNC(mil4000_state::sc3_vram_w)).share("sc3_vram");  // CY62256L-70, U78
+	map(0x500000, 0x503fff).ram().w(FUNC(mil4000_state::sc0_vram_w)).share("sc0_vram");  // CY62256L-70, U77
+	map(0x504000, 0x507fff).ram().w(FUNC(mil4000_state::sc1_vram_w)).share("sc1_vram");  // CY62256L-70, U77
+	map(0x508000, 0x50bfff).ram().w(FUNC(mil4000_state::sc2_vram_w)).share("sc2_vram");  // CY62256L-70, U78
+	map(0x50c000, 0x50ffff).ram().w(FUNC(mil4000_state::sc3_vram_w)).share("sc3_vram");  // CY62256L-70, U78
 	map(0x708000, 0x708001).portr("IN0");
 	map(0x708002, 0x708003).portr("IN1");
-	map(0x708004, 0x708005).r(this, FUNC(mil4000_state::hvretrace_r));
+	map(0x708004, 0x708005).r(FUNC(mil4000_state::hvretrace_r));
 	map(0x708006, 0x708007).portr("IN2");
-	map(0x708008, 0x708009).w(this, FUNC(mil4000_state::output_w));
+	map(0x708008, 0x708009).w(FUNC(mil4000_state::output_w));
 	map(0x708010, 0x708011).noprw(); //touch screen
 	map(0x70801f, 0x70801f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
@@ -448,20 +466,20 @@ void mil4000_state::mil4000_map(address_map &map)
 void mil4000_state::chewheel_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x500000, 0x503fff).ram().w(this, FUNC(mil4000_state::sc0_vram_w)).share("sc0_vram");  // V62C518256L-35P (U7).
-	map(0x504000, 0x507fff).ram().w(this, FUNC(mil4000_state::sc1_vram_w)).share("sc1_vram");  // V62C518256L-35P (U7).
-	map(0x508000, 0x50bfff).ram().w(this, FUNC(mil4000_state::sc2_vram_w)).share("sc2_vram");  // V62C518256L-35P (U8).
-	map(0x50c000, 0x50ffff).ram().w(this, FUNC(mil4000_state::sc3_vram_w)).share("sc3_vram");  // V62C518256L-35P (U8).
+	map(0x500000, 0x503fff).ram().w(FUNC(mil4000_state::sc0_vram_w)).share("sc0_vram");  // V62C518256L-35P (U7).
+	map(0x504000, 0x507fff).ram().w(FUNC(mil4000_state::sc1_vram_w)).share("sc1_vram");  // V62C518256L-35P (U7).
+	map(0x508000, 0x50bfff).ram().w(FUNC(mil4000_state::sc2_vram_w)).share("sc2_vram");  // V62C518256L-35P (U8).
+	map(0x50c000, 0x50ffff).ram().w(FUNC(mil4000_state::sc3_vram_w)).share("sc3_vram");  // V62C518256L-35P (U8).
 
-	map(0x51000c, 0x51000f).r(this, FUNC(mil4000_state::unk_r));     // no idea what's mapped here.
-	map(0x510000, 0x51000f).w(this, FUNC(mil4000_state::unk_w));    // no idea what's mapped here.
+	map(0x51000c, 0x51000f).r(FUNC(mil4000_state::unk_r));     // no idea what's mapped here.
+	map(0x510000, 0x51000f).w(FUNC(mil4000_state::unk_w));    // no idea what's mapped here.
 
 	map(0x708000, 0x708001).portr("IN0");
 	map(0x708002, 0x708003).portr("IN1");
-	map(0x708004, 0x708005).r(this, FUNC(mil4000_state::hvretrace_r));
+	map(0x708004, 0x708005).r(FUNC(mil4000_state::hvretrace_r));
 	map(0x708006, 0x708007).portr("IN2");
-	map(0x708008, 0x708009).w(this, FUNC(mil4000_state::output_w));
-	map(0x708010, 0x708011).rw(this, FUNC(mil4000_state::chewheel_mcu_r), FUNC(mil4000_state::chewheel_mcu_w));
+	map(0x708008, 0x708009).w(FUNC(mil4000_state::output_w));
+	map(0x708010, 0x708011).rw(FUNC(mil4000_state::chewheel_mcu_r), FUNC(mil4000_state::chewheel_mcu_w));
 	map(0x70801f, 0x70801f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
 	map(0x780000, 0x780fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
@@ -538,43 +556,41 @@ static const gfx_layout tilelayout =
 };
 
 
-static GFXDECODE_START( mil4000 )
+static GFXDECODE_START( gfx_mil4000 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,     0, 0x800/32 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(mil4000_state::mil4000)
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(mil4000_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(mil4000_map)
 	// irq 2/4/5 point to the same place, others invalid
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mil4000_state, screen_update_mil4000)
+	MCFG_SCREEN_UPDATE_DRIVER(mil4000_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x800)
-	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::RGBx_555, 0x800);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mil4000);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mil4000)
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(mil4000_state::chewheel)
 	mil4000(config);
-	MCFG_CPU_REPLACE("maincpu", M68000, CPU_CLOCK) /* 2MHz */
-	MCFG_CPU_PROGRAM_MAP(chewheel_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, CPU_CLOCK) /* 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(chewheel_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -755,10 +771,10 @@ ROM_START( chewheel )
 ROM_END
 
 
-//     YEAR  NAME      PARENT    MACHINE   INPUT    STATE          INIT    ROT     COMPANY              FULLNAME                              FLAGS                          LAYOUT
-GAMEL( 2000, mil4000,  0,        mil4000,  mil4000, mil4000_state, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 2.0)", 0,                             layout_mil4000 )
-GAMEL( 2000, mil4000a, mil4000,  mil4000,  mil4000, mil4000_state, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.8)", 0,                             layout_mil4000 )
-GAMEL( 2000, mil4000b, mil4000,  mil4000,  mil4000, mil4000_state, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.5)", 0,                             layout_mil4000 )
-GAMEL( 2000, mil4000c, mil4000,  mil4000,  mil4000, mil4000_state, 0,      ROT0,  "Sure Milano",       "Millennium Nuovo 4000 (Version 1.6)", 0,                             layout_mil4000 )
-GAMEL( 200?, top21,    0,        mil4000,  mil4000, mil4000_state, 0,      ROT0,  "Assogiochi Assago", "Top XXI (Version 1.2)",               0,                             layout_mil4000 )
-GAMEL( 200?, chewheel, 0,        chewheel, mil4000, mil4000_state, 0,      ROT0,  "Assogiochi Assago", "Cherry Wheel (Version 1.7)",          MACHINE_UNEMULATED_PROTECTION, layout_mil4000 )
+//     YEAR  NAME      PARENT   MACHINE   INPUT    STATE          INIT        ROT   COMPANY              FULLNAME                               FLAGS                          LAYOUT
+GAMEL( 2000, mil4000,  0,       mil4000,  mil4000, mil4000_state, empty_init, ROT0, "Sure Milano",       "Millennium Nuovo 4000 (Version 2.0)", 0,                             layout_mil4000 )
+GAMEL( 2000, mil4000a, mil4000, mil4000,  mil4000, mil4000_state, empty_init, ROT0, "Sure Milano",       "Millennium Nuovo 4000 (Version 1.8)", 0,                             layout_mil4000 )
+GAMEL( 2000, mil4000b, mil4000, mil4000,  mil4000, mil4000_state, empty_init, ROT0, "Sure Milano",       "Millennium Nuovo 4000 (Version 1.5)", 0,                             layout_mil4000 )
+GAMEL( 2000, mil4000c, mil4000, mil4000,  mil4000, mil4000_state, empty_init, ROT0, "Sure Milano",       "Millennium Nuovo 4000 (Version 1.6)", 0,                             layout_mil4000 )
+GAMEL( 200?, top21,    0,       mil4000,  mil4000, mil4000_state, empty_init, ROT0, "Assogiochi Assago", "Top XXI (Version 1.2)",               0,                             layout_mil4000 )
+GAMEL( 200?, chewheel, 0,       chewheel, mil4000, mil4000_state, empty_init, ROT0, "Assogiochi Assago", "Cherry Wheel (Version 1.7)",          MACHINE_UNEMULATED_PROTECTION, layout_mil4000 )

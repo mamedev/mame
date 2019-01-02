@@ -45,22 +45,25 @@ void (*arm7_coproc_dt_r_callback)(arm_state *arm, uint32_t insn, uint32_t *prn, 
 void (*arm7_coproc_dt_w_callback)(arm_state *arm, uint32_t insn, uint32_t *prn, void (*write32)(arm_state *arm, uint32_t addr, uint32_t data));
 
 
-DEFINE_DEVICE_TYPE(ARM7,     arm7_cpu_device,     "arm7_le",  "ARM7 (little)")
-DEFINE_DEVICE_TYPE(ARM7_BE,  arm7_be_cpu_device,  "arm7_be",  "ARM7 (big)")
-DEFINE_DEVICE_TYPE(ARM7500,  arm7500_cpu_device,  "arm7500",  "ARM7500")
-DEFINE_DEVICE_TYPE(ARM9,     arm9_cpu_device,     "arm9",     "ARM9")
-DEFINE_DEVICE_TYPE(ARM920T,  arm920t_cpu_device,  "arm920t",  "ARM920T")
-DEFINE_DEVICE_TYPE(ARM946ES, arm946es_cpu_device, "arm946es", "ARM946ES")
-DEFINE_DEVICE_TYPE(PXA255,   pxa255_cpu_device,   "pxa255",   "Intel XScale PXA255")
-DEFINE_DEVICE_TYPE(SA1110,   sa1110_cpu_device,   "sa1110",   "Intel StrongARM SA-1110")
-DEFINE_DEVICE_TYPE(IGS036,   igs036_cpu_device,   "igs036",   "IGS036")
+DEFINE_DEVICE_TYPE(ARM7,         arm7_cpu_device,         "arm7_le",      "ARM7 (little)")
+DEFINE_DEVICE_TYPE(ARM7_BE,      arm7_be_cpu_device,      "arm7_be",      "ARM7 (big)")
+DEFINE_DEVICE_TYPE(ARM710A,      arm710a_cpu_device,      "arm710a",      "ARM710a")
+DEFINE_DEVICE_TYPE(ARM7500,      arm7500_cpu_device,      "arm7500",      "ARM7500")
+DEFINE_DEVICE_TYPE(ARM9,         arm9_cpu_device,         "arm9",         "ARM9")
+DEFINE_DEVICE_TYPE(ARM920T,      arm920t_cpu_device,      "arm920t",      "ARM920T")
+DEFINE_DEVICE_TYPE(ARM946ES,     arm946es_cpu_device,     "arm946es",     "ARM946ES")
+DEFINE_DEVICE_TYPE(ARM11,        arm11_cpu_device,        "arm11",        "ARM11")
+DEFINE_DEVICE_TYPE(ARM1176JZF_S, arm1176jzf_s_cpu_device, "arm1176jzf_s", "ARM1176JZF-S")
+DEFINE_DEVICE_TYPE(PXA255,       pxa255_cpu_device,       "pxa255",       "Intel XScale PXA255")
+DEFINE_DEVICE_TYPE(SA1110,       sa1110_cpu_device,       "sa1110",       "Intel StrongARM SA-1110")
+DEFINE_DEVICE_TYPE(IGS036,       igs036_cpu_device,       "igs036",       "IGS036")
 
 arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, ARM7, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
 {
 }
 
-arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint8_t archFlags, endianness_t endianness)
+arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", endianness, 32, 32, 0)
 	, m_prefetch_word0_shift(endianness == ENDIANNESS_LITTLE ? 0 : 16)
@@ -94,6 +97,15 @@ arm7_be_cpu_device::arm7_be_cpu_device(const machine_config &mconfig, const char
 }
 
 
+arm710a_cpu_device::arm710a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm7_cpu_device(mconfig, ARM710A, tag, owner, clock, 4, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
+{
+	m_copro_id = ARM9_COPRO_ID_MFR_ARM
+			   | ARM9_COPRO_ID_ARCH_V4
+			   | ARM9_COPRO_ID_PART_ARM710;
+}
+
+
 arm7500_cpu_device::arm7500_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, ARM7500, tag, owner, clock, 4, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
 {
@@ -109,7 +121,7 @@ arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, const char *tag,
 }
 
 
-arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint8_t archFlags, endianness_t endianness)
+arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness)
 	: arm7_cpu_device(mconfig, type, tag, owner, clock, archRev, archFlags, endianness)
 {
 	uint32_t arch = ARM9_COPRO_ID_ARCH_V4;
@@ -147,9 +159,6 @@ arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, const char
 			   | 0; // Stepping
 }
 
-
-
-
 arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: arm9_cpu_device(mconfig, type, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE),
 	cp15_control(0x78)
@@ -174,6 +183,30 @@ arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, device_t
 arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm946es_cpu_device(mconfig, ARM946ES, tag, owner, clock)
 {
+}
+
+arm11_cpu_device::arm11_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm11_cpu_device(mconfig, ARM11, tag, owner, clock, 6, ARCHFLAG_T | ARCHFLAG_E | ARCHFLAG_K, ENDIANNESS_LITTLE)
+{
+}
+
+
+arm11_cpu_device::arm11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness)
+	: arm9_cpu_device(mconfig, type, tag, owner, clock, archRev, archFlags, endianness)
+{
+	uint32_t arch = ARM9_COPRO_ID_ARCH_V6;
+
+	m_copro_id = ARM9_COPRO_ID_MFR_ARM | arch | (0xB00 << 4);
+}
+
+arm1176jzf_s_cpu_device::arm1176jzf_s_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm11_cpu_device(mconfig, ARM1176JZF_S, tag, owner, clock, 6, ARCHFLAG_T | ARCHFLAG_E | ARCHFLAG_K, ENDIANNESS_LITTLE)
+{
+	m_copro_id = ARM9_COPRO_ID_MFR_ARM
+			   | ARM9_COPRO_ID_SPEC_REV0
+			   | ARM9_COPRO_ID_ARCH_CPUID
+			   | ARM9_COPRO_ID_PART_ARM1176JZF_S
+			   | ARM9_COPRO_ID_STEP_ARM1176JZF_S_R0P7;
 }
 
 // unknown configuration, but uses MPU not MMU, so closer to ARM946ES
@@ -566,7 +599,16 @@ void arm7_cpu_device::postload()
 void arm7_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+
+	if(m_program->endianness() == ENDIANNESS_LITTLE) {
+		auto cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	} else {
+		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+		m_pr32 = [cache](offs_t address) -> u32 { return cache->read_dword(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	}
 
 	save_item(NAME(m_insn_prefetch_depth));
 	save_item(NAME(m_insn_prefetch_count));
@@ -751,7 +793,7 @@ void arm7_cpu_device::update_insn_prefetch(uint32_t curr_pc)
 		{
 			break;
 		}
-		uint32_t op = m_direct->read_dword(pc);
+		uint32_t op = m_pr32(pc);
 		//printf("ipb[%d] <- %08x(%08x)\n", index, op, pc);
 		m_insn_prefetch_buffer[index] = op;
 		m_insn_prefetch_address[index] = pc;

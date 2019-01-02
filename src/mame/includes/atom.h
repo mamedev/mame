@@ -8,7 +8,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/6522via.h"
 #include "machine/i8255.h"
@@ -115,8 +115,8 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_output_tick);
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
+	image_init_result load_cart(device_image_interface &image, generic_slot_device &slot);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, *m_cart); }
 	DECLARE_QUICKLOAD_LOAD_MEMBER(atom_atm);
 	void atombb(machine_config &config);
 	void atom(machine_config &config);
@@ -130,6 +130,7 @@ class atomeb_state : public atom_state
 public:
 	atomeb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atom_state(mconfig, type, tag),
+		m_ext(*this, "rom_a%x", 0),
 		m_e0(*this, "rom_e0"),
 		m_e1(*this, "rom_e1")
 	{
@@ -142,33 +143,16 @@ public:
 	DECLARE_READ8_MEMBER(ext_r);
 	DECLARE_READ8_MEMBER(dos_r);
 
-	DECLARE_DRIVER_INIT(atomeb);
-
 	/* eprom state */
 	int m_eprom;
 
-	generic_slot_device *m_ext[16];
+	required_device_array<generic_slot_device, 16> m_ext;
 	required_device<generic_slot_device> m_e0;
 	required_device<generic_slot_device> m_e1;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a0_load) { return load_cart(image, m_ext[0x0]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a1_load) { return load_cart(image, m_ext[0x1]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a2_load) { return load_cart(image, m_ext[0x2]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a3_load) { return load_cart(image, m_ext[0x3]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a4_load) { return load_cart(image, m_ext[0x4]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a5_load) { return load_cart(image, m_ext[0x5]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a6_load) { return load_cart(image, m_ext[0x6]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a7_load) { return load_cart(image, m_ext[0x7]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a8_load) { return load_cart(image, m_ext[0x8]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a9_load) { return load_cart(image, m_ext[0x9]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(aa_load) { return load_cart(image, m_ext[0xa]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ab_load) { return load_cart(image, m_ext[0xb]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ac_load) { return load_cart(image, m_ext[0xc]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ad_load) { return load_cart(image, m_ext[0xd]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ae_load) { return load_cart(image, m_ext[0xe]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(af_load) { return load_cart(image, m_ext[0xf]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e0_load) { return load_cart(image, m_e0); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e1_load) { return load_cart(image, m_e1); }
+	template<int I> DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ext_load) { return load_cart(image, *m_ext[I]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e0_load) { return load_cart(image, *m_e0); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e1_load) { return load_cart(image, *m_e1); }
 	void atomeb(machine_config &config);
 	void atomeb_mem(address_map &map);
 };

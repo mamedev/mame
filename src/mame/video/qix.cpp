@@ -19,7 +19,7 @@
  *
  *************************************/
 
-VIDEO_START_MEMBER(qix_state,qix)
+void qix_state::video_start()
 {
 	/* allocate memory for the full video RAM */
 	m_videoram.allocate(256 * 256);
@@ -300,14 +300,14 @@ MC6845_UPDATE_ROW( qix_state::crtc_update_row )
 
 void qix_state::qix_video_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rw(this, FUNC(qix_state::qix_videoram_r), FUNC(qix_state::qix_videoram_w));
+	map(0x0000, 0x7fff).rw(FUNC(qix_state::qix_videoram_r), FUNC(qix_state::qix_videoram_w));
 	map(0x8000, 0x83ff).ram().share("share1");
 	map(0x8400, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8800).mirror(0x03ff).w(this, FUNC(qix_state::qix_palettebank_w));
-	map(0x8c00, 0x8c00).mirror(0x03fe).rw(this, FUNC(qix_state::qix_data_firq_r), FUNC(qix_state::qix_data_firq_w));
-	map(0x8c01, 0x8c01).mirror(0x03fe).rw(this, FUNC(qix_state::qix_video_firq_ack_r), FUNC(qix_state::qix_video_firq_ack_w));
-	map(0x9000, 0x93ff).ram().w(this, FUNC(qix_state::qix_paletteram_w)).share("paletteram");
-	map(0x9400, 0x9400).mirror(0x03fc).rw(this, FUNC(qix_state::qix_addresslatch_r), FUNC(qix_state::qix_addresslatch_w));
+	map(0x8800, 0x8800).mirror(0x03ff).w(FUNC(qix_state::qix_palettebank_w));
+	map(0x8c00, 0x8c00).mirror(0x03fe).rw(FUNC(qix_state::qix_data_firq_r), FUNC(qix_state::qix_data_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x03fe).rw(FUNC(qix_state::qix_video_firq_ack_r), FUNC(qix_state::qix_video_firq_ack_w));
+	map(0x9000, 0x93ff).ram().w(FUNC(qix_state::qix_paletteram_w)).share("paletteram");
+	map(0x9400, 0x9400).mirror(0x03fc).rw(FUNC(qix_state::qix_addresslatch_r), FUNC(qix_state::qix_addresslatch_w));
 	map(0x9402, 0x9403).mirror(0x03fc).writeonly().share("videoram_addr");
 	map(0x9800, 0x9800).mirror(0x03ff).readonly().share("scanline_latch");
 	map(0x9c00, 0x9c00).mirror(0x03fe).w(m_crtc, FUNC(mc6845_device::address_w));
@@ -318,14 +318,14 @@ void qix_state::qix_video_map(address_map &map)
 
 void qix_state::kram3_video_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rw(this, FUNC(qix_state::qix_videoram_r), FUNC(qix_state::qix_videoram_w));
+	map(0x0000, 0x7fff).rw(FUNC(qix_state::qix_videoram_r), FUNC(qix_state::qix_videoram_w));
 	map(0x8000, 0x83ff).ram().share("share1");
 	map(0x8400, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8800).mirror(0x03ff).w(this, FUNC(qix_state::qix_palettebank_w));
-	map(0x8c00, 0x8c00).mirror(0x03fe).rw(this, FUNC(qix_state::qix_data_firq_r), FUNC(qix_state::qix_data_firq_w));
-	map(0x8c01, 0x8c01).mirror(0x03fe).rw(this, FUNC(qix_state::qix_video_firq_ack_r), FUNC(qix_state::qix_video_firq_ack_w));
-	map(0x9000, 0x93ff).ram().w(this, FUNC(qix_state::qix_paletteram_w)).share("paletteram");
-	map(0x9400, 0x9400).mirror(0x03fc).rw(this, FUNC(qix_state::qix_addresslatch_r), FUNC(qix_state::qix_addresslatch_w));
+	map(0x8800, 0x8800).mirror(0x03ff).w(FUNC(qix_state::qix_palettebank_w));
+	map(0x8c00, 0x8c00).mirror(0x03fe).rw(FUNC(qix_state::qix_data_firq_r), FUNC(qix_state::qix_data_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x03fe).rw(FUNC(qix_state::qix_video_firq_ack_r), FUNC(qix_state::qix_video_firq_ack_w));
+	map(0x9000, 0x93ff).ram().w(FUNC(qix_state::qix_paletteram_w)).share("paletteram");
+	map(0x9400, 0x9400).mirror(0x03fc).rw(FUNC(qix_state::qix_addresslatch_r), FUNC(qix_state::qix_addresslatch_w));
 	map(0x9402, 0x9403).mirror(0x03fc).writeonly().share("videoram_addr");
 	map(0x9800, 0x9800).mirror(0x03ff).readonly().share("scanline_latch");
 	map(0x9c00, 0x9c00).mirror(0x03fe).w(m_crtc, FUNC(mc6845_device::address_w));
@@ -334,17 +334,17 @@ void qix_state::kram3_video_map(address_map &map)
 }
 
 
-void qix_state::zookeep_video_map(address_map &map)
+void zookeep_state::video_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rw(this, FUNC(qix_state::qix_videoram_r), FUNC(qix_state::qix_videoram_w));
+	map(0x0000, 0x7fff).rw(FUNC(zookeep_state::qix_videoram_r), FUNC(zookeep_state::qix_videoram_w));
 	map(0x8000, 0x83ff).ram().share("share1");
 	map(0x8400, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8800).mirror(0x03fe).w(this, FUNC(qix_state::qix_palettebank_w));
-	map(0x8801, 0x8801).mirror(0x03fe).w(this, FUNC(qix_state::zookeep_bankswitch_w));
-	map(0x8c00, 0x8c00).mirror(0x03fe).rw(this, FUNC(qix_state::qix_data_firq_r), FUNC(qix_state::qix_data_firq_w));
-	map(0x8c01, 0x8c01).mirror(0x03fe).rw(this, FUNC(qix_state::qix_video_firq_ack_r), FUNC(qix_state::qix_video_firq_ack_w));
-	map(0x9000, 0x93ff).ram().w(this, FUNC(qix_state::qix_paletteram_w)).share("paletteram");
-	map(0x9400, 0x9400).mirror(0x03fc).rw(this, FUNC(qix_state::qix_addresslatch_r), FUNC(qix_state::qix_addresslatch_w));
+	map(0x8800, 0x8800).mirror(0x03fe).w(FUNC(zookeep_state::qix_palettebank_w));
+	map(0x8801, 0x8801).mirror(0x03fe).w(FUNC(zookeep_state::bankswitch_w));
+	map(0x8c00, 0x8c00).mirror(0x03fe).rw(FUNC(zookeep_state::qix_data_firq_r), FUNC(zookeep_state::qix_data_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x03fe).rw(FUNC(zookeep_state::qix_video_firq_ack_r), FUNC(zookeep_state::qix_video_firq_ack_w));
+	map(0x9000, 0x93ff).ram().w(FUNC(zookeep_state::qix_paletteram_w)).share("paletteram");
+	map(0x9400, 0x9400).mirror(0x03fc).rw(FUNC(zookeep_state::qix_addresslatch_r), FUNC(zookeep_state::qix_addresslatch_w));
 	map(0x9402, 0x9403).mirror(0x03fc).writeonly().share("videoram_addr");
 	map(0x9800, 0x9800).mirror(0x03ff).readonly().share("scanline_latch");
 	map(0x9c00, 0x9c00).mirror(0x03fe).w(m_crtc, FUNC(mc6845_device::address_w));
@@ -356,14 +356,14 @@ void qix_state::zookeep_video_map(address_map &map)
 
 void qix_state::slither_video_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rw(this, FUNC(qix_state::qix_videoram_r), FUNC(qix_state::slither_videoram_w));
+	map(0x0000, 0x7fff).rw(FUNC(qix_state::qix_videoram_r), FUNC(qix_state::slither_videoram_w));
 	map(0x8000, 0x83ff).ram().share("share1");
 	map(0x8400, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8800).mirror(0x03ff).w(this, FUNC(qix_state::qix_palettebank_w));
-	map(0x8c00, 0x8c00).mirror(0x03fe).rw(this, FUNC(qix_state::qix_data_firq_r), FUNC(qix_state::qix_data_firq_w));
-	map(0x8c01, 0x8c01).mirror(0x03fe).rw(this, FUNC(qix_state::qix_video_firq_ack_r), FUNC(qix_state::qix_video_firq_ack_w));
-	map(0x9000, 0x93ff).ram().w(this, FUNC(qix_state::qix_paletteram_w)).share("paletteram");
-	map(0x9400, 0x9400).mirror(0x03fc).rw(this, FUNC(qix_state::qix_addresslatch_r), FUNC(qix_state::slither_addresslatch_w));
+	map(0x8800, 0x8800).mirror(0x03ff).w(FUNC(qix_state::qix_palettebank_w));
+	map(0x8c00, 0x8c00).mirror(0x03fe).rw(FUNC(qix_state::qix_data_firq_r), FUNC(qix_state::qix_data_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x03fe).rw(FUNC(qix_state::qix_video_firq_ack_r), FUNC(qix_state::qix_video_firq_ack_w));
+	map(0x9000, 0x93ff).ram().w(FUNC(qix_state::qix_paletteram_w)).share("paletteram");
+	map(0x9400, 0x9400).mirror(0x03fc).rw(FUNC(qix_state::qix_addresslatch_r), FUNC(qix_state::slither_addresslatch_w));
 	map(0x9401, 0x9401).mirror(0x03fc).writeonly().share("videoram_mask");
 	map(0x9402, 0x9403).mirror(0x03fc).writeonly().share("videoram_addr");
 	map(0x9800, 0x9800).mirror(0x03ff).readonly().share("scanline_latch");
@@ -380,41 +380,38 @@ void qix_state::slither_video_map(address_map &map)
  *
  *************************************/
 
-MACHINE_CONFIG_START(qix_state::qix_video)
-	MCFG_CPU_ADD("videocpu", MC6809E, MAIN_CLOCK_OSC/4/4) /* 1.25 MHz */
-	MCFG_CPU_PROGRAM_MAP(qix_video_map)
+void qix_state::qix_video(machine_config &config)
+{
+	MC6809E(config, m_videocpu, MAIN_CLOCK_OSC/4/4); /* 1.25 MHz */
+	m_videocpu->set_addrmap(AS_PROGRAM, &qix_state::qix_video_map);
 
-	MCFG_VIDEO_START_OVERRIDE(qix_state,qix)
+	MC6845(config, m_crtc, QIX_CHARACTER_CLOCK);
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_begin_update_callback(FUNC(qix_state::crtc_begin_update), this);
+	m_crtc->set_update_row_callback(FUNC(qix_state::crtc_update_row), this);
+	m_crtc->out_de_callback().set(FUNC(qix_state::display_enable_changed));
+	m_crtc->out_vsync_callback().set(FUNC(qix_state::qix_vsync_changed));
 
-	MCFG_MC6845_ADD("vid_u18", MC6845, "screen", QIX_CHARACTER_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_BEGIN_UPDATE_CB(qix_state, crtc_begin_update)
-	MCFG_MC6845_UPDATE_ROW_CB(qix_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(qix_state, display_enable_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(qix_state, qix_vsync_changed))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(QIX_CHARACTER_CLOCK*8, 0x148, 0, 0x100, 0x111, 0, 0x100); /* from CRTC */
+	m_screen->set_screen_update("vid_u18", FUNC(mc6845_device::screen_update));
+}
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 0x148, 0, 0x100, 0x111, 0, 0x100) /* from CRTC */
-	MCFG_SCREEN_UPDATE_DEVICE("vid_u18", mc6845_device, screen_update)
-MACHINE_CONFIG_END
+void qix_state::kram3_video(machine_config &config)
+{
+	m_videocpu->set_addrmap(AS_PROGRAM, &qix_state::kram3_video_map);
+	m_videocpu->lic().set(FUNC(qix_state::kram3_lic_videocpu_changed));
+}
 
+void zookeep_state::video(machine_config &config)
+{
+	m_videocpu->set_addrmap(AS_PROGRAM, &zookeep_state::video_map);
+}
 
-MACHINE_CONFIG_START(qix_state::kram3_video)
-	MCFG_CPU_MODIFY("videocpu")
-	MCFG_CPU_PROGRAM_MAP(kram3_video_map)
-	MCFG_MC6809E_LIC_CB(WRITELINE(qix_state, kram3_lic_videocpu_changed))
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(qix_state::zookeep_video)
-	MCFG_CPU_MODIFY("videocpu")
-	MCFG_CPU_PROGRAM_MAP(zookeep_video_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(qix_state::slither_video)
-	MCFG_CPU_MODIFY("videocpu")
-	MCFG_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)   /* 1.34 MHz */
-	MCFG_CPU_PROGRAM_MAP(slither_video_map)
-MACHINE_CONFIG_END
+void qix_state::slither_video(machine_config &config)
+{
+	m_videocpu->set_clock(SLITHER_CLOCK_OSC/4/4);   /* 1.34 MHz */
+	m_videocpu->set_addrmap(AS_PROGRAM, &qix_state::slither_video_map);
+}

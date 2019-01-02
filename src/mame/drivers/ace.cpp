@@ -41,6 +41,7 @@ A1                   2101            2101
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "ace.lh"
@@ -63,7 +64,7 @@ public:
 
 	void ace(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(ace_objpos_w);
 	DECLARE_WRITE8_MEMBER(ace_characterram_w);
 	DECLARE_WRITE8_MEMBER(ace_scoreram_w);
@@ -75,7 +76,6 @@ protected:
 	void ace_postload();
 	void main_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 
 	/* video-related */
@@ -152,11 +152,11 @@ void aceal_state::main_map(address_map &map)
 {
 	map(0x0000, 0x09ff).rom();
 
-	map(0x2000, 0x20ff).ram().w(this, FUNC(aceal_state::ace_scoreram_w)).share("scoreram");  /* 2x2101 */
+	map(0x2000, 0x20ff).ram().w(FUNC(aceal_state::ace_scoreram_w)).share("scoreram");  /* 2x2101 */
 	map(0x8300, 0x83ff).ram().share("ram2");    /* 2x2101 */
-	map(0x8000, 0x80ff).ram().w(this, FUNC(aceal_state::ace_characterram_w)).share("characterram");  /* 3x3101 (3bits: 0, 1, 2) */
+	map(0x8000, 0x80ff).ram().w(FUNC(aceal_state::ace_characterram_w)).share("characterram");  /* 3x3101 (3bits: 0, 1, 2) */
 
-	map(0xc000, 0xc005).w(this, FUNC(aceal_state::ace_objpos_w));
+	map(0xc000, 0xc005).w(FUNC(aceal_state::ace_objpos_w));
 
 	/* players inputs */
 	map(0xc008, 0xc008).portr("c008");
@@ -170,7 +170,7 @@ void aceal_state::main_map(address_map &map)
 	map(0xc010, 0xc010).portr("c010");
 	map(0xc011, 0xc011).portr("c011");
 
-	map(0xc012, 0xc012).r(this, FUNC(aceal_state::unk_r));
+	map(0xc012, 0xc012).r(FUNC(aceal_state::unk_r));
 
 	/* vblank */
 	map(0xc014, 0xc014).portr("c014");
@@ -181,17 +181,17 @@ void aceal_state::main_map(address_map &map)
 	/* start (must read 1 at least once to make the game run) */
 	map(0xc016, 0xc016).portr("c016");
 
-	map(0xc017, 0xc017).r(this, FUNC(aceal_state::unk_r));
-	map(0xc018, 0xc018).r(this, FUNC(aceal_state::unk_r));
-	map(0xc019, 0xc019).r(this, FUNC(aceal_state::unk_r));
+	map(0xc017, 0xc017).r(FUNC(aceal_state::unk_r));
+	map(0xc018, 0xc018).r(FUNC(aceal_state::unk_r));
+	map(0xc019, 0xc019).r(FUNC(aceal_state::unk_r));
 
-	map(0xc020, 0xc020).r(this, FUNC(aceal_state::unk_r));
-	map(0xc021, 0xc021).r(this, FUNC(aceal_state::unk_r));
-	map(0xc022, 0xc022).r(this, FUNC(aceal_state::unk_r));
-	map(0xc023, 0xc023).r(this, FUNC(aceal_state::unk_r));
-	map(0xc024, 0xc024).r(this, FUNC(aceal_state::unk_r));
-	map(0xc025, 0xc025).r(this, FUNC(aceal_state::unk_r));
-	map(0xc026, 0xc026).r(this, FUNC(aceal_state::unk_r));
+	map(0xc020, 0xc020).r(FUNC(aceal_state::unk_r));
+	map(0xc021, 0xc021).r(FUNC(aceal_state::unk_r));
+	map(0xc022, 0xc022).r(FUNC(aceal_state::unk_r));
+	map(0xc023, 0xc023).r(FUNC(aceal_state::unk_r));
+	map(0xc024, 0xc024).r(FUNC(aceal_state::unk_r));
+	map(0xc025, 0xc025).r(FUNC(aceal_state::unk_r));
+	map(0xc026, 0xc026).r(FUNC(aceal_state::unk_r));
 }
 
 
@@ -294,7 +294,7 @@ static const gfx_layout scorelayout =
 	32*8    /* every char takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( ace )
+static GFXDECODE_START( gfx_ace )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 2 )
 	GFXDECODE_ENTRY( nullptr, 0x8000, charlayout0, 0, 2 ) /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( nullptr, 0x8000, charlayout1, 0, 2 ) /* the game dynamically modifies this */
@@ -325,8 +325,8 @@ void aceal_state::machine_reset()
 MACHINE_CONFIG_START(aceal_state::ace)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* 2 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK/9) /* 2 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -335,10 +335,10 @@ MACHINE_CONFIG_START(aceal_state::ace)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aceal_state, screen_update_ace)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ace)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ace)
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	/* ???? */
@@ -364,4 +364,4 @@ ROM_START( ace )
 ROM_END
 
 
-GAMEL(1976, ace, 0, ace, ace, aceal_state, 0, ROT0, "Allied Leisure", "Ace", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND, layout_ace )
+GAMEL(1976, ace, 0, ace, ace, aceal_state, empty_init, ROT0, "Allied Leisure", "Ace", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND, layout_ace )

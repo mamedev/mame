@@ -5,12 +5,18 @@
     Goindol
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_GOINDOL_H
+#define MAME_INCLUDES_GOINDOL_H
+
+#pragma once
+
+#include "emupal.h"
 
 class goindol_state : public driver_device
 {
 public:
-	goindol_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	goindol_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_fg_scrolly(*this, "fg_scrolly"),
 		m_fg_scrollx(*this, "fg_scrollx"),
@@ -20,8 +26,13 @@ public:
 		m_fg_videoram(*this, "fg_videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
+	void goindol(machine_config &config);
+	void init_goindol();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_fg_scrolly;
@@ -46,7 +57,6 @@ public:
 	DECLARE_WRITE8_MEMBER(prot_fcb0_w);
 	DECLARE_WRITE8_MEMBER(goindol_fg_videoram_w);
 	DECLARE_WRITE8_MEMBER(goindol_bg_videoram_w);
-	DECLARE_DRIVER_INIT(goindol);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
@@ -57,7 +67,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void goindol(machine_config &config);
 	void goindol_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GOINDOL_H

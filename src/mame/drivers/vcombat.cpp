@@ -54,7 +54,7 @@ NOTES : Shadow Fighters appears to have been dumped from an earlier
             from Virtual Combat have been used.
         The Shadow Fighters bottom board has an extra 20 mhz xtal on it.
         The data stored in "samples" is simply a series of
-            Creative Media VOC files concatenated to eachother.
+            Creative Media VOC files concatenated to each other.
         The sound program ("sound") is about 640 bytes long.
         The hardware is said to run at medium resolution.
         The SRAM module dump can likely be thrown away for both games.
@@ -106,13 +106,29 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_vid_0(*this, "vid_0"),
 		m_vid_1(*this, "vid_1"),
-		m_dac(*this, "dac") { }
+		m_dac(*this, "dac"),
+		m_crtc(*this, "crtc") { }
+
+	void init_shadfgtr();
+	void init_vcombat();
+
+	void shadfgtr(machine_config &config);
+	void vcombat(machine_config &config);
+
+private:
+	required_device<tlc34076_device> m_tlc34076;
+	required_shared_ptr<uint16_t> m_framebuffer_ctrl;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<i860_cpu_device> m_vid_0;
+	optional_device<i860_cpu_device> m_vid_1;
+	required_device<dac_word_interface> m_dac;
+	optional_device<mc6845_device> m_crtc;
 
 	std::unique_ptr<uint16_t[]> m_m68k_framebuffer[2];
 	std::unique_ptr<uint16_t[]> m_i860_framebuffer[2][2];
-	required_device<tlc34076_device> m_tlc34076;
-	required_shared_ptr<uint16_t> m_framebuffer_ctrl;
 	int m_crtc_select;
+
 	DECLARE_WRITE16_MEMBER(main_video_write);
 	DECLARE_READ16_MEMBER(control_1_r);
 	DECLARE_READ16_MEMBER(control_2_r);
@@ -126,20 +142,13 @@ public:
 	DECLARE_WRITE16_MEMBER(crtc_w);
 	DECLARE_WRITE16_MEMBER(vcombat_dac_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_update);
-	DECLARE_DRIVER_INIT(shadfgtr);
-	DECLARE_DRIVER_INIT(vcombat);
+
 	DECLARE_MACHINE_RESET(vcombat);
 	DECLARE_MACHINE_RESET(shadfgtr);
 	uint32_t update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
 	uint32_t screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<i860_cpu_device> m_vid_0;
-	optional_device<i860_cpu_device> m_vid_1;
-	required_device<dac_word_interface> m_dac;
-	void shadfgtr(machine_config &config);
-	void vcombat(machine_config &config);
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void vid_0_map(address_map &map);
@@ -149,7 +158,7 @@ public:
 uint32_t vcombat_state::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
 {
 	int y;
-	const rgb_t *const pens = m_tlc34076->get_pens();
+	const pen_t *const pens = m_tlc34076->pens();
 
 	uint16_t *m68k_buf = m_m68k_framebuffer[(*m_framebuffer_ctrl & 0x20) ? 1 : 0].get();
 	uint16_t *i860_buf = m_i860_framebuffer[index][0].get();
@@ -285,7 +294,7 @@ READ16_MEMBER(vcombat_state::main_irqiack_r)
 READ16_MEMBER(vcombat_state::sound_resetmain_r)
 {
 	//fprintf(stderr, "M1: reset line to M0\n");
-	//m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	//m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	return 0;
 }
 
@@ -335,15 +344,13 @@ WRITE64_MEMBER(vcombat_state::v1_fb_w)
 
 WRITE16_MEMBER(vcombat_state::crtc_w)
 {
-	mc6845_device *crtc = machine().device<mc6845_device>("crtc");
-
-	if (crtc == nullptr)
+	if (m_crtc == nullptr)
 		return;
 
 	if (m_crtc_select == 0)
-		crtc->address_w(space, 0, data >> 8);
+		m_crtc->address_w(space, 0, data >> 8);
 	else
-		crtc->register_w(space, 0, data >> 8);
+		m_crtc->register_w(space, 0, data >> 8);
 
 	m_crtc_select ^= 1;
 }
@@ -359,28 +366,28 @@ void vcombat_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x20ffff).ram();
-	map(0x300000, 0x30ffff).w(this, FUNC(vcombat_state::main_video_write));
+	map(0x300000, 0x30ffff).w(FUNC(vcombat_state::main_video_write));
 
 	map(0x400000, 0x43ffff).ram().share("vid_0_ram");   /* First i860 shared RAM */
 	map(0x440000, 0x440003).ram().share("share6");      /* M0->P0 i860 #1 com 1 */
 	map(0x480000, 0x480003).ram().share("share7");      /* M0<-P0 i860 #1 com 2 */
-	map(0x4c0000, 0x4c0003).w(this, FUNC(vcombat_state::wiggle_i860p0_pins_w)); /* i860 #1 stop/start/reset */
+	map(0x4c0000, 0x4c0003).w(FUNC(vcombat_state::wiggle_i860p0_pins_w)); /* i860 #1 stop/start/reset */
 
 	map(0x500000, 0x53ffff).ram().share("vid_1_ram");   /* Second i860 shared RAM */
 	map(0x540000, 0x540003).ram().share("share8");      /* M0->P1 i860 #2 com 1 */
 	map(0x580000, 0x580003).ram().share("share9");      /* M0<-P1 i860 #2 com 2 */
-	map(0x5c0000, 0x5c0003).w(this, FUNC(vcombat_state::wiggle_i860p1_pins_w)); /* i860 #2 stop/start/reset */
+	map(0x5c0000, 0x5c0003).w(FUNC(vcombat_state::wiggle_i860p1_pins_w)); /* i860 #2 stop/start/reset */
 
-	map(0x600000, 0x600001).r(this, FUNC(vcombat_state::control_1_r));   /* IN0 port */
+	map(0x600000, 0x600001).r(FUNC(vcombat_state::control_1_r));   /* IN0 port */
 	map(0x600004, 0x600005).ram().share("share5");      /* M0<-M1 */
-	map(0x600008, 0x600009).r(this, FUNC(vcombat_state::control_2_r));   /* IN1 port */
+	map(0x600008, 0x600009).r(FUNC(vcombat_state::control_2_r));   /* IN1 port */
 	map(0x60001c, 0x60001d).noprw();
 
-	map(0x60000c, 0x60000d).w(this, FUNC(vcombat_state::crtc_w));
+	map(0x60000c, 0x60000d).w(FUNC(vcombat_state::crtc_w));
 	map(0x600010, 0x600011).ram().share("fb_control");
 	map(0x700000, 0x7007ff).ram().share("nvram");
-	map(0x701000, 0x701001).r(this, FUNC(vcombat_state::main_irqiack_r));
-	map(0x702000, 0x702001).r(this, FUNC(vcombat_state::control_3_r));
+	map(0x701000, 0x701001).r(FUNC(vcombat_state::main_irqiack_r));
+	map(0x702000, 0x702001).r(FUNC(vcombat_state::control_3_r));
 	map(0x705000, 0x705001).ram().share("share4");      /* M1->M0 */
 
 	//AM_RANGE(0x703000, 0x703001)      /* Headset rotation axis? */
@@ -393,7 +400,7 @@ void vcombat_state::main_map(address_map &map)
 /* The first i860 - middle board */
 void vcombat_state::vid_0_map(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).ram().w(this, FUNC(vcombat_state::v0_fb_w));      /* Shared framebuffer - half of the bits lost to 32-bit bus */
+	map(0x00000000, 0x0001ffff).ram().w(FUNC(vcombat_state::v0_fb_w));      /* Shared framebuffer - half of the bits lost to 32-bit bus */
 	map(0x20000000, 0x20000007).ram().share("share6");      /* M0<-P0 com 1 (0x440000 in 68k-land) */
 	map(0x40000000, 0x401fffff).rom().region("gfx", 0);
 	map(0x80000000, 0x80000007).ram().share("share7");      /* M0->P0 com 2 (0x480000 in 68k-land) */
@@ -405,7 +412,7 @@ void vcombat_state::vid_0_map(address_map &map)
 /* The second i860 - top board */
 void vcombat_state::vid_1_map(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).ram().w(this, FUNC(vcombat_state::v1_fb_w));      /* Half of the bits lost to 32-bit bus */
+	map(0x00000000, 0x0001ffff).ram().w(FUNC(vcombat_state::v1_fb_w));      /* Half of the bits lost to 32-bit bus */
 	map(0x20000000, 0x20000007).ram().share("share8");      /* M0->P1 com 1 (0x540000 in 68k-land) */
 	map(0x40000000, 0x401fffff).rom().region("gfx", 0);
 	map(0x80000000, 0x80000007).ram().share("share9");          /* M0<-P1 com 2      (0x580000 in 68k-land) */
@@ -419,8 +426,8 @@ void vcombat_state::sound_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x08ffff).ram();
-	map(0x0c0000, 0x0c0001).w(this, FUNC(vcombat_state::vcombat_dac_w));
-	map(0x140000, 0x140001).r(this, FUNC(vcombat_state::sound_resetmain_r));   /* Ping M0's reset line */
+	map(0x0c0000, 0x0c0001).w(FUNC(vcombat_state::vcombat_dac_w));
+	map(0x140000, 0x140001).r(FUNC(vcombat_state::sound_resetmain_r));   /* Ping M0's reset line */
 	map(0x180000, 0x180001).ram().share("share4");   /* M1<-M0 */
 	map(0x1c0000, 0x1c0001).ram().share("share5");   /* M1->M0 */
 	map(0x200000, 0x37ffff).rom().region("samples", 0);
@@ -443,7 +450,7 @@ MACHINE_RESET_MEMBER(vcombat_state,shadfgtr)
 }
 
 
-DRIVER_INIT_MEMBER(vcombat_state,vcombat)
+void vcombat_state::init_vcombat()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -475,7 +482,7 @@ DRIVER_INIT_MEMBER(vcombat_state,vcombat)
 	ROM[0x4017] = 0x66;
 }
 
-DRIVER_INIT_MEMBER(vcombat_state,shadfgtr)
+void vcombat_state::init_shadfgtr()
 {
 	/* Allocate th 68000 frame buffers */
 	m_m68k_framebuffer[0] = std::make_unique<uint16_t[]>(0x8000);
@@ -554,24 +561,24 @@ WRITE_LINE_MEMBER(vcombat_state::sound_update)
 }
 
 MACHINE_CONFIG_START(vcombat_state::vcombat)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
 
 	/* The middle board i860 */
-	MCFG_CPU_ADD("vid_0", I860, XTAL(20'000'000))
-	MCFG_CPU_PROGRAM_MAP(vid_0_map)
+	MCFG_DEVICE_ADD("vid_0", I860, XTAL(20'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vid_0_map)
 
 	/* The top board i860 */
-	MCFG_CPU_ADD("vid_1", I860, XTAL(20'000'000))
-	MCFG_CPU_PROGRAM_MAP(vid_1_map)
+	MCFG_DEVICE_ADD("vid_1", I860, XTAL(20'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vid_1_map)
 
 	/* Sound CPU */
-	MCFG_CPU_ADD("soundcpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vcombat_state, irq1_line_hold,  15000) /* Remove this if MC6845 is enabled */
+	MCFG_DEVICE_ADD("soundcpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(vcombat_state, irq1_line_hold,  15000) /* Remove this if MC6845 is enabled */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,vcombat)
 
 /* Temporary hack for experimenting with timing. */
@@ -583,8 +590,9 @@ MACHINE_CONFIG_START(vcombat_state::vcombat)
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	/* Disabled for now as it can't handle multiple screens */
-//  MCFG_MC6845_ADD("crtc", MC6845, "screen", 6000000 / 16)
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+//  MC6845(config, m_crtc, 6000000 / 16);
+//  m_crtc->set_screen("screen");
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208)
@@ -594,44 +602,45 @@ MACHINE_CONFIG_START(vcombat_state::vcombat)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208)
 	MCFG_SCREEN_UPDATE_DRIVER(vcombat_state, screen_update_vcombat_aux)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(vcombat_state::shadfgtr)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
 
 	/* The middle board i860 */
-	MCFG_CPU_ADD("vid_0", I860, XTAL(20'000'000))
-	MCFG_CPU_PROGRAM_MAP(vid_0_map)
+	MCFG_DEVICE_ADD("vid_0", I860, XTAL(20'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vid_0_map)
 
 	/* Sound CPU */
-	MCFG_CPU_ADD("soundcpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,shadfgtr)
 
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(20'000'000) / 4 / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(vcombat_state, sound_update))
+	MC6845(config, m_crtc, XTAL(20'000'000) / 4 / 16);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(16);
+	m_crtc->out_hsync_callback().set(FUNC(vcombat_state::sound_update));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000) / 4, 320, 0, 256, 277, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(vcombat_state, screen_update_vcombat_main)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -693,5 +702,5 @@ ROM_START( shadfgtr )
 ROM_END
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT      MONITOR              COMPANY         FULLNAME           FLAGS
-GAME( 1993, vcombat,  0,      vcombat,  vcombat,  vcombat_state, vcombat,  ORIENTATION_FLIP_X,  "VR8 Inc.",     "Virtual Combat",  MACHINE_NOT_WORKING )
-GAME( 1993, shadfgtr, 0,      shadfgtr, shadfgtr, vcombat_state, shadfgtr, ROT0,                "Dutech Inc.",  "Shadow Fighters", MACHINE_NOT_WORKING )
+GAME( 1993, vcombat,  0,      vcombat,  vcombat,  vcombat_state, init_vcombat,  ORIENTATION_FLIP_X,  "VR8 Inc.",     "Virtual Combat",  MACHINE_NOT_WORKING )
+GAME( 1993, shadfgtr, 0,      shadfgtr, shadfgtr, vcombat_state, init_shadfgtr, ROT0,                "Dutech Inc.",  "Shadow Fighters", MACHINE_NOT_WORKING )

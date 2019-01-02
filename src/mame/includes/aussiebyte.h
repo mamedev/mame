@@ -14,9 +14,9 @@
 #include "bus/rs232/rs232.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
-#include "machine/clock.h"
+#include "imagedev/floppy.h"
 #include "machine/msm5832.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
@@ -30,6 +30,9 @@
 #include "video/mc6845.h"
 
 #include "imagedev/snapquik.h"
+
+#include "emupal.h"
+
 
 
 /***********************************************************
@@ -124,7 +127,7 @@ private:
 	uint16_t m_graph_address;
 	int m_centronics_busy;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_region_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_attribram;

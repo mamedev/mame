@@ -200,10 +200,11 @@ void plus4_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint
 #include "sid.h"
 #include "std.h"
 
-SLOT_INTERFACE_START( plus4_expansion_cards )
-	SLOT_INTERFACE("c1551", C1551)
-	SLOT_INTERFACE("sid", PLUS4_SID)
+void plus4_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("c1551", C1551);
+	device.option_add("sid", PLUS4_SID);
 
 	// the following need ROMs from the software list
-	SLOT_INTERFACE_INTERNAL("standard", PLUS4_STD)
-SLOT_INTERFACE_END
+	device.option_add_internal("standard", PLUS4_STD);
+}

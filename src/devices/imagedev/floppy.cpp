@@ -145,7 +145,7 @@ floppy_connector::~floppy_connector()
 {
 }
 
-void floppy_connector::set_formats(const floppy_format_type *_formats)
+void floppy_connector::set_formats(const floppy_format_type _formats[])
 {
 	formats = _formats;
 }
@@ -400,6 +400,31 @@ floppy_image_format_t *floppy_image_device::identify(std::string filename)
 	return best_format;
 }
 
+void floppy_image_device::init_floppy_load(bool write_supported)
+{
+	revolution_start_time = mon ? attotime::never : machine().time();
+	revolution_count = 0;
+
+	index_resync();
+
+	wpt = 1; // disk sleeve is covering the sensor
+	if (!cur_wpt_cb.isnull())
+		cur_wpt_cb(this, wpt);
+
+	wpt = is_readonly() || (!write_supported);
+	if (!cur_wpt_cb.isnull())
+		cur_wpt_cb(this, wpt);
+
+	if (motor_always_on) {
+		// When disk is inserted, start motor
+		mon_w(0);
+	} else if(!mon)
+		ready_counter = 2;
+
+	if (dskchg_writable)
+		dskchg = 1;
+}
+
 image_init_result floppy_image_device::call_load()
 {
 	io_generic io;
@@ -434,31 +459,12 @@ image_init_result floppy_image_device::call_load()
 	}
 	output_format = is_readonly() ? nullptr : best_format;
 
-	revolution_start_time = mon ? attotime::never : machine().time();
-	revolution_count = 0;
-
-	index_resync();
 	image_dirty = false;
 
-	wpt = 1; // disk sleeve is covering the sensor
-	if (!cur_wpt_cb.isnull())
-		cur_wpt_cb(this, wpt);
-
-	wpt = is_readonly() || (output_format == nullptr);
-	if (!cur_wpt_cb.isnull())
-		cur_wpt_cb(this, wpt);
+	init_floppy_load(output_format != nullptr);
 
 	if (!cur_load_cb.isnull())
 		return cur_load_cb(this);
-
-	if (motor_always_on) {
-		// When disk is inserted, start motor
-		mon_w(0);
-	} else if(!mon)
-		ready_counter = 2;
-
-	if (dskchg_writable)
-		dskchg = 1;
 
 	return image_init_result::PASS;
 }
@@ -519,9 +525,7 @@ image_init_result floppy_image_device::call_create(int format_type, util::option
 		return image_init_result::FAIL;
 	}
 
-	if (motor_always_on)
-		// When disk is inserted, start motor
-		mon_w(0);
+	init_floppy_load(output_format != nullptr);
 
 	return image_init_result::PASS;
 }
@@ -767,9 +771,10 @@ attotime floppy_image_device::get_next_index_time(std::vector<uint32_t> &buf, in
 {
 	uint32_t next_position;
 	int cells = buf.size();
-	if(index+delta < cells)
+	if(index+delta < cells) {
 		next_position = buf[index+delta] & floppy_image::TIME_MASK;
-	else {
+
+	} else {
 		if((buf[cells-1]^buf[0]) & floppy_image::MG_MASK)
 			delta--;
 		index = index + delta - cells + 1;
@@ -784,14 +789,6 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	if(!image || mon)
 		return attotime::never;
 
-	// If the drive is still spinning up, pretend that no transitions will come
-	// TODO: Implement a proper spin-up ramp for transition times, also in order
-	// to cover potential copy protection measures that have direct device
-	// access (mz)
-	// MORE TODO: this breaks the tandy2k and pcjr.  needs investigation.
-	//if (ready_counter > 0)
-	//  return attotime::never;
-
 	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);
 	uint32_t cells = buf.size();
 	if(cells <= 1)
@@ -805,10 +802,11 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	if(index == -1)
 		return attotime::never;
 
-	attotime result = get_next_index_time(buf, index, 1,  base);
-	if(result > from_when)
-		return result;
-	return get_next_index_time(buf, index, 2,  base);
+	for(unsigned int i=1;; i++) {
+		attotime result = get_next_index_time(buf, index, i,  base);
+		if(result > from_when)
+			return result;
+	}
 }
 
 void floppy_image_device::write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions)
@@ -1361,11 +1359,11 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 #define FLOPSPK "flopsndout"
 
-MACHINE_CONFIG_START(floppy_image_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO(FLOPSPK)
-	MCFG_SOUND_ADD(FLOPSND_TAG, FLOPPYSOUND, 44100)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, FLOPSPK, 0.5)
-MACHINE_CONFIG_END
+void floppy_image_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, FLOPSPK).front_center();
+	FLOPPYSOUND(config, FLOPSND_TAG, 44100).add_route(ALL_OUTPUTS, FLOPSPK, 0.5);
+}
 
 
 DEFINE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device, "flopsnd", "Floppy sound")
@@ -2355,4 +2353,3 @@ void ibm_6360::handled_variants(uint32_t *variants, int &var_count) const
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
 }
-

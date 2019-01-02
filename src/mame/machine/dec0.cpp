@@ -88,29 +88,30 @@ READ16_MEMBER(dec0_state::midres_controls_r)
 READ8_MEMBER(dec0_state::hippodrm_prot_r)
 {
 //logerror("6280 PC %06x - Read %06x\n",cpu_getpc(),offset+0x1d0000);
-	if (m_hippodrm_lsb==0x45) return 0x4e;
-	if (m_hippodrm_lsb==0x92) return 0x15;
+	if (m_hippodrm_lsb == 0x45) return 0x4e;
+	if (m_hippodrm_lsb == 0x92) return 0x15;
 	return 0;
 }
 
 WRITE8_MEMBER(dec0_state::hippodrm_prot_w)
 {
-	switch (offset) {
-		case 4: m_hippodrm_msb=data; break;
-		case 5: m_hippodrm_lsb=data; break;
+	switch (offset)
+	{
+		case 4: m_hippodrm_msb = data; break;
+		case 5: m_hippodrm_lsb = data; break;
 	}
 //logerror("6280 PC %06x - Wrote %06x to %04x\n",cpu_getpc(),data,offset+0x1d0000);
 }
 
 READ16_MEMBER(dec0_state::hippodrm_68000_share_r)
 {
-	if (offset==0) m_maincpu->yield(); /* A wee helper */
-	return m_hippodrm_shared_ram[offset]&0xff;
+	if (offset == 0) m_maincpu->yield(); /* A wee helper */
+	return m_hippodrm_shared_ram[offset] & 0xff;
 }
 
 WRITE16_MEMBER(dec0_state::hippodrm_68000_share_w)
 {
-	m_hippodrm_shared_ram[offset]=data&0xff;
+	m_hippodrm_shared_ram[offset] = data & 0xff;
 }
 
 /******************************************************************************/
@@ -194,25 +195,26 @@ WRITE8_MEMBER(dec0_state::dec0_mcu_port3_w)
 
 void dec0_state::baddudes_i8751_write(int data)
 {
-	m_i8751_return=0;
+	m_i8751_return = 0;
 
-	switch (data&0xffff) {
-		case 0x714: m_i8751_return=0x700; break;
-		case 0x73b: m_i8751_return=0x701; break;
-		case 0x72c: m_i8751_return=0x702; break;
-		case 0x73f: m_i8751_return=0x703; break;
-		case 0x755: m_i8751_return=0x704; break;
-		case 0x722: m_i8751_return=0x705; break;
-		case 0x72b: m_i8751_return=0x706; break;
-		case 0x724: m_i8751_return=0x707; break;
-		case 0x728: m_i8751_return=0x708; break;
-		case 0x735: m_i8751_return=0x709; break;
-		case 0x71d: m_i8751_return=0x70a; break;
-		case 0x721: m_i8751_return=0x70b; break;
-		case 0x73e: m_i8751_return=0x70c; break;
-		case 0x761: m_i8751_return=0x70d; break;
-		case 0x753: m_i8751_return=0x70e; break;
-		case 0x75b: m_i8751_return=0x70f; break;
+	switch (data & 0xffff)
+	{
+		case 0x714: m_i8751_return = 0x700; break;
+		case 0x73b: m_i8751_return = 0x701; break;
+		case 0x72c: m_i8751_return = 0x702; break;
+		case 0x73f: m_i8751_return = 0x703; break;
+		case 0x755: m_i8751_return = 0x704; break;
+		case 0x722: m_i8751_return = 0x705; break;
+		case 0x72b: m_i8751_return = 0x706; break;
+		case 0x724: m_i8751_return = 0x707; break;
+		case 0x728: m_i8751_return = 0x708; break;
+		case 0x735: m_i8751_return = 0x709; break;
+		case 0x71d: m_i8751_return = 0x70a; break;
+		case 0x721: m_i8751_return = 0x70b; break;
+		case 0x73e: m_i8751_return = 0x70c; break;
+		case 0x761: m_i8751_return = 0x70d; break;
+		case 0x753: m_i8751_return = 0x70e; break;
+		case 0x75b: m_i8751_return = 0x70f; break;
 	}
 
 	if (!m_i8751_return) logerror("%s: warning - write unknown command %02x to 8571\n",machine().describe_context(),data);
@@ -224,9 +226,10 @@ void dec0_state::birdtry_i8751_write(int data)
 	static int  pwr,
 				hgt;
 
-	m_i8751_return=0;
+	m_i8751_return = 0;
 
-	switch(data&0xffff) {
+	switch (data & 0xffff)
+	{
 		/*"Sprite control"*/
 		case 0x22a: m_i8751_return = 0x200;    break;
 
@@ -314,14 +317,14 @@ void dec0_state::dec0_i8751_write(int data)
 
 void dec0_state::dec0_i8751_reset()
 {
-	m_i8751_return=m_i8751_command=0;
+	m_i8751_return = m_i8751_command = 0;
 }
 
 /******************************************************************************/
 
 WRITE16_MEMBER(dec0_state::sprite_mirror_w)
 {
-	COMBINE_DATA(&m_spriteram[offset]);
+	COMBINE_DATA(&m_spriteram->live()[offset]);
 }
 
 /******************************************************************************/
@@ -337,7 +340,7 @@ WRITE16_MEMBER(dec0_state::robocop_68000_share_w)
 {
 //  logerror("%08x: Share write %04x %04x\n",m_maincpu->pc(),offset,data);
 
-	m_robocop_shared_ram[offset]=data&0xff;
+	m_robocop_shared_ram[offset] = data & 0xff;
 
 	if (offset == 0x7ff) /* A control address - not standard ram */
 		m_subcpu->set_input_line(0, HOLD_LINE);
@@ -355,11 +358,9 @@ void dec0_state::h6280_decrypt(const char *cputag)
 		RAM[i] = (RAM[i] & 0x7e) | ((RAM[i] & 0x1) << 7) | ((RAM[i] & 0x80) >> 7);
 }
 
-DRIVER_INIT_MEMBER(dec0_state,hippodrm)
+void dec0_state::init_hippodrm()
 {
 	uint8_t *RAM = memregion("sub")->base();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x18003f, read16_delegate(FUNC(dec0_state::hippodrm_68000_share_r),this), write16_delegate(FUNC(dec0_state::hippodrm_68000_share_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xffc800, 0xffcfff, write16_delegate(FUNC(dec0_state::sprite_mirror_w),this));
 
 	h6280_decrypt("sub");
 
@@ -373,7 +374,7 @@ DRIVER_INIT_MEMBER(dec0_state,hippodrm)
 	save_item(NAME(m_hippodrm_lsb));
 }
 
-DRIVER_INIT_MEMBER(dec0_state,slyspy)
+void dec0_state::init_slyspy()
 {
 	h6280_decrypt("audiocpu");
 
@@ -381,22 +382,17 @@ DRIVER_INIT_MEMBER(dec0_state,slyspy)
 	save_item(NAME(m_slyspy_sound_state));
 }
 
-DRIVER_INIT_MEMBER(dec0_state,robocop)
-{
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::robocop_68000_share_r),this), write16_delegate(FUNC(dec0_state::robocop_68000_share_w),this));
-}
-
-DRIVER_INIT_MEMBER(dec0_state,drgninja)
+void dec0_state::init_drgninja()
 {
 	m_game = mcu_type::BADDUDES_SIM;
 }
 
-DRIVER_INIT_MEMBER(dec0_state,hbarrel)
+void dec0_state::init_hbarrel()
 {
 	m_game = mcu_type::EMULATED;
 }
 
-DRIVER_INIT_MEMBER(dec0_state,birdtry)
+void dec0_state::init_birdtry()
 {
 	m_game = mcu_type::BIRDTRY_SIM;
 }

@@ -54,7 +54,7 @@ static UINT                 om_mame_register_client;
 static UINT                 om_mame_unregister_client;
 static UINT                 om_mame_get_id_string;
 
-
+static UINT                 im_mame_message;
 
 //============================================================
 //  FUNCTION PROTOTYPES
@@ -124,6 +124,8 @@ int output_win32::init(const osd_options &options)
 	assert(om_mame_unregister_client != 0);
 	om_mame_get_id_string = RegisterWindowMessage(OM_MAME_GET_ID_STRING);
 	assert(om_mame_get_id_string != 0);
+	im_mame_message = RegisterWindowMessage(IM_MAME_MESSAGE);
+	assert(im_mame_message != 0);
 
 	// create a window
 	m_output_hwnd = CreateWindowEx(
@@ -218,6 +220,27 @@ static LRESULT CALLBACK output_window_proc(HWND wnd, UINT message, WPARAM wparam
 	// get a string for an ID
 	else if (message == om_mame_get_id_string)
 		return output.send_id_string((HWND)wparam, lparam);
+
+	// received a message
+	else if (message == im_mame_message)
+	{
+		switch(wparam)
+		{
+		case IM_MAME_PAUSE:
+			if (lparam == 1 && !output.machine().paused())
+				output.machine().pause();
+			else if (lparam == 0 && output.machine().paused())
+				output.machine().resume();
+		case IM_MAME_SAVESTATE:
+			if (lparam == 0)
+				output.machine().schedule_load("auto");
+			else if (lparam == 1)
+				output.machine().schedule_save("auto");
+			break;
+		}
+
+		return 0;
+	}
 
 	else
 		return DefWindowProc(wnd, message, wparam, lparam);

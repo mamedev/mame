@@ -26,8 +26,6 @@
 		} \
 	} while (0)
 
-#define KM1809VG7_TAG   "d17"
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -44,13 +42,13 @@ ROM_START( p1_hdc )
 	ROM_REGION( 0x0800, "p1_hdc", 0 )
 	ROM_DEFAULT_BIOS("v17")
 	ROM_SYSTEM_BIOS(0, "v11", "ver 1.1") // (c) S. Kovalenko, 1990
-	ROMX_LOAD( "b_hd_v11.rf2", 0x00000, 0x0800, CRC(a19c39b2) SHA1(57faa56b320abf801fedbed578cf97d253e5b777), ROM_BIOS(1))
+	ROMX_LOAD( "b_hd_v11.rf2", 0x00000, 0x0800, CRC(a19c39b2) SHA1(57faa56b320abf801fedbed578cf97d253e5b777), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v12", "ver 1.2") // (c) S. Kovalenko, 1991
-	ROMX_LOAD( "p_hdd_nm.bin", 0x00000, 0x0800, CRC(d5f8e4cc) SHA1(5b533642df30958539715f87a7f25b0d66dd0861), ROM_BIOS(2))
+	ROMX_LOAD( "p_hdd_nm.bin", 0x00000, 0x0800, CRC(d5f8e4cc) SHA1(5b533642df30958539715f87a7f25b0d66dd0861), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v14", "ver 1.4") // (c) `.lesnyh. , 1992
-	ROMX_LOAD( "b942_5mb.bin", 0x00000, 0x0800, CRC(a3cfa240) SHA1(0b0aa1ce839a957153bfbbe70310480ca9fe21b6), ROM_BIOS(3))
+	ROMX_LOAD( "b942_5mb.bin", 0x00000, 0x0800, CRC(a3cfa240) SHA1(0b0aa1ce839a957153bfbbe70310480ca9fe21b6), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "v17", "ver 1.7") // (c) S. Kovalenko, 1992
-	ROMX_LOAD( "b942_v17.rom", 0x00000, 0x0800, CRC(869672e3) SHA1(5cf2ae0ec1fa3edb3fe882c805da0bbc3ac21792), ROM_BIOS(4))
+	ROMX_LOAD( "b942_v17.rom", 0x00000, 0x0800, CRC(869672e3) SHA1(5cf2ae0ec1fa3edb3fe882c805da0bbc3ac21792), ROM_BIOS(3))
 ROM_END
 
 
@@ -58,17 +56,18 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(p1_hdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(KM1809VG7_TAG, WD2010, 5000000) // XXX clock?
-	MCFG_WD2010_IN_DRDY_CB(VCC)
-	MCFG_WD2010_IN_INDEX_CB(VCC)
-	MCFG_WD2010_IN_WF_CB(VCC)
-	MCFG_WD2010_IN_TK000_CB(VCC)
-	MCFG_WD2010_IN_SC_CB(VCC)
+void p1_hdc_device::device_add_mconfig(machine_config &config)
+{
+	WD2010(config, m_hdc, 5'000'000); // XXX clock?
+	m_hdc->in_drdy_callback().set_constant(1);
+	m_hdc->in_index_callback().set_constant(1);
+	m_hdc->in_wf_callback().set_constant(1);
+	m_hdc->in_tk000_callback().set_constant(1);
+	m_hdc->in_sc_callback().set_constant(1);
 
-	MCFG_HARDDISK_ADD("hard0")
-	MCFG_HARDDISK_ADD("hard1")
-MACHINE_CONFIG_END
+	HARDDISK(config, "hard0", 0);
+	HARDDISK(config, "hard1", 0);
+}
 
 
 //-------------------------------------------------
@@ -117,7 +116,7 @@ WRITE8_MEMBER(p1_hdc_device::p1_HDC_w)
 p1_hdc_device::p1_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, P1_HDC, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
-	, m_hdc(*this, KM1809VG7_TAG)
+	, m_hdc(*this, "d17")
 {
 }
 

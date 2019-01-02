@@ -183,13 +183,13 @@ WRITE8_MEMBER(rpunch_state::upd_control_w)
 		m_upd_rom_bank = data & 1;
 		memcpy(snd, snd + 0x20000 * (m_upd_rom_bank + 1), 0x20000);
 	}
-	m_upd7759->reset_w(data >> 7);
+	m_upd7759->reset_w(BIT(data, 7));
 }
 
 
 WRITE8_MEMBER(rpunch_state::upd_data_w)
 {
-	m_upd7759->port_w(space, 0, data);
+	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
@@ -208,17 +208,17 @@ void rpunch_state::main_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x04ffff).ram().share("bitmapram");
 	map(0x060000, 0x060fff).ram().share("spriteram");
-	map(0x080000, 0x083fff).ram().w(this, FUNC(rpunch_state::rpunch_videoram_w)).share("videoram");
+	map(0x080000, 0x083fff).ram().w(FUNC(rpunch_state::rpunch_videoram_w)).share("videoram");
 	map(0x0a0000, 0x0a07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x0c0000, 0x0c0007).w(this, FUNC(rpunch_state::rpunch_scrollreg_w));
-	map(0x0c0009, 0x0c0009).select(0x20).w(this, FUNC(rpunch_state::rpunch_gga_w));
-	map(0x0c000c, 0x0c000d).w(this, FUNC(rpunch_state::rpunch_videoreg_w));
+	map(0x0c0000, 0x0c0007).w(FUNC(rpunch_state::rpunch_scrollreg_w));
+	map(0x0c0009, 0x0c0009).select(0x20).w(FUNC(rpunch_state::rpunch_gga_w));
+	map(0x0c000c, 0x0c000d).w(FUNC(rpunch_state::rpunch_videoreg_w));
 	map(0x0c000f, 0x0c000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0c0010, 0x0c0013).w(this, FUNC(rpunch_state::rpunch_ins_w));
+	map(0x0c0010, 0x0c0013).w(FUNC(rpunch_state::rpunch_ins_w));
 	map(0x0c0018, 0x0c0019).portr("P1");
 	map(0x0c001a, 0x0c001b).portr("P2");
 	map(0x0c001c, 0x0c001d).portr("DSW");
-	map(0x0c001e, 0x0c001f).r(this, FUNC(rpunch_state::sound_busy_r));
+	map(0x0c001e, 0x0c001f).r(FUNC(rpunch_state::sound_busy_r));
 	map(0x0fc000, 0x0fffff).ram();
 }
 
@@ -235,8 +235,8 @@ void rpunch_state::sound_map(address_map &map)
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xf001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xf200, 0xf200).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xf400, 0xf400).w(this, FUNC(rpunch_state::upd_control_w));
-	map(0xf600, 0xf600).w(this, FUNC(rpunch_state::upd_data_w));
+	map(0xf400, 0xf400).w(FUNC(rpunch_state::upd_control_w));
+	map(0xf600, 0xf600).w(FUNC(rpunch_state::upd_data_w));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -415,7 +415,7 @@ static const gfx_layout splayout =
 };
 
 
-static GFXDECODE_START( rpunch )
+static GFXDECODE_START( gfx_rpunch )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout, 256, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, splayout,   0, 16*4 )
@@ -444,7 +444,7 @@ static const gfx_layout bootleg_sprite_layout =
 	32*32*2,
 };
 
-static GFXDECODE_START( svolleybl )
+static GFXDECODE_START( gfx_svolleybl )
 	GFXDECODE_ENTRY( "gfx1", 0, bootleg_tile_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, bootleg_tile_layout,   256, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, bootleg_sprite_layout,   0, 16*4 )
@@ -460,14 +460,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(rpunch_state::rpunch)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundirq", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
@@ -478,26 +478,25 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	MCFG_SCREEN_SIZE(304, 224)
 	MCFG_SCREEN_VISIBLE_AREA(8, 303-8, 0, 223-8)
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rpunch)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rpunch);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2) // verified from rpunch schematics
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(rpunch_state, rpunch_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, VIDEO_CLOCK/2); // verified from rpunch schematics
+	m_gga->write_cb().set(FUNC(rpunch_state::rpunch_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", MASTER_CLOCK/4)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", MASTER_CLOCK/4));
+	ymsnd.irq_handler().set("soundirq", FUNC(input_merger_device::in_w<1>));
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -511,14 +510,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(rpunch_state::svolleybl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set("soundirq", FUNC(input_merger_device::in_w<0>));
 
 	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
@@ -529,27 +528,26 @@ MACHINE_CONFIG_START(rpunch_state::svolleybl)
 	MCFG_SCREEN_SIZE(304, 224)
 	MCFG_SCREEN_VISIBLE_AREA(8, 303-8, 0, 223-8)
 	MCFG_SCREEN_UPDATE_DRIVER(rpunch_state, screen_update_rpunch)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", svolleybl)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_svolleybl);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, VIDEO_CLOCK/2)
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(rpunch_state, rpunch_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, VIDEO_CLOCK/2);
+	m_gga->write_cb().set(FUNC(rpunch_state::rpunch_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,rpunch)
 
 	/* sound hardware */
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", MASTER_CLOCK/4)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", MASTER_CLOCK/4));
+	ymsnd.irq_handler().set("soundirq", FUNC(input_merger_device::in_w<1>));
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd", UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -793,13 +791,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(rpunch_state,rabiolep)
+void rpunch_state::init_rabiolep()
 {
 	m_sprite_palette = 0x300;
 }
 
 
-DRIVER_INIT_MEMBER(rpunch_state,svolley)
+void rpunch_state::init_svolley()
 {
 	/* the main differences between Super Volleyball and Rabbit Punch are */
 	/* the lack of direct-mapped bitmap and a different palette base for sprites */
@@ -815,12 +813,12 @@ DRIVER_INIT_MEMBER(rpunch_state,svolley)
  *
  *************************************/
 
-GAME( 1987, rabiolep,  0,        rpunch,    rabiolep, rpunch_state, rabiolep, ROT0, "V-System Co.",                              "Rabio Lepus (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1987, rpunch,    rabiolep, rpunch,    rpunch,   rpunch_state, rabiolep, ROT0, "V-System Co. (Bally/Midway/Sente license)", "Rabbit Punch (US)",        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, svolley,   0,        svolley,   svolley,  rpunch_state, svolley,  ROT0, "V-System Co.",                              "Super Volleyball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, svolleyk,  svolley,  svolley,   svolley,  rpunch_state, svolley,  ROT0, "V-System Co.",                              "Super Volleyball (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1989, svolleyu,  svolley,  svolley,   svolley,  rpunch_state, svolley,  ROT0, "V-System Co. (Data East license)",          "Super Volleyball (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1987, rabiolep,  0,        rpunch,    rabiolep, rpunch_state, init_rabiolep, ROT0, "V-System Co.",                              "Rabio Lepus (Japan)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1987, rpunch,    rabiolep, rpunch,    rpunch,   rpunch_state, init_rabiolep, ROT0, "V-System Co. (Bally/Midway/Sente license)", "Rabbit Punch (US)",        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolley,   0,        svolley,   svolley,  rpunch_state, init_svolley,  ROT0, "V-System Co.",                              "Super Volleyball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolleyk,  svolley,  svolley,   svolley,  rpunch_state, init_svolley,  ROT0, "V-System Co.",                              "Super Volleyball (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1989, svolleyu,  svolley,  svolley,   svolley,  rpunch_state, init_svolley,  ROT0, "V-System Co. (Data East license)",          "Super Volleyball (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 // video registers are changed, and there's some kind of RAM at 090xxx, possible a different sprite scheme for the bootleg (even if the original is intact)
 // the sound system seems to be ripped from the later Power Spikes (see aerofgt.c)
-GAME( 1991, svolleybl, svolley,  svolleybl, svolley,  rpunch_state, svolley,  ROT0, "bootleg",  "Super Volleyball (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL ) // aka 1991 Spikes?
+GAME( 1991, svolleybl, svolley,  svolleybl, svolley,  rpunch_state, init_svolley,  ROT0, "bootleg",  "Super Volleyball (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NO_COCKTAIL ) // aka 1991 Spikes?

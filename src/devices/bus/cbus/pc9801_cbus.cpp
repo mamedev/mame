@@ -55,7 +55,8 @@ device_pc9801cbus_card_interface::~device_pc9801cbus_card_interface()
 pc9801_slot_device::pc9801_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC9801CBUS_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
-	m_cpu(*this, "^maincpu")
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_int_callback{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 {
 }
 
@@ -73,10 +74,42 @@ void pc9801_slot_device::device_config_complete()
 
 
 //-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void pc9801_slot_device::device_resolve_objects()
+{
+	for (auto &cb : m_int_callback)
+		cb.resolve_safe();
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void pc9801_slot_device::device_start()
 {
 //  m_card = dynamic_cast<device_pc9801_slot_card_interface *>(get_card_device());
+}
+
+void pc9801_slot_device::install_io(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
+{
+	int buswidth = this->io_space().data_width();
+	switch(buswidth)
+	{
+		case 8:
+			this->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0);
+			break;
+		case 16:
+			this->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
+			break;
+		case 32:
+			this->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
+			break;
+		default:
+			fatalerror("PC-9801-26: Bus width %d not supported\n", buswidth);
+	}
 }

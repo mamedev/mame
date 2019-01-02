@@ -3,6 +3,8 @@
 #ifndef MAME_INCLUDES_PGM_H
 #define MAME_INCLUDES_PGM_H
 
+#pragma once
+
 #include "machine/igs025.h"
 #include "machine/igs022.h"
 #include "machine/igs028.h"
@@ -17,6 +19,7 @@
 #include "machine/timer.h"
 #include "machine/v3021.h"
 #include "sound/ics2115.h"
+#include "emupal.h"
 
 #define PGMARM7LOGERROR 0
 
@@ -93,7 +96,7 @@ public:
 	DECLARE_WRITE16_MEMBER(pgm_tx_videoram_w);
 	DECLARE_WRITE16_MEMBER(pgm_bg_videoram_w);
 
-	DECLARE_DRIVER_INIT(pgm);
+	void init_pgm();
 
 	TILE_GET_INFO_MEMBER(get_pgm_tx_tilemap_tile_info);
 	TILE_GET_INFO_MEMBER(get_pgm_bg_tilemap_tile_info);
@@ -129,6 +132,6 @@ public:
 
 INPUT_PORTS_EXTERN( pgm );
 
-GFXDECODE_EXTERN( pgm );
+extern gfx_decode_entry const gfx_pgm[];
 
 #endif // MAME_INCLUDES_PGM_H

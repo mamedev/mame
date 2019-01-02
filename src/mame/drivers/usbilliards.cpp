@@ -47,21 +47,18 @@ public:
 	{
 	}
 
+	void usbilliards(machine_config &config);
+
+private:
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-
-	void usbilliards(machine_config &config);
-protected:
 
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-
-private:
-
 };
 
 
@@ -136,4 +133,4 @@ ROM_START( sharkusb )
 	ROM_LOAD( "82s123_a.6n",  0x0100, 0x0100, CRC(63f621cb) SHA1(6c6e6f22313db33afd069dae1b0180b5ccddfa56) ) // 82s123 - handwritten A - A also etched in copper next to socket
 ROM_END
 
-GAME( 1975, sharkusb,    0,       usbilliards, 0, usbilliards_state,  0, ROT0, "US Billiards Inc.", "Shark [TTL]", MACHINE_IS_SKELETON )
+GAME( 1975, sharkusb,    0,       usbilliards, 0, usbilliards_state, empty_init, ROT0, "US Billiards Inc.", "Shark [TTL]", MACHINE_IS_SKELETON )

@@ -7,7 +7,7 @@
 
  This is an ARM7 with Internal ROM. (Also used on later PGM games)
 
- In some cases the first part of the Internal ROM is excute only, and
+ In some cases the first part of the Internal ROM is execute only, and
  cannot be read out with a trojan.  It hasn't been confirmed if these
  games make use of that feature.
 
@@ -39,25 +39,28 @@ public:
 		m_igs017_igs031(*this, "igs017_igs031")
 	{ }
 
+	void igs_majhong(machine_config &config);
+	void amazonia(machine_config &config);
+
+	void init_sdwx();
+	void init_chessc2();
+	void init_lhzb4();
+	void init_mgfx();
+	void init_lhzb3();
+	void init_gonefsh2();
+	void init_sddz();
+	void init_hauntedh();
+	void init_zhongguo();
+	void init_klxyj();
+	void init_slqz3();
+	void init_fruitpar();
+	void init_amazonia();
+	void init_amazoni2();
+
+private:
 	optional_shared_ptr<uint32_t> m_igs_mainram;
 	required_device<cpu_device> m_maincpu;
 	required_device<igs017_igs031_device> m_igs017_igs031;
-
-
-	DECLARE_DRIVER_INIT(sdwx);
-	DECLARE_DRIVER_INIT(chessc2);
-	DECLARE_DRIVER_INIT(lhzb4);
-	DECLARE_DRIVER_INIT(mgfx);
-	DECLARE_DRIVER_INIT(lhzb3);
-	DECLARE_DRIVER_INIT(gonefsh2);
-	DECLARE_DRIVER_INIT(sddz);
-	DECLARE_DRIVER_INIT(hauntedh);
-	DECLARE_DRIVER_INIT(zhongguo);
-	DECLARE_DRIVER_INIT(klxyj);
-	DECLARE_DRIVER_INIT(slqz3);
-	DECLARE_DRIVER_INIT(fruitpar);
-	DECLARE_DRIVER_INIT(amazonia);
-	DECLARE_DRIVER_INIT(amazoni2);
 
 	virtual void video_start() override;
 	uint32_t screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -65,8 +68,6 @@ public:
 
 	void sdwx_gfx_decrypt();
 	void pgm_create_dummy_internal_arm_region();
-	void igs_majhong(machine_config &config);
-	void amazonia(machine_config &config);
 	void igs_majhong_map(address_map &map);
 };
 
@@ -327,10 +328,10 @@ WRITE_LINE_MEMBER(igs_m027_state::vblank_irq)
 
 
 MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
-	MCFG_CPU_ADD("maincpu", ARM7, 20000000)
-	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
+	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
 
-	//MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -340,16 +341,16 @@ MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_igs_majhong)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(igs_m027_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs_m027_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 //  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_REVERSE_TEXT_BITS
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_text_reverse_bits();
+	m_igs017_igs031->set_palette("palette");
 
-	// 82C55? (accessed through igs017/igs031 area like igs017.c?)
+	// 82C55? (accessed through igs017/igs031 area like igs017.cpp?)
 
 	/* sound hardware */
 	// OK6295
@@ -360,10 +361,10 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(igs_m027_state::amazonia)
-	MCFG_CPU_ADD("maincpu", ARM7, 20000000)
-	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
+	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
 
-	//MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 
@@ -374,16 +375,16 @@ MACHINE_CONFIG_START(igs_m027_state::amazonia)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_igs_majhong)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(igs_m027_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs_m027_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 //  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_REVERSE_TEXT_BITS
+	IGS017_IGS031(config, m_igs017_igs031, 0);
+	m_igs017_igs031->set_text_reverse_bits();
+	m_igs017_igs031->set_palette("palette");
 
-	// 82C55? (accessed through igs017/igs031 area like igs017.c?)
+	// 82C55? (accessed through igs017/igs031 area like igs017.cpp?)
 
 	/* sound hardware */
 	// OK6295
@@ -1010,34 +1011,34 @@ void igs_m027_state::pgm_create_dummy_internal_arm_region()
 
 
 /*
-DRIVER_INIT_MEMBER(igs_m027_state,igs_m027)
+void igs_m027_state::init_igs_m027()
 {
     pgm_create_dummy_internal_arm_region(machine());
 }
 */
 
-DRIVER_INIT_MEMBER(igs_m027_state,sdwx)
+void igs_m027_state::init_sdwx()
 {
 	sdwx_decrypt(machine());
 	sdwx_gfx_decrypt();
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,klxyj)
+void igs_m027_state::init_klxyj()
 {
 	klxyj_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,chessc2)
+void igs_m027_state::init_chessc2()
 {
 	chessc2_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,hauntedh)
+void igs_m027_state::init_hauntedh()
 {
 	hauntedh_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
@@ -1046,70 +1047,70 @@ DRIVER_INIT_MEMBER(igs_m027_state,hauntedh)
 
 
 
-DRIVER_INIT_MEMBER(igs_m027_state,lhzb4)
+void igs_m027_state::init_lhzb4()
 {
 	lhzb4_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,mgfx)
+void igs_m027_state::init_mgfx()
 {
 	mgfx_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,lhzb3)
+void igs_m027_state::init_lhzb3()
 {
 	lhzb3_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,sddz)
+void igs_m027_state::init_sddz()
 {
 	sddz_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,gonefsh2)
+void igs_m027_state::init_gonefsh2()
 {
 	gonefsh2_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,zhongguo)
+void igs_m027_state::init_zhongguo()
 {
 	zhongguo_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,slqz3)
+void igs_m027_state::init_slqz3()
 {
 	slqz3_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,fruitpar)
+void igs_m027_state::init_fruitpar()
 {
 	fruitpar_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,amazonia)
+void igs_m027_state::init_amazonia()
 {
 	amazonia_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
-DRIVER_INIT_MEMBER(igs_m027_state,amazoni2)
+void igs_m027_state::init_amazoni2()
 {
 	amazoni2_decrypt(machine());
 	//sdwx_gfx_decrypt(machine());
@@ -1122,18 +1123,18 @@ DRIVER_INIT_MEMBER(igs_m027_state,amazoni2)
 
 ***************************************************************************/
 
-GAME( 1999,  slqz3,     0,        igs_majhong, sdwx, igs_m027_state, slqz3,       ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_IS_SKELETON )
-GAME( 1999,  amazonia,  0,        amazonia,amazonia, igs_m027_state, amazonia,    ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_IS_SKELETON )
-GAME( 1999,  amazonkp,  amazonia, amazonia,amazonia, igs_m027_state, amazonia,    ROT0, "IGS", "Amazonia King Plus (V204BR)", MACHINE_IS_SKELETON )
-GAME( 200?,  fruitpar,  0,        igs_majhong, sdwx, igs_m027_state, fruitpar,    ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_IS_SKELETON )
-GAME( 2002,  sdwx,      0,        igs_majhong, sdwx, igs_m027_state, sdwx,        ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
-GAME( 2002,  amazoni2,  0,        igs_majhong, sdwx, igs_m027_state, amazoni2,    ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_IS_SKELETON )
-GAME( 200?,  sddz,      0,        igs_majhong, sdwx, igs_m027_state, sddz,        ROT0, "IGS", "Super Dou Di Zhu",  MACHINE_IS_SKELETON )
-GAME( 2000,  zhongguo,  0,        igs_majhong, sdwx, igs_m027_state, zhongguo,    ROT0, "IGS", "Zhong Guo Chu Da D",  MACHINE_IS_SKELETON )
-GAME( 200?,  lhzb3,     0,        igs_majhong, sdwx, igs_m027_state, lhzb3,       ROT0, "IGS", "Long Hu Zheng Ba 3", MACHINE_IS_SKELETON )
-GAME( 200?,  lhzb4,     0,        igs_majhong, sdwx, igs_m027_state, lhzb4,       ROT0, "IGS", "Long Hu Zheng Ba 4", MACHINE_IS_SKELETON )
-GAME( 200?,  klxyj,     0,        igs_majhong, sdwx, igs_m027_state, klxyj,       ROT0, "IGS", "Kuai Le Xi You Ji",  MACHINE_IS_SKELETON )
-GAME( 2000,  mgfx,      0,        igs_majhong, sdwx, igs_m027_state, mgfx,        ROT0, "IGS", "Man Guan Fu Xing",   MACHINE_IS_SKELETON )
-GAME( 200?,  gonefsh2,  0,        igs_majhong, sdwx, igs_m027_state, gonefsh2,    ROT0, "IGS", "Gone Fishing 2",   MACHINE_IS_SKELETON )
-GAME( 200?,  chessc2,   0,        igs_majhong, sdwx, igs_m027_state, chessc2,     ROT0, "IGS", "Chess Challenge 2",   MACHINE_IS_SKELETON )
-GAME( 200?,  haunthig,  0,        igs_majhong, sdwx, igs_m027_state, hauntedh,    ROT0, "IGS", "Haunted House (IGS)",   MACHINE_IS_SKELETON )
+GAME( 1999, slqz3,     0,        igs_majhong, sdwx, igs_m027_state, init_slqz3,    ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_IS_SKELETON )
+GAME( 1999, amazonia,  0,        amazonia,amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_IS_SKELETON )
+GAME( 1999, amazonkp,  amazonia, amazonia,amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King Plus (V204BR)", MACHINE_IS_SKELETON )
+GAME( 200?, fruitpar,  0,        igs_majhong, sdwx, igs_m027_state, init_fruitpar, ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_IS_SKELETON )
+GAME( 2002, sdwx,      0,        igs_majhong, sdwx, igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
+GAME( 2002, amazoni2,  0,        igs_majhong, sdwx, igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_IS_SKELETON )
+GAME( 200?, sddz,      0,        igs_majhong, sdwx, igs_m027_state, init_sddz,     ROT0, "IGS", "Super Dou Di Zhu",  MACHINE_IS_SKELETON )
+GAME( 2000, zhongguo,  0,        igs_majhong, sdwx, igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhong Guo Chu Da D",  MACHINE_IS_SKELETON )
+GAME( 200?, lhzb3,     0,        igs_majhong, sdwx, igs_m027_state, init_lhzb3,    ROT0, "IGS", "Long Hu Zheng Ba 3", MACHINE_IS_SKELETON )
+GAME( 200?, lhzb4,     0,        igs_majhong, sdwx, igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zheng Ba 4", MACHINE_IS_SKELETON )
+GAME( 200?, klxyj,     0,        igs_majhong, sdwx, igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji",  MACHINE_IS_SKELETON )
+GAME( 2000, mgfx,      0,        igs_majhong, sdwx, igs_m027_state, init_mgfx,     ROT0, "IGS", "Man Guan Fu Xing",   MACHINE_IS_SKELETON )
+GAME( 200?, gonefsh2,  0,        igs_majhong, sdwx, igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2",   MACHINE_IS_SKELETON )
+GAME( 2002, chessc2,   0,        igs_majhong, sdwx, igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II",   MACHINE_IS_SKELETON )
+GAME( 200?, haunthig,  0,        igs_majhong, sdwx, igs_m027_state, init_hauntedh, ROT0, "IGS", "Haunted House (IGS)",   MACHINE_IS_SKELETON )

@@ -122,6 +122,7 @@ as well as Up Right, Cocktail or Flip Screen from the service menu.
 #include "cpu/h8/h8s2357.h"
 #include "sound/okim9810.h"
 #include "machine/eepromser.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -135,6 +136,9 @@ public:
 		m_vram(*this, "vram")
 	{ }
 
+	void invqix(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER(port3_r);
@@ -148,10 +152,9 @@ public:
 
 	DECLARE_WRITE16_MEMBER(vctl_w);
 
-	void invqix(machine_config &config);
 	void invqix_io_map(address_map &map);
 	void invqix_prg_map(address_map &map);
-protected:
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -160,7 +163,6 @@ protected:
 	// driver_device overrides
 	virtual void video_start() override;
 
-private:
 	uint16_t m_vctl;      // 0000 for normal, 0001 for flip, 0100 when going to change (blank?)
 };
 
@@ -281,23 +283,23 @@ void invqix_state::invqix_prg_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom().region("program", 0);
 	map(0x200000, 0x21ffff).ram();
-	map(0x400001, 0x400001).w("oki", FUNC(okim9810_device::write_tmp_register));
+	map(0x400001, 0x400001).w("oki", FUNC(okim9810_device::tmp_register_w));
 	map(0x400000, 0x400000).w("oki", FUNC(okim9810_device::write));
 	map(0x400002, 0x400002).r("oki", FUNC(okim9810_device::read));
 	map(0x600000, 0x61ffff).ram().share("vram");
-	map(0x620004, 0x620005).w(this, FUNC(invqix_state::vctl_w));
+	map(0x620004, 0x620005).w(FUNC(invqix_state::vctl_w));
 }
 
 void invqix_state::invqix_io_map(address_map &map)
 {
 	map(h8_device::PORT_1, h8_device::PORT_1).portr("P1");
 	map(h8_device::PORT_2, h8_device::PORT_2).portr("SYSTEM").nopw();
-	map(h8_device::PORT_3, h8_device::PORT_3).rw(this, FUNC(invqix_state::port3_r), FUNC(invqix_state::port3_w));
+	map(h8_device::PORT_3, h8_device::PORT_3).rw(FUNC(invqix_state::port3_r), FUNC(invqix_state::port3_w));
 	map(h8_device::PORT_4, h8_device::PORT_4).portr("P4");
-	map(h8_device::PORT_5, h8_device::PORT_5).rw(this, FUNC(invqix_state::port5_r), FUNC(invqix_state::port5_w));
-	map(h8_device::PORT_6, h8_device::PORT_6).rw(this, FUNC(invqix_state::port6_r), FUNC(invqix_state::port6_w));
-	map(h8_device::PORT_A, h8_device::PORT_A).r(this, FUNC(invqix_state::porta_r));
-	map(h8_device::PORT_G, h8_device::PORT_G).r(this, FUNC(invqix_state::portg_r)).nopw();
+	map(h8_device::PORT_5, h8_device::PORT_5).rw(FUNC(invqix_state::port5_r), FUNC(invqix_state::port5_w));
+	map(h8_device::PORT_6, h8_device::PORT_6).rw(FUNC(invqix_state::port6_r), FUNC(invqix_state::port6_w));
+	map(h8_device::PORT_A, h8_device::PORT_A).r(FUNC(invqix_state::porta_r));
+	map(h8_device::PORT_G, h8_device::PORT_G).r(FUNC(invqix_state::portg_r)).nopw();
 }
 
 static INPUT_PORTS_START( invqix )
@@ -333,11 +335,11 @@ static INPUT_PORTS_START( invqix )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(invqix_state::invqix)
-	MCFG_CPU_ADD("maincpu", H8S2394, XTAL(20'000'000))
-	MCFG_CPU_PROGRAM_MAP(invqix_prg_map)
-	MCFG_CPU_IO_MAP(invqix_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", invqix_state,  irq1_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(invqix_state, irq0_line_hold,  60)
+	MCFG_DEVICE_ADD("maincpu", H8S2394, XTAL(20'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(invqix_prg_map)
+	MCFG_DEVICE_IO_MAP(invqix_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", invqix_state,  irq1_line_hold)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(invqix_state, irq0_line_hold,  60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -348,14 +350,14 @@ MACHINE_CONFIG_START(invqix_state::invqix)
 
 	MCFG_PALETTE_ADD("palette", 65536)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
+	MCFG_DEVICE_ADD("oki", OKIM9810, XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
+	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
 MACHINE_CONFIG_END
 
 ROM_START( invqix )
@@ -369,4 +371,4 @@ ROM_START( invqix )
 	ROM_LOAD16_WORD_SWAP( "93c46.ic6", 0x000000, 0x000080, CRC(564b744e) SHA1(4d9ea7dc253797c513258d07a936dfb63d8ed18c) )
 ROM_END
 
-GAME( 2003, invqix, 0, invqix, invqix, invqix_state, 0, ROT270, "Taito / Namco", "Space Invaders / Qix Silver Anniversary Edition (Ver. 2.03)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, invqix, 0, invqix, invqix, invqix_state, empty_init, ROT270, "Taito / Namco", "Space Invaders / Qix Silver Anniversary Edition (Ver. 2.03)", MACHINE_SUPPORTS_SAVE )

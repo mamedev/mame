@@ -195,12 +195,13 @@ std::string omti8621_device::cpu_context() const
 	return string_format("%d.%03d %s", s, ms, machine().describe_context());
 }
 
-static SLOT_INTERFACE_START( pc_hd_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void pc_hd_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 FLOPPY_FORMATS_MEMBER( omti8621_device::floppy_formats )
 	FLOPPY_APOLLO_FORMAT,
@@ -242,17 +243,18 @@ static INPUT_PORTS_START( omti_port )
 	PORT_DIPSETTING(    0x01, "CA000h" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(omti8621_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(OMTI_DISK0_TAG, OMTI_DISK, 0)
-	MCFG_DEVICE_ADD(OMTI_DISK1_TAG, OMTI_DISK, 0)
+void omti8621_device::device_add_mconfig(machine_config &config)
+{
+	OMTI_DISK(config, OMTI_DISK0_TAG, 0);
+	OMTI_DISK(config, OMTI_DISK1_TAG, 0);
 
-	MCFG_PC_FDC_AT_ADD(OMTI_FDC_TAG)
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(omti8621_device, fdc_irq_w))
-	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(omti8621_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(OMTI_FDC_TAG":0", pc_hd_floppies, "525hd", omti8621_device::floppy_formats)
+	pc_fdc_at_device &pc_fdc_at(PC_FDC_AT(config, m_fdc, 0));
+	pc_fdc_at.intrq_wr_callback().set(FUNC(omti8621_device::fdc_irq_w));
+	pc_fdc_at.drq_wr_callback().set(FUNC(omti8621_device::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, OMTI_FDC_TAG":0", pc_hd_floppies, "525hd", omti8621_device::floppy_formats);
 // Apollo workstations never have more then 1 floppy drive
-//  MCFG_FLOPPY_DRIVE_ADD(OMTI_FDC_TAG":1", pc_hd_floppies, "525hd", omti8621_device::floppy_formats)
-MACHINE_CONFIG_END
+//  FLOPPY_CONNECTOR(config, OMTI_FDC_TAG":1", pc_hd_floppies, "525hd", omti8621_device::floppy_formats);
+}
 
 const tiny_rom_entry *omti8621_device::device_rom_region() const
 {

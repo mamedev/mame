@@ -11,6 +11,7 @@
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/saa1099.h"
+#include "diserial.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -39,6 +40,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( midi_rx_w ) { device_serial_interface::rx_w((uint8_t)state); }
 
 protected:
+	void common(machine_config &config);
+
 	struct sb8_dsp_state
 	{
 		uint8_t reset_latch;
@@ -159,7 +162,7 @@ protected:
 	virtual void irq_w(int state, int source) override;
 	virtual uint8_t dack_r(int line) override { return sb_device::dack_r(line); }
 	virtual void dack_w(int line, uint8_t data) override { sb_device::dack_w(line, data); }
-private:
+
 	required_device<ym3812_device> m_ym3812;
 };
 

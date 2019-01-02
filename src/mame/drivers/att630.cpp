@@ -19,11 +19,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void att630(machine_config &config);
+
+private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void att630(machine_config &config);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -47,8 +49,8 @@ static INPUT_PORTS_START( att630 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(att630_state::att630)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(40'000'000) / 4) // clock not confirmed
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(40'000'000) / 4) // clock not confirmed
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(87'183'360), 1376, 0, 1024, 1056, 0, 1024)
@@ -76,4 +78,4 @@ ROM_START( att630 )
 	ROM_LOAD16_BYTE( "460622-1.bin", 0x20001, 0x10000, CRC(c108c1e0) SHA1(ef01349e890b8a4117c01e78d1c23fbd113ba58f) )
 ROM_END
 
-COMP( 1987, att630, 0, 0, att630, att630, att630_state, 0, "AT&T", "630 MTG", MACHINE_IS_SKELETON )
+COMP( 1987, att630, 0, 0, att630, att630, att630_state, empty_init, "AT&T", "630 MTG", MACHINE_IS_SKELETON )

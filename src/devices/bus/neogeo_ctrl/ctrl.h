@@ -118,10 +118,10 @@ DECLARE_DEVICE_TYPE(NEOGEO_CTRL_EDGE_CONNECTOR, neogeo_ctrl_edge_port_device)
 
 
 
-SLOT_INTERFACE_EXTERN( neogeo_controls );
-SLOT_INTERFACE_EXTERN( neogeo_arc_edge );
-SLOT_INTERFACE_EXTERN( neogeo_arc_edge_fixed );
-SLOT_INTERFACE_EXTERN( neogeo_arc_pin15 );
+void neogeo_controls(device_slot_interface &device);
+void neogeo_arc_edge(device_slot_interface &device);
+void neogeo_arc_edge_fixed(device_slot_interface &device);
+void neogeo_arc_pin15(device_slot_interface &device);
 
 
 #endif // MAME_BUS_NEOGEO_CTRL_CTRL_H

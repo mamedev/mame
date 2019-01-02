@@ -92,10 +92,9 @@ macpds_sedisplay_device::macpds_sedisplay_device(const machine_config &mconfig, 
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_macpds_card_interface(mconfig, *this),
-	m_vram(nullptr), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
-	m_assembled_tag(util::string_format("%s:%s", tag, SEDISPLAY_SCREEN_NAME))
+	m_vram(nullptr), m_vbl_disable(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
 {
-	set_screen(m_assembled_tag.c_str());
+	set_screen(*this, SEDISPLAY_SCREEN_NAME);
 }
 
 //-------------------------------------------------

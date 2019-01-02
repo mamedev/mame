@@ -198,7 +198,6 @@ TODO:
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/samples.h"
-#include "screen.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK    XTAL(18'432'000)
@@ -254,18 +253,6 @@ WRITE_LINE_MEMBER(rallyx_state::flip_screen_w)
 }
 
 
-WRITE_LINE_MEMBER(rallyx_state::led_0_w)
-{
-	output().set_led_value(0, state);
-}
-
-
-WRITE_LINE_MEMBER(rallyx_state::led_1_w)
-{
-	output().set_led_value(1, state);
-}
-
-
 WRITE_LINE_MEMBER(rallyx_state::coin_lockout_w)
 {
 	machine().bookkeeping().coin_lockout_w(0, !state);
@@ -293,7 +280,7 @@ WRITE_LINE_MEMBER(rallyx_state::coin_counter_2_w)
 void rallyx_state::rallyx_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x8000, 0x8fff).ram().w(this, FUNC(rallyx_state::rallyx_videoram_w)).share("videoram");
+	map(0x8000, 0x8fff).ram().w(FUNC(rallyx_state::rallyx_videoram_w)).share("videoram");
 	map(0x9800, 0x9fff).ram();
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa080, 0xa080).portr("P2");
@@ -301,8 +288,8 @@ void rallyx_state::rallyx_map(address_map &map)
 	map(0xa000, 0xa00f).writeonly().share("radarattr");
 	map(0xa080, 0xa080).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xa100, 0xa11f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
-	map(0xa130, 0xa130).w(this, FUNC(rallyx_state::rallyx_scrollx_w));
-	map(0xa140, 0xa140).w(this, FUNC(rallyx_state::rallyx_scrolly_w));
+	map(0xa130, 0xa130).w(FUNC(rallyx_state::rallyx_scrollx_w));
+	map(0xa140, 0xa140).w(FUNC(rallyx_state::rallyx_scrolly_w));
 	map(0xa170, 0xa170).nopw();            /* ? */
 	map(0xa180, 0xa187).w("mainlatch", FUNC(ls259_device::write_d0));
 }
@@ -310,14 +297,14 @@ void rallyx_state::rallyx_map(address_map &map)
 void rallyx_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0, 0).w(this, FUNC(rallyx_state::rallyx_interrupt_vector_w));
+	map(0, 0).w(FUNC(rallyx_state::rallyx_interrupt_vector_w));
 }
 
 
 void rallyx_state::jungler_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).ram().w(this, FUNC(rallyx_state::rallyx_videoram_w)).share("videoram");
+	map(0x8000, 0x8fff).ram().w(FUNC(rallyx_state::rallyx_videoram_w)).share("videoram");
 	map(0x9800, 0x9fff).ram();
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa080, 0xa080).portr("P2");
@@ -326,8 +313,8 @@ void rallyx_state::jungler_map(address_map &map)
 	map(0xa000, 0xa00f).mirror(0x00f0).writeonly().share("radarattr");   // jungler writes to a03x
 	map(0xa080, 0xa080).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xa100, 0xa100).w(m_timeplt_audio, FUNC(timeplt_audio_device::sound_data_w));
-	map(0xa130, 0xa130).w(this, FUNC(rallyx_state::rallyx_scrollx_w)); /* only jungler and tactcian */
-	map(0xa140, 0xa140).w(this, FUNC(rallyx_state::rallyx_scrolly_w)); /* only jungler and tactcian */
+	map(0xa130, 0xa130).w(FUNC(rallyx_state::rallyx_scrollx_w)); /* only jungler and tactcian */
+	map(0xa140, 0xa140).w(FUNC(rallyx_state::rallyx_scrolly_w)); /* only jungler and tactcian */
 	map(0xa180, 0xa187).w("mainlatch", FUNC(ls259_device::write_d0));
 }
 
@@ -775,13 +762,13 @@ static const gfx_layout dotlayout =
 	16*8
 };
 
-static GFXDECODE_START( rallyx )
+static GFXDECODE_START( gfx_rallyx )
 	GFXDECODE_ENTRY( "gfx1", 0, rallyx_charlayout,     0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0, rallyx_spritelayout,   0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, dotlayout,         64*4,  1 )
 GFXDECODE_END
 
-static GFXDECODE_START( jungler )
+static GFXDECODE_START( gfx_jungler )
 	GFXDECODE_ENTRY( "gfx1", 0, jungler_charlayout,    0, 64 )
 	GFXDECODE_ENTRY( "gfx1", 0, jungler_spritelayout,  0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, dotlayout,          64*4,  1 )
@@ -826,139 +813,126 @@ WRITE_LINE_MEMBER(rallyx_state::jungler_vblank_irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(rallyx_state::rallyx)
-
+void rallyx_state::rallyx(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(rallyx_map)
-	MCFG_CPU_IO_MAP(io_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);    /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rallyx_state::rallyx_map);
+	m_maincpu->set_addrmap(AS_IO, &rallyx_state::io_map);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 259 at 12M or 4099 at 11M on Logic Board I
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(rallyx_state, bang_w)) // BANG
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(rallyx_state, irq_mask_w)) // INT ON
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(rallyx_state, sound_on_w)) // SOUND ON
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(rallyx_state, flip_screen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(rallyx_state, led_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(rallyx_state, led_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(rallyx_state, coin_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(rallyx_state, coin_counter_1_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 259 at 12M or 4099 at 11M on Logic Board I
+	mainlatch.q_out_cb<0>().set(FUNC(rallyx_state::bang_w)); // BANG
+	mainlatch.q_out_cb<1>().set(FUNC(rallyx_state::irq_mask_w)); // INT ON
+	mainlatch.q_out_cb<2>().set(FUNC(rallyx_state::sound_on_w)); // SOUND ON
+	mainlatch.q_out_cb<3>().set(FUNC(rallyx_state::flip_screen_w)); // FLIP
+	mainlatch.q_out_cb<4>().set_output("led0");
+	mainlatch.q_out_cb<5>().set_output("led1");
+	mainlatch.q_out_cb<6>().set(FUNC(rallyx_state::coin_lockout_w));
+	mainlatch.q_out_cb<7>().set(FUNC(rallyx_state::coin_counter_1_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.606060)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_rallyx)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(rallyx_state, rallyx_vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60.606060);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(36*8, 32*8);
+	m_screen->set_visarea(0*8, 36*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(rallyx_state::screen_update_rallyx));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(rallyx_state::rallyx_vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rallyx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rallyx);
 
-	MCFG_PALETTE_ADD("palette", 64*4+4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_INIT_OWNER(rallyx_state,rallyx)
+	PALETTE(config, m_palette, FUNC(rallyx_state::rallyx_palette), 64*4 + 4, 32);
+	m_palette->enable_shadows();
+
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,rallyx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32) /* 96 KHz */
-	MCFG_NAMCO_AUDIO_VOICES(3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32); /* 96 KHz */
+	m_namco_sound->set_voices(3);
+	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(rallyx_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(rallyx_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-
-MACHINE_CONFIG_START(rallyx_state::jungler)
-
+void rallyx_state::jungler(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(jungler_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);    /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rallyx_state::jungler_map);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 1C on Loco-Motion
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w)) // SOUNDON
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(rallyx_state, nmi_mask_w)) // INTST
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, mute_w)) // MUT
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(rallyx_state, flip_screen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(rallyx_state, coin_counter_1_w)) // OUT1
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // OUT2
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(rallyx_state, coin_counter_2_w)) // OUT3
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(rallyx_state, stars_enable_w)) // STARSON
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1C on Loco-Motion
+	mainlatch.q_out_cb<0>().set("timeplt_audio", FUNC(timeplt_audio_device::sh_irqtrigger_w)); // SOUNDON
+	mainlatch.q_out_cb<1>().set(FUNC(rallyx_state::nmi_mask_w)); // INTST
+	mainlatch.q_out_cb<2>().set("timeplt_audio", FUNC(timeplt_audio_device::mute_w)); // MUT
+	mainlatch.q_out_cb<3>().set(FUNC(rallyx_state::flip_screen_w)); // FLIP
+	mainlatch.q_out_cb<4>().set(FUNC(rallyx_state::coin_counter_1_w)); // OUT1
+	mainlatch.q_out_cb<5>().set_nop(); // OUT2
+	mainlatch.q_out_cb<6>().set(FUNC(rallyx_state::coin_counter_2_w)); // OUT3
+	mainlatch.q_out_cb<7>().set(FUNC(rallyx_state::stars_enable_w)); // STARSON
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_jungler)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(rallyx_state, jungler_vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));  /* frames per second, vblank duration */
+	m_screen->set_size(36*8, 32*8);
+	m_screen->set_visarea(0*8, 36*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(rallyx_state::screen_update_jungler));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(rallyx_state::jungler_vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jungler)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jungler);
 
-	MCFG_PALETTE_ADD("palette", 64*4+4+64)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32+64)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_INIT_OWNER(rallyx_state,jungler)
+	PALETTE(config, m_palette, FUNC(rallyx_state::jungler_palette), 64*4 + 4 + 64, 32 + 64);
+	m_palette->enable_shadows();
+
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,jungler)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
-	downcast<timeplt_audio_device *>(device)->locomotn_sound(config);
-MACHINE_CONFIG_END
+	LOCOMOTN_AUDIO(config, "timeplt_audio");
+}
 
-
-MACHINE_CONFIG_START(rallyx_state::tactcian)
+void rallyx_state::tactcian(machine_config &config)
+{
 	jungler(config);
 
-	/* basic machine hardware */
+	m_screen->set_screen_update(FUNC(rallyx_state::screen_update_locomotn));
 
-	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,locomotn)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_locomotn)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(rallyx_state::locomotn)
+void rallyx_state::locomotn(machine_config &config)
+{
 	jungler(config);
 
-	/* basic machine hardware */
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(rallyx_state::screen_update_locomotn));
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_locomotn)
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,locomotn)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(rallyx_state::commsega)
+void rallyx_state::commsega(machine_config &config)
+{
 	jungler(config);
 
-	/* basic machine hardware */
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(rallyx_state::screen_update_locomotn));
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rallyx_state, screen_update_locomotn)
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,commsega)
-MACHINE_CONFIG_END
+}
 
 
 /*************************************
@@ -1443,21 +1417,21 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, rallyx,   0,        rallyx,   rallyx,   rallyx_state, 0, ROT0,  "Namco", "Rally X (32k Ver.?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallyxa,  rallyx,   rallyx,   rallyx,   rallyx_state, 0, ROT0,  "Namco", "Rally X", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallyxm,  rallyx,   rallyx,   rallyx,   rallyx_state, 0, ROT0,  "Namco (Midway license)", "Rally X (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallyxmr, rallyx,   rallyx,   rallyx,   rallyx_state, 0, ROT0,  "bootleg (Model Racing)", "Rally X (Model Racing bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, dngrtrck, rallyx,   rallyx,   dngrtrck, rallyx_state, 0, ROT0,  "bootleg (Petaco)", "Danger Track (Rally X bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, nrallyx,  0,        rallyx,   nrallyx,  rallyx_state, 0, ROT0,  "Namco", "New Rally X", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, nrallyxb, nrallyx,  rallyx,   nrallyx,  rallyx_state, 0, ROT0,  "Namco", "New Rally X (bootleg?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, jungler,  0,        jungler,  jungler,  rallyx_state, 0, ROT90, "Konami", "Jungler", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, junglers, jungler,  jungler,  jungler,  rallyx_state, 0, ROT90, "Konami (Stern Electronics license)", "Jungler (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jackler,  jungler,  jungler,  jungler,  rallyx_state, 0, ROT90, "bootleg", "Jackler (Jungler bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, savanna,  jungler,  jungler,  jungler,  rallyx_state, 0, ROT90, "bootleg (Olympia)", "Savanna (Jungler bootleg)", MACHINE_SUPPORTS_SAVE ) // or licensed from Konami?
-GAME( 1982, tactcian, 0,        tactcian, tactcian, rallyx_state, 0, ROT90, "Konami (Sega license)", "Tactician (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tactcian2,tactcian, tactcian, tactcian, rallyx_state, 0, ROT90, "Konami (Sega license)", "Tactician (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, locomotn, 0,        locomotn, locomotn, rallyx_state, 0, ROT90, "Konami (Centuri license)", "Loco-Motion", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, gutangtn, locomotn, locomotn, locomotn, rallyx_state, 0, ROT90, "Konami (Sega license)", "Guttang Gottong", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, cottong,  locomotn, locomotn, locomotn, rallyx_state, 0, ROT90, "bootleg", "Cotocoto Cottong", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, locoboot, locomotn, locomotn, locomotn, rallyx_state, 0, ROT90, "bootleg", "Loco-Motion (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, commsega, 0,        commsega, commsega, rallyx_state, 0, ROT90, "Sega", "Commando (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyx,   0,        rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "Namco", "Rally X (32k Ver.?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyxa,  rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "Namco", "Rally X", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyxm,  rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "Namco (Midway license)", "Rally X (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallyxmr, rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "bootleg (Model Racing)", "Rally X (Model Racing bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, dngrtrck, rallyx,   rallyx,   dngrtrck, rallyx_state, empty_init, ROT0,  "bootleg (Petaco)", "Danger Track (Rally X bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, nrallyx,  0,        rallyx,   nrallyx,  rallyx_state, empty_init, ROT0,  "Namco", "New Rally X", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, nrallyxb, nrallyx,  rallyx,   nrallyx,  rallyx_state, empty_init, ROT0,  "Namco", "New Rally X (bootleg?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, jungler,  0,        jungler,  jungler,  rallyx_state, empty_init, ROT90, "Konami", "Jungler", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, junglers, jungler,  jungler,  jungler,  rallyx_state, empty_init, ROT90, "Konami (Stern Electronics license)", "Jungler (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jackler,  jungler,  jungler,  jungler,  rallyx_state, empty_init, ROT90, "bootleg", "Jackler (Jungler bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, savanna,  jungler,  jungler,  jungler,  rallyx_state, empty_init, ROT90, "bootleg (Olympia)", "Savanna (Jungler bootleg)", MACHINE_SUPPORTS_SAVE ) // or licensed from Konami?
+GAME( 1982, tactcian, 0,        tactcian, tactcian, rallyx_state, empty_init, ROT90, "Konami (Sega license)", "Tactician (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tactcian2,tactcian, tactcian, tactcian, rallyx_state, empty_init, ROT90, "Konami (Sega license)", "Tactician (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, locomotn, 0,        locomotn, locomotn, rallyx_state, empty_init, ROT90, "Konami (Centuri license)", "Loco-Motion", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, gutangtn, locomotn, locomotn, locomotn, rallyx_state, empty_init, ROT90, "Konami (Sega license)", "Guttang Gottong", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, cottong,  locomotn, locomotn, locomotn, rallyx_state, empty_init, ROT90, "bootleg", "Cotocoto Cottong", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, locoboot, locomotn, locomotn, locomotn, rallyx_state, empty_init, ROT90, "bootleg", "Loco-Motion (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, commsega, 0,        commsega, commsega, rallyx_state, empty_init, ROT90, "Sega", "Commando (Sega)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -423,7 +423,7 @@ Always solder the battery plus to plus and minus to minus. If it's wired in plus
 the voltage will double to 6V.
 If you have a System 32 board with an FD1149 add another new battery now!
 
-Rom Types:
+ROM Types:
 Main program ROM at IC8 is 27C240
 Sound Program at IC36 is 27C100
 Sound Data at IC35,34,24 are 838000
@@ -563,21 +563,26 @@ segas32_state::segas32_state(const machine_config &mconfig, const char *tag, dev
 }
 
 segas32_state::segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-	m_z80_shared_ram(*this,"z80_shared_ram"),
-	m_system32_workram(*this,"workram"),
-	m_system32_videoram(*this,"videoram", 0),
-	m_system32_spriteram(*this,"spriteram", 0),
-	m_system32_paletteram(*this,"paletteram.%u", 0, uint8_t(0)),
-	m_maincpu(*this, "maincpu"),
-	m_soundcpu(*this, "soundcpu"),
-	m_multipcm(*this, "sega"),
-	m_gfxdecode(*this, "gfxdecode"),
-	m_screen(*this, "screen"),
-	m_palette(*this, "palette"),
-	m_irq_timer_0(*this, "v60_irq0"),
-	m_irq_timer_1(*this, "v60_irq1"),
-	m_s32comm(*this, "s32comm")
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_z80_shared_ram(*this,"z80_shared_ram")
+	, m_system32_workram(*this,"workram")
+	, m_videoram(*this,"videoram", 0)
+	, m_spriteram(*this,"spriteram", 0)
+	, m_paletteram(*this,"paletteram.%u", 0, uint8_t(0))
+	, m_maincpu(*this, "maincpu")
+	, m_soundcpu(*this, "soundcpu")
+	, m_multipcm(*this, "sega")
+	, m_gfxdecode(*this, "gfxdecode")
+	, m_screen(*this, "screen")
+	, m_palette(*this, "palette")
+	, m_irq_timer_0(*this, "v60_irq0")
+	, m_irq_timer_1(*this, "v60_irq1")
+	, m_s32comm(*this, "s32comm")
+	, m_sprite_region(*this, "sprites")
+	, m_maincpu_region(*this, "maincpu")
+	, m_soundrom_bank(*this, "soundbank")
+	, m_multipcm_bank_hi(*this, "multipcmbankhi")
+	, m_multipcm_bank_lo(*this, "multipcmbanklo")
 {
 }
 
@@ -637,6 +642,7 @@ void segas32_upd7725_state::device_start()
 void segas32_cd_state::device_start()
 {
 	common_start(0);
+	m_lamps.resolve();
 }
 
 void sega_multi32_state::device_start()
@@ -862,18 +868,11 @@ WRITE8_MEMBER(segas32_state::tilebank_external_w)
 	m_system32_tilebank_external = data;
 }
 
-
-WRITE_LINE_MEMBER(segas32_state::display_enable_0_w)
+template<int Which>
+WRITE_LINE_MEMBER(segas32_state::display_enable_w)
 {
-	m_system32_displayenable[0] = state;
+	m_system32_displayenable[Which] = state;
 }
-
-
-WRITE_LINE_MEMBER(segas32_state::display_enable_1_w)
-{
-	m_system32_displayenable[1] = state;
-}
-
 
 
 /*************************************
@@ -893,7 +892,6 @@ READ16_MEMBER(segas32_state::random_number_r)
 }
 
 
-
 /*************************************
  *
  *  Sound communications
@@ -910,7 +908,6 @@ WRITE8_MEMBER(segas32_state::shared_ram_w)
 {
 	m_z80_shared_ram[offset] = data;
 }
-
 
 
 /*************************************
@@ -989,7 +986,6 @@ WRITE_LINE_MEMBER(segas32_state::ym3438_irq_handler)
 }
 
 
-
 /*************************************
  *
  *  Sound banking
@@ -999,30 +995,29 @@ WRITE_LINE_MEMBER(segas32_state::ym3438_irq_handler)
 WRITE8_MEMBER(segas32_state::sound_bank_lo_w)
 {
 	m_sound_bank = (m_sound_bank & ~0x3f) | (data & 0x3f);
-	membank("bank1")->set_entry(m_sound_bank);
+	m_soundrom_bank->set_entry(m_sound_bank);
 }
 
 
 WRITE8_MEMBER(segas32_state::sound_bank_hi_w)
 {
 	m_sound_bank = (m_sound_bank & 0x3f) | ((data & 0x04) << 4) | ((data & 0x03) << 7);
-	membank("bank1")->set_entry(m_sound_bank);
+	m_soundrom_bank->set_entry(m_sound_bank);
 }
 
 
 WRITE8_MEMBER(segas32_state::multipcm_bank_w)
 {
-	membank("multipcmbankhi")->set_entry((data >> 3) & 7);
-	membank("multipcmbanklo")->set_entry(data & 7);
+	m_multipcm_bank_hi->set_entry((data >> 3) & 7);
+	m_multipcm_bank_lo->set_entry(data & 7);
 }
 
 
 WRITE8_MEMBER(segas32_state::scross_bank_w)
 {
-	membank("multipcmbankhi")->set_entry(data & 7);
-	membank("multipcmbanklo")->set_entry(data & 7);
+	m_multipcm_bank_hi->set_entry(data & 7);
+	m_multipcm_bank_lo->set_entry(data & 7);
 }
-
 
 
 /*************************************
@@ -1043,6 +1038,122 @@ WRITE8_MEMBER(segas32_state::sound_dummy_w)
 }
 
 
+/*************************************
+ *
+ *  Common palette handling
+ *
+ *************************************/
+
+inline uint16_t segas32_state::xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(uint16_t value)
+{
+	int r = (value >> 0) & 0x1f;
+	int g = (value >> 5) & 0x1f;
+	int b = (value >> 10) & 0x1f;
+	value = (value & 0x8000) | ((b & 0x01) << 14) | ((g & 0x01) << 13) | ((r & 0x01) << 12);
+	value |= ((b & 0x1e) << 7) | ((g & 0x1e) << 3) | ((r & 0x1e) >> 1);
+	return value;
+}
+
+
+inline uint16_t segas32_state::xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(uint16_t value)
+{
+	int r = ((value >> 12) & 0x01) | ((value << 1) & 0x1e);
+	int g = ((value >> 13) & 0x01) | ((value >> 3) & 0x1e);
+	int b = ((value >> 14) & 0x01) | ((value >> 7) & 0x1e);
+	return (value & 0x8000) | (b << 10) | (g << 5) | (r << 0);
+}
+
+
+inline void segas32_state::update_color(int offset, uint16_t data)
+{
+	/* note that since we use this RAM directly, we don't technically need */
+	/* to call palette_set_color() at all; however, it does give us that */
+	/* nice display when you hit F4, which is useful for debugging */
+
+	/* set the color */
+	m_palette->set_pen_color(offset, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+}
+
+
+/*************************************
+ *
+ *  Palette RAM access
+ *
+ *************************************/
+
+template<int Which>
+READ16_MEMBER(segas32_state::paletteram_r)
+{
+	int convert;
+
+	/* the lower half of palette RAM is formatted xBBBBBGGGGGRRRRR */
+	/* the upper half of palette RAM is formatted xBGRBBBBGGGGRRRR */
+	/* we store everything if the first format, and convert accesses to the other format */
+	/* on the fly */
+	convert = (offset & 0x4000);
+	offset &= 0x3fff;
+
+	if (!convert)
+		return m_paletteram[Which][offset];
+	else
+		return xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(m_paletteram[Which][offset]);
+}
+
+template<int Which>
+WRITE16_MEMBER(segas32_state::paletteram_w)
+{
+	uint16_t value;
+	int convert;
+
+	/* the lower half of palette RAM is formatted xBBBBBGGGGGRRRRR */
+	/* the upper half of palette RAM is formatted xBGRBBBBGGGGRRRR */
+	/* we store everything if the first format, and convert accesses to the other format */
+	/* on the fly */
+	convert = (offset & 0x4000);
+	offset &= 0x3fff;
+
+	/* read, modify, and write the new value, updating the palette */
+	value = m_paletteram[Which][offset];
+	if (convert) value = xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(value);
+	COMBINE_DATA(&value);
+	if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
+	m_paletteram[Which][offset] = value;
+	update_color(0x4000*Which + offset, value);
+
+	/* if blending is enabled, writes go to both halves of palette RAM */
+	if (m_mixer_control[Which][0x4e/2] & 0x0880)
+	{
+		offset ^= 0x2000;
+
+		/* read, modify, and write the new value, updating the palette */
+		value = m_paletteram[Which][offset];
+		if (convert) value = xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(value);
+		COMBINE_DATA(&value);
+		if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
+		m_paletteram[Which][offset] = value;
+		update_color(0x4000*Which + offset, value);
+	}
+}
+
+
+/*************************************
+ *
+ *  Mixer control registers
+ *
+ *************************************/
+
+template<int Which>
+READ16_MEMBER(segas32_state::mixer_r)
+{
+	return m_mixer_control[Which][offset];
+}
+
+template<int Which>
+WRITE16_MEMBER(segas32_state::mixer_w)
+{
+	COMBINE_DATA(&m_mixer_control[Which][offset]);
+}
+
 
 /*************************************
  *
@@ -1055,19 +1166,19 @@ void segas32_state::system32_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x20ffff).mirror(0x0f0000).ram().share("workram");
-	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_videoram_r), FUNC(segas32_state::system32_videoram_w)).share("videoram");
-	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_spriteram_r), FUNC(segas32_state::system32_spriteram_w)).share("spriteram");
-	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(this, FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask16(0x00ff);
-	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_paletteram_r), FUNC(segas32_state::system32_paletteram_w)).share("paletteram.0");
-	map(0x610000, 0x61007f).mirror(0x0eff80).rw(this, FUNC(segas32_state::system32_mixer_r), FUNC(segas32_state::system32_mixer_w));
-	map(0x700000, 0x701fff).mirror(0x0fe000).rw(this, FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w)).share("videoram");
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w)).share("spriteram");
+	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask16(0x00ff);
+	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>)).share("paletteram.0");
+	map(0x610000, 0x61007f).mirror(0x0eff80).rw(FUNC(segas32_state::mixer_r<0>), FUNC(segas32_state::mixer_w<0>));
+	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask16(0x00ff);
 	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
 	map(0x801002, 0x801002).rw("s32comm", FUNC(s32comm_device::fg_r), FUNC(s32comm_device::fg_w));
 	map(0xc00000, 0xc0001f).mirror(0x0fff80).rw("io_chip", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	// 0xc00040-0xc0007f - I/O expansion area
-	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(this, FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
-	map(0xd80000, 0xdfffff).rw(this, FUNC(segas32_state::random_number_r), FUNC(segas32_state::random_number_w));
+	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
+	map(0xd80000, 0xdfffff).rw(FUNC(segas32_state::random_number_r), FUNC(segas32_state::random_number_w));
 	map(0xf00000, 0xffffff).rom().region("maincpu", 0);
 }
 
@@ -1078,14 +1189,14 @@ void segas32_state::multi32_map(address_map &map)
 	map.global_mask(0xffffff);
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x21ffff).mirror(0x0e0000).ram();
-	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_videoram_r), FUNC(segas32_state::system32_videoram_w)).share("videoram");
-	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::multi32_spriteram_r), FUNC(segas32_state::multi32_spriteram_w)).share("spriteram");
-	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(this, FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask32(0x00ff00ff);
-	map(0x600000, 0x60ffff).mirror(0x060000).rw(this, FUNC(segas32_state::multi32_paletteram_0_r), FUNC(segas32_state::multi32_paletteram_0_w)).share("paletteram.0");
-	map(0x610000, 0x61007f).mirror(0x06ff80).w(this, FUNC(segas32_state::multi32_mixer_0_w));
-	map(0x680000, 0x68ffff).mirror(0x060000).rw(this, FUNC(segas32_state::multi32_paletteram_1_r), FUNC(segas32_state::multi32_paletteram_1_w)).share("paletteram.1");
-	map(0x690000, 0x69007f).mirror(0x06ff80).w(this, FUNC(segas32_state::multi32_mixer_1_w));
-	map(0x700000, 0x701fff).mirror(0x0fe000).rw(this, FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w)).share("videoram");
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w)).share("spriteram");
+	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask32(0x00ff00ff);
+	map(0x600000, 0x60ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>)).share("paletteram.0");
+	map(0x610000, 0x61007f).mirror(0x06ff80).w(FUNC(segas32_state::mixer_w<0>));
+	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<1>), FUNC(segas32_state::paletteram_w<1>)).share("paletteram.1");
+	map(0x690000, 0x69007f).mirror(0x06ff80).w(FUNC(segas32_state::mixer_w<1>));
+	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask32(0x00ff00ff);
 	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
 	map(0x801002, 0x801002).rw("s32comm", FUNC(s32comm_device::fg_r), FUNC(s32comm_device::fg_w));
@@ -1093,8 +1204,8 @@ void segas32_state::multi32_map(address_map &map)
 	// 0xc00040-0xc0007f - I/O expansion area 0
 	map(0xc80000, 0xc8001f).mirror(0x07ff80).rw("io_chip_1", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask32(0x00ff00ff);
 	// 0xc80040-0xc8007f - I/O expansion area 1
-	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(this, FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
-	map(0xd80000, 0xdfffff).rw(this, FUNC(segas32_state::random_number_r), FUNC(segas32_state::random_number_w));
+	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
+	map(0xd80000, 0xdfffff).rw(FUNC(segas32_state::random_number_r), FUNC(segas32_state::random_number_w));
 	map(0xf00000, 0xffffff).rom().region("maincpu", 0);
 }
 
@@ -1109,7 +1220,7 @@ void segas32_state::multi32_map(address_map &map)
 void segas32_state::system32_sound_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom().region("soundcpu", 0);
-	map(0xa000, 0xbfff).bankr("bank1");
+	map(0xa000, 0xbfff).bankr("soundbank");
 	map(0xc000, 0xc00f).mirror(0x0ff0).w("rfsnd", FUNC(rf5c68_device::rf5c68_w));
 	map(0xd000, 0xdfff).rw("rfsnd", FUNC(rf5c68_device::rf5c68_mem_r), FUNC(rf5c68_device::rf5c68_mem_w));
 	map(0xe000, 0xffff).ram().share("z80_shared_ram");
@@ -1121,18 +1232,24 @@ void segas32_state::system32_sound_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x80, 0x83).mirror(0x0c).rw("ym1", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
 	map(0x90, 0x93).mirror(0x0c).rw("ym2", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
-	map(0xa0, 0xaf).w(this, FUNC(segas32_state::sound_bank_lo_w));
-	map(0xb0, 0xbf).w(this, FUNC(segas32_state::sound_bank_hi_w));
-	map(0xc0, 0xcf).w(this, FUNC(segas32_state::sound_int_control_lo_w));
-	map(0xd0, 0xd3).mirror(0x04).w(this, FUNC(segas32_state::sound_int_control_hi_w));
-	map(0xf1, 0xf1).rw(this, FUNC(segas32_state::sound_dummy_r), FUNC(segas32_state::sound_dummy_w));
+	map(0xa0, 0xaf).w(FUNC(segas32_state::sound_bank_lo_w));
+	map(0xb0, 0xbf).w(FUNC(segas32_state::sound_bank_hi_w));
+	map(0xc0, 0xcf).w(FUNC(segas32_state::sound_int_control_lo_w));
+	map(0xd0, 0xd3).mirror(0x04).w(FUNC(segas32_state::sound_int_control_hi_w));
+	map(0xf1, 0xf1).rw(FUNC(segas32_state::sound_dummy_r), FUNC(segas32_state::sound_dummy_w));
+}
+
+void segas32_state::rf5c68_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).ram();
 }
 
 
 void segas32_state::multi32_sound_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom().region("soundcpu", 0);
-	map(0xa000, 0xbfff).bankr("bank1");
+	map(0xa000, 0xbfff).bankr("soundbank");
 	map(0xc000, 0xdfff).rw("sega", FUNC(multipcm_device::read), FUNC(multipcm_device::write));
 	map(0xe000, 0xffff).ram().share("z80_shared_ram");
 }
@@ -1142,11 +1259,11 @@ void segas32_state::multi32_sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x80, 0x83).mirror(0x0c).rw("ymsnd", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
-	map(0xa0, 0xaf).w(this, FUNC(segas32_state::sound_bank_lo_w));
-	map(0xb0, 0xbf).w(this, FUNC(segas32_state::multipcm_bank_w));
-	map(0xc0, 0xcf).w(this, FUNC(segas32_state::sound_int_control_lo_w));
-	map(0xd0, 0xd3).mirror(0x04).w(this, FUNC(segas32_state::sound_int_control_hi_w));
-	map(0xf1, 0xf1).rw(this, FUNC(segas32_state::sound_dummy_r), FUNC(segas32_state::sound_dummy_w));
+	map(0xa0, 0xaf).w(FUNC(segas32_state::sound_bank_lo_w));
+	map(0xb0, 0xbf).w(FUNC(segas32_state::multipcm_bank_w));
+	map(0xc0, 0xcf).w(FUNC(segas32_state::sound_int_control_lo_w));
+	map(0xd0, 0xd3).mirror(0x04).w(FUNC(segas32_state::sound_int_control_hi_w));
+	map(0xf1, 0xf1).rw(FUNC(segas32_state::sound_dummy_r), FUNC(segas32_state::sound_dummy_w));
 }
 
 
@@ -1567,6 +1684,7 @@ static INPUT_PORTS_START( f1en )
 
 	PORT_MODIFY("slavepcb:SERVICE12_A")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("slavepcb:SERVICE34_A")
@@ -2166,15 +2284,14 @@ static const gfx_layout bgcharlayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0,1,2,3 },
-	{ 0, 4, 16, 20, 8, 12, 24, 28, 32, 36, 48, 52, 40, 44, 56, 60  },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64, 9*64,10*64,11*64,12*64,13*64,14*64,15*64 },
+	{ STEP4(0,1) },
+	{ 0, 4, 16, 20, 8, 12, 24, 28, 32, 36, 48, 52, 40, 44, 56, 60 },
+	{ STEP16(0,4*16) },
 	16*64
 };
 
 
-static GFXDECODE_START( segas32 )
+static GFXDECODE_START( gfx_segas32 )
 	GFXDECODE_ENTRY( "gfx1", 0, bgcharlayout,   0x00, 0x3ff  )
 GFXDECODE_END
 
@@ -2189,65 +2306,67 @@ GFXDECODE_END
  *************************************/
 
 
-MACHINE_CONFIG_START(segas32_state::device_add_mconfig)
-
+void segas32_state::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V60, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(system32_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas32_state,  start_of_vblank_int)
+	V60(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_state::system32_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas32_state::start_of_vblank_int));
 
-	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(system32_sound_map)
-	MCFG_CPU_IO_MAP(system32_sound_portmap)
+	Z80(config, m_soundcpu, MASTER_CLOCK/4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas32_state::system32_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas32_state::system32_sound_portmap);
 
-	MCFG_DEVICE_ADD("io_chip", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1_A"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2_A"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("PORTC_A"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segas32_state, misc_output_0_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(6)
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE12_A"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("SERVICE34_A"))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(segas32_state, sw2_output_0_w))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(segas32_state, tilebank_external_w))
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(segas32_state, display_enable_0_w))
-	MCFG_315_5296_OUT_CNT2_CB(INPUTLINE("soundcpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	sega_315_5296_device &io_chip(SEGA_315_5296(config, "io_chip", 0)); // unknown clock
+	io_chip.in_pa_callback().set_ioport("P1_A");
+	io_chip.in_pb_callback().set_ioport("P2_A");
+	io_chip.in_pc_callback().set_ioport("PORTC_A");
+	io_chip.out_pd_callback().set(FUNC(segas32_state::misc_output_0_w));
+	io_chip.out_pd_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(7);
+	io_chip.out_pd_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(5);
+	io_chip.out_pd_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(6);
+	io_chip.in_pe_callback().set_ioport("SERVICE12_A");
+	io_chip.in_pf_callback().set_ioport("SERVICE34_A");
+	io_chip.out_pg_callback().set(FUNC(segas32_state::sw2_output_0_w));
+	io_chip.out_ph_callback().set(FUNC(segas32_state::tilebank_external_w));
+	io_chip.out_cnt1_callback().set(FUNC(segas32_state::display_enable_w<0>));
+	io_chip.out_cnt2_callback().set_inputline(m_soundcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
-	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
+	TIMER(config, "v60_irq0").configure_generic(FUNC(segas32_state::signal_v60_irq_callback));
+	TIMER(config, "v60_irq1").configure_generic(FUNC(segas32_state::signal_v60_irq_callback));
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas32)
-	MCFG_PALETTE_ADD("palette", 0x4000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas32);
+	PALETTE(config, m_palette).set_entries(0x4000);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(52*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segas32_state, screen_update_system32)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(52*8, 262);
+	m_screen->set_visarea(0*8, 52*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(segas32_state::screen_update_system32));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ym1", YM3438, MASTER_CLOCK/4)
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(segas32_state, ym3438_irq_handler))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
+	ym3438_device &ym1(YM3438(config, "ym1", MASTER_CLOCK/4));
+	ym1.irq_handler().set(FUNC(segas32_state::ym3438_irq_handler));
+	ym1.add_route(0, "lspeaker", 0.40);
+	ym1.add_route(1, "rspeaker", 0.40);
 
-	MCFG_SOUND_ADD("ym2", YM3438, MASTER_CLOCK/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
+	ym3438_device &ym2(YM3438(config, "ym2", MASTER_CLOCK/4));
+	ym2.add_route(0, "lspeaker", 0.40);
+	ym2.add_route(1, "rspeaker", 0.40);
 
-	MCFG_RF5C68_ADD("rfsnd", RFC_CLOCK/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
+	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", RFC_CLOCK/4));
+	rfsnd.add_route(0, "lspeaker", 0.55);
+	rfsnd.add_route(1, "rspeaker", 0.55);
+	rfsnd.set_addrmap(0, &segas32_state::rf5c68_map);
 
-	MCFG_S32COMM_ADD("s32comm")
-MACHINE_CONFIG_END
+	S32COMM(config, m_s32comm, 0);
+}
 
 DEFINE_DEVICE_TYPE(SEGA_S32_REGULAR_DEVICE, segas32_regular_state, "segas32_pcb_regular", "Sega System 32 regular PCB")
 
@@ -2267,18 +2386,18 @@ void segas32_state::system32_analog_map(address_map &map)
 	map(0xc00050, 0xc00057).mirror(0x0fff80).rw("adc", FUNC(msm6253_device::d7_r), FUNC(msm6253_device::address_w)).umask16(0x00ff);
 }
 
-MACHINE_CONFIG_START(segas32_analog_state::device_add_mconfig)
+void segas32_analog_state::device_add_mconfig(machine_config &config)
+{
 	segas32_state::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(system32_analog_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_analog_state::system32_analog_map);
 
-	MCFG_DEVICE_ADD("adc", MSM6253, 0)
-	MCFG_MSM6253_IN0_ANALOG_PORT("ANALOG1")
-	MCFG_MSM6253_IN1_ANALOG_PORT("ANALOG2")
-	MCFG_MSM6253_IN2_ANALOG_PORT("ANALOG3")
-	MCFG_MSM6253_IN3_ANALOG_PORT("ANALOG4")
-MACHINE_CONFIG_END
+	msm6253_device &adc(MSM6253(config, "adc", 0));
+	adc.set_input_tag<0>("ANALOG1");
+	adc.set_input_tag<1>("ANALOG2");
+	adc.set_input_tag<2>("ANALOG3");
+	adc.set_input_tag<3>("ANALOG4");
+}
 
 DEFINE_DEVICE_TYPE(SEGA_S32_ANALOG_DEVICE, segas32_analog_state, "segas32_pcb_analog", "Sega System 32 analog PCB")
 
@@ -2301,31 +2420,31 @@ void segas32_trackball_state::system32_trackball_map(address_map &map)
 	map.unmap_value_high();
 	system32_map(map);
 	//AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_READWRITE8(sonic_custom_io_r, sonic_custom_io_w, 0x00ff)
-	map(0xc00040, 0xc00047).mirror(0x0fff80).rw("upd1", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy)).umask16(0x00ff);
-	map(0xc00048, 0xc0004f).mirror(0x0fff80).rw("upd2", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy)).umask16(0x00ff);
-	map(0xc00050, 0xc00057).mirror(0x0fff80).rw("upd3", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy)).umask16(0x00ff);
+	map(0xc00040, 0xc00047).mirror(0x0fff80).rw("upd1", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
+	map(0xc00048, 0xc0004f).mirror(0x0fff80).rw("upd2", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
+	map(0xc00050, 0xc00057).mirror(0x0fff80).rw("upd3", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
 }
 
-MACHINE_CONFIG_START(segas32_trackball_state::device_add_mconfig)
+void segas32_trackball_state::device_add_mconfig(machine_config &config)
+{
 	segas32_state::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(system32_trackball_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_trackball_state::system32_trackball_map);
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX1")
-	MCFG_UPD4701_PORTY("TRACKY1")
+	upd4701_device &upd1(UPD4701A(config, "upd1"));
+	upd1.set_portx_tag("TRACKX1");
+	upd1.set_porty_tag("TRACKY1");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX2")
-	MCFG_UPD4701_PORTY("TRACKY2")
+	upd4701_device &upd2(UPD4701A(config, "upd2"));
+	upd2.set_portx_tag("TRACKX2");
+	upd2.set_porty_tag("TRACKY2");
 
-	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX3")
-	MCFG_UPD4701_PORTY("TRACKY3")
+	upd4701_device &upd3(UPD4701A(config, "upd3"));
+	upd3.set_portx_tag("TRACKX3");
+	upd3.set_porty_tag("TRACKY3");
 
 	// 837-8685 I/O board has an unpopulated space for a fourth UPD4701A
-MACHINE_CONFIG_END
+}
 
 DEFINE_DEVICE_TYPE(SEGA_S32_TRACKBALL_DEVICE, segas32_trackball_state, "segas32_pcb_trackball", "Sega System 32 trackball PCB")
 
@@ -2345,17 +2464,17 @@ void segas32_state::system32_4player_map(address_map &map)
 	map(0xc00060, 0xc00067).mirror(0x0fff80).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 }
 
-MACHINE_CONFIG_START(segas32_4player_state::device_add_mconfig)
+void segas32_4player_state::device_add_mconfig(machine_config &config)
+{
 	segas32_state::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(system32_4player_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_4player_state::system32_4player_map);
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("EXTRA1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("EXTRA2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA3"))
-MACHINE_CONFIG_END
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("EXTRA1");
+	ppi.in_pb_callback().set_ioport("EXTRA2");
+	ppi.in_pc_callback().set_ioport("EXTRA3");
+}
 
 DEFINE_DEVICE_TYPE(SEGA_S32_4PLAYER_DEVICE, segas32_4player_state, "segas32_pcb_4player", "Sega System 32 4-player/fighting PCB")
 
@@ -2380,18 +2499,18 @@ void segas32_state::ga2_main_map(address_map &map)
 	map(0xa00000, 0xa00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask16(0x00ff);
 }
 
-MACHINE_CONFIG_START(segas32_v25_state::device_add_mconfig)
+void segas32_v25_state::device_add_mconfig(machine_config &config)
+{
 	segas32_4player_state::device_add_mconfig(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ga2_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_v25_state::ga2_main_map);
 
-	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+	MB8421(config, "dpram", 0);
 
 	/* add a V25 for protection */
-	MCFG_CPU_ADD("mcu", V25, 10000000)
-	MCFG_CPU_PROGRAM_MAP(v25_map)
-MACHINE_CONFIG_END
+	v25_device &mcu(V25(config, "mcu", 10000000));
+	mcu.set_addrmap(AS_PROGRAM, &segas32_v25_state::v25_map);
+}
 
 DEFINE_DEVICE_TYPE(SEGA_S32_V25_DEVICE, segas32_v25_state, "segas32_pcb_v25", "Sega System 32 V25 PCB")
 
@@ -2404,19 +2523,20 @@ segas32_v25_state::segas32_v25_state(const machine_config &mconfig, const char *
 
 
 
-MACHINE_CONFIG_START(segas32_upd7725_state::device_add_mconfig)
+void segas32_upd7725_state::device_add_mconfig(machine_config &config)
+{
 	segas32_analog_state::device_add_mconfig(config);
 
-	/* add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the master pcb's rom board where an fd1149 could go */
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000) // TODO: Find real clock speed for the upd7725; this is a canned oscillator on the 837-8341 pcb
-	MCFG_CPU_PROGRAM_MAP(upd7725_prg_map)
-	MCFG_CPU_DATA_MAP(upd7725_data_map)
-	MCFG_DEVICE_DISABLE() // TODO: disable for now, needs DMA pins and interrupts implemented in upd7725 core
+	/* add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the master pcb's ROM board where an fd1149 could go */
+	upd7725_device &dsp(UPD7725(config, "dsp", 8000000)); // TODO: Find real clock speed for the upd7725; this is a canned oscillator on the 837-8341 pcb
+	dsp.set_addrmap(AS_PROGRAM, &segas32_upd7725_state::upd7725_prg_map);
+	dsp.set_addrmap(AS_DATA, &segas32_upd7725_state::upd7725_data_map);
+	dsp.set_disable(); // TODO: disable for now, needs DMA pins and interrupts implemented in upd7725 core
 	// TODO: find /INT source for upd7725
 	// TODO: figure out how the p0 and p1 lines from the upd7725 affect the mainboard; do they select one of four (or 8) latches to/from the mainboard?
 	// TODO: trace out the 837-8341 pcb
 	// See HLE of this dsp in /src/mame/machine/segas32.cpp : arescue_dsp_r and arescue_dsp_w
-MACHINE_CONFIG_END
+}
 
 DEFINE_DEVICE_TYPE(SEGA_S32_UPD7725_DEVICE, segas32_upd7725_state, "segas32_pcb_upd7725", "Sega System 32 uPD7725 PCB")
 
@@ -2431,13 +2551,13 @@ segas32_upd7725_state::segas32_upd7725_state(const machine_config &mconfig, cons
 WRITE8_MEMBER(segas32_cd_state::lamps1_w)
 {
 	for (int i = 0; i < 8; i++)
-		machine().output().set_lamp_value(i, BIT(data, i));
+		m_lamps[i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(segas32_cd_state::lamps2_w)
 {
 	for (int i = 0; i < 8; i++)
-		machine().output().set_lamp_value(8 + i, BIT(data, i));
+		m_lamps[8 + i] = BIT(data, i);
 }
 
 WRITE_LINE_MEMBER(segas32_cd_state::scsi_irq_w)
@@ -2466,112 +2586,115 @@ void segas32_state::system32_cd_map(address_map &map)
 void segas32_cd_state::cdrom_config(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE( 0, "^^^^lspeaker", 0.30 )
-	MCFG_SOUND_ROUTE( 1, "^^^^rspeaker", 0.30 )
+	MCFG_SOUND_ROUTE( 0, "^^lspeaker", 0.30 )
+	MCFG_SOUND_ROUTE( 1, "^^rspeaker", 0.30 )
 }
 
-MACHINE_CONFIG_START(segas32_cd_state::device_add_mconfig)
+void segas32_cd_state::device_add_mconfig(machine_config &config)
+{
 	segas32_state::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(system32_cd_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_cd_state::system32_cd_map);
 
-	MCFG_DEVICE_ADD("mb89352", MB89352A, 8000000)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_MB89352A_IRQ_CB(WRITELINE(segas32_cd_state, scsi_irq_w))
-	MCFG_MB89352A_DRQ_CB(WRITELINE(segas32_cd_state, scsi_drq_w))
+	mb89352_device &scsictrl(MB89352A(config, "mb89352", 8000000));
+	scsictrl.set_scsi_port("scsi");
+	scsictrl.irq_cb().set(FUNC(segas32_cd_state::scsi_irq_w));
+	scsictrl.drq_cb().set(FUNC(segas32_cd_state::scsi_drq_w));
 
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_0)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
+	scsi.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
+	scsi.slot(1).set_option_machine_config("cdrom", cdrom_config);
 
-	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
-	MCFG_CXD1095_OUT_PORTA_CB(WRITE8(segas32_cd_state, lamps1_w))
-	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(segas32_cd_state, lamps2_w))
-	MCFG_CXD1095_IN_PORTD_CB(CONSTANT(0xff)) // Ports C-E used for IEEE-488 printer interface
-MACHINE_CONFIG_END
+	cxd1095_device &cxdio(CXD1095(config, "cxdio", 0));
+	cxdio.out_porta_cb().set(FUNC(segas32_cd_state::lamps1_w));
+	cxdio.out_portb_cb().set(FUNC(segas32_cd_state::lamps2_w));
+	cxdio.in_portd_cb().set_constant(0xff); // Ports C-E used for IEEE-488 printer interface
+}
 
 DEFINE_DEVICE_TYPE(SEGA_S32_CD_DEVICE, segas32_cd_state, "segas32_pcb_cd", "Sega System 32 CD PCB")
 
 segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segas32_state(mconfig, SEGA_S32_CD_DEVICE, tag, owner, clock)
+	, m_lamps(*this, "lamp%u", 0U)
 {
 }
 
 
 
-MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
+void sega_multi32_state::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V70, MULTI32_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(multi32_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas32_state,  start_of_vblank_int)
+	V70(config, m_maincpu, MULTI32_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sega_multi32_state::multi32_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas32_state::start_of_vblank_int));
 
-	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(multi32_sound_map)
-	MCFG_CPU_IO_MAP(multi32_sound_portmap)
+	Z80(config, m_soundcpu, MASTER_CLOCK/4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &sega_multi32_state::multi32_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &sega_multi32_state::multi32_sound_portmap);
 
-	MCFG_DEVICE_ADD("io_chip_0", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1_A"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2_A"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("PORTC_A"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segas32_state, misc_output_0_w))
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE12_A"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("SERVICE34_A"))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(segas32_state, sw2_output_0_w))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(segas32_state, tilebank_external_w))
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(segas32_state, display_enable_0_w))
-	MCFG_315_5296_OUT_CNT2_CB(INPUTLINE("soundcpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	sega_315_5296_device &io_chip_0(SEGA_315_5296(config, "io_chip_0", 0)); // unknown clock
+	io_chip_0.in_pa_callback().set_ioport("P1_A");
+	io_chip_0.in_pb_callback().set_ioport("P2_A");
+	io_chip_0.in_pc_callback().set_ioport("PORTC_A");
+	io_chip_0.out_pd_callback().set(FUNC(segas32_state::misc_output_0_w));
+	io_chip_0.in_pe_callback().set_ioport("SERVICE12_A");
+	io_chip_0.in_pf_callback().set_ioport("SERVICE34_A");
+	io_chip_0.out_pg_callback().set(FUNC(segas32_state::sw2_output_0_w));
+	io_chip_0.out_ph_callback().set(FUNC(segas32_state::tilebank_external_w));
+	io_chip_0.out_cnt1_callback().set(FUNC(segas32_state::display_enable_w<0>));
+	io_chip_0.out_cnt2_callback().set_inputline(m_soundcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_DEVICE_ADD("io_chip_1", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1_B"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2_B"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("PORTC_B"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segas32_state, misc_output_1_w))
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE12_B"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("SERVICE34_B"))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(segas32_state, sw2_output_1_w))
-	MCFG_315_5296_OUT_PORTH_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(6)
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(segas32_state, display_enable_1_w))
+	sega_315_5296_device &io_chip_1(SEGA_315_5296(config, "io_chip_1", 0)); // unknown clock
+	io_chip_1.in_pa_callback().set_ioport("P1_B");
+	io_chip_1.in_pb_callback().set_ioport("P2_B");
+	io_chip_1.in_pc_callback().set_ioport("PORTC_B");
+	io_chip_1.out_pd_callback().set(FUNC(segas32_state::misc_output_1_w));
+	io_chip_1.in_pe_callback().set_ioport("SERVICE12_B");
+	io_chip_1.in_pf_callback().set_ioport("SERVICE34_B");
+	io_chip_1.out_pg_callback().set(FUNC(segas32_state::sw2_output_1_w));
+	io_chip_1.out_ph_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(7);
+	io_chip_1.out_ph_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(5);
+	io_chip_1.out_ph_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(6);
+	io_chip_1.out_cnt1_callback().set(FUNC(segas32_state::display_enable_w<1>));
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
-	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
+	TIMER(config, "v60_irq0").configure_generic(FUNC(segas32_state::signal_v60_irq_callback));
+	TIMER(config, "v60_irq1").configure_generic(FUNC(segas32_state::signal_v60_irq_callback));
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segas32)
-	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas32);
+	PALETTE(config, m_palette).set_entries(0x8000);
+	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(52*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segas32_state, screen_update_multi32_left)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(52*8, 262);
+	m_screen->set_visarea(0*8, 52*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(segas32_state::screen_update_multi32_left));
 
-	MCFG_SCREEN_ADD("screen2", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(52*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segas32_state, screen_update_multi32_right)
+	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen2.set_refresh_hz(60);
+	screen2.set_size(52*8, 262);
+	screen2.set_visarea(0*8, 52*8-1, 0*8, 28*8-1);
+	screen2.set_screen_update(FUNC(segas32_state::screen_update_multi32_right));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM3438, MASTER_CLOCK/4)
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(segas32_state, ym3438_irq_handler))
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.40)
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", MASTER_CLOCK/4));
+	ymsnd.irq_handler().set(FUNC(segas32_state::ym3438_irq_handler));
+	ymsnd.add_route(1, "lspeaker", 0.40);
+	ymsnd.add_route(0, "rspeaker", 0.40);
 
-	MCFG_SOUND_ADD("sega", MULTIPCM, MASTER_CLOCK/4)
-	MCFG_DEVICE_ADDRESS_MAP(0, multipcm_map)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+	MULTIPCM(config, m_multipcm, MASTER_CLOCK/4);
+	m_multipcm->set_addrmap(0, &sega_multi32_state::multipcm_map);
+	m_multipcm->add_route(1, "lspeaker", 1.0);
+	m_multipcm->add_route(0, "rspeaker", 1.0);
 
-	MCFG_S32COMM_ADD("s32comm")
-MACHINE_CONFIG_END
+	S32COMM(config, m_s32comm, 0);
+}
 
 
 DEFINE_DEVICE_TYPE(SEGA_MULTI32_DEVICE, sega_multi32_state, "segas32_pcb_multi", "Sega Multi 32")
@@ -2593,21 +2716,21 @@ void sega_multi32_analog_state::multi32_analog_map(address_map &map)
 	map.global_mask(0xffffff);
 	multi32_map(map);
 	map(0xc00050, 0xc00057).mirror(0x07ff80).rw("adc", FUNC(msm6253_device::d7_r), FUNC(msm6253_device::address_w)).umask32(0x00ff00ff);
-	map(0xc00060, 0xc00060).mirror(0x07ff80).w(this, FUNC(sega_multi32_analog_state::analog_bank_w));
+	map(0xc00060, 0xc00060).mirror(0x07ff80).w(FUNC(sega_multi32_analog_state::analog_bank_w));
 }
 
-MACHINE_CONFIG_START(sega_multi32_analog_state::device_add_mconfig)
+void sega_multi32_analog_state::device_add_mconfig(machine_config &config)
+{
 	sega_multi32_state::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(multi32_analog_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sega_multi32_analog_state::multi32_analog_map);
 
-	MCFG_DEVICE_ADD("adc", MSM6253, 0)
-	MCFG_MSM6253_IN0_ANALOG_PORT("ANALOG1")
-	MCFG_MSM6253_IN1_ANALOG_PORT("ANALOG2")
-	MCFG_MSM6253_IN2_ANALOG_READ(sega_multi32_analog_state, in2_analog_read)
-	MCFG_MSM6253_IN3_ANALOG_READ(sega_multi32_analog_state, in3_analog_read)
-MACHINE_CONFIG_END
+	msm6253_device &adc(MSM6253(config, "adc", 0));
+	adc.set_input_tag<0>("ANALOG1");
+	adc.set_input_tag<1>("ANALOG2");
+	adc.set_input_cb<2>(FUNC(sega_multi32_analog_state::in2_analog_read));
+	adc.set_input_cb<3>(FUNC(sega_multi32_analog_state::in3_analog_read));
+}
 
 ioport_value sega_multi32_analog_state::in2_analog_read()
 {
@@ -2641,17 +2764,17 @@ void segas32_state::multi32_6player_map(address_map &map)
 	map(0xc00060, 0xc00067).mirror(0x07ff80).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0x00ff00ff);
 }
 
-MACHINE_CONFIG_START(sega_multi32_6player_state::device_add_mconfig)
+void sega_multi32_6player_state::device_add_mconfig(machine_config &config)
+{
 	sega_multi32_state::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(multi32_6player_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sega_multi32_6player_state::multi32_6player_map);
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("EXTRA1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("EXTRA2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA3"))
-MACHINE_CONFIG_END
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("EXTRA1");
+	ppi.in_pb_callback().set_ioport("EXTRA2");
+	ppi.in_pc_callback().set_ioport("EXTRA3");
+}
 
 DEFINE_DEVICE_TYPE(SEGA_MULTI32_6PLAYER_DEVICE, sega_multi32_6player_state, "segas32_pcb_multi_6player", "Sega Multi 32 6-player PCB")
 
@@ -2670,40 +2793,6 @@ public:
 		, m_slavepcb(*this, "slavepcb")
 	{ }
 
-	required_device<segas32_state> m_mainpcb;
-	optional_device<segas32_state> m_slavepcb;
-
-	DECLARE_DRIVER_INIT(titlef);
-	DECLARE_DRIVER_INIT(slipstrm);
-	DECLARE_DRIVER_INIT(radm);
-	DECLARE_DRIVER_INIT(holo);
-	DECLARE_DRIVER_INIT(svf);
-	DECLARE_DRIVER_INIT(jleague);
-	DECLARE_DRIVER_INIT(arescue);
-	DECLARE_DRIVER_INIT(jpark);
-	DECLARE_DRIVER_INIT(ga2);
-	DECLARE_DRIVER_INIT(scross);
-	DECLARE_DRIVER_INIT(spidman);
-	DECLARE_DRIVER_INIT(sonicp);
-	DECLARE_DRIVER_INIT(f1en);
-	DECLARE_DRIVER_INIT(dbzvrvs);
-	DECLARE_DRIVER_INIT(brival);
-	DECLARE_DRIVER_INIT(harddunk);
-	DECLARE_DRIVER_INIT(arabfgt);
-	DECLARE_DRIVER_INIT(sonic);
-	DECLARE_DRIVER_INIT(alien3);
-	DECLARE_DRIVER_INIT(darkedge);
-	DECLARE_DRIVER_INIT(radr);
-	DECLARE_DRIVER_INIT(f1lap);
-	DECLARE_DRIVER_INIT(orunners);
-
-	std::unique_ptr<uint16_t[]> m_dual_pcb_comms;
-	DECLARE_WRITE16_MEMBER(dual_pcb_comms_w);
-	DECLARE_READ16_MEMBER(dual_pcb_comms_r);
-	DECLARE_READ16_MEMBER(dual_pcb_masterslave);
-	DECLARE_READ16_MEMBER(dual_pcb_slave);
-
-
 	void sega_multi32(machine_config &config);
 	void sega_system32(machine_config &config);
 	void sega_multi32_analog(machine_config &config);
@@ -2716,65 +2805,109 @@ public:
 	void sega_system32_arf(machine_config &config);
 	void sega_system32_analog(machine_config &config);
 	void sega_system32_4p(machine_config &config);
+
+	void init_titlef();
+	void init_slipstrm();
+	void init_radm();
+	void init_holo();
+	void init_svf();
+	void init_jleague();
+	void init_arescue();
+	void init_jpark();
+	void init_ga2();
+	void init_scross();
+	void init_spidman();
+	void init_sonicp();
+	void init_f1en();
+	void init_dbzvrvs();
+	void init_brival();
+	void init_harddunk();
+	void init_arabfgt();
+	void init_sonic();
+	void init_alien3();
+	void init_darkedge();
+	void init_radr();
+	void init_f1lap();
+	void init_orunners();
+
+private:
+	required_device<segas32_state> m_mainpcb;
+	optional_device<segas32_state> m_slavepcb;
+
+	std::unique_ptr<uint16_t[]> m_dual_pcb_comms;
+	DECLARE_WRITE16_MEMBER(dual_pcb_comms_w);
+	DECLARE_READ16_MEMBER(dual_pcb_comms_r);
+	DECLARE_READ16_MEMBER(dual_pcb_masterslave);
+	DECLARE_READ16_MEMBER(dual_pcb_slave);
 };
 
 
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_REGULAR_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32(machine_config &config)
+{
+	SEGA_S32_REGULAR_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_analog)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_ANALOG_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_analog(machine_config &config)
+{
+	SEGA_S32_ANALOG_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_track)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_TRACKBALL_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_track(machine_config &config)
+{
+	SEGA_S32_TRACKBALL_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_4p)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_4PLAYER_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_4p(machine_config &config)
+{
+	SEGA_S32_4PLAYER_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_cd)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_CD_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_cd(machine_config &config)
+{
+	SEGA_S32_CD_DEVICE(config, "mainpcb", 0);
+}
 
 // for f1en where there is a sub-board containing shared ram sitting underneath the ROM board bridging 2 PCBs (not a network link)
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_dual_direct)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_ANALOG_DEVICE, 0)
-	MCFG_DEVICE_ADD("slavepcb", SEGA_S32_ANALOG_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_dual_direct(machine_config &config)
+{
+	SEGA_S32_ANALOG_DEVICE(config, "mainpcb", 0);
+	SEGA_S32_ANALOG_DEVICE(config, "slavepcb", 0);
+}
 
 // air rescue is like f1en above but also has the 837-8341 DSP daughterboard on the mainpcb side only
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_dual_direct_upd7725)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_UPD7725_DEVICE, 0)
-	MCFG_DEVICE_ADD("slavepcb", SEGA_S32_ANALOG_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_dual_direct_upd7725(machine_config &config)
+{
+	SEGA_S32_UPD7725_DEVICE(config, "mainpcb", 0);
+	SEGA_S32_ANALOG_DEVICE(config, "slavepcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_ga2)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_V25_DEVICE, 0)
-	MCFG_CPU_MODIFY("mainpcb:mcu")
-	MCFG_V25_CONFIG(segas32_v25_state::ga2_opcode_table)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_ga2(machine_config &config)
+{
+	SEGA_S32_V25_DEVICE(config, "mainpcb", 0);
+	subdevice<v25_common_device>("mainpcb:mcu")->set_decryption_table(segas32_v25_state::ga2_opcode_table);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_arf)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_V25_DEVICE, 0)
-	MCFG_CPU_MODIFY("mainpcb:mcu")
-	MCFG_V25_CONFIG(segas32_v25_state::arf_opcode_table)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_arf(machine_config &config)
+{
+	SEGA_S32_V25_DEVICE(config, "mainpcb", 0);
+	subdevice<v25_common_device>("mainpcb:mcu")->set_decryption_table(segas32_v25_state::arf_opcode_table);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_multi32)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_MULTI32_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_multi32(machine_config &config)
+{
+	SEGA_MULTI32_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_multi32_analog)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_MULTI32_ANALOG_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_multi32_analog(machine_config &config)
+{
+	SEGA_MULTI32_ANALOG_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_multi32_6p)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_MULTI32_6PLAYER_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_multi32_6p(machine_config &config)
+{
+	SEGA_MULTI32_6PLAYER_DEVICE(config, "mainpcb", 0);
+}
 
 /*************************************
  *
@@ -2846,15 +2979,16 @@ MACHINE_CONFIG_END
 /**************************************************************************************************************************
  **************************************************************************************************************************
  **************************************************************************************************************************
-    Air Rescue (US)
+    Air Rescue (Export)
 
     Sega Game ID codes:
        Game BD: 833-8508-01 AIR RESCUE (US)
                 833-8508-02 AIR RESCUE (Export)
                 833-8508-03 AIR RESCUE (Japan)
-    Rom PCB No: 834-8526-01 (US)
+    ROM PCB No: 834-8526-01 (US)
                 834-8526-02 (Export)
                 834-8526-03 (Japan)
+                834-8526-05 (Export)
    Link PCB No: 837-8223-01
      A/D BD No: 837-7536 (one for each mainboard)
      DSP BD No: 837-8341
@@ -2866,7 +3000,7 @@ MACHINE_CONFIG_END
     This provides a direct connection between the PCBs (NOT a network link) so they effectively operate as a single boardset
     sharing RAM (we should emulate it as such)
 
-    Link PCB is a single sparsely populated romless PCB but contains
+    Link PCB is a single sparsely populated ROMless PCB but contains
 
     Left side
     1x MB8431-12LP (IC2)
@@ -2881,10 +3015,86 @@ MACHINE_CONFIG_END
 
     (todo, full layout)
 
-    The left Rom PCB (master?) contains a sub-board on the ROM board with the math DSP, the right Rom PCB does not have this.
+    The left ROM PCB (master?) contains a sub-board on the ROM board with the math DSP, the right ROM PCB does not have this.
 
 */
 ROM_START( arescue )
+	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
+	ROM_LOAD_x4( "epr-14542.ic13",     0x000000, 0x020000, CRC(6d39fc18) SHA1(7fbddfb2605a020331e1e81a7bc4466196df17bd) ) /* 834-8526-05 (Export) */
+	ROM_LOAD_x4( "epr-14541.ic6",      0x080000, 0x020000, CRC(5c3f2ec5) SHA1(d11a24d12917e4c5ac9010ca6db0f1ac9d44475a) )
+	ROM_LOAD16_BYTE( "epr-14509.ic14", 0x100000, 0x080000, CRC(daa5a356) SHA1(ca87242c59de5ab5f9406635bee758a855fe20bc) )
+	ROM_LOAD16_BYTE( "epr-14508.ic7",  0x100001, 0x080000, CRC(6702c14d) SHA1(dc9324f16a3e3238f5ccdade9451d6823a50b563) )
+
+	ROM_REGION( 0x400000, "mainpcb:soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD_x4( "epr-14513.ic35", 0x000000, 0x40000, CRC(f9a884cd) SHA1(73010fff5e0257355e08e78838c74af86ed364ce) )
+	ROM_LOAD_x2( "mpr-14512.ic31", 0x100000, 0x80000, CRC(9da48051) SHA1(2d41148d089a75362ed0fde577eca919213ac666) )
+	ROM_LOAD_x2( "mpr-14511.ic26", 0x200000, 0x80000, CRC(074c53cc) SHA1(9c89843bbe8058123c25b7f8f86de754ddbca2bb) )
+	ROM_LOAD_x2( "mpr-14510.ic22", 0x300000, 0x80000, CRC(5ea6d52d) SHA1(d424082468940bb91ab424ac7812839792ed4e88) )
+
+	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_LOAD32_BYTE( "mpr-14496.ic25", 0x000003, 0x080000, CRC(737da16c) SHA1(52247d9bc2924e90d040bef484a541b1f4a9026f) )
+	ROM_LOAD32_BYTE( "mpr-14497.ic29", 0x000001, 0x080000, CRC(ebd7ed17) SHA1(2307dc28501965432d2ff55a21698efdce014401) )
+	ROM_LOAD32_BYTE( "mpr-14498.ic34", 0x000002, 0x080000, CRC(d4a764bd) SHA1(8434a9225ed1e01e8b1cfe169268e42cd3ce6ee3) )
+	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
+
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
+	ROMX_LOAD( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
+
+	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
+	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
+	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+
+	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
+	ROM_LOAD_x4( "epr-14542.ic13",     0x000000, 0x020000, CRC(6d39fc18) SHA1(7fbddfb2605a020331e1e81a7bc4466196df17bd) ) /* 834-8526-05 (Export) */
+	ROM_LOAD_x4( "epr-14541.ic6",      0x080000, 0x020000, CRC(5c3f2ec5) SHA1(d11a24d12917e4c5ac9010ca6db0f1ac9d44475a) )
+	ROM_LOAD16_BYTE( "epr-14509.ic14", 0x100000, 0x080000, CRC(daa5a356) SHA1(ca87242c59de5ab5f9406635bee758a855fe20bc) )
+	ROM_LOAD16_BYTE( "epr-14508.ic7",  0x100001, 0x080000, CRC(6702c14d) SHA1(dc9324f16a3e3238f5ccdade9451d6823a50b563) )
+
+	ROM_REGION( 0x400000, "slavepcb:soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD_x4( "epr-14513.ic35", 0x000000, 0x40000, CRC(f9a884cd) SHA1(73010fff5e0257355e08e78838c74af86ed364ce) )
+	ROM_LOAD_x2( "mpr-14512.ic31", 0x100000, 0x80000, CRC(9da48051) SHA1(2d41148d089a75362ed0fde577eca919213ac666) )
+	ROM_LOAD_x2( "mpr-14511.ic26", 0x200000, 0x80000, CRC(074c53cc) SHA1(9c89843bbe8058123c25b7f8f86de754ddbca2bb) )
+	ROM_LOAD_x2( "mpr-14510.ic22", 0x300000, 0x80000, CRC(5ea6d52d) SHA1(d424082468940bb91ab424ac7812839792ed4e88) )
+
+	ROM_REGION( 0x200000, "slavepcb:gfx1", 0 ) /* tiles */
+	ROM_LOAD32_BYTE( "mpr-14496.ic25", 0x000003, 0x080000, CRC(737da16c) SHA1(52247d9bc2924e90d040bef484a541b1f4a9026f) )
+	ROM_LOAD32_BYTE( "mpr-14497.ic29", 0x000001, 0x080000, CRC(ebd7ed17) SHA1(2307dc28501965432d2ff55a21698efdce014401) )
+	ROM_LOAD32_BYTE( "mpr-14498.ic34", 0x000002, 0x080000, CRC(d4a764bd) SHA1(8434a9225ed1e01e8b1cfe169268e42cd3ce6ee3) )
+	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
+
+	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
+	ROMX_LOAD( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
+ROM_END
+
+/**************************************************************************************************************************
+    Air Rescue (US)
+
+    Sega Game ID codes:
+       Game BD: 833-8508-01 AIR RESCUE
+    ROM PCB No: 834-8526-01
+   Link PCB No: 837-8223-01
+     A/D BD No: 837-7536 (one for each mainboard)
+     DSP BD No: 837-8341
+
+    requires 2 linked system32 pcbs
+    requires additional math DSP to be emulated
+*/
+ROM_START( arescueu )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14540.ic13",     0x000000, 0x020000, CRC(c2b4e5d0) SHA1(69f8ddded5095df9012663d0ded61b78f1692a8d) )
 	ROM_LOAD_x4( "epr-14539.ic6",      0x080000, 0x020000, CRC(1a1b5532) SHA1(f3651470222036703b7ecedb6e91e4cdb3d20df7) )
@@ -2903,7 +3113,7 @@ ROM_START( arescue )
 	ROM_LOAD32_BYTE( "mpr-14498.ic34", 0x000002, 0x080000, CRC(d4a764bd) SHA1(8434a9225ed1e01e8b1cfe169268e42cd3ce6ee3) )
 	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
 
-	ROM_REGION32_BE( 0x800000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) , ROM_SKIP(7) )
@@ -2936,7 +3146,7 @@ ROM_START( arescue )
 	ROM_LOAD32_BYTE( "mpr-14498.ic34", 0x000002, 0x080000, CRC(d4a764bd) SHA1(8434a9225ed1e01e8b1cfe169268e42cd3ce6ee3) )
 	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
 
-	ROM_REGION32_BE( 0x800000, "slavepcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) , ROM_SKIP(7) )
@@ -2945,7 +3155,6 @@ ROM_START( arescue )
 	ROMX_LOAD( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
-
 ROM_END
 
 /**************************************************************************************************************************
@@ -2953,7 +3162,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 833-8508-03 AIR RESCUE
-    Rom PCB No: 834-8526-03
+    ROM PCB No: 834-8526-03
    Link PCB No: 837-8223-01
      A/D BD No: 837-7536 (one for each mainboard)
      DSP BD No: 837-8341
@@ -2980,7 +3189,7 @@ ROM_START( arescuej )
 	ROM_LOAD32_BYTE( "mpr-14498.ic34", 0x000002, 0x080000, CRC(d4a764bd) SHA1(8434a9225ed1e01e8b1cfe169268e42cd3ce6ee3) )
 	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
 
-	ROM_REGION32_BE( 0x800000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) , ROM_SKIP(7) )
@@ -3013,7 +3222,7 @@ ROM_START( arescuej )
 	ROM_LOAD32_BYTE( "mpr-14498.ic34", 0x000002, 0x080000, CRC(d4a764bd) SHA1(8434a9225ed1e01e8b1cfe169268e42cd3ce6ee3) )
 	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
 
-	ROM_REGION32_BE( 0x800000, "slavepcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) , ROM_SKIP(7) )
@@ -3022,7 +3231,6 @@ ROM_START( arescuej )
 	ROMX_LOAD( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
-
 ROM_END
 
 
@@ -3034,7 +3242,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 834-9877-02
-    Rom PCB No: 837-9878-02
+    ROM PCB No: 837-9878-02
       Main PCB: 837-7428-03 (SYSTEM 32 COM)
      A/D BD NO. 837-7536
 */
@@ -3055,7 +3263,7 @@ ROM_START( alien3 )
 	ROM_LOAD16_BYTE( "mpr-15863.ic14", 0x000000, 0x200000, CRC(9d36b645) SHA1(2977047780b615b64c3b4aec78fef0643d40490e) )
 	ROM_LOAD16_BYTE( "mpr-15862.ic5",  0x000001, 0x200000, CRC(9e277d25) SHA1(9f191484a42391268306a8d2d95c340ce8b2d6cd) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-15864.ic32", 0x000000, 0x200000, CRC(58207157) SHA1(d1b0c7edac8b89b1322398d4cd3a976a88bc0b56) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15866.ic30", 0x000002, 0x200000, CRC(9c53732c) SHA1(9aa5103cc10b4927c16e0cf102b64a15dd038756) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15868.ic28", 0x000004, 0x200000, CRC(62d556e8) SHA1(d70cab0881784a3d4dd06d0c99587ca6054c2dc4) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3075,7 +3283,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 834-9877-01
-    Rom PCB No: 837-9878-01
+    ROM PCB No: 837-9878-01
       Main PCB: 837-7428-03 (SYSTEM 32 COM)
      A/D BD NO. 837-7536
 */
@@ -3096,7 +3304,7 @@ ROM_START( alien3u )
 	ROM_LOAD16_BYTE( "mpr-15863.ic14", 0x000000, 0x200000, CRC(9d36b645) SHA1(2977047780b615b64c3b4aec78fef0643d40490e) )
 	ROM_LOAD16_BYTE( "mpr-15862.ic5",  0x000001, 0x200000, CRC(9e277d25) SHA1(9f191484a42391268306a8d2d95c340ce8b2d6cd) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-15864.ic32", 0x000000, 0x200000, CRC(58207157) SHA1(d1b0c7edac8b89b1322398d4cd3a976a88bc0b56) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15866.ic30", 0x000002, 0x200000, CRC(9c53732c) SHA1(9aa5103cc10b4927c16e0cf102b64a15dd038756) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15868.ic28", 0x000004, 0x200000, CRC(62d556e8) SHA1(d70cab0881784a3d4dd06d0c99587ca6054c2dc4) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3116,7 +3324,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 834-9877
-    Rom PCB No: 837-9878
+    ROM PCB No: 837-9878
       Main PCB: 837-7428-03 (SYSTEM 32 COM)
      A/D BD NO. 837-7536
 */
@@ -3137,7 +3345,7 @@ ROM_START( alien3j )
 	ROM_LOAD16_BYTE( "mpr-15863.ic14", 0x000000, 0x200000, CRC(9d36b645) SHA1(2977047780b615b64c3b4aec78fef0643d40490e) )
 	ROM_LOAD16_BYTE( "mpr-15862.ic5",  0x000001, 0x200000, CRC(9e277d25) SHA1(9f191484a42391268306a8d2d95c340ce8b2d6cd) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-15864.ic32", 0x000000, 0x200000, CRC(58207157) SHA1(d1b0c7edac8b89b1322398d4cd3a976a88bc0b56) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15866.ic30", 0x000002, 0x200000, CRC(9c53732c) SHA1(9aa5103cc10b4927c16e0cf102b64a15dd038756) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15868.ic28", 0x000004, 0x200000, CRC(62d556e8) SHA1(d70cab0881784a3d4dd06d0c99587ca6054c2dc4) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3159,7 +3367,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 833-8646-05 ARABIAN FIGHT
-    Rom PCB No: 833-8647-02
+    ROM PCB No: 833-8647-02
    V25 sub PCB: 834-8529-01
      A/D BD NO. 837-7968
 */
@@ -3182,7 +3390,7 @@ ROM_START( arabfgt )
 	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(94f1cf10) SHA1(34ec86487bcb6726c025149c319f00a854eb7a1d) )
 	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(010656f3) SHA1(31619c022cba4f250ce174f186d3e34444f60faf) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14600f.ic32", 0x000000, 0x200000, CRC(e860988a) SHA1(328581877c0890519c854f75f0976b0e9c4560f8) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-14602.ic30",  0x000002, 0x200000, CRC(64524e4d) SHA1(86246185ab5ab638a73991c9e3aeb07c6d51be4f) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-14604.ic28",  0x000004, 0x200000, CRC(5f8d5167) SHA1(1b08495e5a4cc2530c2895e47abd0e0b75496c68) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3216,7 +3424,7 @@ ROM_START( arabfgtu )
 	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(94f1cf10) SHA1(34ec86487bcb6726c025149c319f00a854eb7a1d) )
 	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(010656f3) SHA1(31619c022cba4f250ce174f186d3e34444f60faf) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14600f.ic32", 0x000000, 0x200000, CRC(e860988a) SHA1(328581877c0890519c854f75f0976b0e9c4560f8) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-14602.ic30",  0x000002, 0x200000, CRC(64524e4d) SHA1(86246185ab5ab638a73991c9e3aeb07c6d51be4f) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-14604.ic28",  0x000004, 0x200000, CRC(5f8d5167) SHA1(1b08495e5a4cc2530c2895e47abd0e0b75496c68) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3250,7 +3458,7 @@ ROM_START( arabfgtj )
 	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(94f1cf10) SHA1(34ec86487bcb6726c025149c319f00a854eb7a1d) )
 	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(010656f3) SHA1(31619c022cba4f250ce174f186d3e34444f60faf) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14600f.ic32", 0x000000, 0x200000, CRC(e860988a) SHA1(328581877c0890519c854f75f0976b0e9c4560f8) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-14602.ic30",  0x000002, 0x200000, CRC(64524e4d) SHA1(86246185ab5ab638a73991c9e3aeb07c6d51be4f) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-14604.ic28",  0x000004, 0x200000, CRC(5f8d5167) SHA1(1b08495e5a4cc2530c2895e47abd0e0b75496c68) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3284,7 +3492,7 @@ ROM_START( brival )
 	ROM_LOAD16_BYTE( "mpr-15629.ic14", 0x000000, 0x200000, CRC(2c8dd96d) SHA1(4a42a30485c19eb4f4a9d518a3dff3ae11911d01) )
 	ROM_LOAD16_BYTE( "mpr-15628.ic5",  0x000001, 0x200000, CRC(58d4ca40) SHA1(b1633acc803bba7e8283a9663b49abeda662a74d) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-15637.ic32", 0x000000, 0x200000, CRC(b6cf2f05) SHA1(a308d40ce5165e03fccf7fcd615ee111f7840fdc) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15635.ic30", 0x000002, 0x200000, CRC(70f2eb2b) SHA1(9868c8b0dd8ce810a0e32f51e702eee7e1c9a967) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15633.ic28", 0x000004, 0x200000, CRC(005dfed5) SHA1(f555620d75d3886a890307be9df9c0879bcda695) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3311,15 +3519,15 @@ ROM_START( brivalj )
 	ROM_LOAD( "mpr-15626.ic34",    0x200000, 0x100000, CRC(83306d1e) SHA1(feb08902b51c0013d9417832cdf198e36cdfc28c) )
 	ROM_LOAD( "mpr-15625.ic24",    0x300000, 0x100000, CRC(3ce82932) SHA1(f2107bc2591f46a51c9f0d706933b1ae69db91f9) )
 
-	/* the 10 roms below may be bad dumps ... mp14598 / 99 have corrupt tiles when compared to the roms
+	/* the 10 ROMs below may be bad dumps ... mp14598 / 99 have corrupt tiles when compared to the ROMs
 	   in the parent set, but Sega did change the part numbers so they might be correct, the others
 	   are suspicious, the changes are very similar but the part numbers haven't changed.  We really
 	   need a 3rd board to verify */
 	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
-	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(1de17e83) SHA1(04ee14b863f93b42a5bd1b6da71cff54ef11d4b7) ) /* Rom # matches tile rom # from Arabian Fight ??? */
-	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(cafb0de9) SHA1(94c6bfc7a4081dee373e9466a7b6f80889696087) ) /* Rom # matchrs tile rom # from Arabian Fight ??? */
+	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(1de17e83) SHA1(04ee14b863f93b42a5bd1b6da71cff54ef11d4b7) ) /* ROM # matches tile ROM # from Arabian Fight ??? */
+	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(cafb0de9) SHA1(94c6bfc7a4081dee373e9466a7b6f80889696087) ) /* ROM # matches tile ROM # from Arabian Fight ??? */
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "brivalj_mp15637.32", 0x000000, 0x200000, CRC(f39844c0) SHA1(c48dc8cccdd9d3756cf99a983c6a89ed43fcda22) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "brivalj_mp15635.30", 0x000002, 0x200000, CRC(263cf6d1) SHA1(7accd214502fd050edc0901c9929d6069dae4d00) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "brivalj_mp15633.28", 0x000004, 0x200000, CRC(44e9a88b) SHA1(57a930b9c3b83c889df54de60c90f847c2dcb614) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3351,7 +3559,7 @@ ROM_START( darkedge )
 	ROM_LOAD16_BYTE( "mpr-15248.ic14", 0x000000, 0x080000, CRC(185b308b) SHA1(a49c1b752b3c4355560e0cd712fb9a096140e37b) )
 	ROM_LOAD16_BYTE( "mpr-15247.ic5",  0x000001, 0x080000, CRC(be21548c) SHA1(2e315aadc2a0b781c3ee3fe71c75eb1f43514eff) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-15249.ic32", 0x000000, 0x200000, CRC(2b4371a8) SHA1(47f448bfbc068f2d0cdedd81bcd280823d5758a3) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15251.ic30", 0x000002, 0x200000, CRC(efe2d689) SHA1(af22153ea3afdde3732f881087c642170f91d745) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15253.ic28", 0x000004, 0x200000, CRC(8356ed01) SHA1(a28747813807361c7d0c722a94e194caea8bfab6) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3380,7 +3588,7 @@ ROM_START( darkedgej )
 	ROM_LOAD16_BYTE( "mpr-15248.ic14", 0x000000, 0x080000, CRC(185b308b) SHA1(a49c1b752b3c4355560e0cd712fb9a096140e37b) )
 	ROM_LOAD16_BYTE( "mpr-15247.ic5",  0x000001, 0x080000, CRC(be21548c) SHA1(2e315aadc2a0b781c3ee3fe71c75eb1f43514eff) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-15249.ic32", 0x000000, 0x200000, CRC(2b4371a8) SHA1(47f448bfbc068f2d0cdedd81bcd280823d5758a3) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15251.ic30", 0x000002, 0x200000, CRC(efe2d689) SHA1(af22153ea3afdde3732f881087c642170f91d745) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15253.ic28", 0x000004, 0x200000, CRC(8356ed01) SHA1(a28747813807361c7d0c722a94e194caea8bfab6) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3416,7 +3624,7 @@ ROM_START( dbzvrvs )
 	ROM_LOAD16_BYTE( "mpr-16545", 0x000000, 0x100000, CRC(51748bac) SHA1(b1cae16b62a8d29117c0adb140eb09c1092f6c37) )
 	ROM_LOAD16_BYTE( "mpr-16544", 0x000001, 0x100000, CRC(f6c93dfc) SHA1(a006cedb7d0151ccc8d22e6588b1c39e099da182) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-16546", 0x000000, 0x200000, CRC(96f4be31) SHA1(ce3281630180d91de7850e9b1062382817fe0b1d) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16548", 0x000002, 0x200000, CRC(00377f59) SHA1(cf0f808d7730f334c5ac80d3171fa457be9ac88e) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16550", 0x000004, 0x200000, CRC(168e8966) SHA1(a18ec30f1358b09bcde6d8d2dbe0a82bea3bdae9) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3459,7 +3667,7 @@ ROM_START( f1en )
 	ROM_LOAD32_BYTE( "mpr-14360", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
 	ROM_LOAD32_BYTE( "mpr-14359", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
 
-	ROM_REGION32_BE( 0x800000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14370", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14369", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14368", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) , ROM_SKIP(7) )
@@ -3486,7 +3694,7 @@ ROM_START( f1en )
 	ROM_LOAD32_BYTE( "mpr-14360", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
 	ROM_LOAD32_BYTE( "mpr-14359", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
 
-	ROM_REGION32_BE( 0x800000, "slavepcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14370", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14369", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14368", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) , ROM_SKIP(7) )
@@ -3527,7 +3735,7 @@ ROM_START( f1enu ) // ROM PCB number is 834-8439-04
 	ROM_LOAD32_BYTE( "mpr-14360", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
 	ROM_LOAD32_BYTE( "mpr-14359", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
 
-	ROM_REGION32_BE( 0x800000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14370", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14369", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14368", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) , ROM_SKIP(7) )
@@ -3554,7 +3762,7 @@ ROM_START( f1enu ) // ROM PCB number is 834-8439-04
 	ROM_LOAD32_BYTE( "mpr-14360", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
 	ROM_LOAD32_BYTE( "mpr-14359", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
 
-	ROM_REGION32_BE( 0x800000, "slavepcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14370", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14369", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14368", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) , ROM_SKIP(7) )
@@ -3594,7 +3802,7 @@ ROM_START( f1enj ) // ROM PCB number is 834-8439-04
 	ROM_LOAD32_BYTE( "mpr-14360", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
 	ROM_LOAD32_BYTE( "mpr-14359", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
 
-	ROM_REGION32_BE( 0x800000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14370", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14369", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14368", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) , ROM_SKIP(7) )
@@ -3621,7 +3829,7 @@ ROM_START( f1enj ) // ROM PCB number is 834-8439-04
 	ROM_LOAD32_BYTE( "mpr-14360", 0x000001, 0x040000, CRC(c5e8da79) SHA1(662a6c146fe3d0b8763d845379c06d0ee6ced1ed) )
 	ROM_LOAD32_BYTE( "mpr-14359", 0x000003, 0x040000, CRC(70305c68) SHA1(7a6a1bf7381eba8cc1c3897497b32ca63316972a) )
 
-	ROM_REGION32_BE( 0x800000, "slavepcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14370", 0x000000, 0x080000, CRC(fda78289) SHA1(3740affdcc738c50d07ff3e5b592bdf8a8b6be15) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14369", 0x000001, 0x080000, CRC(7765116d) SHA1(9493148aa84adc90143cf638265d4c55bfb43990) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14368", 0x000002, 0x080000, CRC(5744a30e) SHA1(98544fb234a8e93716e951d5414a490845e213c5) , ROM_SKIP(7) )
@@ -3638,6 +3846,9 @@ ROM_END
  **************************************************************************************************************************
     F1 Super Lap (Export)
     protected via FD1149 317-0210
+     GAME BD NO. 833-9407-02 F1 SUPER LAP
+         ROM BD. 834-9408-02
+      A/D BD NO. 837-7536
 */
 ROM_START( f1lap )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -3656,7 +3867,7 @@ ROM_START( f1lap )
 	ROM_LOAD16_BYTE( "mpr-15608.ic14", 0x000000, 0x200000, CRC(64462c69) SHA1(9501e83c52e3e16f73b94cef975b5a31b2ee5476) )
 	ROM_LOAD16_BYTE( "mpr-15609.ic5",  0x000001, 0x200000, CRC(d586e455) SHA1(aea190d31c590216eb19766ba749b1e9b710bdce) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-15600.ic32", 0x000000, 0x200000, CRC(d2698d23) SHA1(996fbcc1d0814e6f14fa7e4870ece077ecda54e6) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15602.ic30", 0x000002, 0x200000, CRC(1674764d) SHA1(bc39757a5d25df1a088f874ca2442854eb551e48) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15604.ic28", 0x000004, 0x200000, CRC(1552bbb9) SHA1(77edd3f9d8dec87fa0445d264309e6164eba9313) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3695,7 +3906,7 @@ ROM_START( f1lapj )
 	ROM_LOAD16_BYTE( "mpr-15608.ic14", 0x000000, 0x200000, CRC(64462c69) SHA1(9501e83c52e3e16f73b94cef975b5a31b2ee5476) )
 	ROM_LOAD16_BYTE( "mpr-15609.ic5",  0x000001, 0x200000, CRC(d586e455) SHA1(aea190d31c590216eb19766ba749b1e9b710bdce) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-15600.ic32", 0x000000, 0x200000, CRC(d2698d23) SHA1(996fbcc1d0814e6f14fa7e4870ece077ecda54e6) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15602.ic30", 0x000002, 0x200000, CRC(1674764d) SHA1(bc39757a5d25df1a088f874ca2442854eb551e48) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15604.ic28", 0x000004, 0x200000, CRC(1552bbb9) SHA1(77edd3f9d8dec87fa0445d264309e6164eba9313) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3736,7 +3947,7 @@ ROM_START( ga2 )
 	ROM_LOAD16_BYTE( "mpr-14948.ic14", 0x000000, 0x200000, CRC(75050d4a) SHA1(51d6bc9935abcf30af438e69c2cf4e09f57a803f) )
 	ROM_LOAD16_BYTE( "mpr-14947.ic5",  0x000001, 0x200000, CRC(b53e62f4) SHA1(5aa0f198e6eb070b77b0d180d30c0228a9bc691e) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14949.ic32", 0x000000, 0x200000, CRC(152c716c) SHA1(448d16ea036b66e886119c00af543dfa5e53fd84) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-14951.ic30", 0x000002, 0x200000, CRC(fdb1a534) SHA1(3126b595bf69bf9952fedf8f9c6743eb10489dc6) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-14953.ic28", 0x000004, 0x200000, CRC(33bd1c15) SHA1(4e16562e3357d4db54b20543073e8f1fd6f74b1f) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3752,7 +3963,7 @@ ROM_END
     protected via a custom V25 with encrypted code
     Sega Game ID codes:
      Game: 833-8932-02 GOLDEN AXE II AC USA
-Rom board: 833-8933-01
+ROM board: 833-8933-01
 Sub board: 834-8529-02
 
 */
@@ -3776,7 +3987,7 @@ ROM_START( ga2u )
 	ROM_LOAD16_BYTE( "mpr-14948.ic14", 0x000000, 0x200000, CRC(75050d4a) SHA1(51d6bc9935abcf30af438e69c2cf4e09f57a803f) )
 	ROM_LOAD16_BYTE( "mpr-14947.ic5",  0x000001, 0x200000, CRC(b53e62f4) SHA1(5aa0f198e6eb070b77b0d180d30c0228a9bc691e) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14949.ic32", 0x000000, 0x200000, CRC(152c716c) SHA1(448d16ea036b66e886119c00af543dfa5e53fd84) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-14951.ic30", 0x000002, 0x200000, CRC(fdb1a534) SHA1(3126b595bf69bf9952fedf8f9c6743eb10489dc6) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-14953.ic28", 0x000004, 0x200000, CRC(33bd1c15) SHA1(4e16562e3357d4db54b20543073e8f1fd6f74b1f) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3811,7 +4022,7 @@ ROM_START( ga2j )
 	ROM_LOAD16_BYTE( "mpr-14948.ic14", 0x000000, 0x200000, CRC(75050d4a) SHA1(51d6bc9935abcf30af438e69c2cf4e09f57a803f) )
 	ROM_LOAD16_BYTE( "mpr-14947.ic5",  0x000001, 0x200000, CRC(b53e62f4) SHA1(5aa0f198e6eb070b77b0d180d30c0228a9bc691e) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14949.ic32", 0x000000, 0x200000, CRC(152c716c) SHA1(448d16ea036b66e886119c00af543dfa5e53fd84) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-14951.ic30", 0x000002, 0x200000, CRC(fdb1a534) SHA1(3126b595bf69bf9952fedf8f9c6743eb10489dc6) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-14953.ic28", 0x000004, 0x200000, CRC(33bd1c15) SHA1(4e16562e3357d4db54b20543073e8f1fd6f74b1f) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3842,7 +4053,7 @@ ROM_START( harddunk )
 	ROM_LOAD16_BYTE( "mpr-16503.ic3", 0x000000, 0x080000, CRC(ac1b6f1a) SHA1(56482931adf7fe551acf796b74cd8af3773d4fef) )
 	ROM_LOAD16_BYTE( "mpr-16504.ic11", 0x000001, 0x080000, CRC(7c61fcd8) SHA1(ca4354f90fada752bf11ee22a7798a8aa22b1c61) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-16495.ic14", 0x000000, 0x200000, CRC(6e5f26be) SHA1(146761072bbed08f4a9df8a474b34fab61afaa4f) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16497.ic15", 0x000002, 0x200000, CRC(42ab5859) SHA1(f50c51eb81186aec5f747ecab4c5c928f8701afc) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16499.ic10", 0x000004, 0x200000, CRC(a290ea36) SHA1(2503b44174f23a9d323caab86553977d1d6d9c94) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3873,7 +4084,7 @@ ROM_START( harddunkj )
 	ROM_LOAD16_BYTE( "mpr-16503.ic3", 0x000000, 0x080000, CRC(ac1b6f1a) SHA1(56482931adf7fe551acf796b74cd8af3773d4fef) )
 	ROM_LOAD16_BYTE( "mpr-16504.ic11", 0x000001, 0x080000, CRC(7c61fcd8) SHA1(ca4354f90fada752bf11ee22a7798a8aa22b1c61) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-16495.ic14", 0x000000, 0x200000, CRC(6e5f26be) SHA1(146761072bbed08f4a9df8a474b34fab61afaa4f) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16497.ic15", 0x000002, 0x200000, CRC(42ab5859) SHA1(f50c51eb81186aec5f747ecab4c5c928f8701afc) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16499.ic10", 0x000004, 0x200000, CRC(a290ea36) SHA1(2503b44174f23a9d323caab86553977d1d6d9c94) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3895,7 +4106,7 @@ ROM_END
     Holosseum (US)
     not protected
      Game: 833-8887-01 HOLOSSEUM
-Rom board: 834-8888-01
+ROM board: 834-8888-01
 
 */
 ROM_START( holo )
@@ -3914,7 +4125,7 @@ ROM_START( holo )
 	ROM_REGION( 0x000100, "mainpcb:gfx1", ROMREGION_ERASEFF ) /* tiles */
 	/* game doesn't use bg tilemaps */
 
-	ROM_REGION32_BE( 0x800000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14973", 0x000000, 0x100000, CRC(b3c3ff6b) SHA1(94e8dbfae37a5b122ee3d471aad1f758e4a39b9e) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14972", 0x000001, 0x100000, CRC(0c161374) SHA1(413ab45deb687ecdbdc06ae98aa32ad8a0d80e0c) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14971", 0x000002, 0x100000, CRC(dfcf6fdf) SHA1(417291b54010be20dd6738a70d372b580615a8bb) , ROM_SKIP(7) )
@@ -3951,7 +4162,7 @@ ROM_START( jpark )
 	ROM_LOAD16_BYTE( "mpr-16404.ic14", 0x000000, 0x200000, CRC(11283807) SHA1(99e465c3fc31e640740b8257a349e203f026754a) )
 	ROM_LOAD16_BYTE( "mpr-16403.ic5",  0x000001, 0x200000, CRC(02530a9b) SHA1(b43e1b47f74c801bfc599cbe893fb8dc13453dd0) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-16405.ic32", 0x000000, 0x200000, CRC(b425f182) SHA1(66c6bd29dd3450db816b895c4c9c5208a66aae67) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16407.ic30", 0x000002, 0x200000, CRC(bc49ffd9) SHA1(a50ba7ddccfdfd7638c4041978b39c1559afbbb4) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16409.ic28", 0x000004, 0x200000, CRC(fe73660d) SHA1(ec1a3ea5303d2ccb9e327da18476969953626e1c) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3987,7 +4198,7 @@ ROM_START( jparkj )
 	ROM_LOAD16_BYTE( "mpr-16404.ic14", 0x000000, 0x200000, CRC(11283807) SHA1(99e465c3fc31e640740b8257a349e203f026754a) )
 	ROM_LOAD16_BYTE( "mpr-16403.ic5",  0x000001, 0x200000, CRC(02530a9b) SHA1(b43e1b47f74c801bfc599cbe893fb8dc13453dd0) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-16405.ic32", 0x000000, 0x200000, CRC(b425f182) SHA1(66c6bd29dd3450db816b895c4c9c5208a66aae67) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16407.ic30", 0x000002, 0x200000, CRC(bc49ffd9) SHA1(a50ba7ddccfdfd7638c4041978b39c1559afbbb4) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16409.ic28", 0x000004, 0x200000, CRC(fe73660d) SHA1(ec1a3ea5303d2ccb9e327da18476969953626e1c) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -4023,7 +4234,7 @@ ROM_START( jparkja )
 	ROM_LOAD16_BYTE( "mpr-16404.ic14", 0x000000, 0x200000, CRC(11283807) SHA1(99e465c3fc31e640740b8257a349e203f026754a) )
 	ROM_LOAD16_BYTE( "mpr-16403.ic5",  0x000001, 0x200000, CRC(02530a9b) SHA1(b43e1b47f74c801bfc599cbe893fb8dc13453dd0) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-16405.ic32", 0x000000, 0x200000, CRC(b425f182) SHA1(66c6bd29dd3450db816b895c4c9c5208a66aae67) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16407.ic30", 0x000002, 0x200000, CRC(bc49ffd9) SHA1(a50ba7ddccfdfd7638c4041978b39c1559afbbb4) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16409.ic28", 0x000004, 0x200000, CRC(fe73660d) SHA1(ec1a3ea5303d2ccb9e327da18476969953626e1c) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -4059,7 +4270,7 @@ ROM_START( jparkjc )
 	ROM_LOAD16_BYTE( "mpr-16404.ic14", 0x000000, 0x200000, CRC(11283807) SHA1(99e465c3fc31e640740b8257a349e203f026754a) )
 	ROM_LOAD16_BYTE( "mpr-16403.ic5",  0x000001, 0x200000, CRC(02530a9b) SHA1(b43e1b47f74c801bfc599cbe893fb8dc13453dd0) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-16405.ic32", 0x000000, 0x200000, CRC(b425f182) SHA1(66c6bd29dd3450db816b895c4c9c5208a66aae67) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16407.ic30", 0x000002, 0x200000, CRC(bc49ffd9) SHA1(a50ba7ddccfdfd7638c4041978b39c1559afbbb4) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16409.ic28", 0x000004, 0x200000, CRC(fe73660d) SHA1(ec1a3ea5303d2ccb9e327da18476969953626e1c) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -4077,7 +4288,7 @@ ROM_END
     Soreike Kokology Vol. 2
     Sega System32 + CD - Sega 1993
 
-    Rom Board is 837-8393 16Mb ROM board (Same as godenaxe2 or Arabian Fight)
+    ROM Board is 837-8393 16Mb ROM board (Same as godenaxe2 or Arabian Fight)
 
     SCSI CD board is 839-0572-01. It use a Fujitsu MB89352AP for SCSI + a Sony CXD1095Q for I/O + 8Mhz quartz
 */
@@ -4096,7 +4307,7 @@ ROM_START( kokoroj2 )
 	ROM_LOAD16_BYTE( "mpr-16188.ic14", 0x000000, 0x200000, CRC(83a450ab) SHA1(1d0b45512d784ed1d82135b84c7c540f92d789f7) )
 	ROM_LOAD16_BYTE( "mpr-16187.ic5",  0x000001, 0x200000, CRC(98b62f8b) SHA1(eaf98efd9eac7b7c385138a8a4dbc94b0ca38df5) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-16189.ic32", 0x000000, 0x200000, CRC(0937f713) SHA1(4b2b09ec8ed97794ad3824d1c57eae7f7e01379c) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16191.ic30", 0x000002, 0x200000, CRC(cfef4aaa) SHA1(bc8a252dcbdb8facdd91eda7aed0f56fe7529d15) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16193.ic28", 0x000004, 0x200000, CRC(a0706e4e) SHA1(1f36d952971c05db4190b229aa4957db3e5224f1) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -4139,7 +4350,7 @@ ROM_START( orunners )
 	ROM_LOAD16_BYTE( "mpr15548.ic3", 0x000000, 0x200000, CRC(b6470a66) SHA1(e1544590c02d41f62f82a4d771b893fb0f2734c7) )
 	ROM_LOAD16_BYTE( "mpr15549.ic11", 0x000001, 0x200000, CRC(81d12520) SHA1(1555893941e832f00ad3d0b3ad0c34a0d3a1c58a) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr15540.ic14", 0x000000, 0x200000, CRC(a10d72b4) SHA1(6d9d5e20be6721b53ce49df4d5a1bbd91f5b3aed) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr15542.ic15", 0x000002, 0x200000, CRC(40952374) SHA1(c669ef52508bc2f49cf812dc86ac98fb535471fa) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr15544.ic10", 0x000004, 0x200000, CRC(39e3df45) SHA1(38a7b21617b45613b05509dda388f8f7770b186c) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -4177,7 +4388,7 @@ ROM_START( orunnersu )
 	ROM_LOAD16_BYTE( "mpr15548.ic3", 0x000000, 0x200000, CRC(b6470a66) SHA1(e1544590c02d41f62f82a4d771b893fb0f2734c7) )
 	ROM_LOAD16_BYTE( "mpr15549.ic11", 0x000001, 0x200000, CRC(81d12520) SHA1(1555893941e832f00ad3d0b3ad0c34a0d3a1c58a) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr15540.ic14", 0x000000, 0x200000, CRC(a10d72b4) SHA1(6d9d5e20be6721b53ce49df4d5a1bbd91f5b3aed) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr15542.ic15", 0x000002, 0x200000, CRC(40952374) SHA1(c669ef52508bc2f49cf812dc86ac98fb535471fa) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr15544.ic10", 0x000004, 0x200000, CRC(39e3df45) SHA1(38a7b21617b45613b05509dda388f8f7770b186c) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -4215,7 +4426,7 @@ ROM_START( orunnersj )
 	ROM_LOAD16_BYTE( "mpr15548.ic3", 0x000000, 0x200000, CRC(b6470a66) SHA1(e1544590c02d41f62f82a4d771b893fb0f2734c7) )
 	ROM_LOAD16_BYTE( "mpr15549.ic11", 0x000001, 0x200000, CRC(81d12520) SHA1(1555893941e832f00ad3d0b3ad0c34a0d3a1c58a) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr15540.ic14", 0x000000, 0x200000, CRC(a10d72b4) SHA1(6d9d5e20be6721b53ce49df4d5a1bbd91f5b3aed) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr15542.ic15", 0x000002, 0x200000, CRC(40952374) SHA1(c669ef52508bc2f49cf812dc86ac98fb535471fa) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr15544.ic10", 0x000004, 0x200000, CRC(39e3df45) SHA1(38a7b21617b45613b05509dda388f8f7770b186c) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -4256,7 +4467,7 @@ Export: EPR-13693.ic21 (dumped)
         EPR-13694.ic37 (not dumped)
         EPR-13695.ic38 (not dumped)
 
-    Japanese version is undumped. There is likely a Japanese specific sound rom at IC20 (EPR-13524.ic20 ??)
+    Japanese version is undumped. There is likely a Japanese specific sound ROM at IC20 (EPR-13524.ic20 ??)
 */
 ROM_START( radm )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -4268,7 +4479,7 @@ ROM_START( radm )
 	ROM_LOAD_x8( "epr-13527.ic9",  0x000000, 0x020000, CRC(a2e3fbbe) SHA1(2787bbef696ab3f2b7855ac991867837d3de54cd) )
 	ROM_LOAD_x2( "epr-13523.ic14", 0x100000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) )
 	ROM_LOAD_x2( "epr-13699.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) )
-	ROM_LOAD_x2( "epr-13523.ic22", 0x300000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) /* Deluxe or Upright manuals don't show this rom */
+	ROM_LOAD_x2( "epr-13523.ic22", 0x300000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) /* Deluxe or Upright manuals don't show this ROM */
 
 	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-13519.ic3",  0x000000, 0x080000, CRC(bedc9534) SHA1(7b3f7a47b6c0ca6707dc3c1167f3564d43adb32f) )
@@ -4276,7 +4487,7 @@ ROM_START( radm )
 	ROM_LOAD32_BYTE( "mpr-13521.ic12", 0x000001, 0x080000, CRC(e9bca903) SHA1(18a73c830b9755262a1c525e3ad5ae084117b64d) )
 	ROM_LOAD32_BYTE( "mpr-13522.ic18", 0x000003, 0x080000, CRC(25e04648) SHA1(617e794e8f7aa2a435bac917b8968699fe88dafb) )
 
-	ROM_REGION32_BE( 0x800000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-13511.ic1",  0x000000, 0x100000, CRC(f8f15b11) SHA1(da6c2b8c3a94c4c263583f046823eaea818aff7c) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-13512.ic5",  0x000001, 0x100000, CRC(d0be34a6) SHA1(b42a63e30f0f7a94de8a825ca93cf8efdb7a7648) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-13513.ic10", 0x000002, 0x100000, CRC(feef1982) SHA1(bdf906317079a12c48ef4fca5bef0d437e9bf050) , ROM_SKIP(7) )
@@ -4307,7 +4518,7 @@ ROM_START( radmu )
 	ROM_LOAD_x8( "epr-13527.ic9",  0x000000, 0x020000, CRC(a2e3fbbe) SHA1(2787bbef696ab3f2b7855ac991867837d3de54cd) )
 	ROM_LOAD_x2( "epr-13523.ic14", 0x100000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) )
 	ROM_LOAD_x2( "epr-13699.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) )
-	ROM_LOAD_x2( "epr-13523.ic22", 0x300000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) /* Deluxe or Upright manuals don't show this rom */
+	ROM_LOAD_x2( "epr-13523.ic22", 0x300000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) /* Deluxe or Upright manuals don't show this ROM */
 
 	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-13519.ic3",  0x000000, 0x080000, CRC(bedc9534) SHA1(7b3f7a47b6c0ca6707dc3c1167f3564d43adb32f) )
@@ -4315,7 +4526,7 @@ ROM_START( radmu )
 	ROM_LOAD32_BYTE( "mpr-13521.ic12", 0x000001, 0x080000, CRC(e9bca903) SHA1(18a73c830b9755262a1c525e3ad5ae084117b64d) )
 	ROM_LOAD32_BYTE( "mpr-13522.ic18", 0x000003, 0x080000, CRC(25e04648) SHA1(617e794e8f7aa2a435bac917b8968699fe88dafb) )
 
-	ROM_REGION32_BE( 0x800000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-13511.ic1",  0x000000, 0x100000, CRC(f8f15b11) SHA1(da6c2b8c3a94c4c263583f046823eaea818aff7c) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-13512.ic5",  0x000001, 0x100000, CRC(d0be34a6) SHA1(b42a63e30f0f7a94de8a825ca93cf8efdb7a7648) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-13513.ic10", 0x000002, 0x100000, CRC(feef1982) SHA1(bdf906317079a12c48ef4fca5bef0d437e9bf050) , ROM_SKIP(7) )
@@ -4341,7 +4552,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-8110-02 RAD RALLY
-Rom board: 833-8111-02
+ROM board: 833-8111-02
 A/D BD NO. 837-7536
 
 */
@@ -4363,7 +4574,7 @@ ROM_START( radr )
 	ROM_LOAD32_BYTE( "epr-14104.ic12", 0x000001, 0x040000, CRC(b0173646) SHA1(1ba4edc033e0e4f5a1e02987e9f6b8b1650b46d7) )
 	ROM_LOAD32_BYTE( "epr-14105.ic18", 0x000003, 0x040000, CRC(614843b6) SHA1(d4f2cd3b024f7152d6e89237f0da06adea2efe57) )
 
-	ROM_REGION32_BE( 0x800000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-13511.ic1",  0x000000, 0x100000, CRC(f8f15b11) SHA1(da6c2b8c3a94c4c263583f046823eaea818aff7c) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-13512.ic5",  0x000001, 0x100000, CRC(d0be34a6) SHA1(b42a63e30f0f7a94de8a825ca93cf8efdb7a7648) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-13513.ic10", 0x000002, 0x100000, CRC(feef1982) SHA1(bdf906317079a12c48ef4fca5bef0d437e9bf050) , ROM_SKIP(7) )
@@ -4386,7 +4597,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-8110-01 RAD RALLY
-Rom board: 833-8111-01
+ROM board: 833-8111-01
 A/D BD NO. 837-7536
 
 */
@@ -4408,7 +4619,7 @@ ROM_START( radru )
 	ROM_LOAD32_BYTE( "epr-14104.ic12", 0x000001, 0x040000, CRC(b0173646) SHA1(1ba4edc033e0e4f5a1e02987e9f6b8b1650b46d7) )
 	ROM_LOAD32_BYTE( "epr-14105.ic16", 0x000003, 0x040000, CRC(614843b6) SHA1(d4f2cd3b024f7152d6e89237f0da06adea2efe57) )
 
-	ROM_REGION32_BE( 0x800000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-13511.ic1",  0x000000, 0x100000, CRC(f8f15b11) SHA1(da6c2b8c3a94c4c263583f046823eaea818aff7c) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-13512.ic5",  0x000001, 0x100000, CRC(d0be34a6) SHA1(b42a63e30f0f7a94de8a825ca93cf8efdb7a7648) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-13513.ic10", 0x000002, 0x100000, CRC(feef1982) SHA1(bdf906317079a12c48ef4fca5bef0d437e9bf050) , ROM_SKIP(7) )
@@ -4431,7 +4642,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-8110-03 RAD RALLY
-Rom board: 833-8111-03
+ROM board: 833-8111-03
 A/D BD NO. 837-7536
 
 */
@@ -4453,7 +4664,7 @@ ROM_START( radrj )
 	ROM_LOAD32_BYTE( "epr-14104.ic12", 0x000001, 0x040000, CRC(b0173646) SHA1(1ba4edc033e0e4f5a1e02987e9f6b8b1650b46d7) )
 	ROM_LOAD32_BYTE( "epr-14105.ic16", 0x000003, 0x040000, CRC(614843b6) SHA1(d4f2cd3b024f7152d6e89237f0da06adea2efe57) )
 
-	ROM_REGION32_BE( 0x800000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-13511.ic1",  0x000000, 0x100000, CRC(f8f15b11) SHA1(da6c2b8c3a94c4c263583f046823eaea818aff7c) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-13512.ic5",  0x000001, 0x100000, CRC(d0be34a6) SHA1(b42a63e30f0f7a94de8a825ca93cf8efdb7a7648) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-13513.ic10", 0x000002, 0x100000, CRC(feef1982) SHA1(bdf906317079a12c48ef4fca5bef0d437e9bf050) , ROM_SKIP(7) )
@@ -4497,7 +4708,7 @@ ROM_START( slipstrm )
 	ROM_LOAD32_BYTE( "s32_scr02.ic29", 0x000001, 0x080000, CRC(52c4bb85) SHA1(4fbee1072a19c75c25b5fd269acc75640923d69c) )
 	ROM_LOAD32_BYTE( "s32_scr03.ic25", 0x000003, 0x080000, CRC(4948604a) SHA1(d5a1b9781fef7976a59a0af9b755a04fcacf9381) )
 
-	ROM_REGION32_BE( 0x400000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x400000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "s32_obj00.ic36", 0x000000, 0x80000, CRC(cffe9e0d) SHA1(5272d54ff142de927a9abd61f3646e963c7d22c4) , ROM_SKIP(7) )
 	ROMX_LOAD( "s32_obj01.ic32", 0x000001, 0x80000, CRC(4ebd1383) SHA1(ce35f4d15e7904bfde55e58cdde925cba8002763) , ROM_SKIP(7) )
 	ROMX_LOAD( "s32_obj02.ic27", 0x000002, 0x80000, CRC(b3cf4fe2) SHA1(e13199522e1e3e8b9cfe72cc29b33f25dad542ef) , ROM_SKIP(7) )
@@ -4532,7 +4743,7 @@ ROM_START( slipstrmh )
 	ROM_LOAD32_BYTE( "s32_scr02.ic29", 0x000001, 0x080000, CRC(52c4bb85) SHA1(4fbee1072a19c75c25b5fd269acc75640923d69c) )
 	ROM_LOAD32_BYTE( "s32_scr03.ic25", 0x000003, 0x080000, CRC(4948604a) SHA1(d5a1b9781fef7976a59a0af9b755a04fcacf9381) )
 
-	ROM_REGION32_BE( 0x400000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x400000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "s32_obj00.ic36", 0x000000, 0x80000, CRC(cffe9e0d) SHA1(5272d54ff142de927a9abd61f3646e963c7d22c4) , ROM_SKIP(7) )
 	ROMX_LOAD( "s32_obj01.ic32", 0x000001, 0x80000, CRC(4ebd1383) SHA1(ce35f4d15e7904bfde55e58cdde925cba8002763) , ROM_SKIP(7) )
 	ROMX_LOAD( "s32_obj02.ic27", 0x000002, 0x80000, CRC(b3cf4fe2) SHA1(e13199522e1e3e8b9cfe72cc29b33f25dad542ef) , ROM_SKIP(7) )
@@ -4565,13 +4776,13 @@ ROM_START( sonic )
 	ROM_LOAD_x4( "epr-15785.ic36", 0x000000, 0x040000, CRC(0fe7422e) SHA1(b7eaf4736ba155965317bb4ef3b33fc122635151) )
 	ROM_LOAD( "mpr-15784.ic35",    0x100000, 0x100000, CRC(42f06714) SHA1(30e45bb2d9b492f0c1acc4fbe1e5869f0559300b) )
 	ROM_LOAD( "mpr-15783.ic34",    0x200000, 0x100000, CRC(e4220eea) SHA1(a546c8bfc24e0695cf79c49e1a867d2595a1ed7f) )
-	ROM_LOAD( "mpr-15782.ic33",    0x300000, 0x100000, CRC(cf56b5a0) SHA1(5786228aab120c3361524ba93b418b24fd5b8ffb) ) // (this is the only rom unchanged from the prototype)
+	ROM_LOAD( "mpr-15782.ic33",    0x300000, 0x100000, CRC(cf56b5a0) SHA1(5786228aab120c3361524ba93b418b24fd5b8ffb) ) // (this is the only ROM unchanged from the prototype)
 
 	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15789.ic14", 0x000000, 0x100000, CRC(4378f12b) SHA1(826e0550a3c5f2b6e59c6531ac03658a4f826651) )
 	ROM_LOAD16_BYTE( "mpr-15788.ic5",  0x000001, 0x100000, CRC(a6ed5d7a) SHA1(d30f26b452d380e7657e044e144f7dbbc4dc13e5) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-15790.ic32", 0x000000, 0x200000, CRC(c69d51b1) SHA1(7644fb64457855f9ed87ca25ddc28c21bcb61fd9) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15792.ic30", 0x000002, 0x200000, CRC(1006bb67) SHA1(38c752e634aa94b1a23c09c4dba6388b7d0358af) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15794.ic28", 0x000004, 0x200000, CRC(8672b480) SHA1(61659e3856cdff0b2bca190a7e60c81b86ea2089) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -4609,7 +4820,7 @@ ROM_START( sonicp )
 	ROM_LOAD32_BYTE( "sonscl2.bin", 0x000001, 0x080000, CRC(a5de28b2) SHA1(49a16ac10cf01b5b8802b8b015a2e403086c206a) )
 	ROM_LOAD32_BYTE( "sonscl3.bin", 0x000003, 0x080000, CRC(7ce7554b) SHA1(8def3acae6baafbe9e350f18e245a9a833df5cc4) )
 
-	ROM_REGION32_BE( 0x800000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "sonobj0.bin", 0x000000, 0x100000, CRC(ceea18e3) SHA1(f902a7e2f8e126fd7a7862c55de32ce6352a7716) , ROM_SKIP(7) )
 	ROMX_LOAD( "sonobj1.bin", 0x000001, 0x100000, CRC(6bbc226b) SHA1(5ef4256b6a93891daf1349def6db3bc428e5f4f3) , ROM_SKIP(7) )
 	ROMX_LOAD( "sonobj2.bin", 0x000002, 0x100000, CRC(fcd5ef0e) SHA1(e3e50d4838ac3cce41d69ee6cd31981fbe422a4b) , ROM_SKIP(7) )
@@ -4646,7 +4857,7 @@ ROM_START( spidman )
 	ROM_LOAD32_BYTE( "mpr-14289-s.ic29", 0x000001, 0x100000, CRC(38570582) SHA1(a9d810a02a1f5a6849c79d65fbebff21a4b82b59) )
 	ROM_LOAD32_BYTE( "mpr-14288-s.ic25", 0x000003, 0x100000, CRC(3188b636) SHA1(bc0adeeca5040caa563ee1e0eded9c323ca23446) )
 
-	ROM_REGION32_BE( 0x800000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14299-h.ic36", 0x000000, 0x100000, CRC(ce59231b) SHA1(bcb1f11b74935694d0617ec8df66db2cc57b6219) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14298-h.ic32", 0x000001, 0x100000, CRC(2745c84c) SHA1(5a0528c921cba7a1047d3a2ece79925103d719a1) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14297-h.ic27", 0x000002, 0x100000, CRC(29cb9450) SHA1(7dc38d23a2f0cee2f4edde05c1a6f0dc83f331db) , ROM_SKIP(7) )
@@ -4663,9 +4874,9 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-8331-04 SPIDER-MAN
-Rom board: 834-8332-01
+ROM board: 834-8332-01
 
- Rom board type: 837-7429-01
+ ROM board type: 837-7429-01
 Input sub board: 837-7968
 
 */
@@ -4688,7 +4899,7 @@ ROM_START( spidmanu )
 	ROM_LOAD32_BYTE( "mpr-14289-s.ic29", 0x000001, 0x100000, CRC(38570582) SHA1(a9d810a02a1f5a6849c79d65fbebff21a4b82b59) )
 	ROM_LOAD32_BYTE( "mpr-14288-s.ic25", 0x000003, 0x100000, CRC(3188b636) SHA1(bc0adeeca5040caa563ee1e0eded9c323ca23446) )
 
-	ROM_REGION32_BE( 0x800000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14299-h.ic36", 0x000000, 0x100000, CRC(ce59231b) SHA1(bcb1f11b74935694d0617ec8df66db2cc57b6219) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14298-h.ic32", 0x000001, 0x100000, CRC(2745c84c) SHA1(5a0528c921cba7a1047d3a2ece79925103d719a1) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14297-h.ic27", 0x000002, 0x100000, CRC(29cb9450) SHA1(7dc38d23a2f0cee2f4edde05c1a6f0dc83f331db) , ROM_SKIP(7) )
@@ -4704,7 +4915,7 @@ ROM_END
     not protected
 
      Game: 833-8331 SPIDER-MAN
-Rom board: 834-8332
+ROM board: 834-8332
 
 */
 ROM_START( spidmanj )
@@ -4726,7 +4937,7 @@ ROM_START( spidmanj )
 	ROM_LOAD32_BYTE( "mpr-14289-s.ic29", 0x000001, 0x100000, CRC(38570582) SHA1(a9d810a02a1f5a6849c79d65fbebff21a4b82b59) )
 	ROM_LOAD32_BYTE( "mpr-14288-s.ic25", 0x000003, 0x100000, CRC(3188b636) SHA1(bc0adeeca5040caa563ee1e0eded9c323ca23446) )
 
-	ROM_REGION32_BE( 0x800000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-14299-h.ic36", 0x000000, 0x100000, CRC(ce59231b) SHA1(bcb1f11b74935694d0617ec8df66db2cc57b6219) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14298-h.ic32", 0x000001, 0x100000, CRC(2745c84c) SHA1(5a0528c921cba7a1047d3a2ece79925103d719a1) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14297-h.ic27", 0x000002, 0x100000, CRC(29cb9450) SHA1(7dc38d23a2f0cee2f4edde05c1a6f0dc83f331db) , ROM_SKIP(7) )
@@ -4756,7 +4967,7 @@ ROM_START( scross )
 	ROM_LOAD16_BYTE( "mpr-15020.ic3", 0x000000, 0x100000, CRC(de47006a) SHA1(dbef7b9ff8c39992b8596d38985e65c627d6fa79) )
 	ROM_LOAD16_BYTE( "mpr-15021.ic11", 0x000001, 0x100000, CRC(3677db02) SHA1(7aeeb85f1632253fcdc8f7881512066e97837e5e) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-15022.ic14", 0x000000, 0x100000, CRC(baee6fd5) SHA1(ddf022c61f0805af45a84c65eb5d01006c153c07) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15024.ic15", 0x000002, 0x100000, CRC(b9f339e2) SHA1(4b9a392459132a19d62928ef3939e1f2356e3994) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15026.ic10", 0x000004, 0x100000, CRC(b72e8df6) SHA1(a7a87f79814b022985121e163c7f88244c50e427) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -4789,7 +5000,7 @@ ROM_START( scrossa )
 	ROM_LOAD16_BYTE( "mpr-15020.ic3", 0x000000, 0x100000, CRC(de47006a) SHA1(dbef7b9ff8c39992b8596d38985e65c627d6fa79) )
 	ROM_LOAD16_BYTE( "mpr-15021.ic11", 0x000001, 0x100000, CRC(3677db02) SHA1(7aeeb85f1632253fcdc8f7881512066e97837e5e) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-15022.ic14", 0x000000, 0x100000, CRC(baee6fd5) SHA1(ddf022c61f0805af45a84c65eb5d01006c153c07) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15024.ic15", 0x000002, 0x100000, CRC(b9f339e2) SHA1(4b9a392459132a19d62928ef3939e1f2356e3994) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15026.ic10", 0x000004, 0x100000, CRC(b72e8df6) SHA1(a7a87f79814b022985121e163c7f88244c50e427) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -4826,7 +5037,7 @@ ROM_START( scrossu )
 	ROM_LOAD16_BYTE( "mpr-15020.ic3", 0x000000, 0x100000, CRC(de47006a) SHA1(dbef7b9ff8c39992b8596d38985e65c627d6fa79) )
 	ROM_LOAD16_BYTE( "mpr-15021.ic11", 0x000001, 0x100000, CRC(3677db02) SHA1(7aeeb85f1632253fcdc8f7881512066e97837e5e) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-15022.ic14", 0x000000, 0x100000, CRC(baee6fd5) SHA1(ddf022c61f0805af45a84c65eb5d01006c153c07) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15024.ic15", 0x000002, 0x100000, CRC(b9f339e2) SHA1(4b9a392459132a19d62928ef3939e1f2356e3994) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15026.ic10", 0x000004, 0x100000, CRC(b72e8df6) SHA1(a7a87f79814b022985121e163c7f88244c50e427) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -4850,7 +5061,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-10851-02
-Rom board: 834-10852-02
+ROM board: 834-10852-02
 */
 ROM_START( svf )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -4869,7 +5080,7 @@ ROM_START( svf )
 	ROM_LOAD16_BYTE( "mpr-16784.ic14", 0x000000, 0x100000, CRC(4608efe2) SHA1(9b41aa28f50af770e854ef9fdff1a55da7b7b131) )
 	ROM_LOAD16_BYTE( "mpr-16783.ic5",  0x000001, 0x100000, CRC(042eabe7) SHA1(a11df5c21d85f0c96dbdcaf57be37a79658ad648) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-16785.ic32", 0x000000, 0x200000, CRC(51f775ce) SHA1(125b40bf47304d37b92e81df5081c81d9af6c8a2) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16787.ic30", 0x000002, 0x200000, CRC(dee7a204) SHA1(29acff4d5dd68609ac46853860788206d18262ab) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16789.ic28", 0x000004, 0x200000, CRC(6b6c8ad3) SHA1(97b0078c851845c31dcf0fe4b2a88393dcdf8988) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -4897,7 +5108,7 @@ ROM_START( svfo )
 	ROM_LOAD16_BYTE( "mpr-16784.ic14", 0x000000, 0x100000, CRC(4608efe2) SHA1(9b41aa28f50af770e854ef9fdff1a55da7b7b131) )
 	ROM_LOAD16_BYTE( "mpr-16783.ic5",  0x000001, 0x100000, CRC(042eabe7) SHA1(a11df5c21d85f0c96dbdcaf57be37a79658ad648) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-16785.ic32", 0x000000, 0x200000, CRC(51f775ce) SHA1(125b40bf47304d37b92e81df5081c81d9af6c8a2) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16787.ic30", 0x000002, 0x200000, CRC(dee7a204) SHA1(29acff4d5dd68609ac46853860788206d18262ab) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16789.ic28", 0x000004, 0x200000, CRC(6b6c8ad3) SHA1(97b0078c851845c31dcf0fe4b2a88393dcdf8988) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -4929,7 +5140,7 @@ ROM_START( svs )
 	ROM_LOAD16_BYTE( "mpr-16784.ic14", 0x000000, 0x100000, CRC(4608efe2) SHA1(9b41aa28f50af770e854ef9fdff1a55da7b7b131) )
 	ROM_LOAD16_BYTE( "mpr-16783.ic5",  0x000001, 0x100000, CRC(042eabe7) SHA1(a11df5c21d85f0c96dbdcaf57be37a79658ad648) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-16785.ic32", 0x000000, 0x200000, CRC(51f775ce) SHA1(125b40bf47304d37b92e81df5081c81d9af6c8a2) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16787.ic30", 0x000002, 0x200000, CRC(dee7a204) SHA1(29acff4d5dd68609ac46853860788206d18262ab) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16789.ic28", 0x000004, 0x200000, CRC(6b6c8ad3) SHA1(97b0078c851845c31dcf0fe4b2a88393dcdf8988) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -4965,7 +5176,7 @@ ROM_START( jleague )
 	ROM_LOAD16_BYTE( "mpr-16784.ic14", 0x000000, 0x100000, CRC(4608efe2) SHA1(9b41aa28f50af770e854ef9fdff1a55da7b7b131) )
 	ROM_LOAD16_BYTE( "mpr-16783.ic5",  0x000001, 0x100000, CRC(042eabe7) SHA1(a11df5c21d85f0c96dbdcaf57be37a79658ad648) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-16785.ic32", 0x000000, 0x200000, CRC(51f775ce) SHA1(125b40bf47304d37b92e81df5081c81d9af6c8a2) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16787.ic30", 0x000002, 0x200000, CRC(dee7a204) SHA1(29acff4d5dd68609ac46853860788206d18262ab) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16789.ic28", 0x000004, 0x200000, CRC(6b6c8ad3) SHA1(97b0078c851845c31dcf0fe4b2a88393dcdf8988) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -4993,7 +5204,7 @@ ROM_START( jleagueo )
 	ROM_LOAD16_BYTE( "mpr-16784.ic14", 0x000000, 0x100000, CRC(4608efe2) SHA1(9b41aa28f50af770e854ef9fdff1a55da7b7b131) )
 	ROM_LOAD16_BYTE( "mpr-16783.ic5",  0x000001, 0x100000, CRC(042eabe7) SHA1(a11df5c21d85f0c96dbdcaf57be37a79658ad648) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-16785.ic32", 0x000000, 0x200000, CRC(51f775ce) SHA1(125b40bf47304d37b92e81df5081c81d9af6c8a2) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16787.ic30", 0x000002, 0x200000, CRC(dee7a204) SHA1(29acff4d5dd68609ac46853860788206d18262ab) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16789.ic28", 0x000004, 0x200000, CRC(6b6c8ad3) SHA1(97b0078c851845c31dcf0fe4b2a88393dcdf8988) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -5013,7 +5224,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 834-9324-02 TITLE FIGHT
-Rom board: 834-9413-02
+ROM board: 834-9413-02
   Main BD: 837-8676 (SYSTEM MULTI 32)
 
 */
@@ -5029,7 +5240,7 @@ ROM_START( titlef )
 	ROM_LOAD16_BYTE( "mpr-15381.ic3",  0x000000, 0x200000, CRC(162cc4d6) SHA1(2369d3d76ab5ef8f033aa45530ab957f0e5ff028) )
 	ROM_LOAD16_BYTE( "mpr-15382.ic11", 0x000001, 0x200000, CRC(fd03a130) SHA1(040c36383ef5d8298af714958cd5b0a4c7556ae7) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-15379.ic14", 0x000000, 0x200000, CRC(e5c74b11) SHA1(67e4460efe5dcd88ffc12024b255efc843e6a8b5) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15375.ic15", 0x000002, 0x200000, CRC(046a9b50) SHA1(2b4c53f2a0264835cb7197daa9b3461c212541e8) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15371.ic10", 0x000004, 0x200000, CRC(999046c6) SHA1(37ce4e8aaf537b5366eacabaf36e4477b5624121) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -5049,7 +5260,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 834-9324-01 TITLE FIGHT
-Rom board: 834-9413-01
+ROM board: 834-9413-01
   Main BD: 837-8676 (SYSTEM MULTI 32)
 
 */
@@ -5065,7 +5276,7 @@ ROM_START( titlefu )
 	ROM_LOAD16_BYTE( "mpr-15381.ic3",  0x000000, 0x200000, CRC(162cc4d6) SHA1(2369d3d76ab5ef8f033aa45530ab957f0e5ff028) )
 	ROM_LOAD16_BYTE( "mpr-15382.ic11", 0x000001, 0x200000, CRC(fd03a130) SHA1(040c36383ef5d8298af714958cd5b0a4c7556ae7) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-15379.ic14", 0x000000, 0x200000, CRC(e5c74b11) SHA1(67e4460efe5dcd88ffc12024b255efc843e6a8b5) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15375.ic15", 0x000002, 0x200000, CRC(046a9b50) SHA1(2b4c53f2a0264835cb7197daa9b3461c212541e8) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15371.ic10", 0x000004, 0x200000, CRC(999046c6) SHA1(37ce4e8aaf537b5366eacabaf36e4477b5624121) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -5085,7 +5296,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 834-9324-03 TITLE FIGHT
-Rom board: 834-9413-03
+ROM board: 834-9413-03
   Main BD: 837-8676 (SYSTEM MULTI 32)
 
 */
@@ -5101,7 +5312,7 @@ ROM_START( titlefj )
 	ROM_LOAD16_BYTE( "mpr-15381.ic3",  0x000000, 0x200000, CRC(162cc4d6) SHA1(2369d3d76ab5ef8f033aa45530ab957f0e5ff028) )
 	ROM_LOAD16_BYTE( "mpr-15382.ic11", 0x000001, 0x200000, CRC(fd03a130) SHA1(040c36383ef5d8298af714958cd5b0a4c7556ae7) )
 
-	ROM_REGION32_BE( 0x1000000, "mainpcb:gfx2", 0 ) /* sprites */
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "mpr-15379.ic14", 0x000000, 0x200000, CRC(e5c74b11) SHA1(67e4460efe5dcd88ffc12024b255efc843e6a8b5) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15375.ic15", 0x000002, 0x200000, CRC(046a9b50) SHA1(2b4c53f2a0264835cb7197daa9b3461c212541e8) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-15371.ic10", 0x000004, 0x200000, CRC(999046c6) SHA1(37ce4e8aaf537b5366eacabaf36e4477b5624121) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -5125,23 +5336,21 @@ ROM_END
 
 void segas32_state::segas32_common_init()
 {
+	if ((m_multipcm_bank_lo.found()) && (m_multipcm_bank_hi.found()))
+	{
+		uint8_t *ROM = memregion("sega")->base();
+		uint32_t size = memregion("sega")->bytes();
+		m_multipcm_bank_lo->configure_entries(0, size / 0x80000, &ROM[0], 0x80000);
+		m_multipcm_bank_hi->configure_entries(0, size / 0x80000, &ROM[0], 0x80000);
+	}
 	uint8_t *Z80 = memregion("soundcpu")->base();
 	uint32_t size = memregion("soundcpu")->bytes();
-	membank("bank1")->configure_entries(0, size / 0x2000, &Z80[0], 0x2000);
+	m_soundrom_bank->configure_entries(0, size / 0x2000, &Z80[0], 0x2000);
 	/* reset the custom handlers and other pointers */
 	m_system32_prot_vblank = nullptr;
 	m_sw1_output = nullptr;
 	m_sw2_output = nullptr;
 	m_sw3_output = nullptr;
-}
-
-void segas32_state::multi32_common_init()
-{
-	uint8_t *ROM = memregion("sega")->base();
-	uint32_t size = memregion("sega")->bytes();
-	membank("multipcmbanklo")->configure_entries(0, size / 0x80000, &ROM[0], 0x80000);
-	membank("multipcmbankhi")->configure_entries(0, size / 0x80000, &ROM[0], 0x80000);
-	segas32_common_init();
 }
 
 
@@ -5355,55 +5564,55 @@ READ16_MEMBER(segas32_new_state::dual_pcb_slave)
 
 
 
-DRIVER_INIT_MEMBER(segas32_new_state,titlef) {  m_mainpcb->init_titlef(); }
-DRIVER_INIT_MEMBER(segas32_new_state,slipstrm) {    m_mainpcb->init_slipstrm(); }
-DRIVER_INIT_MEMBER(segas32_new_state,radm) {    m_mainpcb->init_radm(); }
-DRIVER_INIT_MEMBER(segas32_new_state,holo) {    m_mainpcb->init_holo(); }
-DRIVER_INIT_MEMBER(segas32_new_state,svf) { m_mainpcb->init_svf(); }
-DRIVER_INIT_MEMBER(segas32_new_state,jleague) { m_mainpcb->init_jleague(); }
-DRIVER_INIT_MEMBER(segas32_new_state,jpark) {   m_mainpcb->init_jpark(); }
-DRIVER_INIT_MEMBER(segas32_new_state,ga2) { m_mainpcb->init_ga2(); }
-DRIVER_INIT_MEMBER(segas32_new_state,scross) {  m_mainpcb->init_scross(); }
-DRIVER_INIT_MEMBER(segas32_new_state,spidman) { m_mainpcb->init_spidman(); }
-DRIVER_INIT_MEMBER(segas32_new_state,sonicp) {  m_mainpcb->init_sonicp(); }
-DRIVER_INIT_MEMBER(segas32_new_state,dbzvrvs) { m_mainpcb->init_dbzvrvs(); }
-DRIVER_INIT_MEMBER(segas32_new_state,brival) {  m_mainpcb->init_brival(); }
-DRIVER_INIT_MEMBER(segas32_new_state,harddunk) {    m_mainpcb->init_harddunk(); }
-DRIVER_INIT_MEMBER(segas32_new_state,arabfgt) { m_mainpcb->init_arabfgt(); }
-DRIVER_INIT_MEMBER(segas32_new_state,sonic) {   m_mainpcb->init_sonic(); }
-DRIVER_INIT_MEMBER(segas32_new_state,alien3) {  m_mainpcb->init_alien3(); }
-DRIVER_INIT_MEMBER(segas32_new_state,darkedge) {    m_mainpcb->init_darkedge(); }
-DRIVER_INIT_MEMBER(segas32_new_state,radr) {    m_mainpcb->init_radr(); }
-DRIVER_INIT_MEMBER(segas32_new_state,orunners) {    m_mainpcb->init_orunners(); }
+void segas32_new_state::init_titlef() {  m_mainpcb->init_titlef(); }
+void segas32_new_state::init_slipstrm() {    m_mainpcb->init_slipstrm(); }
+void segas32_new_state::init_radm() {    m_mainpcb->init_radm(); }
+void segas32_new_state::init_holo() {    m_mainpcb->init_holo(); }
+void segas32_new_state::init_svf() { m_mainpcb->init_svf(); }
+void segas32_new_state::init_jleague() { m_mainpcb->init_jleague(); }
+void segas32_new_state::init_jpark() {   m_mainpcb->init_jpark(); }
+void segas32_new_state::init_ga2() { m_mainpcb->init_ga2(); }
+void segas32_new_state::init_scross() {  m_mainpcb->init_scross(); }
+void segas32_new_state::init_spidman() { m_mainpcb->init_spidman(); }
+void segas32_new_state::init_sonicp() {  m_mainpcb->init_sonicp(); }
+void segas32_new_state::init_dbzvrvs() { m_mainpcb->init_dbzvrvs(); }
+void segas32_new_state::init_brival() {  m_mainpcb->init_brival(); }
+void segas32_new_state::init_harddunk() {    m_mainpcb->init_harddunk(); }
+void segas32_new_state::init_arabfgt() { m_mainpcb->init_arabfgt(); }
+void segas32_new_state::init_sonic() {   m_mainpcb->init_sonic(); }
+void segas32_new_state::init_alien3() {  m_mainpcb->init_alien3(); }
+void segas32_new_state::init_darkedge() {    m_mainpcb->init_darkedge(); }
+void segas32_new_state::init_radr() {    m_mainpcb->init_radr(); }
+void segas32_new_state::init_orunners() {    m_mainpcb->init_orunners(); }
 
-DRIVER_INIT_MEMBER(segas32_new_state, arescue)
+void segas32_new_state::init_arescue()
 {
 	m_mainpcb->init_arescue(1);
 	m_slavepcb->init_arescue(0);
 
 	m_dual_pcb_comms = std::make_unique<uint16_t[]>(0x1000/2);
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
 
-	m_slavepcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_slavepcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_slave),this));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_slave),this));
 }
 
-DRIVER_INIT_MEMBER(segas32_new_state,f1en) {
+void segas32_new_state::init_f1en() {
 	m_mainpcb->init_f1en();
 	m_slavepcb->init_f1en();
 
 	m_dual_pcb_comms = std::make_unique<uint16_t[]>(0x1000/2);
 	memset(m_dual_pcb_comms.get(), 0xff, 0x1000 / 2);
 
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
 
-	m_slavepcb->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_slavepcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_slave),this));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_slave),this));
 }
 
-DRIVER_INIT_MEMBER(segas32_new_state,f1lap)
+void segas32_new_state::init_f1lap()
 {
 	m_mainpcb->init_f1lap();
 }
@@ -5513,7 +5722,7 @@ void segas32_state::init_ga2(void)
 
 void segas32_state::init_harddunk(void)
 {
-	multi32_common_init();
+	segas32_common_init();
 	m_sw1_output = &segas32_state::harddunk_sw1_output;
 	m_sw2_output = &segas32_state::harddunk_sw2_output;
 	m_sw3_output = &segas32_state::harddunk_sw3_output;
@@ -5529,7 +5738,7 @@ void segas32_state::init_holo(void)
 void segas32_state::init_jpark(void)
 {
 	/* Temp. Patch until we emulate the 'Drive Board', thanks to Malice */
-	uint16_t *pROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *pROM = (uint16_t *)m_maincpu_region->base();
 
 	segas32_common_init();
 
@@ -5542,7 +5751,7 @@ void segas32_state::init_jpark(void)
 
 void segas32_state::init_orunners(void)
 {
-	multi32_common_init();
+	segas32_common_init();
 	m_sw1_output = &segas32_state::orunners_sw1_output;
 	m_sw2_output = &segas32_state::orunners_sw2_output;
 
@@ -5570,7 +5779,7 @@ void segas32_state::init_radr(void)
 
 void segas32_state::init_scross(void)
 {
-	multi32_common_init();
+	segas32_common_init();
 	m_soundcpu->space(AS_PROGRAM).install_write_handler(0xb0, 0xbf, write8_delegate(FUNC(segas32_state::scross_bank_w),this));
 
 	m_sw1_output = &segas32_state::scross_sw1_output;
@@ -5622,7 +5831,7 @@ void segas32_state::init_jleague(void)
 
 void segas32_state::init_titlef(void)
 {
-	multi32_common_init();
+	segas32_common_init();
 	m_sw1_output = &segas32_state::titlef_sw1_output;
 	m_sw2_output = &segas32_state::titlef_sw2_output;
 }
@@ -5634,80 +5843,81 @@ void segas32_state::init_titlef(void)
  *
  *************************************/
 
-GAME( 1992, arescue,   0,        sega_system32_dual_direct_upd7725,     arescue,  segas32_new_state, arescue,  ROT0, "Sega",   "Air Rescue (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, arescuej,  arescue,  sega_system32_dual_direct_upd7725,     arescue,  segas32_new_state, arescue,  ROT0, "Sega",   "Air Rescue (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, arescue,   0,        sega_system32_dual_direct_upd7725, arescue, segas32_new_state, init_arescue, ROT0, "Sega", "Air Rescue (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, arescueu,  arescue,  sega_system32_dual_direct_upd7725, arescue, segas32_new_state, init_arescue, ROT0, "Sega", "Air Rescue (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, arescuej,  arescue,  sega_system32_dual_direct_upd7725, arescue, segas32_new_state, init_arescue, ROT0, "Sega", "Air Rescue (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, alien3,    0,        sega_system32_analog, alien3, segas32_new_state, alien3,  ROT0, "Sega",   "Alien3: The Gun (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, alien3u,   alien3,   sega_system32_analog, alien3, segas32_new_state, alien3,  ROT0, "Sega",   "Alien3: The Gun (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, alien3j,   alien3,   sega_system32_analog, alien3, segas32_new_state, alien3,  ROT0, "Sega",   "Alien3: The Gun (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, alien3,    0,        sega_system32_analog,      alien3,   segas32_new_state, init_alien3,   ROT0, "Sega",   "Alien3: The Gun (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, alien3u,   alien3,   sega_system32_analog,      alien3,   segas32_new_state, init_alien3,   ROT0, "Sega",   "Alien3: The Gun (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, alien3j,   alien3,   sega_system32_analog,      alien3,   segas32_new_state, init_alien3,   ROT0, "Sega",   "Alien3: The Gun (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1991, arabfgt,   0,        sega_system32_arf, arabfgt,  segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (World)", MACHINE_IMPERFECT_GRAPHICS ) /* Released in 03.1992 */
-GAME( 1991, arabfgtu,  arabfgt,  sega_system32_arf, arabfgtu, segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, arabfgtj,  arabfgt,  sega_system32_arf, arabfgt,  segas32_new_state, arabfgt,  ROT0, "Sega",   "Arabian Fight (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, arabfgt,   0,        sega_system32_arf,         arabfgt,  segas32_new_state, init_arabfgt,  ROT0, "Sega",   "Arabian Fight (World)", MACHINE_IMPERFECT_GRAPHICS ) /* Released in 03.1992 */
+GAME( 1991, arabfgtu,  arabfgt,  sega_system32_arf,         arabfgtu, segas32_new_state, init_arabfgt,  ROT0, "Sega",   "Arabian Fight (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, arabfgtj,  arabfgt,  sega_system32_arf,         arabfgt,  segas32_new_state, init_arabfgt,  ROT0, "Sega",   "Arabian Fight (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, brival,    0,        sega_system32_4p,  brival,   segas32_new_state, brival,   ROT0, "Sega",   "Burning Rival (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, brivalj,   brival,   sega_system32_4p,  brival,   segas32_new_state, brival,   ROT0, "Sega",   "Burning Rival (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, brival,    0,        sega_system32_4p,          brival,   segas32_new_state, init_brival,   ROT0, "Sega",   "Burning Rival (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, brivalj,   brival,   sega_system32_4p,          brival,   segas32_new_state, init_brival,   ROT0, "Sega",   "Burning Rival (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, darkedge,  0,        sega_system32_4p,  darkedge, segas32_new_state, darkedge, ROT0, "Sega",   "Dark Edge (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, darkedgej, darkedge, sega_system32_4p,  darkedge, segas32_new_state, darkedge, ROT0, "Sega",   "Dark Edge (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, darkedge,  0,        sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, darkedgej, darkedge, sega_system32_4p,          darkedge, segas32_new_state, init_darkedge, ROT0, "Sega",   "Dark Edge (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, dbzvrvs,   0,        sega_system32_analog,          dbzvrvs,  segas32_new_state, dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z V.R.V.S. (Japan)", MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1994, dbzvrvs,   0,        sega_system32_analog,      dbzvrvs,  segas32_new_state, init_dbzvrvs,  ROT0, "Sega / Banpresto", "Dragon Ball Z V.R.V.S. (Japan)", MACHINE_IMPERFECT_GRAPHICS)
 
-GAME( 1991, f1en,      0,        sega_system32_dual_direct,     f1en,     segas32_new_state, f1en,     ROT0, "Sega",   "F1 Exhaust Note (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, f1enu,     f1en,     sega_system32_dual_direct,     f1en,     segas32_new_state, f1en,     ROT0, "Sega",   "F1 Exhaust Note (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, f1enj,     f1en,     sega_system32_dual_direct,     f1en,     segas32_new_state, f1en,     ROT0, "Sega",   "F1 Exhaust Note (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, f1en,      0,        sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, f1enu,     f1en,     sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, f1enj,     f1en,     sega_system32_dual_direct, f1en,     segas32_new_state, init_f1en,     ROT0, "Sega",   "F1 Exhaust Note (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, f1lap,     0,        sega_system32_analog, f1lap, segas32_new_state, f1lap,    ROT0, "Sega",   "F1 Super Lap (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, f1lapj,    f1lap,    sega_system32_analog, f1lap, segas32_new_state, f1lap,    ROT0, "Sega",   "F1 Super Lap (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, f1lap,     0,        sega_system32_analog,      f1lap,    segas32_new_state, init_f1lap,    ROT0, "Sega",   "F1 Super Lap (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, f1lapj,    f1lap,    sega_system32_analog,      f1lap,    segas32_new_state, init_f1lap,    ROT0, "Sega",   "F1 Super Lap (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, ga2,       0,        sega_system32_ga2, ga2,      segas32_new_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, ga2u,      ga2,      sega_system32_ga2, ga2u,     segas32_new_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, ga2j,      ga2,      sega_system32_ga2, ga2,      segas32_new_state, ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, ga2,       0,        sega_system32_ga2,         ga2,      segas32_new_state, init_ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, ga2u,      ga2,      sega_system32_ga2,         ga2u,     segas32_new_state, init_ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, ga2j,      ga2,      sega_system32_ga2,         ga2,      segas32_new_state, init_ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, holo,      0,        sega_system32,     holo,     segas32_new_state, holo,     ORIENTATION_FLIP_Y, "Sega",   "Holosseum (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, holo,      0,        sega_system32,             holo,     segas32_new_state, init_holo,     ORIENTATION_FLIP_Y, "Sega",   "Holosseum (US)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, jpark,     0,        sega_system32_analog, jpark, segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (World)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1994 */
-GAME( 1993, jparkj,    jpark,    sega_system32_analog, jpark, segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Deluxe)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, jparkja,   jpark,    sega_system32_analog, jpark, segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Deluxe)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, jparkjc,   jpark,    sega_system32_analog, jpark, segas32_new_state, jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Conversion)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, jpark,     0,        sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (World)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1994 */
+GAME( 1993, jparkj,    jpark,    sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Deluxe)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, jparkja,   jpark,    sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Deluxe)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, jparkjc,   jpark,    sega_system32_analog,      jpark,    segas32_new_state, init_jpark,    ROT0, "Sega",   "Jurassic Park (Japan, Rev A, Conversion)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, kokoroj2,  0,        sega_system32_cd,  kokoroj2, segas32_new_state, radr,     ROT0, "Sega",   "Soreike Kokology Vol. 2 - Kokoro no Tanteikyoku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER) /* uses an Audio CD */
+GAME( 1993, kokoroj2,  0,        sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology Vol. 2 - Kokoro no Tanteikyoku", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER) /* uses an Audio CD */
 
-GAME( 1990, radm,      0,        sega_system32_analog, radm,  segas32_new_state, radm,     ROT0, "Sega",   "Rad Mobile (World)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1991 */
-GAME( 1990, radmu,     radm,     sega_system32_analog, radm,  segas32_new_state, radm,     ROT0, "Sega",   "Rad Mobile (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, radm,      0,        sega_system32_analog,      radm,     segas32_new_state, init_radm,     ROT0, "Sega",   "Rad Mobile (World)", MACHINE_IMPERFECT_GRAPHICS )  /* Released in 02.1991 */
+GAME( 1990, radmu,     radm,     sega_system32_analog,      radm,     segas32_new_state, init_radm,     ROT0, "Sega",   "Rad Mobile (US)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAMEL(1991, radr,      0,        sega_system32_analog, radr,  segas32_new_state, radr,     ROT0, "Sega",   "Rad Rally (World)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
-GAMEL(1991, radru,     radr,     sega_system32_analog, radr,  segas32_new_state, radr,     ROT0, "Sega",   "Rad Rally (US)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
-GAMEL(1991, radrj,     radr,     sega_system32_analog, radr,  segas32_new_state, radr,     ROT0, "Sega",   "Rad Rally (Japan)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1991, radr,      0,        sega_system32_analog,      radr,     segas32_new_state, init_radr,     ROT0, "Sega",   "Rad Rally (World)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1991, radru,     radr,     sega_system32_analog,      radr,     segas32_new_state, init_radr,     ROT0, "Sega",   "Rad Rally (US)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1991, radrj,     radr,     sega_system32_analog,      radr,     segas32_new_state, init_radr,     ROT0, "Sega",   "Rad Rally (Japan)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
 
-GAMEL(1995, slipstrm,  0,        sega_system32_analog, slipstrm, segas32_new_state, slipstrm, ROT0, "Capcom", "Slip Stream (Brazil 950515)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
-GAMEL(1995, slipstrmh, slipstrm, sega_system32_analog, slipstrm, segas32_new_state, slipstrm, ROT0, "Capcom", "Slip Stream (Hispanic 950515)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1995, slipstrm,  0,        sega_system32_analog,      slipstrm, segas32_new_state, init_slipstrm, ROT0, "Capcom", "Slip Stream (Brazil 950515)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1995, slipstrmh, slipstrm, sega_system32_analog,      slipstrm, segas32_new_state, init_slipstrm, ROT0, "Capcom", "Slip Stream (Hispanic 950515)", MACHINE_IMPERFECT_GRAPHICS, layout_radr )
 
-GAME( 1992, sonic,     0,        sega_system32_track, sonic,  segas32_new_state, sonic,    ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, rev. C)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, sonicp,    sonic,    sega_system32_track, sonic,  segas32_new_state, sonicp,   ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, sonic,     0,        sega_system32_track,       sonic,    segas32_new_state, init_sonic,    ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, rev. C)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, sonicp,    sonic,    sega_system32_track,       sonic,    segas32_new_state, init_sonicp,   ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, prototype)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1991, spidman,   0,        sega_system32_4p,  spidman,  segas32_new_state, spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, spidmanu,  spidman,  sega_system32_4p,  spidmanu, segas32_new_state, spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, spidmanj,  spidman,  sega_system32_4p,  spidman,  segas32_new_state, spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, spidman,   0,        sega_system32_4p,          spidman,  segas32_new_state, init_spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, spidmanu,  spidman,  sega_system32_4p,          spidmanu, segas32_new_state, init_spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, spidmanj,  spidman,  sega_system32_4p,          spidman,  segas32_new_state, init_spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, svf,       0,        sega_system32,     svf,      segas32_new_state, svf,      ROT0, "Sega",   "Super Visual Football: European Sega Cup (Rev A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, svfo,      svf,      sega_system32,     svf,      segas32_new_state, svf,      ROT0, "Sega",   "Super Visual Football: European Sega Cup", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, svs,       svf,      sega_system32,     svf,      segas32_new_state, svf,      ROT0, "Sega",   "Super Visual Soccer: Sega Cup (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, jleague,   svf,      sega_system32,     svf,      segas32_new_state, jleague,  ROT0, "Sega",   "The J.League 1994 (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, jleagueo,  svf,      sega_system32,     svf,      segas32_new_state, jleague,  ROT0, "Sega",   "The J.League 1994 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, svf,       0,        sega_system32,             svf,      segas32_new_state, init_svf,      ROT0, "Sega",   "Super Visual Football: European Sega Cup (Rev A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, svfo,      svf,      sega_system32,             svf,      segas32_new_state, init_svf,      ROT0, "Sega",   "Super Visual Football: European Sega Cup", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, svs,       svf,      sega_system32,             svf,      segas32_new_state, init_svf,      ROT0, "Sega",   "Super Visual Soccer: Sega Cup (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, jleague,   svf,      sega_system32,             svf,      segas32_new_state, init_jleague,  ROT0, "Sega",   "The J.League 1994 (Japan, Rev A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, jleagueo,  svf,      sega_system32,             svf,      segas32_new_state, init_jleague,  ROT0, "Sega",   "The J.League 1994 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
 
-GAME( 1994, harddunk,  0,        sega_multi32_6p,   harddunk, segas32_new_state, harddunk, ROT0, "Sega",   "Hard Dunk (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, harddunkj, harddunk, sega_multi32_6p,   harddunk, segas32_new_state, harddunk, ROT0, "Sega",   "Hard Dunk (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, harddunk,  0,        sega_multi32_6p,           harddunk, segas32_new_state, init_harddunk, ROT0, "Sega",   "Hard Dunk (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, harddunkj, harddunk, sega_multi32_6p,           harddunk, segas32_new_state, init_harddunk, ROT0, "Sega",   "Hard Dunk (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, orunners,  0,        sega_multi32_analog, orunners, segas32_new_state, orunners, ROT0, "Sega", "OutRunners (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, orunnersu, orunners, sega_multi32_analog, orunners, segas32_new_state, orunners, ROT0, "Sega", "OutRunners (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, orunnersj, orunners, sega_multi32_analog, orunners, segas32_new_state, orunners, ROT0, "Sega", "OutRunners (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, orunners,  0,        sega_multi32_analog,       orunners, segas32_new_state, init_orunners, ROT0, "Sega", "OutRunners (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, orunnersu, orunners, sega_multi32_analog,       orunners, segas32_new_state, init_orunners, ROT0, "Sega", "OutRunners (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, orunnersj, orunners, sega_multi32_analog,       orunners, segas32_new_state, init_orunners, ROT0, "Sega", "OutRunners (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, scross,    0,        sega_multi32_analog, scross, segas32_new_state, scross,   ROT0, "Sega", "Stadium Cross (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, scrossa,   scross,   sega_multi32_analog, scross, segas32_new_state, scross,   ROT0, "Sega", "Stadium Cross (World, alt)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, scrossu,   scross,   sega_multi32_analog, scross, segas32_new_state, scross,   ROT0, "Sega", "Stadium Cross (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, scross,    0,        sega_multi32_analog,       scross,   segas32_new_state, init_scross,   ROT0, "Sega", "Stadium Cross (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, scrossa,   scross,   sega_multi32_analog,       scross,   segas32_new_state, init_scross,   ROT0, "Sega", "Stadium Cross (World, alt)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, scrossu,   scross,   sega_multi32_analog,       scross,   segas32_new_state, init_scross,   ROT0, "Sega", "Stadium Cross (US)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1992, titlef,    0,        sega_multi32,      titlef,   segas32_new_state, titlef,   ROT0, "Sega",   "Title Fight (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, titlefu,   titlef,   sega_multi32,      titlef,   segas32_new_state, titlef,   ROT0, "Sega",   "Title Fight (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, titlefj,   titlef,   sega_multi32,      titlef,   segas32_new_state, titlef,   ROT0, "Sega",   "Title Fight (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, titlef,    0,        sega_multi32,              titlef,   segas32_new_state, init_titlef,   ROT0, "Sega",   "Title Fight (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, titlefu,   titlef,   sega_multi32,              titlef,   segas32_new_state, init_titlef,   ROT0, "Sega",   "Title Fight (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, titlefj,   titlef,   sega_multi32,              titlef,   segas32_new_state, init_titlef,   ROT0, "Sega",   "Title Fight (Japan)", MACHINE_IMPERFECT_GRAPHICS )

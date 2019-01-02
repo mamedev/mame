@@ -21,8 +21,8 @@
 //**************************************************************************
 
 class a2bus_sam_device:
-	public device_t,
-	public device_a2bus_card_interface
+		public device_t,
+		public device_a2bus_card_interface
 {
 public:
 	// construction/destruction
@@ -41,6 +41,6 @@ protected:
 };
 
 // device type definition
-extern const device_type A2BUS_SAM;
+DECLARE_DEVICE_TYPE(A2BUS_SAM, a2bus_sam_device)
 
 #endif // MAME_BUS_A2BUS_A2SAM_H

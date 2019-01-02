@@ -25,6 +25,10 @@ static INPUT_PORTS_START( neogeo_irrmaze )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
+	PORT_START("START")
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+
 	PORT_START("TRACK_X")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(20) PORT_REVERSE
 
@@ -47,6 +51,7 @@ neogeo_irrmaze_device::neogeo_irrmaze_device(const machine_config &mconfig, cons
 	m_tx(*this, "TRACK_X"),
 	m_ty(*this, "TRACK_Y"),
 	m_buttons(*this, "BUTTONS"),
+	m_ss(*this, "START"),
 	m_spi_outputs(*this, "sit%u", 0U),
 	m_spi_sr(0U),
 	m_ctrl_sel(0U)
@@ -99,6 +104,15 @@ READ8_MEMBER(neogeo_irrmaze_device::in0_r)
 READ8_MEMBER(neogeo_irrmaze_device::in1_r)
 {
 	return m_buttons->read();
+}
+
+//-------------------------------------------------
+//  read_start_sel
+//-------------------------------------------------
+
+uint8_t neogeo_irrmaze_device::read_start_sel()
+{
+	return m_ss->read();
 }
 
 //-------------------------------------------------

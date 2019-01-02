@@ -330,6 +330,7 @@ struct sdl_joystick_state
 struct sdl_api_state
 {
 	SDL_Joystick *device;
+	SDL_Haptic *hapdevice;
 	SDL_JoystickID joystick_id;
 };
 
@@ -350,6 +351,11 @@ public:
 	{
 		if (sdl_state.device != nullptr)
 		{
+			if (sdl_state.hapdevice != nullptr)
+			{
+				SDL_HapticClose(sdl_state.hapdevice);
+				sdl_state.hapdevice = nullptr;
+			}
 			SDL_JoystickClose(sdl_state.device);
 			sdl_state.device = nullptr;
 		}
@@ -724,10 +730,12 @@ class sdl_joystick_module : public sdl_input_module
 {
 private:
 	device_map_t   m_joy_map;
+	bool           m_initialized_joystick;
+	bool           m_initialized_haptic;
 	bool           m_sixaxis_mode;
 public:
 	sdl_joystick_module()
-		: sdl_input_module(OSD_JOYSTICKINPUT_PROVIDER), m_sixaxis_mode(false)
+		: sdl_input_module(OSD_JOYSTICKINPUT_PROVIDER), m_initialized_joystick(false), m_initialized_haptic(false), m_sixaxis_mode(false)
 	{
 	}
 
@@ -735,17 +743,32 @@ public:
 	{
 		sdl_input_module::exit();
 
-		SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+		if (m_initialized_joystick)
+		{
+			SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+		}
+
+		if (m_initialized_haptic)
+		{
+			SDL_QuitSubSystem(SDL_INIT_HAPTIC);
+		}
 	}
 
 	virtual void input_init(running_machine &machine) override
 	{
 		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
-		if (SDL_InitSubSystem(SDL_INIT_JOYSTICK))
+		m_initialized_joystick = !SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+		if (!m_initialized_joystick)
 		{
 			osd_printf_error("Could not initialize SDL Joystick: %s.\n", SDL_GetError());
 			return;
+		}
+
+		m_initialized_haptic = !SDL_InitSubSystem(SDL_INIT_HAPTIC);
+		if (!m_initialized_haptic)
+		{
+			osd_printf_verbose("Could not initialize SDL Haptic subsystem: %s.\n", SDL_GetError());
 		}
 
 		sdl_input_module::input_init(machine);
@@ -775,10 +798,19 @@ public:
 			SDL_Joystick *joy = SDL_JoystickOpen(physical_stick);
 			devinfo->sdl_state.device = joy;
 			devinfo->sdl_state.joystick_id = SDL_JoystickInstanceID(joy);
+			devinfo->sdl_state.hapdevice = SDL_HapticOpenFromJoystick(joy);
 
 			osd_printf_verbose("Joystick: %s\n", SDL_JoystickNameForIndex(physical_stick));
 			osd_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy), SDL_JoystickNumBalls(joy));
 			osd_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick + 1);
+			if (devinfo->sdl_state.hapdevice != nullptr)
+			{
+				osd_printf_verbose("Joystick:   ...  Has haptic capability\n");
+			}
+			else
+			{
+				osd_printf_verbose("Joystick:   ...  Does not have haptic capability\n");
+			}
 
 			// loop over all axes
 			for (int axis = 0; axis < SDL_JoystickNumAxes(joy); axis++)

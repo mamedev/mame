@@ -69,6 +69,9 @@ public:
 	{
 	}
 
+	void savquest(machine_config &config);
+
+private:
 	std::unique_ptr<uint32_t[]> m_bios_f0000_ram;
 	std::unique_ptr<uint32_t[]> m_bios_e0000_ram;
 	std::unique_ptr<uint32_t[]> m_bios_e4000_ram;
@@ -113,15 +116,12 @@ public:
 	DECLARE_READ8_MEMBER(smram_r);
 	DECLARE_WRITE8_MEMBER(smram_w);
 
-	void savquest(machine_config &config);
 	void savquest_io(address_map &map);
 	void savquest_map(address_map &map);
-protected:
-
 
 	// driver_device overrides
 //  virtual void video_start();
-public:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
@@ -740,13 +740,13 @@ void savquest_state::savquest_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw(this, FUNC(savquest_state::smram_r), FUNC(savquest_state::smram_w)); //AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
+	map(0x000a0000, 0x000bffff).rw(FUNC(savquest_state::smram_r), FUNC(savquest_state::smram_w)); //AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
-	map(0x000f0000, 0x000fffff).bankr("bios_f0000").w(this, FUNC(savquest_state::bios_f0000_ram_w));
-	map(0x000e0000, 0x000e3fff).bankr("bios_e0000").w(this, FUNC(savquest_state::bios_e0000_ram_w));
-	map(0x000e4000, 0x000e7fff).bankr("bios_e4000").w(this, FUNC(savquest_state::bios_e4000_ram_w));
-	map(0x000e8000, 0x000ebfff).bankr("bios_e8000").w(this, FUNC(savquest_state::bios_e8000_ram_w));
-	map(0x000ec000, 0x000effff).bankr("bios_ec000").w(this, FUNC(savquest_state::bios_ec000_ram_w));
+	map(0x000f0000, 0x000fffff).bankr("bios_f0000").w(FUNC(savquest_state::bios_f0000_ram_w));
+	map(0x000e0000, 0x000e3fff).bankr("bios_e0000").w(FUNC(savquest_state::bios_e0000_ram_w));
+	map(0x000e4000, 0x000e7fff).bankr("bios_e4000").w(FUNC(savquest_state::bios_e4000_ram_w));
+	map(0x000e8000, 0x000ebfff).bankr("bios_e8000").w(FUNC(savquest_state::bios_e8000_ram_w));
+	map(0x000ec000, 0x000effff).bankr("bios_ec000").w(FUNC(savquest_state::bios_ec000_ram_w));
 	map(0x00100000, 0x07ffffff).ram(); // 128MB RAM
 	map(0xe0000000, 0xe0fbffff).rw(m_voodoo, FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
@@ -759,14 +759,14 @@ void savquest_state::savquest_io(address_map &map)
 
 	map(0x00e8, 0x00ef).noprw();
 
-	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
-	map(0x0378, 0x037b).rw(this, FUNC(savquest_state::parallel_port_r), FUNC(savquest_state::parallel_port_w));
+	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+	map(0x0378, 0x037b).rw(FUNC(savquest_state::parallel_port_r), FUNC(savquest_state::parallel_port_w));
 	map(0x03b0, 0x03bf).rw(m_vga, FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw(m_vga, FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw(m_vga, FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
-	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
+	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 
@@ -807,15 +807,16 @@ WRITE_LINE_MEMBER(savquest_state::vblank_assert)
 {
 }
 
-SLOT_INTERFACE_START( savquest_isa16_cards )
-	SLOT_INTERFACE("sb16", ISA16_SOUND_BLASTER_16)
-SLOT_INTERFACE_END
+void savquest_isa16_cards(device_slot_interface &device)
+{
+	device.option_add("sb16", ISA16_SOUND_BLASTER_16);
+}
 
 MACHINE_CONFIG_START(savquest_state::savquest)
-	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000) // actually Pentium II 450
-	MCFG_CPU_PROGRAM_MAP(savquest_map)
-	MCFG_CPU_IO_MAP(savquest_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM2, 450000000) // actually Pentium II 450
+	MCFG_DEVICE_PROGRAM_MAP(savquest_map)
+	MCFG_DEVICE_IO_MAP(savquest_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 	MCFG_DEVICE_REMOVE("rtc")
@@ -826,17 +827,17 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, savquest_state, intel82371ab_pci_r, intel82371ab_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(13, DEVICE_SELF, savquest_state, pci_3dfx_r, pci_3dfx_w)
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, nullptr, nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir7_w))
+	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, nullptr, nullptr, true));
+	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
 
 	/* sound hardware */
 
-	MCFG_DEVICE_ADD("isa", ISA16, 0)
-	MCFG_ISA16_CPU(":maincpu")
-	MCFG_ISA16_SLOT_ADD("isa", "isa1", savquest_isa16_cards, "sb16", false)
+	isa16_device &isa(ISA16(config, "isa", 0)); // FIXME: determine ISA bus clock
+	isa.set_cputag("maincpu");
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "isa", savquest_isa16_cards, "sb16", false)
 
 	/* video hardware */
 	pcvideo_s3_vga(config);
@@ -846,7 +847,7 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	MCFG_VOODOO_TMUMEM(4,4) /* this is the 12Mb card */
 	MCFG_VOODOO_SCREEN_TAG("screen")
 	MCFG_VOODOO_CPU_TAG("maincpu")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(savquest_state,vblank_assert))
+	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, savquest_state,vblank_assert))
 MACHINE_CONFIG_END
 
 ROM_START( savquest )
@@ -864,4 +865,4 @@ ROM_START( savquest )
 ROM_END
 
 
-GAME(1999, savquest, 0, savquest, savquest, savquest_state, 0, ROT0, "Interactive Light", "Savage Quest", MACHINE_IS_SKELETON)
+GAME(1999, savquest, 0, savquest, savquest, savquest_state, empty_init, ROT0, "Interactive Light", "Savage Quest", MACHINE_IS_SKELETON)

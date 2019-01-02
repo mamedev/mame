@@ -177,19 +177,19 @@ static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 4;
 void wwfsstar_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x080000, 0x080fff).ram().w(this, FUNC(wwfsstar_state::fg0_videoram_w)).share("fg0_videoram"); /* FG0 Ram */
-	map(0x0c0000, 0x0c0fff).ram().w(this, FUNC(wwfsstar_state::bg0_videoram_w)).share("bg0_videoram"); /* BG0 Ram */
+	map(0x080000, 0x080fff).ram().w(FUNC(wwfsstar_state::fg0_videoram_w)).share("fg0_videoram"); /* FG0 Ram */
+	map(0x0c0000, 0x0c0fff).ram().w(FUNC(wwfsstar_state::bg0_videoram_w)).share("bg0_videoram"); /* BG0 Ram */
 	map(0x100000, 0x1003ff).ram().share("spriteram");       /* SPR Ram */
 	map(0x140000, 0x140fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x180000, 0x180003).w(this, FUNC(wwfsstar_state::irqack_w));
+	map(0x180000, 0x180003).w(FUNC(wwfsstar_state::irqack_w));
 	map(0x180000, 0x180001).portr("DSW1");
 	map(0x180002, 0x180003).portr("DSW2");
 	map(0x180004, 0x180005).portr("P1");
-	map(0x180004, 0x180007).w(this, FUNC(wwfsstar_state::scroll_w));
+	map(0x180004, 0x180007).w(FUNC(wwfsstar_state::scroll_w));
 	map(0x180006, 0x180007).portr("P2");
 	map(0x180008, 0x180009).portr("SYSTEM");
 	map(0x180009, 0x180009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x18000a, 0x18000b).w(this, FUNC(wwfsstar_state::flipscreen_w));
+	map(0x18000a, 0x18000b).w(FUNC(wwfsstar_state::flipscreen_w));
 	map(0x1c0000, 0x1c3fff).ram();                             /* Work Ram */
 }
 
@@ -402,7 +402,7 @@ static const gfx_layout tiles16x16_layout =
 	64*8
 };
 
-static GFXDECODE_START( wwfsstar )
+static GFXDECODE_START( gfx_wwfsstar )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,     0, 16 )    /* colors   0-255 */
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 128, 16 )    /* colors   128-383 */
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16_layout, 256,  8 )    /* colors   256-383 */
@@ -416,35 +416,35 @@ GFXDECODE_END
 MACHINE_CONFIG_START(wwfsstar_state::wwfsstar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wwfsstar_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 320, 0, 256, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(wwfsstar_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wwfsstar)
-	MCFG_PALETTE_ADD("palette", 384)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wwfsstar);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 384);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.45);
+	ymsnd.add_route(1, "rspeaker", 0.45);
 
-	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -661,9 +661,9 @@ ROM_END
 // There is only 1 ROM difference between US revision 6 & 7.  Rev 7 has a patch to the way the 2nd coin slot works
 
 
-GAME( 1989, wwfsstar,   0,        wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (Europe)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstaru7, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (US revision 7)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstaru6, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (US revision 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstaru4, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (US revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstarj,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstarb,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "bootleg",       "WWF Superstars (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstar,   0,        wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (Europe)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstaru7, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (US revision 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstaru6, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (US revision 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstaru4, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstarj,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstarb,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "bootleg",       "WWF Superstars (bootleg)",   MACHINE_SUPPORTS_SAVE )

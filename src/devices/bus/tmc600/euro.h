@@ -111,7 +111,7 @@ protected:
 DECLARE_DEVICE_TYPE(TMC600_EURO_BUS_SLOT, tmc600_euro_bus_slot_t)
 
 
-SLOT_INTERFACE_EXTERN( tmc600_euro_bus_cards );
+void tmc600_euro_bus_cards(device_slot_interface &device);
 
 
 typedef device_type_iterator<tmc600_euro_bus_slot_t> tmc600_euro_bus_slot_t_iterator;

@@ -164,6 +164,7 @@ Given CS numbers this is released after the other GunChamp
 
 #include "emu.h"
 #include "cpu/scmp/scmp.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "gunchamps.lh"
@@ -172,12 +173,16 @@ Given CS numbers this is released after the other GunChamp
 class supershot_state : public driver_device
 {
 public:
-	supershot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	supershot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
+	void supershot(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t   *m_tilemap;
 	DECLARE_WRITE8_MEMBER(supershot_vidram_w);
@@ -188,7 +193,6 @@ public:
 	uint32_t screen_update_supershot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void supershot(machine_config &config);
 	void supershot_map(address_map &map);
 };
 
@@ -271,14 +275,14 @@ WRITE8_MEMBER(supershot_state::supershot_output1_w)
 void supershot_state::supershot_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x23ff).ram().w(this, FUNC(supershot_state::supershot_vidram_w)).share("videoram");
+	map(0x2000, 0x23ff).ram().w(FUNC(supershot_state::supershot_vidram_w)).share("videoram");
 	map(0x4100, 0x41ff).ram();
 	map(0x4200, 0x4200).portr("GUNX");
 	map(0x4201, 0x4201).portr("GUNY");
 	map(0x4202, 0x4202).portr("IN0");
 	map(0x4203, 0x4203).portr("DSW");
-	map(0x4206, 0x4206).w(this, FUNC(supershot_state::supershot_output0_w));
-	map(0x4207, 0x4207).w(this, FUNC(supershot_state::supershot_output1_w));
+	map(0x4206, 0x4206).w(FUNC(supershot_state::supershot_output0_w));
+	map(0x4207, 0x4207).w(FUNC(supershot_state::supershot_output1_w));
 }
 
 
@@ -336,15 +340,15 @@ static const gfx_layout supershot_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( supershot )
+static GFXDECODE_START( gfx_supershot )
 	GFXDECODE_ENTRY( "gfx", 0, supershot_charlayout,   0, 1  )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(supershot_state::supershot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SCMP, XTAL(11'289'000)/4)
-	MCFG_CPU_PROGRAM_MAP(supershot_map)
+	MCFG_DEVICE_ADD("maincpu", SCMP, XTAL(11'289'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(supershot_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -355,8 +359,8 @@ MACHINE_CONFIG_START(supershot_state::supershot)
 	MCFG_SCREEN_UPDATE_DRIVER(supershot_state, screen_update_supershot)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supershot)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supershot)
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	//...
@@ -399,5 +403,5 @@ ROM_START( gunchamps )
 ROM_END
 
 
-GAME( 1979, sshot,     0,        supershot, supershot, supershot_state, 0, ROT0, "Model Racing", "Super Shot",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAMEL(1980, gunchamps, gunchamp, supershot, supershot, supershot_state, 0, ROT0, "Model Racing", "Gun Champ (newer, Super Shot hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING, layout_gunchamps )
+GAME( 1979, sshot,     0,        supershot, supershot, supershot_state, empty_init, ROT0, "Model Racing", "Super Shot",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAMEL(1980, gunchamps, gunchamp, supershot, supershot, supershot_state, empty_init, ROT0, "Model Racing", "Gun Champ (newer, Super Shot hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING, layout_gunchamps )

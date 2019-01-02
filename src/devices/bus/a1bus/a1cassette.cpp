@@ -60,8 +60,8 @@ a1bus_cassette_device::a1bus_cassette_device(const machine_config &mconfig, devi
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a1bus_card_interface(mconfig, *this)
 	, m_cassette(*this, "cassette")
-	, m_rom(nullptr),
-	m_cassette_output_flipflop(0)
+	, m_rom(*this, CASSETTE_ROM_REGION)
+	, m_cassette_output_flipflop(0)
 {
 }
 
@@ -71,12 +71,8 @@ a1bus_cassette_device::a1bus_cassette_device(const machine_config &mconfig, devi
 
 void a1bus_cassette_device::device_start()
 {
-	set_a1bus_device();
-
-	m_rom = device().machine().root_device().memregion(this->subtag(CASSETTE_ROM_REGION).c_str())->base();
-
 	install_device(0xc000, 0xc0ff, read8_delegate(FUNC(a1bus_cassette_device::cassette_r), this), write8_delegate(FUNC(a1bus_cassette_device::cassette_w), this));
-	install_bank(0xc100, 0xc1ff, (char *)"bank_a1cas", m_rom);
+	install_bank(0xc100, 0xc1ff, "bank_a1cas", &m_rom[0]);
 
 	save_item(NAME(m_cassette_output_flipflop));
 }

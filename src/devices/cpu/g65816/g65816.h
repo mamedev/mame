@@ -229,8 +229,8 @@ protected:
 	unsigned m_ir;            /* Instruction Register */
 	unsigned m_irq_delay;     /* delay 1 instruction before checking irq */
 	address_space *m_data_space;
-	direct_read_data<0> *m_program_direct;
-	direct_read_data<0> *m_opcode_direct;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_program_cache;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_opcode_cache;
 	unsigned m_stopped;       /* Sets how the CPU is stopped */
 	const opcode_func* m_opcodes;
 	get_reg_func m_get_reg;

@@ -11,16 +11,12 @@
 #pragma once
 
 #include "sound/s14001a.h"
+#include "emupal.h"
 #include "screen.h"
 
 class wolfpack_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_PERIODIC
-	};
-
 	wolfpack_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_alpha_num_ram(*this, "alpha_num_ram"),
@@ -28,13 +24,20 @@ public:
 		m_s14001a(*this, "speech"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_led(*this, "led0")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
 	void wolfpack(machine_config &config);
 
-protected:
+	DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
+
+private:
+	enum
+	{
+		TIMER_PERIODIC
+	};
+
 	DECLARE_READ8_MEMBER(misc_r);
 	DECLARE_WRITE8_MEMBER(high_explo_w);
 	DECLARE_WRITE8_MEMBER(sonar_ping_w);
@@ -68,7 +71,7 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	DECLARE_PALETTE_INIT(wolfpack);
+	void wolfpack_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
@@ -80,7 +83,6 @@ protected:
 
 	void main_map(address_map &map);
 
-private:
 	// devices, pointers
 	required_shared_ptr<uint8_t> m_alpha_num_ram;
 	required_device<cpu_device> m_maincpu;
@@ -88,6 +90,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	output_finder<> m_led;
 
 	bool m_collision;
 	unsigned m_current_index;

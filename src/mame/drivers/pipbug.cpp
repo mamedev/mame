@@ -54,11 +54,13 @@ public:
 	{
 	}
 
+	void pipbug(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(pipbug_ctrl_w);
 	required_device<rs232_port_device> m_rs232;
-	required_device<cpu_device> m_maincpu;
-	DECLARE_QUICKLOAD_LOAD_MEMBER( pipbug );
-	void pipbug(machine_config &config);
+	required_device<s2650_device> m_maincpu;
+	DECLARE_QUICKLOAD_LOAD_MEMBER(pipbug);
 	void pipbug_data(address_map &map);
 	void pipbug_mem(address_map &map);
 };
@@ -78,7 +80,7 @@ void pipbug_state::pipbug_mem(address_map &map)
 void pipbug_state::pipbug_data(address_map &map)
 {
 //  ADDRESS_MAP_UNMAP_HIGH
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(this, FUNC(pipbug_state::pipbug_ctrl_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(FUNC(pipbug_state::pipbug_ctrl_w));
 }
 
 /* Input ports */
@@ -158,21 +160,23 @@ QUICKLOAD_LOAD_MEMBER( pipbug_state, pipbug )
 	return result;
 }
 
-MACHINE_CONFIG_START(pipbug_state::pipbug)
+void pipbug_state::pipbug(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(pipbug_mem)
-	MCFG_CPU_DATA_MAP(pipbug_data)
-	MCFG_S2650_FLAG_OUTPUT(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	S2650(config, m_maincpu, XTAL(1'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pipbug_state::pipbug_mem);
+	m_maincpu->set_addrmap(AS_DATA, &pipbug_state::pipbug_data);
+	m_maincpu->flag_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	/* video hardware */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(INPUTLINE("maincpu", S2650_SENSE_LINE))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
+	m_rs232->rxd_handler().set_inputline(m_maincpu, S2650_SENSE_LINE);
+	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", pipbug_state, pipbug, "pgm", 1)
-MACHINE_CONFIG_END
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(pipbug_state, pipbug), this), "pgm", 1);
+}
 
 
 /* ROM definition */
@@ -183,5 +187,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1979, pipbug, 0,      0,      pipbug,   pipbug, pipbug_state, 0,    "Signetics", "PIPBUG", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME  FLAGS
+COMP( 1979, pipbug, 0,      0,      pipbug,  pipbug, pipbug_state, empty_init, "Signetics", "PIPBUG", MACHINE_NO_SOUND_HW )

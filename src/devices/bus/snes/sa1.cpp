@@ -170,11 +170,11 @@ void sns_sa1_device::recalc_irqs()
 {
 	if (m_scpu_flags & m_scpu_sie & (SCPU_IRQ_SA1|SCPU_IRQ_CHARCONV))
 	{
-		machine().device("maincpu")->execute().set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
+		write_irq(ASSERT_LINE);
 	}
 	else
 	{
-		machine().device("maincpu")->execute().set_input_line(G65816_LINE_IRQ, CLEAR_LINE);
+		write_irq(CLEAR_LINE);
 	}
 
 	if (m_sa1_flags & m_sa1_sie & (SA1_IRQ_SCPU|SA1_IRQ_TIMER|SA1_IRQ_DMA))
@@ -1137,13 +1137,13 @@ WRITE8_MEMBER( sns_sa1_device::sa1_lo_w )
 
 void sns_sa1_device::sa1_map(address_map &map)
 {
-	map(0x000000, 0x7dffff).rw(this, FUNC(sns_sa1_device::sa1_lo_r), FUNC(sns_sa1_device::sa1_lo_w));
+	map(0x000000, 0x7dffff).rw(FUNC(sns_sa1_device::sa1_lo_r), FUNC(sns_sa1_device::sa1_lo_w));
 	map(0x7e0000, 0x7fffff).noprw();
-	map(0x800000, 0xffffff).rw(this, FUNC(sns_sa1_device::sa1_hi_r), FUNC(sns_sa1_device::sa1_hi_w));
+	map(0x800000, 0xffffff).rw(FUNC(sns_sa1_device::sa1_hi_r), FUNC(sns_sa1_device::sa1_hi_w));
 }
 
 
 MACHINE_CONFIG_START(sns_sa1_device::device_add_mconfig)
-	MCFG_CPU_ADD("sa1cpu", G65816, 10000000)
-	MCFG_CPU_PROGRAM_MAP(sa1_map)
+	MCFG_DEVICE_ADD("sa1cpu", G65816, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(sa1_map)
 MACHINE_CONFIG_END

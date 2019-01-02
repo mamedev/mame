@@ -3,83 +3,63 @@
 #ifndef MAME_INCLUDES_KONAMIGX_H
 #define MAME_INCLUDES_KONAMIGX_H
 
-#include "sound/k056800.h"
-#include "sound/k054539.h"
+#pragma once
+
 #include "cpu/tms57002/tms57002.h"
 #include "machine/adc083x.h"
 #include "machine/k053252.h"
 #include "machine/timer.h"
-#include "video/k054156_k054157_k056832.h"
+#include "sound/k056800.h"
+#include "sound/k054539.h"
 #include "video/k053246_k053247_k055673.h"
-#include "video/k055555.h"
-#include "video/k054338.h"
+#include "video/k053250.h"
 #include "video/k053936.h"
+#include "video/k054156_k054157_k056832.h"
+#include "video/k054338.h"
+#include "video/k055555.h"
+#include "emupal.h"
 #include "screen.h"
 
 class konamigx_state : public driver_device
 {
 public:
 	konamigx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_soundcpu(*this, "soundcpu"),
-		m_dasp(*this, "dasp"),
-		m_k053252(*this, "k053252"),
-		m_k055673(*this, "k055673"),
-		m_k055555(*this, "k055555"),
-		m_k056832(*this, "k056832"),
-		m_k054338(*this, "k054338"),
-		m_k056800(*this, "k056800"),
-		m_k054539_1(*this,"k054539_1"),
-		m_k054539_2(*this,"k054539_2"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_workram(*this,"workram"),
-		m_psacram(*this,"psacram"),
-		m_subpaletteram32(*this,"subpaletteram"),
-		m_k053936_0_ctrl(*this,"k053936_0_ctrl",32),
-		m_k053936_0_linectrl(*this,"k053936_0_line",32),
-		m_k053936_0_ctrl_16(*this,"k053936_0_ct16",16),
-		m_k053936_0_linectrl_16(*this,"k053936_0_li16",16),
-		m_konamigx_type3_psac2_bank(*this,"psac2_bank"),
-		m_generic_paletteram_32(*this, "paletteram"),
-		m_an0(*this, "AN0"),
-		m_an1(*this, "AN1"),
-		m_light0_x(*this, "LIGHT0_X"),
-		m_light0_y(*this, "LIGHT0_Y"),
-		m_light1_x(*this, "LIGHT1_X"),
-		m_light1_y(*this, "LIGHT1_Y"),
-		m_eepromout(*this, "EEPROMOUT"),
-		m_use_68020_post_clock_hack(0)
-		{ }
-
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_soundcpu;
-	optional_device<tms57002_device> m_dasp;
-	required_device<k053252_device> m_k053252;
-	required_device<k055673_device> m_k055673;
-	required_device<k055555_device> m_k055555;
-	required_device<k056832_device> m_k056832;
-	optional_device<k054338_device> m_k054338;
-	optional_device<k056800_device> m_k056800;
-	optional_device<k054539_device> m_k054539_1;
-	optional_device<k054539_device> m_k054539_2;
-	optional_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-
-	optional_shared_ptr<uint32_t> m_workram;
-	optional_shared_ptr<uint32_t> m_psacram;
-	optional_shared_ptr<uint32_t> m_subpaletteram32;
-	optional_shared_ptr<uint16_t> m_k053936_0_ctrl;
-	optional_shared_ptr<uint16_t> m_k053936_0_linectrl;
-	optional_shared_ptr<uint16_t> m_k053936_0_ctrl_16;
-	optional_shared_ptr<uint16_t> m_k053936_0_linectrl_16;
-	optional_shared_ptr<uint32_t> m_konamigx_type3_psac2_bank;
-	optional_shared_ptr<uint32_t> m_generic_paletteram_32;
-
-	optional_ioport m_an0, m_an1, m_light0_x, m_light0_y, m_light1_x, m_light1_y, m_eepromout;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_dasp(*this, "dasp")
+		, m_k053252(*this, "k053252")
+		, m_k055673(*this, "k055673")
+		, m_k055555(*this, "k055555")
+		, m_k056832(*this, "k056832")
+		, m_k054338(*this, "k054338")
+		, m_k056800(*this, "k056800")
+		, m_k054539_1(*this, "k054539_1")
+		, m_k054539_2(*this, "k054539_2")
+		, m_k053250_1(*this, "k053250_1")
+		, m_k053250_2(*this, "k053250_2")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_workram(*this, "workram")
+		, m_psacram(*this, "psacram")
+		, m_subpaletteram32(*this, "subpaletteram")
+		, m_k053936_0_ctrl(*this, "k053936_0_ctrl", 32)
+		, m_k053936_0_linectrl(*this, "k053936_0_line", 32)
+		, m_k053936_0_ctrl_16(*this, "k053936_0_ct16", 16)
+		, m_k053936_0_linectrl_16(*this, "k053936_0_li16", 16)
+		, m_konamigx_type3_psac2_bank(*this, "psac2_bank")
+		, m_generic_paletteram_32(*this, "paletteram")
+		, m_an0(*this, "AN0")
+		, m_an1(*this, "AN1")
+		, m_light0_x(*this, "LIGHT0_X")
+		, m_light0_y(*this, "LIGHT0_Y")
+		, m_light1_x(*this, "LIGHT1_X")
+		, m_light1_y(*this, "LIGHT1_Y")
+		, m_eepromout(*this, "EEPROMOUT")
+		, m_use_68020_post_clock_hack(0)
+		, m_lamp(*this, "lamp0")
+	{ }
 
 	DECLARE_WRITE32_MEMBER(esc_w);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
@@ -106,7 +86,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(hblank_irq_ack_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gx_rdport1_3_r);
-	DECLARE_DRIVER_INIT(konamigx);
+	void init_konamigx();
 	TILE_GET_INFO_MEMBER(get_gx_psac_tile_info);
 	TILE_GET_INFO_MEMBER(get_gx_psac3_tile_info);
 	TILE_GET_INFO_MEMBER(get_gx_psac3_alt_tile_info);
@@ -133,7 +113,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_CALLBACK_MEMBER(boothack_callback);
-	ADC083X_INPUT_CB(adc0834_callback);
+	double adc0834_callback(uint8_t input);
 	K056832_CB_MEMBER(type2_tile_callback);
 	K056832_CB_MEMBER(alpha_tile_callback);
 	K055673_CB_MEMBER(type2_sprite_callback);
@@ -186,6 +166,61 @@ public:
 	inline int K055555GX_decode_objcolor(int c18);
 	inline int K055555GX_decode_inpri(int c18);
 	int K055555GX_decode_vmixcolor(int layer, int *color);
+
+	void init_posthack();
+	void konamigx_6bpp(machine_config &config);
+	void gxtype4(machine_config &config);
+	void gxtype4_vsn(machine_config &config);
+	void racinfrc(machine_config &config);
+	void gxtype4sd2(machine_config &config);
+	void konamigx_bios(machine_config &config);
+	void gxtype3(machine_config &config);
+	void opengolf(machine_config &config);
+	void winspike(machine_config &config);
+	void le2(machine_config &config);
+	void konamigx(machine_config &config);
+	void dragoonj(machine_config &config);
+	void salmndr2(machine_config &config);
+	void tbyahhoo(machine_config &config);
+	void gokuparo(machine_config &config);
+	void sexyparo(machine_config &config);
+	void gx_base_memmap(address_map &map);
+	void gx_type1_map(address_map &map);
+	void gx_type2_map(address_map &map);
+	void gx_type3_map(address_map &map);
+	void gx_type4_map(address_map &map);
+	void gxsndmap(address_map &map);
+	void gxtmsmap(address_map &map);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_soundcpu;
+	optional_device<tms57002_device> m_dasp;
+	required_device<k053252_device> m_k053252;
+	required_device<k055673_device> m_k055673;
+	required_device<k055555_device> m_k055555;
+	required_device<k056832_device> m_k056832;
+	optional_device<k054338_device> m_k054338;
+	optional_device<k056800_device> m_k056800;
+	optional_device<k054539_device> m_k054539_1;
+	optional_device<k054539_device> m_k054539_2;
+	optional_device<k053250_device> m_k053250_1;
+	optional_device<k053250_device> m_k053250_2;
+	optional_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	optional_shared_ptr<uint32_t> m_workram;
+	optional_shared_ptr<uint32_t> m_psacram;
+	optional_shared_ptr<uint32_t> m_subpaletteram32;
+	optional_shared_ptr<uint16_t> m_k053936_0_ctrl;
+	optional_shared_ptr<uint16_t> m_k053936_0_linectrl;
+	optional_shared_ptr<uint16_t> m_k053936_0_ctrl_16;
+	optional_shared_ptr<uint16_t> m_k053936_0_linectrl_16;
+	optional_shared_ptr<uint32_t> m_konamigx_type3_psac2_bank;
+	optional_shared_ptr<uint32_t> m_generic_paletteram_32;
+
+	optional_ioport m_an0, m_an1, m_light0_x, m_light0_y, m_light1_x, m_light1_y, m_eepromout;
 
 	uint8_t m_sound_ctrl;
 	uint8_t m_sound_intck;
@@ -259,32 +294,8 @@ public:
 
 	int m_konamigx_type3_psac2_actual_bank;
 	//int m_konamigx_type3_psac2_actual_last_bank = 0;
-
-	DECLARE_DRIVER_INIT(posthack);
 	int m_use_68020_post_clock_hack;
-	void konamigx_6bpp(machine_config &config);
-	void gxtype4(machine_config &config);
-	void gxtype4_vsn(machine_config &config);
-	void racinfrc(machine_config &config);
-	void gxtype4sd2(machine_config &config);
-	void konamigx_bios(machine_config &config);
-	void gxtype3(machine_config &config);
-	void opengolf(machine_config &config);
-	void winspike(machine_config &config);
-	void le2(machine_config &config);
-	void konamigx(machine_config &config);
-	void dragoonj(machine_config &config);
-	void salmndr2(machine_config &config);
-	void tbyahhoo(machine_config &config);
-	void gokuparo(machine_config &config);
-	void sexyparo(machine_config &config);
-	void gx_base_memmap(address_map &map);
-	void gx_type1_map(address_map &map);
-	void gx_type2_map(address_map &map);
-	void gx_type3_map(address_map &map);
-	void gx_type4_map(address_map &map);
-	void gxsndmap(address_map &map);
-	void gxtmsmap(address_map &map);
+	output_finder<> m_lamp;
 };
 
 // Sprite Callbacks

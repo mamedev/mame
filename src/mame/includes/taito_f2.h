@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 #include "machine/taitocchip.h"
 #include "machine/taitoio.h"
 
@@ -16,11 +15,81 @@
 #include "video/tc0360pri.h"
 #include "video/tc0480scp.h"
 #include "machine/timer.h"
-
+#include "emupal.h"
+#include "screen.h"
 
 class taitof2_state : public driver_device
 {
 public:
+	taitof2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_sprite_extension(*this, "sprite_ext")
+		, m_spriteram(*this, "spriteram")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_cchip(*this, "cchip")
+		, m_cchip_irq_clear(*this, "cchip_irq_clear")
+		, m_oki(*this, "oki")
+		, m_tc0100scn(*this, "tc0100scn")
+		, m_tc0100scn_1(*this, "tc0100scn_1")
+		, m_tc0100scn_2(*this, "tc0100scn_2")
+		, m_tc0110pcr(*this, "tc0110pcr")
+		, m_tc0360pri(*this, "tc0360pri")
+		, m_tc0280grd(*this, "tc0280grd")
+		, m_tc0430grw(*this, "tc0430grw")
+		, m_tc0480scp(*this, "tc0480scp")
+		, m_tc0220ioc(*this, "tc0220ioc")
+		, m_tc0510nio(*this, "tc0510nio")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+	{ }
+
+
+	void taito_f2_tc0220ioc(machine_config &config);
+	void taito_f2_tc0510nio(machine_config &config);
+	void taito_f2_te7750(machine_config &config);
+	void taito_f2(machine_config &config);
+	void thundfox(machine_config &config);
+	void dinorex(machine_config &config);
+	void mjnquest(machine_config &config);
+	void cameltrya(machine_config &config);
+	void koshien(machine_config &config);
+	void qzchikyu(machine_config &config);
+	void metalb(machine_config &config);
+	void yesnoj(machine_config &config);
+	void quizhq(machine_config &config);
+	void dondokod(machine_config &config);
+	void qcrayon2(machine_config &config);
+	void qtorimon(machine_config &config);
+	void driftout(machine_config &config);
+	void solfigtr(machine_config &config);
+	void qzquest(machine_config &config);
+	void liquidk(machine_config &config);
+	void deadconx(machine_config &config);
+	void ssi(machine_config &config);
+	void pulirula(machine_config &config);
+	void growl(machine_config &config);
+	void ninjak(machine_config &config);
+	void footchmp(machine_config &config);
+	void cameltry(machine_config &config);
+	void finalb(machine_config &config);
+	void hthero(machine_config &config);
+	void driveout(machine_config &config);
+	void gunfront(machine_config &config);
+	void qcrayon(machine_config &config);
+	void megab(machine_config &config);
+	void qjinsei(machine_config &config);
+	void deadconxj(machine_config &config);
+	void footchmpbl(machine_config &config);
+	void yuyugogo(machine_config &config);
+
+	void init_driveout();
+	void init_cameltry();
+	void init_mjnquest();
+	void init_finalb();
+
+protected:
 	enum
 	{
 		TIMER_TAITOF2_INTERRUPT6
@@ -34,30 +103,6 @@ public:
 		int zoomx, zoomy;
 		int primask;
 	};
-
-	taitof2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_sprite_extension(*this, "sprite_ext"),
-			m_spriteram(*this, "spriteram"),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_cchip(*this, "cchip"),
-			m_cchip_irq_clear(*this, "cchip_irq_clear"),
-			m_oki(*this, "oki"),
-			m_tc0100scn(*this, "tc0100scn"),
-			m_tc0100scn_1(*this, "tc0100scn_1"),
-			m_tc0100scn_2(*this, "tc0100scn_2"),
-			m_tc0110pcr(*this, "tc0110pcr"),
-			m_tc0360pri(*this, "tc0360pri"),
-			m_tc0280grd(*this, "tc0280grd"),
-			m_tc0430grw(*this, "tc0430grw"),
-			m_tc0480scp(*this, "tc0480scp"),
-			m_tc0220ioc(*this, "tc0220ioc"),
-			m_tc0510nio(*this, "tc0510nio"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette")
-			{ }
-
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_sprite_extension;
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -123,6 +168,7 @@ public:
 	optional_device<tc0220ioc_device> m_tc0220ioc;
 	optional_device<tc0510nio_device> m_tc0510nio;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(coin_nibble_w);
@@ -140,10 +186,7 @@ public:
 	DECLARE_WRITE16_MEMBER(taitof2_spritebank_w);
 	DECLARE_WRITE16_MEMBER(koshien_spritebank_w);
 	DECLARE_WRITE8_MEMBER(cameltrya_porta_w);
-	DECLARE_DRIVER_INIT(driveout);
-	DECLARE_DRIVER_INIT(cameltry);
-	DECLARE_DRIVER_INIT(mjnquest);
-	DECLARE_DRIVER_INIT(finalb);
+
 	DECLARE_MACHINE_START(f2);
 	DECLARE_VIDEO_START(taitof2_default);
 	DECLARE_MACHINE_START(common);
@@ -196,43 +239,6 @@ public:
 	void taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 	uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley );
 
-	void taito_f2_tc0220ioc(machine_config &config);
-	void taito_f2_tc0510nio(machine_config &config);
-	void taito_f2_te7750(machine_config &config);
-	void taito_f2(machine_config &config);
-	void thundfox(machine_config &config);
-	void dinorex(machine_config &config);
-	void mjnquest(machine_config &config);
-	void cameltrya(machine_config &config);
-	void koshien(machine_config &config);
-	void qzchikyu(machine_config &config);
-	void metalb(machine_config &config);
-	void yesnoj(machine_config &config);
-	void quizhq(machine_config &config);
-	void dondokod(machine_config &config);
-	void qcrayon2(machine_config &config);
-	void qtorimon(machine_config &config);
-	void driftout(machine_config &config);
-	void solfigtr(machine_config &config);
-	void qzquest(machine_config &config);
-	void liquidk(machine_config &config);
-	void deadconx(machine_config &config);
-	void ssi(machine_config &config);
-	void pulirula(machine_config &config);
-	void growl(machine_config &config);
-	void ninjak(machine_config &config);
-	void footchmp(machine_config &config);
-	void cameltry(machine_config &config);
-	void finalb(machine_config &config);
-	void hthero(machine_config &config);
-	void driveout(machine_config &config);
-	void gunfront(machine_config &config);
-	void qcrayon(machine_config &config);
-	void megab(machine_config &config);
-	void qjinsei(machine_config &config);
-	void deadconxj(machine_config &config);
-	void footchmpbl(machine_config &config);
-	void yuyugogo(machine_config &config);
 	void cameltry_map(address_map &map);
 	void cameltrya_map(address_map &map);
 	void cameltrya_sound_map(address_map &map);
@@ -266,7 +272,7 @@ public:
 	void thundfox_map(address_map &map);
 	void yesnoj_map(address_map &map);
 	void yuyugogo_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 

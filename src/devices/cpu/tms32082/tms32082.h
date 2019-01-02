@@ -131,7 +131,7 @@ protected:
 	int m_icount;
 
 	address_space *m_program;
-	direct_read_data<0> * m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> * m_cache;
 
 	write32_delegate m_cmd_callback;
 
@@ -191,7 +191,7 @@ protected:
 	int m_icount;
 
 	address_space *m_program;
-	direct_read_data<0> * m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> * m_cache;
 };
 
 

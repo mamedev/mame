@@ -50,15 +50,18 @@ DEFINE_DEVICE_TYPE(VP550, vp550_device, "vp550", "VP-550 Super Sound")
 //  MACHINE_CONFIG_START( vp550 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vp550_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+void vp550_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_CDP1863_ADD(CDP1863_A_TAG, 0, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	CDP1863(config, m_pfg_a, 0);
+	m_pfg_a->set_clock2(0);
+	m_pfg_a->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_CDP1863_ADD(CDP1863_B_TAG, 0, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	CDP1863(config, m_pfg_b, 0);
+	m_pfg_b->set_clock2(0);
+	m_pfg_b->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -117,8 +120,8 @@ void vp550_device::vip_program_w(address_space &space, offs_t offset, uint8_t da
 
 		switch (offset & 0x03)
 		{
-		case 1: m_pfg_a->str_w(data); break;
-		case 2: m_pfg_b->str_w(data); break;
+		case 1: m_pfg_a->write_str(data); break;
+		case 2: m_pfg_b->write_str(data); break;
 		case 3: octave_w(space, offset, data); break;
 		}
 
@@ -136,9 +139,9 @@ void vp550_device::vip_program_w(address_space &space, offs_t offset, uint8_t da
 //  vip_sc_w - status code write
 //-------------------------------------------------
 
-void vp550_device::vip_sc_w(int data)
+void vp550_device::vip_sc_w(int n, int sc)
 {
-	if (BIT(data, 1))
+	if (BIT(sc, 1))
 	{
 		if (LOG) logerror("VP550 '%s' Clear Interrupt\n", tag());
 

@@ -25,6 +25,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -211,7 +212,7 @@ READ16_MEMBER(offtwall_state::unknown_verify_r)
 void offtwall_state::main_map(address_map &map)
 {
 	map(0x000000, 0x037fff).rom();
-	map(0x038000, 0x03ffff).r(this, FUNC(offtwall_state::bankrom_r)).region("maincpu", 0x38000).share("bankrom_base");
+	map(0x038000, 0x03ffff).r(FUNC(offtwall_state::bankrom_r)).region("maincpu", 0x38000).share("bankrom_base");
 	map(0x120000, 0x120fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x260000, 0x260001).portr("260000");
 	map(0x260002, 0x260003).portr("260002");
@@ -222,7 +223,7 @@ void offtwall_state::main_map(address_map &map)
 	map(0x260024, 0x260025).portr("260024");
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_iii_device::main_response_r));
 	map(0x260041, 0x260041).w(m_jsa, FUNC(atari_jsa_iii_device::main_command_w));
-	map(0x260050, 0x260051).w(this, FUNC(offtwall_state::io_latch_w));
+	map(0x260050, 0x260051).w(FUNC(offtwall_state::io_latch_w));
 	map(0x260060, 0x260061).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x2a0000, 0x2a0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x3e0000, 0x3e0fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
@@ -323,7 +324,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( offtwall )
+static GFXDECODE_START( gfx_offtwall )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 32 )      /* sprites & playfield */
 GFXDECODE_END
 
@@ -338,22 +339,21 @@ GFXDECODE_END
 MACHINE_CONFIG_START(offtwall_state::offtwall)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", offtwall)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_offtwall)
+	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_ATARI_VAD_PLAYFIELD(offtwall_state, "gfxdecode", get_playfield_tile_info)
-	MCFG_ATARI_VAD_MOB(offtwall_state::s_mob_config, "gfxdecode")
+	ATARI_VAD(config, m_vad, 0, "screen");
+	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(DEVICE_SELF_OWNER, FUNC(offtwall_state::get_playfield_tile_info));
+	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, "screen", offtwall_state::s_mob_config).set_gfxdecode("gfxdecode");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -364,12 +364,13 @@ MACHINE_CONFIG_START(offtwall_state::offtwall)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_III_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
-	MCFG_ATARI_JSA_TEST_PORT("260010", 6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_REMOVE("jsa:oki1")
+	ATARI_JSA_III(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
+	m_jsa->test_read_cb().set_ioport("260010").bit(6);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
+	config.device_remove("jsa:oki1");
 MACHINE_CONFIG_END
 
 
@@ -441,7 +442,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(offtwall_state,offtwall)
+void offtwall_state::init_offtwall()
 {
 	/* install son-of-slapstic workarounds */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
@@ -453,7 +454,7 @@ DRIVER_INIT_MEMBER(offtwall_state,offtwall)
 }
 
 
-DRIVER_INIT_MEMBER(offtwall_state,offtwalc)
+void offtwall_state::init_offtwalc()
 {
 	/* install son-of-slapstic workarounds */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
@@ -472,5 +473,5 @@ DRIVER_INIT_MEMBER(offtwall_state,offtwalc)
  *
  *************************************/
 
-GAME( 1991, offtwall, 0,        offtwall, offtwall, offtwall_state, offtwall, ROT0, "Atari Games", "Off the Wall (2/3-player upright)", 0 )
-GAME( 1991, offtwallc,offtwall, offtwall, offtwall, offtwall_state, offtwalc, ROT0, "Atari Games", "Off the Wall (2-player cocktail)", 0 )
+GAME( 1991, offtwall, 0,        offtwall, offtwall, offtwall_state, init_offtwall, ROT0, "Atari Games", "Off the Wall (2/3-player upright)", 0 )
+GAME( 1991, offtwallc,offtwall, offtwall, offtwall, offtwall_state, init_offtwalc, ROT0, "Atari Games", "Off the Wall (2-player cocktail)", 0 )

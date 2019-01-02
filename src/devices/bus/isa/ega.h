@@ -7,6 +7,7 @@
 
 #include "isa.h"
 #include "video/crtc_ega.h"
+#include "emupal.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -65,7 +66,7 @@ public:
 	DECLARE_READ8_MEMBER(pc_ega8_3X0_r);
 
 	/* Video memory and related variables */
-	memory_region   *m_vram;
+	std::unique_ptr<uint8_t[]> m_vram;
 	uint8_t   *m_plane[4];
 	uint8_t   m_read_latch[4];
 	uint8_t   *m_videoram;

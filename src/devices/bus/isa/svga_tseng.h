@@ -24,6 +24,8 @@ public:
 
 	DECLARE_READ8_MEMBER(input_port_0_r);
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -34,6 +36,9 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
+	void map_io();
+	void map_ram();
+	void map_rom();
 	tseng_vga_device *m_vga;
 };
 

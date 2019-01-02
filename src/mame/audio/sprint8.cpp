@@ -169,7 +169,7 @@ DISCRETE_555_MSTABLE(NODE_RELATIVE(NODE_60, _car - 1), 1, NODE_RELATIVE(NODE_50,
 DISCRETE_OP_AMP_FILTER(NODE_RELATIVE(SPRINT8_MOTOR1_SND, _car - 1), 1, NODE_RELATIVE(NODE_60, _car - 1), 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &sprint8_motor_filter)
 
 
-DISCRETE_SOUND_START( sprint8 )
+DISCRETE_SOUND_START( sprint8_discrete )
 	/************************************************
 	 * Input register mapping
 	 ************************************************/
@@ -300,13 +300,12 @@ MACHINE_CONFIG_START(sprint8_state::sprint8_audio)
 	/* sound hardware */
 	/* the proper way is to hook up 4 speakers, but they are not really
 	 * F/R/L/R speakers.  Though you can pretend the 1-2 mix is the front. */
-	MCFG_SPEAKER_ADD("speaker_1_2", 0.0, 0.0, 1.0)      /* front */
-	MCFG_SPEAKER_ADD("speaker_3_7", -0.2, 0.0, 1.0)     /* left */
-	MCFG_SPEAKER_ADD("speaker_5_6",  0.0, 0.0, -0.5)    /* back */
-	MCFG_SPEAKER_ADD("speaker_4_8", 0.2, 0.0, 1.0)      /* right */
+	SPEAKER(config, "speaker_1_2", 0.0, 0.0, 1.0);      // front
+	SPEAKER(config, "speaker_3_7", -0.2, 0.0, 1.0);     // left
+	SPEAKER(config, "speaker_5_6",  0.0, 0.0, -0.5);    // back
+	SPEAKER(config, "speaker_4_8", 0.2, 0.0, 1.0);      // right
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(sprint8)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, sprint8_discrete)
 	MCFG_SOUND_ROUTE(0, "speaker_1_2", 1.0)
 	/* volumes on other channels defaulted to off, */
 	/* user can turn them up if needed. */
@@ -315,20 +314,21 @@ MACHINE_CONFIG_START(sprint8_state::sprint8_audio)
 	MCFG_SOUND_ROUTE(2, "speaker_5_6", 0.0)
 	MCFG_SOUND_ROUTE(3, "speaker_4_8", 0.0)
 
-	MCFG_DEVICE_ADD("latch", F9334, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sprint8_state, int_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_CRASH_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_SCREECH_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(sprint8_state, team_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_ATTRACT_EN>))
+	f9334_device &latch(F9334(config, "latch"));
+	latch.q_out_cb<0>().set(FUNC(sprint8_state::int_reset_w));
+	latch.q_out_cb<1>().set("discrete", FUNC(discrete_device::write_line<SPRINT8_CRASH_EN>));
+	latch.q_out_cb<2>().set("discrete", FUNC(discrete_device::write_line<SPRINT8_SCREECH_EN>));
+	latch.q_out_cb<5>().set(FUNC(sprint8_state::team_w));
+	latch.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<SPRINT8_ATTRACT_EN>));
 
-	MCFG_DEVICE_ADD("motor", F9334, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR1_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR2_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR3_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR4_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR5_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR6_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR7_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT8_MOTOR8_EN>))
+	f9334_device &motor(F9334(config, "motor"));
+	motor.q_out_cb<0>().set("discrete", FUNC(discrete_device::write_line<SPRINT8_MOTOR1_EN>));
+	motor.q_out_cb<1>().set("discrete", FUNC(discrete_device::write_line<SPRINT8_MOTOR2_EN>));
+	motor.q_out_cb<2>().set("discrete", FUNC(discrete_device::write_line<SPRINT8_MOTOR3_EN>));
+	motor.q_out_cb<3>().set("discrete", FUNC(discrete_device::write_line<SPRINT8_MOTOR4_EN>));
+	motor.q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<SPRINT8_MOTOR5_EN>));
+	motor.q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<SPRINT8_MOTOR6_EN>));
+	motor.q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<SPRINT8_MOTOR7_EN>));
+	motor.q_out_cb<7>().set("discrete", FUNC(discrete_device::write_line<SPRINT8_MOTOR8_EN>));
 MACHINE_CONFIG_END
+;

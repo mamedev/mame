@@ -16,27 +16,6 @@ DECLARE_DEVICE_TYPE(I8088, i8088_cpu_device)
 #define INPUT_LINE_TEST         20
 
 
-#define MCFG_I8086_LOCK_HANDLER(_write) \
-	devcb = &downcast<i8086_common_cpu_device &>(*device).set_lock_handler(DEVCB_##_write);
-
-#define MCFG_I8086_IF_HANDLER(_write) \
-	devcb = &downcast<i8086_cpu_device &>(*device).set_if_handler(DEVCB_##_write);
-
-#define MCFG_I8086_STACK_MAP(map) \
-	MCFG_DEVICE_ADDRESS_MAP(i8086_cpu_device::AS_STACK, map)
-
-#define MCFG_I8086_CODE_MAP(map) \
-	MCFG_DEVICE_ADDRESS_MAP(i8086_cpu_device::AS_CODE, map)
-
-#define MCFG_I8086_EXTRA_MAP(map) \
-	MCFG_DEVICE_ADDRESS_MAP(i8086_cpu_device::AS_EXTRA, map)
-
-#define MCFG_I8086_ESC_OPCODE_HANDLER(_write) \
-	devcb = &downcast<i8086_cpu_device &>(*device).set_esc_opcode_handler(DEVCB_##_write);
-
-#define MCFG_I8086_ESC_DATA_HANDLER(_write) \
-	devcb = &downcast<i8086_cpu_device &>(*device).set_esc_data_handler(DEVCB_##_write);
-
 enum
 {
 	I8086_PC = STATE_GENPC,
@@ -49,7 +28,7 @@ enum
 class i8086_common_cpu_device : public cpu_device, public i386_disassembler::config
 {
 public:
-	template <class Object> devcb_base &set_lock_handler(Object &&cb) { return m_lock_handler.set_callback(std::forward<Object>(cb)); }
+	auto lock_handler() { return m_lock_handler.bind(); }
 
 protected:
 	enum
@@ -138,6 +117,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 50; }
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -314,9 +294,8 @@ protected:
 	uint8_t   m_test_state;
 
 	address_space *m_program, *m_opcodes;
-	direct_read_data<0> *m_direct, *m_direct_opcodes;
+	std::function<u8 (offs_t)> m_or8;
 	address_space *m_io;
-	offs_t m_fetch_xor;
 	int m_icount;
 
 	uint32_t m_prefix_seg;   /* the latest prefix segment */
@@ -366,9 +345,9 @@ public:
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-	template <class Object> devcb_base &set_if_handler(Object &&cb) { return m_out_if_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_esc_opcode_handler(Object &&cb) { return m_esc_opcode_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_esc_data_handler(Object &&cb) { return m_esc_data_handler.set_callback(std::forward<Object>(cb)); }
+	auto if_handler() { return m_out_if_func.bind(); }
+	auto esc_opcode_handler() { return m_esc_opcode_handler.bind(); }
+	auto esc_data_handler() { return m_esc_data_handler.bind(); }
 
 protected:
 	i8086_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size);

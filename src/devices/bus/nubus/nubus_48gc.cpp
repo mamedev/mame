@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(NUBUS_824GC, nubus_824gc_device, "nb_824gc", "Apple 8*24 vide
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(jmfb_device::device_add_mconfig)
-	MCFG_SCREEN_ADD( GC48_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_ADD(GC48_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, jmfb_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
 //  MCFG_SCREEN_SIZE(1152, 870)
@@ -76,10 +76,9 @@ jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const 
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
 	m_screen(nullptr), m_timer(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_stride(0), m_base(0), m_count(0), m_clutoffs(0), m_xres(0), m_yres(0),
-	m_is824(is824),
-	m_assembled_tag(util::string_format("%s:%s", tag, GC48_SCREEN_NAME))
+	m_is824(is824)
 {
-	set_screen(m_assembled_tag.c_str());
+	set_screen(*this, GC48_SCREEN_NAME);
 }
 
 nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

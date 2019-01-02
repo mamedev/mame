@@ -10,7 +10,9 @@
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define FDC9266_TAG "u43"
@@ -19,14 +21,18 @@ class tim011_state : public driver_device
 {
 public:
 	tim011_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_fdc(*this, FDC9266_TAG),
-			m_floppy0(*this, FDC9266_TAG ":0:35dd"),
-			m_floppy1(*this, FDC9266_TAG ":1:35dd"),
-			m_floppy2(*this, FDC9266_TAG ":2:35dd"),
-			m_floppy3(*this, FDC9266_TAG ":3:35dd") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_fdc(*this, FDC9266_TAG)
+		, m_floppy0(*this, FDC9266_TAG ":0:35dd")
+		, m_floppy1(*this, FDC9266_TAG ":1:35dd")
+		, m_floppy2(*this, FDC9266_TAG ":2:35dd")
+		, m_floppy3(*this, FDC9266_TAG ":3:35dd")
+	{ }
 
+	void tim011(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_tim011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -43,7 +49,6 @@ public:
 	required_device<floppy_image_device> m_floppy1;
 	required_device<floppy_image_device> m_floppy2;
 	required_device<floppy_image_device> m_floppy3;
-	void tim011(machine_config &config);
 	void tim011_io(address_map &map);
 	void tim011_mem(address_map &map);
 };
@@ -115,9 +120,10 @@ READ8_MEMBER(tim011_state::scroll_r)
 	return m_scroll;
 }
 
-static SLOT_INTERFACE_START( tim011_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void tim011_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 static const floppy_format_type tim011_floppy_formats[] = {
 	FLOPPY_IMD_FORMAT,
@@ -128,16 +134,16 @@ static const floppy_format_type tim011_floppy_formats[] = {
 
 MACHINE_CONFIG_START(tim011_state::tim011)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z180, XTAL(12'288'000) / 2) // location U17 HD64180
-	MCFG_CPU_PROGRAM_MAP(tim011_mem)
-	MCFG_CPU_IO_MAP(tim011_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tim011_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",Z180, XTAL(12'288'000) / 2) // location U17 HD64180
+	MCFG_DEVICE_PROGRAM_MAP(tim011_mem)
+	MCFG_DEVICE_IO_MAP(tim011_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tim011_state, irq0_line_hold)
 
-//  MCFG_CPU_ADD("keyboard",CDP1802, XTAL(1'750'000)) // CDP1802, unknown clock
+//  MCFG_DEVICE_ADD("keyboard",CDP1802, XTAL(1'750'000)) // CDP1802, unknown clock
 
-	// FDC9266 location U43 XTAL(8'000'000)
-	MCFG_UPD765A_ADD(FDC9266_TAG, true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ2))
+	// FDC9266 location U43
+	UPD765A(config, m_fdc, XTAL(8'000'000), true, true);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 
 	/* floppy drives */
 	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":0", tim011_floppies, "35dd", tim011_floppy_formats)
@@ -154,7 +160,7 @@ MACHINE_CONFIG_START(tim011_state::tim011)
 	MCFG_SCREEN_UPDATE_DRIVER(tim011_state, screen_update_tim011)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -167,5 +173,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT  COMPANY                    FULLNAME   FLAGS */
-COMP( 1987, tim011, 0,      0,       tim011,    tim011, tim011_state,  0,    "Mihajlo Pupin Institute", "TIM-011", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                    FULLNAME   FLAGS */
+COMP( 1987, tim011, 0,      0,      tim011,  tim011, tim011_state, empty_init, "Mihajlo Pupin Institute", "TIM-011", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -30,6 +30,7 @@ Notes:
 #include "emu.h"
 #include "cpu/h8/h83048.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -39,28 +40,30 @@ Notes:
 class sealy_state : public driver_device
 {
 public:
-	sealy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sealy_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")
 	{ }
 
+	void sealy(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
 	// screen updates
-	DECLARE_PALETTE_INIT(sealy);
+	void sealy_palette(palette_device &palette) const;
 	uint32_t screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void sealy(machine_config &config);
 	void sealy_map(address_map &map);
 };
 
 
-PALETTE_INIT_MEMBER(sealy_state,sealy)
+void sealy_state::sealy_palette(palette_device &palette) const
 {
 //  for (int i = 0; i < 32768; i++)
-//      palette.set_pen_color(i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+//      palette.set_pen_color(i, pal5bit(i >> 5), pal5bit(i >> 10), pal5bit(i >> 0));
 }
 
 uint32_t sealy_state::screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -92,7 +95,7 @@ static const gfx_layout gfxlayout_8x8x16 =
 };
 
 
-static GFXDECODE_START( sealy )
+static GFXDECODE_START( gfx_sealy )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x16, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_8x8x16, 0, 1 )
 GFXDECODE_END
@@ -101,8 +104,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sealy_state::sealy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
-	MCFG_CPU_PROGRAM_MAP(sealy_map)
+	MCFG_DEVICE_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
+	MCFG_DEVICE_PROGRAM_MAP(sealy_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -112,13 +115,12 @@ MACHINE_CONFIG_START(sealy_state::sealy)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sealy_state, screen_update_sealy)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sealy)
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_INIT_OWNER(sealy_state, sealy)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_sealy);
+	PALETTE(config, m_palette, FUNC(sealy_state::sealy_palette), 32768);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MAIN_CLOCK/13, PIN7_HIGH)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, MAIN_CLOCK/13, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -139,4 +141,4 @@ ROM_START( crzyddz )
 ROM_END
 
 
-GAME( 2004?, crzyddz,  0, sealy, sealy, sealy_state, 0, ROT0, "Sealy", "Crazy Dou Di Zhu", MACHINE_IS_SKELETON )
+GAME( 2004?, crzyddz,  0, sealy, sealy, sealy_state, empty_init, ROT0, "Sealy", "Crazy Dou Di Zhu", MACHINE_IS_SKELETON )

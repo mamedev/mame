@@ -12,18 +12,15 @@
 #include "machine/ins8250.h"
 #include "bus/rs232/rs232.h"
 
-#define MCFG_VRC5074_ADD(_tag, _cpu_tag) \
-	MCFG_PCI_HOST_ADD(_tag, VRC5074, 0x1033005a, 0x04, 0x00000000) \
-	downcast<vrc5074_device *>(device)->set_cpu_tag(_cpu_tag);
-
-#define MCFG_VRC5074_SET_SDRAM(_index, _size) \
-	downcast<vrc5074_device *>(device)->set_sdram_size(_index, _size);
-
-#define MCFG_VRC5074_SET_CS(_cs_num, _map) \
-  downcast<vrc5074_device *>(device)->set_map(_cs_num, address_map_constructor(&_map, #_map, this), this);
-
 class vrc5074_device : public pci_host_device {
 public:
+	template <typename T>
+	vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: vrc5074_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+
 	vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	required_device<ns16550_device> m_uart;
 
@@ -33,8 +30,8 @@ public:
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 	virtual void device_post_load() override;
 
-	void set_cpu_tag(const char *tag);
-	void set_sdram_size(const int index, const int size) { m_sdram_size[index] = size; };
+	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+	void set_sdram_size(int index, int size) { m_sdram_size[index] = size; };
 
 	void set_map(int id, const address_map_constructor &map, device_t *device);
 
@@ -77,17 +74,13 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	// This value is not verified to be correct
-	static constexpr unsigned SYSTEM_CLOCK = 100000000;
-
 	enum
 	{
 		AS_PCI_MEM = 1,
 		AS_PCI_IO = 2
 	};
 
-	mips3_device *m_cpu;
-	const char *cpu_tag;
+	required_device<mips3_device> m_cpu;
 	int m_sdram_size[2];
 
 	address_space_config m_mem_config, m_io_config;

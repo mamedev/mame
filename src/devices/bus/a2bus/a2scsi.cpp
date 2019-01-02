@@ -55,14 +55,15 @@ void a2bus_scsi_device::ncr5380(device_t *device)
 	devcb_base *devcb;
 	(void)devcb;
 	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5380N_DRQ_HANDLER(DEVWRITELINE("^^", a2bus_scsi_device, drq_w))
+	MCFG_NCR5380N_DRQ_HANDLER(WRITELINE("^^", a2bus_scsi_device, drq_w))
 }
 
-static SLOT_INTERFACE_START( scsi_devices )
-	SLOT_INTERFACE("cdrom", NSCSI_CDROM)
-	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
-	SLOT_INTERFACE_INTERNAL("ncr5380", NCR5380N)
-SLOT_INTERFACE_END
+static void scsi_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add_internal("ncr5380", NCR5380N);
+}
 
 ROM_START( scsi )
 	ROM_REGION(0x4000, SCSI_ROM_REGION, 0)  // this is the Rev. C ROM
@@ -87,7 +88,7 @@ MACHINE_CONFIG_START(a2bus_scsi_device::device_add_mconfig)
 	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, "harddisk", false)
 	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5380", ncr5380)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5380", ncr5380)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

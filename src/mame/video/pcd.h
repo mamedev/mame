@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-
 #ifndef MAME_VIDEO_PCD_H
 #define MAME_VIDEO_PCD_H
 
@@ -9,9 +8,10 @@
 #include "machine/pic8259.h"
 #include "machine/timer.h"
 #include "video/scn2674.h"
+#include "emupal.h"
 
-#define MCFG_PCX_VIDEO_TXD_HANDLER(_devcb) \
-	devcb = &downcast<pcx_video_device &>(*device).set_txd_handler(DEVCB_##_devcb);
+#include "diserial.h"
+
 
 class pcdx_video_device : public device_t, public device_gfx_interface
 {
@@ -19,14 +19,14 @@ public:
 	virtual void map(address_map &map) = 0;
 	DECLARE_READ8_MEMBER(detect_r);
 	DECLARE_WRITE8_MEMBER(detect_w);
-	DECLARE_PALETTE_INIT(pcdx);
 
 protected:
 	pcdx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	void pcdx_palette(palette_device &palette) const;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
-	required_device<scn2674_device> m_crtc;
 	required_device<pic8259_device> m_pic2;
 };
 
@@ -48,6 +48,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
+	required_device<scn2674_device> m_crtc;
 	required_ioport m_mouse_btn;
 	required_ioport m_mouse_x;
 	required_ioport m_mouse_y;
@@ -82,23 +83,20 @@ class pcx_video_device : public pcdx_video_device,
 {
 public:
 	pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template <class Object> devcb_base &set_txd_handler(Object &&cb) { return m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	auto txd_handler() { return m_txd_handler.bind(); }
 
 	virtual void map(address_map &map) override;
 	DECLARE_READ8_MEMBER(term_r);
 	DECLARE_WRITE8_MEMBER(term_w);
 	DECLARE_READ8_MEMBER(term_mcu_r);
 	DECLARE_WRITE8_MEMBER(term_mcu_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(vram_latch_r);
-	DECLARE_WRITE8_MEMBER(vram_latch_w);
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(p1_w);
 
 	void pcx_vid_io(address_map &map);
 	void pcx_vid_map(address_map &map);
-	void pcx_vram(address_map &map);
+	void pcx_char_ram(address_map &map);
+	void pcx_attr_ram(address_map &map);
 protected:
 	void device_start() override;
 	void device_reset() override;
@@ -109,15 +107,16 @@ protected:
 	void rcv_complete() override;
 
 private:
-	std::vector<uint8_t> m_vram;
+	required_device<scn2672_device> m_crtc;
+
 	required_region_ptr<uint8_t> m_charrom;
 	devcb_write_line m_txd_handler;
-	uint8_t m_term_key, m_term_char, m_term_stat, m_vram_latch_r[2], m_vram_latch_w[2], m_p1;
+	uint8_t m_term_key, m_term_char, m_term_stat, m_p1;
 
 	DECLARE_READ8_MEMBER(rx_callback);
 	DECLARE_WRITE8_MEMBER(tx_callback);
 
-	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
+	SCN2672_DRAW_CHARACTER_MEMBER(display_pixels);
 };
 
 DECLARE_DEVICE_TYPE(PCD_VIDEO, pcd_video_device)

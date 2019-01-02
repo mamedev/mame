@@ -80,6 +80,7 @@
 #include "bus/a1bus/a1cassette.h"
 #include "bus/a1bus/a1cffa.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -133,7 +134,6 @@ private:
 
 	emu_timer *m_ready_start_timer, *m_ready_end_timer, *m_kbd_strobe_timer;
 
-	DECLARE_PALETTE_INIT(apple2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(ram_r);
@@ -357,14 +357,14 @@ uint32_t apple1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	// the cursor 555 timer counts 0.52 of a second; the cursor is ON for
 	// 2 of those counts and OFF for the last one.
-	if (((int)(machine().time().as_double() / (0.52 / 3.0)) % 3) < 2)
+	if ((int(machine().time().as_double() / (0.52 / 3.0)) % 3) < 2)
 	{
 		curs_save = m_vram[(m_cursy * 40) + m_cursx];
 		m_vram[(m_cursy * 40) + m_cursx] = 0x40;
 		cursor_blink = 1;
 	}
 
-	for (int row = 0; row < cliprect.max_y; row += 8)
+	for (int row = 0; row < cliprect.bottom(); row += 8)
 	{
 		for (int col = 0; col < 40; col++)
 		{
@@ -434,7 +434,7 @@ WRITE8_MEMBER(apple1_state::ram_w)
 
 void apple1_state::apple1_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rw(this, FUNC(apple1_state::ram_r), FUNC(apple1_state::ram_w));
+	map(0x0000, 0xbfff).rw(FUNC(apple1_state::ram_r), FUNC(apple1_state::ram_w));
 	map(0xd010, 0xd013).mirror(0x0fec).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xe000, 0xefff).ram().share(A1_BASICRAM_TAG);
 	map(0xff00, 0xffff).rom().region(A1_CPU_TAG, 0);
@@ -494,7 +494,7 @@ WRITE8_MEMBER(apple1_state::pia_display_w)
 // and to the display hardware
 WRITE_LINE_MEMBER(apple1_state::pia_display_gate_w)
 {
-	m_pia->portb_w((state << 7) ^ 0x80);
+	m_pia->write_portb((state << 7) ^ 0x80);
 
 	// falling edge means start the display timer
 	if (state == CLEAR_LINE)
@@ -588,39 +588,38 @@ static INPUT_PORTS_START( apple1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(apple1_cards)
-	SLOT_INTERFACE("cassette", A1BUS_CASSETTE)
-	SLOT_INTERFACE("cffa", A1BUS_CFFA)
-SLOT_INTERFACE_END
+static void apple1_cards(device_slot_interface &device)
+{
+	device.option_add("cassette", A1BUS_CASSETTE);
+	device.option_add("cffa", A1BUS_CFFA);
+}
 
 MACHINE_CONFIG_START(apple1_state::apple1)
-	MCFG_CPU_ADD(A1_CPU_TAG, M6502, 960000)        // effective CPU speed
-	MCFG_CPU_PROGRAM_MAP(apple1_map)
+	MCFG_DEVICE_ADD(m_maincpu, M6502, 960000)        // effective CPU speed
+	MCFG_DEVICE_PROGRAM_MAP(apple1_map)
 
 	// video timings are identical to the Apple II, unsurprisingly
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181), (65*7)*2, 0, (40*7)*2, 262, 0, 192)
 	MCFG_SCREEN_UPDATE_DRIVER(apple1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD( A1_PIA_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(apple1_state, pia_keyboard_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(apple1_state, pia_display_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(apple1_state, pia_display_gate_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(apple1_state::pia_keyboard_r));
+	m_pia->writepb_handler().set(FUNC(apple1_state::pia_display_w));
+	m_pia->cb2_handler().set(FUNC(apple1_state::pia_display_gate_w));
 
 	MCFG_DEVICE_ADD(A1_BUS_TAG, A1BUS, 0)
-	MCFG_A1BUS_CPU("maincpu")
-	MCFG_A1BUS_SLOT_ADD(A1_BUS_TAG, "exp", apple1_cards, "cassette")
+	MCFG_A1BUS_CPU(m_maincpu)
+	MCFG_DEVICE_ADD("exp", A1BUS_SLOT, 0, A1_BUS_TAG, apple1_cards, "cassette")
 
 	MCFG_SNAPSHOT_ADD("snapshot", apple1_state, apple1, "snp", 0)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "apple1")
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
-	MCFG_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K")
+	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("4K,8K,12K,16K,20K,24K,28K,32K,36K,40K,44K");
 MACHINE_CONFIG_END
 
 ROM_START(apple1)
@@ -631,5 +630,5 @@ ROM_START(apple1)
 	ROM_LOAD("s2513.d2", 0x0000, 0x0200, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee)) // apple1.vid
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE          INIT  COMPANY            FULLNAME */
-COMP( 1976, apple1,  0,     0,      apple1,     apple1, apple1_state,  0,    "Apple Computer",  "Apple I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY           FULLNAME */
+COMP( 1976, apple1, 0,      0,      apple1,  apple1, apple1_state, empty_init, "Apple Computer", "Apple I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

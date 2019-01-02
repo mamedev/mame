@@ -5,11 +5,9 @@
 
 #pragma once
 
-#define MCFG_KONPPC_CGBOARD_NUMBER(_num) \
-	downcast<konppc_device &>(*device).set_num_boards(_num);
-
-#define MCFG_KONPPC_CGBOARD_TYPE(_cgtype) \
-	downcast<konppc_device &>(*device).set_cbboard_type(konppc_device::CGBOARD_TYPE_##_cgtype);
+#include "cpu/sharc/sharc.h"
+#include "machine/k033906.h"
+#include "video/voodoo.h"
 
 class konppc_device :  public device_t
 {
@@ -71,6 +69,11 @@ protected:
 	uint32_t nwk_fifo_r(address_space &space, int board);
 	void nwk_fifo_w(int board, uint32_t data);
 private:
+	// device finders
+	optional_device_array<adsp21062_device, 2> m_dsp;
+	optional_device_array<k033906_device, 2> m_k033906;
+	optional_device_array<voodoo_device, 2> m_voodoo;
+
 	// internal state
 	uint32_t dsp_comm_ppc[MAX_CG_BOARDS][2];
 	uint32_t dsp_comm_sharc[MAX_CG_BOARDS][2];

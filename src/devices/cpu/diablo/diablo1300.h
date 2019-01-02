@@ -74,7 +74,7 @@ protected:
 	// address spaces
 	address_space *m_program;
 	address_space *m_data;
-	direct_read_data<-1> *m_direct;
+	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
 };
 
 // device type definition

@@ -21,10 +21,10 @@ set the data line and then set the clock line.
 //**************************************************************************
 
 #define MCFG_PC_KBDC_OUT_CLOCK_CB(_devcb) \
-	devcb = &downcast<pc_kbdc_device &>(*device).set_out_clock_callback(DEVCB_##_devcb);
+	downcast<pc_kbdc_device &>(*device).set_out_clock_callback(DEVCB_##_devcb);
 
 #define MCFG_PC_KBDC_OUT_DATA_CB(_devcb) \
-	devcb = &downcast<pc_kbdc_device &>(*device).set_out_data_callback(DEVCB_##_devcb);
+	downcast<pc_kbdc_device &>(*device).set_out_data_callback(DEVCB_##_devcb);
 
 #define MCFG_PC_KBDC_SLOT_ADD(_kbdc_tag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, PC_KBDC_SLOT, 0 ) \
@@ -41,15 +41,24 @@ class pc_kbdc_slot_device : public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	pc_kbdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: pc_kbdc_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	pc_kbdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// device-level overrides
-	virtual void device_start() override;
 
 	// inline configuration
 	void set_pc_kbdc_slot(device_t *kbdc_device) { m_kbdc_device = kbdc_device; }
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	// configuration
 	device_t *m_kbdc_device;
 };
@@ -69,6 +78,8 @@ public:
 
 	template <class Object> devcb_base &set_out_clock_callback(Object &&cb) { return m_out_clock_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_data_callback(Object &&cb) { return m_out_data_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_clock_cb() { return m_out_clock_cb.bind(); }
+	auto out_data_cb() { return m_out_data_cb.bind(); }
 
 	void set_keyboard(device_pc_kbd_interface *keyboard);
 
@@ -82,8 +93,8 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	void update_clock_state();
 	void update_data_state();
@@ -91,13 +102,13 @@ protected:
 	devcb_write_line    m_out_clock_cb;
 	devcb_write_line    m_out_data_cb;
 
-	int                         m_clock_state;
-	int                         m_data_state;
+	int8_t m_clock_state;
+	int8_t m_data_state;
 
-	int                         m_mb_clock_state;
-	int                         m_mb_data_state;
-	int                         m_kb_clock_state;
-	int                         m_kb_data_state;
+	uint8_t m_mb_clock_state;
+	uint8_t m_mb_data_state;
+	uint8_t m_kb_clock_state;
+	uint8_t m_kb_data_state;
 
 	device_pc_kbd_interface     *m_keyboard;
 };
@@ -113,14 +124,9 @@ class device_pc_kbd_interface : public device_slot_card_interface
 {
 	friend class pc_kbdc_device;
 public:
-	// construction/destruction
-	device_pc_kbd_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_pc_kbd_interface();
 
 	void set_pc_kbdc_device();
-
-	int clock_signal() { return m_pc_kbdc ? m_pc_kbdc->clock_signal() : 1; }
-	int data_signal() { return m_pc_kbdc ? m_pc_kbdc->data_signal() : 1; }
 
 	//
 	// Override the clock_write and data_write methods in a keyboard implementation
@@ -132,6 +138,11 @@ public:
 	void set_pc_kbdc(device_t *kbdc_device) { m_pc_kbdc = dynamic_cast<pc_kbdc_device *>(kbdc_device); }
 
 protected:
+	device_pc_kbd_interface(const machine_config &mconfig, device_t &device);
+
+	int clock_signal() const { return m_pc_kbdc ? m_pc_kbdc->clock_signal() : 1; }
+	int data_signal() const { return m_pc_kbdc ? m_pc_kbdc->data_signal() : 1; }
+
 	pc_kbdc_device          *m_pc_kbdc;
 	const char              *m_pc_kbdc_tag;
 };

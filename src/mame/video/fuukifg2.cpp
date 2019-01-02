@@ -46,29 +46,13 @@
 
 ***************************************************************************/
 
-inline void fuuki16_state::get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
+template<int Layer>
+TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info)
 {
-	uint16_t code = m_vram[_N_][2 * tile_index + 0];
-	uint16_t attr = m_vram[_N_][2 * tile_index + 1];
-	SET_TILE_INFO_MEMBER(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
+	uint16_t code = m_vram[Layer][2 * tile_index + 0];
+	uint16_t attr = m_vram[Layer][2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER((Layer < 2) ? (1 + Layer) : 3, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
 }
-
-TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_1){ get_tile_info(tileinfo, tile_index, 1); }
-TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_2){ get_tile_info(tileinfo, tile_index, 2); }
-TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 3); }
-
-inline void fuuki16_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _N_)
-{
-	COMBINE_DATA(&m_vram[_N_][offset]);
-	m_tilemap[_N_]->mark_tile_dirty(offset / 2);
-}
-
-WRITE16_MEMBER(fuuki16_state::vram_0_w){ vram_w(offset, data, mem_mask, 0); }
-WRITE16_MEMBER(fuuki16_state::vram_1_w){ vram_w(offset, data, mem_mask, 1); }
-WRITE16_MEMBER(fuuki16_state::vram_2_w){ vram_w(offset, data, mem_mask, 2); }
-WRITE16_MEMBER(fuuki16_state::vram_3_w){ vram_w(offset, data, mem_mask, 3); }
-
 
 /***************************************************************************
 
@@ -80,24 +64,20 @@ WRITE16_MEMBER(fuuki16_state::vram_3_w){ vram_w(offset, data, mem_mask, 3); }
 
 /* Not used atm, seems to be fine without clearing pens? */
 #if 0
-PALETTE_INIT_MEMBER(fuuki16_state,fuuki16)
+void fuuki16_state::fuuki16_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int pen;
-
-	/* The game does not initialise the palette at startup. It should
-	   be totally black */
-	for (pen = 0; pen < palette.entries(); pen++)
-		palette.set_pen_color(pen,rgb_t(0,0,0));
+	// The game does not initialise the palette at startup. It should be totally black
+	for (int pen = 0; pen < palette.entries(); pen++)
+		palette.set_pen_color(pen, rgb_t:black());
 }
 #endif
 
 void fuuki16_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info_3),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info<2>),this), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fuuki16_state::get_tile_info<3>),this), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
 
 	m_tilemap[0]->set_transparent_pen(0x0f);    // 4 bits
 	m_tilemap[1]->set_transparent_pen(0xff);    // 8 bits
@@ -145,12 +125,11 @@ void fuuki16_state::video_start()
 /* Wrapper to handle bg and bg2 ttogether */
 void fuuki16_state::draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
 {
-	int buffer = (m_vregs[0x1e / 2] & 0x40);
+	int buffer = (m_vregs[0x1e / 2] & 0x40) >> 6;
 
 	switch( i )
 	{
-		case 2: if (buffer) m_tilemap[3]->draw(screen, bitmap, cliprect, flag, pri);
-				else        m_tilemap[2]->draw(screen, bitmap, cliprect, flag, pri);
+		case 2: m_tilemap[2|buffer]->draw(screen, bitmap, cliprect, flag, pri);
 				return;
 		case 1: m_tilemap[1]->draw(screen, bitmap, cliprect, flag, pri);
 				return;

@@ -534,15 +534,15 @@ WRITE8_MEMBER( mpz80_state::disp_col_w )
 
 void mpz80_state::mpz80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(mpz80_state::mmu_r), FUNC(mpz80_state::mmu_w));
+	map(0x0000, 0xffff).rw(FUNC(mpz80_state::mmu_r), FUNC(mpz80_state::mmu_w));
 /*
     Task 0 Segment 0 map:
 
     map(0x0000, 0x03ff).ram();
-    map(0x0400, 0x0400).rw(this, FUNC(mpz80_state::trap_addr_r), FUNC(mpz80_state::disp_seg_w));
-    map(0x0401, 0x0401).rw(this, FUNC(mpz80_state::keyboard_r), FUNC(mpz80_state::disp_col_w));
-    map(0x0402, 0x0402).rw(this, FUNC(mpz80_state::switch_r), FUNC(mpz80_state::task_w));
-    map(0x0403, 0x0403).rw(this, FUNC(mpz80_state::status_r), FUNC(mpz80_state::mask_w));
+    map(0x0400, 0x0400).rw(FUNC(mpz80_state::trap_addr_r), FUNC(mpz80_state::disp_seg_w));
+    map(0x0401, 0x0401).rw(FUNC(mpz80_state::keyboard_r), FUNC(mpz80_state::disp_col_w));
+    map(0x0402, 0x0402).rw(FUNC(mpz80_state::switch_r), FUNC(mpz80_state::task_w));
+    map(0x0403, 0x0403).rw(FUNC(mpz80_state::status_r), FUNC(mpz80_state::mask_w));
     map(0x0600, 0x07ff).ram().share("map_ram");
     map(0x0800, 0x0bff).rom().region(Z80_TAG, 0);
     map(0x0c00, 0x0c00).rw(AM9512_TAG, FUNC(am9512_device::read), FUNC(am9512_device::write));
@@ -555,7 +555,7 @@ void mpz80_state::mpz80_mem(address_map &map)
 
 void mpz80_state::mpz80_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(mpz80_state::mmu_io_r), FUNC(mpz80_state::mmu_io_w));
+	map(0x0000, 0xffff).rw(FUNC(mpz80_state::mmu_io_r), FUNC(mpz80_state::mmu_io_w));
 }
 
 
@@ -664,15 +664,16 @@ WRITE_LINE_MEMBER( mpz80_state::s100_nmi_w )
 //#include "bus/s100/nsmdsad.h"
 #include "bus/s100/wunderbus.h"
 
-static SLOT_INTERFACE_START( mpz80_s100_cards )
-	SLOT_INTERFACE("mm65k16s", S100_MM65K16S)
-	SLOT_INTERFACE("wunderbus", S100_WUNDERBUS)
-	SLOT_INTERFACE("dj2db", S100_DJ2DB)
-	SLOT_INTERFACE("djdma", S100_DJDMA)
-//  SLOT_INTERFACE("multio", S100_MULTIO)
-//  SLOT_INTERFACE("hdcdma", S100_HDCDMA)
-//  SLOT_INTERFACE("hdca", S100_HDCA)
-SLOT_INTERFACE_END
+static void mpz80_s100_cards(device_slot_interface &device)
+{
+	device.option_add("mm65k16s", S100_MM65K16S);
+	device.option_add("wunderbus", S100_WUNDERBUS);
+	device.option_add("dj2db", S100_DJ2DB);
+	device.option_add("djdma", S100_DJDMA);
+//  device.option_add("multio", S100_MULTIO);
+//  device.option_add("hdcdma", S100_HDCDMA);
+//  device.option_add("hdca", S100_HDCA);
+}
 
 
 
@@ -713,14 +714,14 @@ void mpz80_state::machine_reset()
 
 MACHINE_CONFIG_START(mpz80_state::mpz80)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mpz80_mem)
-	MCFG_CPU_IO_MAP(mpz80_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mpz80_mem)
+	MCFG_DEVICE_IO_MAP(mpz80_io)
 
 	// S-100
 	MCFG_DEVICE_ADD(S100_TAG, S100_BUS, XTAL(4'000'000) / 2)
-	MCFG_S100_IRQ_CALLBACK(WRITELINE(mpz80_state, s100_pint_w))
-	MCFG_S100_NMI_CALLBACK(WRITELINE(mpz80_state, s100_nmi_w))
+	MCFG_S100_IRQ_CALLBACK(WRITELINE(*this, mpz80_state, s100_pint_w))
+	MCFG_S100_NMI_CALLBACK(WRITELINE(*this, mpz80_state, s100_nmi_w))
 	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
 	MCFG_S100_SLOT_ADD(S100_TAG ":1", mpz80_s100_cards, "mm65k16s")
 	MCFG_S100_SLOT_ADD(S100_TAG ":2", mpz80_s100_cards, "wunderbus")
@@ -738,8 +739,7 @@ MACHINE_CONFIG_START(mpz80_state::mpz80)
 	MCFG_S100_SLOT_ADD(S100_TAG ":14", mpz80_s100_cards, nullptr)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("65K")
+	RAM(config, RAM_TAG).set_default_size("65K"); // 65K???
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "mpz80")
@@ -759,11 +759,11 @@ ROM_START( mpz80 )
 	ROM_REGION( 0x1000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS("447")
 	ROM_SYSTEM_BIOS( 0, "373", "3.73" )
-	ROMX_LOAD( "mpz80 mon3.73 fb34.17c", 0x0000, 0x1000, CRC(0bbffaec) SHA1(005ba726fc071f06cb1c969d170960438a3fc1a8), ROM_BIOS(1) )
+	ROMX_LOAD( "mpz80 mon3.73 fb34.17c", 0x0000, 0x1000, CRC(0bbffaec) SHA1(005ba726fc071f06cb1c969d170960438a3fc1a8), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "375", "3.75" )
-	ROMX_LOAD( "mpz80 mon3.75 0706.17c", 0x0000, 0x1000, CRC(1118a592) SHA1(d70f94c09602cd0bdc4fbaeb14989e8cc1540960), ROM_BIOS(2) )
+	ROMX_LOAD( "mpz80 mon3.75 0706.17c", 0x0000, 0x1000, CRC(1118a592) SHA1(d70f94c09602cd0bdc4fbaeb14989e8cc1540960), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "447", "4.47" )
-	ROMX_LOAD( "mon 4.47 f4f6.17c", 0x0000, 0x1000, CRC(b99c5d7f) SHA1(11181432ee524c7e5a68ead0671fc945256f5d1b), ROM_BIOS(3) )
+	ROMX_LOAD( "mon 4.47 f4f6.17c", 0x0000, 0x1000, CRC(b99c5d7f) SHA1(11181432ee524c7e5a68ead0671fc945256f5d1b), ROM_BIOS(2) )
 
 	ROM_REGION( 0x20, "s100rev2", 0 )
 	ROM_LOAD( "z80-2 15a.15a", 0x00, 0x20, CRC(8a84249d) SHA1(dfbc49c5944f110f48419fd893fa84f4f0e113b8) ) // 82S123 or 6331
@@ -780,5 +780,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE         INIT    COMPANY            FULLNAME    FLAGS
-COMP( 1980, mpz80,  0,      0,      mpz80,   mpz80, mpz80_state,  0,      "Morrow Designs",  "MPZ80",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY            FULLNAME    FLAGS
+COMP( 1980, mpz80, 0,      0,      mpz80,   mpz80, mpz80_state, empty_init, "Morrow Designs",  "MPZ80",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

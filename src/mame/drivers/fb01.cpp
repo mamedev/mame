@@ -16,7 +16,7 @@
 #include "sound/ym2151.h"
 #include "video/hd44780.h"
 
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -37,30 +37,33 @@ public:
 	{
 	}
 
+	void fb01(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
 	DECLARE_WRITE_LINE_MEMBER(midi_in);
 	DECLARE_WRITE_LINE_MEMBER(ym2164_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(upd71051_txrdy_w);
 	DECLARE_WRITE_LINE_MEMBER(upd71051_rxrdy_w);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	DECLARE_PALETTE_INIT(fb01);
+	void fb01_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(fb01_pixel_update);
 
-	void fb01(machine_config &config);
 	void fb01_io(address_map &map);
 	void fb01_mem(address_map &map);
-private:
+
+	void update_int();
+
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_upd71051;
 	required_device<midi_port_device> m_midi_thru;
 	int m_ym2164_irq;
 	int m_upd71051_txrdy;
 	int m_upd71051_rxrdy;
-
-	void update_int();
 };
 
 
@@ -80,8 +83,7 @@ void fb01_state::fb01_io(address_map &map)
 	map(0x01, 0x01).rw("ym2164", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
 
 	// 10-11  USART uPD71051C  4MHz & 4MHz / 8
-	map(0x10, 0x10).rw(m_upd71051, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x11, 0x11).rw(m_upd71051, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x11).rw(m_upd71051, FUNC(i8251_device::read), FUNC(i8251_device::write));
 
 	// 20     PANEL SWITCH
 	map(0x20, 0x20).portr("PANEL");
@@ -170,7 +172,7 @@ HD44780_PIXEL_UPDATE(fb01_state::fb01_pixel_update)
 }
 
 
-PALETTE_INIT_MEMBER(fb01_state, fb01)
+void fb01_state::fb01_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(30, 0, 0));
 	palette.set_pen_color(1, rgb_t(150, 0, 0));
@@ -179,9 +181,9 @@ PALETTE_INIT_MEMBER(fb01_state, fb01)
 
 MACHINE_CONFIG_START(fb01_state::fb01)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(fb01_mem)
-	MCFG_CPU_IO_MAP(fb01_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(fb01_mem)
+	MCFG_DEVICE_IO_MAP(fb01_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -189,41 +191,40 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(6*16, 9)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9-1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT( layout_fb01 )
+	config.set_default_layout(layout_fb01);
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(fb01_state, fb01)
+	PALETTE(config, "palette", FUNC(fb01_state::fb01_palette), 2);
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 8)   // 2x8 displayed as 1x16
 	MCFG_HD44780_PIXEL_UPDATE_CB(fb01_state,fb01_pixel_update)
 
-	MCFG_DEVICE_ADD("upd71051", I8251, XTAL(4'000'000))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(fb01_state, upd71051_rxrdy_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(fb01_state, upd71051_txrdy_w))
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
+	I8251(config, m_upd71051, XTAL(4'000'000));
+	m_upd71051->rxrdy_handler().set(FUNC(fb01_state::upd71051_rxrdy_w));
+	m_upd71051->txrdy_handler().set(FUNC(fb01_state::upd71051_txrdy_w));
+	m_upd71051->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 
 	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(4'000'000) / 8) // 500KHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(fb01_state, write_usart_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, fb01_state, write_usart_clock))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(fb01_state, midi_in))
+	MCFG_MIDI_RX_HANDLER(WRITELINE(*this, fb01_state, midi_in))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_MIDI_PORT_ADD("mdthru", midiout_slot, "midiout")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_YM2151_ADD("ym2164", XTAL(4'000'000))
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(fb01_state, ym2164_irq_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	ym2151_device &ym2164(YM2151(config, "ym2164", XTAL(4'000'000)));
+	ym2164.irq_handler().set(FUNC(fb01_state::ym2164_irq_w));
+	ym2164.add_route(0, "lspeaker", 1.00);
+	ym2164.add_route(1, "rspeaker", 1.00);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 
@@ -236,5 +237,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME  PARENT  COMPAT   MACHINE  INPUT  STATE        INIT  COMPANY   FULLNAME  FLAGS
-CONS( 1986, fb01, 0,      0,       fb01,    fb01,  fb01_state,  0,    "Yamaha", "FB-01",  MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE       INIT        COMPANY   FULLNAME  FLAGS
+CONS( 1986, fb01, 0,      0,      fb01,    fb01,  fb01_state, empty_init, "Yamaha", "FB-01",  MACHINE_SUPPORTS_SAVE )

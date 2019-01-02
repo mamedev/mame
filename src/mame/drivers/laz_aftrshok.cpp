@@ -42,10 +42,12 @@ public:
 	//  ,m_maincpu(*this, "maincpu")
 	{ }
 
+	void aftrshok(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void aftrshok(machine_config &config);
 //  required_device<mcs51_cpu_device> m_maincpu;
 };
 
@@ -66,15 +68,15 @@ void aftrshok_state::machine_reset()
 MACHINE_CONFIG_START(aftrshok_state::aftrshok)
 
 	/* basic machine hardware */
-//  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
-//  MCFG_CPU_PROGRAM_MAP(aftrshok_map)
-//  MCFG_CPU_IO_MAP(aftrshok_io)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", aftrshok_state,  irq0_line_hold)
+//  MCFG_DEVICE_ADD("maincpu", ??, 8000000) // unknown
+//  MCFG_DEVICE_PROGRAM_MAP(aftrshok_map)
+//  MCFG_DEVICE_IO_MAP(aftrshok_io)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aftrshok_state,  irq0_line_hold)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // maybe
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // maybe
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -101,5 +103,5 @@ ROM_START( aftrshoka )
 ROM_END
 
 
-GAME( 19??, aftrshok,  0,           aftrshok, aftrshok, aftrshok_state,  0, ROT0, "Lazer-tron", "After Shock (Lazer-tron, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 19??, aftrshoka, aftrshok,    aftrshok, aftrshok, aftrshok_state,  0, ROT0, "Lazer-tron", "After Shock (Lazer-tron, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, aftrshok,  0,        aftrshok, aftrshok, aftrshok_state, empty_init, ROT0, "Lazer-tron", "After Shock (Lazer-tron, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, aftrshoka, aftrshok, aftrshok, aftrshok, aftrshok_state, empty_init, ROT0, "Lazer-tron", "After Shock (Lazer-tron, set 2)", MACHINE_IS_SKELETON_MECHANICAL )

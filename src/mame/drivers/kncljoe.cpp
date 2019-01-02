@@ -48,17 +48,17 @@ WRITE8_MEMBER(kncljoe_state::sound_cmd_w)
 void kncljoe_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xcfff).ram().w(this, FUNC(kncljoe_state::kncljoe_videoram_w)).share("videoram");
-	map(0xd000, 0xd001).w(this, FUNC(kncljoe_state::kncljoe_scroll_w)).share("scrollregs");
+	map(0xc000, 0xcfff).ram().w(FUNC(kncljoe_state::kncljoe_videoram_w)).share("videoram");
+	map(0xd000, 0xd001).w(FUNC(kncljoe_state::kncljoe_scroll_w)).share("scrollregs");
 	map(0xd800, 0xd800).portr("SYSTEM");
 	map(0xd801, 0xd801).portr("P1");
 	map(0xd802, 0xd802).portr("P2");
 	map(0xd803, 0xd803).portr("DSWA");
 	map(0xd804, 0xd804).portr("DSWB");
-	map(0xd800, 0xd800).w(this, FUNC(kncljoe_state::sound_cmd_w));
-	map(0xd801, 0xd801).w(this, FUNC(kncljoe_state::kncljoe_control_w));
-	map(0xd802, 0xd802).w("sn1", FUNC(sn76489_device::write));
-	map(0xd803, 0xd803).w("sn2", FUNC(sn76489_device::write));
+	map(0xd800, 0xd800).w(FUNC(kncljoe_state::sound_cmd_w));
+	map(0xd801, 0xd801).w(FUNC(kncljoe_state::kncljoe_control_w));
+	map(0xd802, 0xd802).w("sn1", FUNC(sn76489_device::command_w));
+	map(0xd803, 0xd803).w("sn2", FUNC(sn76489_device::command_w));
 	map(0xd807, 0xd807).nopr();     /* unknown read */
 	map(0xd817, 0xd817).nopr();     /* unknown read */
 	map(0xe800, 0xefff).ram().share("spriteram");
@@ -108,14 +108,8 @@ void kncljoe_state::sound_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x0fff).nopw();
-	map(0x1000, 0x1fff).w(this, FUNC(kncljoe_state::sound_irq_ack_w));
+	map(0x1000, 0x1fff).w(FUNC(kncljoe_state::sound_irq_ack_w));
 	map(0x2000, 0x7fff).rom();
-}
-
-void kncljoe_state::sound_portmap(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(kncljoe_state::m6803_port1_r), FUNC(kncljoe_state::m6803_port1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(kncljoe_state::m6803_port2_r), FUNC(kncljoe_state::m6803_port2_w));
 }
 
 
@@ -225,7 +219,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( kncljoe )
+static GFXDECODE_START( gfx_kncljoe )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 16 )    /* colors 0x00-0x7f direct mapped */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x80, 16 )    /* colors 0x80-0x8f with lookup table */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x80, 16 )
@@ -234,7 +228,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(kncljoe_state::sound_nmi)
 {
-	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void kncljoe_state::machine_start()
@@ -258,15 +252,17 @@ void kncljoe_state::machine_reset()
 MACHINE_CONFIG_START(kncljoe_state::kncljoe)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(6'000'000))  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kncljoe_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(6'000'000))  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kncljoe_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", M6803, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kncljoe_state, sound_nmi,  (double)3970) //measured 3.970 kHz
-
+	m6803_cpu_device &soundcpu(M6803(config, "soundcpu", XTAL(3'579'545))); /* verified on pcb */
+	soundcpu.set_addrmap(AS_PROGRAM, &kncljoe_state::sound_map);
+	soundcpu.in_p1_cb().set(FUNC(kncljoe_state::m6803_port1_r));
+	soundcpu.out_p1_cb().set(FUNC(kncljoe_state::m6803_port1_w));
+	soundcpu.in_p2_cb().set(FUNC(kncljoe_state::m6803_port2_r));
+	soundcpu.out_p2_cb().set(FUNC(kncljoe_state::m6803_port2_w));
+	soundcpu.set_periodic_int(FUNC(kncljoe_state::sound_nmi), attotime::from_hz((double)3970)); //measured 3.970 kHz
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -276,27 +272,25 @@ MACHINE_CONFIG_START(kncljoe_state::kncljoe)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kncljoe_state, screen_update_kncljoe)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kncljoe)
-	MCFG_PALETTE_ADD("palette", 16*8+16*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128+16)
-	MCFG_PALETTE_INIT_OWNER(kncljoe_state, kncljoe)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kncljoe);
+	PALETTE(config, m_palette, FUNC(kncljoe_state::kncljoe_palette), 16*8+16*8, 128+16);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(3'579'545)/4) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kncljoe_state, unused_w))
+	AY8910(config, m_ay8910, XTAL(3'579'545)/4); /* verified on pcb */
+	m_ay8910->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_ay8910->port_b_write_callback().set(FUNC(kncljoe_state::unused_w));
+	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.30);
+
+	MCFG_DEVICE_ADD("sn1", SN76489, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("sn1", SN76489, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-
-	MCFG_SOUND_ADD("sn2", SN76489, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD("sn2", SN76489, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -400,6 +394,6 @@ ROM_END
 
 
 
-GAME( 1985, kncljoe,  0,       kncljoe, kncljoe, kncljoe_state, 0, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, kncljoea, kncljoe, kncljoe, kncljoe, kncljoe_state, 0, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, bcrusher, kncljoe, kncljoe, kncljoe, kncljoe_state, 0, ROT0, "bootleg",                        "Bone Crusher", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kncljoe,  0,       kncljoe, kncljoe, kncljoe_state, empty_init, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kncljoea, kncljoe, kncljoe, kncljoe, kncljoe_state, empty_init, ROT0, "Seibu Kaihatsu (Taito license)", "Knuckle Joe (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bcrusher, kncljoe, kncljoe, kncljoe, kncljoe_state, empty_init, ROT0, "bootleg",                        "Bone Crusher", MACHINE_SUPPORTS_SAVE )

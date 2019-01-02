@@ -36,6 +36,9 @@
 #define TI_VDP_TAG         "vdp"
 #define TI_SCREEN_TAG      "screen"
 #define TI_HEXBUS_TAG   "hexbus"
+#define TI_CASSETTE     "cassette"
+#define TI992_VDC_TAG   "vdc"
+
 #define TI_VDPFREQ XTAL(10'738'635)
 
 // v9938

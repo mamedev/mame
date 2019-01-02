@@ -214,7 +214,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 						tile_data^=0xff;
 
 					if(blink && m_screen->frame_number() & 0x10)
-						tile_data^=0xff;
+						tile_data = 0;
 
 					if(yi >= char_size)
 						pen = -1;
@@ -402,10 +402,10 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 		switch((offset & 0xe) + 1)
 		{
 			case 0x01:
-				m_font_addr = (data & 0xff) | (m_font_addr & 0x7f00);
+				m_font_addr = (data & 0xff) | (m_font_addr & 0xff00);
 				return;
 			case 0x03:
-				m_font_addr = ((data & 0x7f) << 8) | (m_font_addr & 0xff);
+				m_font_addr = ((data & 0xff) << 8) | (m_font_addr & 0xff);
 				return;
 			case 0x05:
 				//logerror("%02x\n",data);
@@ -416,7 +416,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 			{
 				uint32_t pcg_offset;
 
-				pcg_offset = m_font_addr << 5;
+				pcg_offset = (m_font_addr & 0x7fff) << 5;
 				pcg_offset|= m_font_line;
 				pcg_offset|= m_font_lr;
 				//logerror("%04x %02x %02x %08x\n",m_font_addr,m_font_line,m_font_lr,pcg_offset);

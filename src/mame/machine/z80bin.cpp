@@ -15,7 +15,7 @@ image_init_result z80bin_load_file(device_image_interface *image, address_space 
 	uint16_t i=0, j, size;
 	uint8_t data;
 	char pgmname[256];
-	char message[256];
+	char message[512];
 
 	image->fseek(7, SEEK_SET);
 

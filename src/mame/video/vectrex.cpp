@@ -6,7 +6,7 @@
 #include "cpu/m6809/m6809.h"
 
 
-#define ANALOG_DELAY 7800
+#define ANALOG_DELAY 8500
 
 #define INT_PER_CLOCK 550
 
@@ -49,7 +49,7 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::lightpen_trigger)
 
 	if (m_lightpen_port & 2)
 	{
-		m_maincpu->set_input_line(M6809_FIRQ_LINE, PULSE_LINE);
+		m_maincpu->pulse_input_line(M6809_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 }
 
@@ -75,7 +75,7 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::lightpen_trigger)
 
 READ8_MEMBER(vectrex_base_state::vectrex_via_r)
 {
-	return m_via6522_0->read(space, offset);
+	return m_via6522_0->read(offset);
 }
 
 WRITE8_MEMBER(vectrex_base_state::vectrex_via_w)
@@ -102,7 +102,7 @@ WRITE8_MEMBER(vectrex_base_state::vectrex_via_w)
 									period);
 		break;
 	}
-	m_via6522_0->write(space, offset, data);
+	m_via6522_0->write(offset, data);
 }
 
 

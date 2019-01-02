@@ -50,6 +50,23 @@ public:
 		m_bankmotor_delta(0)
 	{ }
 
+	void shangon_fd1089b(machine_config &config);
+	void outrun_fd1094(machine_config &config);
+	void outrundx(machine_config &config);
+	void shangon(machine_config &config);
+	void outrun_fd1089a(machine_config &config);
+	void outrun(machine_config &config);
+	void outrun_base(machine_config &config);
+
+	// game-specific driver init
+	void init_generic();
+	void init_outrun();
+	void init_outrunb();
+	void init_shangon();
+
+	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
+
+protected:
 	// PPI read/write handlers
 	DECLARE_READ8_MEMBER( unknown_porta_r );
 	DECLARE_READ8_MEMBER( unknown_portb_r );
@@ -68,12 +85,6 @@ public:
 	DECLARE_WRITE16_MEMBER( misc_io_w );
 	DECLARE_WRITE16_MEMBER( nop_w );
 
-	// game-specific driver init
-	DECLARE_DRIVER_INIT(generic);
-	DECLARE_DRIVER_INIT(outrun);
-	DECLARE_DRIVER_INIT(outrunb);
-	DECLARE_DRIVER_INIT(shangon);
-
 	// video updates
 	uint32_t screen_update_outrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_shangon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -83,22 +94,14 @@ public:
 	DECLARE_READ16_MEMBER( sega_road_control_0_r ) { return m_segaic16road->segaic16_road_control_0_r(space,offset,mem_mask); };
 	DECLARE_WRITE16_MEMBER( sega_road_control_0_w ) { m_segaic16road->segaic16_road_control_0_w(space,offset,data,mem_mask); };
 
-	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
 	TIMER_DEVICE_CALLBACK_MEMBER(bankmotor_update);
 
-	void shangon_fd1089b(machine_config &config);
-	void outrun_fd1094(machine_config &config);
-	void outrundx(machine_config &config);
-	void shangon(machine_config &config);
-	void outrun_fd1089a(machine_config &config);
-	void outrun(machine_config &config);
-	void outrun_base(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void outrun_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
 	void sub_map(address_map &map);
-protected:
+
 	// timer IDs
 	enum
 	{

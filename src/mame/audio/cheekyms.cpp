@@ -38,9 +38,9 @@ WRITE_LINE_MEMBER(cheekyms_audio_device::coin_extra_w)  { m_coin_extra->write_li
 
 
 MACHINE_CONFIG_START(cheekyms_audio_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sound_nl", NETLIST_SOUND, 48000)
+	MCFG_DEVICE_ADD("sound_nl", NETLIST_SOUND, 48000)
 	MCFG_NETLIST_SETUP(cheekyms)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

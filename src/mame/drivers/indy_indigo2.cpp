@@ -4,21 +4,39 @@
 *
 *   SGI IP22 Indigo2/Indy workstation
 *
-*   Todo: Fix tod clock set problem
-*         Fix NVRAM saving
-*         Fix SCSI DMA to handle chains properly
-*         Probably many more things
+*  Known Issues:
+*  - The proper hookup for the MAC address is unknown, requiring
+*    a fake MAC to be set up before any IRIX installers will proceed.
+*  - The IRIX 6.5.x installer kernel-panics on startup.
+*  - The IRIX 5.3 installer hangs after loading.
+*  - The Gentoo Linux live CD hangs on starting the kernel.
+*  - The disk formatting/partitioning utility for IRIX, fx, has
+*    various issues, from the disk formatting too quickly to hanging
+*    when exercising the disk.
+*  - Disk accesses frequently result in a "SYNC negotiation error"
+*    message.
 *
 *  Memory map:
 *
+*  00000000 - 0007ffff      Alias for first 512kbyte of RAM
+*  00080000 - 0008ffff      EISA I/O space (pullups on Indy)
+*  00090000 - 0009ffff      EISA I/O space Alias (pullups on Indy)
+*  000a0000 - 07ffffff      EISA Memory
+*  08000000 - 17ffffff      Low System Memory
 *  18000000 - 1effffff      RESERVED - Unused
 *  1f000000 - 1f3fffff      GIO - GFX
 *  1f400000 - 1f5fffff      GIO - EXP0
 *  1f600000 - 1f9fffff      GIO - EXP1 - Unused
-*  1fa00000 - 1fa02047      Memory Controller
+*  1fa00000 - 1fa1ffff      Memory Controller
 *  1fb00000 - 1fb1a7ff      HPC3 CHIP1
 *  1fb80000 - 1fb9a7ff      HPC3 CHIP0
-*  1fc00000 - 1fc7ffff      BIOS
+*  1fc00000 - 1fffffff      BIOS
+*  20000000 - 2fffffff      High System Memory
+*  30000000 - 7fffffff      Reserved
+*  80000000 - ffffffff      EISA Memory
+*
+*  IP22/24 has 2 pieces of PC-compatible hardware: the 8042 PS/2 keyboard/mouse
+*  interface and the 8254 PIT.  Both are licensed cores embedded in the IOC custom chip.
 *
 *  References used:
 *    MipsLinux: http://www.mips-linux.org/
@@ -29,14 +47,15 @@
 *    NetBSD: http://www.netbsd.org/
 *    gxemul: http://gavare.se/gxemul/
 *
-* Gentoo LiveCD r5 boot instructions:
-*     mess -cdrom gentoor5.chd ip225015
-*     enter the command interpreter and type "sashARCS".  press enter and
-*     it'll autoboot.
+*  Gentoo LiveCD r5 boot instructions:
+*  - Specify an appropriate LiveCD image at the command line.
+*  - Enter the command interpreter and type "sashARCS". Press enter and
+*    it will autoboot.
 *
-* IRIX boot instructions:
-*     mess -cdrom irix656inst1.chd ip225015
-*     at the menu, choose either "run diagnostics" or "install system software"
+*  IRIX boot instructions:
+*  - Specify an appropriate IRIX CD image at the command line.
+*  - At the menu, choose either "run diagnostics" or "install
+*    system software".
 *
 \*********************************************************************/
 
@@ -47,20 +66,15 @@
 
 #include "cpu/mips/mips3.h"
 
-#include "machine/ds1386.h"
-#include "machine/hal2.h"
 #include "machine/hpc3.h"
-#include "machine/ioc2.h"
 #include "machine/sgi.h"
 
 #include "sound/cdda.h"
-#include "sound/dac.h"
-#include "sound/volt_reg.h"
 
 #include "video/newport.h"
 
+#include "emupal.h"
 #include "screen.h"
-#include "speaker.h"
 
 class ip22_state : public driver_device
 {
@@ -69,108 +83,85 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_mainram(*this, "mainram")
-		, m_sgi_mc(*this, "sgi_mc")
+		, m_mem_ctrl(*this, "memctrl")
+		, m_scsi_ctrl(*this, "wd33c93")
 		, m_newport(*this, "newport")
-		, m_dac(*this, "dac")
-		, m_scsi(*this, "wd33c93")
-		, m_hal2(*this, HAL2_TAG)
-		, m_hpc3(*this, HPC3_TAG)
-		, m_ioc2(*this, "ioc2")
-		, m_rtc(*this, RTC_TAG)
+		, m_hpc3(*this, "hpc3")
 	{
 	}
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	DECLARE_WRITE32_MEMBER(ip22_write_ram);
-
-	DECLARE_DRIVER_INIT(ip225015);
-
+	void ip22_base(machine_config &config);
 	void ip225015(machine_config &config);
 	void ip224613(machine_config &config);
-	void ip244415(machine_config &config);
-	void ip225015_map(address_map &map);
+
+protected:
+	virtual void machine_reset() override;
+
+	DECLARE_READ32_MEMBER(eisa_io_r);
+
+	DECLARE_WRITE64_MEMBER(write_ram);
+
+	void ip22_map(address_map &map);
 
 	static void cdrom_config(device_t *device);
 
-	static const char* HAL2_TAG;
-	static const char* HPC3_TAG;
-	static const char* RTC_TAG;
-
-protected:
 	required_device<mips3_device> m_maincpu;
-	required_shared_ptr<uint32_t> m_mainram;
-	required_device<sgi_mc_device> m_sgi_mc;
+	required_shared_ptr<uint64_t> m_mainram;
+	required_device<sgi_mc_device> m_mem_ctrl;
+	required_device<wd33c93_device> m_scsi_ctrl;
 	required_device<newport_video_device> m_newport;
-	required_device<dac_word_interface> m_dac;
-	required_device<wd33c93_device> m_scsi;
-	required_device<hal2_device> m_hal2;
 	required_device<hpc3_device> m_hpc3;
-	required_device<ioc2_device> m_ioc2;
-	required_device<ds1386_device> m_rtc;
-
-	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 };
 
-/*static*/ const char* ip22_state::HAL2_TAG = "hal2";
-/*static*/ const char* ip22_state::HPC3_TAG = "hpc3";
-/*static*/ const char* ip22_state::RTC_TAG = "rtc";
-
-#define VERBOSE_LEVEL ( 0 )
-
-inline void ATTR_PRINTF(3,4) ip22_state::verboselog(int n_level, const char *s_fmt, ... )
+class ip24_state : public ip22_state
 {
-	if( VERBOSE_LEVEL >= n_level )
+public:
+	ip24_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ip22_state(mconfig, type, tag)
+		, m_scsi_ctrl2(*this, "wd33c93_2")
 	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror("%08x: %s", m_maincpu->pc(), buf);
 	}
+
+	void ip244415(machine_config &config);
+
+private:
+	required_device<wd33c93_device> m_scsi_ctrl2;
+};
+
+READ32_MEMBER(ip22_state::eisa_io_r)
+{
+	return 0xffffffff;
 }
 
 // a bit hackish, but makes the memory detection work properly and allows a big cleanup of the mapping
-WRITE32_MEMBER(ip22_state::ip22_write_ram)
+WRITE64_MEMBER(ip22_state::write_ram)
 {
 	// if banks 2 or 3 are enabled, do nothing, we don't support that much memory
-	if (m_sgi_mc->read(space, 0xc8/4, 0xffffffff) & 0x10001000)
+	if (m_mem_ctrl->get_mem_config(1) & 0x10001000)
 	{
 		// a random perturbation so the memory test fails
-		data ^= 0xffffffff;
+		data ^= 0xffffffffffffffffULL;
 	}
 
 	// if banks 0 or 1 have 2 membanks, also kill it, we only want 128 MB
-	if (m_sgi_mc->read(space, 0xc0/4, 0xffffffff) & 0x40004000)
+	if (m_mem_ctrl->get_mem_config(0) & 0x40004000)
 	{
 		// a random perturbation so the memory test fails
-		data ^= 0xffffffff;
+		data ^= 0xffffffffffffffffULL;
 	}
 	COMBINE_DATA(&m_mainram[offset]);
 }
 
-void ip22_state::ip225015_map(address_map &map)
+void ip22_state::ip22_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).bankrw("bank1");    /* mirror of first 512k of main RAM */
-	map(0x08000000, 0x0fffffff).share("mainram").ram().w(this, FUNC(ip22_state::ip22_write_ram));     /* 128 MB of main RAM */
+	map(0x00080000, 0x0009ffff).r(FUNC(ip22_state::eisa_io_r));
+	map(0x08000000, 0x0fffffff).share("mainram").ram().w(FUNC(ip22_state::write_ram));     /* 128 MB of main RAM */
 	map(0x1f0f0000, 0x1f0f1fff).rw(m_newport, FUNC(newport_video_device::rex3_r), FUNC(newport_video_device::rex3_w));
-	map(0x1fa00000, 0x1fa1ffff).rw(m_sgi_mc, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
-	map(0x1fb90000, 0x1fb9ffff).rw(m_hpc3, FUNC(hpc3_device::hd_enet_r), FUNC(hpc3_device::hd_enet_w));
-	map(0x1fbb0000, 0x1fbb0003).ram();   /* unknown, but read a lot and discarded */
-	map(0x1fbc0000, 0x1fbc7fff).rw(m_hpc3, FUNC(hpc3_device::hd0_r), FUNC(hpc3_device::hd0_w));
-	map(0x1fbc8000, 0x1fbcffff).rw(m_hpc3, FUNC(hpc3_device::unkpbus0_r), FUNC(hpc3_device::unkpbus0_w)).share("unkpbus0");
-	map(0x1fb80000, 0x1fb8ffff).rw(m_hpc3, FUNC(hpc3_device::pbusdma_r), FUNC(hpc3_device::pbusdma_w));
-	map(0x1fbd8000, 0x1fbd83ff).rw(m_hal2, FUNC(hal2_device::read), FUNC(hal2_device::write));
-	map(0x1fbd8400, 0x1fbd87ff).ram(); /* hack */
-	map(0x1fbd9000, 0x1fbd93ff).rw(m_hpc3, FUNC(hpc3_device::pbus4_r), FUNC(hpc3_device::pbus4_w));
-	map(0x1fbd9800, 0x1fbd9bff).rw(m_ioc2, FUNC(ioc2_device::read), FUNC(ioc2_device::write));
-	map(0x1fbdc000, 0x1fbdc7ff).ram();
-	map(0x1fbdd000, 0x1fbdd3ff).ram();
-	map(0x1fbe0000, 0x1fbe04ff).rw(m_rtc, FUNC(ds1386_device::data_r), FUNC(ds1386_device::data_w)).umask32(0x000000ff);
+	map(0x1fa00000, 0x1fa1ffff).rw(m_mem_ctrl, FUNC(sgi_mc_device::read), FUNC(sgi_mc_device::write));
+	map(0x1fb80000, 0x1fbfffff).m(m_hpc3, FUNC(hpc3_device::map));
 	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
-	map(0x20000000, 0x27ffffff).share("mainram").ram().w(this, FUNC(ip22_state::ip22_write_ram));
+	map(0x20000000, 0x27ffffff).share("mainram").ram().w(FUNC(ip22_state::write_ram));
 }
 
 void ip22_state::machine_reset()
@@ -179,16 +170,6 @@ void ip22_state::machine_reset()
 	membank("bank1")->set_base(m_mainram);
 
 	m_maincpu->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
-}
-
-void ip22_state::machine_start()
-{
-}
-
-DRIVER_INIT_MEMBER(ip22_state, ip225015)
-{
-	// IP22 uses 2 pieces of PC-compatible hardware: the 8042 PS/2 keyboard/mouse
-	// interface and the 8254 PIT.  Both are licensed cores embedded in the IOC custom chip.
 }
 
 static INPUT_PORTS_START( ip225015 )
@@ -201,74 +182,81 @@ INPUT_PORTS_END
 
 void ip22_state::cdrom_config(device_t *device)
 {
-	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, ":lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, ":rspeaker", 1.0)
+	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
+	cdda->add_route(0, ":hpc3:lspeaker", 1.0);
+	cdda->add_route(1, ":hpc3:rspeaker", 1.0);
 }
 
-MACHINE_CONFIG_START(ip22_state::ip225015)
-	MCFG_CPU_ADD("maincpu", R5000BE, 50000000*3)
-	//MCFG_MIPS3_ICACHE_SIZE(32768)
-	//MCFG_MIPS3_DCACHE_SIZE(32768)
-	MCFG_CPU_PROGRAM_MAP(ip225015_map)
-
+void ip22_state::ip22_base(machine_config &config)
+{
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 60 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1280+64, 1024+64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1279, 0, 1023)
-	MCFG_SCREEN_UPDATE_DEVICE("newport", newport_video_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(1280+64, 1024+64);
+	screen.set_visarea(0, 1279, 0, 1023);
+	screen.set_screen_update("newport", FUNC(newport_video_device::screen_update));
+	screen.screen_vblank().set(m_newport, FUNC(newport_video_device::vblank_w));
 
-	MCFG_PALETTE_ADD("palette", 65536)
+	PALETTE(config, "palette").set_entries(65536);
 
-	MCFG_NEWPORT_ADD("newport")
+	NEWPORT_VIDEO(config, m_newport, m_maincpu, m_hpc3);
 
-	MCFG_DEVICE_ADD("sgi_mc", SGI_MC, 0)
+	SGI_MC(config, m_mem_ctrl, m_maincpu, ":hpc3:eeprom");
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
+	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
+	scsi.set_slot_device(2, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
+	scsi.slot(2).set_option_machine_config("cdrom", cdrom_config);
 
-	MCFG_SOUND_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	WD33C93(config, m_scsi_ctrl);
+	m_scsi_ctrl->set_scsi_port("scsi");
+	m_scsi_ctrl->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_irq));
+	//m_scsi_ctrl->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_drq));
+}
 
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_1)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "cdrom", SCSICD, SCSI_ID_4)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
+void ip22_state::ip225015(machine_config &config)
+{
+	ip22_base(config);
 
-	MCFG_DEVICE_ADD("wd33c93", WD33C93, 0)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_WD33C93_IRQ_CB(DEVWRITELINE(HPC3_TAG, hpc3_device, scsi_irq))
+	R5000BE(config, m_maincpu, 50000000*3);
+	m_maincpu->set_icache_size(32768);
+	m_maincpu->set_dcache_size(32768);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
-	MCFG_SGI_HAL2_ADD(HAL2_TAG)
+	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl);
+}
 
-	MCFG_IOC2_GUINNESS_ADD("ioc2")
-	MCFG_IOC2_CPU("maincpu")
+void ip22_state::ip224613(machine_config &config)
+{
+	ip22_base(config);
 
-	MCFG_SGI_HPC3_ADD(HPC3_TAG)
-	MCFG_HPC3_CPU_TAG("maincpu")
-	MCFG_HPC3_SCSI_TAG("wd33c93")
-	MCFG_HPC3_IOC2_TAG("ioc2")
+	R4600BE(config, m_maincpu, 33333333*4);
+	m_maincpu->set_icache_size(32768);
+	m_maincpu->set_dcache_size(32768);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ip22_state::ip22_map);
 
-	MCFG_DS1386_8K_ADD(RTC_TAG, 32768)
-MACHINE_CONFIG_END
+	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl);
+}
 
-MACHINE_CONFIG_START(ip22_state::ip224613)
-	ip225015(config);
-	MCFG_CPU_REPLACE("maincpu", R4600BE, 133333333)
-	//MCFG_MIPS3_ICACHE_SIZE(32768)
-	//MCFG_MIPS3_DCACHE_SIZE(32768)
-	MCFG_CPU_PROGRAM_MAP( ip225015_map)
-MACHINE_CONFIG_END
+void ip24_state::ip244415(machine_config &config)
+{
+	ip22_base(config);
 
-MACHINE_CONFIG_START(ip22_state::ip244415)
-	ip225015(config);
-	MCFG_CPU_REPLACE("maincpu", R4600BE, 150000000)
-	//MCFG_MIPS3_ICACHE_SIZE(32768)
-	//MCFG_MIPS3_DCACHE_SIZE(32768)
-	MCFG_CPU_PROGRAM_MAP(ip225015_map)
-MACHINE_CONFIG_END
+	R4400BE(config, m_maincpu, 50000000*3);
+	m_maincpu->set_icache_size(32768);
+	m_maincpu->set_dcache_size(32768);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip22_map);
+
+	SCSI_PORT(config, "scsi2");
+
+	WD33C93(config, m_scsi_ctrl2);
+	m_scsi_ctrl2->set_scsi_port("scsi2");
+	m_scsi_ctrl->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_irq));
+	//m_scsi_ctrl->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_drq));
+
+	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl, m_scsi_ctrl2);
+}
 
 /* SCC init ip225015
  * Channel A
@@ -300,21 +288,21 @@ MACHINE_CONFIG_END
  * 00 <- 10 Reset External/status IE
 */
 ROM_START( ip225015 )
-	ROM_REGION( 0x80000, "user1", 0 )
-	ROM_LOAD( "ip225015.bin", 0x000000, 0x080000, CRC(aee5502e) SHA1(9243fef0a3508790651e0d6d2705c887629b1280) )
+	ROM_REGION64_BE( 0x80000, "user1", 0 )
+	ROMX_LOAD( "ip225015.bin", 0x000000, 0x080000, CRC(aee5502e) SHA1(9243fef0a3508790651e0d6d2705c887629b1280), ROM_GROUPDWORD | ROM_REVERSE )
 ROM_END
 
 ROM_START( ip224613 )
-	ROM_REGION( 0x80000, "user1", 0 )
-	ROM_LOAD( "ip224613.bin", 0x000000, 0x080000, CRC(f1868b5b) SHA1(0dcbbd776e671785b9b65f3c6dbd609794a40157) )
+	ROM_REGION64_BE( 0x80000, "user1", 0 )
+	ROMX_LOAD( "ip224613.bin", 0x000000, 0x080000, CRC(f1868b5b) SHA1(0dcbbd776e671785b9b65f3c6dbd609794a40157), ROM_GROUPDWORD | ROM_REVERSE )
 ROM_END
 
 ROM_START( ip244415 )
-	ROM_REGION( 0x80000, "user1", 0 )
-	ROM_LOAD( "ip244415.bin", 0x000000, 0x080000, CRC(2f37825a) SHA1(0d48c573b53a307478820b85aacb57b868297ca3) )
+	ROM_REGION64_BE( 0x80000, "user1", 0 )
+	ROMX_LOAD( "ip244415.bin", 0x000000, 0x080000, CRC(2f37825a) SHA1(0d48c573b53a307478820b85aacb57b868297ca3), ROM_GROUPDWORD | ROM_REVERSE )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     STATE       INIT      COMPANY                 FULLNAME                   FLAGS
-COMP( 1993, ip225015, 0,        0,        ip225015, ip225015, ip22_state, ip225015, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_NOT_WORKING )
-COMP( 1993, ip224613, 0,        0,        ip224613, ip225015, ip22_state, ip225015, "Silicon Graphics Inc", "Indy (R4600, 133MHz)",    MACHINE_NOT_WORKING )
-COMP( 1994, ip244415, 0,        0,        ip244415, ip225015, ip22_state, ip225015, "Silicon Graphics Inc", "Indigo2 (R4400, 150MHz)", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS       INIT        COMPANY                 FULLNAME                   FLAGS
+COMP( 1993, ip225015, 0,      0,      ip225015, ip225015, ip22_state, empty_init, "Silicon Graphics Inc", "Indy (R5000, 150MHz)",    MACHINE_NOT_WORKING )
+COMP( 1993, ip224613, 0,      0,      ip224613, ip225015, ip22_state, empty_init, "Silicon Graphics Inc", "Indy (R4600, 133MHz)",    MACHINE_NOT_WORKING )
+COMP( 1994, ip244415, 0,      0,      ip244415, ip225015, ip24_state, empty_init, "Silicon Graphics Inc", "Indigo2 (R4400, 150MHz)", MACHINE_NOT_WORKING )

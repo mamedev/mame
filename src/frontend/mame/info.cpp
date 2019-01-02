@@ -18,6 +18,7 @@
 
 #include "config.h"
 #include "drivenum.h"
+#include "romload.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -107,7 +108,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST display vbstart CDATA #IMPLIED>\n"
 "\t\t<!ELEMENT sound EMPTY>\n"
 "\t\t\t<!ATTLIST sound channels CDATA #REQUIRED>\n"
-"\t\t\t<!ELEMENT condition EMPTY>\n"
+"\t\t<!ELEMENT condition EMPTY>\n"
 "\t\t\t<!ATTLIST condition tag CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST condition mask CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST condition relation (eq|ne|gt|le|lt|ge) #REQUIRED>\n"
@@ -563,15 +564,8 @@ void info_xml_creator::output_one_device(machine_config &config, device_t &devic
 
 
 //-------------------------------------------------
-//  output_devices - print the XML info for devices
-//  with roms and for devices that can be mounted
-//  in slots
-//  The current solution works to some extent, but
-//  it is limited by the fact that devices are only
-//  acknowledged when attached to a driver (so that
-//  for instance sub-sub-devices could never appear
-//  in the xml input if they are not also attached
-//  directly to a driver as device or sub-device)
+//  output_devices - print the XML info for
+//  registered device types
 //-------------------------------------------------
 
 void info_xml_creator::output_devices(device_type_set const *filter)
@@ -582,7 +576,11 @@ void info_xml_creator::output_devices(device_type_set const *filter)
 	auto const action = [this, &config] (device_type type)
 			{
 				// add it at the root of the machine config
-				device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+				device_t *dev;
+				{
+					machine_config::token const tok(config.begin_configuration(config.root_device()));
+					dev = config.device_add("_tmp", type, 0);
+				}
 
 				// notify this device and all its subdevices that they are now configured
 				for (device_t &device : device_iterator(*dev))
@@ -591,7 +589,8 @@ void info_xml_creator::output_devices(device_type_set const *filter)
 
 				// print details and remove it
 				output_one_device(config, *dev, dev->tag());
-				config.device_remove(&config.root_device(), "_tmp");
+				machine_config::token const tok(config.begin_configuration(config.root_device()));
+				config.device_remove("_tmp");
 			};
 
 	// run through devices
@@ -897,35 +896,32 @@ void info_xml_creator::output_display(device_t &device, machine_flags::type cons
 			}
 
 			// output the orientation as a string
-			if (flags)
+			switch (screendev.orientation())
 			{
-				switch (*flags & machine_flags::MASK_ORIENTATION)
-				{
-				case ORIENTATION_FLIP_X:
-					fprintf(m_output, " rotate=\"0\" flipx=\"yes\"");
-					break;
-				case ORIENTATION_FLIP_Y:
-					fprintf(m_output, " rotate=\"180\" flipx=\"yes\"");
-					break;
-				case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-					fprintf(m_output, " rotate=\"180\"");
-					break;
-				case ORIENTATION_SWAP_XY:
-					fprintf(m_output, " rotate=\"90\" flipx=\"yes\"");
-					break;
-				case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X:
-					fprintf(m_output, " rotate=\"90\"");
-					break;
-				case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_Y:
-					fprintf(m_output, " rotate=\"270\"");
-					break;
-				case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-					fprintf(m_output, " rotate=\"270\" flipx=\"yes\"");
-					break;
-				default:
-					fprintf(m_output, " rotate=\"0\"");
-					break;
-				}
+			case ORIENTATION_FLIP_X:
+				fprintf(m_output, " rotate=\"0\" flipx=\"yes\"");
+				break;
+			case ORIENTATION_FLIP_Y:
+				fprintf(m_output, " rotate=\"180\" flipx=\"yes\"");
+				break;
+			case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
+				fprintf(m_output, " rotate=\"180\"");
+				break;
+			case ORIENTATION_SWAP_XY:
+				fprintf(m_output, " rotate=\"90\" flipx=\"yes\"");
+				break;
+			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X:
+				fprintf(m_output, " rotate=\"90\"");
+				break;
+			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_Y:
+				fprintf(m_output, " rotate=\"270\"");
+				break;
+			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
+				fprintf(m_output, " rotate=\"270\" flipx=\"yes\"");
+				break;
+			default:
+				fprintf(m_output, " rotate=\"0\"");
+				break;
 			}
 
 			// output width and height only for games that are not vector
@@ -1756,6 +1752,7 @@ void info_xml_creator::output_slots(machine_config &config, device_t &device, co
 
 		if (devtypes || listed)
 		{
+			machine_config::token const tok(config.begin_configuration(slot.device()));
 			std::string newtag(slot.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
@@ -1767,7 +1764,7 @@ void info_xml_creator::output_slots(machine_config &config, device_t &device, co
 			{
 				if (devtypes || (listed && option.second->selectable()))
 				{
-					device_t *const dev = config.device_add(&slot.device(), "_dummy", option.second->devtype(), option.second->clock());
+					device_t *const dev = config.device_add("_dummy", option.second->devtype(), option.second->clock());
 					if (!dev->configured())
 						dev->config_complete();
 
@@ -1783,7 +1780,7 @@ void info_xml_creator::output_slots(machine_config &config, device_t &device, co
 						fprintf(m_output, "/>\n");
 					}
 
-					config.device_remove(&slot.device(), "_dummy");
+					config.device_remove("_dummy");
 				}
 			}
 

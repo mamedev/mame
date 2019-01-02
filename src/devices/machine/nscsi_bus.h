@@ -119,6 +119,30 @@ protected:
 		SS_QUEUE_FULL                    = 0x28
 	};
 
+	// SCSI sense keys
+	enum {
+		SK_NO_SENSE                      = 0x00,
+		SK_RECOVERED_ERROR               = 0x01,
+		SK_NOT_READY                     = 0x02,
+		SK_MEDIUM_ERROR                  = 0x03,
+		SK_HARDWARE_ERROR                = 0x04,
+		SK_ILLEGAL_REQUEST               = 0x05,
+		SK_UNIT_ATTENTION                = 0x06,
+		SK_DATA_PROTECT                  = 0x07,
+		SK_BLANK_CHECK                   = 0x08,
+		SK_VENDOR_SPECIFIC               = 0x09,
+		SK_COPY_ABORTED                  = 0x0a,
+		SK_ABORTED_COMMAND               = 0x0b,
+		SK_VOLUME_OVERFLOW               = 0x0d,
+		SK_MISCOMPARE                    = 0x0e,
+		SK_COMPLETED                     = 0x0f
+	};
+
+	// SCSI addtional sense code qualifiers
+	enum {
+		SK_ASC_MEDIUM_NOT_PRESENT       = 0x3a
+	};
+
 	// SCSI commands
 	static const char *const command_names[256];
 	enum {
@@ -285,7 +309,7 @@ protected:
 	void scsi_data_in(int buf, int size);
 	void scsi_data_out(int buf, int size);
 
-	void sense(bool deferred, uint8_t key);
+	void sense(bool deferred, uint8_t key, uint8_t asc = 0, uint8_t ascq = 0);
 	int get_lun(int def = 0);
 	void bad_lun();
 
@@ -354,7 +378,7 @@ protected:
 	// Fast negation period (30ns)
 	virtual attotime scsi_fast_negation_period();
 
-	uint8_t scsi_cmdbuf[4096], scsi_sense_buffer[8];
+	uint8_t scsi_cmdbuf[4096], scsi_sense_buffer[18];
 	int scsi_cmdsize;
 	uint8_t scsi_identify;
 

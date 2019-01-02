@@ -1,21 +1,28 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
-#include "video/poly.h"
+#ifndef MAME_INCLUDES_MODEL2_H
+#define MAME_INCLUDES_MODEL2_H
+
+#pragma once
+
 #include "audio/dsbz80.h"
 #include "audio/segam1audio.h"
-#include "machine/eepromser.h"
-#include "machine/i8251.h"
 #include "cpu/i960/i960.h"
 #include "cpu/mb86233/mb86233.h"
 #include "cpu/sharc/sharc.h"
 #include "cpu/mb86235/mb86235.h"
-#include "machine/bankdev.h"
-#include "machine/gen_fifo.h"
-#include "sound/scsp.h"
 #include "machine/315-5881_crypt.h"
 #include "machine/315-5838_317-0229_comp.h"
+#include "machine/bankdev.h"
+#include "machine/eepromser.h"
+#include "machine/gen_fifo.h"
+#include "machine/i8251.h"
 #include "machine/m2comm.h"
 #include "machine/timer.h"
+#include "sound/scsp.h"
+#include "video/segaic24.h"
+#include "video/poly.h"
+#include "emupal.h"
 #include "screen.h"
 
 class model2_renderer;
@@ -26,8 +33,8 @@ struct triangle;
 class model2_state : public driver_device
 {
 public:
-	model2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	model2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_textureram0(*this, "textureram0"),
 		m_textureram1(*this, "textureram1"),
 		m_workram(*this, "workram"),
@@ -43,16 +50,16 @@ public:
 		m_copro_fifo_out(*this, "copro_fifo_out"),
 		m_drivecpu(*this, "drivecpu"),
 		m_eeprom(*this, "eeprom"),
+		m_tiles(*this, "tile"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_scsp(*this, "scsp"),
+		m_timers(*this, "timer%u", 0U),
 		m_cryptdevice(*this, "315_5881"),
 		m_0229crypt(*this, "317_0229"),
 		m_copro_data(*this, "copro_data"),
-		m_in(*this, "IN%u", 0),
-		m_dsw(*this, "DSW"),
+		m_in0(*this, "IN0"),
 		m_gears(*this, "GEARS"),
-		m_analog_ports(*this, "ANA%u", 0),
 		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"})
 	{ }
 
@@ -67,7 +74,6 @@ public:
 
 	/* Public for access by the ioports */
 	DECLARE_CUSTOM_INPUT_MEMBER(daytona_gearbox_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(rchase2_devices_r);
 
 	/* Public for access by MCFG */
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
@@ -76,16 +82,19 @@ public:
 
 
 	/* Public for access by GAME() */
-	DECLARE_DRIVER_INIT(overrev);
-	DECLARE_DRIVER_INIT(pltkids);
-	DECLARE_DRIVER_INIT(rchase2);
-	DECLARE_DRIVER_INIT(manxttdx);
-	DECLARE_DRIVER_INIT(doa);
-	DECLARE_DRIVER_INIT(zerogun);
-	DECLARE_DRIVER_INIT(sgt24h);
-	DECLARE_DRIVER_INIT(srallyc);
+	void init_overrev();
+	void init_pltkids();
+	void init_rchase2();
+	void init_manxttdx();
+	void init_doa();
+	void init_zerogun();
+	void init_sgt24h();
+	void init_srallyc();
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	required_shared_ptr<uint32_t> m_workram;
 	required_shared_ptr<uint32_t> m_bufferram;
 	std::unique_ptr<uint16_t[]> m_fbvramA;
@@ -102,25 +111,23 @@ protected:
 	required_device<generic_fifo_u32_device> m_copro_fifo_out;
 	optional_device<cpu_device> m_drivecpu;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<segas24_tile_device> m_tiles;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<scsp_device> m_scsp;
+	required_device_array<timer_device, 4> m_timers;
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_0229crypt;
 	optional_memory_region m_copro_data;
 
-	optional_ioport_array<5> m_in;
-	optional_ioport m_dsw;
+	required_ioport m_in0;
 	optional_ioport m_gears;
-	optional_ioport_array<4> m_analog_ports;
 	optional_ioport_array<4> m_lightgun_ports;
 
 	uint32_t m_timervals[4];
 	uint32_t m_timerorig[4];
 	int m_timerrun[4];
-	timer_device *m_timers[4];
 	int m_ctrlmode;
-	int m_analog_channel;
 	uint16_t m_cmd_data;
 	uint8_t m_driveio_comm_data;
 	int m_iop_write_num;
@@ -154,23 +161,24 @@ protected:
 	DECLARE_WRITE32_MEMBER(geo_w);
 
 	// Everything else
-	DECLARE_READ8_MEMBER(model2_crx_in_r);
 	DECLARE_READ32_MEMBER(timers_r);
 	DECLARE_WRITE32_MEMBER(timers_w);
 	DECLARE_READ16_MEMBER(palette_r);
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_READ16_MEMBER(colorxlat_r);
 	DECLARE_WRITE16_MEMBER(colorxlat_w);
-	DECLARE_WRITE32_MEMBER(ctrl0_w);
-	DECLARE_WRITE32_MEMBER(analog_2b_w);
+	DECLARE_WRITE8_MEMBER(eeprom_w);
+	DECLARE_READ8_MEMBER(in0_r);
 	DECLARE_READ32_MEMBER(fifo_control_2a_r);
 	DECLARE_READ32_MEMBER(videoctl_r);
 	DECLARE_WRITE32_MEMBER(videoctl_w);
-	DECLARE_WRITE32_MEMBER(rchase2_devices_w);
-	DECLARE_WRITE32_MEMBER(srallyc_devices_w);
-	DECLARE_READ8_MEMBER(lightgun_coords_r);
-	DECLARE_READ8_MEMBER(lightgun_offscreen_r);
+	DECLARE_READ8_MEMBER(rchase2_drive_board_r);
+	DECLARE_WRITE8_MEMBER(rchase2_drive_board_w);
+	DECLARE_WRITE8_MEMBER(drive_board_w);
+	DECLARE_READ8_MEMBER(lightgun_data_r);
+	DECLARE_READ8_MEMBER(lightgun_mux_r);
 	DECLARE_WRITE8_MEMBER(lightgun_mux_w);
+	DECLARE_READ8_MEMBER(lightgun_offscreen_r);
 	DECLARE_READ32_MEMBER(irq_request_r);
 	DECLARE_WRITE32_MEMBER(irq_ack_w);
 	DECLARE_READ32_MEMBER(irq_enable_r);
@@ -180,6 +188,10 @@ protected:
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
 	DECLARE_WRITE16_MEMBER(horizontal_sync_w);
 	DECLARE_WRITE16_MEMBER(vertical_sync_w);
+	DECLARE_READ32_MEMBER(doa_prot_r);
+	DECLARE_READ32_MEMBER(doa_unk_r);
+	void sega_0229_map(address_map &map);
+	int m_prot_a;
 
 	void raster_init(memory_region *texture_rom);
 	void geo_init(memory_region *polygon_rom);
@@ -201,8 +213,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(driveio_port_w);
 	void push_geo_data(uint32_t data);
 	DECLARE_VIDEO_START(model2);
-	DECLARE_MACHINE_RESET(model2_common);
-	DECLARE_MACHINE_RESET(model2_scsp);
+	void reset_model2_scsp();
 	uint32_t screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 //  DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
 //  DECLARE_WRITE_LINE_MEMBER(sound_ready_w);
@@ -225,7 +236,9 @@ protected:
 	void geo_sharc_map(address_map &map);
 	void model2_base_mem(address_map &map);
 	void model2_5881_mem(address_map &map);
+	void model2_0229_mem(address_map &map);
 	void model2_snd(address_map &map);
+	void scsp_map(address_map &map);
 
 	void debug_init();
 	void debug_commands( int ref, const std::vector<std::string> &params );
@@ -239,12 +252,6 @@ protected:
 	uint32_t m_intena;
 	uint32_t m_coproctl;
 	uint32_t m_coprocnt;
-
-	int m_port_1c00004;
-	int m_port_1c00006;
-	int m_port_1c00010;
-	int m_port_1c00012;
-	int m_port_1c00014;
 
 	virtual void copro_halt() = 0;
 	virtual void copro_boot() = 0;
@@ -320,10 +327,10 @@ public:
 		  m_copro_tgp_bank(*this, "copro_tgp_bank")
 	{}
 
-	DECLARE_MACHINE_START(model2_tgp);
-	DECLARE_MACHINE_START(srallyc);
-
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	required_device<mb86234_device> m_copro_tgp;
 	required_shared_ptr<uint32_t> m_copro_tgp_program;
 	required_region_ptr<uint32_t> m_copro_tgp_tables;
@@ -358,8 +365,6 @@ protected:
 	DECLARE_WRITE32_MEMBER(copro_atan_w);
 	DECLARE_READ32_MEMBER(copro_atan_r);
 
-	DECLARE_MACHINE_RESET(model2_tgp);
-
 	void model2_tgp_mem(address_map &map);
 
 	void copro_tgp_prog_map(address_map &map);
@@ -382,11 +387,8 @@ class model2o_state : public model2_tgp_state
 {
 public:
 	model2o_state(const machine_config &mconfig, device_type type, const char *tag)
-		: model2_tgp_state(mconfig, type, tag),
-		  m_dpram(*this, "dpram")
+		: model2_tgp_state(mconfig, type, tag)
 	{}
-
-	DECLARE_MACHINE_RESET(model2o);
 
 	void model2o(machine_config &config);
 	void daytona(machine_config &config);
@@ -394,18 +396,12 @@ public:
 	void vcop(machine_config &config);
 
 protected:
-	DECLARE_READ32_MEMBER(dpram_r);
-	DECLARE_WRITE32_MEMBER(dpram_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ32_MEMBER(fifo_control_2o_r);
 	DECLARE_WRITE8_MEMBER(daytona_output_w);
 	DECLARE_WRITE8_MEMBER(desert_output_w);
 	DECLARE_WRITE8_MEMBER(vcop_output_w);
 
 	void model2o_mem(address_map &map);
-
-	required_shared_ptr<uint32_t> m_dpram;
 };
 
 /*****************************
@@ -463,18 +459,22 @@ public:
 		: model2_tgp_state(mconfig, type, tag)
 	{}
 
-	DECLARE_MACHINE_RESET(model2a);
-
 	void manxtt(machine_config &config);
 	void manxttdx(machine_config &config);
 	void model2a(machine_config &config);
 	void model2a_0229(machine_config &config);
 	void model2a_5881(machine_config &config);
 	void srallyc(machine_config &config);
+	void vcop2(machine_config &config);
+	void skytargt(machine_config &config);
+	void zeroguna(machine_config &config);
 
 protected:
+	virtual void machine_reset() override;
+
 	void model2a_crx_mem(address_map &map);
 	void model2a_5881_mem(address_map &map);
+	void model2a_0229_mem(address_map &map);
 };
 
 /*****************************
@@ -491,17 +491,19 @@ public:
 		  m_copro_adsp(*this, "copro_adsp")
 	{}
 
-	DECLARE_MACHINE_RESET(model2b);
-	DECLARE_MACHINE_START(model2b);
-	DECLARE_MACHINE_START(srallyc);
-
 	void model2b(machine_config &config);
 	void model2b_0229(machine_config &config);
 	void model2b_5881(machine_config &config);
 	void indy500(machine_config &config);
 	void rchase2(machine_config &config);
+	void gunblade(machine_config &config);
+	void dynabb(machine_config &config);
+	void zerogun(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	required_device<adsp21062_device> m_copro_adsp;
 
 	DECLARE_WRITE32_MEMBER(copro_function_port_w);
@@ -513,6 +515,7 @@ protected:
 
 	void model2b_crx_mem(address_map &map);
 	void model2b_5881_mem(address_map &map);
+	void model2b_0229_mem(address_map &map);
 	// TODO: split into own class
 	void rchase2_iocpu_map(address_map &map);
 	void rchase2_ioport_map(address_map &map);
@@ -538,16 +541,21 @@ public:
 		  m_copro_tgpx4_program(*this, "copro_tgpx4_program")
 	{}
 
-	DECLARE_MACHINE_RESET(model2c);
-	DECLARE_MACHINE_START(model2c);
-	DECLARE_MACHINE_START(srallyc);
-
 	void model2c(machine_config &config);
 	void model2c_5881(machine_config &config);
-	void overrev2c(machine_config &config);
+	void skisuprg(machine_config &config);
 	void stcc(machine_config &config);
+	void waverunr(machine_config &config);
+	void bel(machine_config &config);
+	void hotd(machine_config &config);
+	void overrev2c(machine_config &config);
+	void segawski(machine_config &config);
+	void topskatr(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	required_device<mb86235_device> m_copro_tgpx4;
 	required_shared_ptr<uint64_t> m_copro_tgpx4_program;
 
@@ -740,3 +748,5 @@ struct quad_m2
 	uint16_t              texheader[4];
 	uint8_t               luma;
 };
+
+#endif // MAME_INCLUDES_MODEL2_H

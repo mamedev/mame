@@ -63,6 +63,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/ay31015.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #include "hp2640.lh"
@@ -121,6 +122,9 @@ class hp2645_state : public driver_device
 public:
 	hp2645_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void hp2645(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -151,10 +155,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_beep_exp);
 
-	void hp2645(machine_config &config);
 	void cpu_io_map(address_map &map);
 	void cpu_mem_map(address_map &map);
-protected:
+
 	required_device<i8080a_cpu_device> m_cpu;
 	required_device<timer_device> m_timer_10ms;
 	required_ioport_array<4> m_io_key;
@@ -940,18 +943,18 @@ void hp2645_state::cpu_mem_map(address_map &map)
 	map.unmap_value_low();
 	map(0x0000, 0x57ff).rom();
 	map(0x8100, 0x8100).r(m_uart, FUNC(ay51013_device::receive));
-	map(0x8120, 0x8120).r(this, FUNC(hp2645_state::async_status_r));
-	map(0x8140, 0x8140).w(this, FUNC(hp2645_state::async_control_w));
+	map(0x8120, 0x8120).r(FUNC(hp2645_state::async_status_r));
+	map(0x8140, 0x8140).w(FUNC(hp2645_state::async_control_w));
 	map(0x8160, 0x8160).w(m_uart, FUNC(ay51013_device::transmit));
-	map(0x8300, 0x8300).w(this, FUNC(hp2645_state::kb_led_w));
-	map(0x8300, 0x830d).r(this, FUNC(hp2645_state::kb_r));
-	map(0x830e, 0x830e).r(this, FUNC(hp2645_state::switches_ah_r));
-	map(0x830f, 0x830f).r(this, FUNC(hp2645_state::datacomm_sw_r));
-	map(0x8320, 0x8320).w(this, FUNC(hp2645_state::kb_prev_w));
-	map(0x8380, 0x8380).rw(this, FUNC(hp2645_state::switches_jr_r), FUNC(hp2645_state::kb_reset_w));
-	map(0x83a0, 0x83a0).r(this, FUNC(hp2645_state::switches_sz_r));
-	map(0x8700, 0x8700).w(this, FUNC(hp2645_state::cx_w));
-	map(0x8720, 0x8720).w(this, FUNC(hp2645_state::cy_w));
+	map(0x8300, 0x8300).w(FUNC(hp2645_state::kb_led_w));
+	map(0x8300, 0x830d).r(FUNC(hp2645_state::kb_r));
+	map(0x830e, 0x830e).r(FUNC(hp2645_state::switches_ah_r));
+	map(0x830f, 0x830f).r(FUNC(hp2645_state::datacomm_sw_r));
+	map(0x8320, 0x8320).w(FUNC(hp2645_state::kb_prev_w));
+	map(0x8380, 0x8380).rw(FUNC(hp2645_state::switches_jr_r), FUNC(hp2645_state::kb_reset_w));
+	map(0x83a0, 0x83a0).r(FUNC(hp2645_state::switches_sz_r));
+	map(0x8700, 0x8700).w(FUNC(hp2645_state::cx_w));
+	map(0x8720, 0x8720).w(FUNC(hp2645_state::cy_w));
 	map(0x9100, 0x91ff).ram();
 	map(0xc000, 0xffff).ram();
 }
@@ -959,14 +962,14 @@ void hp2645_state::cpu_mem_map(address_map &map)
 void hp2645_state::cpu_io_map(address_map &map)
 {
 	map.unmap_value_low();
-	map(0x00, 0xff).w(this, FUNC(hp2645_state::mode_byte_w));
+	map(0x00, 0xff).w(FUNC(hp2645_state::mode_byte_w));
 }
 
 MACHINE_CONFIG_START(hp2645_state::hp2645)
-	MCFG_CPU_ADD("cpu" , I8080A , SYS_CLOCK / 2)
-	MCFG_CPU_PROGRAM_MAP(cpu_mem_map)
-	MCFG_CPU_IO_MAP(cpu_io_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(hp2645_state , irq_callback)
+	MCFG_DEVICE_ADD("cpu" , I8080A , SYS_CLOCK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_mem_map)
+	MCFG_DEVICE_IO_MAP(cpu_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp2645_state , irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD("timer_10ms" , hp2645_state , timer_10ms_exp)
 	MCFG_TIMER_DRIVER_ADD("timer_cursor_blink_inh" , hp2645_state , timer_cursor_blink_inh)
@@ -980,23 +983,22 @@ MACHINE_CONFIG_START(hp2645_state::hp2645)
 						   VIDEO_TOT_ROWS * VIDEO_CHAR_HEIGHT , 0 , VIDEO_VIS_ROWS * VIDEO_CHAR_HEIGHT)
 	MCFG_SCREEN_UPDATE_DRIVER(hp2645_state , screen_update)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp2645_state, scanline_timer, "screen", 0, 1)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
-	MCFG_DEFAULT_LAYOUT(layout_hp2640)
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
+	config.set_default_layout(layout_hp2640);
 
 	// RS232
-	MCFG_RS232_PORT_ADD("rs232" , default_rs232_devices , nullptr)
+	RS232_PORT(config, m_rs232, default_rs232_devices , nullptr);
 
 	// UART (TR1602B)
-	MCFG_DEVICE_ADD("uart", AY51013, 0)
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232" , rs232_port_device , rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(WRITELINE(hp2645_state , async_txd_w))
-	MCFG_AY51013_WRITE_DAV_CB(WRITELINE(hp2645_state , async_dav_w))
-	MCFG_AY51013_AUTO_RDAV(true)
+	AY51013(config, m_uart);
+	m_uart->read_si_callback().set(m_rs232, FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set(FUNC(hp2645_state::async_txd_w));
+	m_uart->write_dav_callback().set(FUNC(hp2645_state::async_dav_w));
+	m_uart->set_auto_rdav(true);
 
 	// Beep
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep" , BEEP , BEEP_FREQUENCY)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, BEEP_FREQUENCY).add_route(ALL_OUTPUTS, "mono", 1.00);
 	MCFG_TIMER_DRIVER_ADD("timer_beep" , hp2645_state , timer_beep_exp)
 
 MACHINE_CONFIG_END
@@ -1029,4 +1031,4 @@ ROM_START(hp2645)
 	ROM_LOAD("1816-1425.bin", 0x0000, 0x400, CRC(69a34fef) SHA1(816929cadd53c2fe42b3ca561c029cb1ccd4ca24))
 ROM_END
 
-COMP(1976 , hp2645 , 0 , 0 , hp2645 , hp2645 , hp2645_state , 0 , "HP" , "HP 2645A" , 0)
+COMP( 1976, hp2645, 0, 0, hp2645, hp2645, hp2645_state, empty_init, "HP", "HP 2645A", 0)

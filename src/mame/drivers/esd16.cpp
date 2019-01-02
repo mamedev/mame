@@ -72,6 +72,7 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -129,9 +130,9 @@ void esd16_state::esd16_io_area_dsw(address_map &map, u32 base)
 	map(base + 0x2, base + 0x3).portr("P1_P2");
 	map(base + 0x4, base + 0x5).portr("SYSTEM");
 	map(base + 0x6, base + 0x7).portr("DSW");
-	map(base + 0x8, base + 0x9).w(this, FUNC(esd16_state::esd16_tilemap0_color_w));
+	map(base + 0x8, base + 0x9).w(FUNC(esd16_state::esd16_tilemap0_color_w));
 	map(base + 0xa, base + 0xb).nopw(); /* Unknown */
-	map(base + 0xc, base + 0xd).w(this, FUNC(esd16_state::esd16_sound_command_w));
+	map(base + 0xc, base + 0xd).w(FUNC(esd16_state::esd16_sound_command_w));
 	map(base + 0xe, base + 0xf).nopw(); /* n/c */
 }
 
@@ -140,11 +141,11 @@ void esd16_state::esd16_io_area_eeprom(address_map &map, u32 base)
 	map(base + 0x0, base + 0x1).nopw(); /* Irq Ack */
 	map(base + 0x2, base + 0x3).portr("P1_P2");
 	map(base + 0x4, base + 0x5).portr("SYSTEM");
-	map(base + 0x6, base + 0x7).r(this, FUNC(esd16_state::esd_eeprom_r));
-	map(base + 0x8, base + 0x9).w(this, FUNC(esd16_state::esd16_tilemap0_color_w));
+	map(base + 0x6, base + 0x7).r(FUNC(esd16_state::esd_eeprom_r));
+	map(base + 0x8, base + 0x9).w(FUNC(esd16_state::esd16_tilemap0_color_w));
 	map(base + 0xa, base + 0xb).nopw(); /* Unknown */
-	map(base + 0xc, base + 0xd).w(this, FUNC(esd16_state::esd16_sound_command_w));
-	map(base + 0xe, base + 0xf).w(this, FUNC(esd16_state::esd_eeprom_w));
+	map(base + 0xc, base + 0xd).w(FUNC(esd16_state::esd16_sound_command_w));
+	map(base + 0xe, base + 0xf).w(FUNC(esd16_state::esd_eeprom_w));
 }
 
 void esd16_state::esd16_vid_attr_area(address_map &map, u32 base)
@@ -169,8 +170,8 @@ void esd16_state::esd16_sprite_area(address_map &map, u32 base)
 
 void esd16_state::esd16_vram_area(address_map &map, u32 base)
 {
-	map(base + 0x00000, base + 0x03fff).w(this, FUNC(esd16_state::esd16_vram_0_w)).share("vram_0").mirror(0x4000);
-	map(base + 0x20000, base + 0x23fff).w(this, FUNC(esd16_state::esd16_vram_1_w)).share("vram_1").mirror(0x4000);
+	map(base + 0x00000, base + 0x03fff).w(FUNC(esd16_state::esd16_vram_0_w)).share("vram_0").mirror(0x4000);
+	map(base + 0x20000, base + 0x23fff).w(FUNC(esd16_state::esd16_vram_1_w)).share("vram_1").mirror(0x4000);
 }
 
 /*** Memory Maps ***/
@@ -195,13 +196,13 @@ void esd16_state::jumppop_map(address_map &map)
 	map(0x120000, 0x123fff).ram();
 	map(0x1a0000, 0x1a7fff).ram();
 
-	map(0x180008, 0x180009).w(this, FUNC(esd16_state::esd16_tilemap0_color_jumppop_w)); // todo
-
 	esd16_palette_area(map, 0x140000);
 	esd16_sprite_area(map, 0x160000);
 	esd16_io_area_dsw(map, 0x180000);
 	esd16_vram_area(map, 0x300000);
 	esd16_vid_attr_area(map, 0x380000);
+
+	map(0x180008, 0x180009).w(FUNC(esd16_state::esd16_tilemap0_color_jumppop_w)); // todo
 }
 
 void esd16_state::hedpanic_map(address_map &map)
@@ -215,7 +216,7 @@ void esd16_state::hedpanic_map(address_map &map)
 	esd16_vid_attr_area(map, 0xb00000);
 	esd16_io_area_eeprom(map, 0xc00000);
 
-	map(0xd00008, 0xd00009).w(this, FUNC(esd16_state::hedpanic_platform_w)); // protection
+	map(0xd00008, 0xd00009).w(FUNC(esd16_state::hedpanic_platform_w)); // protection
 }
 
 /* Multi Champ Deluxe, like Head Panic but different addresses */
@@ -231,7 +232,7 @@ void esd16_state::mchampdx_map(address_map &map)
 	esd16_sprite_area(map, 0x600000);
 	esd16_vid_attr_area(map, 0x700000);
 
-	map(0xd00008, 0xd00009).w(this, FUNC(esd16_state::hedpanic_platform_w));                      // not used in mchampdx?
+	map(0xd00008, 0xd00009).w(FUNC(esd16_state::hedpanic_platform_w));                      // not used in mchampdx?
 }
 
 /* Tang Tang & Deluxe 5 - like the others but again with different addresses */
@@ -246,7 +247,7 @@ void esd16_state::tangtang_map(address_map &map)
 	esd16_vram_area(map, 0x300000);
 	esd16_vid_attr_area(map, 0x400000);
 	esd16_io_area_eeprom(map, 0x500000);
-	map(0x600008, 0x600009).w(this, FUNC(esd16_state::hedpanic_platform_w));
+	map(0x600008, 0x600009).w(FUNC(esd16_state::hedpanic_platform_w));
 }
 
 
@@ -283,9 +284,9 @@ void esd16_state::multchmp_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("ymsnd", FUNC(ym3812_device::write));          // YM3812
 	map(0x02, 0x02).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // M6295
-	map(0x03, 0x03).r(this, FUNC(esd16_state::esd16_sound_command_r));             // From Main CPU
+	map(0x03, 0x03).r(FUNC(esd16_state::esd16_sound_command_r));             // From Main CPU
 	map(0x04, 0x04).nopw();                        // ? $00, $30
-	map(0x05, 0x05).w(this, FUNC(esd16_state::esd16_sound_rombank_w));                // ROM Bank
+	map(0x05, 0x05).w(FUNC(esd16_state::esd16_sound_rombank_w));                // ROM Bank
 	map(0x06, 0x06).noprw();                         // ? At the start / ? 1 (End of NMI routine)
 }
 
@@ -585,16 +586,16 @@ static const gfx_layout hedpanic_layout_16x16x8 =
 };
 
 
-static GFXDECODE_START( esd16 )
-	GFXDECODE_ENTRY( "spr", 0, hedpanic_sprite_16x16x5, 0x200, 8 ) // [0] Sprites
-	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,   0x000, 2 ) // [1] Layers
-	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8,   0x000, 2 ) // [1] Layers
+static GFXDECODE_START( gfx_esd16 )
+	GFXDECODE_ENTRY( "spr", 0, hedpanic_sprite_16x16x5, 0x200, 8 )      // [0] Sprites
+	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,   0x000, 2 )      // [1] Layers
+	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8, 0x000, 2 )      // [1] Layers
 GFXDECODE_END
 
-static GFXDECODE_START( jumppop )
-	GFXDECODE_ENTRY( "spr", 0, jumppop_sprite_16x16x4,  0x000, 0x40 )   /* Sprites 16x16 */ // has 4bpp sprites, unlike the others
-	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,   0x000, 4 )  /* Characters 8x8 */
-	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8, 0x000, 4 )  /* Tiles 16x16 */
+static GFXDECODE_START( gfx_jumppop )
+	GFXDECODE_ENTRY( "spr", 0, jumppop_sprite_16x16x4,  0x000, 0x40 )   // Sprites 16x16 - has 4bpp sprites, unlike the others
+	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,   0x000, 4 )      // Characters 8x8
+	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8, 0x000, 4 )      // Tiles 16x16
 GFXDECODE_END
 
 
@@ -633,14 +634,14 @@ DECOSPR_PRIORITY_CB_MEMBER(esd16_state::hedpanic_pri_callback)
 MACHINE_CONFIG_START(esd16_state::esd16)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(16'000'000))  /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(multchmp_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", esd16_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(16'000'000))  /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(multchmp_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", esd16_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* 4MHz */
-	MCFG_CPU_PROGRAM_MAP(multchmp_sound_map)
-	MCFG_CPU_IO_MAP(multchmp_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(esd16_state, nmi_line_pulse, 32*60)    /* IRQ By Main CPU */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* 4MHz */
+	MCFG_DEVICE_PROGRAM_MAP(multchmp_sound_map)
+	MCFG_DEVICE_IO_MAP(multchmp_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(esd16_state, nmi_line_pulse, 32*60)    /* IRQ By Main CPU */
 
 
 	/* video hardware */
@@ -652,27 +653,26 @@ MACHINE_CONFIG_START(esd16_state::esd16)
 	MCFG_SCREEN_UPDATE_DRIVER(esd16_state, screen_update_hedpanic)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(0)
-	MCFG_DECO_SPRITE_ISBOOTLEG(true)
-	MCFG_DECO_SPRITE_PRIORITY_CB(esd16_state, hedpanic_pri_callback)
-	MCFG_DECO_SPRITE_FLIPALLX(1)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(0);
+	m_sprgen->set_is_bootleg(true);
+	m_sprgen->set_pri_callback(FUNC(esd16_state::hedpanic_pri_callback), this);
+	m_sprgen->set_flipallx(1);
+	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esd16)
-	MCFG_PALETTE_ADD("palette", 0x1000/2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_esd16);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x1000/2);
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)   /* 4MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)   /* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* 1MHz */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* 1MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -682,18 +682,18 @@ MACHINE_CONFIG_START(esd16_state::jumppop)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(jumppop_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(jumppop_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_CLOCK( XTAL(14'000'000)/4) /* 3.5MHz - Verified */
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_CLOCK( XTAL(14'000'000)/4) /* 3.5MHz - Verified */
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", jumppop)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_jumppop)
 
-	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL(14'000'000)/4) /* 3.5MHz - Verified */
+	MCFG_DEVICE_REPLACE("ymsnd", YM3812, XTAL(14'000'000)/4) /* 3.5MHz - Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_REPLACE("oki", XTAL(14'000'000)/16, PIN7_HIGH) /* 875kHz - Verified */
+	MCFG_DEVICE_REPLACE("oki", OKIM6295, XTAL(14'000'000)/16, okim6295_device::PIN7_HIGH) /* 875kHz - Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -702,32 +702,32 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(esd16_state::hedpanio)
 	esd16(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hedpanic_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hedpanic_map)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 MACHINE_CONFIG_END
 
 /* The ESD 08-26-1999 PCBs take that further and modify the sprite offsets */
 
-MACHINE_CONFIG_START(esd16_state::hedpanic)
+void esd16_state::hedpanic(machine_config &config)
+{
 	hedpanio(config);
-	MCFG_DEVICE_MODIFY("spritegen")
-	MCFG_DECO_SPRITE_OFFSETS(-0x18, -0x100)
-MACHINE_CONFIG_END
+	m_sprgen->set_offsets(-0x18, -0x100);
+}
 
 /* ESD 08-26-1999 PCBs with different memory maps */
 
 MACHINE_CONFIG_START(esd16_state::mchampdx)
 	hedpanic(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mchampdx_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mchampdx_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(esd16_state::tangtang)
 	hedpanic(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tangtang_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tangtang_map)
 MACHINE_CONFIG_END
 
 
@@ -858,7 +858,7 @@ ROM_START( multchmpk )
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(6e741fcd) SHA1(742e0952916c00f67dd9f8d01e721a9a538d2fc4) )
 ROM_END
 
-ROM_START( multchmpa )
+ROM_START( multchmpa ) /* Also found on a ESD 10-10-98 PCB which looks identical to the ESD 11-09-98 PCB */
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000, CRC(bfd39198) SHA1(11c0cb7a865daa1be9301ddfa5f5d2014e8f9908) )
 	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000, CRC(cd769077) SHA1(741cca679393dab031691834874c96fee791241e) )
@@ -962,7 +962,7 @@ ROM_START( mchampdx )
 	ROM_LOAD16_BYTE( "rom.fu34", 0x000001, 0x200000, CRC(2895cf09) SHA1(88756fcd589af1986c3881d4080f086afc11b498) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "ver0106_esd4.su10", 0x00000, 0x40000, CRC(ac8ae009) SHA1(2c1c30cc4b3e34a5f14d7dfb6f6e18ff21f526f5) )
+	ROM_LOAD( "esd4.su10", 0x00000, 0x40000, CRC(2fbe94ab) SHA1(1bc4a33ec93a80fb598722d2b50bdf3ccaaa984a) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
 	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(646b2f53) SHA1(f6673f68084b63a69c612a03c58f57435d5a9496) )
@@ -1572,10 +1572,10 @@ Notes:
               Filename      Type                                      Use
               ---------------------------------------------------------------------------
               68K_PRG.BIN   Hitachi HN27C4096 256K x16 EPROM          68000 Program
-              Z80_PRG.BIN   Atmel AT27C020 256K x8 OTP MASKROM        Z80 Program
-              SAMPLES.BIN   Atmel AT27C020 256K x8 OTP MASKROM        Oki M6295 Samples
-              BG0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 FlashROM   Background Graphics
-              SP0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 FlashROM   Sprite Graphics
+              Z80_PRG.BIN   Atmel AT27C020 256K x8 OTP mask ROM       Z80 Program
+              SAMPLES.BIN   Atmel AT27C020 256K x8 OTP mask ROM       Oki M6295 Samples
+              BG0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 Flash ROM  Background Graphics
+              SP0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 Flash ROM  Sprite Graphics
 
               Note there are no IC locations on the PCB, so the extension of the ROMs is just 'BIN'
 
@@ -1669,31 +1669,31 @@ ROM_END
 ***************************************************************************/
 
 /* ESD 11-09-98 */
-GAME( 1999, multchmp,  0,        esd16,    multchmp, esd16_state, 0, ROT0, "ESD",         "Multi Champ (World, ver. 2.5)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1998, multchmpk, multchmp, esd16,    multchmp, esd16_state, 0, ROT0, "ESD",         "Multi Champ (Korea, older)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1998, multchmpa, multchmp, esd16,    multchmp, esd16_state, 0, ROT0, "ESD",         "Multi Champ (World, older)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1999, multchmp,  0,        esd16,    multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, ver. 2.5)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1998, multchmpk, multchmp, esd16,    multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (Korea, older)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1998, multchmpa, multchmp, esd16,    multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, older)",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, jumppop,   0,        jumppop,  jumppop,  esd16_state, 0, ROT0, "ESD",         "Jumping Pop (set 1)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 2001, jumppope,  jumppop,  jumppop,  jumppop,  esd16_state, 0, ROT0, "Emag Soft",   "Jumping Pop (set 2)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 2001, jumppop,   0,        jumppop,  jumppop,  esd16_state, empty_init, ROT0, "ESD",         "Jumping Pop (set 1)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 2001, jumppope,  jumppop,  jumppop,  jumppop,  esd16_state, empty_init, ROT0, "Emag Soft",   "Jumping Pop (set 2)",                        MACHINE_SUPPORTS_SAVE )
 
 /* ESD 05-28-99 */
-GAME( 1999, hedpanico, hedpanic, hedpanio, hedpanic, esd16_state, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hedpanico, hedpanic, hedpanio, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)",         MACHINE_SUPPORTS_SAVE )
 
 /* ESD 06-10-1999 */
-GAME( 1999, hedpanica, hedpanic, hedpanic, hedpanic, esd16_state, 0, ROT0, "ESD",         "Head Panic (ver. 0702, 02/07/1999)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hedpanica, hedpanic, hedpanic, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0702, 02/07/1999)",         MACHINE_SUPPORTS_SAVE )
 
 /* ESD 08-26-1999 */
-GAME( 2000, mchampdx,  0,        mchampdx, hedpanic, esd16_state, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, mchampdxa, mchampdx, mchampdx, hedpanic, esd16_state, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, mchampdxb, mchampdx, mchampdx, hedpanic, esd16_state, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hedpanic,  0,        hedpanic, hedpanic, esd16_state, 0, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hedpanicf, hedpanic, hedpanic, hedpanic, esd16_state, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mchampdx,  0,        mchampdx, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, mchampdxa, mchampdx, mchampdx, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, mchampdxb, mchampdx, mchampdx, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hedpanic,  0,        hedpanic, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hedpanicf, hedpanic, hedpanic, hedpanic, esd16_state, empty_init, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)",         MACHINE_SUPPORTS_SAVE )
 
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
-GAME( 2000, deluxe5,   0,        tangtang, hedpanic, esd16_state, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)",    MACHINE_SUPPORTS_SAVE ) // all 4 sets report the same version number?
-GAME( 2000, deluxe5a,  deluxe5,  tangtang, hedpanic, esd16_state, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2000, deluxe5b,  deluxe5,  tangtang, hedpanic, esd16_state, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2000, deluxe4u,  deluxe5,  tangtang, hedpanic, esd16_state, 0, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe5,   0,        tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)",    MACHINE_SUPPORTS_SAVE ) // all 4 sets report the same version number?
+GAME( 2000, deluxe5a,  deluxe5,  tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe5b,  deluxe5,  tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe4u,  deluxe5,  tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, tangtang,  0,        tangtang, hedpanic, esd16_state, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)",          MACHINE_SUPPORTS_SAVE )
-GAME( 2001, swatpolc,  0,        hedpanic, swatpolc, esd16_state, 0, ROT0, "ESD",         "SWAT Police",                                MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tangtang,  0,        tangtang, hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)",          MACHINE_SUPPORTS_SAVE )
+GAME( 2001, swatpolc,  0,        hedpanic, swatpolc, esd16_state, empty_init, ROT0, "ESD",         "SWAT Police",                                MACHINE_SUPPORTS_SAVE )

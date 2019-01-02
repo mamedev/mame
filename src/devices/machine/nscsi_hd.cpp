@@ -6,8 +6,9 @@
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_COMMAND (1U << 1)
+#define LOG_DATA    (1U << 2)
 
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE 0
 
 #include "logmacro.h"
 
@@ -60,21 +61,30 @@ MACHINE_CONFIG_END
 
 uint8_t nscsi_harddisk_device::scsi_get_data(int id, int pos)
 {
+	uint8_t data = 0;
 	if(id != 2)
-		return nscsi_full_device::scsi_get_data(id, pos);
-	int clba = lba + pos / bytes_per_sector;
-	if(clba != cur_lba) {
-		cur_lba = clba;
-		if(!hard_disk_read(harddisk, cur_lba, block)) {
-			LOG("HD READ ERROR !\n");
-			memset(block, 0, sizeof(block));
-		}
+	{
+		data = nscsi_full_device::scsi_get_data(id, pos);
 	}
-	return block[pos % bytes_per_sector];
+	else
+	{
+		int clba = lba + pos / bytes_per_sector;
+		if(clba != cur_lba) {
+			cur_lba = clba;
+			if(!hard_disk_read(harddisk, cur_lba, block)) {
+				LOG("HD READ ERROR !\n");
+				memset(block, 0, sizeof(block));
+			}
+		}
+		data = block[pos % bytes_per_sector];
+	}
+	LOGMASKED(LOG_DATA, "nscsi_hd: scsi_get_data, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
+	return data;
 }
 
 void nscsi_harddisk_device::scsi_put_data(int id, int pos, uint8_t data)
 {
+	LOGMASKED(LOG_DATA, "nscsi_hd: scsi_put_data, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
 	if(id != 2) {
 		nscsi_full_device::scsi_put_data(id, pos, data);
 		return;
@@ -136,7 +146,11 @@ void nscsi_harddisk_device::scsi_command()
 		int size = scsi_cmdbuf[4];
 		switch(page) {
 		case 0:
-			memset(scsi_cmdbuf, 0, 148);
+			std::fill_n(scsi_cmdbuf, 148, 0);
+
+			// vendor and product information must be padded with spaces
+			std::fill_n(&scsi_cmdbuf[8], 28, 0x20);
+
 			// From Seagate SCSI Commands Reference Manual (http://www.seagate.com/staticfiles/support/disc/manuals/scsi/100293068a.pdf), page 73:
 			// If the SCSI target device is not capable of supporting a peripheral device connected to this logical unit, the
 			// device server shall set these fields to 7Fh (i.e., PERIPHERAL QUALIFIER field set to 011b and PERIPHERAL DEVICE
@@ -148,6 +162,7 @@ void nscsi_harddisk_device::scsi_command()
 			scsi_cmdbuf[1] = 0x00; // media is not removable
 			scsi_cmdbuf[2] = 0x05; // device complies with SPC-3 standard
 			scsi_cmdbuf[3] = 0x01; // response data format = CCS
+			scsi_cmdbuf[4] = 52;   // additional length
 			if(m_inquiry_data.empty()) {
 				LOG("IDNT tag not found in chd metadata, using default inquiry data\n");
 
@@ -323,7 +338,7 @@ void nscsi_harddisk_device::scsi_command()
 	}
 
 	case SC_START_STOP_UNIT:
-		LOG("command START STOP UNIT\n");
+		LOG("command %s UNIT\n", (scsi_cmdbuf[4] & 0x1) ? "START" : "STOP");
 		scsi_status_complete(SS_GOOD);
 		break;
 
@@ -364,6 +379,27 @@ void nscsi_harddisk_device::scsi_command()
 		LOG("command WRITE EXTENDED start=%08x blocks=%04x\n", lba, blocks);
 
 		scsi_data_out(2, blocks*bytes_per_sector);
+		scsi_status_complete(SS_GOOD);
+		break;
+
+	case SC_FORMAT_UNIT:
+		LOG("command FORMAT UNIT:%s%s%s%s%s\n",
+				(scsi_cmdbuf[1] & 0x80) ? " FMT-PINFO" : "",
+				(scsi_cmdbuf[1] & 0x40) ? " RTO_REQ" : "",
+				(scsi_cmdbuf[1] & 0x20) ? " LONG-LIST" : "",
+				(scsi_cmdbuf[1] & 0x10) ? " FMTDATA" : "",
+				(scsi_cmdbuf[1] & 0x08) ? " CMPLIST" : "");
+		{
+			hard_disk_info *info = hard_disk_get_info(harddisk);
+			auto block = std::make_unique<uint8_t[]>(info->sectorbytes);
+			for(int cyl = 0; cyl < info->cylinders; cyl++) {
+				for(int head = 0; head < info->heads; head++) {
+					for(int sector = 0; sector < info->sectors; sector++) {
+						hard_disk_write(harddisk, cyl * head * sector, block.get());
+					}
+				}
+			}
+		}
 		scsi_status_complete(SS_GOOD);
 		break;
 

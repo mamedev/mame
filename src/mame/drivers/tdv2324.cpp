@@ -103,6 +103,7 @@
 #include "emu.h"
 #include "includes/tdv2324.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -153,9 +154,9 @@ void tdv2324_state::tdv2324_io(address_map &map)
 	/* 0x30 is read by main code and if high bit isn't set at some point it will never get anywhere */
 	/* e0, e2, e8, ea are written to */
 	/* 30, e6 and e2 are readable */
-	map(0x30, 0x30).r(this, FUNC(tdv2324_state::tdv2324_main_io_30));
+	map(0x30, 0x30).r(FUNC(tdv2324_state::tdv2324_main_io_30));
 //  AM_RANGE(0xe2, 0xe2) AM_WRITE(tdv2324_main_io_e2) console output
-	map(0xe6, 0xe6).r(this, FUNC(tdv2324_state::tdv2324_main_io_e6));
+	map(0xe6, 0xe6).r(FUNC(tdv2324_state::tdv2324_main_io_e6));
 //  AM_RANGE(0x, 0x) AM_DEVREADWRITE(P8253_5_0_TAG, pit8253_device, read, write)
 //  AM_RANGE(0x, 0x) AM_DEVREADWRITE(MK3887N4_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 //  AM_RANGE(0x, 0x) AM_DEVREADWRITE(P8259A_TAG, pic8259_device, read, write)
@@ -248,9 +249,10 @@ uint32_t tdv2324_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 //  SLOT_INTERFACE( tdv2324_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( tdv2324_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void tdv2324_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 
 
@@ -264,16 +266,16 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(tdv2324_state::tdv2324)
 	// basic system hardware
-	MCFG_CPU_ADD(P8085AH_0_TAG, I8085A, 8700000/2) // ???
-	MCFG_CPU_PROGRAM_MAP(tdv2324_mem)
-	MCFG_CPU_IO_MAP(tdv2324_io)
+	MCFG_DEVICE_ADD(P8085AH_0_TAG, I8085A, 8700000/2) // ???
+	MCFG_DEVICE_PROGRAM_MAP(tdv2324_mem)
+	MCFG_DEVICE_IO_MAP(tdv2324_io)
 
-	MCFG_CPU_ADD(P8085AH_1_TAG, I8085A, 8000000/2) // ???
-	MCFG_CPU_PROGRAM_MAP(tdv2324_sub_mem)
-	MCFG_CPU_IO_MAP(tdv2324_sub_io)
+	MCFG_DEVICE_ADD(P8085AH_1_TAG, I8085A, 8000000/2) // ???
+	MCFG_DEVICE_PROGRAM_MAP(tdv2324_sub_mem)
+	MCFG_DEVICE_IO_MAP(tdv2324_sub_io)
 
-	MCFG_CPU_ADD(MC68B02P_TAG, M6802, 8000000/2) // ???
-	MCFG_CPU_PROGRAM_MAP(tdv2324_fdc_mem)
+	MCFG_DEVICE_ADD(MC68B02P_TAG, M6802, 8000000/2) // ???
+	MCFG_DEVICE_PROGRAM_MAP(tdv2324_fdc_mem)
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
@@ -282,27 +284,25 @@ MACHINE_CONFIG_START(tdv2324_state::tdv2324)
 	MCFG_SCREEN_SIZE(800, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD(TMS9937NL_TAG, TMS9927, XTAL(25'398'360) / 8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
+	TMS9927(config, m_tms, 25.39836_MHz_XTAL / 8).set_char_width(8);
 
 	// devices
-	MCFG_DEVICE_ADD(P8259A_TAG, PIC8259, 0)
+	PIC8259(config, m_pic, 0);
 
-	MCFG_DEVICE_ADD(P8253_5_0_TAG, PIT8253, 0)
+	PIT8253(config, m_pit0, 0);
 
-	MCFG_DEVICE_ADD(P8253_5_1_TAG, PIT8253, 0)
+	PIT8253(config, m_pit1, 0);
 
-	MCFG_DEVICE_ADD(MK3887N4_TAG, Z80SIO2, 8000000/2)
+	Z80SIO2(config, MK3887N4_TAG, 8000000/2);
 
-	MCFG_FD1797_ADD(FD1797PL02_TAG, 8000000/4)
+	FD1797(config, FD1797PL02_TAG, 8000000/4);
 	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "tdv2324")
@@ -354,5 +354,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY     FULLNAME    FLAGS
-COMP( 1983, tdv2324,  0,      0,      tdv2324,  tdv2324, tdv2324_state, 0,    "Tandberg", "TDV 2324", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME    FLAGS
+COMP( 1983, tdv2324, 0,      0,      tdv2324, tdv2324, tdv2324_state, empty_init, "Tandberg", "TDV 2324", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -25,6 +25,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -32,12 +33,20 @@
 class photon2_state : public driver_device
 {
 public:
-	photon2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	photon2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_speaker(*this, "speaker"),
-		m_spectrum_video_ram(*this, "spectrum_vram") { }
+		m_spectrum_video_ram(*this, "spectrum_vram")
+	{ }
 
+	void photon2(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 
@@ -53,15 +62,12 @@ public:
 	DECLARE_WRITE8_MEMBER(fe_w);
 	DECLARE_WRITE8_MEMBER(misc_w);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(photon2);
+	void photon2_palette(palette_device &palette) const;
 
 	uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(spec_interrupt_hack);
-	void photon2(machine_config &config);
 	void spectrum_io(address_map &map);
 	void spectrum_mem(address_map &map);
 };
@@ -93,7 +99,7 @@ public:
 #define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizonal retrace */
 #define SPEC_CYCLES_PER_LINE      224  /* Number of cycles to display a single line */
 
-static const rgb_t spectrum_palette[16] = {
+static constexpr rgb_t spectrum_palette[16] = {
 	rgb_t(0x00, 0x00, 0x00),
 	rgb_t(0x00, 0x00, 0xbf),
 	rgb_t(0xbf, 0x00, 0x00),
@@ -112,10 +118,10 @@ static const rgb_t spectrum_palette[16] = {
 	rgb_t(0xff, 0xff, 0xff)
 };
 
-/* Initialise the palette */
-PALETTE_INIT_MEMBER(photon2_state, photon2)
+// Initialise the palette
+void photon2_state::photon2_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
+	palette.set_pen_colors(0, spectrum_palette);
 }
 
 void photon2_state::video_start()
@@ -269,11 +275,11 @@ void photon2_state::spectrum_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x1f, 0x1f).portr("JOY");
-	map(0x5b, 0x5b).portr("COIN").w(this, FUNC(photon2_state::misc_w));
-	map(0x7a, 0x7a).w(this, FUNC(photon2_state::membank_w));
+	map(0x5b, 0x5b).portr("COIN").w(FUNC(photon2_state::misc_w));
+	map(0x7a, 0x7a).w(FUNC(photon2_state::membank_w));
 	map(0x7b, 0x7b).nopw(); // unknown write
-	map(0x7e, 0x7e).w(this, FUNC(photon2_state::membank_w));
-	map(0xfe, 0xfe).rw(this, FUNC(photon2_state::fe_r), FUNC(photon2_state::fe_w));
+	map(0x7e, 0x7e).w(FUNC(photon2_state::membank_w));
+	map(0xfe, 0xfe).rw(FUNC(photon2_state::fe_r), FUNC(photon2_state::fe_w));
 }
 
 /*************************************
@@ -339,7 +345,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(photon2_state::spec_interrupt_hack)
 	{
 		if ( m_nmi_enable )
 		{
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 }
@@ -354,11 +360,10 @@ void photon2_state::machine_start()
 
 MACHINE_CONFIG_START(photon2_state::photon2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(spectrum_mem)
-	MCFG_CPU_IO_MAP(spectrum_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(spectrum_mem)
+	MCFG_DEVICE_IO_MAP(spectrum_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", photon2_state, spec_interrupt_hack, "screen", 0, 1)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -367,17 +372,14 @@ MACHINE_CONFIG_START(photon2_state::photon2)
 	MCFG_SCREEN_SIZE(SPEC_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, SPEC_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(photon2_state, screen_update_spectrum)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(photon2_state, screen_vblank_spectrum))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, photon2_state, screen_vblank_spectrum))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(photon2_state, photon2)
+	PALETTE(config, "palette", FUNC(photon2_state::photon2_palette), 16);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 /*************************************
@@ -414,6 +416,6 @@ ROM_START( brod )
 	ROM_LOAD( "brod13.bin", 0xa000, 0x2000, CRC(1177cd17) SHA1(58c5c09a7b857ce6311339c4d0f4d8c1a7e232a3) )
 ROM_END
 
-GAME( 19??,  kok,   0,      photon2, photon2, photon2_state, 0, ROT0, "bootleg", "Povar / Sobrat' Buran / Agroprom (Arcade multi-game bootleg of ZX Spectrum 'Cookie', 'Jetpac' & 'Pssst')", MACHINE_SUPPORTS_SAVE ) // originals (c)1983 ACG / Ultimate
-GAME( 19??,  black, 0,      photon2, black,   photon2_state, 0, ROT0, "bootleg", "Czernyj Korabl (Arcade bootleg of ZX Spectrum 'Blackbeard')",                                              MACHINE_SUPPORTS_SAVE ) // original (c)1988 Toposoft
-GAME( 19??,  brod,  0,      photon2, black,   photon2_state, 0, ROT0, "bootleg", "Brodjaga (Arcade bootleg of ZX Spectrum 'Inspector Gadget and the Circus of Fear')",                       MACHINE_SUPPORTS_SAVE ) // original (c)1987 BEAM software
+GAME( 19??,  kok,   0,      photon2, photon2, photon2_state, empty_init, ROT0, "bootleg", "Povar / Sobrat' Buran / Agroprom (Arcade multi-game bootleg of ZX Spectrum 'Cookie', 'Jetpac' & 'Pssst')", MACHINE_SUPPORTS_SAVE ) // originals (c)1983 ACG / Ultimate
+GAME( 19??,  black, 0,      photon2, black,   photon2_state, empty_init, ROT0, "bootleg", "Czernyj Korabl (Arcade bootleg of ZX Spectrum 'Blackbeard')",                                              MACHINE_SUPPORTS_SAVE ) // original (c)1988 Toposoft
+GAME( 19??,  brod,  0,      photon2, black,   photon2_state, empty_init, ROT0, "bootleg", "Brodjaga (Arcade bootleg of ZX Spectrum 'Inspector Gadget and the Circus of Fear')",                       MACHINE_SUPPORTS_SAVE ) // original (c)1987 BEAM software

@@ -74,16 +74,6 @@ void tankbatt_state::machine_start()
 	save_item(NAME(m_sound_enable));
 }
 
-WRITE_LINE_MEMBER(tankbatt_state::led0_w)
-{
-	machine().output().set_led_value(0, state);
-}
-
-WRITE_LINE_MEMBER(tankbatt_state::led1_w)
-{
-	machine().output().set_led_value(1, state);
-}
-
 READ8_MEMBER(tankbatt_state::in0_r)
 {
 	int val;
@@ -172,11 +162,11 @@ void tankbatt_state::main_map(address_map &map)
 	map(0x0000, 0x000f).ram().share("bulletsram");
 	map(0x0010, 0x01ff).ram();
 	map(0x0200, 0x07ff).ram();
-	map(0x0800, 0x0bff).ram().w(this, FUNC(tankbatt_state::videoram_w)).share("videoram");
-	map(0x0c00, 0x0c07).r(this, FUNC(tankbatt_state::in0_r)).w("outlatch", FUNC(cd4099_device::write_d0));
-	map(0x0c08, 0x0c0f).r(this, FUNC(tankbatt_state::in1_r)).w("mainlatch", FUNC(cd4099_device::write_d0));
-	map(0x0c10, 0x0c10).w(this, FUNC(tankbatt_state::irq_ack_w));
-	map(0x0c18, 0x0c1f).r(this, FUNC(tankbatt_state::dsw_r));
+	map(0x0800, 0x0bff).ram().w(FUNC(tankbatt_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0c07).r(FUNC(tankbatt_state::in0_r)).w("outlatch", FUNC(cd4099_device::write_d0));
+	map(0x0c08, 0x0c0f).r(FUNC(tankbatt_state::in1_r)).w("mainlatch", FUNC(cd4099_device::write_d0));
+	map(0x0c10, 0x0c10).w(FUNC(tankbatt_state::irq_ack_w));
+	map(0x0c18, 0x0c1f).r(FUNC(tankbatt_state::dsw_r));
 	map(0x0c18, 0x0c18).nopw();    /* watchdog ?? */
 	map(0x6000, 0x7fff).rom().region("maincpu", 0);
 	map(0xe000, 0xffff).rom().region("maincpu", 0); //mirror for the reset/irq vectors
@@ -186,7 +176,7 @@ void tankbatt_state::main_map(address_map &map)
 
 INTERRUPT_GEN_MEMBER(tankbatt_state::interrupt)
 {
-	if (m_nmi_enable) device.execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	if (m_nmi_enable) device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INPUT_CHANGED_MEMBER(tankbatt_state::coin_inserted)
@@ -261,7 +251,7 @@ static const gfx_layout bulletlayout =
 };
 
 
-static GFXDECODE_START( tankbatt )
+static GFXDECODE_START( gfx_tankbatt )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 256 )
 	GFXDECODE_ENTRY( "gfx1", 0, bulletlayout, 0, 256 )
 GFXDECODE_END
@@ -279,50 +269,48 @@ static const char *const tankbatt_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START(tankbatt_state::tankbatt)
-
+void tankbatt_state::tankbatt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1000000) /* 1 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tankbatt_state,  interrupt)
+	M6502(config, m_maincpu, 1000000); /* 1 MHz ???? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tankbatt_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tankbatt_state::interrupt));
 
-	MCFG_DEVICE_ADD("mainlatch", CD4099, 0) // latches at 4H and 5H (are the empty 4J and 5J locations for LS259 substitution?)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) //coin counter mirror?
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tankbatt_state, interrupt_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tankbatt_state, sh_engine_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(tankbatt_state, sh_fire_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(tankbatt_state, sh_expl_w)) // bit 7 also set by ASL instruction
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // bit 7 also set by ASL instruction
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(tankbatt_state, demo_interrupt_enable_w))
+	cd4099_device &mainlatch(CD4099(config, "mainlatch")); // latches at 4H and 5H (are the empty 4J and 5J locations for LS259 substitution?)
+	mainlatch.q_out_cb<0>().set_nop(); //coin counter mirror?
+	mainlatch.q_out_cb<2>().set(FUNC(tankbatt_state::interrupt_enable_w));
+	mainlatch.q_out_cb<3>().set(FUNC(tankbatt_state::sh_engine_w));
+	mainlatch.q_out_cb<4>().set(FUNC(tankbatt_state::sh_fire_w));
+	mainlatch.q_out_cb<5>().set(FUNC(tankbatt_state::sh_expl_w)); // bit 7 also set by ASL instruction
+	mainlatch.q_out_cb<6>().set_nop(); // bit 7 also set by ASL instruction
+	mainlatch.q_out_cb<7>().set(FUNC(tankbatt_state::demo_interrupt_enable_w));
 
-	MCFG_DEVICE_ADD("outlatch", CD4099, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tankbatt_state, led0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tankbatt_state, led1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tankbatt_state, coincounter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tankbatt_state, coinlockout_w))
+	cd4099_device &outlatch(CD4099(config, "outlatch"));
+	outlatch.q_out_cb<0>().set_output("led0");
+	outlatch.q_out_cb<1>().set_output("led1");
+	outlatch.q_out_cb<2>().set(FUNC(tankbatt_state::coincounter_w));
+	outlatch.q_out_cb<3>().set(FUNC(tankbatt_state::coinlockout_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tankbatt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tankbatt_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tankbatt)
-	MCFG_PALETTE_ADD("palette", 256*2)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(tankbatt_state, tankbatt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tankbatt);
+	PALETTE(config, m_palette, FUNC(tankbatt_state::tankbatt_palette), 256*2, 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(3)
-	MCFG_SAMPLES_NAMES(tankbatt_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(3);
+	m_samples->set_samples_names(tankbatt_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -360,5 +348,5 @@ ROM_START( tankbattb ) /* board with "NAMCO" removed from gfx1 rom, otherwise id
 	ROM_LOAD( "bct1-1.l3", 0x0000, 0x0100, CRC(d17518bc) SHA1(f3b0deffa586808bc59e9a24ec1699c54ebe84cc) ) // dm74s287n.3l
 ROM_END
 
-GAME( 1980, tankbatt,  0,        tankbatt, tankbatt, tankbatt_state, 0, ROT90, "Namco",   "Tank Battalion", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tankbattb, tankbatt, tankbatt, tankbatt, tankbatt_state, 0, ROT90, "bootleg", "Tank Battalion (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tankbatt,  0,        tankbatt, tankbatt, tankbatt_state, empty_init, ROT90, "Namco",   "Tank Battalion", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tankbattb, tankbatt, tankbatt, tankbatt, tankbatt_state, empty_init, ROT90, "bootleg", "Tank Battalion (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

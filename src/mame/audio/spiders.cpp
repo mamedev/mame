@@ -110,7 +110,7 @@ static const discrete_555_desc spiders_super_web_555a =
 #define SPIDERS_SW          NODE_13
 #define SPIDERS_X           NODE_14
 
-static DISCRETE_SOUND_START(spiders)
+static DISCRETE_SOUND_START(spiders_discrete)
 
 	/************************************************/
 	/* Input register mapping for spiders           */
@@ -178,37 +178,35 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(spiders_state::spiders_audio_command_w)
 {
-	pia6821_device *pia = downcast<pia6821_device *>(machine().device("pia4"));
-	pia->porta_w(data & 0xf8);
-	pia->ca1_w(data & 0x80 ? 1 : 0);
+	m_pia[3]->write_porta(data & 0xf8);
+	m_pia[3]->ca1_w(BIT(data, 7));
 }
 
 
 WRITE8_MEMBER(spiders_state::spiders_audio_a_w)
 {
-	m_discrete->write(space, SPIDER_WEB_SOUND_MOD_DATA, 1 + (data & 4) * 8 + (data & 2) * 4 + (data & 1) * 2);
+	m_discrete->write(SPIDER_WEB_SOUND_MOD_DATA, 1 + (data & 4) * 8 + (data & 2) * 4 + (data & 1) * 2);
 }
 
 WRITE8_MEMBER(spiders_state::spiders_audio_b_w)
 {
-	m_discrete->write(space, SPIDERS_WEB_SOUND_DATA, data);
+	m_discrete->write(SPIDERS_WEB_SOUND_DATA, data);
 }
 
 
 WRITE8_MEMBER(spiders_state::spiders_audio_ctrl_w)
 {
-	m_discrete->write(space, SPIDERS_FIRE_EN, data & 0x10 ? 1 : 0);
-	m_discrete->write(space, SPIDERS_EXP_EN, data & 0x08 ? 1 : 0);
-	m_discrete->write(space, SPIDERS_SUPER_WEB_EXPL_EN, data & 0x04 ? 1 : 0);
-	m_discrete->write(space, SPIDERS_SUPER_WEB_EN, data & 0x02 ? 1 : 0);
-	m_discrete->write(space, SPIDERS_X_EN, data & 0x01 ? 1 : 0);
+	m_discrete->write(SPIDERS_FIRE_EN, data & 0x10 ? 1 : 0);
+	m_discrete->write(SPIDERS_EXP_EN, data & 0x08 ? 1 : 0);
+	m_discrete->write(SPIDERS_SUPER_WEB_EXPL_EN, data & 0x04 ? 1 : 0);
+	m_discrete->write(SPIDERS_SUPER_WEB_EN, data & 0x02 ? 1 : 0);
+	m_discrete->write(SPIDERS_X_EN, data & 0x01 ? 1 : 0);
 }
 
 
 MACHINE_CONFIG_START(spiders_state::spiders_audio)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(spiders)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("discrete", DISCRETE, spiders_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

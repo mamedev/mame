@@ -19,6 +19,7 @@
 #include "machine/bankdev.h"
 #include "machine/x2212.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -54,8 +55,12 @@ public:
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_i8085;
+	void mc7105(machine_config &config);
+	void vt240(machine_config &config);
+
+private:
+	required_device<t11_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_i8085;
 	required_device<i8251_device> m_i8251;
 	required_device<scn2681_device> m_duart;
 	required_device<rs232_port_device> m_host;
@@ -104,7 +109,7 @@ public:
 	DECLARE_READ16_MEMBER(mem_r);
 	DECLARE_WRITE16_MEMBER(mem_w);
 
-	DECLARE_DRIVER_INIT(vt240);
+	void init_vt240();
 	virtual void machine_reset() override;
 	UPD7220_DISPLAY_PIXELS_MEMBER(hgdc_draw);
 	void irq_encoder(int irq, int state);
@@ -122,8 +127,7 @@ public:
 	uint16_t m_irqs;
 	bool m_lb;
 	uint16_t m_scrl;
-	void mc7105(machine_config &config);
-	void vt240(machine_config &config);
+
 	void bank_map(address_map &map);
 	void upd7220_map(address_map &map);
 	void vt240_char_io(address_map &map);
@@ -250,7 +254,7 @@ READ8_MEMBER(vt240_state::i8085_comm_r)
 			return m_i8085_out;
 		case 2:
 			m_i8085->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
-			m_i8085->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_i8085->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			m_t11 = 1;
 			break;
 	}
@@ -268,7 +272,7 @@ WRITE8_MEMBER(vt240_state::i8085_comm_w)
 			break;
 		case 2:
 			m_i8085->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
-			m_i8085->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_i8085->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			m_t11 = 1;
 			break;
 	}
@@ -277,14 +281,14 @@ WRITE8_MEMBER(vt240_state::i8085_comm_w)
 READ8_MEMBER(vt240_state::duart_r)
 {
 	if(!(offset & 1))
-		return m_duart->read(space, offset >> 1);
+		return m_duart->read(offset >> 1);
 	return 0;
 }
 
 WRITE8_MEMBER(vt240_state::duart_w)
 {
 	if(offset & 1)
-		m_duart->write(space, offset >> 1, data);
+		m_duart->write(offset >> 1, data);
 }
 
 WRITE8_MEMBER(vt240_state::duartout_w)
@@ -553,29 +557,29 @@ void vt240_state::bank_map(address_map &map)
 void vt240_state::vt240_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0000000, 0167777).rw(this, FUNC(vt240_state::mem_r), FUNC(vt240_state::mem_w));
-	map(0170000, 0170037).rw(this, FUNC(vt240_state::mem_map_cs_r), FUNC(vt240_state::mem_map_cs_w)).umask16(0x00ff);
-	map(0170040, 0170040).w(this, FUNC(vt240_state::mem_map_sel_w));
-	map(0170100, 0170100).r(this, FUNC(vt240_state::ctrl_r));
-	map(0170140, 0170140).rw(this, FUNC(vt240_state::nvr_store_r), FUNC(vt240_state::nvr_store_w));
+	map(0000000, 0167777).rw(FUNC(vt240_state::mem_r), FUNC(vt240_state::mem_w));
+	map(0170000, 0170037).rw(FUNC(vt240_state::mem_map_cs_r), FUNC(vt240_state::mem_map_cs_w)).umask16(0x00ff);
+	map(0170040, 0170040).w(FUNC(vt240_state::mem_map_sel_w));
+	map(0170100, 0170100).r(FUNC(vt240_state::ctrl_r));
+	map(0170140, 0170140).rw(FUNC(vt240_state::nvr_store_r), FUNC(vt240_state::nvr_store_w));
 	map(0171000, 0171003).rw(m_i8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).umask16(0x00ff);
 	map(0171004, 0171007).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0x00ff);
-	map(0172000, 0172077).rw(this, FUNC(vt240_state::duart_r), FUNC(vt240_state::duart_w)).umask16(0x00ff);
+	map(0172000, 0172077).rw(FUNC(vt240_state::duart_r), FUNC(vt240_state::duart_w)).umask16(0x00ff);
 	map(0173000, 0173003).r(m_hgdc, FUNC(upd7220_device::read)).umask16(0x00ff);
-	map(0173040, 0173077).r(this, FUNC(vt240_state::vom_r)).umask16(0x00ff);
-	map(0173140, 0173140).r(this, FUNC(vt240_state::char_buf_r));
+	map(0173040, 0173077).r(FUNC(vt240_state::vom_r)).umask16(0x00ff);
+	map(0173140, 0173140).r(FUNC(vt240_state::char_buf_r));
 	map(0174000, 0174003).w(m_hgdc, FUNC(upd7220_device::write)).umask16(0x00ff);
-	map(0174040, 0174077).w(this, FUNC(vt240_state::vom_w)).umask16(0x00ff);
-	map(0174140, 0174140).w(this, FUNC(vt240_state::char_buf_w));
-	map(0174400, 0174400).w(this, FUNC(vt240_state::patmult_w));
-	map(0174440, 0174440).w(this, FUNC(vt240_state::mask_w));
-	map(0174500, 0174500).w(this, FUNC(vt240_state::vpat_w));
-	map(0174540, 0174540).w(this, FUNC(vt240_state::lu_w));
-	map(0174600, 0174600).w(this, FUNC(vt240_state::reg0_w));
-	map(0174640, 0174640).w(this, FUNC(vt240_state::reg1_w));
-	map(0174700, 0174700).w(this, FUNC(vt240_state::hbscrl_w));
-	map(0174740, 0174740).w(this, FUNC(vt240_state::lbscrl_w));
-	map(0175000, 0175005).rw(this, FUNC(vt240_state::i8085_comm_r), FUNC(vt240_state::i8085_comm_w)).umask16(0x00ff);
+	map(0174040, 0174077).w(FUNC(vt240_state::vom_w)).umask16(0x00ff);
+	map(0174140, 0174140).w(FUNC(vt240_state::char_buf_w));
+	map(0174400, 0174400).w(FUNC(vt240_state::patmult_w));
+	map(0174440, 0174440).w(FUNC(vt240_state::mask_w));
+	map(0174500, 0174500).w(FUNC(vt240_state::vpat_w));
+	map(0174540, 0174540).w(FUNC(vt240_state::lu_w));
+	map(0174600, 0174600).w(FUNC(vt240_state::reg0_w));
+	map(0174640, 0174640).w(FUNC(vt240_state::reg1_w));
+	map(0174700, 0174700).w(FUNC(vt240_state::hbscrl_w));
+	map(0174740, 0174740).w(FUNC(vt240_state::lbscrl_w));
+	map(0175000, 0175005).rw(FUNC(vt240_state::i8085_comm_r), FUNC(vt240_state::i8085_comm_w)).umask16(0x00ff);
 	map(0176000, 0176777).rw(m_nvram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
 	// 017700x System comm logic
 }
@@ -594,22 +598,22 @@ void vt240_state::vt240_char_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
-	map(0x10, 0x1f).rw(this, FUNC(vt240_state::vom_r), FUNC(vt240_state::vom_w));
-	map(0x20, 0x20).rw(this, FUNC(vt240_state::t11_comm_r), FUNC(vt240_state::t11_comm_w));
-	map(0x30, 0x30).rw(this, FUNC(vt240_state::char_buf_r), FUNC(vt240_state::char_buf_w));
-	map(0x80, 0x80).w(this, FUNC(vt240_state::patmult_w));
-	map(0x90, 0x90).w(this, FUNC(vt240_state::mask_w));
-	map(0xa0, 0xa0).w(this, FUNC(vt240_state::vpat_w));
-	map(0xb0, 0xb0).w(this, FUNC(vt240_state::lu_w));
-	map(0xc0, 0xc0).w(this, FUNC(vt240_state::reg0_w));
-	map(0xd0, 0xd0).w(this, FUNC(vt240_state::reg1_w));
-	map(0xe0, 0xe0).w(this, FUNC(vt240_state::hbscrl_w));
-	map(0xf0, 0xf0).w(this, FUNC(vt240_state::lbscrl_w));
+	map(0x10, 0x1f).rw(FUNC(vt240_state::vom_r), FUNC(vt240_state::vom_w));
+	map(0x20, 0x20).rw(FUNC(vt240_state::t11_comm_r), FUNC(vt240_state::t11_comm_w));
+	map(0x30, 0x30).rw(FUNC(vt240_state::char_buf_r), FUNC(vt240_state::char_buf_w));
+	map(0x80, 0x80).w(FUNC(vt240_state::patmult_w));
+	map(0x90, 0x90).w(FUNC(vt240_state::mask_w));
+	map(0xa0, 0xa0).w(FUNC(vt240_state::vpat_w));
+	map(0xb0, 0xb0).w(FUNC(vt240_state::lu_w));
+	map(0xc0, 0xc0).w(FUNC(vt240_state::reg0_w));
+	map(0xd0, 0xd0).w(FUNC(vt240_state::reg1_w));
+	map(0xe0, 0xe0).w(FUNC(vt240_state::hbscrl_w));
+	map(0xf0, 0xf0).w(FUNC(vt240_state::lbscrl_w));
 }
 
 void vt240_state::upd7220_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).rw(this, FUNC(vt240_state::vram_r), FUNC(vt240_state::vram_w)).share("vram");
+	map(0x00000, 0x3ffff).rw(FUNC(vt240_state::vram_r), FUNC(vt240_state::vram_w)).share("vram");
 }
 
 
@@ -639,7 +643,7 @@ static const gfx_layout vt240_chars_8x10 =
 	8*10
 };
 
-static GFXDECODE_START( vt240 )
+static GFXDECODE_START( gfx_vt240 )
 	GFXDECODE_ENTRY( "charcpu", 0x338*10-3, vt240_chars_8x10, 0, 8 )
 GFXDECODE_END
 
@@ -650,84 +654,79 @@ static INPUT_PORTS_START( vt240 )
 	PORT_CONFSETTING(0x01, "Color")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(vt240_state::vt240)
-	MCFG_CPU_ADD("maincpu", T11, XTAL(7'372'800)) // confirm
-	MCFG_CPU_PROGRAM_MAP(vt240_mem)
-	MCFG_T11_INITIAL_MODE(5 << 13)
-	MCFG_T11_RESET(WRITELINE(vt240_state, t11_reset_w))
+void vt240_state::vt240(machine_config &config)
+{
+	T11(config, m_maincpu, XTAL(7'372'800)); // confirm
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt240_state::vt240_mem);
+	m_maincpu->set_initial_mode(5 << 13);
+	m_maincpu->out_reset().set(FUNC(vt240_state::t11_reset_w));
 
-	MCFG_CPU_ADD("charcpu", I8085A, XTAL(16'097'280) / 2)
-	MCFG_CPU_PROGRAM_MAP(vt240_char_mem)
-	MCFG_CPU_IO_MAP(vt240_char_io)
-	MCFG_I8085A_SOD(WRITELINE(vt240_state, i8085_rdy_w))
-	MCFG_I8085A_SID(READLINE(vt240_state, i8085_sid_r))
+	I8085A(config, m_i8085, XTAL(16'097'280) / 2);
+	m_i8085->set_addrmap(AS_PROGRAM, &vt240_state::vt240_char_mem);
+	m_i8085->set_addrmap(AS_IO, &vt240_state::vt240_char_io);
+	m_i8085->out_sod_func().set(FUNC(vt240_state::i8085_rdy_w));
+	m_i8085->in_sid_func().set(FUNC(vt240_state::i8085_sid_r));
 
-	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	ADDRESS_MAP_BANK(config, "bank").set_map(&vt240_state::bank_map).set_options(ENDIANNESS_LITTLE, 16, 20, 0x1000);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'097'280), 1024, 0, 800, 629, 0, 480)
-	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vt240)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(16'097'280), 1024, 0, 800, 629, 0, 480);
+	screen.set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
 
-	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(16'097'280) / 16) // actually /8?
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(vt240_state, hgdc_draw)
-	MCFG_UPD7220_VSYNC_CALLBACK(INPUTLINE("charcpu", I8085_RST75_LINE))
-	MCFG_UPD7220_BLANK_CALLBACK(INPUTLINE("charcpu", I8085_RST55_LINE))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	PALETTE(config, m_palette).set_entries(32);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_vt240);
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(7'372'800) / 2)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(vt240_state, irq13_w))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("host", rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("printer", rs232_port_device, write_txd))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(vt240_state, duartout_w))
+	UPD7220(config, m_hgdc, XTAL(16'097'280) / 16); // actually /8?
+	m_hgdc->set_addrmap(0, &vt240_state::upd7220_map);
+	m_hgdc->set_display_pixels_callback(FUNC(vt240_state::hgdc_draw), this);
+	m_hgdc->vsync_wr_callback().set_inputline(m_i8085, I8085_RST75_LINE);
+	m_hgdc->blank_wr_callback().set_inputline(m_i8085, I8085_RST55_LINE);
+	m_hgdc->set_screen("screen");
 
-	MCFG_DEVICE_ADD("i8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(vt240_state, tx_w))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(vt240_state, lben_w))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(vt240_state, irq9_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(vt240_state, irq7_w))
+	SCN2681(config, m_duart, XTAL(7'372'800) / 2);
+	m_duart->irq_cb().set(FUNC(vt240_state::irq13_w));
+	m_duart->a_tx_cb().set(m_host, FUNC(rs232_port_device::write_txd));
+	m_duart->b_tx_cb().set("printer", FUNC(rs232_port_device::write_txd));
+	m_duart->outport_cb().set(FUNC(vt240_state::duartout_w));
 
-	MCFG_DEVICE_ADD("lk201", LK201, 0)
-	MCFG_LK201_TX_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
+	I8251(config, m_i8251, 0);
+	m_i8251->txd_handler().set(FUNC(vt240_state::tx_w));
+	m_i8251->dtr_handler().set(FUNC(vt240_state::lben_w));
+	m_i8251->rxrdy_handler().set(FUNC(vt240_state::irq9_w));
+	m_i8251->txrdy_handler().set(FUNC(vt240_state::irq7_w));
 
-	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800 * 64) // 8251 is set to /64 on the clock input
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(vt240_state, write_keyboard_clock))
+	LK201(config, m_lk201, 0);
+	m_lk201->tx_handler().set(m_i8251, FUNC(i8251_device::write_rxd));
 
-	MCFG_RS232_PORT_ADD("host", default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_a_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("duart", scn2681_device, ip5_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("duart", scn2681_device, ip0_w))
+	CLOCK(config, "keyboard_clock", 4800 * 64).signal_handler().set(FUNC(vt240_state::write_keyboard_clock)); // 8251 is set to /64 on the clock input
 
-	MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_b_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("duart", scn2681_device, ip1_w))
+	RS232_PORT(config, m_host, default_rs232_devices, "null_modem");
+	m_host->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
+	m_host->dsr_handler().set(m_duart, FUNC(scn2681_device::ip5_w));
+	m_host->cts_handler().set(m_duart, FUNC(scn2681_device::ip0_w));
 
-	MCFG_X2212_ADD("x2212")
-MACHINE_CONFIG_END
+	rs232_port_device &printer(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	printer.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
+	printer.dsr_handler().set(m_duart, FUNC(scn2681_device::ip1_w));
 
-MACHINE_CONFIG_START(vt240_state::mc7105)
+	X2212(config, "x2212");
+}
+
+void vt240_state::mc7105(machine_config &config)
+{
 	vt240(config);
 
-	MCFG_DEVICE_REMOVE("lk201")
-	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
-	MCFG_MS7004_TX_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
+	config.device_remove("lk201");
 
-	MCFG_DEVICE_MODIFY("i8251")
-	MCFG_I8251_TXD_HANDLER(NOOP)
-	//MCFG_I8251_TXD_HANDLER(DEVWRITELINE("ms7004", ms7004_device, rx_w))
+	ms7004_device &ms7004(MS7004(config, "ms7004", 0));
+	ms7004.tx_handler().set(m_i8251, FUNC(i8251_device::write_rxd));
+
+	m_i8251->txd_handler().set_nop();
+	//m_i8251->txd_handler().set("ms7004", FUNC(ms7004_device::rx_w));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
-	MCFG_DEVICE_REMOVE("keyboard_clock")
-	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*64)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(vt240_state, write_keyboard_clock))
-MACHINE_CONFIG_END
+	CLOCK(config.replace(), "keyboard_clock", 4960*64).signal_handler().set(FUNC(vt240_state::write_keyboard_clock));
+}
 
 /* ROM definition */
 ROM_START( mc7105 )
@@ -759,15 +758,15 @@ ROM_START( vt240 )
 	// but according to the Field Change Order below, the initial release is V2.1, so the above must be a prototype.
 	// DOL for v2.1 to v2.2 change: http://web.archive.org/web/20060905145200/http://cmcnabb.cc.vt.edu/dec94mds/vt240dol.txt
 	ROM_SYSTEM_BIOS( 0, "vt240v21", "VT240 V2.1" ) // initial factory release, FCO says this was 8 Feburary 1985
-	ROMX_LOAD( "23-006e6-00.e20", 0x00000, 0x8000, CRC(79c11d82) SHA1(5a6fe5b75b6504a161f2c9b148c0fe9f19770837), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "23-004e6-00.e22", 0x00001, 0x8000, CRC(eba10fef) SHA1(c0ee4d8e4eeb70066f03f3d17a7e2f2bd0b5f8ad), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "23-007e6-00.e19", 0x10000, 0x8000, CRC(d18a2ab8) SHA1(37f448a332fc50298007ed39c8bf1ab1eb6d4cae), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "23-005e6-00.e21", 0x10001, 0x8000, CRC(558d0285) SHA1(e96a49bf9d55d8ab879d9b39aa380368c5c9ade0), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "23-006e6-00.e20", 0x00000, 0x8000, CRC(79c11d82) SHA1(5a6fe5b75b6504a161f2c9b148c0fe9f19770837), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "23-004e6-00.e22", 0x00001, 0x8000, CRC(eba10fef) SHA1(c0ee4d8e4eeb70066f03f3d17a7e2f2bd0b5f8ad), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "23-007e6-00.e19", 0x10000, 0x8000, CRC(d18a2ab8) SHA1(37f448a332fc50298007ed39c8bf1ab1eb6d4cae), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "23-005e6-00.e21", 0x10001, 0x8000, CRC(558d0285) SHA1(e96a49bf9d55d8ab879d9b39aa380368c5c9ade0), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "vt240", "VT240 V2.2" ) // Revised version, December 1985
-	ROMX_LOAD( "23-058e6.e20", 0x00000, 0x8000, CRC(d2a56b90) SHA1(39cbb26134d7d8ba308df3a93228918a5945b45f), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "23-056e6.e22", 0x00001, 0x8000, CRC(c46e13c3) SHA1(0f2801fa7483d1f97708143cd81ae0816bf9a435), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "23-059e6.e19", 0x10000, 0x8000, CRC(f8393346) SHA1(1e28daf1b7f2bdabc47ce2f6fa99ef038b275a29), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "23-057e6.e21", 0x10001, 0x8000, CRC(7ce9dce9) SHA1(5a105e5bdca13910b3b79cc23567ce2dc36b844d), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "23-058e6.e20", 0x00000, 0x8000, CRC(d2a56b90) SHA1(39cbb26134d7d8ba308df3a93228918a5945b45f), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "23-056e6.e22", 0x00001, 0x8000, CRC(c46e13c3) SHA1(0f2801fa7483d1f97708143cd81ae0816bf9a435), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "23-059e6.e19", 0x10000, 0x8000, CRC(f8393346) SHA1(1e28daf1b7f2bdabc47ce2f6fa99ef038b275a29), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "23-057e6.e21", 0x10001, 0x8000, CRC(7ce9dce9) SHA1(5a105e5bdca13910b3b79cc23567ce2dc36b844d), ROM_SKIP(1) | ROM_BIOS(1))
 	// E39, E85, E131 are empty.
 
 	ROM_REGION( 0x1000, "proms", ROMREGION_ERASEFF )
@@ -784,8 +783,8 @@ ROM_START( vt240 )
 	ROM_LOAD( "x2212", 0x000, 0x100, CRC(31c90c64) SHA1(21a0f1d4eec1ced04b85923151783bf23d18bfbd) )
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT          CLASS   INIT    COMPANY                      FULLNAME       FLAGS */
-COMP( 1983, vt240,  0,      0,       vt240,    vt240, vt240_state,   0,  "Digital Equipment Corporation", "VT240", MACHINE_IMPERFECT_GRAPHICS )
-//COMP( 1983, vt241,  0,      0,       vt220,     vt220, vt240_state,   0,  "Digital Equipment Corporation", "VT241", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                          FULLNAME  FLAGS */
+COMP( 1983, vt240,  0,      0,      vt240,   vt240, vt240_state, empty_init, "Digital Equipment Corporation", "VT240",  MACHINE_IMPERFECT_GRAPHICS )
+//COMP( 1983, vt241,  0,      0,      vt220,   vt220, vt240_state, empty_init, "Digital Equipment Corporation", "VT241",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 // NOTE: the only difference between VT240 and VT241 is the latter comes with a VR241 Color monitor, while the former comes with a mono display; the ROMs and operation are identical.
-COMP( 1983, mc7105, 0,      0,       mc7105,    vt240, vt240_state,   0,  "Elektronika",                  "MC7105", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, mc7105, 0,      0,      mc7105,  vt240, vt240_state, empty_init, "Elektronika",                   "MC7105", MACHINE_IMPERFECT_GRAPHICS )

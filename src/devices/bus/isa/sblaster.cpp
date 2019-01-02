@@ -5,7 +5,6 @@
   ISA 8/16 bit Creative Labs Sound Blaster Sound Card
 
   TODO:
-  - implement DAC
   - DSP type is a MCS-51 family, it has an internal ROM that needs decapping;
   - implement jumpers DIP-SWs;
 
@@ -327,6 +326,8 @@ void sb_device::process_fifo(uint8_t cmd)
 		switch(cmd)
 		{
 			case 0x10:  // Direct DAC
+				m_ldac->write(m_dsp.fifo[1] << 8);
+				m_rdac->write(m_dsp.fifo[1] << 8);
 				break;
 
 			case 0x14:  // 8-bit DMA, no autoinit
@@ -1140,71 +1141,63 @@ DEFINE_DEVICE_TYPE(ISA16_SOUND_BLASTER_16, isa16_sblaster16_device, "isa_sblaste
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa8_sblaster1_0_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 3.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 3.00)
-	MCFG_SAA1099_ADD("saa1099.1", 7159090)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-	MCFG_SAA1099_ADD("saa1099.2", 7159090)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+void sb_device::common(machine_config &config)
+{
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
+	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_PC_JOY_ADD("pc_joy")
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, sb_device, midi_rx_w))
+	PC_JOY(config, m_joy);
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-MACHINE_CONFIG_END
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(sb_device::midi_rx_w));
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
+}
 
-MACHINE_CONFIG_START(isa8_sblaster1_5_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+void isa8_sblaster1_0_device::device_add_mconfig(machine_config &config)
+{
+	common(config);
+
+	YM3812(config, m_ym3812, ym3812_StdClock);
+	m_ym3812->add_route(ALL_OUTPUTS, "lspeaker", 3.0);
+	m_ym3812->add_route(ALL_OUTPUTS, "rspeaker", 3.0);
+
+	SAA1099(config, m_saa1099_1, 7159090);
+	m_saa1099_1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_saa1099_1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+
+	SAA1099(config, m_saa1099_2, 7159090);
+	m_saa1099_2->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_saa1099_2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+}
+
+void isa8_sblaster1_5_device::device_add_mconfig(machine_config &config)
+{
+	common(config);
+
+	YM3812(config, m_ym3812, ym3812_StdClock);
+	m_ym3812->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ym3812->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 	/* no CM/S support (empty sockets) */
+}
 
-	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+void isa16_sblaster16_device::device_add_mconfig(machine_config &config)
+{
+	common(config);
 
-	MCFG_PC_JOY_ADD("pc_joy")
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, sb_device, midi_rx_w))
-
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(isa16_sblaster16_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ymf262", YMF262, ymf262_StdClock)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
-
-	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-
-	MCFG_PC_JOY_ADD("pc_joy")
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, sb_device, midi_rx_w))
-
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-MACHINE_CONFIG_END
+	ymf262_device &ymf262(YMF262(config, "ymf262", ymf262_StdClock));
+	ymf262.add_route(0, "lspeaker", 1.0);
+	ymf262.add_route(1, "rspeaker", 1.0);
+	ymf262.add_route(2, "lspeaker", 1.0);
+	ymf262.add_route(3, "rspeaker", 1.0);
+}
 
 //**************************************************************************
 //  LIVE DEVICE

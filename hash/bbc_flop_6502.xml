@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Micro - 6502 2nd Processor Discs -->
+<!-- Acorn BBC Micro - 6502 2nd Processor Discs -->
 
 <!-- Loading Instructions:
 
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbc_flop_6502" description="6502 2nd Processor Discs">
+<softwarelist name="bbc_flop_6502" description="Acorn 6502 2nd Processor discs">
 
 	<software name="6502dev">
 		<description>6502 Development Package</description>
@@ -126,6 +126,20 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="204800">
 				<rom name="econet_level_2_utils.ssd" size="204800" crc="c7039167" sha1="37a52b17138c1d84301ed23a04456939810f103c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psystem">
+		<description>P-System</description>
+		<year>1984</year>
+		<publisher>Acornsoft/TDI</publisher>
+		<info name="release" value="SNB26" />
+		<info name="usage" value="Requires 6502 2nd Processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="P-System (1)"/>
+			<dataarea name="flop" size="204800">
+				<rom name="Acornsoft P-System.ssd" size="204800" crc="7f880ffb" sha1="2dc9a1905a60e2f40194639c2997e335cfd8a536" offset="0" />
 			</dataarea>
 		</part>
 	</software>

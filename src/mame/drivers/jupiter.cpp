@@ -28,11 +28,13 @@ ToDo: (both)
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/keyboard.h"
 #include "machine/6850acia.h"
 #include "bus/rs232/rs232.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MCM6571AP_TAG   "vid125_6c"
@@ -53,11 +55,13 @@ public:
 		, m_acia1(*this, "acia1")
 	{ }
 
-	DECLARE_DRIVER_INIT(jupiter2);
-
 	void jupiter2(machine_config &config);
-	void jupiter2_mem(address_map &map);
+
+	void init_jupiter2();
+
 private:
+	void jupiter2_mem(address_map &map);
+
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia0;
@@ -75,17 +79,20 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void jupiter3(machine_config &config);
+
+	void init_jupiter3();
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DRIVER_INIT(jupiter3);
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(ff_r);
 
-	void jupiter3(machine_config &config);
 	void jupiter3_io(address_map &map);
 	void jupiter3_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -149,9 +156,9 @@ void jupiter3_state::jupiter3_mem(address_map &map)
 void jupiter3_state::jupiter3_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xa1, 0xa4).r(this, FUNC(jupiter3_state::ff_r));
-	map(0xb0, 0xb0).r(this, FUNC(jupiter3_state::status_r));
-	map(0xb2, 0xb2).r(this, FUNC(jupiter3_state::key_r));
+	map(0xa1, 0xa4).r(FUNC(jupiter3_state::ff_r));
+	map(0xb0, 0xb0).r(FUNC(jupiter3_state::status_r));
+	map(0xb2, 0xb2).r(FUNC(jupiter3_state::key_r));
 }
 
 READ8_MEMBER( jupiter3_state::ff_r )
@@ -236,9 +243,10 @@ uint32_t jupiter3_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-static SLOT_INTERFACE_START( jupiter_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void jupiter_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
 
 
 //**************************************************************************
@@ -275,36 +283,36 @@ void jupiter3_state::machine_reset()
 //  MACHINE_CONFIG( jupiter )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(jupiter2_state::jupiter2)
+void jupiter2_state::jupiter2(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD(MCM6571AP_TAG, M6800, 2000000)
-	MCFG_CPU_PROGRAM_MAP(jupiter2_mem)
+	M6800(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jupiter2_state::jupiter2_mem);
 
 	// devices
-	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771, 1000000)
-	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	FD1771(config, INS1771N1_TAG, 1000000);
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD("acia0", ACIA6850, XTAL(2'000'000)) // unknown frequency
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial0", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial0", rs232_port_device, write_rts))
+	ACIA6850(config, m_acia0, XTAL(2'000'000)); // unknown frequency
+	m_acia0->txd_handler().set("serial0", FUNC(rs232_port_device::write_txd));
+	m_acia0->rts_handler().set("serial0", FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD("serial0", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_cts))
+	rs232_port_device &serial0(RS232_PORT(config, "serial0", default_rs232_devices, "terminal"));
+	serial0.rxd_handler().set(m_acia0, FUNC(acia6850_device::write_rxd));
+	serial0.cts_handler().set(m_acia0, FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD("acia1", ACIA6850, XTAL(2'000'000)) // unknown frequency
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_rts))
+	ACIA6850(config, m_acia1, XTAL(2'000'000)); // unknown frequency
+	m_acia1->txd_handler().set("serial1", FUNC(rs232_port_device::write_txd));
+	m_acia1->rts_handler().set("serial1", FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD("serial1", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_cts))
+	rs232_port_device &serial1(RS232_PORT(config, "serial1", default_rs232_devices, "terminal"));
+	serial1.rxd_handler().set(m_acia1, FUNC(acia6850_device::write_rxd));
+	serial1.cts_handler().set(m_acia1, FUNC(acia6850_device::write_cts));
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("64K");
+}
 
 
 //-------------------------------------------------
@@ -313,9 +321,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jupiter3_state::jupiter3)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(jupiter3_mem)
-	MCFG_CPU_IO_MAP(jupiter3_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(jupiter3_mem)
+	MCFG_DEVICE_IO_MAP(jupiter3_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -326,19 +334,18 @@ MACHINE_CONFIG_START(jupiter3_state::jupiter3)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 320-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// devices
-	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771, 1000000)
+	FD1771(config, INS1771N1_TAG, 1000000);
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(jupiter3_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(jupiter3_state::kbd_put));
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
@@ -387,7 +394,7 @@ ROM_END
 //  DRIVER_INIT( jupiter )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(jupiter2_state,jupiter2)
+void jupiter2_state::init_jupiter2()
 {
 	uint8_t *rom = memregion(MCM6571AP_TAG)->base();
 	uint8_t inverted[0x1000];
@@ -409,7 +416,7 @@ DRIVER_INIT_MEMBER(jupiter2_state,jupiter2)
 //  DRIVER_INIT( jupiter3 )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(jupiter3_state,jupiter3)
+void jupiter3_state::init_jupiter3()
 {
 	uint8_t *rom = memregion(Z80_TAG)->base();
 	uint8_t inverted[0x1000];
@@ -430,6 +437,6 @@ DRIVER_INIT_MEMBER(jupiter3_state,jupiter3)
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE           INIT       COMPANY      FULLNAME       FLAGS
-COMP( 1976, jupiter2, 0,      0,       jupiter2,  jupiter, jupiter2_state, jupiter2, "Wave Mate", "Jupiter II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1976, jupiter3, 0,      0,       jupiter3,  jupiter, jupiter3_state, jupiter3, "Wave Mate", "Jupiter III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS           INIT           COMPANY      FULLNAME       FLAGS
+COMP( 1976, jupiter2, 0,      0,      jupiter2, jupiter, jupiter2_state, init_jupiter2, "Wave Mate", "Jupiter II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1976, jupiter3, 0,      0,      jupiter3, jupiter, jupiter3_state, init_jupiter3, "Wave Mate", "Jupiter III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

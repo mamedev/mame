@@ -449,7 +449,7 @@ WRITE8_MEMBER(tnzs_mcu_state::bankswitch1_w)
 {
 	tnzs_base_state::bankswitch1_w(space, offset, data, mem_mask);
 	if ((data & 0x04) != 0 && m_mcu != nullptr)
-		m_mcu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_mcu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
 	// written only at startup by plumppop?
 	if (m_upd4701.found())

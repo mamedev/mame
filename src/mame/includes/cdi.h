@@ -10,6 +10,7 @@
 #include "sound/dmadac.h"
 #include "video/mcd212.h"
 #include "cpu/mcs51/mcs51.h"
+#include "screen.h"
 
 /*----------- driver state -----------*/
 
@@ -26,16 +27,16 @@ public:
 		, m_planeb(*this, "planeb")
 		, m_input1(*this, "INPUT1")
 		, m_input2(*this, "INPUT2")
-		, m_mousex(*this, "MOUSEX")
-		, m_mousey(*this, "MOUSEY")
-		, m_mousebtn(*this, "MOUSEBTN")
 		, m_slave_hle(*this, "slave_hle")
 		, m_servo(*this, "servo")
 		, m_slave(*this, "slave")
 		, m_scc(*this, "scc68070")
 		, m_cdic(*this, "cdic")
 		, m_cdda(*this, "cdda")
-		, m_mcd212(*this, "mcd212") { }
+		, m_mcd212(*this, "mcd212")
+		, m_lcd(*this, "lcd")
+		, m_dmadac(*this, "dac%u", 1U)
+	{ }
 
 	enum m68hc05eg_io_reg_t
 	{
@@ -78,9 +79,6 @@ public:
 	required_shared_ptr<uint16_t> m_planeb;
 	optional_ioport m_input1;
 	optional_ioport m_input2;
-	required_ioport m_mousex;
-	required_ioport m_mousey;
-	required_ioport m_mousebtn;
 	optional_device<cdislave_device> m_slave_hle;
 	optional_device<cpu_device> m_servo;
 	optional_device<cpu_device> m_slave;
@@ -88,8 +86,9 @@ public:
 	optional_device<cdicdic_device> m_cdic;
 	required_device<cdda_device> m_cdda;
 	required_device<mcd212_device> m_mcd212;
+	optional_device<screen_device> m_lcd;
 
-	dmadac_sound_device *m_dmadac[2];
+	required_device_array<dmadac_sound_device, 2> m_dmadac;
 
 	INTERRUPT_GEN_MEMBER( mcu_frame );
 

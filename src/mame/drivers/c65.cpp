@@ -29,6 +29,7 @@ http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C64DX_aka_C65_System
 #include "emu.h"
 #include "cpu/m6502/m4510.h"
 #include "machine/mos6526.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -39,19 +40,19 @@ class c65_state : public driver_device
 {
 public:
 	c65_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_cia0(*this, "cia_0"),
-			m_cia1(*this, "cia_1"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_workram(*this, "wram"),
-			m_palred(*this, "redpal"),
-			m_palgreen(*this, "greenpal"),
-			m_palblue(*this, "bluepal"),
-			m_dmalist(*this, "dmalist"),
-			m_cram(*this, "cram"),
-			m_gfxdecode(*this, "gfxdecode")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cia0(*this, "cia_0")
+		, m_cia1(*this, "cia_1")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_workram(*this, "wram")
+		, m_palred(*this, "redpal")
+		, m_palgreen(*this, "greenpal")
+		, m_palblue(*this, "bluepal")
+		, m_dmalist(*this, "dmalist")
+		, m_cram(*this, "cram")
+		, m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	// devices
@@ -93,9 +94,9 @@ public:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(c65);
-	DECLARE_DRIVER_INIT(c65);
-	DECLARE_DRIVER_INIT(c65pal);
+	void c65_palette(palette_device &palette);
+	void init_c65();
+	void init_c65pal();
 
 	INTERRUPT_GEN_MEMBER(vic3_vblank_irq);
 	void c65(machine_config &config);
@@ -146,9 +147,9 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 	uint8_t *cptr = &m_iplrom[((m_VIC3_ControlA & 0x40) ? 0x9000: 0xd000) + ((m_VIC2_VS_CB_Base & 0x2) << 10)];
 
 	// TODO: border area
-	for(int y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for(int y=cliprect.top();y<=cliprect.bottom();y++)
 	{
-		for(int x=cliprect.min_x;x<=cliprect.max_x;x++)
+		for(int x=cliprect.left();x<=cliprect.right();x++)
 		{
 			//int, xi,yi,xm,ym,dot_x;
 			int xi = inner_x_char(x / pixel_width);
@@ -488,19 +489,19 @@ void c65_state::c65_map(address_map &map)
 {
 	map(0x00000, 0x07fff).ram().share("wram"); // TODO: bank
 	map(0x0c800, 0x0cfff).rom().region("maincpu", 0xc800);
-	map(0x0d000, 0x0d07f).rw(this, FUNC(c65_state::vic4567_dummy_r), FUNC(c65_state::vic4567_dummy_w)); // 0x0d000, 0x0d07f VIC-4567
-	map(0x0d080, 0x0d081).r(this, FUNC(c65_state::dummy_r)); // 0x0d080, 0x0d09f FDC
+	map(0x0d000, 0x0d07f).rw(FUNC(c65_state::vic4567_dummy_r), FUNC(c65_state::vic4567_dummy_w)); // 0x0d000, 0x0d07f VIC-4567
+	map(0x0d080, 0x0d081).r(FUNC(c65_state::dummy_r)); // 0x0d080, 0x0d09f FDC
 	// 0x0d0a0, 0x0d0ff Ram Expansion Control (REC)
-	map(0x0d100, 0x0d1ff).ram().w(this, FUNC(c65_state::PalRed_w)).share("redpal");// 0x0d100, 0x0d1ff Red Palette
-	map(0x0d200, 0x0d2ff).ram().w(this, FUNC(c65_state::PalGreen_w)).share("greenpal"); // 0x0d200, 0x0d2ff Green Palette
-	map(0x0d300, 0x0d3ff).ram().w(this, FUNC(c65_state::PalBlue_w)).share("bluepal"); // 0x0d300, 0x0d3ff Blue Palette
+	map(0x0d100, 0x0d1ff).ram().w(FUNC(c65_state::PalRed_w)).share("redpal");// 0x0d100, 0x0d1ff Red Palette
+	map(0x0d200, 0x0d2ff).ram().w(FUNC(c65_state::PalGreen_w)).share("greenpal"); // 0x0d200, 0x0d2ff Green Palette
+	map(0x0d300, 0x0d3ff).ram().w(FUNC(c65_state::PalBlue_w)).share("bluepal"); // 0x0d300, 0x0d3ff Blue Palette
 	// 0x0d400, 0x0d4*f Right SID
 	// 0x0d440, 0x0d4*f Left  SID
-	map(0x0d600, 0x0d6ff).rw(this, FUNC(c65_state::uart_r), FUNC(c65_state::uart_w));
-	map(0x0d700, 0x0d702).w(this, FUNC(c65_state::DMAgic_w)).share("dmalist"); // 0x0d700, 0x0d7** DMAgic
+	map(0x0d600, 0x0d6ff).rw(FUNC(c65_state::uart_r), FUNC(c65_state::uart_w));
+	map(0x0d700, 0x0d702).w(FUNC(c65_state::DMAgic_w)).share("dmalist"); // 0x0d700, 0x0d7** DMAgic
 	//AM_RANGE(0x0d703, 0x0d703) AM_READ(DMAgic_r)
 	// 0x0d800, 0x0d8** Color matrix
-	map(0x0d800, 0x0dfff).rw(this, FUNC(c65_state::CIASelect_r), FUNC(c65_state::CIASelect_w)).share("cram");
+	map(0x0d800, 0x0dfff).rw(FUNC(c65_state::CIASelect_r), FUNC(c65_state::CIASelect_w)).share("cram");
 	// 0x0dc00, 0x0dc** CIA-1
 	// 0x0dd00, 0x0dd** CIA-2
 	// 0x0de00, 0x0de** Ext I/O Select 1
@@ -631,7 +632,7 @@ void c65_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(c65_state, c65)
+void c65_state::c65_palette(palette_device &palette)
 {
 	for (int i = 0; i < 0x100; i++)
 		PalEntryFlush(i);
@@ -648,7 +649,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( c65 )
+static GFXDECODE_START( gfx_c65 )
 	GFXDECODE_ENTRY( "maincpu", 0xd000, charlayout,     0, 16 ) // another identical copy is at 0x9000
 GFXDECODE_END
 
@@ -686,23 +687,23 @@ WRITE_LINE_MEMBER(c65_state::cia0_irq)
 MACHINE_CONFIG_START(c65_state::c65)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M4510, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(c65_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", c65_state, vic3_vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", M4510, MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(c65_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", c65_state, vic3_vblank_irq)
 
 	MCFG_DEVICE_ADD("cia_0", MOS6526, MAIN_CLOCK)
 	MCFG_MOS6526_TOD(60)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c65_state, cia0_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c65_state, cia0_porta_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c65_state, cia0_porta_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(c65_state, cia0_portb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(c65_state, cia0_portb_w))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c65_state, cia0_irq))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c65_state, cia0_porta_r))
+	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c65_state, cia0_porta_w))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c65_state, cia0_portb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c65_state, cia0_portb_w))
 
 	MCFG_DEVICE_ADD("cia_1", MOS6526, MAIN_CLOCK)
 	MCFG_MOS6526_TOD(60)
-//  MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(c65_state, c65_cia1_interrupt))
-//  MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(c65_state, c65_cia1_port_a_r))
-//  MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(c65_state, c65_cia1_port_a_w))
+//  MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c65_state, c65_cia1_interrupt))
+//  MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c65_state, c65_cia1_port_a_r))
+//  MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c65_state, c65_cia1_port_a_w))
 
 
 	/* video hardware */
@@ -713,15 +714,15 @@ MACHINE_CONFIG_START(c65_state::c65)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK*4, 910, 0, 640, 262, 0, 200) // mods needed
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c65)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_c65)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(c65_state, c65)
+	PALETTE(config, m_palette, FUNC(c65_state::c65_palette), 0x100);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	// 2x 8580 SID
 
 	// software list
@@ -738,15 +739,15 @@ MACHINE_CONFIG_END
 ROM_START( c65 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "910111", "V0.9.910111" ) // sum16 CAFF, this shows up on the picture from a spare, unused rom on the 20171102 c64dx auction as "390488-02 CAFF" with the 02 scratched off on the chip and 03 written in pen, unclear what the "correct" label is.
-	ROMX_LOAD( "910111.bin", 0x0000, 0x20000, CRC(c5d8d32e) SHA1(71c05f098eff29d306b0170e2c1cdeadb1a5f206), ROM_BIOS(1) )
+	ROMX_LOAD( "910111.bin", 0x0000, 0x20000, CRC(c5d8d32e) SHA1(71c05f098eff29d306b0170e2c1cdeadb1a5f206), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "910523", "V0.9.910523" ) // sum16 B96B
-	ROMX_LOAD( "910523.bin", 0x0000, 0x20000, CRC(e8235dd4) SHA1(e453a8e7e5b95de65a70952e9d48012191e1b3e7), ROM_BIOS(2) )
+	ROMX_LOAD( "910523.bin", 0x0000, 0x20000, CRC(e8235dd4) SHA1(e453a8e7e5b95de65a70952e9d48012191e1b3e7), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "910626", "V0.9.910626" ) // sum16 888C
-	ROMX_LOAD( "910626.bin", 0x0000, 0x20000, CRC(12527742) SHA1(07c185b3bc58410183422f7ac13a37ddd330881b), ROM_BIOS(3) )
+	ROMX_LOAD( "910626.bin", 0x0000, 0x20000, CRC(12527742) SHA1(07c185b3bc58410183422f7ac13a37ddd330881b), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "910828", "V0.9.910828" ) // sum16 C9CD
-	ROMX_LOAD( "910828.bin", 0x0000, 0x20000, CRC(3ee40b06) SHA1(b63d970727a2b8da72a0a8e234f3c30a20cbcb26), ROM_BIOS(4) )
+	ROMX_LOAD( "910828.bin", 0x0000, 0x20000, CRC(3ee40b06) SHA1(b63d970727a2b8da72a0a8e234f3c30a20cbcb26), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "911001", "V0.9.911001" ) // sum16 4BCF
-	ROMX_LOAD( "911001.bin", 0x0000, 0x20000, CRC(0888b50f) SHA1(129b9a2611edaebaa028ac3e3f444927c8b1fc5d), ROM_BIOS(5) )
+	ROMX_LOAD( "911001.bin", 0x0000, 0x20000, CRC(0888b50f) SHA1(129b9a2611edaebaa028ac3e3f444927c8b1fc5d), ROM_BIOS(4) )
 ROM_END
 
 ROM_START( c64dx )
@@ -754,18 +755,18 @@ ROM_START( c64dx )
 	ROM_LOAD( "910429.bin", 0x0000, 0x20000, CRC(b025805c) SHA1(c3b05665684f74adbe33052a2d10170a1063ee7d) )
 ROM_END
 
-DRIVER_INIT_MEMBER(c65_state,c65)
+void c65_state::init_c65()
 {
 //  m_dma.version = 2;
 //  c65_common_driver_init();
 }
 
-DRIVER_INIT_MEMBER(c65_state,c65pal)
+void c65_state::init_c65pal()
 {
 //  m_dma.version = 1;
 //  c65_common_driver_init();
 //  m_pal = 1;
 }
 
-COMP( 1991, c65,    0,      0,      c65,    c65, c65_state, c65,    "Commodore Business Machines",  "Commodore 65 Development System (Prototype, NTSC)", MACHINE_NOT_WORKING )
-COMP( 1991, c64dx,  c65,    0,      c65,    c65, c65_state, c65pal, "Commodore Business Machines",  "Commodore 64DX Development System (Prototype, PAL, German)", MACHINE_NOT_WORKING )
+COMP( 1991, c65,   0,   0, c65, c65, c65_state, init_c65,    "Commodore Business Machines", "Commodore 65 Development System (Prototype, NTSC)",          MACHINE_NOT_WORKING )
+COMP( 1991, c64dx, c65, 0, c65, c65, c65_state, init_c65pal, "Commodore Business Machines", "Commodore 64DX Development System (Prototype, PAL, German)", MACHINE_NOT_WORKING )

@@ -33,12 +33,14 @@ DEFINE_DEVICE_TYPE(VP595, vp595_device, "vp595", "VP-595 Simple Sound")
 //  MACHINE_CONFIG_START( vp595 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vp595_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+void vp595_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_CDP1863_ADD(CDP1863_TAG, 0, CDP1863_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	CDP1863(config, m_pfg, 0);
+	m_pfg->set_clock2(CDP1863_XTAL);
+	m_pfg->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -77,7 +79,7 @@ void vp595_device::vip_io_w(address_space &space, offs_t offset, uint8_t data)
 	{
 		if (!data) data = 0x80;
 
-		m_pfg->str_w(data);
+		m_pfg->write_str(data);
 	}
 }
 

@@ -51,9 +51,9 @@ ROM_START( fd2000 )
 	ROM_REGION( 0x8000, G65SC02PI2_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v140" )
 	ROM_SYSTEM_BIOS( 0, "v134", "Version 1.34" )
-	ROMX_LOAD( "cmd fd-2000 dos v1.34 fd-350026.bin", 0x0000, 0x8000, CRC(859a5edc) SHA1(487fa82a7977e5208d5088f3580f34e8c89560d1), ROM_BIOS(1) )
+	ROMX_LOAD( "cmd fd-2000 dos v1.34 fd-350026.bin", 0x0000, 0x8000, CRC(859a5edc) SHA1(487fa82a7977e5208d5088f3580f34e8c89560d1), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v140", "Version 1.40" )
-	ROMX_LOAD( "cmd fd-2000 dos v1.40 cs 33cc6f.bin", 0x0000, 0x8000, CRC(4e6ca15c) SHA1(0c61ba58269baf2b8aadf3bbc4648c7a5a6d2128), ROM_BIOS(2) )
+	ROMX_LOAD( "cmd fd-2000 dos v1.40 cs 33cc6f.bin", 0x0000, 0x8000, CRC(4e6ca15c) SHA1(0c61ba58269baf2b8aadf3bbc4648c7a5a6d2128), ROM_BIOS(1) )
 ROM_END
 
 
@@ -65,9 +65,9 @@ ROM_START( fd4000 )
 	ROM_REGION( 0x8000, R65C02P4_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v140" )
 	ROM_SYSTEM_BIOS( 0, "v134", "Version 1.34" )
-	ROMX_LOAD( "cmd fd-4000 dos v1.34 fd-350022.bin", 0x0000, 0x8000, CRC(1f4820c1) SHA1(7a2966662e7840fd9377549727ccba62e4349c6f), ROM_BIOS(1) )
+	ROMX_LOAD( "cmd fd-4000 dos v1.34 fd-350022.bin", 0x0000, 0x8000, CRC(1f4820c1) SHA1(7a2966662e7840fd9377549727ccba62e4349c6f), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v140", "Version 1.40" )
-	ROMX_LOAD( "cmd fd-4000 dos v1.40 fd-350022.bin", 0x0000, 0x8000, CRC(b563ef10) SHA1(d936d76fd8b50ce4c65f885703653d7c1bd7d3c9), ROM_BIOS(2) )
+	ROMX_LOAD( "cmd fd-4000 dos v1.40 fd-350022.bin", 0x0000, 0x8000, CRC(b563ef10) SHA1(d936d76fd8b50ce4c65f885703653d7c1bd7d3c9), ROM_BIOS(1) )
 ROM_END
 
 
@@ -194,13 +194,15 @@ WRITE8_MEMBER( fd2000_device::via_pb_w )
 	*/
 }
 
-static SLOT_INTERFACE_START( fd2000_floppies )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD ) // TEAC FD-235HF
-SLOT_INTERFACE_END
+static void fd2000_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD); // TEAC FD-235HF
+}
 
-static SLOT_INTERFACE_START( fd4000_floppies )
-	SLOT_INTERFACE( "35ed", FLOPPY_35_ED ) // TEAC FD-235J
-SLOT_INTERFACE_END
+static void fd4000_floppies(device_slot_interface &device)
+{
+	device.option_add("35ed", FLOPPY_35_ED); // TEAC FD-235J
+}
 /*
 FLOPPY_FORMATS_MEMBER( fd2000_device::floppy_formats )
     FLOPPY_D81_FORMAT
@@ -213,36 +215,32 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(fd2000_device::device_add_mconfig)
-	MCFG_CPU_ADD(G65SC02PI2_TAG, M65C02, XTAL(24'000'000)/12)
-	MCFG_CPU_PROGRAM_MAP(fd2000_mem)
+void fd2000_device::add_common_devices(machine_config &config)
+{
+	M65C02(config, m_maincpu, 24_MHz_XTAL / 12);
 
-	MCFG_DEVICE_ADD(G65SC22P2_TAG, VIA6522, XTAL(24'000'000)/12)
-	MCFG_VIA6522_READPA_HANDLER(READ8(fd2000_device, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(fd2000_device, via_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(fd2000_device, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(fd2000_device, via_pb_w))
+	via6522_device &via(VIA6522(config, G65SC22P2_TAG, 24_MHz_XTAL / 12));
+	via.readpa_handler().set(FUNC(fd2000_device::via_pa_r));
+	via.readpb_handler().set(FUNC(fd2000_device::via_pb_r));
+	via.writepa_handler().set(FUNC(fd2000_device::via_pa_w));
+	via.writepb_handler().set(FUNC(fd2000_device::via_pb_w));
+}
 
-	MCFG_DP8473_ADD(DP8473V_TAG)
+void fd2000_device::device_add_mconfig(machine_config &config)
+{
+	add_common_devices(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fd2000_device::fd2000_mem);
+	DP8473(config, m_fdc, 24_MHz_XTAL);
+	FLOPPY_CONNECTOR(config, DP8473V_TAG":0", fd2000_floppies, "35hd", floppy_image_device::default_floppy_formats, true);//fd2000_device::floppy_formats);
+}
 
-	MCFG_FLOPPY_DRIVE_ADD_FIXED(DP8473V_TAG":0", fd2000_floppies, "35hd", floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(fd4000_device::device_add_mconfig)
-	MCFG_CPU_ADD(R65C02P4_TAG, M65C02, XTAL(24'000'000)/6)
-	MCFG_CPU_PROGRAM_MAP(fd4000_mem)
-
-	MCFG_DEVICE_ADD(G65SC22P2_TAG, VIA6522, XTAL(24'000'000)/12)
-	MCFG_VIA6522_READPA_HANDLER(READ8(fd2000_device, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(fd2000_device, via_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(fd2000_device, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(fd2000_device, via_pb_w))
-
-	MCFG_PC8477A_ADD(PC8477AV1_TAG)
-
-	MCFG_FLOPPY_DRIVE_ADD_FIXED(PC8477AV1_TAG":0", fd4000_floppies, "35ed", floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
-MACHINE_CONFIG_END
+void fd4000_device::device_add_mconfig(machine_config &config)
+{
+	add_common_devices(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fd4000_device::fd4000_mem);
+	PC8477A(config, m_fdc, 24_MHz_XTAL);
+	FLOPPY_CONNECTOR(config, PC8477AV1_TAG":0", fd4000_floppies, "35hd", floppy_image_device::default_floppy_formats, true);//fd2000_device::floppy_formats);
+}
 
 
 //**************************************************************************
@@ -275,9 +273,9 @@ fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, co
 fd4000_device::fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: fd2000_device(mconfig, FD4000, tag, owner, clock)
 {
-	m_maincpu.set_tag(R65C02P4_TAG);
-	m_fdc.set_tag(PC8477AV1_TAG);
-	m_floppy0.set_tag(PC8477AV1_TAG":0");
+	m_maincpu.set_tag(*this, R65C02P4_TAG);
+	m_fdc.set_tag(*this, PC8477AV1_TAG);
+	m_floppy0.set_tag(*this, PC8477AV1_TAG":0");
 }
 
 

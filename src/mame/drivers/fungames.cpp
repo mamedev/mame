@@ -46,21 +46,18 @@ public:
 	{
 	}
 
+	void fungames(machine_config &config);
+
+private:
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-
-	void fungames(machine_config &config);
-protected:
 
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-
-private:
-
 };
 
 
@@ -135,5 +132,5 @@ ROM_START( take5 )
 ROM_END
 
 
-GAME( 1976, biplane4,  0, fungames, 0, fungames_state,  0, ROT0, "Fun Games", "Biplane 4 [TTL]", MACHINE_IS_SKELETON )
-GAME( 1975, take5,     0, fungames, 0, fungames_state,  0, ROT0, "Fun Games", "Take 5 [TTL]",    MACHINE_IS_SKELETON )
+GAME( 1976, biplane4, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Biplane 4 [TTL]", MACHINE_IS_SKELETON )
+GAME( 1975, take5,    0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Take 5 [TTL]",    MACHINE_IS_SKELETON )

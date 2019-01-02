@@ -16,7 +16,7 @@ INPUT_CHANGED_MEMBER(cheekyms_state::coin_inserted)
 {
 	/* this starts a 556 one-shot timer (and triggers a sound effect) */
 	if (newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -33,8 +33,8 @@ void cheekyms_state::io_map(address_map &map)
 	map(0x00, 0x00).portr("DSW");
 	map(0x01, 0x01).portr("INPUTS");
 	map(0x20, 0x3f).writeonly().share("spriteram");
-	map(0x40, 0x40).w(this, FUNC(cheekyms_state::port_40_w));
-	map(0x80, 0x80).w(this, FUNC(cheekyms_state::port_80_w)).share("port_80");
+	map(0x40, 0x40).w(FUNC(cheekyms_state::port_40_w));
+	map(0x80, 0x80).w(FUNC(cheekyms_state::port_80_w)).share("port_80");
 }
 
 
@@ -103,7 +103,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( cheekyms )
+static GFXDECODE_START( gfx_cheekyms )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 0x20 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x80, 0x10 )
 GFXDECODE_END
@@ -124,10 +124,10 @@ INTERRUPT_GEN_MEMBER(cheekyms_state::vblank_irq)
 MACHINE_CONFIG_START(cheekyms_state::cheekyms)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,5000000/2)  /* 2.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cheekyms_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80,5000000/2)  /* 2.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cheekyms_state,  vblank_irq)
 
 
 	/* video hardware */
@@ -137,35 +137,13 @@ MACHINE_CONFIG_START(cheekyms_state::cheekyms)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cheekyms_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cheekyms)
-	MCFG_PALETTE_ADD("palette", 0xc0)
-	MCFG_PALETTE_INIT_OWNER(cheekyms_state, cheekyms)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cheekyms);
+	PALETTE(config, m_palette, FUNC(cheekyms_state::cheekyms_palette), 0xc0);
 
 	/* audio hardware */
-	MCFG_DEVICE_ADD("soundboard", CHEEKY_MOUSE_AUDIO, 0)
-#if 0
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-
-	MCFG_SOUND_ADD("dac0", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_ADD("dac1", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_ADD("dac4", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_ADD("dac5", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_ADD("dac6", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_ADD("dac7", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac4", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac5", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac6", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac7", 1.0, DAC_VREF_POS_INPUT)
-#endif
+	CHEEKY_MOUSE_AUDIO(config, m_sound_board, 0);
 MACHINE_CONFIG_END
 
 
@@ -200,4 +178,4 @@ ROM_END
 
 
 
-GAME( 1980, cheekyms, 0, cheekyms, cheekyms, cheekyms_state, 0, ROT270, "Universal", "Cheeky Mouse", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cheekyms, 0, cheekyms, cheekyms, cheekyms_state, empty_init, ROT270, "Universal", "Cheeky Mouse", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

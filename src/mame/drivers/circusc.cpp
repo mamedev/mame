@@ -124,12 +124,12 @@ WRITE8_MEMBER(circusc_state::circusc_sound_w)
 
 		/* CS3 */
 		case 1:
-			m_sn_1->write(space, 0, m_sn_latch);
+			m_sn_1->write(m_sn_latch);
 			break;
 
 		/* CS4 */
 		case 2:
-			m_sn_2->write(space, 0, m_sn_latch);
+			m_sn_2->write(m_sn_latch);
 			break;
 
 		/* CS5 */
@@ -139,9 +139,9 @@ WRITE8_MEMBER(circusc_state::circusc_sound_w)
 
 		/* CS6 */
 		case 4:
-			m_discrete->write(space, NODE_05, (offset & 0x20) >> 5);
-			m_discrete->write(space, NODE_06, (offset & 0x18) >> 3);
-			m_discrete->write(space, NODE_07, (offset & 0x40) >> 6);
+			m_discrete->write(NODE_05, (offset & 0x20) >> 5);
+			m_discrete->write(NODE_06, (offset & 0x18) >> 3);
+			m_discrete->write(NODE_07, (offset & 0x40) >> 6);
 			break;
 	}
 }
@@ -158,7 +158,7 @@ void circusc_state::circusc_map(address_map &map)
 	map(0x0000, 0x0007).mirror(0x03f8).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x0400, 0x0400).mirror(0x03ff).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* WDOG */
 	map(0x0800, 0x0800).mirror(0x03ff).w("soundlatch", FUNC(generic_latch_8_device::write));              /* SOUND DATA */
-	map(0x0c00, 0x0c00).mirror(0x03ff).w(this, FUNC(circusc_state::circusc_sh_irqtrigger_w));    /* SOUND-ON causes interrupt on audio CPU */
+	map(0x0c00, 0x0c00).mirror(0x03ff).w(FUNC(circusc_state::circusc_sh_irqtrigger_w));    /* SOUND-ON causes interrupt on audio CPU */
 	map(0x1000, 0x1000).mirror(0x03fc).portr("SYSTEM");
 	map(0x1001, 0x1001).mirror(0x03fc).portr("P1");
 	map(0x1002, 0x1002).mirror(0x03fc).portr("P2");
@@ -167,8 +167,8 @@ void circusc_state::circusc_map(address_map &map)
 	map(0x1800, 0x1800).mirror(0x03ff).portr("DSW2");
 	map(0x1c00, 0x1c00).mirror(0x03ff).writeonly().share("scroll"); /* VGAP */
 	map(0x2000, 0x2fff).ram();
-	map(0x3000, 0x33ff).ram().w(this, FUNC(circusc_state::circusc_colorram_w)).share("colorram"); /* colorram */
-	map(0x3400, 0x37ff).ram().w(this, FUNC(circusc_state::circusc_videoram_w)).share("videoram"); /* videoram */
+	map(0x3000, 0x33ff).ram().w(FUNC(circusc_state::circusc_colorram_w)).share("colorram"); /* colorram */
+	map(0x3400, 0x37ff).ram().w(FUNC(circusc_state::circusc_videoram_w)).share("videoram"); /* videoram */
 	map(0x3800, 0x38ff).ram().share("spriteram_2"); /* spriteram2 */
 	map(0x3900, 0x39ff).ram().share("spriteram"); /* spriteram */
 	map(0x3a00, 0x3fff).ram();
@@ -180,8 +180,8 @@ void circusc_state::sound_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).mirror(0x1c00).ram();
 	map(0x6000, 0x6000).mirror(0x1fff).r("soundlatch", FUNC(generic_latch_8_device::read));       /* CS0 */
-	map(0x8000, 0x8000).mirror(0x1fff).r(this, FUNC(circusc_state::circusc_sh_timer_r));  /* CS1 */
-	map(0xa000, 0xa07f).mirror(0x1f80).w(this, FUNC(circusc_state::circusc_sound_w));    /* CS2 - CS6 */
+	map(0x8000, 0x8000).mirror(0x1fff).r(FUNC(circusc_state::circusc_sh_timer_r));  /* CS1 */
+	map(0xa000, 0xa07f).mirror(0x1f80).w(FUNC(circusc_state::circusc_sound_w));    /* CS2 - CS6 */
 }
 
 
@@ -302,7 +302,7 @@ static const gfx_layout spritelayout =
 	32*4*8    /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( circusc )
+static GFXDECODE_START( gfx_circusc )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 )
 GFXDECODE_END
@@ -318,7 +318,7 @@ static const discrete_mixer_desc circusc_mixer_desc =
 		CAP_U(0.47),
 		0, 1};
 
-static DISCRETE_SOUND_START( circusc )
+static DISCRETE_SOUND_START( circusc_discrete )
 
 	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
 	DISCRETE_INPUTX_STREAM(NODE_02, 1, 1.0, 0)
@@ -347,23 +347,21 @@ WRITE_LINE_MEMBER(circusc_state::vblank_irq)
 MACHINE_CONFIG_START(circusc_state::circusc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, 2048000)        /* 2 MHz? */
-	MCFG_CPU_PROGRAM_MAP(circusc_map)
+	MCFG_DEVICE_ADD("maincpu", KONAMI1, 2048000)        /* 2 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(circusc_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2C
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(circusc_state, flipscreen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(circusc_state, irq_mask_w)) // INTST
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // MUT - not used
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(circusc_state, coin_counter_1_w)) // COIN1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(circusc_state, coin_counter_2_w)) // COIN2
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(circusc_state, spritebank_w)) // OBJ CHENG
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2C
+	mainlatch.q_out_cb<0>().set(FUNC(circusc_state::flipscreen_w)); // FLIP
+	mainlatch.q_out_cb<1>().set(FUNC(circusc_state::irq_mask_w)); // INTST
+	mainlatch.q_out_cb<2>().set_nop(); // MUT - not used
+	mainlatch.q_out_cb<3>().set(FUNC(circusc_state::coin_counter_1_w)); // COIN1
+	mainlatch.q_out_cb<4>().set(FUNC(circusc_state::coin_counter_2_w)); // COIN2
+	mainlatch.q_out_cb<5>().set(FUNC(circusc_state::spritebank_w)); // OBJ CHENG
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -372,32 +370,28 @@ MACHINE_CONFIG_START(circusc_state::circusc)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(circusc_state, screen_update_circusc)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(circusc_state, vblank_irq))
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, circusc_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", circusc)
-	MCFG_PALETTE_ADD("palette", 16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(circusc_state, circusc)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circusc);
+	PALETTE(config, m_palette, FUNC(circusc_state::circusc_palette), 16*16 + 16*16, 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("sn1", SN76496, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 0)
+	MCFG_DEVICE_ADD("sn1", SN76496, XTAL(14'318'181)/8)
+	MCFG_SOUND_ROUTE(0, "fltdisc", 1.0, 0)
 
-	MCFG_SOUND_ADD("sn2", SN76496, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 1)
+	MCFG_DEVICE_ADD("sn2", SN76496, XTAL(14'318'181)/8)
+	MCFG_SOUND_ROUTE(0, "fltdisc", 1.0, 1)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 2) // ls374.7g + r44+r45+r47+r48+r50+r56+r57+r58+r59 (20k) + r46+r49+r51+r52+r53+r54+r55 (10k) + upc324.3h
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "fltdisc", 1.0, 2) // ls374.7g + r44+r45+r47+r48+r50+r56+r57+r58+r59 (20k) + r46+r49+r51+r52+r53+r54+r55 (10k) + upc324.3h
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_SOUND_ADD("fltdisc", DISCRETE, 0)
-
-	MCFG_DISCRETE_INTF(circusc)
+	MCFG_DEVICE_ADD("fltdisc", DISCRETE, circusc_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -591,14 +585,14 @@ ROM_START( circusce ) /* Version P */
 ROM_END
 
 
-DRIVER_INIT_MEMBER(circusc_state,circusc)
+void circusc_state::init_circusc()
 {
 }
 
 
-GAME( 1984, circusc,  0,       circusc, circusc, circusc_state, circusc, ROT90, "Konami", "Circus Charlie (level select, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, circusc2, circusc, circusc, circusc, circusc_state, circusc, ROT90, "Konami", "Circus Charlie (level select, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, circusc3, circusc, circusc, circusc, circusc_state, circusc, ROT90, "Konami", "Circus Charlie (level select, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, circusc4, circusc, circusc, circusc, circusc_state, circusc, ROT90, "Konami", "Circus Charlie (no level select)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, circuscc, circusc, circusc, circusc, circusc_state, circusc, ROT90, "Konami (Centuri license)", "Circus Charlie (Centuri)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, circusce, circusc, circusc, circusc, circusc_state, circusc, ROT90, "Konami (Centuri license)", "Circus Charlie (Centuri, earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, circusc,  0,       circusc, circusc, circusc_state, init_circusc, ROT90, "Konami", "Circus Charlie (level select, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, circusc2, circusc, circusc, circusc, circusc_state, init_circusc, ROT90, "Konami", "Circus Charlie (level select, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, circusc3, circusc, circusc, circusc, circusc_state, init_circusc, ROT90, "Konami", "Circus Charlie (level select, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, circusc4, circusc, circusc, circusc, circusc_state, init_circusc, ROT90, "Konami", "Circus Charlie (no level select)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, circuscc, circusc, circusc, circusc, circusc_state, init_circusc, ROT90, "Konami (Centuri license)", "Circus Charlie (Centuri)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, circusce, circusc, circusc, circusc, circusc_state, init_circusc, ROT90, "Konami (Centuri license)", "Circus Charlie (Centuri, earlier)", MACHINE_SUPPORTS_SAVE )

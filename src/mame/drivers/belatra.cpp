@@ -71,10 +71,11 @@ static INPUT_PORTS_START( belatra )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(belatra_state::belatra)
-	MCFG_CPU_ADD("maincpu", ARM7, 54000000) // guess...
-	MCFG_CPU_PROGRAM_MAP(belatra_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 54000000) // guess...
+	MCFG_DEVICE_PROGRAM_MAP(belatra_map)
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound */
 MACHINE_CONFIG_END
 
@@ -124,12 +125,12 @@ ROM_START( ldrinka )
 ROM_END
 
 
-GAME( 2004, fairyl2,   0,         belatra, belatra, belatra_state, 0, ROT0, "Belatra","Fairy Land 2 (set 1)",   MACHINE_IS_SKELETON )
-GAME( 2004, fairyl2a,  fairyl2,   belatra, belatra, belatra_state, 0, ROT0, "Belatra","Fairy Land 2 (set 2)",   MACHINE_IS_SKELETON )
-GAME( 2004, fairyl2b,  fairyl2,   belatra, belatra, belatra_state, 0, ROT0, "Belatra","Fairy Land 2 (set 3)",   MACHINE_IS_SKELETON )
-GAME( 2004, fairyl2bl, fairyl2,   belatra, belatra, belatra_state, 0, ROT0, "Belatra","Fairy Land 2 (bootleg)", MACHINE_IS_SKELETON )
+GAME( 2004, fairyl2,   0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra","Fairy Land 2 (set 1)",   MACHINE_IS_SKELETON )
+GAME( 2004, fairyl2a,  fairyl2, belatra, belatra, belatra_state, empty_init, ROT0, "Belatra","Fairy Land 2 (set 2)",   MACHINE_IS_SKELETON )
+GAME( 2004, fairyl2b,  fairyl2, belatra, belatra, belatra_state, empty_init, ROT0, "Belatra","Fairy Land 2 (set 3)",   MACHINE_IS_SKELETON )
+GAME( 2004, fairyl2bl, fairyl2, belatra, belatra, belatra_state, empty_init, ROT0, "Belatra","Fairy Land 2 (bootleg)", MACHINE_IS_SKELETON )
 
-GAME( 2004, ldrink,    0,         belatra, belatra, belatra_state, 0, ROT0, "Belatra","Lucky Drink (set 1)",    MACHINE_IS_SKELETON )
-GAME( 2004, ldrinka,   ldrink,    belatra, belatra, belatra_state, 0, ROT0, "Belatra","Lucky Drink (set 2)",    MACHINE_IS_SKELETON )
+GAME( 2004, ldrink,    0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra","Lucky Drink (set 1)",    MACHINE_IS_SKELETON )
+GAME( 2004, ldrinka,   ldrink,  belatra, belatra, belatra_state, empty_init, ROT0, "Belatra","Lucky Drink (set 2)",    MACHINE_IS_SKELETON )
 
-GAME( 2004, merryjn,   0,         belatra, belatra, belatra_state, 0, ROT0, "Belatra","Merry Joiner",           MACHINE_IS_SKELETON )
+GAME( 2004, merryjn,   0,       belatra, belatra, belatra_state, empty_init, ROT0, "Belatra","Merry Joiner",           MACHINE_IS_SKELETON )

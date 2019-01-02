@@ -102,23 +102,20 @@ class junofrst_state : public tutankhm_state
 {
 public:
 	junofrst_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tutankhm_state(mconfig, type, tag),
-			m_audiocpu(*this, "audiocpu"),
-			m_i8039(*this, "mcu"),
-			m_filter_0_0(*this, "filter.0.0"),
-			m_filter_0_1(*this, "filter.0.1"),
-			m_filter_0_2(*this, "filter.0.2") { }
+		: tutankhm_state(mconfig, type, tag)
+		, m_audiocpu(*this, "audiocpu")
+		, m_i8039(*this, "mcu")
+		, m_filter_0_0(*this, "filter.0.0")
+		, m_filter_0_1(*this, "filter.0.1")
+		, m_filter_0_2(*this, "filter.0.2")
+	{
+	}
 
-	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_i8039;
-	required_device<filter_rc_device> m_filter_0_0;
-	required_device<filter_rc_device> m_filter_0_1;
-	required_device<filter_rc_device> m_filter_0_2;
+	void init_junofrst();
 
-	uint8_t    m_blitterdata[4];
-	int      m_i8039_status;
-	int      m_last_irq;
+	void junofrst(machine_config &config);
 
+private:
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_WRITE8_MEMBER(bankselect_w);
 	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
@@ -127,16 +124,24 @@ public:
 	DECLARE_READ8_MEMBER(portA_r);
 	DECLARE_WRITE8_MEMBER(portB_w);
 
-	DECLARE_DRIVER_INIT(junofrst);
-	DECLARE_MACHINE_START(junofrst);
-	DECLARE_MACHINE_RESET(junofrst);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(_30hz_irq);
-	void junofrst(machine_config &config);
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 	void mcu_io_map(address_map &map);
 	void mcu_map(address_map &map);
+
+	required_device<cpu_device> m_audiocpu;
+	required_device<i8039_device> m_i8039;
+	required_device<filter_rc_device> m_filter_0_0;
+	required_device<filter_rc_device> m_filter_0_1;
+	required_device<filter_rc_device> m_filter_0_2;
+
+	uint8_t  m_blitterdata[4];
+	int      m_i8039_status;
+	int      m_last_irq;
 };
 
 
@@ -290,10 +295,10 @@ void junofrst_state::main_map(address_map &map)
 	map(0x8028, 0x8028).portr("P2");
 	map(0x802c, 0x802c).portr("DSW1");
 	map(0x8030, 0x8037).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0x8040, 0x8040).w(this, FUNC(junofrst_state::sh_irqtrigger_w));
+	map(0x8040, 0x8040).w(FUNC(junofrst_state::sh_irqtrigger_w));
 	map(0x8050, 0x8050).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x8060, 0x8060).w(this, FUNC(junofrst_state::bankselect_w));
-	map(0x8070, 0x8073).w(this, FUNC(junofrst_state::blitter_w));
+	map(0x8060, 0x8060).w(FUNC(junofrst_state::bankselect_w));
+	map(0x8070, 0x8073).w(FUNC(junofrst_state::blitter_w));
 	map(0x8100, 0x8fff).ram();
 	map(0x9000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xffff).rom();
@@ -309,7 +314,7 @@ void junofrst_state::audio_map(address_map &map)
 	map(0x4001, 0x4001).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x4002, 0x4002).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x5000, 0x5000).w("soundlatch2", FUNC(generic_latch_8_device::write));
-	map(0x6000, 0x6000).w(this, FUNC(junofrst_state::i8039_irq_w));
+	map(0x6000, 0x6000).w(FUNC(junofrst_state::i8039_irq_w));
 }
 
 
@@ -364,8 +369,9 @@ static INPUT_PORTS_START( junofrst )
 INPUT_PORTS_END
 
 
-MACHINE_START_MEMBER(junofrst_state,junofrst)
+void junofrst_state::machine_start()
 {
+	// note that base class version is not called
 	save_item(NAME(m_i8039_status));
 	save_item(NAME(m_last_irq));
 	save_item(NAME(m_irq_toggle));
@@ -375,8 +381,9 @@ MACHINE_START_MEMBER(junofrst_state,junofrst)
 	save_item(NAME(m_blitterdata));
 }
 
-MACHINE_RESET_MEMBER(junofrst_state,junofrst)
+void junofrst_state::machine_reset()
 {
+	// note that base class version is not called
 	m_i8039_status = 0;
 	m_last_irq = 0;
 	m_blitterdata[0] = 0;
@@ -399,65 +406,61 @@ WRITE_LINE_MEMBER(junofrst_state::_30hz_irq)
 MACHINE_CONFIG_START(junofrst_state::junofrst)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, 1500000)         /* 1.5 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	KONAMI1(config, m_maincpu, 1500000);         /* 1.5 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &junofrst_state::main_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80,14318000/8)    /* 1.78975 MHz */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	Z80(config, m_audiocpu, 14318000/8);    /* 1.78975 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &junofrst_state::audio_map);
 
-	MCFG_CPU_ADD("mcu", I8039,8000000)  /* 8MHz crystal */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(junofrst_state, i8039_irqen_and_status_w))
+	I8039(config, m_i8039, 8000000);  /* 8MHz crystal */
+	m_i8039->set_addrmap(AS_PROGRAM, &junofrst_state::mcu_map);
+	m_i8039->set_addrmap(AS_IO, &junofrst_state::mcu_io_map);
+	m_i8039->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	m_i8039->p2_out_cb().set(FUNC(junofrst_state::i8039_irqen_and_status_w));
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B3
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(junofrst_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(junofrst_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(junofrst_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(junofrst_state, flip_screen_x_w)) // HFF
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(junofrst_state, flip_screen_y_w)) // VFLIP
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // B3
+	mainlatch.q_out_cb<0>().set(FUNC(junofrst_state::irq_enable_w));
+	mainlatch.q_out_cb<1>().set(FUNC(junofrst_state::coin_counter_2_w));
+	mainlatch.q_out_cb<2>().set(FUNC(junofrst_state::coin_counter_1_w));
+	mainlatch.q_out_cb<3>().set_nop();
+	mainlatch.q_out_cb<4>().set(FUNC(junofrst_state::flip_screen_x_w)); // HFF
+	mainlatch.q_out_cb<5>().set(FUNC(junofrst_state::flip_screen_y_w)); // VFLIP
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_MACHINE_START_OVERRIDE(junofrst_state,junofrst)
-	MCFG_MACHINE_RESET_OVERRIDE(junofrst_state,junofrst)
-
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 16);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* not sure about the visible area */
-	MCFG_SCREEN_UPDATE_DRIVER(junofrst_state, screen_update_tutankhm)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(junofrst_state, _30hz_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);  /* not sure about the visible area */
+	screen.set_screen_update(FUNC(junofrst_state::screen_update_tutankhm));
+	screen.screen_vblank().set(FUNC(junofrst_state::_30hz_irq));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(junofrst_state, portA_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(junofrst_state, portB_w))
-	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.30)
-	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.30)
-	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.30)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 14318000/8));
+	aysnd.port_a_read_callback().set(FUNC(junofrst_state::portA_r));
+	aysnd.port_b_write_callback().set(FUNC(junofrst_state::portB_w));
+	aysnd.add_route(0, "filter.0.0", 0.30);
+	aysnd.add_route(1, "filter.0.1", 0.30);
+	aysnd.add_route(2, "filter.0.2", 0.30);
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 100K (R56-63)/200K (R64-71) ladder network
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 100K (R56-63)/200K (R64-71) ladder network
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_FILTER_RC_ADD("filter.0.0", 0)
+	MCFG_DEVICE_ADD("filter.0.0", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_FILTER_RC_ADD("filter.0.1", 0)
+	MCFG_DEVICE_ADD("filter.0.1", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_FILTER_RC_ADD("filter.0.2", 0)
+	MCFG_DEVICE_ADD("filter.0.2", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -514,11 +517,11 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(junofrst_state,junofrst)
+void junofrst_state::init_junofrst()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
 }
 
 
-GAME( 1983, junofrst, 0,        junofrst, junofrst, junofrst_state, junofrst, ROT90, "Konami", "Juno First", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, junofrstg,junofrst, junofrst, junofrst, junofrst_state, junofrst, ROT90, "Konami (Gottlieb license)", "Juno First (Gottlieb)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, junofrst,  0,        junofrst, junofrst, junofrst_state, init_junofrst, ROT90, "Konami", "Juno First", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, junofrstg, junofrst, junofrst, junofrst, junofrst_state, init_junofrst, ROT90, "Konami (Gottlieb license)", "Juno First (Gottlieb)", MACHINE_SUPPORTS_SAVE )

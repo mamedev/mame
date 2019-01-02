@@ -280,12 +280,13 @@ MACHINE_CONFIG_START(isa8_aga_device::device_add_mconfig)
 
 	MCFG_PALETTE_ADD( "palette", /* CGA_PALETTE_SETS * 16*/ 65536 )
 
-	MCFG_MC6845_ADD(AGA_MC6845_NAME, MC6845, AGA_SCREEN_NAME, XTAL(14'318'181)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(isa8_aga_device, aga_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(isa8_aga_device, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_aga_device, vsync_changed))
+	MC6845(config, m_mc6845, XTAL(14'318'181)/8);
+	m_mc6845->set_screen(AGA_SCREEN_NAME);
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(8);
+	m_mc6845->set_update_row_callback(FUNC(isa8_aga_device::aga_update_row), this);
+	m_mc6845->out_hsync_callback().set(FUNC(isa8_aga_device::hsync_changed));
+	m_mc6845->out_vsync_callback().set(FUNC(isa8_aga_device::vsync_changed));
 MACHINE_CONFIG_END
 
 

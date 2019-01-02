@@ -29,7 +29,7 @@
 #include "machine/nvram.h"
 #include "sound/spkrdev.h"
 #include "video/hd61830.h"
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -50,6 +50,14 @@ public:
 		, m_bank3(*this, "bank3")
 	{ }
 
+	void hunter2(machine_config &config);
+
+	void init_hunter2();
+
+protected:
+	virtual void machine_reset() override;
+
+private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_READ8_MEMBER(serial_dsr_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
@@ -62,21 +70,19 @@ public:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_WRITE8_MEMBER(irqctrl_w);
 	DECLARE_WRITE8_MEMBER(memmap_w);
-	DECLARE_PALETTE_INIT(hunter2);
-	DECLARE_DRIVER_INIT(hunter2);
+	void hunter2_palette(palette_device &palette) const;
+
 	DECLARE_WRITE_LINE_MEMBER(timer0_out);
 	DECLARE_WRITE_LINE_MEMBER(timer1_out);
 	DECLARE_WRITE_LINE_MEMBER(cts_w);
 	DECLARE_WRITE_LINE_MEMBER(rxd_w);
 
-	void hunter2(machine_config &config);
 	void hunter2_banked_mem(address_map &map);
 	void hunter2_io(address_map &map);
 	void hunter2_mem(address_map &map);
-private:
+
 	uint8_t m_keydata;
 	uint8_t m_irq_mask;
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<rs232_port_device> m_rs232;
@@ -113,14 +119,14 @@ void hunter2_state::hunter2_io(address_map &map)
 	map(0x21, 0x21).rw("lcdc", FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w));
 	map(0x3e, 0x3e).r("lcdc", FUNC(hd61830_device::data_r));
 	map(0x40, 0x4f).rw("rtc", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write));
-	map(0x60, 0x60).w(this, FUNC(hunter2_state::display_ctrl_w));
-	map(0x80, 0x80).w(this, FUNC(hunter2_state::port80_w));
-	map(0x81, 0x81).w(this, FUNC(hunter2_state::serial_tx_w));
-	map(0x82, 0x82).w(this, FUNC(hunter2_state::serial_dtr_w));
-	map(0x84, 0x84).w(this, FUNC(hunter2_state::serial_rts_w));
-	map(0x86, 0x86).w(this, FUNC(hunter2_state::speaker_w));
-	map(0xbb, 0xbb).w(this, FUNC(hunter2_state::irqctrl_w));
-	map(0xe0, 0xe0).w(this, FUNC(hunter2_state::memmap_w));
+	map(0x60, 0x60).w(FUNC(hunter2_state::display_ctrl_w));
+	map(0x80, 0x80).w(FUNC(hunter2_state::port80_w));
+	map(0x81, 0x81).w(FUNC(hunter2_state::serial_tx_w));
+	map(0x82, 0x82).w(FUNC(hunter2_state::serial_dtr_w));
+	map(0x84, 0x84).w(FUNC(hunter2_state::serial_rts_w));
+	map(0x86, 0x86).w(FUNC(hunter2_state::speaker_w));
+	map(0xbb, 0xbb).w(FUNC(hunter2_state::irqctrl_w));
+	map(0xe0, 0xe0).w(FUNC(hunter2_state::memmap_w));
 }
 
 
@@ -332,14 +338,14 @@ void hunter2_state::machine_reset()
 }
 
 // it is presumed that writing to rom will go nowhere
-DRIVER_INIT_MEMBER( hunter2_state, hunter2 )
+void hunter2_state::init_hunter2()
 {
 	uint8_t *ram = m_ram->base();
 
 	m_nvram->set_base(ram,m_ram->bytes());
 }
 
-PALETTE_INIT_MEMBER(hunter2_state, hunter2)
+void hunter2_state::hunter2_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -348,7 +354,7 @@ PALETTE_INIT_MEMBER(hunter2_state, hunter2)
 WRITE_LINE_MEMBER(hunter2_state::timer0_out)
 {
 	if(state == ASSERT_LINE)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(hunter2_state::timer1_out)
@@ -374,9 +380,9 @@ WRITE_LINE_MEMBER(hunter2_state::rxd_w)
 
 MACHINE_CONFIG_START(hunter2_state::hunter2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NSC800, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(hunter2_mem)
-	MCFG_CPU_IO_MAP(hunter2_io)
+	MCFG_DEVICE_ADD("maincpu", NSC800, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hunter2_mem)
+	MCFG_DEVICE_IO_MAP(hunter2_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -386,15 +392,13 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 63)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(hunter2_state, hunter2)
+	PALETTE(config, "palette", FUNC(hunter2_state::hunter2_palette), 2);
 	MCFG_DEVICE_ADD("lcdc", HD61830, XTAL(4'915'200)/2/2) // unknown clock
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -404,37 +408,23 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	MCFG_MM58274C_DAY1(1)   // monday
 
 	MCFG_NSC810_ADD("iotimer",XTAL(4'000'000),XTAL(4'000'000))
-	MCFG_NSC810_PORTA_READ(READ8(hunter2_state,keyboard_r))
-	MCFG_NSC810_PORTB_READ(READ8(hunter2_state,serial_dsr_r))
-	MCFG_NSC810_PORTB_WRITE(WRITE8(hunter2_state,keyboard_w))
-	MCFG_NSC810_PORTC_READ(READ8(hunter2_state,serial_rx_r))
-	MCFG_NSC810_TIMER0_OUT(WRITELINE(hunter2_state,timer0_out))
-	MCFG_NSC810_TIMER1_OUT(WRITELINE(hunter2_state,timer1_out))
+	MCFG_NSC810_PORTA_READ(READ8(*this, hunter2_state,keyboard_r))
+	MCFG_NSC810_PORTB_READ(READ8(*this, hunter2_state,serial_dsr_r))
+	MCFG_NSC810_PORTB_WRITE(WRITE8(*this, hunter2_state,keyboard_w))
+	MCFG_NSC810_PORTC_READ(READ8(*this, hunter2_state,serial_rx_r))
+	MCFG_NSC810_TIMER0_OUT(WRITELINE(*this, hunter2_state,timer0_out))
+	MCFG_NSC810_TIMER1_OUT(WRITELINE(*this, hunter2_state,timer1_out))
 
-	MCFG_RS232_PORT_ADD("serial",default_rs232_devices,nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(hunter2_state,cts_w))
-	MCFG_RS232_RXD_HANDLER(WRITELINE(hunter2_state,rxd_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->cts_handler().set(FUNC(hunter2_state::cts_w));
+	m_rs232->rxd_handler().set(FUNC(hunter2_state::rxd_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("bank2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("bank3", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
+	ADDRESS_MAP_BANK(config, "bank1").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+	ADDRESS_MAP_BANK(config, "bank2").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+	ADDRESS_MAP_BANK(config, "bank3").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
+	ADDRESS_MAP_BANK(config, "bank4").set_map(&hunter2_state::hunter2_banked_mem).set_endianness(ENDIANNESS_LITTLE).set_data_width(8).set_stride(0x4000);
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -449,5 +439,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE           INIT      COMPANY   FULLNAME   FLAGS
-COMP( 1981, hunter2, 0,      0,       hunter2,   hunter2, hunter2_state,  hunter2,  "Husky", "Hunter 2", MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY  FULLNAME    FLAGS
+COMP( 1981, hunter2, 0,      0,      hunter2, hunter2, hunter2_state, init_hunter2, "Husky", "Hunter 2", MACHINE_NOT_WORKING )

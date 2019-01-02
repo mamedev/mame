@@ -53,17 +53,17 @@ const tiny_rom_entry *cst_q_plus4_device::device_rom_region() const
 MACHINE_CONFIG_START(cst_q_plus4_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
 
-	MCFG_QL_EXPANSION_SLOT_ADD("exp1", ql_expansion_cards, nullptr)
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(cst_q_plus4_device, exp1_extintl_w))
+	MCFG_DEVICE_ADD("exp1", QL_EXPANSION_SLOT, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr)
+	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, cst_q_plus4_device, exp1_extintl_w))
 
-	MCFG_QL_EXPANSION_SLOT_ADD("exp2", ql_expansion_cards, nullptr)
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(cst_q_plus4_device, exp2_extintl_w))
+	MCFG_DEVICE_ADD("exp2", QL_EXPANSION_SLOT, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr)
+	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, cst_q_plus4_device, exp2_extintl_w))
 
-	MCFG_QL_EXPANSION_SLOT_ADD("exp3", ql_expansion_cards, nullptr)
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(cst_q_plus4_device, exp3_extintl_w))
+	MCFG_DEVICE_ADD("exp3", QL_EXPANSION_SLOT, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr)
+	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, cst_q_plus4_device, exp3_extintl_w))
 
-	MCFG_QL_EXPANSION_SLOT_ADD("exp4", ql_expansion_cards, nullptr)
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(cst_q_plus4_device, exp4_extintl_w))
+	MCFG_DEVICE_ADD("exp4", QL_EXPANSION_SLOT, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr)
+	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, cst_q_plus4_device, exp4_extintl_w))
 MACHINE_CONFIG_END
 
 

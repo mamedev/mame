@@ -37,7 +37,7 @@ class williams_cvsd_sound_device :  public device_t,
 {
 public:
 	// construction/destruction
-	williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write
 	DECLARE_WRITE16_MEMBER(write);
@@ -49,6 +49,9 @@ public:
 	DECLARE_WRITE8_MEMBER(cvsd_clock_set_w);
 
 	void williams_cvsd_map(address_map &map);
+
+	mc6809e_device *get_cpu() { return m_cpu; }
+
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -61,6 +64,8 @@ private:
 	required_device<mc6809e_device> m_cpu;
 	required_device<pia6821_device> m_pia;
 	required_device<hc55516_device> m_hc55516;
+
+	required_memory_bank m_rombank;
 
 	// internal state
 	uint8_t m_talkback;
@@ -76,7 +81,7 @@ class williams_narc_sound_device :  public device_t,
 {
 public:
 	// construction/destruction
-	williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write
 	DECLARE_READ16_MEMBER(read);
@@ -98,6 +103,9 @@ public:
 
 	void williams_narc_master_map(address_map &map);
 	void williams_narc_slave_map(address_map &map);
+
+	mc6809e_device *get_cpu() { return m_cpu[0]; }
+
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -115,9 +123,11 @@ private:
 	};
 
 	// devices
-	required_device<mc6809e_device> m_cpu0;
-	required_device<mc6809e_device> m_cpu1;
+	required_device_array<mc6809e_device, 2> m_cpu;
 	required_device<hc55516_device> m_hc55516;
+
+	required_memory_bank m_masterbank;
+	required_memory_bank m_slavebank;
 
 	// internal state
 	uint8_t m_latch;
@@ -135,7 +145,7 @@ class williams_adpcm_sound_device : public device_t,
 {
 public:
 	// construction/destruction
-	williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write
 	DECLARE_WRITE16_MEMBER(write);
@@ -150,6 +160,9 @@ public:
 
 	void williams_adpcm_map(address_map &map);
 	void williams_adpcm_oki_map(address_map &map);
+
+	mc6809e_device *get_cpu() { return m_cpu; }
+
 protected:
 	// timer IDs
 	enum
@@ -167,6 +180,9 @@ protected:
 private:
 	// devices
 	required_device<mc6809e_device> m_cpu;
+
+	required_memory_bank m_rombank;
+	required_memory_bank m_okibank;
 
 	// internal state
 	uint8_t m_latch;

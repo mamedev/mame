@@ -626,7 +626,7 @@ void segaybd_state::suby_map(address_map &map)
 	map(0x0c0000, 0x0cffff).ram().share("shareram");
 	map(0x180000, 0x1807ff).mirror(0x007800).ram().share("rotateram");
 	map(0x188000, 0x188fff).mirror(0x007000).ram().share("bsprites");
-	map(0x190000, 0x193fff).mirror(0x004000).ram().w(this, FUNC(segaybd_state::paletteram_w)).share("paletteram");
+	map(0x190000, 0x193fff).mirror(0x004000).ram().w(FUNC(segaybd_state::paletteram_w)).share("paletteram");
 	map(0x198000, 0x19ffff).r(m_segaic16vid, FUNC(segaic16_video_device::rotate_control_r));
 	map(0x1f0000, 0x1fffff).ram();
 }
@@ -690,8 +690,8 @@ void segaybd_state::main_map_link(address_map &map)
 {
 	main_map(map);
 	map(0x190000, 0x190fff).rw("mb8421", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)).umask16(0x00ff);
-	map(0x191000, 0x191001).r(this, FUNC(segaybd_state::link_r));
-	map(0x192000, 0x192001).rw(this, FUNC(segaybd_state::link2_r), FUNC(segaybd_state::link2_w));
+	map(0x191000, 0x191001).r(FUNC(segaybd_state::link_r));
+	map(0x192000, 0x192001).rw(FUNC(segaybd_state::link2_r), FUNC(segaybd_state::link2_w));
 }
 
 
@@ -1271,112 +1271,111 @@ INPUT_PORTS_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(segaybd_state::yboard)
-
+void segaybd_state::yboard(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaybd_state::main_map);
 
-	MCFG_CPU_ADD("subx", M68000, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(subx_map)
+	M68000(config, m_subx, MASTER_CLOCK/4);
+	m_subx->set_addrmap(AS_PROGRAM, &segaybd_state::subx_map);
 
-	MCFG_CPU_ADD("suby", M68000, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(suby_map)
+	M68000(config, m_suby, MASTER_CLOCK/4);
+	m_suby->set_addrmap(AS_PROGRAM, &segaybd_state::suby_map);
 
-	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	Z80(config, m_soundcpu, SOUND_CLOCK/8);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segaybd_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segaybd_state::sound_portmap);
 
-	MCFG_NVRAM_ADD_0FILL("backupram")
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_MB3773_ADD("watchdog") // IC95
+	MB3773(config, "watchdog"); // IC95
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5296, MASTER_CLOCK/8)
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("GENERAL"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("LIMITSW"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segaybd_state, output1_w))
-	MCFG_315_5296_OUT_PORTE_CB(WRITE8(segaybd_state, misc_output_w))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("DSW"))
-	MCFG_315_5296_IN_PORTG_CB(IOPORT("COINAGE"))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(segaybd_state, output2_w))
+	sega_315_5296_device &io(SEGA_315_5296(config, "io", MASTER_CLOCK/8));
+	io.in_pa_callback().set_ioport("P1");
+	io.in_pb_callback().set_ioport("GENERAL");
+	io.in_pc_callback().set_ioport("LIMITSW");
+	io.out_pd_callback().set(FUNC(segaybd_state::output1_w));
+	io.out_pe_callback().set(FUNC(segaybd_state::misc_output_w));
+	io.in_pf_callback().set_ioport("DSW");
+	io.in_pg_callback().set_ioport("COINAGE");
+	io.out_ph_callback().set(FUNC(segaybd_state::output2_w));
 	// FMCS and CKOT connect to CS and OSC IN on MSM6253 below
 
-	MCFG_DEVICE_ADD("adc", MSM6253, 0)
-	MCFG_MSM6253_IN0_ANALOG_PORT("ADC.0")
-	MCFG_MSM6253_IN1_ANALOG_PORT("ADC.1")
-	MCFG_MSM6253_IN2_ANALOG_PORT("ADC.2")
-	MCFG_MSM6253_IN3_ANALOG_READ(segaybd_state, analog_mux)
+	msm6253_device &adc(MSM6253(config, "adc", 0));
+	adc.set_input_tag<0>("ADC.0");
+	adc.set_input_tag<1>("ADC.1");
+	adc.set_input_tag<2>("ADC.2");
+	adc.set_input_cb<3>(FUNC(segaybd_state::analog_mux));
 
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_main")
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_subx")
-	MCFG_SEGA_315_5248_MULTIPLIER_ADD("multiplier_suby")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_main")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_subx")
-	MCFG_SEGA_315_5249_DIVIDER_ADD("divider_suby")
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_main", 0);
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_subx", 0);
+	SEGA_315_5248_MULTIPLIER(config, "multiplier_suby", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_main", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_subx", 0);
+	SEGA_315_5249_DIVIDER(config, "divider_suby", 0);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(342,262)   // to be verified
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segaybd_state,screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(342,262);   // to be verified
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(segaybd_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	GFXDECODE(config, "gfxdecode", m_palette, gfxdecode_device::empty);
 
-	MCFG_SEGA_SYS16B_SPRITES_ADD("bsprites")
-	MCFG_SEGA_YBOARD_SPRITES_ADD("ysprites")
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
+	SEGA_SYS16B_SPRITES(config, m_bsprites, 0);
+	SEGA_YBOARD_SPRITES(config, m_ysprites, 0);
+	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 
-	MCFG_PALETTE_ADD("palette", 8192*3)
+	PALETTE(config, m_palette).set_entries(8192*3);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/8)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/8));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.43);
+	ymsnd.add_route(1, "rspeaker", 0.43);
 
-	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/8)
-	MCFG_SEGAPCM_BANK_MASK(BANK_12M, BANK_MASKF8)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	segapcm_device &pcm(SEGAPCM(config, "pcm", SOUND_CLOCK/8));
+	pcm.set_bank(segapcm_device::BANK_12M | segapcm_device::BANK_MASKF8);
+	pcm.add_route(0, "lspeaker", 1.0);
+	pcm.add_route(1, "rspeaker", 1.0);
+}
 
 
 // irq at 0x28 is from MB8421, and irq at 0x38 probably from MB89372?
-MACHINE_CONFIG_START(segaybd_state::yboard_link)
+void segaybd_state::yboard_link(machine_config &config)
+{
 	yboard(config);
 
 	// basic machine hardware
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(main_map_link)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaybd_state::main_map_link);
 
-	MCFG_CPU_ADD("linkcpu", Z80, XTAL(16'000'000)/2 ) // 8 Mhz
-	MCFG_CPU_PROGRAM_MAP(link_map)
-	MCFG_CPU_IO_MAP(link_portmap)
+	Z80(config, m_linkcpu, XTAL(16'000'000)/2); // 8 Mhz
+	m_linkcpu->set_addrmap(AS_PROGRAM, &segaybd_state::link_map);
+	m_linkcpu->set_addrmap(AS_IO, &segaybd_state::link_portmap);
 
-	MCFG_DEVICE_ADD("mb8421", MB8421, 0)
-	MCFG_MB8421_INTL_HANDLER(WRITELINE(segaybd_state, mb8421_intl))
-	MCFG_MB8421_INTR_HANDLER(WRITELINE(segaybd_state, mb8421_intr))
-MACHINE_CONFIG_END
+	mb8421_device &mb8421(MB8421(config, "mb8421"));
+	mb8421.intl_callback().set(FUNC(segaybd_state::mb8421_intl));
+	mb8421.intr_callback().set(FUNC(segaybd_state::mb8421_intr));
+}
 
-MACHINE_CONFIG_START(segaybd_state::yboard_deluxe)
+void segaybd_state::yboard_deluxe(machine_config &config)
+{
 	yboard(config);
 
 	// basic machine hardware
-	MCFG_CPU_ADD("motorcpu", Z80, XTAL(16'000'000)/2 ) // 8 Mhz(guessed)
-	MCFG_CPU_PROGRAM_MAP(motor_map)
-//  MCFG_CPU_IO_MAP(motor_portmap)
-
-MACHINE_CONFIG_END
+	z80_device &motorcpu(Z80(config, "motorcpu", XTAL(16'000'000)/2)); // 8 Mhz(guessed)
+	motorcpu.set_addrmap(AS_PROGRAM, &segaybd_state::motor_map);
+//  motorcpu.set_addrmap(AS_IO, &segaybd_state::motor_portmap);
+}
 
 //**************************************************************************
 //  ROM DEFINITIONS
@@ -2081,7 +2080,7 @@ ROM_START( pdrift )
 	ROM_RELOAD(                 0x160000, 0x20000 )
 
 	ROM_REGION( 0x100000, "user1", 0 )
-	// These are mpr-11754.107 split into 4 roms. They would be located on a Sega 839-0221 daughter card.
+	// These are mpr-11754.107 split into 4 ROMs. They would be located on a Sega 839-0221 daughter card.
 	ROM_LOAD( "epr-11895.ic1", 0x000000, 0x20000, CRC(ee99a6fd) SHA1(4444826e751d9186e6d46b081e47cd99ee3cf853) )
 	ROM_LOAD( "epr-11896.ic2", 0x000000, 0x20000, CRC(4bebc015) SHA1(307022ea1c1ee87c9ef3782526888c48c3c69fd2) )
 	ROM_LOAD( "epr-11897.ic3", 0x000000, 0x20000, CRC(4463cb95) SHA1(e86fd4611cf83fe72d59950a60fc8c3a7381a1c7) )
@@ -2164,7 +2163,7 @@ ROM_START( pdrifta )
 	ROM_RELOAD(                 0x160000, 0x20000 )
 
 	ROM_REGION( 0x100000, "user1", 0 )
-	// These are mpr-11754.107 split into 4 roms. They would be located on a Sega 839-0221 daughter card.
+	// These are mpr-11754.107 split into 4 ROMs. They would be located on a Sega 839-0221 daughter card.
 	ROM_LOAD( "epr-11895.ic1", 0x000000, 0x20000, CRC(ee99a6fd) SHA1(4444826e751d9186e6d46b081e47cd99ee3cf853) )
 	ROM_LOAD( "epr-11896.ic2", 0x000000, 0x20000, CRC(4bebc015) SHA1(307022ea1c1ee87c9ef3782526888c48c3c69fd2) )
 	ROM_LOAD( "epr-11897.ic3", 0x000000, 0x20000, CRC(4463cb95) SHA1(e86fd4611cf83fe72d59950a60fc8c3a7381a1c7) )
@@ -2173,7 +2172,7 @@ ROM_END
 
 //*************************************************************************************************************************
 //  Power Drift (World)
-//  Earlier set based on eprom numbers & Sega Eprom/Mask Rom Locations sheet 421-7708
+//  Earlier set based on EPROM numbers & Sega EPROM/Mask ROM Locations sheet 421-7708
 //
 ROM_START( pdrifte )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // M
@@ -2248,7 +2247,7 @@ ROM_START( pdrifte )
 	ROM_RELOAD(                 0x160000, 0x20000 )
 
 	ROM_REGION( 0x100000, "user1", 0 )
-	// These are mpr-11754.107 split into 4 roms. They would be located on a Sega 839-0221 daughter card.
+	// These are mpr-11754.107 split into 4 ROMs. They would be located on a Sega 839-0221 daughter card.
 	ROM_LOAD( "epr-11895.ic1", 0x000000, 0x20000, CRC(ee99a6fd) SHA1(4444826e751d9186e6d46b081e47cd99ee3cf853) )
 	ROM_LOAD( "epr-11896.ic2", 0x000000, 0x20000, CRC(4bebc015) SHA1(307022ea1c1ee87c9ef3782526888c48c3c69fd2) )
 	ROM_LOAD( "epr-11897.ic3", 0x000000, 0x20000, CRC(4463cb95) SHA1(e86fd4611cf83fe72d59950a60fc8c3a7381a1c7) )
@@ -2334,7 +2333,7 @@ ROM_START( pdriftj )
 	ROM_RELOAD(                 0x160000, 0x20000 )
 
 	ROM_REGION( 0x100000, "user1", 0 )
-	// These are mpr-11754.107 split into 4 roms. They would be located on a Sega 839-0221 daughter card.
+	// These are mpr-11754.107 split into 4 ROMs. They would be located on a Sega 839-0221 daughter card.
 	ROM_LOAD( "epr-11895.ic1", 0x000000, 0x20000, CRC(ee99a6fd) SHA1(4444826e751d9186e6d46b081e47cd99ee3cf853) )
 	ROM_LOAD( "epr-11896.ic2", 0x000000, 0x20000, CRC(4bebc015) SHA1(307022ea1c1ee87c9ef3782526888c48c3c69fd2) )
 	ROM_LOAD( "epr-11897.ic3", 0x000000, 0x20000, CRC(4463cb95) SHA1(e86fd4611cf83fe72d59950a60fc8c3a7381a1c7) )
@@ -2345,7 +2344,7 @@ ROM_END
 //  Power Drift (Japan), Sega Y-board Link version
 //  Sega Game ID:  833-6697
 //
-//  This was just 6 loose program roms + 4 sprite roms + the link PCBs, other roms could be incorrect
+//  This was just 6 loose program ROMs + 4 sprite ROMs + the link PCBs, other ROMs could be incorrect
 //
 ROM_START(pdriftl)
 	ROM_REGION(0x080000, "maincpu", 0) // M
@@ -2419,7 +2418,7 @@ ROM_START(pdriftl)
 	ROM_RELOAD(               0x160000, 0x20000)
 
 	ROM_REGION(0x100000, "user1", 0)
-	// These are mpr-11754.107 split into 4 roms. They would be located on a Sega 839-0221 daughter card.
+	// These are mpr-11754.107 split into 4 ROMs. They would be located on a Sega 839-0221 daughter card.
 	ROM_LOAD("epr-11895.ic1", 0x000000, 0x20000, CRC(ee99a6fd) SHA1(4444826e751d9186e6d46b081e47cd99ee3cf853) )
 	ROM_LOAD("epr-11896.ic2", 0x000000, 0x20000, CRC(4bebc015) SHA1(307022ea1c1ee87c9ef3782526888c48c3c69fd2) )
 	ROM_LOAD("epr-11897.ic3", 0x000000, 0x20000, CRC(4463cb95) SHA1(e86fd4611cf83fe72d59950a60fc8c3a7381a1c7) )
@@ -2712,7 +2711,7 @@ ROM_END
 //  init_generic - common initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segaybd_state,generic)
+void segaybd_state::init_generic()
 {
 	// allocate a scanline timer
 	m_scanline_timer = timer_alloc(TID_IRQ2_GEN);
@@ -2731,17 +2730,17 @@ DRIVER_INIT_MEMBER(segaybd_state,generic)
 //  init_* - game-specific initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segaybd_state,gforce2)
+void segaybd_state::init_gforce2()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_output_cb1 = output_delegate(&segaybd_state::gforce2_output_cb1, this);
 	m_output_cb2 = output_delegate(&segaybd_state::gforce2_output_cb2, this);
 }
 
-DRIVER_INIT_MEMBER(segaybd_state,gloc)
+void segaybd_state::init_gloc()
 {
 	// because some of the output data isn't fully understood we need to "center" the rams
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_output_cb1 = output_delegate(&segaybd_state::gloc_output_cb1, this);
 	m_output_cb2 = output_delegate(&segaybd_state::gloc_output_cb2, this);
 
@@ -2749,23 +2748,23 @@ DRIVER_INIT_MEMBER(segaybd_state,gloc)
 	output().set_value("right_motor_position_nor", 16);
 }
 
-DRIVER_INIT_MEMBER(segaybd_state,r360)
+void segaybd_state::init_r360()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_output_cb2 = output_delegate(&segaybd_state::r360_output_cb2, this);
 }
 
-DRIVER_INIT_MEMBER(segaybd_state,pdrift)
+void segaybd_state::init_pdrift()
 {
 	// because some of the output data isn't fully understood we need to "center" the motor
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_output_cb1 = output_delegate(&segaybd_state::pdrift_output_cb1, this);
 	m_output_cb2 = output_delegate(&segaybd_state::pdrift_output_cb2, this);
 }
 
-DRIVER_INIT_MEMBER(segaybd_state,rchase)
+void segaybd_state::init_rchase()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_output_cb2 = output_delegate(&segaybd_state::rchase_output_cb2, this);
 }
 
@@ -2776,25 +2775,25 @@ DRIVER_INIT_MEMBER(segaybd_state,rchase)
 //**************************************************************************
 
 //    YEAR, NAME,      PARENT,   MACHINE,       INPUT,    STATE,         INIT,    MONITOR,COMPANY,FULLNAME,FLAGS,                                     LAYOUT
-GAME( 1988, gforce2,   0,        yboard,        gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gforce2sd, gforce2,  yboard_deluxe, gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Super Deluxe unit)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gforce2ja, gforce2,  yboard,        gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan, Rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gforce2j,  gforce2,  yboard,        gforce2,  segaybd_state, gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gforce2,   0,        yboard,        gforce2,  segaybd_state, init_gforce2, ROT0,   "Sega", "Galaxy Force 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gforce2sd, gforce2,  yboard_deluxe, gforce2,  segaybd_state, init_gforce2, ROT0,   "Sega", "Galaxy Force 2 (Super Deluxe unit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gforce2ja, gforce2,  yboard,        gforce2,  segaybd_state, init_gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan, Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gforce2j,  gforce2,  yboard,        gforce2,  segaybd_state, init_gforce2, ROT0,   "Sega", "Galaxy Force 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, gloc,      0,        yboard,        gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, glocu,     gloc,     yboard,        gloc,     segaybd_state, gloc,    ROT0,   "Sega", "G-LOC Air Battle (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, glocr360,  gloc,     yboard,        glocr360, segaybd_state, r360,    ROT0,   "Sega", "G-LOC R360 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, glocr360j, gloc,     yboard,        glocr360, segaybd_state, r360,    ROT0,   "Sega", "G-LOC R360 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gloc,      0,        yboard,        gloc,     segaybd_state, init_gloc,    ROT0,   "Sega", "G-LOC Air Battle (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, glocu,     gloc,     yboard,        gloc,     segaybd_state, init_gloc,    ROT0,   "Sega", "G-LOC Air Battle (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, glocr360,  gloc,     yboard,        glocr360, segaybd_state, init_r360,    ROT0,   "Sega", "G-LOC R360 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, glocr360j, gloc,     yboard,        glocr360, segaybd_state, init_r360,    ROT0,   "Sega", "G-LOC R360 (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1988, pdrift,    0,        yboard,        pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Rev A)", MACHINE_SUPPORTS_SAVE,   layout_pdrift )
-GAMEL(1988, pdrifta,   pdrift,   yboard,        pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
-GAMEL(1988, pdrifte,   pdrift,   yboard,        pdrifte,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
-GAMEL(1988, pdriftj,   pdrift,   yboard,        pdriftj,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
+GAMEL(1988, pdrift,    0,        yboard,        pdrift,   segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (World, Rev A)", MACHINE_SUPPORTS_SAVE,   layout_pdrift )
+GAMEL(1988, pdrifta,   pdrift,   yboard,        pdrift,   segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (World)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
+GAMEL(1988, pdrifte,   pdrift,   yboard,        pdrifte,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
+GAMEL(1988, pdriftj,   pdrift,   yboard,        pdriftj,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
 
-GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE, layout_pdrift)
+GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE, layout_pdrift)
 
-GAME( 1991, rchase,    0,        yboard,        rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, rchasej,   rchase,   yboard,        rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rchase,    0,        yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, rchasej,   rchase,   yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, strkfgtr,  0,        yboard,        strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, strkfgtrj, strkfgtr, yboard,        strkfgtr, segaybd_state, gloc,    ROT0,   "Sega", "Strike Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, strkfgtr,  0,        yboard,        strkfgtr, segaybd_state, init_gloc,    ROT0,   "Sega", "Strike Fighter (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, strkfgtrj, strkfgtr, yboard,        strkfgtr, segaybd_state, init_gloc,    ROT0,   "Sega", "Strike Fighter (Japan)", MACHINE_SUPPORTS_SAVE )

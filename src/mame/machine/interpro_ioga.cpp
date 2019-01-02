@@ -8,14 +8,14 @@
  * ROM and diagnostic tests.
  *
  * The device handles most of the I/O for the system, including timers, DMA,
- * interrupts, and target device interfacing. There is a significant amount of
- * work to be completed before the boot diagnostics will pass without errors,
- * let alone successfully booting CLIX.
+ * interrupts, and target device interfacing.
  *
  * TODO
- *   - edge/level triggered interrupts
- *   - make mouse a slot device
- *   - improve dma and timers
+ *   - tidy up dma control flags
+ *   - timer 2 and 3
+ *   - correct serial dma per-channel interrupt handling
+ *   - multi-channel Ethernet?
+ *   - save/restore state
  */
 
 #include "emu.h"
@@ -54,136 +54,105 @@
 #define LOGIRQ(irq, ...) do { if (VERBOSE_IRQ & (1U << irq)) (LOG_OUTPUT_FUNC)(__VA_ARGS__); } while (false)
 #define LOGDMA(dma, ...) do { if (VERBOSE_DMA & (1U << dma)) (LOG_OUTPUT_FUNC)(__VA_ARGS__); } while (false)
 
-const interpro_ioga_device::interrupt_data_t interpro_ioga_device::m_interrupt_data[] =
-{
-	{ INT_HARD_IN, IRQ_TIMER2,   IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "internal int 3", "timer 2" }, // either external or internal?
-	{ INT_HARD_IN, IRQ_TIMER3,   IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "internal int 4", "timer 3" }, // either external or internal?
-	{ INT_HARD_EX, IRQ_SCSI,     IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 0", "scsi" },    // IRQ_ENABLE_INTERNAL
-	{ INT_HARD_EX, IRQ_FLOPPY,   IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 1", "floppy" },  // IRQ_ENABLE_INTERNAL
-	{ INT_HARD_EX, IRQ_PLOTTER,  IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 2", "plotter" }, // IRQ_ENABLE_INTERNAL
-
-	{ INT_HARD_EX, IRQ_SRXCBUS0, IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 3", "srx/cbus 0" },
-	{ INT_HARD_EX, IRQ_SRXCBUS1, IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 4", "srx/cbus 1" },
-	{ INT_HARD_EX, IRQ_SRXCBUS2, IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 5", "srx/cbus 2" },
-
-	{ INT_HARD_EX, IRQ_VB,       IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 6", "vb" },
-	{ INT_HARD_EX, IRQ_9,        IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 7", "?" },
-	{ INT_HARD_EX, IRQ_CBUS3,    IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 8", "cbus 3" },
-	{ INT_HARD_EX, IRQ_RTC,      IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 9", "clock/calendar" },
-	{ INT_HARD_EX, IRQ_12,       IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 10", "sga?" },
-
-	{ INT_HARD_IN, IRQ_MOUSE,    IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "internal int 0", "mouse" },
-	{ INT_HARD_IN, IRQ_TIMER0,   IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "internal int 1", "timer 0" },
-	{ INT_HARD_IN, IRQ_TIMER1,   IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "internal int 2", "timer 1" },
-	{ INT_HARD_IN, IRQ_SERDMA,   IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "internal int 5", "serial dma" }, // IRQ_ENABLE_EXTERNAL << 0 | IRQ_ENABLE_EXTERNAL << 1 | IRQ_ENABLE_EXTERNAL << 2
-
-	{ INT_HARD_EX, IRQ_SERIAL,   IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 11", "serial" },
-	{ INT_HARD_EX, IRQ_ETHERNET, IRQ_PENDING | IRQ_ENABLE_EXTERNAL, "external int 12", "ethernet" }, // IRQ_ENABLE_INTERNAL
-
-	{ INT_SOFT_LO, IRQ_SOFT0,    0x0100, "soft int 0", "soft" },
-	{ INT_SOFT_LO, IRQ_SOFT1,    0x0200, "soft int 1", "soft" },
-	{ INT_SOFT_LO, IRQ_SOFT2,    0x0400, "soft int 2", "soft" },
-	{ INT_SOFT_LO, IRQ_SOFT3,    0x0800, "soft int 3", "soft" },
-	{ INT_SOFT_LO, IRQ_SOFT4,    0x1000, "soft int 4", "soft" },
-	{ INT_SOFT_LO, IRQ_SOFT5,    0x2000, "soft int 5", "soft" },
-	{ INT_SOFT_LO, IRQ_SOFT6,    0x4000, "soft int 6", "soft" },
-	{ INT_SOFT_LO, IRQ_SOFT7,    0x8000, "soft int 7", "soft" },
-
-	{ INT_SOFT_HI, IRQ_SOFT8,    IRQ_PENDING, "soft int 8", "soft" },
-	{ INT_SOFT_HI, IRQ_SOFT9,    IRQ_PENDING, "soft int 9", "soft" },
-	{ INT_SOFT_HI, IRQ_SOFT10,   IRQ_PENDING, "soft int 10", "soft" },
-	{ INT_SOFT_HI, IRQ_SOFT11,   IRQ_PENDING, "soft int 11", "soft" },
-	{ INT_SOFT_HI, IRQ_SOFT12,   IRQ_PENDING, "soft int 12", "soft" },
-	{ INT_SOFT_HI, IRQ_SOFT13,   IRQ_PENDING, "soft int 13", "soft" },
-	{ INT_SOFT_HI, IRQ_SOFT14,   IRQ_PENDING, "soft int 14", "soft" },
-	{ INT_SOFT_HI, IRQ_SOFT15,   IRQ_PENDING, "soft int 15", "soft" },
-};
-
 void interpro_ioga_device::map(address_map &map)
 {
+	map(0x0c, 0x1b).rw(FUNC(interpro_ioga_device::dma_plotter_r), FUNC(interpro_ioga_device::dma_plotter_w));
+	map(0x1c, 0x1f).rw(FUNC(interpro_ioga_device::dma_plotter_eosl_r), FUNC(interpro_ioga_device::dma_plotter_eosl_w));
+	map(0x20, 0x2f).rw(FUNC(interpro_ioga_device::dma_scsi_r), FUNC(interpro_ioga_device::dma_scsi_w));
+	map(0x30, 0x3f).rw(FUNC(interpro_ioga_device::dma_floppy_r), FUNC(interpro_ioga_device::dma_floppy_w));
+	map(0x40, 0x43).rw(FUNC(interpro_ioga_device::serial_dma0_addr_r), FUNC(interpro_ioga_device::serial_dma0_addr_w));
+	map(0x44, 0x47).rw(FUNC(interpro_ioga_device::serial_dma0_ctrl_r), FUNC(interpro_ioga_device::serial_dma0_ctrl_w));
+	map(0x48, 0x4b).rw(FUNC(interpro_ioga_device::serial_dma1_addr_r), FUNC(interpro_ioga_device::serial_dma1_addr_w));
+	map(0x4c, 0x4f).rw(FUNC(interpro_ioga_device::serial_dma1_ctrl_r), FUNC(interpro_ioga_device::serial_dma1_ctrl_w));
+	map(0x50, 0x53).rw(FUNC(interpro_ioga_device::serial_dma2_addr_r), FUNC(interpro_ioga_device::serial_dma2_addr_w));
+	map(0x54, 0x57).rw(FUNC(interpro_ioga_device::serial_dma2_ctrl_r), FUNC(interpro_ioga_device::serial_dma2_ctrl_w));
 
-	map(0x0c, 0x1b).rw(this, FUNC(interpro_ioga_device::dma_plotter_r), FUNC(interpro_ioga_device::dma_plotter_w));
-	map(0x1c, 0x1f).rw(this, FUNC(interpro_ioga_device::dma_plotter_eosl_r), FUNC(interpro_ioga_device::dma_plotter_eosl_w));
-	map(0x20, 0x2f).rw(this, FUNC(interpro_ioga_device::dma_scsi_r), FUNC(interpro_ioga_device::dma_scsi_w));
-	map(0x30, 0x3f).rw(this, FUNC(interpro_ioga_device::dma_floppy_r), FUNC(interpro_ioga_device::dma_floppy_w));
-	map(0x40, 0x43).rw(this, FUNC(interpro_ioga_device::serial_dma0_addr_r), FUNC(interpro_ioga_device::serial_dma0_addr_w));
-	map(0x44, 0x47).rw(this, FUNC(interpro_ioga_device::serial_dma0_ctrl_r), FUNC(interpro_ioga_device::serial_dma0_ctrl_w));
-	map(0x48, 0x4b).rw(this, FUNC(interpro_ioga_device::serial_dma1_addr_r), FUNC(interpro_ioga_device::serial_dma1_addr_w));
-	map(0x4c, 0x4f).rw(this, FUNC(interpro_ioga_device::serial_dma1_ctrl_r), FUNC(interpro_ioga_device::serial_dma1_ctrl_w));
-	map(0x50, 0x53).rw(this, FUNC(interpro_ioga_device::serial_dma2_addr_r), FUNC(interpro_ioga_device::serial_dma2_addr_w));
-	map(0x54, 0x57).rw(this, FUNC(interpro_ioga_device::serial_dma2_ctrl_r), FUNC(interpro_ioga_device::serial_dma2_ctrl_w));
+	map(0x84, 0x87).rw(FUNC(interpro_ioga_device::mouse_status_r), FUNC(interpro_ioga_device::mouse_status_w));
+	map(0x88, 0x8b).rw(FUNC(interpro_ioga_device::prescaler_r), FUNC(interpro_ioga_device::prescaler_w));
+	map(0x8c, 0x8f).rw(FUNC(interpro_ioga_device::timer0_r), FUNC(interpro_ioga_device::timer0_w));
+	map(0x90, 0x93).rw(FUNC(interpro_ioga_device::timer1_r), FUNC(interpro_ioga_device::timer1_w));
+	map(0x94, 0x97).r(FUNC(interpro_ioga_device::error_address_r));
+	map(0x98, 0x9b).r(FUNC(interpro_ioga_device::error_businfo_r));
+	map(0x9c, 0x9d).rw(FUNC(interpro_ioga_device::arbctl_r), FUNC(interpro_ioga_device::arbctl_w));
+}
 
-	// 5a - sib control?
-	map(0x5c, 0x7f).rw(this, FUNC(interpro_ioga_device::icr_r), FUNC(interpro_ioga_device::icr_w));
-	map(0x80, 0x81).rw(this, FUNC(interpro_ioga_device::icr18_r), FUNC(interpro_ioga_device::icr18_w));
-	map(0x82, 0x82).rw(this, FUNC(interpro_ioga_device::softint_r), FUNC(interpro_ioga_device::softint_w));
-	map(0x83, 0x83).rw(this, FUNC(interpro_ioga_device::nmictrl_r), FUNC(interpro_ioga_device::nmictrl_w));
-	map(0x84, 0x87).rw(this, FUNC(interpro_ioga_device::mouse_status_r), FUNC(interpro_ioga_device::mouse_status_w));
-	map(0x88, 0x8b).rw(this, FUNC(interpro_ioga_device::prescaler_r), FUNC(interpro_ioga_device::prescaler_w));
-	map(0x8c, 0x8f).rw(this, FUNC(interpro_ioga_device::timer0_r), FUNC(interpro_ioga_device::timer0_w));
-	map(0x90, 0x93).rw(this, FUNC(interpro_ioga_device::timer1_r), FUNC(interpro_ioga_device::timer1_w));
-	map(0x94, 0x97).r(this, FUNC(interpro_ioga_device::error_address_r));
-	map(0x98, 0x9b).r(this, FUNC(interpro_ioga_device::error_businfo_r));
-	map(0x9c, 0x9d).rw(this, FUNC(interpro_ioga_device::arbctl_r), FUNC(interpro_ioga_device::arbctl_w));
-	//AM_RANGE(0x9c, 0x9f) AM_READWRITE16(?, ?, 0xffff0000) // ip2000 boot code writes 0x7f18
-	map(0xa0, 0xa3).rw(this, FUNC(interpro_ioga_device::timer2_count_r), FUNC(interpro_ioga_device::timer2_count_w));
-	map(0xa4, 0xa7).rw(this, FUNC(interpro_ioga_device::timer2_value_r), FUNC(interpro_ioga_device::timer2_value_w));
-	map(0xa8, 0xab).rw(this, FUNC(interpro_ioga_device::timer3_r), FUNC(interpro_ioga_device::timer3_w));
-	map(0xac, 0xaf).rw(this, FUNC(interpro_ioga_device::bus_timeout_r), FUNC(interpro_ioga_device::bus_timeout_w)); // boot writes 0x64
-	map(0xb0, 0xbf).rw(this, FUNC(interpro_ioga_device::softint_vector_r), FUNC(interpro_ioga_device::softint_vector_w));
+void emerald_ioga_device::map(address_map &map)
+{
+	interpro_ioga_device::map(map);
 
-	//c0, c4, c8 -ethernet address a,b,c?
+	map(0x00, 0x03).rw(FUNC(emerald_ioga_device::eth_base_r), FUNC(emerald_ioga_device::eth_base_w));
+	map(0x04, 0x05).rw(FUNC(emerald_ioga_device::eth_control_r), FUNC(emerald_ioga_device::eth_control_w));
+
+	map(0x60, 0x83).rw(FUNC(interpro_ioga_device::hardint_r), FUNC(interpro_ioga_device::hardint_w));
+	map(0x82, 0x82).rw(FUNC(interpro_ioga_device::softint_r), FUNC(interpro_ioga_device::softint_w));
+	map(0x83, 0x83).rw(FUNC(interpro_ioga_device::nmictrl_r), FUNC(interpro_ioga_device::nmictrl_w));
 }
 
 void turquoise_ioga_device::map(address_map &map)
 {
 	interpro_ioga_device::map(map);
 
-	map(0x00, 0x03).rw(this, FUNC(turquoise_ioga_device::eth_base_r), FUNC(turquoise_ioga_device::eth_base_w));
-	map(0x04, 0x05).rw(this, FUNC(turquoise_ioga_device::eth_control_r), FUNC(turquoise_ioga_device::eth_control_w));
+	map(0x00, 0x03).rw(FUNC(turquoise_ioga_device::eth_base_r), FUNC(turquoise_ioga_device::eth_base_w));
+	map(0x04, 0x05).rw(FUNC(turquoise_ioga_device::eth_control_r), FUNC(turquoise_ioga_device::eth_control_w));
+
+	map(0x60, 0x83).rw(FUNC(turquoise_ioga_device::hardint_r), FUNC(turquoise_ioga_device::hardint_w));
+	map(0x82, 0x82).rw(FUNC(turquoise_ioga_device::softint_r), FUNC(turquoise_ioga_device::softint_w));
+	map(0x83, 0x83).rw(FUNC(turquoise_ioga_device::nmictrl_r), FUNC(turquoise_ioga_device::nmictrl_w));
+
+	//map(0x9e, 0x9f).rw(FUNC(turquoise_ioga_device::?), FUNC(turquoise_ioga_device::?)); // ip2000 boot code writes 0x7f18
 }
 
 void sapphire_ioga_device::map(address_map &map)
 {
 	interpro_ioga_device::map(map);
 
-	map(0x00, 0x03).rw(this, FUNC(sapphire_ioga_device::eth_remap_r), FUNC(sapphire_ioga_device::eth_remap_w));
-	map(0x04, 0x07).rw(this, FUNC(sapphire_ioga_device::eth_mappg_r), FUNC(sapphire_ioga_device::eth_mappg_w));
-	map(0x08, 0x0b).rw(this, FUNC(sapphire_ioga_device::eth_control_r), FUNC(sapphire_ioga_device::eth_control_w));
+	map(0x00, 0x03).rw(FUNC(sapphire_ioga_device::eth_remap_r), FUNC(sapphire_ioga_device::eth_remap_w));
+	map(0x04, 0x07).rw(FUNC(sapphire_ioga_device::eth_mappg_r), FUNC(sapphire_ioga_device::eth_mappg_w));
+	map(0x08, 0x0b).rw(FUNC(sapphire_ioga_device::eth_control_r), FUNC(sapphire_ioga_device::eth_control_w));
+
+	// 5a - sib control?
+	//map(0x58, 0x5b).rw(FUNC(interpro_ioga_device::sib_r), FUNC(interpro_ioga_device::sib_w));
+
+	map(0x5c, 0x83).rw(FUNC(interpro_ioga_device::hardint_r), FUNC(interpro_ioga_device::hardint_w));
+	map(0x82, 0x82).rw(FUNC(interpro_ioga_device::softint_r), FUNC(interpro_ioga_device::softint_w));
+	map(0x83, 0x83).rw(FUNC(interpro_ioga_device::nmictrl_r), FUNC(interpro_ioga_device::nmictrl_w));
+
+	map(0xa0, 0xa3).rw(FUNC(sapphire_ioga_device::timer2_count_r), FUNC(sapphire_ioga_device::timer2_count_w));
+	map(0xa4, 0xa7).rw(FUNC(sapphire_ioga_device::timer2_value_r), FUNC(sapphire_ioga_device::timer2_value_w));
+	map(0xa8, 0xab).rw(FUNC(sapphire_ioga_device::timer3_r), FUNC(sapphire_ioga_device::timer3_w));
+	map(0xac, 0xaf).rw(FUNC(sapphire_ioga_device::bus_timeout_r), FUNC(sapphire_ioga_device::bus_timeout_w)); // boot writes 0x64
+
+	map(0xb0, 0xbf).rw(FUNC(sapphire_ioga_device::softint_vector_r), FUNC(sapphire_ioga_device::softint_vector_w));
+
+	//c0, c4, c8 -ethernet address a,b,c?
 }
 
-static INPUT_PORTS_START(interpro_mouse)
-	PORT_START("mouse_buttons")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_ioga_device, mouse_button, nullptr)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Middle Button") PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_ioga_device, mouse_button, nullptr)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Mouse Right Button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_ioga_device, mouse_button, nullptr)
-
-	PORT_START("mouse_x")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_ioga_device, mouse_x, nullptr)
-	PORT_START("mouse_y")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, interpro_ioga_device, mouse_y, nullptr)
-INPUT_PORTS_END
-
+DEFINE_DEVICE_TYPE(EMERALD_IOGA, emerald_ioga_device, "ioga_e", "I/O Gate Array (Emerald)")
 DEFINE_DEVICE_TYPE(TURQUOISE_IOGA, turquoise_ioga_device, "ioga_t", "I/O Gate Array (Turquoise)")
 DEFINE_DEVICE_TYPE(SAPPHIRE_IOGA, sapphire_ioga_device, "ioga_s", "I/O Gate Array (Sapphire)")
 
 interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_memory_tag(nullptr)
-	, m_memory_space(nullptr)
+	, m_memory_device(*this, finder_base::DUMMY_TAG)
+	, m_memory(nullptr)
 	, m_out_nmi_func(*this)
 	, m_out_irq_func(*this)
-	, m_out_ivec_func(*this)
+	, m_out_irq_vector_func(*this)
 	, m_fdc_tc_func(*this)
 	, m_eth_ca_func(*this)
 	, m_dma_channel{
-		{ 0,0,0,0,CLEAR_LINE,IDLE, {*this}, {*this}, ARBCTL_BGR_PLOT, DMA_PLOTTER, "plotter" },
-		{ 0,0,0,0,CLEAR_LINE,IDLE, {*this}, {*this}, ARBCTL_BGR_SCSI, DMA_SCSI, "scsi" },
-		{ 0,0,0,0,CLEAR_LINE,IDLE, {*this}, {*this}, ARBCTL_BGR_FDC, DMA_FLOPPY, "floppy" } }
+		{ 0,0,0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_PLOT, DMA_PLOTTER, "plotter" },
+		{ 0,0,0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_SCSI, DMA_SCSI, "scsi" },
+		{ 0,0,0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_FDC, DMA_FLOPPY, "floppy" } }
 	, m_serial_dma_channel{
 		{ 0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_SER0, 0, "serial0" },
 		{ 0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_SER1, 1, "serial1" },
 		{ 0,0,CLEAR_LINE, {*this}, {*this}, ARBCTL_BGR_SER2, 2, "serial2" } }
+{
+}
+
+emerald_ioga_device::emerald_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: interpro_ioga_device(mconfig, EMERALD_IOGA, tag, owner, clock)
 {
 }
 
@@ -199,17 +168,17 @@ sapphire_ioga_device::sapphire_ioga_device(const machine_config &mconfig, const 
 
 void interpro_ioga_device::device_start()
 {
-	assert_always(m_memory_tag != nullptr, "memory tag and address space number must be configured");
-
 	// get the memory space
-	device_memory_interface *memory;
-	siblingdevice(m_memory_tag)->interface(memory);
-	m_memory_space = &memory->space(m_memory_spacenum);
+	if (!m_memory_device->has_space(m_memory_spacenum))
+		fatalerror("%s: device %s (%s) doesn't have memory space %d\n",
+			tag(), m_memory_device->device().tag(), m_memory_device->device().name(), m_memory_spacenum);
+
+	m_memory = m_memory_device->space(m_memory_spacenum).cache<2, 0, ENDIANNESS_LITTLE>();
 
 	// resolve callbacks
 	m_out_nmi_func.resolve();
 	m_out_irq_func.resolve();
-	m_out_ivec_func.resolve();
+	m_out_irq_vector_func.resolve();
 	m_fdc_tc_func.resolve();
 	m_eth_ca_func.resolve();
 
@@ -232,28 +201,34 @@ void interpro_ioga_device::device_start()
 
 	m_timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::timer0), this));
 	m_timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::timer1), this));
-	m_timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::timer2), this));
-	m_timer3 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::timer3), this));
 
-	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::mouse_timer), this));
+	m_timer_60hz = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::timer_60hz), this));
+
 	m_eth_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::eth_reset), this));
+}
+
+void sapphire_ioga_device::device_start()
+{
+	interpro_ioga_device::device_start();
+
+	m_timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sapphire_ioga_device::timer2), this));
+	m_timer3 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sapphire_ioga_device::timer3), this));
 }
 
 void interpro_ioga_device::device_reset()
 {
 	// initialise interrupt state
-	m_active_interrupt = nullptr;
+	m_active_interrupt_type = INT_NONE;
 	m_nmi_state = CLEAR_LINE;
 	m_irq_state = CLEAR_LINE;
-	m_ivec = 0;
-	m_hwint_forced = 0;
+	m_irq_vector = 0;
+	m_line_state = 0;
+
+	m_hwicr = std::make_unique<u16[]>(get_int_count());
 
 	// initialise dma state
 	for (dma_channel_t &dma_channel : m_dma_channel)
-	{
 		dma_channel.drq_state = CLEAR_LINE;
-		dma_channel.state = IDLE;
-	}
 
 	for (serial_dma_channel_t &dma_channel : m_serial_dma_channel)
 		dma_channel.drq_state = CLEAR_LINE;
@@ -265,28 +240,40 @@ void interpro_ioga_device::device_reset()
 
 	m_timer0->enable(false);
 	m_timer1->enable(false);
-	m_timer2->enable(false);
-	m_timer3->enable(false);
 
-	m_mouse_timer->enable(false);
 	m_eth_reset_timer->enable(false);
 
-	// configure timer 0 for 60Hz
 	m_timer0_count = 0;
-	m_timer0_limit = 0;
-	m_timer0->adjust(attotime::zero, 0, attotime::from_hz(60));
-
 	m_timer1_count = 0;
-	m_timer2_count = 0;
-	m_timer2_value = 0;
-	m_timer3_count = 0;
+
+	m_timer_60hz->adjust(attotime::zero, 0, attotime::from_hz(60));
 
 	m_prescaler = 0;
 }
 
-ioport_constructor interpro_ioga_device::device_input_ports() const
+void sapphire_ioga_device::device_reset()
 {
-	return INPUT_PORTS_NAME(interpro_mouse);
+	interpro_ioga_device::device_reset();
+
+	m_timer2->enable(false);
+	m_timer3->enable(false);
+
+	m_timer2_count = 0;
+	m_timer2_value = 0;
+	m_timer3_count = 0;
+}
+
+/*
+ * Interrupts
+ */
+WRITE32_MEMBER(interpro_ioga_device::bus_error)
+{
+	LOG("bus_error address 0x%08x businfo 0x%08x\n", data, offset);
+
+	m_error_address = data;
+	m_error_businfo = offset;
+
+	set_nmi_line(ASSERT_LINE);
 }
 
 void interpro_ioga_device::set_nmi_line(int state)
@@ -311,66 +298,212 @@ void interpro_ioga_device::set_nmi_line(int state)
 		nmi(CLEAR_LINE);
 }
 
-void interpro_ioga_device::set_int_line(interrupt_type type, int number, int state)
+void interpro_ioga_device::nmi(int state)
 {
-	LOGIRQ(number, "irq: set_int_line(%d, %d, %d)\n", type, number, state);
-#if 0
-	// preliminary edge/level triggered interrupt handling
-	if (type == INT_HARD_IN || type == INT_HARD_EX)
+	if (m_nmi_state != state)
 	{
-		/*
-		 *  existing   new    type   result
-		 *   clear    clear   edge    nothing
-		 *   clear    assert  edge    pending if not masked
-		 *   assert   clear   edge    nothing
-		 *   assert   assert  edge    nothing
-
-		 *   clear    clear   level   nothing
-		 *   clear    assert  level   pending
-		 *   assert   clear   level   !pending
-		 *   assert   assert  level   nothing
-		 */
-
-		u16 icr = get_icr(type, number);
-		u32 mask = 1 << number;
-
-		if (icr & IRQ_EDGE)
-		{
-			if ((m_line_state & mask) == 0 && state)
-				set_pending(type, number, true);
-		}
-		else
-		{
-			if (((m_line_state & mask) == 0) ^ (state != ASSERT_LINE))
-				set_pending(type, number, state == ASSERT_LINE);
-		}
-
-		m_line_state = (state == ASSERT_LINE) ? (m_line_state | mask) : (m_line_state & ~mask);
+		m_nmi_state = state;
+		m_out_nmi_func(state);
 	}
-	else
-#else
-	(void)m_line_state;
-#endif
-	set_pending(type, number, state == ASSERT_LINE);
-
-	m_interrupt_timer->adjust(attotime::zero);
 }
 
-/*
- * Interrupts
- */
+void interpro_ioga_device::set_int_line(int number, int state)
+{
+	const u8 offset = get_reg_offset(number);
+
+	LOGIRQ(number, "irq: hard interrupt %d state %d\n", number, state);
+
+	if (state == CLEAR_LINE)
+	{
+		m_line_state &= ~(1 << number);
+		return;
+	}
+
+	// check already pending
+	if (m_hwicr[offset] & IRQ_PENDING)
+		return;
+
+	// record line state for level triggered interrupts
+	if (!(m_hwicr[offset] & IRQ_EDGE))
+		m_line_state |= (1 << number);
+
+	// check enabled
+	if ((number != IRQ_SERDMA && !(m_hwicr[offset] & (IRQ_ENABLE | IRQ_ENABLE_INT)))
+	|| ((number == IRQ_SERDMA && !(m_hwicr[offset] & IRQ_ENABLE_SERDMA))))
+		return;
+
+	// set pending
+	if (BIT(m_line_state, number) || (m_hwicr[offset] & IRQ_EDGE))
+	{
+		LOGIRQ(number, "irq: hard interrupt %d pending\n", number);
+		m_hwicr[offset] |= IRQ_PENDING;
+
+		// schedule interrupt check
+		m_interrupt_timer->adjust(attotime::zero);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(interpro_ioga_device::interrupt_check)
+{
+	// find highest priority pending interrupt
+	u16 irq_vector = get_irq_vector();
+
+	// hard interrupts
+	for (u8 i = 0; i < get_int_count(); i++)
+	{
+		// test interrupt pending
+		if (m_hwicr[i] & IRQ_PENDING)
+		{
+			// check priority
+			if (m_active_interrupt_type == INT_NONE || (m_hwicr[i] & IRQ_VECTOR) < irq_vector)
+			{
+				m_active_interrupt_type = INT_HARD;
+				m_active_interrupt_number = i;
+
+				irq_vector = m_hwicr[i] & IRQ_VECTOR;
+			}
+		}
+	}
+
+	// soft interrupts
+	if (m_softint)
+	{
+		for (u8 i = 0; i < 8; i++)
+		{
+			// test interrupt pending
+			if (m_softint & (1 << i))
+			{
+				// check priority
+				if ((m_active_interrupt_type == INT_NONE) || (0x8f + i * 0x10) < irq_vector)
+				{
+					m_active_interrupt_type = INT_SOFT;
+					m_active_interrupt_number = i;
+
+					irq_vector = 0x8f + i * 0x10;
+				}
+			}
+		}
+	}
+
+	// assert irq and ivec
+	if (m_active_interrupt_type != INT_NONE)
+		irq(ASSERT_LINE, irq_vector);
+}
+
+TIMER_CALLBACK_MEMBER(sapphire_ioga_device::interrupt_check)
+{
+	// find highest priority pending interrupt
+	u16 irq_vector = get_irq_vector();
+
+	// hard interrupts
+	for (u8 i = 0; i < get_int_count(); i++)
+	{
+		// test interrupt pending
+		if (m_hwicr[i] & IRQ_PENDING)
+		{
+			// check priority
+			if (m_active_interrupt_type == INT_NONE || (m_hwicr[i] & IRQ_VECTOR) < irq_vector)
+			{
+				m_active_interrupt_type = INT_HARD;
+				m_active_interrupt_number = i;
+
+				irq_vector = m_hwicr[i] & IRQ_VECTOR;
+			}
+		}
+	}
+
+	// soft interrupts (low type)
+	if (m_softint)
+	{
+		for (u8 i = 0; i < 8; i++)
+		{
+			// test interrupt pending
+			if (m_softint & (1 << i))
+			{
+				// check priority
+				if (m_active_interrupt_type == INT_NONE || (0x8f + i * 0x10) < irq_vector)
+				{
+					m_active_interrupt_type = INT_SOFT;
+					m_active_interrupt_number = i;
+
+					irq_vector = 0x8f + i * 0x10;
+				}
+			}
+		}
+	}
+
+	// soft interrupts (high type)
+	for (u8 i = 0; i < 8; i++)
+	{
+		// test interrupt pending
+		if (m_swicr[i] & IRQ_PENDING)
+		{
+			// check priority
+			if (m_active_interrupt_type == INT_NONE || (m_swicr[i] & IRQ_VECTOR) < irq_vector)
+			{
+				m_active_interrupt_type = INT_SOFT;
+				m_active_interrupt_number = i + 8;
+
+				irq_vector = m_swicr[i] & IRQ_VECTOR;
+			}
+		}
+	}
+
+	// assert irq and ivec
+	if (m_active_interrupt_type != INT_NONE)
+		irq(ASSERT_LINE, irq_vector);
+}
+
+void interpro_ioga_device::irq(int state, u8 irq_vector)
+{
+	if (irq_vector != m_irq_vector)
+	{
+		LOGIRQ(m_active_interrupt_number, "irq: setting irq vector 0x%02x\n", irq_vector);
+
+		m_irq_vector = irq_vector;
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(interpro_ioga_device::set_irq_vector), this));
+	}
+
+	if (m_irq_state != state)
+	{
+		LOGIRQ(m_active_interrupt_number, "irq: %s interrupt type %d number %d\n",
+			state ? "asserting" : "clearing",m_active_interrupt_type, m_active_interrupt_number);
+
+		m_irq_state = state;
+		m_out_irq_func(state);
+
+		if (state == CLEAR_LINE)
+			m_active_interrupt_type = INT_NONE;
+	}
+}
+
 IRQ_CALLBACK_MEMBER(interpro_ioga_device::acknowledge_interrupt)
 {
 	switch (irqline)
 	{
 	case INPUT_LINE_IRQ0:
-		// clear pending flag
-		set_pending(m_active_interrupt->type, m_active_interrupt->number, false);
+		LOGIRQ(m_active_interrupt_number, "irq: interrupt type %d number %d acknowledged\n",
+			m_active_interrupt_type, m_active_interrupt_number);
 
-		// clear irq/ivec
+		// clear pending
+		switch (m_active_interrupt_type)
+		{
+		case INT_HARD:
+			m_hwicr[m_active_interrupt_number] &= ~IRQ_PENDING;
+			break;
+
+		case INT_SOFT:
+			m_softint &= ~(1 << m_active_interrupt_number);
+			break;
+
+		default:
+			// can't happen
+			fatalerror("irq: interrupt acknowledged without active interrupt\n");
+			break;
+		}
+
+		// clear irq and irq vector
 		irq(CLEAR_LINE, 0);
-
-		m_active_interrupt = nullptr;
 		break;
 
 	case INPUT_LINE_NMI:
@@ -378,152 +511,105 @@ IRQ_CALLBACK_MEMBER(interpro_ioga_device::acknowledge_interrupt)
 		break;
 	}
 
+	// schedule interrupt check
 	m_interrupt_timer->adjust(attotime::zero);
 
 	return 0;
 }
 
-TIMER_CALLBACK_MEMBER(interpro_ioga_device::interrupt_check)
+IRQ_CALLBACK_MEMBER(sapphire_ioga_device::acknowledge_interrupt)
 {
-	// find highest priority unmasked pending interrupt
-	u16 ivec = m_ivec;
-	for (const interrupt_data_t &interrupt : m_interrupt_data)
+	switch (irqline)
 	{
-		u16 icr = get_icr(interrupt.type, interrupt.number);
+	case INPUT_LINE_IRQ0:
+		LOGIRQ(m_active_interrupt_number, "irq: interrupt type %d number %d acknowledged\n",
+			m_active_interrupt_type, m_active_interrupt_number);
 
-		// test for pending and not masked
-		if ((icr & interrupt.mask) == interrupt.mask)
+		// clear pending
+		switch (m_active_interrupt_type)
 		{
-			// check priority
-			if (m_active_interrupt == nullptr || (icr & IRQ_VECTOR) < ivec)
-			{
-				m_active_interrupt = &interrupt;
-				ivec = icr & IRQ_VECTOR;
-			}
+		case INT_HARD:
+			m_hwicr[m_active_interrupt_number] &= ~IRQ_PENDING;
+			break;
+
+		case INT_SOFT:
+			if (m_active_interrupt_number < 8)
+				m_softint &= ~(1 << m_active_interrupt_number);
+			else
+				m_swicr[m_active_interrupt_number - 8] &= ~IRQ_PENDING;
+			break;
+
+		default:
+			// can't happen
+			fatalerror("irq: interrupt acknowledged without active interrupt\n");
+			break;
+		}
+
+		// clear irq and irq vector
+		irq(CLEAR_LINE, 0);
+		break;
+
+	case INPUT_LINE_NMI:
+		nmi(CLEAR_LINE);
+		break;
+	}
+
+	// schedule interrupt check
+	m_interrupt_timer->adjust(attotime::zero);
+
+	return 0;
+}
+
+WRITE16_MEMBER(interpro_ioga_device::hardint_w)
+{
+	const int number = get_int_number(offset);
+	bool force = false;
+
+	LOGIRQ(offset, "irq: interrupt %d offset 0x%02x data 0x%04x mem_mask 0x%04x (%s)\n", number, offset, data, mem_mask, machine().describe_context());
+
+	if (!(m_hwicr[offset] & IRQ_PENDING))
+	{
+		// handle forcing
+		if (data & IRQ_PENDING)
+		{
+			LOGIRQ(number, "irq: interrupt %d force pending\n", number);
+
+			// set force pending
+			m_force_state |= (1 << number);
+		}
+		else if (BIT(m_force_state, number))
+		{
+			LOGIRQ(number, "irq: interrupt %d forced\n", number);
+
+			// clear force pending
+			m_force_state &= ~(1 << number);
+
+			// force the interrupt
+			force = true;
 		}
 	}
 
-	// assert irq and ivec
-	if (m_active_interrupt != nullptr)
-		irq(ASSERT_LINE, ivec);
-}
+	// store the data
+	mem_mask &= ~IRQ_PENDING;
+	COMBINE_DATA(&m_hwicr[offset]);
 
-void interpro_ioga_device::set_pending(interrupt_type type, int number, bool pending)
-{
-	switch (type)
+	if (force)
 	{
-	case INT_HARD_IN:
-	case INT_HARD_EX:
-		if (pending)
-			m_hwicr[number] |= IRQ_PENDING;
-		else
-			m_hwicr[number] &= ~IRQ_PENDING;
-		break;
-
-	case INT_SOFT_LO:
-		if (pending)
-			m_softint |= (1 << number);
-		else
-			m_softint &= ~(1 << number);
-		break;
-
-	case INT_SOFT_HI:
-		if (pending)
-			m_swicr[number] |= IRQ_PENDING;
-		else
-			m_swicr[number] &= ~IRQ_PENDING;
-		break;
+		// force an interrupt
+		set_int_line(number, ASSERT_LINE);
+		set_int_line(number, CLEAR_LINE);
 	}
-}
-
-bool interpro_ioga_device::nmi(int state)
-{
-	if (m_nmi_state != state)
-	{
-		m_nmi_state = state;
-		m_out_nmi_func(state);
-
-		return true;
-	}
-	else
-		return false;
-}
-
-bool interpro_ioga_device::irq(int state, u8 ivec)
-{
-	if (ivec != m_ivec)
-	{
-		LOGIRQ(m_active_interrupt->number, "setting ivec 0x%02x\n", ivec);
-
-		m_ivec = ivec;
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(interpro_ioga_device::set_ivec), this));
-	}
-
-	if (m_irq_state != state)
-	{
-		LOGIRQ(m_active_interrupt->number, "%s %s number %d source %s (%s)\n",
-			state ? "asserting" : "clearing", m_active_interrupt->name, m_active_interrupt->number, m_active_interrupt->source, machine().describe_context());
-
-		m_irq_state = state;
-		m_out_irq_func(state);
-
-		return true;
-	}
-	else
-		return false;
-}
-
-TIMER_CALLBACK_MEMBER(interpro_ioga_device::set_ivec)
-{
-	m_out_ivec_func(m_ivec);
-}
-
-u16 interpro_ioga_device::get_icr(interrupt_type type, int number) const
-{
-	switch (type)
-	{
-	case INT_HARD_IN:
-	case INT_HARD_EX:
-		return m_hwicr[number];
-
-	case INT_SOFT_LO:
-		return (m_softint << 8) | (0x8f + number * 0x10);
-
-	case INT_SOFT_HI:
-		return m_swicr[number];
-	}
-
-	return 0;
-}
-
-WRITE16_MEMBER(interpro_ioga_device::icr_w)
-{
-	/*
-	 * It appears that writing the pending flag high and then low again is
-	 * intended to force an interrupt to be generated. We record the initial
-	 * write in m_hwint_forced, and when a subsequent write occurrs, turn the
-	 * pending bit on to trigger the interrupt.
-	 *
-	 * FIXME: should we only flag a forced interrupt if pending is written high
-	 * from low? Maybe all of this can be eliminated by the edge/level trigger
-	 * logic in the future.
-	 */
-
-	LOGIRQ(offset, "irq: interrupt vector %d = 0x%04x (%s)\n", offset, data, machine().describe_context());
-
-	// store all bits except pending
-	m_hwicr[offset] = (m_hwicr[offset] & IRQ_PENDING) | (data & ~IRQ_PENDING);
-
-	// scan for pending interrupts
-	m_interrupt_timer->adjust(attotime::zero);
+	else if (m_line_state & (1 << number))
+		// re-assert line
+		set_int_line(number, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(interpro_ioga_device::softint_w)
 {
 	// store the written value
-	// FIXME: forced interrupt handling
-	COMBINE_DATA(&m_softint);
+	m_softint |= data;
 
+	// schedule interrupt check
 	m_interrupt_timer->adjust(attotime::zero);
 }
 
@@ -532,23 +618,51 @@ WRITE8_MEMBER(interpro_ioga_device::nmictrl_w)
 	// check for a forced nmi (NMI_NEGPOL written from 1 to 0 with NMI_IE set)
 	const bool forced = (m_nmictrl & NMI_NEGPOL) && ((data & (NMI_NEGPOL | NMI_IE)) == NMI_IE);
 
-	LOGMASKED(LOG_NMI, "nmi: nmictrl = 0x%02x (%s)\n", data, machine().describe_context());
+	LOGMASKED(LOG_NMI, "nmi: nmictrl 0x%02x (%s)\n", data, machine().describe_context());
 	m_nmictrl = data;
 
 	if (forced)
 	{
-		LOGMASKED(LOG_NMI, "nmi: forcing nmi\n");
+		LOGMASKED(LOG_NMI, "nmi: forced\n");
 
 		set_nmi_line(ASSERT_LINE);
 	}
 }
 
-WRITE16_MEMBER(interpro_ioga_device::softint_vector_w)
+WRITE16_MEMBER(sapphire_ioga_device::softint_vector_w)
 {
-	// store the written value
+	const int number = offset + 8;
+
+	LOG("irq: soft interrupt %d data 0x%04x\n", number, data);
+
+	if (!(m_swicr[offset] & IRQ_PENDING))
+	{
+		// handle forcing
+		if (data & IRQ_PENDING)
+		{
+			LOG("irq: soft interrupt %d force pending\n", number);
+
+			// set force pending
+			m_force_state |= (1 << (offset + 24));
+
+			mem_mask &= ~IRQ_PENDING;
+		}
+		else if (BIT(m_force_state, offset + 24))
+		{
+			LOG("irq: soft interrupt %d forced\n", number);
+
+			// clear force pending
+			m_force_state &= ~(1 << (offset + 24));
+
+			// set interrupt pending
+			data |= IRQ_PENDING;
+		}
+	}
+
+	// update the register
 	COMBINE_DATA(&m_swicr[offset]);
 
-	// force interrupt if needed
+	// schedule interrupt check
 	m_interrupt_timer->adjust(attotime::zero);
 }
 
@@ -559,87 +673,62 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::dma)
 {
 	for (dma_channel_t &dma_channel : m_dma_channel)
 	{
-		// check if there's something to transfer
-		if (dma_channel.transfer_count == 0 || (dma_channel.control & DMA_CTRL_BGR) == 0)
+		// check if the channel is enabled
+		if (!(dma_channel.control & DMA_CTRL_ENABLE))
 			continue;
 
 		// check if the device is requesting a transfer
 		if (dma_channel.drq_state == CLEAR_LINE)
 			continue;
 
-		// check if the bus is available
-		if ((m_arbctl & dma_channel.arb_mask) == 0)
-		{
-			// set bus wait flag and abort
-			//dma_channel.control |= DMA_CTRL_WAIT;
-
+		// check if there's something to transfer
+		if (dma_channel.transfer_count == 0)
 			continue;
-		}
-		//else
-		//  // clear bus wait flag
-		//  dma_channel.control &= ~DMA_CTRL_WAIT;
 
-		// translate address when DMA_CTRL_VIRTUAL is set
-		// FIXME: what happens when we span a page?
-		if (dma_channel.control & DMA_CTRL_VIRTUAL)
-		{
-			const u32 ptde = m_memory_space->read_dword(dma_channel.virtual_address);
+		// check if the bus is available
+		if (!(m_arbctl & dma_channel.arb_mask))
+			continue;
 
-			if ((ptde & 0x1) == 0)
-			{
-				dma_channel.real_address = (ptde & ~0xfff) | (dma_channel.real_address & 0xfff);
-				dma_channel.control &= ~DMA_CTRL_VIRTUAL;
-
-				LOGDMA(dma_channel.channel, "dma: translated virtual address 0x%08x\n", dma_channel.real_address);
-
-				// FIXME: what about protection levels and system tags?
-
-				// set referenced and dirty page table entry flags
-				m_memory_space->write_dword(dma_channel.virtual_address, ptde | ((dma_channel.control & DMA_CTRL_WRITE) ? 0x2 : 0x6));
-			}
-			else
-			{
-				// page fault
-				// FIXME: error status
-				dma_channel.control |= DMA_CTRL_BERR | DMA_CTRL_ERR;
-				LOGDMA(dma_channel.channel, "dma: page fault translating virtual address 0x%08x ptde 0x%08x\n", dma_channel.virtual_address, ptde);
-				break;
-			}
-		}
-
-		//LOGDMA(dma_channel.channel, "dma: transfer %s device begun, channel = %d, control 0x%08x, real address 0x%08x, virtual address 0x%08x, count 0x%08x\n",
-		//  (dma_channel.control & DMA_CTRL_WRITE) ? "to" : "from", dma_channel.channel, dma_channel.control, dma_channel.real_address, dma_channel.virtual_address, dma_channel.transfer_count);
+		if (dma_channel.control & DMA_CTRL_BERR)
+			continue;
 
 		// transfer from the memory to device or device to memory
 		while (dma_channel.transfer_count && dma_channel.drq_state)
 		{
 			// transfer from the memory to device or device to memory
 			if (dma_channel.control & DMA_CTRL_WRITE)
-				dma_channel.device_w(m_memory_space->read_byte(dma_channel.real_address));
+				dma_channel.device_w(m_memory->read_byte(dma_channel.real_address));
 			else
-				m_memory_space->write_byte(dma_channel.real_address, dma_channel.device_r());
+				m_memory->write_byte(dma_channel.real_address, dma_channel.device_r());
 
 			// increment address and decrement count
 			dma_channel.real_address++;
 			dma_channel.transfer_count--;
 
 			// check for page wrap
-			if (dma_channel.transfer_count && (dma_channel.real_address & 0xfff) == 0)
+			if ((dma_channel.real_address & 0xfff) == 0 && dma_channel.transfer_count)
 			{
 				LOGDMA(dma_channel.channel, "dma: wrapped to next memory page\n");
 
-				dma_channel.virtual_address += 4;
-				dma_channel.control |= DMA_CTRL_VIRTUAL;
+				// translate virtual address
+				if (dma_channel.control & DMA_CTRL_VIRTUAL)
+				{
+					const u32 ptde = m_memory->read_dword(dma_channel.virtual_address);
+					dma_channel.virtual_address += 4;
 
-				m_dma_timer->adjust(attotime::zero);
-				break;
+					// FIXME: ignore the page fault flag?
+					dma_channel.real_address = ptde & ~0xfff;
+
+					LOGDMA(dma_channel.channel, "dma: translated virtual 0x%08x real 0x%08x\n",
+						dma_channel.virtual_address, dma_channel.real_address);
+				}
 			}
 		}
 
 		// check if the transfer is complete
 		if (dma_channel.transfer_count == 0)
 		{
-			LOGDMA(dma_channel.channel, "dma: transfer %s device ended, channel = %d, control 0x%08x, real address 0x%08x, virtual address 0x%08x, count 0x%08x\n",
+			LOGDMA(dma_channel.channel, "dma: transfer %s device ended channel %d control 0x%08x real address 0x%08x virtual address 0x%08x count 0x%08x\n",
 				(dma_channel.control & DMA_CTRL_WRITE) ? "to" : "from", dma_channel.channel, dma_channel.control, dma_channel.real_address, dma_channel.virtual_address, dma_channel.transfer_count);
 
 			if (dma_channel.channel == DMA_FLOPPY)
@@ -650,11 +739,11 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::dma)
 				m_fdc_tc_func(CLEAR_LINE);
 			}
 
-			// clear bus grant required
-			dma_channel.control &= ~DMA_CTRL_BGR;
-
 			// set transfer count zero flag
 			dma_channel.control |= DMA_CTRL_TCZERO;
+
+			// disable the channel
+			dma_channel.control &= ~DMA_CTRL_ENABLE;
 		}
 
 #if IOGA_DMA_DIAG_HACK
@@ -734,7 +823,8 @@ void interpro_ioga_device::drq(int state, int channel)
 
 	// log every 256 bytes
 	if ((dma_channel.transfer_count & 0xff) == 0)
-		LOGDMA(channel, "dma: drq for channel %d %s transfer_count 0x%08x\n", channel, state ? "asserted" : "deasserted", dma_channel.transfer_count);
+		LOGDMA(channel, "dma: drq for channel %d %s transfer_count 0x%08x\n",
+			channel, state ? "asserted" : "deasserted", dma_channel.transfer_count);
 
 	if (state)
 		m_dma_timer->adjust(attotime::zero);
@@ -756,7 +846,7 @@ u32 interpro_ioga_device::dma_r(address_space &space, offs_t offset, u32 mem_mas
 		return dma_channel.transfer_count;
 
 	case 3:
-		return dma_channel.control;
+		return dma_channel.control & ~DMA_CTRL_VIRTUAL;
 
 	default:
 		logerror("dma_r: unknown dma register %d\n", offset);
@@ -777,29 +867,43 @@ void interpro_ioga_device::dma_w(address_space &space, offs_t offset, u32 data, 
 		break;
 
 	case 1:
-		LOGDMA(channel, "dma: channel %d virtual address = 0x%08x mem_mask 0x%08x (%s)\n",
+		LOGDMA(channel, "dma: channel %d virtual address 0x%08x mem_mask 0x%08x (%s)\n",
 			channel, data, mem_mask, machine().describe_context());
 		COMBINE_DATA(&dma_channel.virtual_address);
+		dma_channel.virtual_address &= ~0x3;
 		break;
 
 	case 2:
-		LOGDMA(channel, "dma: channel %d transfer count = 0x%08x mem_mask 0x%08x (%s)\n",
+		LOGDMA(channel, "dma: channel %d transfer count 0x%08x mem_mask 0x%08x (%s)\n",
 			channel, data, mem_mask, machine().describe_context());
 		COMBINE_DATA(&dma_channel.transfer_count);
+
+		dma_channel.control &= ~DMA_CTRL_TCZERO;
 		break;
 
 	case 3:
-		LOGDMA(channel, "dma: channel %d control = 0x%08x mem_mask 0x%08x (%s)\n",
+		LOGDMA(channel, "dma: channel %d control 0x%08x mem_mask 0x%08x (%s)\n",
 			channel, data, mem_mask, machine().describe_context());
 
-		COMBINE_DATA(&dma_channel.control);
-		// (7.0272) if bus error flag is set, clear existing bus error (otherwise retain existing state)
-		//if (data & DMA_CTRL_BERR)
-		//  dma_channel.control = data & DMA_CTRL_WMASK;
-		//else
-		//  dma_channel.control = (data & DMA_CTRL_WMASK) | (dma_channel.control & DMA_CTRL_BERR);
+		dma_channel.control = (data & mem_mask & (DMA_CTRL_WMASK|DMA_CTRL_VIRTUAL)) | (dma_channel.control & (~mem_mask | ~(DMA_CTRL_WMASK|DMA_CTRL_VIRTUAL)));
 
-		dma_channel.state = COMMAND;
+		// translate virtual address
+		if (data & DMA_CTRL_VIRTUAL)
+		{
+			const u32 ptde = m_memory->read_dword(dma_channel.virtual_address);
+			dma_channel.virtual_address += 4;
+
+			// FIXME: ignore the page fault flag?
+			dma_channel.real_address = (ptde & ~0xfff) | (dma_channel.real_address & 0xfff);
+
+			LOGDMA(dma_channel.channel, "dma: translated virtual 0x%08x real 0x%08x\n",
+				dma_channel.virtual_address, dma_channel.real_address);
+		}
+
+		// (7.0272) if bus error flag is written, clear existing bus error (otherwise retain existing state)
+		if (data & DMA_CTRL_BERR)
+			dma_channel.control &= ~DMA_CTRL_BERR;
+
 		break;
 	}
 }
@@ -825,12 +929,12 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::serial_dma)
 		// transfer from the memory to device or device to memory
 		while ((dma_channel.control & SDMA_COUNT) && dma_channel.drq_state)
 		{
-			// TODO: work out which control register bits indicate read from device
-			if (dma_channel.control & SDMA_SEND)
+			if (dma_channel.control & SDMA_WRITE)
 			{
-				u8 data = m_memory_space->read_byte(dma_channel.address);
+				u8 data = m_memory->read_byte(dma_channel.address++);
 
-				LOGMASKED(LOG_SERIALDMA, "dma: transmitting byte 0x%02x to serial channel %d\n", data, dma_channel.channel);
+				LOGMASKED(LOG_SERIALDMA, "dma: writing byte 0x%02x to serial channel %d\n",
+					data, dma_channel.channel);
 
 				dma_channel.device_w(data);
 			}
@@ -838,23 +942,26 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::serial_dma)
 			{
 				u8 data = dma_channel.device_r();
 
-				LOGMASKED(LOG_SERIALDMA, "dma: receiving byte 0x%02x from serial channel %d\n", data, dma_channel.channel);
+				LOGMASKED(LOG_SERIALDMA, "dma: reading byte 0x%02x from serial channel %d\n",
+					data, dma_channel.channel);
 
-				m_memory_space->write_byte(dma_channel.address, data);
+				m_memory->write_byte(dma_channel.address++, data);
 			}
 
-			// increment address and decrement count
-			dma_channel.address++;
-			dma_channel.control = (dma_channel.control & SDMA_CONTROL) | ((dma_channel.control & SDMA_COUNT) - 1);
+			// decrement transfer count
+			dma_channel.control = (dma_channel.control & ~SDMA_COUNT) | ((dma_channel.control & SDMA_COUNT) - 1);
 		}
 
 		if ((dma_channel.control & SDMA_COUNT) == 0)
 		{
 			// transfer count zero
 			dma_channel.control |= SDMA_TCZERO;
+			dma_channel.control &= ~SDMA_ENABLE;
 
 			// raise an interrupt
-			set_int_line(INT_HARD_IN, IRQ_SERDMA, ASSERT_LINE);
+			// FIXME: assume edge-triggered?
+			set_int_line(IRQ_SERDMA, ASSERT_LINE);
+			set_int_line(IRQ_SERDMA, CLEAR_LINE);
 		}
 	}
 }
@@ -865,15 +972,17 @@ void interpro_ioga_device::serial_drq(int state, int channel)
 
 	dma_channel.drq_state = state;
 
-	LOGMASKED(LOG_SERIALDMA, "dma: drq for serial channel %d %s count 0x%04x\n", channel, state ? "asserted" : "deasserted", dma_channel.control & SDMA_COUNT);
+	LOGMASKED(LOG_SERIALDMA, "dma: drq for serial channel %d %s count 0x%04x\n",
+		channel, state ? "asserted" : "deasserted", dma_channel.control & SDMA_COUNT);
 
-	if (state && (dma_channel.control & SDMA_COUNT))
+	if (state && (dma_channel.control & SDMA_ENABLE))
 		m_serial_dma_timer->adjust(attotime::zero);
 }
 
 void interpro_ioga_device::serial_dma_addr_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, int channel)
 {
-	LOGMASKED(LOG_SERIALDMA, "dma: serial channel %d address 0x%08x mask 0x%08x (%s)\n", channel, data, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_SERIALDMA, "dma: serial channel %d address 0x%08x mask 0x%08x (%s)\n",
+		channel, data, mem_mask, machine().describe_context());
 
 	COMBINE_DATA(&m_serial_dma_channel[channel].address);
 }
@@ -882,11 +991,12 @@ void interpro_ioga_device::serial_dma_ctrl_w(address_space &space, offs_t offset
 {
 	serial_dma_channel_t &dma_channel = m_serial_dma_channel[channel];
 
-	LOGMASKED(LOG_SERIALDMA, "dma: serial channel %d control 0x%08x mask 0x%08x (%s)\n", channel, data, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_SERIALDMA, "dma: serial channel %d control 0x%08x mask 0x%08x (%s)\n",
+		channel, data, mem_mask, machine().describe_context());
 
 	COMBINE_DATA(&dma_channel.control);
 
-	if (dma_channel.control & SDMA_COUNT)
+	if (dma_channel.control & SDMA_ENABLE)
 		m_serial_dma_timer->adjust(attotime::zero);
 }
 
@@ -895,7 +1005,8 @@ void interpro_ioga_device::serial_dma_ctrl_w(address_space &space, offs_t offset
  */
 WRITE16_MEMBER(interpro_ioga_device::arbctl_w)
 {
-	LOGMASKED(LOG_DMA | LOG_SERIALDMA, "dma: arbctl = 0x%04x (%s)\n", data, machine().describe_context());
+	LOGMASKED(LOG_DMA | LOG_SERIALDMA, "dma: arbctl = 0x%04x (%s)\n",
+		data, machine().describe_context());
 
 	m_arbctl = data;
 
@@ -920,30 +1031,46 @@ READ32_MEMBER(interpro_ioga_device::error_businfo_r)
  */
 READ32_MEMBER(interpro_ioga_device::timer0_r)
 {
-	LOGMASKED(LOG_TIMERRD, "timer0_r data 0x%08x mask 0x%08x (%s)\n", m_timer0_count, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_TIMERRD, "timer0_r data 0x%08x mask 0x%08x (%s)\n",
+		m_timer0_count, mem_mask, machine().describe_context());
 
 	return m_timer0_count;
 }
 
 WRITE32_MEMBER(interpro_ioga_device::timer0_w)
 {
-	//m_timer0_limit = data;
+	LOGMASKED(LOG_TIMER0, "timer0_w data 0x%08x mask 0x%08x prescaler 0x%08x (%s)\n",
+		data, mem_mask, m_prescaler, machine().describe_context());
+
+	// store the timer count value
 	m_timer0_count = data;
 
-	m_timer0->adjust(attotime::zero, 0, attotime::from_hz(60));
+	// restart the timer
+	attotime period = attotime::from_ticks(m_prescaler ? m_prescaler & 0xffff : 0x10000, 10_MHz_XTAL);
 
-	LOGMASKED(LOG_TIMER0, "timer0_w data 0x%08x mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
+	m_timer0->adjust(period, 0, period);
 }
 
 TIMER_CALLBACK_MEMBER(interpro_ioga_device::timer0)
 {
-	if (m_timer0_count == 0)
-		set_int_line(INT_HARD_IN, IRQ_TIMER0, ASSERT_LINE);
-	else
-		m_timer0_count++;
+	m_timer0_count++;
 
-	//m_hwicr[IRQ_VB] |= IRQ_PENDING; // this makes mouse diag countdown work (at half correct speed)
-	set_int_line(INT_HARD_EX, IRQ_12, ASSERT_LINE); // FIXME: 60Hz timer on InterPro 2000
+	// check if the timer has expired
+	if (m_timer0_count == 0)
+	{
+		// stop the timer
+		m_timer0->enable(false);
+
+		// raise an interrupt
+		set_int_line(IRQ_TIMER0, ASSERT_LINE);
+		set_int_line(IRQ_TIMER0, CLEAR_LINE);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(interpro_ioga_device::timer_60hz)
+{
+	set_int_line(IRQ_60HZ, ASSERT_LINE);
+	set_int_line(IRQ_60HZ, CLEAR_LINE);
 }
 
 READ32_MEMBER(interpro_ioga_device::timer1_r)
@@ -956,7 +1083,8 @@ READ32_MEMBER(interpro_ioga_device::timer1_r)
 	else if (m_timer1->param())
 		result |= TIMER1_EXPIRED;
 
-	LOGMASKED(LOG_TIMERRD, "timer1_r data 0x%08x mask 0x%08x (%s)\n", result, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_TIMERRD, "timer1_r data 0x%08x mask 0x%08x (%s)\n",
+		result, mem_mask, machine().describe_context());
 
 	return result;
 }
@@ -972,11 +1100,12 @@ WRITE32_MEMBER(interpro_ioga_device::timer1_w)
 	// start the timer if necessary
 	if (data & TIMER1_START)
 	{
-		LOGMASKED(LOG_TIMER1, "timer1_w data 0x%08x mask 0x%08x prescaler 0x%04x (%s)\n", data, mem_mask, m_prescaler & 0x7fff, machine().describe_context());
+		LOGMASKED(LOG_TIMER1, "timer1_w data 0x%08x mask 0x%08x prescaler 0x%08x (%s)\n",
+			data, mem_mask, m_prescaler, machine().describe_context());
 
-		// theory: timer 1 is 10MHz (typical prescaler value of 1000 and timer value of 100 giving a delay of 100ms)
-		// FIXME: division by 50 is sufficient to pass iogadiag timer 1 tests
-		m_timer1->adjust(attotime::zero, false, attotime::from_usec((m_prescaler & 0x7fff) / 50));
+		attotime period = attotime::from_ticks(m_prescaler ? m_prescaler & 0xffff : 0x10000, 10_MHz_XTAL);
+
+		m_timer1->adjust(period, 0, period);
 	}
 }
 
@@ -992,43 +1121,48 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::timer1)
 
 		// disable timer and set the zero flag
 		m_timer1->enable(false);
-		m_timer1->set_param(true);
+		m_timer1->set_param(1);
 
-		// throw an interrupt
-		set_int_line(INT_HARD_IN, IRQ_TIMER1, ASSERT_LINE);
+		// raise an interrupt
+		set_int_line(IRQ_TIMER1, ASSERT_LINE);
+		set_int_line(IRQ_TIMER1, CLEAR_LINE);
 	}
 }
 
-READ32_MEMBER(interpro_ioga_device::timer2_count_r)
+READ32_MEMBER(sapphire_ioga_device::timer2_count_r)
 {
-	LOGMASKED(LOG_TIMERRD, "timer2_count_r data 0x%08x mask 0x%08x (%s)\n", m_timer2_count, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_TIMERRD, "timer2_count_r data 0x%08x mask 0x%08x (%s)\n",
+		m_timer2_count, mem_mask, machine().describe_context());
 
 	return m_timer2_count;
 }
 
-WRITE32_MEMBER(interpro_ioga_device::timer2_count_w)
+WRITE32_MEMBER(sapphire_ioga_device::timer2_count_w)
 {
 	m_timer2_count = data;
 
-	LOGMASKED(LOG_TIMER2, "timer2_count_w data 0x%08x mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_TIMER2, "timer2_count_w data 0x%08x mask 0x%08x (%s)\n",
+		data, mem_mask, machine().describe_context());
 }
 
-READ32_MEMBER(interpro_ioga_device::timer2_value_r)
+READ32_MEMBER(sapphire_ioga_device::timer2_value_r)
 {
-	LOGMASKED(LOG_TIMERRD, "timer2_value_r data 0x%08x mask 0x%08x (%s)\n", m_timer2_value, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_TIMERRD, "timer2_value_r data 0x%08x mask 0x%08x (%s)\n",
+		m_timer2_value, mem_mask, machine().describe_context());
 
 	return m_timer2_value;
 }
 
-WRITE32_MEMBER(interpro_ioga_device::timer2_value_w)
+WRITE32_MEMBER(sapphire_ioga_device::timer2_value_w)
 {
 	m_timer2_value = data;
 	m_timer2_count = data; // ?
 
-	LOGMASKED(LOG_TIMER2, "timer2_value_w data 0x%08x mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_TIMER2, "timer2_value_w data 0x%08x mask 0x%08x (%s)\n",
+		data, mem_mask, machine().describe_context());
 }
 
-READ32_MEMBER(interpro_ioga_device::timer3_r)
+READ32_MEMBER(sapphire_ioga_device::timer3_r)
 {
 	u32 result = m_timer3_count & TIMER3_COUNT;
 
@@ -1037,12 +1171,13 @@ READ32_MEMBER(interpro_ioga_device::timer3_r)
 	else if (m_timer3->param())
 		result |= TIMER3_EXPIRED;
 
-	LOGMASKED(LOG_TIMERRD, "timer3_r data 0x%08x mask 0x%08x (%s)\n", result, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_TIMERRD, "timer3_r data 0x%08x mask 0x%08x (%s)\n",
+		result, mem_mask, machine().describe_context());
 
 	return result;
 }
 
-WRITE32_MEMBER(interpro_ioga_device::timer3_w)
+WRITE32_MEMBER(sapphire_ioga_device::timer3_w)
 {
 	// stop the timer so it won't trigger while we're fiddling with it
 	m_timer3->enable(false);
@@ -1053,14 +1188,15 @@ WRITE32_MEMBER(interpro_ioga_device::timer3_w)
 	// start the timer if necessary
 	if (data & TIMER3_START)
 	{
-		LOGMASKED(LOG_TIMER3, "timer3_w data 0x%08x mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
+		LOGMASKED(LOG_TIMER3, "timer3_w data 0x%08x mask 0x%08x (%s)\n",
+			data, mem_mask, machine().describe_context());
 
 		// theory: timer 3 is 12.5MHz (typical value of 12500 giving a delay of 1ms)
 		m_timer3->adjust(attotime::zero, false, attotime::from_hz(XTAL(12'500'000)));
 	}
 }
 
-TIMER_CALLBACK_MEMBER(interpro_ioga_device::timer3)
+TIMER_CALLBACK_MEMBER(sapphire_ioga_device::timer3)
 {
 	// decrement timer count value
 	m_timer3_count--;
@@ -1074,28 +1210,22 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::timer3)
 		m_timer3->enable(false);
 		m_timer3->set_param(true);
 
-		// throw an interrupt
-		set_int_line(INT_HARD_IN, IRQ_TIMER3, ASSERT_LINE);
+		// raise an interrupt
+		set_int_line(IRQ_TIMER3, ASSERT_LINE);
 	}
 }
 
 READ32_MEMBER(interpro_ioga_device::prescaler_r)
 {
-	// FIXME: prescaler only used with timer 1?
-	LOGMASKED(LOG_TIMERRD, "prescaler_r data 0x%08x mask 0x%08x (%s)\n", m_prescaler, mem_mask, machine().describe_context());
-
-	return m_prescaler;
+	return (m_prescaler ^ 0xffff0000) - 0x10000;
 }
 
 WRITE32_MEMBER(interpro_ioga_device::prescaler_w)
 {
-	LOGMASKED(LOG_TIMER1, "prescaler_w data 0x%08x mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_TIMER0 | LOG_TIMER1, "prescaler_w data 0x%08x mask 0x%08x (%s)\n",
+		data, mem_mask, machine().describe_context());
 
-	// this logic satisfies prescaler tests, but fails timer prescaler tests
-	if ((data & 0x7fff) < 0x100 && (data & 0x7fff) != 0)
-		m_prescaler = (data ^ 0xffff0000);
-	else
-		m_prescaler = (data ^ 0xffff0000) - 0x10000;
+	COMBINE_DATA(&m_prescaler);
 }
 
 /*
@@ -1103,17 +1233,20 @@ WRITE32_MEMBER(interpro_ioga_device::prescaler_w)
  */
 READ32_MEMBER(interpro_ioga_device::mouse_status_r)
 {
-	const u32 result = m_mouse_status;
+	const u32 result = m_mouse_status ^ MOUSE_BUTTONS;
 
-	LOGMASKED(LOG_MOUSE, "mouse_status_r status 0x%08x mask 0x%08x (%s)\n", result, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_MOUSE, "mouse_status_r status 0x%08x mask 0x%08x (%s)\n",
+		result, mem_mask, machine().describe_context());
 
-	// clear xpos and ypos fields
+	// clear xpos and ypos fields and interrupt
 	if (!machine().side_effects_disabled())
 	{
 		if (mem_mask & MOUSE_XPOS)
 			m_mouse_status &= ~(MOUSE_XPOS);
 		if (mem_mask & MOUSE_YPOS)
 			m_mouse_status &= ~(MOUSE_YPOS);
+
+		set_int_line(IRQ_MOUSE, CLEAR_LINE);
 	}
 
 	return result;
@@ -1121,79 +1254,90 @@ READ32_MEMBER(interpro_ioga_device::mouse_status_r)
 
 WRITE32_MEMBER(interpro_ioga_device::mouse_status_w)
 {
-	LOGMASKED(LOG_MOUSE, "mouse_status_w status 0x%08x mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_MOUSE, "mouse_status_w status 0x%08x mask 0x%08x\n",
+		data, mem_mask);
 
-	m_mouse_status |= (data & MOUSE_COUNTER);
+	COMBINE_DATA(&m_mouse_status);
 
-	// FIXME: diagnostic test fails with value >= 0x1000
-	if (data & MOUSE_COUNTER)
-		m_mouse_timer->adjust(attotime::from_nsec(data & MOUSE_COUNTER));
-}
-
-INPUT_CHANGED_MEMBER(interpro_ioga_device::mouse_button)
-{
-	if (newval)
-		m_mouse_status |= (field.mask() << 16);
-	else
-		m_mouse_status &= ~(field.mask() << 16);
-
-	// FIXME: this isn't right, but the rebuild code only
-	// reads the button status if the x/y status is non-zero?
-	m_mouse_status |= MOUSE_COUNTER;
-
-	set_int_line(INT_HARD_IN, IRQ_MOUSE, ASSERT_LINE);
-}
-
-INPUT_CHANGED_MEMBER(interpro_ioga_device::mouse_x)
-{
-	// compute x delta
-	int delta = newval - oldval;
-	if (delta > 0x80)
-		delta -= 0x100;
-	else if (delta < -0x80)
-		delta += 0x100;
-
-	// set new x delta
-	m_mouse_status &= ~MOUSE_XPOS;
-	m_mouse_status |= ((delta << 8) & MOUSE_XPOS);
-
-	set_int_line(INT_HARD_IN, IRQ_MOUSE, ASSERT_LINE);
-}
-
-INPUT_CHANGED_MEMBER(interpro_ioga_device::mouse_y)
-{
-	// compute y delta
-	int delta = newval - oldval;
-	if (delta > 0x80)
-		delta -= 0x100;
-	else if (delta < -0x80)
-		delta += 0x100;
-
-	// set new y delta
-	m_mouse_status &= ~MOUSE_YPOS;
-	m_mouse_status |= ((delta << 0) & MOUSE_YPOS);
-
-	set_int_line(INT_HARD_IN, IRQ_MOUSE, ASSERT_LINE);
-}
-
-TIMER_CALLBACK_MEMBER(interpro_ioga_device::mouse_timer)
-{
-	set_int_line(INT_HARD_IN, IRQ_MOUSE, ASSERT_LINE);
+	set_int_line(IRQ_MOUSE, ASSERT_LINE);
 }
 
 /*
  * Ethernet
  */
+WRITE32_MEMBER(emerald_ioga_device::eth_base_w)
+{
+	LOGMASKED(LOG_NETWORK, "eth: base_w 0x%08x mem_mask 0x%08x (%s)\n",
+		data, mem_mask, machine().describe_context());
+
+	m_eth_base = ((m_eth_base & ~mem_mask) | (data & mem_mask)) & ETH_BASE_MASK;
+}
+
+WRITE16_MEMBER(emerald_ioga_device::eth_control_w)
+{
+	LOGMASKED(LOG_NETWORK, "eth: control_w 0x%04x mem_mask 0x%04x (%s)\n",
+		data, mem_mask, machine().describe_context());
+
+	m_eth_control = data;
+
+	// ethernet device reset (active low)
+	if ((data & ETH_RESET) == 0)
+	{
+		// reset the ethernet device
+		siblingdevice("eth")->reset();
+
+		// clear the reset flag (the 250ns delay is long enough to pass diagnostic tests)
+		m_eth_reset_timer->adjust(attotime::from_nsec(250));
+	}
+
+	// ethernet channel attention
+	if (data & ETH_CA)
+	{
+		m_eth_ca_func(ASSERT_LINE);
+		m_eth_ca_func(CLEAR_LINE);
+	}
+}
+
+WRITE16_MEMBER(emerald_ioga_device::eth_w)
+{
+	const u32 address = m_eth_base | ((offset << 1) & ~ETH_BASE_MASK);
+
+	LOGMASKED(LOG_NETWORK, "eth_w address 0x%08x mask 0x%04x data 0x%04x\n",
+		address, mem_mask, data);
+	m_memory->write_word(address, data, mem_mask);
+}
+
+READ16_MEMBER(emerald_ioga_device::eth_r)
+{
+	const u32 address = m_eth_base | ((offset << 1) & ~ETH_BASE_MASK);
+
+	const u16 data = m_memory->read_word(address, mem_mask);
+	LOGMASKED(LOG_NETWORK, "eth_r 0x%08x mask 0x%04x data 0x%04x\n",
+		address, mem_mask, data);
+
+	return data;
+}
+
+TIMER_CALLBACK_MEMBER(emerald_ioga_device::eth_reset)
+{
+	LOGMASKED(LOG_NETWORK, "eth: reset flag cleared\n");
+
+	// clear ethernet reset flag
+	m_eth_control &= ~ETH_RESET;
+}
+
 WRITE32_MEMBER(turquoise_ioga_device::eth_base_w)
 {
-	LOGMASKED(LOG_NETWORK, "eth: base_w 0x%08x mem_mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_NETWORK, "eth: base_w 0x%08x mem_mask 0x%08x (%s)\n",
+		data, mem_mask, machine().describe_context());
 
 	m_eth_base = ((m_eth_base & ~mem_mask) | (data & mem_mask)) & ETH_BASE_MASK;
 }
 
 WRITE16_MEMBER(turquoise_ioga_device::eth_control_w)
 {
-	LOGMASKED(LOG_NETWORK, "eth: control_w 0x%04x mem_mask 0x%04x (%s)\n", data, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_NETWORK, "eth: control_w 0x%04x mem_mask 0x%04x (%s)\n",
+		data, mem_mask, machine().describe_context());
 
 	m_eth_control = data;
 
@@ -1219,16 +1363,18 @@ WRITE16_MEMBER(turquoise_ioga_device::eth_w)
 {
 	const u32 address = m_eth_base | ((offset << 1) & ~ETH_BASE_MASK);
 
-	LOGMASKED(LOG_NETWORK, "eth_w address 0x%08x mask 0x%04x data 0x%04x\n", address, mem_mask, data);
-	m_memory_space->write_word(address, data, mem_mask);
+	LOGMASKED(LOG_NETWORK, "eth_w address 0x%08x mask 0x%04x data 0x%04x\n",
+		address, mem_mask, data);
+	m_memory->write_word(address, data, mem_mask);
 }
 
 READ16_MEMBER(turquoise_ioga_device::eth_r)
 {
 	const u32 address = m_eth_base | ((offset << 1) & ~ETH_BASE_MASK);
 
-	const u16 data = m_memory_space->read_word(address, mem_mask);
-	LOGMASKED(LOG_NETWORK, "eth_r 0x%08x mask 0x%04x data 0x%04x\n", address, mem_mask, data);
+	const u16 data = m_memory->read_word(address, mem_mask);
+	LOGMASKED(LOG_NETWORK, "eth_r 0x%08x mask 0x%04x data 0x%04x\n",
+		address, mem_mask, data);
 
 	return data;
 }
@@ -1243,28 +1389,32 @@ TIMER_CALLBACK_MEMBER(turquoise_ioga_device::eth_reset)
 
 WRITE32_MEMBER(sapphire_ioga_device::eth_remap_w)
 {
-	LOGMASKED(LOG_NETWORK, "eth: remap = 0x%08x (%s)\n", data, machine().describe_context());
+	LOGMASKED(LOG_NETWORK, "eth: remap = 0x%08x (%s)\n",
+		data, machine().describe_context());
 
 	m_eth_remap = data & ~0xf;
 }
 
 WRITE32_MEMBER(sapphire_ioga_device::eth_mappg_w)
 {
-	LOGMASKED(LOG_NETWORK, "eth: map page = 0x%08x (%s)\n", data, machine().describe_context());
+	LOGMASKED(LOG_NETWORK, "eth: map page = 0x%08x (%s)\n",
+		data, machine().describe_context());
 
 	m_eth_mappg = data & ~0xf;
 }
 
 READ32_MEMBER(sapphire_ioga_device::eth_control_r)
 {
-	LOGMASKED(LOG_NETWORK, "eth: control_r 0x%08x (%s)\n", m_eth_control, machine().describe_context());
+	LOGMASKED(LOG_NETWORK, "eth: control_r 0x%08x (%s)\n",
+		m_eth_control, machine().describe_context());
 
 	return m_eth_control;
 }
 
 WRITE32_MEMBER(sapphire_ioga_device::eth_control_w)
 {
-	LOGMASKED(LOG_NETWORK, "eth: control_w 0x%08x mem_mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_NETWORK, "eth: control_w 0x%08x mem_mask 0x%08x (%s)\n",
+		data, mem_mask, machine().describe_context());
 
 	m_eth_control = data & ETH_MASK;
 
@@ -1297,11 +1447,13 @@ WRITE16_MEMBER(sapphire_ioga_device::eth_w)
 		address &= ~(m_eth_mappg & ETH_MAPPG);
 		address |= (m_eth_remap & ETH_REMAP_ADDR);
 
-		LOGMASKED(LOG_NETWORK, "eth_w address 0x%08x remapped 0x%08x\n", offset << 1, address);
+		LOGMASKED(LOG_NETWORK, "eth_w address 0x%08x remapped 0x%08x\n",
+			offset << 1, address);
 	}
 
-	LOGMASKED(LOG_NETWORK, "eth_w channel %c address 0x%08x mask 0x%08x data 0x%04x\n", channel + 'A', address, mem_mask, data);
-	m_memory_space->write_word(address, data, mem_mask);
+	LOGMASKED(LOG_NETWORK, "eth_w channel %c address 0x%08x mask 0x%08x data 0x%04x\n",
+		channel + 'A', address, mem_mask, data);
+	m_memory->write_word(address, data, mem_mask);
 }
 
 READ16_MEMBER(sapphire_ioga_device::eth_r)
@@ -1316,11 +1468,13 @@ READ16_MEMBER(sapphire_ioga_device::eth_r)
 		address |= (m_eth_remap & ETH_REMAP_ADDR);
 		address &= 0x3fffffff;
 
-		LOGMASKED(LOG_NETWORK, "eth_r address 0x%08x remapped 0x%08x\n", offset << 1, address);
+		LOGMASKED(LOG_NETWORK, "eth_r address 0x%08x remapped 0x%08x\n",
+			offset << 1, address);
 	}
 
-	u16 data = m_memory_space->read_word(address, mem_mask);
-	LOGMASKED(LOG_NETWORK, "eth_r channel %c address 0x%08x mask 0x%08x data 0x%04x\n", channel + 'A', address, mem_mask, data);
+	u16 data = m_memory->read_word(address, mem_mask);
+	LOGMASKED(LOG_NETWORK, "eth_r channel %c address 0x%08x mask 0x%08x data 0x%04x\n",
+		channel + 'A', address, mem_mask, data);
 	return data;
 }
 

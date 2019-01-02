@@ -13,17 +13,7 @@
 //  LEGACY MACROS
 //**************************************************************************
 
-#define MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_option, _fixed) MCFG_SLOT_OPTION_RESET slot_options_##_slot_intf(device); MCFG_SLOT_DEFAULT_OPTION(_def_option) MCFG_SLOT_FIXED(_fixed)
-#define SLOT_INTERFACE_NAME(name) slot_options_##name
-#define SLOT_INTERFACE_START(name) void slot_options_##name(device_t *device) {
-#define SLOT_INTERFACE(name,device) MCFG_SLOT_OPTION_ADD(name, device)
-#define SLOT_INTERFACE_INTERNAL(name,device) MCFG_SLOT_OPTION_ADD(name, device) MCFG_SLOT_OPTION_SELECTABLE(name, false)
-#define SLOT_INTERFACE_END }
-#define SLOT_INTERFACE_EXTERN(name) void slot_options_##name(device_t *device)
-#define MCFG_DEVICE_CARD_DEFAULT_BIOS(_option, _default_bios) MCFG_SLOT_OPTION_DEFAULT_BIOS(_option, _default_bios)
-#define MCFG_DEVICE_CARD_MACHINE_CONFIG(_option, _machine_config_name) MCFG_SLOT_OPTION_MACHINE_CONFIG(_option, _machine_config_name)
-#define MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS(_option, _dev_inp_def) MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS(_option, _dev_inp_def)
-#define MCFG_DEVICE_CARD_CLOCK(_option, _clock) MCFG_SLOT_OPTION_CLOCK(_option, _clock)
+#define MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_option, _fixed) MCFG_SLOT_OPTION_RESET _slot_intf(dynamic_cast<device_slot_interface &>(*device)); MCFG_SLOT_DEFAULT_OPTION(_def_option) MCFG_SLOT_FIXED(_fixed)
 
 
 //**************************************************************************
@@ -42,9 +32,6 @@
 #define MCFG_SLOT_OPTION_ADD(_option, _devtype) \
 	dynamic_cast<device_slot_interface &>(*device).option_add(_option, _devtype);
 
-#define MCFG_SLOT_OPTION_SELECTABLE(_option, _selectable) \
-	dynamic_cast<device_slot_interface &>(*device).set_option_selectable(_option, _selectable);
-
 #define MCFG_SLOT_OPTION_DEFAULT_BIOS(_option, _default_bios) \
 	dynamic_cast<device_slot_interface &>(*device).set_option_default_bios(_option, _default_bios);
 
@@ -61,35 +48,6 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// ======================> device_slot_option
-
-class device_slot_option
-{
-	friend class device_slot_interface;
-
-public:
-	device_slot_option(const char *name, const device_type &devtype);
-
-	const char *name() const { return m_name; }
-	const device_type &devtype() const { return m_devtype; }
-	bool selectable() const { return m_selectable; }
-	const char *default_bios() const { return m_default_bios; }
-	std::function<void (device_t *)> machine_config() const { return m_machine_config; }
-	const input_device_default *input_device_defaults() const { return m_input_device_defaults; }
-	u32 clock() const { return m_clock; }
-
-private:
-	// internal state
-	const char *m_name;
-	const device_type &m_devtype;
-	bool m_selectable;
-	const char *m_default_bios;
-	std::function<void (device_t *)> m_machine_config;
-	const input_device_default *m_input_device_defaults;
-	u32 m_clock;
-};
-
 
 // ======================> get_default_card_software_hook
 
@@ -124,6 +82,36 @@ private:
 class device_slot_interface : public device_interface
 {
 public:
+	class slot_option
+	{
+	public:
+		slot_option(char const *name, device_type const &devtype, bool selectable);
+
+		char const *name() const { return m_name; }
+		device_type const &devtype() const { return m_devtype; }
+		bool selectable() const { return m_selectable; }
+		char const *default_bios() const { return m_default_bios; }
+		std::function<void (device_t *)> const &machine_config() const { return m_machine_config; }
+		input_device_default const *input_device_defaults() const { return m_input_device_defaults; }
+		u32 clock() const { return m_clock; }
+
+		slot_option &default_bios(char const *default_bios) { m_default_bios = default_bios; return *this; }
+		template <typename Object> slot_option &machine_config(Object &&cb) { m_machine_config = std::forward<Object>(cb); return *this; }
+		slot_option &input_device_defaults(input_device_default const *dev_inp_def) { m_input_device_defaults = dev_inp_def; return *this; }
+		slot_option &clock(u32 clock) { m_clock = clock; return *this; }
+		slot_option &clock(XTAL clock) { clock.validate(std::string("Configuring slot option ") + m_name); m_clock = clock.value(); return *this; }
+
+	private:
+		// internal state
+		char const *const m_name;
+		device_type const m_devtype;
+		bool const m_selectable;
+		char const *m_default_bios;
+		std::function<void (device_t *)> m_machine_config;
+		input_device_default const *m_input_device_defaults;
+		u32 m_clock;
+	};
+
 	// construction/destruction
 	device_slot_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_slot_interface();
@@ -131,30 +119,33 @@ public:
 	void set_fixed(bool fixed) { m_fixed = fixed; }
 	void set_default_option(const char *option) { m_default_option = option; }
 	void option_reset() { m_options.clear(); }
-	void option_add(const char *option, const device_type &devtype);
-	void set_option_selectable(const char *option, bool selectable){ config_option(option)->m_selectable = selectable; }
-	void set_option_default_bios(const char *option, const char *default_bios) { config_option(option)->m_default_bios = default_bios; }
-	void set_option_machine_config(const char *option, std::function<void (device_t *)> machine_config) { config_option(option)->m_machine_config = machine_config; }
-	void set_option_device_input_defaults(const char *option, const input_device_default *default_input) { config_option(option)->m_input_device_defaults = default_input; }
-	void set_option_clock(const char *option, u32 default_clock) { config_option(option)->m_clock = default_clock; }
+	slot_option &option_add(const char *option, const device_type &devtype);
+	slot_option &option_add_internal(const char *option, const device_type &devtype);
+	void set_option_default_bios(const char *option, const char *default_bios) { config_option(option)->default_bios(default_bios); }
+	template <typename T> void set_option_machine_config(const char *option, T &&machine_config) { config_option(option)->machine_config(std::forward<T>(machine_config)); }
+	void set_option_device_input_defaults(const char *option, const input_device_default *default_input) { config_option(option)->input_device_defaults(default_input); }
 	bool fixed() const { return m_fixed; }
 	bool has_selectable_options() const;
 	const char *default_option() const { return m_default_option; }
-	const std::unordered_map<std::string, std::unique_ptr<device_slot_option>> &option_list() const { return m_options; }
-	device_slot_option *option(const char *name) const;
+	const std::unordered_map<std::string, std::unique_ptr<slot_option>> &option_list() const { return m_options; }
+	const slot_option *option(const char *name) const;
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const { return std::string(); }
 	device_t *get_card_device() const { return m_card_device; }
 	void set_card_device(device_t *dev) { m_card_device = dev; }
 	const char *slot_name() const { return device().tag() + 1; }
 
+protected:
+	void set_default_clock(u32 clock) { m_default_clock = clock; }
+
 private:
 	// internal state
-	std::unordered_map<std::string,std::unique_ptr<device_slot_option>> m_options;
+	std::unordered_map<std::string,std::unique_ptr<slot_option>> m_options;
+	u32 m_default_clock;
 	const char *m_default_option;
 	bool m_fixed;
 	device_t *m_card_device;
 
-	device_slot_option *config_option(const char *option);
+	slot_option *config_option(const char *option);
 };
 
 // iterator

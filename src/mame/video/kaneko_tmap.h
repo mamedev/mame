@@ -10,10 +10,15 @@
 class kaneko_view2_tilemap_device : public device_t
 {
 public:
+	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: kaneko_view2_tilemap_device(mconfig, tag, owner, (uint32_t)0)
+	{
+	}
+
 	kaneko_view2_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_gfx_region(int region) { m_tilebase = region; }
 	void set_offset(int dx, int dy, int xdim, int ydim)
 	{
@@ -90,14 +95,5 @@ private:
 
 
 DECLARE_DEVICE_TYPE(KANEKO_TMAP, kaneko_view2_tilemap_device)
-
-#define MCFG_KANEKO_TMAP_GFXDECODE(_gfxtag) \
-	downcast<kaneko_view2_tilemap_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
-#define MCFG_KANEKO_TMAP_GFX_REGION(_region) \
-	downcast<kaneko_view2_tilemap_device &>(*device).set_gfx_region(_region);
-#define MCFG_KANEKO_TMAP_INVERT_FLIP(_invert) \
-	downcast<kaneko_view2_tilemap_device &>(*device).set_invert_flip(_invert);
-#define MCFG_KANEKO_TMAP_OFFSET(_dx, _dy, _xdim, _ydim) \
-	downcast<kaneko_view2_tilemap_device &>(*device).set_offset(_dx, _dy, _xdim, _ydim);
 
 #endif // MAME_VIDEO_KANEKO_TMAP_H

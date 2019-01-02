@@ -22,6 +22,7 @@ sound system appears to be the same as 'spartanxtec.cpp'
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -47,7 +48,11 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void spyhuntertec(machine_config &config);
 
+	void init_spyhuntertec();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<timer_device> m_analog_timer;
@@ -68,8 +73,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-
-
 	uint8_t m_spyhunt_sprite_color_mask;
 	int16_t m_spyhunt_scroll_offset;
 	int16_t m_spyhunt_scrollx;
@@ -80,8 +83,8 @@ public:
 	tilemap_t *m_alpha_tilemap;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(spyhuntertec_paletteram_w);
-	DECLARE_DRIVER_INIT(spyhuntertec);
-//  DECLARE_VIDEO_START(spyhuntertec);
+
+	//  DECLARE_VIDEO_START(spyhuntertec);
 //  uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_port04_w);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_portf0_w);
@@ -111,7 +114,6 @@ public:
 
 	uint8_t m_analog_select;
 	uint8_t m_analog_count;
-	void spyhuntertec(machine_config &config);
 	void spyhuntertec_map(address_map &map);
 	void spyhuntertec_portmap(address_map &map);
 	void spyhuntertec_sound_map(address_map &map);
@@ -432,16 +434,16 @@ void spyhuntertec_state::spyhuntertec_map(address_map &map)
 	map(0xa800, 0xa8ff).ram(); // the ROM is a solid fill in these areas, and they get tested as RAM, I think they moved the 'real' scroll regs here
 	map(0xa900, 0xa9ff).ram();
 
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(spyhuntertec_state::spyhunt_videoram_w)).share("videoram");
-	map(0xe800, 0xebff).mirror(0x0400).ram().w(this, FUNC(spyhuntertec_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
+	map(0xe000, 0xe7ff).ram().w(FUNC(spyhuntertec_state::spyhunt_videoram_w)).share("videoram");
+	map(0xe800, 0xebff).mirror(0x0400).ram().w(FUNC(spyhuntertec_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
 	map(0xf000, 0xf7ff).ram(); //AM_SHARE("nvram")
 	map(0xf800, 0xf9ff).ram().share("spriteram"); // origional spriteram
-	map(0xfa00, 0xfa7f).mirror(0x0180).ram().w(this, FUNC(spyhuntertec_state::spyhuntertec_paletteram_w)).share("paletteram");
+	map(0xfa00, 0xfa7f).mirror(0x0180).ram().w(FUNC(spyhuntertec_state::spyhuntertec_paletteram_w)).share("paletteram");
 
 	map(0xfc00, 0xfc00).portr("DSW0");
 	map(0xfc01, 0xfc01).portr("DSW1");
-	map(0xfc02, 0xfc02).r(this, FUNC(spyhuntertec_state::spyhuntertec_in2_r));
-	map(0xfc03, 0xfc03).r(this, FUNC(spyhuntertec_state::spyhuntertec_in3_r));
+	map(0xfc02, 0xfc02).r(FUNC(spyhuntertec_state::spyhuntertec_in2_r));
+	map(0xfc03, 0xfc03).r(FUNC(spyhuntertec_state::spyhuntertec_in3_r));
 
 	map(0xfd00, 0xfd00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
@@ -462,11 +464,11 @@ void spyhuntertec_state::spyhuntertec_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x04, 0x04).w(this, FUNC(spyhuntertec_state::spyhuntertec_port04_w));
-	map(0x84, 0x86).w(this, FUNC(spyhuntertec_state::spyhunt_scroll_value_w));
+	map(0x04, 0x04).w(FUNC(spyhuntertec_state::spyhuntertec_port04_w));
+	map(0x84, 0x86).w(FUNC(spyhuntertec_state::spyhunt_scroll_value_w));
 	map(0xe0, 0xe0).nopw(); // was watchdog
 //  AM_RANGE(0xe8, 0xe8) AM_WRITENOP
-	map(0xf0, 0xf0).w(this, FUNC(spyhuntertec_state::spyhuntertec_portf0_w));
+	map(0xf0, 0xf0).w(FUNC(spyhuntertec_state::spyhuntertec_portf0_w));
 }
 
 
@@ -489,7 +491,7 @@ void spyhuntertec_state::spyhuntertec_sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 
-	map(0x00, 0x00).w(this, FUNC(spyhuntertec_state::sound_irq_ack));
+	map(0x00, 0x00).w(FUNC(spyhuntertec_state::sound_irq_ack));
 
 	map(0x0012, 0x0013).w("ay3", FUNC(ay8912_device::address_data_w));
 	map(0x0012, 0x0012).r("ay3", FUNC(ay8912_device::data_r));
@@ -647,7 +649,7 @@ static const gfx_layout spyhuntertec_charlayout =
 };
 
 
-static GFXDECODE_START( spyhuntertec )
+static GFXDECODE_START( gfx_spyhuntertec )
 	GFXDECODE_ENTRY( "gfx1", 0, spyhuntertec_charlayout,  3*16, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spyhuntertec_sprite_layout,   0*16, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spyhuntertec_alphalayout, 4*16, 1 )
@@ -673,10 +675,10 @@ MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 // 2 XTALs: one 20MHz, other one near maincpu ?MHz
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000 ) // NEC D780C-2 (rated 6MHz)
-	MCFG_CPU_PROGRAM_MAP(spyhuntertec_map)
-	MCFG_CPU_IO_MAP(spyhuntertec_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spyhuntertec_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000 ) // NEC D780C-2 (rated 6MHz)
+	MCFG_DEVICE_PROGRAM_MAP(spyhuntertec_map)
+	MCFG_DEVICE_IO_MAP(spyhuntertec_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spyhuntertec_state, irq0_line_hold)
 	MCFG_TIMER_DRIVER_ADD("analog_timer", spyhuntertec_state, analog_count_callback)
 
 	/* video hardware */
@@ -689,38 +691,138 @@ MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 	MCFG_SCREEN_UPDATE_DRIVER(spyhuntertec_state, screen_update_spyhuntertec)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spyhuntertec)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spyhuntertec)
 	MCFG_PALETTE_ADD("palette", 64+4)
 
 //  MCFG_PALETTE_INIT_OWNER(spyhuntertec_state,spyhunt)
 
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000 ) // SGS Z8400B1 (rated 2.5MHz?)
-	MCFG_CPU_PROGRAM_MAP(spyhuntertec_sound_map)
-	MCFG_CPU_IO_MAP(spyhuntertec_sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(spyhuntertec_state, irq0_line_assert, 1000)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000 ) // SGS Z8400B1 (rated 2.5MHz?)
+	MCFG_DEVICE_PROGRAM_MAP(spyhuntertec_sound_map)
+	MCFG_DEVICE_IO_MAP(spyhuntertec_sound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(spyhuntertec_state, irq0_line_assert, 1000)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_SOUND_ADD("ay1", AY8912, 3000000/2) // AY-3-8912
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(spyhuntertec_state, ay1_porta_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(spyhuntertec_state, ay1_porta_w))
+	ay8912_device &ay1(AY8912(config, "ay1", 3000000/2)); // AY-3-8912
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
+	ay1.port_a_read_callback().set(FUNC(spyhuntertec_state::ay1_porta_r));
+	ay1.port_a_write_callback().set(FUNC(spyhuntertec_state::ay1_porta_w));
 
-	MCFG_SOUND_ADD("ay2", AY8912, 3000000/2) // "
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(spyhuntertec_state, ay2_porta_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(spyhuntertec_state, ay2_porta_w))
+	ay8912_device &ay2(AY8912(config, "ay2", 3000000/2)); // "
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
+	ay2.port_a_read_callback().set(FUNC(spyhuntertec_state::ay2_porta_r));
+	ay2.port_a_write_callback().set(FUNC(spyhuntertec_state::ay2_porta_w));
 
-	MCFG_SOUND_ADD("ay3", AY8912, 3000000/2) // "
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, "ay3", 3000000/2).add_route(ALL_OUTPUTS, "mono", 0.25); // "
 
 MACHINE_CONFIG_END
 
 
+
+
+/*
+  Spy Hunter (Recreativos Franco)
+  Licensed by Bally Midway.
+  Original PCB.
+*/
+
+ROM_START( spyhuntsp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",   0x0000, 0x4000, CRC(ae05b8a2) SHA1(8854368206c484b30865a4d29ac85f854599e791) )
+	ROM_LOAD( "2.bin",   0x4000, 0x4000, CRC(c96f5d69) SHA1(528b1ded5d4fea008482cace48c96ec162d78bae) )
+	ROM_LOAD( "3.bin",   0x8000, 0x4000, CRC(bd6c1a5c) SHA1(c47fe5daccead4a3ea326c2b0b12405e24f9e222) )
+	ROM_LOAD( "4.bin",   0xc000, 0x2000, CRC(3ea6a65c) SHA1(1320ce17044307ed3c4f2459631a9aa1734f1f30) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "5.bin",   0x0000, 0x2000, CRC(33fe2829) SHA1(e6950dbf681242bf23542ca6604e62eacb431101) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "6.bin",   0x0000, 0x200, CRC(6b76f46a) SHA1(4b398084c42a60fcfa4a9bf14f844e36a3f42723) )
+	ROM_CONTINUE(0x0001, 0x200)
+	ROM_CONTINUE(0x0800, 0x200)
+	ROM_CONTINUE(0x0801, 0x200)
+	ROM_CONTINUE(0x1000, 0x200)
+	ROM_CONTINUE(0x1001, 0x200)
+	ROM_CONTINUE(0x1800, 0x200)
+	ROM_CONTINUE(0x1801, 0x200)
+	ROM_CONTINUE(0x2000, 0x200)
+	ROM_CONTINUE(0x2001, 0x200)
+	ROM_CONTINUE(0x2800, 0x200)
+	ROM_CONTINUE(0x2801, 0x200)
+	ROM_CONTINUE(0x3000, 0x200)
+	ROM_CONTINUE(0x3001, 0x200)
+	ROM_CONTINUE(0x3800, 0x200)
+	ROM_CONTINUE(0x3801, 0x200)
+	ROM_LOAD32_BYTE( "7.bin",   0x0002, 0x200, CRC(085bd7a7) SHA1(c35c309b6c6485baec54d4434dea44abf4d48f41) )
+	ROM_CONTINUE(0x0003, 0x200)
+	ROM_CONTINUE(0x0802, 0x200)
+	ROM_CONTINUE(0x0803, 0x200)
+	ROM_CONTINUE(0x1002, 0x200)
+	ROM_CONTINUE(0x1003, 0x200)
+	ROM_CONTINUE(0x1802, 0x200)
+	ROM_CONTINUE(0x1803, 0x200)
+	ROM_CONTINUE(0x2002, 0x200)
+	ROM_CONTINUE(0x2003, 0x200)
+	ROM_CONTINUE(0x2802, 0x200)
+	ROM_CONTINUE(0x2803, 0x200)
+	ROM_CONTINUE(0x3002, 0x200)
+	ROM_CONTINUE(0x3003, 0x200)
+	ROM_CONTINUE(0x3802, 0x200)
+	ROM_CONTINUE(0x3803, 0x200)
+	ROM_LOAD32_BYTE( "8.bin",   0x4000, 0x200, CRC(e699b329) SHA1(cb4b8c7b6fa1cb1144a18f1442dc3b267c408914) )
+	ROM_CONTINUE(0x4001, 0x200)
+	ROM_CONTINUE(0x4800, 0x200)
+	ROM_CONTINUE(0x4801, 0x200)
+	ROM_CONTINUE(0x5000, 0x200)
+	ROM_CONTINUE(0x5001, 0x200)
+	ROM_CONTINUE(0x5800, 0x200)
+	ROM_CONTINUE(0x5801, 0x200)
+	ROM_CONTINUE(0x6000, 0x200)
+	ROM_CONTINUE(0x6001, 0x200)
+	ROM_CONTINUE(0x6800, 0x200)
+	ROM_CONTINUE(0x6801, 0x200)
+	ROM_CONTINUE(0x7000, 0x200)
+	ROM_CONTINUE(0x7001, 0x200)
+	ROM_CONTINUE(0x7800, 0x200)
+	ROM_CONTINUE(0x7801, 0x200)
+	ROM_LOAD32_BYTE( "9.bin",   0x4002, 0x200, CRC(6d462ec7) SHA1(0ff37f75b0eeceb86177a3f7c93834d5c0e24515) )
+	ROM_CONTINUE(0x4003, 0x200)
+	ROM_CONTINUE(0x4802, 0x200)
+	ROM_CONTINUE(0x4803, 0x200)
+	ROM_CONTINUE(0x5002, 0x200)
+	ROM_CONTINUE(0x5003, 0x200)
+	ROM_CONTINUE(0x5802, 0x200)
+	ROM_CONTINUE(0x5803, 0x200)
+	ROM_CONTINUE(0x6002, 0x200)
+	ROM_CONTINUE(0x6003, 0x200)
+	ROM_CONTINUE(0x6802, 0x200)
+	ROM_CONTINUE(0x6803, 0x200)
+	ROM_CONTINUE(0x7002, 0x200)
+	ROM_CONTINUE(0x7003, 0x200)
+	ROM_CONTINUE(0x7802, 0x200)
+	ROM_CONTINUE(0x7803, 0x200)
+
+	ROM_REGION( 0x10000, "gfx2", ROMREGION_INVERT )
+	ROM_LOAD( "10.bin",   0x00000, 0x4000, CRC(6f9fd416) SHA1(a51c86e5b22c91fc44673f53400b58af40b18065) )
+	ROM_LOAD( "11.bin",   0x04000, 0x4000, CRC(75526ffe) SHA1(ff1adf6f9b6595114d0bd06b72d9eb7bbf70144d) )
+	ROM_LOAD( "12.bin",   0x08000, 0x4000, CRC(82ee7a4d) SHA1(184720de76680275bf7c4a171f03a0ce771d91fc) )
+	ROM_LOAD( "13.bin",   0x0c000, 0x4000, CRC(0cc592a3) SHA1(b3563bde83432cdbaedb88d4d222da30bf679b08) )
+
+	ROM_REGION( 0x01000, "gfx3", 0 )
+	ROM_LOAD( "14.bin",  0x00000, 0x1000, CRC(87a4c130) SHA1(7792afdc36b0f3bd51c387d04d38f60c85fd2e93) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.ic19", 0x0000, 0x0100, CRC(b9dc4d09) SHA1(56176e5c40e6926784cfe93b2e5241c2b46f4a38) )
+	ROM_LOAD( "82s129.ic20", 0x0100, 0x0100, CRC(b9dc4d09) SHA1(56176e5c40e6926784cfe93b2e5241c2b46f4a38) )
+
+	ROM_REGION( 0x200, "proms2", 0 )
+	ROM_LOAD( "prom.1c8", 0x0000, 0x0200, CRC(ce69832d) SHA1(a663cbf762232f3ed9fc0b42a559e1ca4639589b) )
+
+ROM_END
 
 
 ROM_START( spyhuntpr )
@@ -811,11 +913,17 @@ ROM_START( spyhuntpr )
 	ROM_LOAD( "14.bin",  0x00000, 0x1000, CRC(87a4c130) SHA1(7792afdc36b0f3bd51c387d04d38f60c85fd2e93) )
 ROM_END
 
-DRIVER_INIT_MEMBER(spyhuntertec_state,spyhuntertec)
+
+void spyhuntertec_state::init_spyhuntertec()
 {
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 16;
 }
 
+/***************************************************************************
+*                              Game Drivers                                *
+***************************************************************************/
 
-GAMEL(1983, spyhuntpr,spyhunt,  spyhuntertec, spyhuntertec,spyhuntertec_state,  spyhuntertec,ROT90, "bootleg (Recreativos Franco S.A. license, Tecfri)", "Spy Hunter (Spain, Recreativos Franco S.A., Tecfri PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_spyhunttec )
+//    YEAR  NAME       PARENT   MACHINE       INPUT         STATE               INIT               ROT    COMPANY                                              FULLNAME                                                             FLAGS                                        LAYOUT
+GAMEL(1985, spyhuntsp, spyhunt, spyhuntertec, spyhuntertec, spyhuntertec_state, init_spyhuntertec, ROT90, "Recreativos Franco S.A. (Bally Midway license)",    "Spy Hunter (Spain, Recreativos Franco S.A., Bally Midway license)", MACHINE_SUPPORTS_SAVE,                       layout_spyhunttec )
+GAMEL(1985, spyhuntpr, spyhunt, spyhuntertec, spyhuntertec, spyhuntertec_state, init_spyhuntertec, ROT90, "bootleg (Recreativos Franco S.A. license, Tecfri)", "Spy Hunter (Spain, Recreativos Franco S.A., Tecfri PCB)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_spyhunttec )

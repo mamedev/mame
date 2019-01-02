@@ -112,10 +112,10 @@
 
 WRITE8_MEMBER(victory_state::lamp_control_w)
 {
-	output().set_led_value(0, data & 0x80);
-	output().set_led_value(1, data & 0x40);
-	output().set_led_value(2, data & 0x20);
-	output().set_led_value(3, data & 0x10);
+	m_lamps[0] = BIT(data, 7);
+	m_lamps[1] = BIT(data, 6);
+	m_lamps[2] = BIT(data, 5);
+	m_lamps[3] = BIT(data, 4);
 }
 
 
@@ -129,15 +129,15 @@ WRITE8_MEMBER(victory_state::lamp_control_w)
 void victory_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc0ff).r(this, FUNC(victory_state::video_control_r));
-	map(0xc100, 0xc1ff).w(this, FUNC(victory_state::video_control_w));
-	map(0xc200, 0xc3ff).w(this, FUNC(victory_state::paletteram_w));
+	map(0xc000, 0xc0ff).r(FUNC(victory_state::video_control_r));
+	map(0xc100, 0xc1ff).w(FUNC(victory_state::video_control_w));
+	map(0xc200, 0xc3ff).w(FUNC(victory_state::paletteram_w));
 	map(0xc400, 0xc7ff).ram().share("videoram");
 	map(0xc800, 0xdfff).ram().share("charram");
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xf7ff).ram().share("nvram");
-	map(0xf800, 0xf800).mirror(0x07fc).rw("custom", FUNC(victory_sound_device::response_r), FUNC(victory_sound_device::command_w));
-	map(0xf801, 0xf801).mirror(0x07fc).r("custom", FUNC(victory_sound_device::status_r));
+	map(0xf800, 0xf800).mirror(0x07fc).rw("soundbd", FUNC(victory_sound_device::response_r), FUNC(victory_sound_device::command_w));
+	map(0xf801, 0xf801).mirror(0x07fc).r("soundbd", FUNC(victory_sound_device::status_r));
 }
 
 
@@ -148,7 +148,7 @@ void victory_state::main_io_map(address_map &map)
 	map(0x04, 0x04).mirror(0x03).portr("SW1");
 	map(0x08, 0x0b).rw("pio1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x0c, 0x0f).rw("pio2", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0x10, 0x10).mirror(0x03).w(this, FUNC(victory_state::lamp_control_w));
+	map(0x10, 0x10).mirror(0x03).w(FUNC(victory_state::lamp_control_w));
 	map(0x14, 0xff).noprw();
 }
 
@@ -213,21 +213,21 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(victory_state::victory)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, VICTORY_MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", victory_state,  vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, VICTORY_MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", victory_state,  vblank_interrupt)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// PIO interrupts are disconnected
-	MCFG_DEVICE_ADD("pio1", Z80PIO, VICTORY_MAIN_CPU_CLOCK) // at K8
-	MCFG_Z80PIO_IN_PA_CB(IOPORT("DIAL"))
-	MCFG_Z80PIO_IN_PB_CB(IOPORT("COIN"))
+	z80pio_device& pio1(Z80PIO(config, "pio1", VICTORY_MAIN_CPU_CLOCK)); // at K8
+	pio1.in_pa_callback().set_ioport("DIAL");
+	pio1.in_pb_callback().set_ioport("COIN");
 
-	MCFG_DEVICE_ADD("pio2", Z80PIO, VICTORY_MAIN_CPU_CLOCK) // at L8
-	MCFG_Z80PIO_IN_PA_CB(IOPORT("BUTTONS"))
-	MCFG_Z80PIO_IN_PB_CB(IOPORT("UNUSED"))
+	z80pio_device& pio2(Z80PIO(config, "pio2", VICTORY_MAIN_CPU_CLOCK)); // at L8
+	pio2.in_pa_callback().set_ioport("BUTTONS");
+	pio2.in_pb_callback().set_ioport("UNUSED");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -241,8 +241,7 @@ MACHINE_CONFIG_START(victory_state::victory)
 
 
 	/* audio hardware */
-	victory_audio(config);
-
+	EXIDY_VICTORY(config, "soundbd", 0);
 MACHINE_CONFIG_END
 
 
@@ -268,7 +267,7 @@ ROM_START( victory )
 	ROM_LOAD( "vic3.kl1", 0xa000, 0x1000, CRC(2b7e626f) SHA1(5a607faf05f81da44c68fe1a6efe2a7c4ac048c7) )
 	ROM_LOAD( "vic3.l1",  0xb000, 0x1000, CRC(7bb8e1f5) SHA1(0f624e859bb9c2203c0aebe89ac2f807b4fa9a47) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "vic1.7bc", 0xc000, 0x1000, CRC(d4927560) SHA1(f263419dec70b758cf429cd7e5b388258027bfde) )
 	ROM_LOAD( "vic1.7c",  0xd000, 0x1000, CRC(059efab5) SHA1(60259eb56a282a0fbab5e966a16430ab486b1492) )
 	ROM_LOAD( "vic1.7d",  0xe000, 0x1000, CRC(82c4767c) SHA1(64eac78e7dab5f435eb035be46e24e73a74f0eae) )
@@ -301,7 +300,7 @@ ROM_START( victorba )
 	ROM_LOAD( "kl1.rom", 0xa000, 0x1000, CRC(6c82ebca) SHA1(3f30e92cbdca73948d285d4509bdee85d8fa57b7) )
 	ROM_LOAD( "l1.rom",  0xb000, 0x1000, CRC(03b89d8a) SHA1(37b501e910d3c3784a6696fab7fd6ba568470a8b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "soundbd:audiocpu", 0 )
 	ROM_LOAD( "vic1.7bc", 0xc000, 0x1000, CRC(d4927560) SHA1(f263419dec70b758cf429cd7e5b388258027bfde) )
 	ROM_LOAD( "vic1.7c",  0xd000, 0x1000, CRC(059efab5) SHA1(60259eb56a282a0fbab5e966a16430ab486b1492) )
 	ROM_LOAD( "vic1.7d",  0xe000, 0x1000, CRC(82c4767c) SHA1(64eac78e7dab5f435eb035be46e24e73a74f0eae) )
@@ -326,5 +325,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, victory,  0,       victory, victory, victory_state, 0, ROT0, "Exidy", "Victory", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, victorba, victory, victory, victory, victory_state, 0, ROT0, "Exidy", "Victor Banana", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, victory,  0,       victory, victory, victory_state, empty_init, ROT0, "Exidy", "Victory", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, victorba, victory, victory, victory, victory_state, empty_init, ROT0, "Exidy", "Victor Banana", MACHINE_SUPPORTS_SAVE )

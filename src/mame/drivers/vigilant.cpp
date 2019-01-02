@@ -79,7 +79,7 @@ void vigilant_state::vigilant_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");        /* Fallthrough */
 	map(0x0000, 0x7fff).rom();
 	map(0xc020, 0xc0df).ram().share("spriteram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(vigilant_state::paletteram_w)).share("paletteram");
+	map(0xc800, 0xcfff).ram().w(FUNC(vigilant_state::paletteram_w)).share("paletteram");
 	map(0xd000, 0xdfff).ram().share("videoram");
 	map(0xe000, 0xefff).ram();
 }
@@ -88,13 +88,13 @@ void vigilant_state::vigilant_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));    /* SD */
-	map(0x01, 0x01).portr("IN1").w(this, FUNC(vigilant_state::vigilant_out2_w));          /* OUT2 */
+	map(0x01, 0x01).portr("IN1").w(FUNC(vigilant_state::vigilant_out2_w));          /* OUT2 */
 	map(0x02, 0x02).portr("IN2");
 	map(0x03, 0x03).portr("DSW1");
-	map(0x04, 0x04).portr("DSW2").w(this, FUNC(vigilant_state::bank_select_w));  /* PBANK */
-	map(0x80, 0x81).w(this, FUNC(vigilant_state::vigilant_horiz_scroll_w));      /* HSPL, HSPH */
-	map(0x82, 0x83).w(this, FUNC(vigilant_state::vigilant_rear_horiz_scroll_w)); /* RHSPL, RHSPH */
-	map(0x84, 0x84).w(this, FUNC(vigilant_state::vigilant_rear_color_w));        /* RCOD */
+	map(0x04, 0x04).portr("DSW2").w(FUNC(vigilant_state::bank_select_w));  /* PBANK */
+	map(0x80, 0x81).w(FUNC(vigilant_state::vigilant_horiz_scroll_w));      /* HSPL, HSPH */
+	map(0x82, 0x83).w(FUNC(vigilant_state::vigilant_rear_horiz_scroll_w)); /* RHSPL, RHSPH */
+	map(0x84, 0x84).w(FUNC(vigilant_state::vigilant_rear_color_w));        /* RCOD */
 }
 
 void vigilant_state::kikcubic_map(address_map &map)
@@ -102,7 +102,7 @@ void vigilant_state::kikcubic_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");        /* Fallthrough */
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc0ff).ram().share("spriteram");
-	map(0xc800, 0xcaff).ram().w(this, FUNC(vigilant_state::paletteram_w)).share("paletteram");
+	map(0xc800, 0xcaff).ram().w(FUNC(vigilant_state::paletteram_w)).share("paletteram");
 	map(0xd000, 0xdfff).ram().share("videoram");
 	map(0xe000, 0xffff).ram();
 }
@@ -110,11 +110,11 @@ void vigilant_state::kikcubic_map(address_map &map)
 void vigilant_state::kikcubic_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("DSW1").w(this, FUNC(vigilant_state::kikcubic_coin_w)); /* also flip screen, and...? */
+	map(0x00, 0x00).portr("DSW1").w(FUNC(vigilant_state::kikcubic_coin_w)); /* also flip screen, and...? */
 	map(0x01, 0x01).portr("DSW2");
 	map(0x02, 0x02).portr("IN0");
 	map(0x03, 0x03).portr("IN1");
-	map(0x04, 0x04).portr("IN2").w(this, FUNC(vigilant_state::bank_select_w));
+	map(0x04, 0x04).portr("IN2").w(FUNC(vigilant_state::bank_select_w));
 	map(0x06, 0x06).w("soundlatch", FUNC(generic_latch_8_device::write));
 //  AM_RANGE(0x07, 0x07) AM_WRITENOP /* ?? */
 }
@@ -458,7 +458,7 @@ static const gfx_layout buccaneer_back_layout =
 	16*8
 };
 
-static GFXDECODE_START( vigilant )
+static GFXDECODE_START( gfx_vigilant )
 	GFXDECODE_ENTRY( "gfx1", 0, text_layout,   256, 16 )    /* colors 256-511 */
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout,   0, 16 )    /* colors   0-255 */
 	GFXDECODE_ENTRY( "gfx3", 0, back_layout,   512,  2 )    /* actually the background uses colors */
@@ -466,7 +466,7 @@ static GFXDECODE_START( vigilant )
 													/* pens we can handle it more easily. */
 GFXDECODE_END
 
-static GFXDECODE_START( buccanrs )
+static GFXDECODE_START( gfx_buccanrs )
 	GFXDECODE_ENTRY( "gfx1", 0, text_layout,   256, 16 )    /* colors 256-511 */
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout_buccanrs,   0, 16 )   /* colors   0-255 */
 	GFXDECODE_ENTRY( "gfx3", 0, buccaneer_back_layout,   512,  2 )  /* actually the background uses colors */
@@ -474,177 +474,186 @@ static GFXDECODE_START( buccanrs )
 													/* pens we can handle it more easily. */
 GFXDECODE_END
 
-static GFXDECODE_START( kikcubic )
+static GFXDECODE_START( gfx_kikcubic )
 	GFXDECODE_ENTRY( "gfx1", 0, text_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 0, 16 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(vigilant_state::vigilant)
-
+void vigilant_state::vigilant(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3579645)          /* 3.579645 MHz */
-	MCFG_CPU_PROGRAM_MAP(vigilant_map)
-	MCFG_CPU_IO_MAP(vigilant_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vigilant_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vigilant_state::vigilant_map);
+	m_maincpu->set_addrmap(AS_IO, &vigilant_state::vigilant_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vigilant_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("soundcpu", Z80, 3579645)         /* 3.579645 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vigilant_state, nmi_line_pulse, 128*55)    /* clocked by V1 */
-								/* IRQs are generated by main Z80 and YM2151 */
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
+	z80_device &soundcpu(Z80(config, "soundcpu", 3.579545_MHz_XTAL));
+	soundcpu.set_addrmap(AS_PROGRAM, &vigilant_state::sound_map);
+	soundcpu.set_addrmap(AS_IO, &vigilant_state::sound_io_map);
+	soundcpu.set_periodic_int(FUNC(vigilant_state::nmi_line_pulse), attotime::from_hz(128*55));    /* clocked by V1 */
+	/* IRQs are generated by main Z80 and YM2151 */
+	soundcpu.set_irq_acknowledge_callback("soundirq", FUNC(rst_neg_buffer_device::inta_cb));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA((16*8)-1, (64-16)*8-4, 0*8, 32*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(vigilant_state, screen_update_vigilant)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(55);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea((16*8)-1, (64-16)*8-4, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(vigilant_state::screen_update_vigilant));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vigilant)
-	MCFG_PALETTE_ADD("palette", 512+32) /* 512 real palette, 32 virtual palette */
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vigilant);
+	PALETTE(config, m_palette).set_entries(512+32); /* 512 real palette, 32 virtual palette */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
+	soundlatch.set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
+	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
-	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
+	IREM_M72_AUDIO(config, m_audio);
 
-	MCFG_YM2151_ADD("ymsnd", 3579645)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
+	ymsnd.add_route(0, "lspeaker", 0.55);
+	ymsnd.add_route(1, "rspeaker", 0.55);
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
+	dac.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	dac.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(vigilant_state::buccanrs)
-
+void vigilant_state::buccanrs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5688800)          /* 5.688800 MHz */
-	MCFG_CPU_PROGRAM_MAP(vigilant_map)
-	MCFG_CPU_IO_MAP(vigilant_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vigilant_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 5688800);          /* 5.688800 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vigilant_state::vigilant_map);
+	m_maincpu->set_addrmap(AS_IO, &vigilant_state::vigilant_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vigilant_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("soundcpu", Z80, 18432000/6)          /* 3.072000 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(buccanrs_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vigilant_state, nmi_line_pulse, 128*55)    /* clocked by V1 */
+	z80_device &soundcpu(Z80(config, "soundcpu", 18432000/6));	/* 3.072000 MHz */
+	soundcpu.set_addrmap(AS_PROGRAM, &vigilant_state::sound_map);
+	soundcpu.set_addrmap(AS_IO, &vigilant_state::buccanrs_sound_io_map);
+	soundcpu.set_periodic_int(FUNC(vigilant_state::nmi_line_pulse), attotime::from_hz(128*55));    /* clocked by V1 */
 								/* IRQs are generated by main Z80 and YM2151 */
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
+	soundcpu.set_irq_acknowledge_callback("soundirq", FUNC(rst_neg_buffer_device::inta_cb));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(16*8, (64-16)*8-1, 0*8, 32*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(vigilant_state, screen_update_vigilant)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(55);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(16*8, (64-16)*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(vigilant_state::screen_update_vigilant));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", buccanrs)
-	MCFG_PALETTE_ADD("palette", 512+32) /* 512 real palette, 32 virtual palette */
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_buccanrs);
+	PALETTE(config, m_palette).set_entries(512+32); /* 512 real palette, 32 virtual palette */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
+	soundlatch.set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
+	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
-	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
+	IREM_M72_AUDIO(config, m_audio);
 
-	MCFG_SOUND_ADD("ym1", YM2203, 18432000/6)
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.35)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.35)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  0.35)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
-	MCFG_SOUND_ROUTE(2, "lspeaker",  0.35)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.35)
-	MCFG_SOUND_ROUTE(3, "lspeaker",  0.50)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.50)
+	ym2203_device &ym1(YM2203(config, "ym1", 18432000/6));
+	ym1.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
+	ym1.add_route(0, "lspeaker",  0.35);
+	ym1.add_route(0, "rspeaker", 0.35);
+	ym1.add_route(1, "lspeaker",  0.35);
+	ym1.add_route(1, "rspeaker", 0.35);
+	ym1.add_route(2, "lspeaker",  0.35);
+	ym1.add_route(2, "rspeaker", 0.35);
+	ym1.add_route(3, "lspeaker",  0.50);
+	ym1.add_route(3, "rspeaker", 0.50);
 
-	MCFG_SOUND_ADD("ym2", YM2203, 18432000/6)
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.35)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.35)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  0.35)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
-	MCFG_SOUND_ROUTE(2, "lspeaker",  0.35)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.35)
-	MCFG_SOUND_ROUTE(3, "lspeaker",  0.50)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 0.50)
+	ym2203_device &ym2(YM2203(config, "ym2", 18432000/6));;
+	ym2.add_route(0, "lspeaker",  0.35);
+	ym2.add_route(0, "rspeaker", 0.35);
+	ym2.add_route(1, "lspeaker",  0.35);
+	ym2.add_route(1, "rspeaker", 0.35);
+	ym2.add_route(2, "lspeaker",  0.35);
+	ym2.add_route(2, "rspeaker", 0.35);
+	ym2.add_route(3, "lspeaker",  0.50);
+	ym2.add_route(3, "rspeaker", 0.50);
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
+	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(vigilant_state::kikcubic)
-
+void vigilant_state::kikcubic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3579645)          /* 3.579645 MHz */
-	MCFG_CPU_PROGRAM_MAP(kikcubic_map)
-	MCFG_CPU_IO_MAP(kikcubic_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vigilant_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vigilant_state::kikcubic_map);
+	m_maincpu->set_addrmap(AS_IO, &vigilant_state::kikcubic_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vigilant_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("soundcpu", Z80, 3579645)         /* 3.579645 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vigilant_state, nmi_line_pulse, 128*55)    /* clocked by V1 */
+	z80_device &soundcpu(Z80(config, "soundcpu", 3.579545_MHz_XTAL));
+	soundcpu.set_addrmap(AS_PROGRAM, &vigilant_state::sound_map);
+	soundcpu.set_addrmap(AS_IO, &vigilant_state::sound_io_map);
+	soundcpu.set_periodic_int(FUNC(vigilant_state::nmi_line_pulse), attotime::from_hz(128*55));    /* clocked by V1 */
 								/* IRQs are generated by main Z80 and YM2151 */
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
+	soundcpu.set_irq_acknowledge_callback("soundirq", FUNC(rst_neg_buffer_device::inta_cb));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 0*8, 32*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(vigilant_state, screen_update_kikcubic)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(55);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(vigilant_state::screen_update_kikcubic));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kikcubic)
-	MCFG_PALETTE_ADD("palette", 256)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kikcubic);
+	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
+	soundlatch.set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("soundirq", RST_NEG_BUFFER, 0)
-	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("soundcpu", 0))
+	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline("soundcpu", 0);
 
-	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
+	IREM_M72_AUDIO(config, m_audio);
 
-	MCFG_YM2151_ADD("ymsnd", 3579645)
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
+	ymsnd.add_route(0, "lspeaker", 0.55);
+	ymsnd.add_route(1, "rspeaker", 0.55);
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
+	dac.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	dac.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 
@@ -1151,18 +1160,18 @@ ROM_START( buccanrsb )
 	ROM_LOAD( "prom2.u99",  0x0300, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )
 ROM_END
 
-GAME( 1988, vigilant,   0,          vigilant, vigilant, vigilant_state, 0, ROT0, "Irem", "Vigilante (World, Rev E)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantg,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev G)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilanto,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem (Data East license)", "Vigilante (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilanta,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem", "Vigilante (World, Rev A)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantb,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem (Data East license)", "Vigilante (US, Rev B)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantc,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem", "Vigilante (World, Rev C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantd,  vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "Irem", "Vigilante (Japan, Rev D)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vigilantbl, vigilant,   vigilant, vigilant, vigilant_state, 0, ROT0, "bootleg", "Vigilante (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilant,   0,          vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem", "Vigilante (World, Rev E)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantg,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem (Data East license)", "Vigilante (US, Rev G)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilanto,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem (Data East license)", "Vigilante (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilanta,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem", "Vigilante (World, Rev A)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantb,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem (Data East license)", "Vigilante (US, Rev B)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantc,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem", "Vigilante (World, Rev C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantd,  vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "Irem", "Vigilante (Japan, Rev D)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vigilantbl, vigilant,   vigilant, vigilant, vigilant_state, empty_init, ROT0, "bootleg", "Vigilante (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, kikcubic,   0,          kikcubic, kikcubic, vigilant_state, 0, ROT0, "Irem", "Meikyu Jima (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) /* English title is Kickle Cubicle */
-GAME( 1988, kikcubicb,  kikcubic,   kikcubic, kikcubic, vigilant_state, 0, ROT0, "bootleg", "Kickle Cubele", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kikcubic,   0,          kikcubic, kikcubic, vigilant_state, empty_init, ROT0, "Irem", "Meikyu Jima (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) /* English title is Kickle Cubicle */
+GAME( 1988, kikcubicb,  kikcubic,   kikcubic, kikcubic, vigilant_state, empty_init, ROT0, "bootleg", "Kickle Cubele", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, buccanrs,   0,          buccanrs, buccanrs, vigilant_state, 0, ROT0, "Duintronic", "Buccaneers (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, buccanrsa,  buccanrs,   buccanrs, buccanra, vigilant_state, 0, ROT0, "Duintronic", "Buccaneers (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, buccanrsb,  buccanrs,   buccanrs, buccanrs, vigilant_state, 0, ROT0, "Duintronic", "Buccaneers (set 3, harder)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, buccanrs,   0,          buccanrs, buccanrs, vigilant_state, empty_init, ROT0, "Duintronic", "Buccaneers (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, buccanrsa,  buccanrs,   buccanrs, buccanra, vigilant_state, empty_init, ROT0, "Duintronic", "Buccaneers (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, buccanrsb,  buccanrs,   buccanrs, buccanrs, vigilant_state, empty_init, ROT0, "Duintronic", "Buccaneers (set 3, harder)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

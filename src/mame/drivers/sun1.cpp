@@ -76,8 +76,9 @@ public:
 	}
 
 	void sun1(machine_config &config);
+
+private:
 	void sun1_mem(address_map &map);
-protected:
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
@@ -113,40 +114,41 @@ void sun1_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(sun1_state::sun1)
+void sun1_state::sun1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(sun1_mem)
+	M68000(config, m_maincpu, 16_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun1_state::sun1_mem);
 
-	MCFG_DEVICE_ADD("timer", AM9513, XTAL(16'000'000) / 4)
-	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("timer", am9513_device, gate1_w))
-	MCFG_AM9513_OUT1_CALLBACK(NOOP) // Watchdog; generates BERR/Reset
-	MCFG_AM9513_OUT2_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_6)) // User timer
-	MCFG_AM9513_OUT3_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7)) // Refresh timer (2 ms)
-	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("iouart", upd7201_new_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("iouart", upd7201_new_device, txca_w))
-	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("iouart", upd7201_new_device, rxcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("iouart", upd7201_new_device, txcb_w))
+	am9513_device &timer(AM9513(config, "timer", 16_MHz_XTAL / 4));
+	timer.fout_cb().set("timer", FUNC(am9513_device::gate1_w));
+	timer.out1_cb().set_nop(); // Watchdog; generates BERR/Reset
+	timer.out2_cb().set_inputline(m_maincpu, M68K_IRQ_6); // User timer
+	timer.out3_cb().set_inputline(m_maincpu, M68K_IRQ_7); // Refresh timer (2 ms)
+	timer.out4_cb().set(m_iouart, FUNC(upd7201_new_device::rxca_w));
+	timer.out4_cb().append(m_iouart, FUNC(upd7201_new_device::txca_w));
+	timer.out5_cb().set(m_iouart, FUNC(upd7201_new_device::rxcb_w));
+	timer.out5_cb().append(m_iouart, FUNC(upd7201_new_device::txcb_w));
 
-	MCFG_DEVICE_ADD("iouart", UPD7201_NEW, XTAL(16'000'000) / 4)
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
+	UPD7201_NEW(config, m_iouart, 16_MHz_XTAL / 4);
+	m_iouart->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_iouart->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	m_iouart->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	m_iouart->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	m_iouart->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	m_iouart->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
+	m_iouart->out_int_callback().set_inputline(m_maincpu, M68K_IRQ_5);
 
-	MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, dcda_w))
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
+	rs232a.rxd_handler().set(m_iouart, FUNC(upd7201_new_device::rxa_w));
+	rs232a.cts_handler().set(m_iouart, FUNC(upd7201_new_device::ctsa_w));
+	rs232a.dcd_handler().set(m_iouart, FUNC(upd7201_new_device::dcda_w));
 
-	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, ctsb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("iouart", upd7201_new_device, dcdb_w))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_iouart, FUNC(upd7201_new_device::rxb_w));
+	rs232b.cts_handler().set(m_iouart, FUNC(upd7201_new_device::ctsb_w));
+	rs232b.dcd_handler().set(m_iouart, FUNC(upd7201_new_device::dcdb_w));
+}
 
 /* ROM definition */
 ROM_START( sun1 )
@@ -154,12 +156,12 @@ ROM_START( sun1 )
 	ROM_DEFAULT_BIOS("1.0")
 
 	ROM_SYSTEM_BIOS(0, "1.0", "Sun Monitor 1.0")
-	ROMX_LOAD( "v10.8.bin", 0x0001, 0x2000, CRC(3528a0f8) SHA1(be437dd93d1a44eccffa6f5e05935119482beab0), ROM_SKIP(1)|ROM_BIOS(1))
-	ROMX_LOAD( "v10.0.bin", 0x0000, 0x2000, CRC(1ad4c52a) SHA1(4bc1a19e8f202378d5d7baa8b95319275c040a6d), ROM_SKIP(1)|ROM_BIOS(1))
+	ROMX_LOAD( "v10.8.bin", 0x0001, 0x2000, CRC(3528a0f8) SHA1(be437dd93d1a44eccffa6f5e05935119482beab0), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "v10.0.bin", 0x0000, 0x2000, CRC(1ad4c52a) SHA1(4bc1a19e8f202378d5d7baa8b95319275c040a6d), ROM_SKIP(1) | ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "diag", "Interactive Tests")
-	ROMX_LOAD( "8mhzdiag.8.bin", 0x0001, 0x2000, CRC(808a549e) SHA1(d2aba014a5507c1538f2c1a73e1d2524f28034f4), ROM_SKIP(1)|ROM_BIOS(2))
-	ROMX_LOAD( "8mhzdiag.0.bin", 0x0000, 0x2000, CRC(7a92d506) SHA1(5df3800f7083293fc01bb6a7e7538ad425bbebfb), ROM_SKIP(1)|ROM_BIOS(2))
+	ROMX_LOAD( "8mhzdiag.8.bin", 0x0001, 0x2000, CRC(808a549e) SHA1(d2aba014a5507c1538f2c1a73e1d2524f28034f4), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "8mhzdiag.0.bin", 0x0000, 0x2000, CRC(7a92d506) SHA1(5df3800f7083293fc01bb6a7e7538ad425bbebfb), ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_REGION( 0x10000, "gfx", ROMREGION_ERASEFF )
 	ROM_LOAD( "gfxu605.g4.bin",  0x0000, 0x0200, CRC(274b7b3d) SHA1(40d8be2cfcbd03512a05925991bb5030d5d4b5e9))
@@ -178,5 +180,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY             FULLNAME  FLAGS
-COMP( 1982, sun1,  0,      0,       sun1,      sun1,  sun1_state, 0,    "Sun Microsystems", "Sun-1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME  FLAGS
+COMP( 1982, sun1, 0,      0,      sun1,    sun1,  sun1_state, empty_init, "Sun Microsystems", "Sun-1",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

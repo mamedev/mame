@@ -118,6 +118,6 @@ DECLARE_DEVICE_TYPE(O2_CART_SLOT, o2_cart_slot_device)
 	MCFG_DEVICE_ADD(_tag, O2_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
-SLOT_INTERFACE_EXTERN(o2_cart);
+void o2_cart(device_slot_interface &device);
 
 #endif // MAME_BUS_ODYSSEY2_SLOT_H

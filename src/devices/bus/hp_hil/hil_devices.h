@@ -19,7 +19,7 @@
 #define STR_MOUSE_HP_46060B    "hp_46060b"  // 3-button mouse
 
 
-SLOT_INTERFACE_EXTERN(hp_hil_devices);
+void hp_hil_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_HP_HIL_HIL_DEVICES_H

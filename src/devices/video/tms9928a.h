@@ -21,6 +21,13 @@
     TMS9128         YPbPr       60
     TMS9129         YPbPr       50
 
+    EFO90501        ?           50?    (uses 10.816 MHz XTAL; TI logo sometimes present)
+
+    XTAL inputs                 10.738098 to 10.739172 MHz (10.738635 MHz typical)
+    Pixel clock (internal)      XTAL ÷ 2
+    CPUCLK (N/A with TMS992x)   XTAL ÷ 3 (3.58 MHz typical)
+    GROMCLK                     XTAL ÷ 24 (447.5 kHz typical)
+
 */
 
 #ifndef MAME_VIDEO_TMS9928A_H
@@ -31,34 +38,6 @@
 #include "screen.h"
 
 
-//  MCFG_DEVICE_ADD(_tag, _variant, XTAL(10'738'635) / 2 )
-
-#define MCFG_TMS9928A_VRAM_SIZE(_size) \
-	downcast<tms9928a_device &>(*device).set_vram_size(_size);
-
-#define MCFG_TMS9928A_OUT_INT_LINE_CB(_devcb) \
-	devcb = &downcast<tms9928a_device &>(*device).set_out_int_line_callback(DEVCB_##_devcb);
-
-#define MCFG_TMS9928A_SET_SCREEN MCFG_VIDEO_SET_SCREEN
-
-#define MCFG_TMS9928A_OUT_GROMCLK_CB(_devcb) \
-	devcb = &downcast<tms9928a_device &>(*device).set_out_gromclk_callback(DEVCB_##_devcb);
-
-
-#define MCFG_TMS9928A_SCREEN_ADD_NTSC(_screen_tag) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	MCFG_SCREEN_ADD( _screen_tag, RASTER ) \
-	MCFG_SCREEN_RAW_PARAMS( XTAL(10'738'635) / 2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
-			tms9928a_device::TOTAL_VERT_NTSC, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12 )
-
-
-#define MCFG_TMS9928A_SCREEN_ADD_PAL(_screen_tag) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER ) \
-	MCFG_SCREEN_RAW_PARAMS( XTAL(10'738'635) / 2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
-			tms9928a_device::TOTAL_VERT_PAL, tms9928a_device::VERT_DISPLAY_START_PAL - 12, tms9928a_device::VERT_DISPLAY_START_PAL + 192 + 12 )
-
-
 DECLARE_DEVICE_TYPE(TMS9918,  tms9918_device)
 DECLARE_DEVICE_TYPE(TMS9918A, tms9918a_device)
 DECLARE_DEVICE_TYPE(TMS9118,  tms9118_device)
@@ -67,10 +46,12 @@ DECLARE_DEVICE_TYPE(TMS9128,  tms9128_device)
 DECLARE_DEVICE_TYPE(TMS9929,  tms9929_device)
 DECLARE_DEVICE_TYPE(TMS9929A, tms9929a_device)
 DECLARE_DEVICE_TYPE(TMS9129,  tms9129_device)
+DECLARE_DEVICE_TYPE(EFO90501, efo90501_device)
 
 
 class tms9928a_device : public device_t,
 						public device_memory_interface,
+						public device_palette_interface,
 						public device_video_interface
 {
 public:
@@ -89,16 +70,16 @@ public:
 	tms9928a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_vram_size(int vram_size) { m_vram_size = vram_size; }
-	template <class Object> devcb_base &set_out_int_line_callback(Object &&cb) { return m_out_int_line_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_gromclk_callback(Object &&cb) { return m_out_gromclk_cb.set_callback(std::forward<Object>(cb)); }
+	auto int_callback() { return m_out_int_line_cb.bind(); }
+	auto gromclk_callback() { return m_out_gromclk_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	DECLARE_READ8_MEMBER( vram_read );
-	DECLARE_WRITE8_MEMBER( vram_write );
-	DECLARE_READ8_MEMBER( register_read );
-	DECLARE_WRITE8_MEMBER( register_write );
+	DECLARE_READ8_MEMBER( vram_r ) { return vram_read(); }
+	DECLARE_WRITE8_MEMBER( vram_w ) { vram_write(data); }
+	DECLARE_READ8_MEMBER( register_r ) { return register_read(); }
+	DECLARE_WRITE8_MEMBER( register_w ) { register_write(data); }
 
 	u8 vram_read();
 	void vram_write(u8 data);
@@ -116,12 +97,16 @@ protected:
 	tms9928a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_50hz, bool is_reva, bool is_99);
 
 	// device-level overrides
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
+
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 16; }
 
 private:
 	void change_register(uint8_t reg, uint8_t val);
@@ -157,7 +142,6 @@ private:
 	const bool    m_50hz;
 	const bool    m_reva;
 	const bool    m_99;
-	rgb_t   m_palette[16];
 
 	/* memory */
 	const address_space_config      m_space_config;
@@ -220,6 +204,13 @@ class tms9129_device : public tms9928a_device
 {
 public:
 	tms9129_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+class efo90501_device : public tms9928a_device
+{
+public:
+	efo90501_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

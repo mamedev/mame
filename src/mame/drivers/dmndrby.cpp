@@ -57,6 +57,7 @@ DD10 DD14  DD18     H5            DD21
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -64,8 +65,8 @@ DD10 DD14  DD18     H5            DD21
 class dmndrby_state : public driver_device
 {
 public:
-	dmndrby_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dmndrby_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_scroll_ram(*this, "scroll_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
 		m_dderby_vidchars(*this, "vidchars"),
@@ -74,8 +75,15 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
+	void dderby(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	required_shared_ptr<uint8_t> m_scroll_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;
 	required_shared_ptr<uint8_t> m_dderby_vidchars;
@@ -84,21 +92,22 @@ public:
 	tilemap_t *m_racetrack_tilemap;
 	uint8_t m_io_port[8];
 	int m_bg;
-	DECLARE_WRITE8_MEMBER(dderby_sound_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(output_w);
-	TILE_GET_INFO_MEMBER(get_dmndrby_tile_info);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(dmndrby);
-	uint32_t screen_update_dderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(dderby_irq);
-	INTERRUPT_GEN_MEMBER(dderby_timer_irq);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void dderby(machine_config &config);
+
+	DECLARE_WRITE8_MEMBER(dderby_sound_w);
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_WRITE8_MEMBER(output_w);
+	TILE_GET_INFO_MEMBER(get_dmndrby_tile_info);
+	void dmndrby_palette(palette_device &palette) const;
+	uint32_t screen_update_dderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(dderby_irq);
+	INTERRUPT_GEN_MEMBER(dderby_timer_irq);
+
 	void dderby_sound_map(address_map &map);
 	void memmap(address_map &map);
 };
@@ -149,13 +158,13 @@ void dmndrby_state::memmap(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x8000, 0x8fff).ram().share("nvram");
-	map(0xc000, 0xc007).r(this, FUNC(dmndrby_state::input_r));
-	map(0xc000, 0xc007).w(this, FUNC(dmndrby_state::output_w));
+	map(0xc000, 0xc007).r(FUNC(dmndrby_state::input_r));
+	map(0xc000, 0xc007).w(FUNC(dmndrby_state::output_w));
 	map(0xc802, 0xc802).portr("DSW1");
 	map(0xc803, 0xc803).portr("DSW2");
 	map(0xca00, 0xca00).nopw();//(vblank_irq_w) //???
 	map(0xca01, 0xca01).nopw(); //watchdog
-	map(0xca02, 0xca02).ram().w(this, FUNC(dmndrby_state::dderby_sound_w));
+	map(0xca02, 0xca02).ram().w(FUNC(dmndrby_state::dderby_sound_w));
 	map(0xca03, 0xca03).nopw();//(timer_irq_w) //???
 	map(0xcc00, 0xcc05).ram().share("scroll_ram");
 	map(0xce08, 0xce1f).ram().share("sprite_ram"); // horse sprites
@@ -337,7 +346,7 @@ static const gfx_layout tiles8x8_layout2 =
 	8*8,
 };
 
-static GFXDECODE_START( dmndrby )
+static GFXDECODE_START( gfx_dmndrby )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 32*16, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout2, 0, 8)
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16_layout, 16*16, 32 )
@@ -466,51 +475,49 @@ wouldnt like to say its the most effective way though...
 }
 
 // copied from elsewhere. surely incorrect
-PALETTE_INIT_MEMBER(dmndrby_state, dmndrby)
+void dmndrby_state::dmndrby_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances_rg[3] = { 1000, 470, 220 };
-	static const int resistances_b [2] = { 470, 220 };
-	double rweights[3], gweights[3], bweights[2];
-	int i;
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double rweights[3], gweights[3], bweights[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3, &resistances_rg[0], rweights, 470, 0,
 			3, &resistances_rg[0], gweights, 470, 0,
 			2, &resistances_b[0],  bweights, 470, 0);
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x20; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = combine_3_weights(rweights, bit0, bit1, bit2);
+		// red component */
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_3_weights(rweights, bit0, bit1, bit2);
 
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = combine_3_weights(gweights, bit0, bit1, bit2);
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_3_weights(gweights, bit0, bit1, bit2);
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 6) & 0x01;
-		bit1 = (color_prom[i] >> 7) & 0x01;
-		b = combine_2_weights(bweights, bit0, bit1);
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_2_weights(bweights, bit0, bit1);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom = memregion("proms2")->base();
 
-	/* normal tiles use colors 0-15 */
-	for (i = 0x000; i < 0x300; i++)
+	// normal tiles use colors 0-15
+	for (int i = 0x000; i < 0x300; i++)
 	{
 		uint8_t ctabentry = color_prom[i];
 		palette.set_pen_indirect(i, ctabentry);
@@ -530,16 +537,16 @@ INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_timer_irq)
 
 MACHINE_CONFIG_START(dmndrby_state::dderby)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dmndrby_state,  dderby_irq)
-	MCFG_CPU_PERIODIC_INT_DRIVER(dmndrby_state, dderby_timer_irq,  244/2)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(memmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dmndrby_state,  dderby_irq)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(dmndrby_state, dderby_timer_irq,  244/2)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* verified on schematics */
-	MCFG_CPU_PROGRAM_MAP(dderby_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* verified on schematics */
+	MCFG_DEVICE_PROGRAM_MAP(dderby_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -548,19 +555,16 @@ MACHINE_CONFIG_START(dmndrby_state::dderby)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dmndrby_state, screen_update_dderby)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dmndrby)
-	MCFG_PALETTE_ADD("palette", 0x300)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x20)
-	MCFG_PALETTE_INIT_OWNER(dmndrby_state, dmndrby)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dmndrby);
+	PALETTE(config, m_palette, FUNC(dmndrby_state::dmndrby_palette), 0x300, 0x20);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1789750) // frequency guessed
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay1", 1789750).add_route(ALL_OUTPUTS, "mono", 0.35); // frequency guessed
 MACHINE_CONFIG_END
 
 
@@ -663,6 +667,6 @@ ROM_START( dmndrbya )
 ROM_END
 
 
-//    YEAR, NAME,     PARENT,  MACHINE, INPUT,   STATE,         INIT, MONITOR, COMPANY,       FULLNAME                    FLAGS
-GAME( 1994, dmndrby,  0,       dderby,  dderby,  dmndrby_state, 0,    ROT0,    "Electrocoin", "Diamond Derby (Newer)",    MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING ) // hack?
-GAME( 1986, dmndrbya, dmndrby, dderby,  dderbya, dmndrby_state, 0,    ROT0,    "Electrocoin", "Diamond Derby (Original)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING )
+//    YEAR, NAME,     PARENT,  MACHINE, INPUT,   STATE,         INIT,       MONITOR, COMPANY,       FULLNAME                    FLAGS
+GAME( 1994, dmndrby,  0,       dderby,  dderby,  dmndrby_state, empty_init, ROT0,    "Electrocoin", "Diamond Derby (Newer)",    MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING ) // hack?
+GAME( 1986, dmndrbya, dmndrby, dderby,  dderbya, dmndrby_state, empty_init, ROT0,    "Electrocoin", "Diamond Derby (Original)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING )

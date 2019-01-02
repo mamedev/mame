@@ -51,6 +51,7 @@ To Do:
 #include "sound/saa1099.h"
 #include "video/mc6845.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -59,35 +60,48 @@ class blitz68k_state : public driver_device
 {
 public:
 	blitz68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_nvram(*this, "nvram"),
-			m_frame_buffer(*this, "frame_buffer"),
-			m_blit_romaddr(*this, "blit_romaddr"),
-			m_blit_attr1_ram(*this, "blit_attr1_ram"),
-			m_blit_dst_ram_loword(*this, "blitram_loword"),
-			m_blit_attr2_ram(*this, "blit_attr2_ram"),
-			m_blit_dst_ram_hiword(*this, "blitram_hiword"),
-			m_blit_vregs(*this, "blit_vregs"),
-			m_blit_transpen(*this, "blit_transpen"),
-			m_leds0(*this, "leds0"),
-			m_leds1(*this, "leds1"),
-			m_leds2(*this, "leds2") ,
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")  { }
+		: driver_device(mconfig, type, tag)
+		, m_nvram(*this, "nvram")
+		, m_frame_buffer(*this, "frame_buffer")
+		, m_blit_romaddr(*this, "blit_romaddr")
+		, m_blit_attr1_ram(*this, "blit_attr1_ram")
+		, m_blit_dst_ram_loword(*this, "blitram_loword")
+		, m_blit_attr2_ram(*this, "blit_attr2_ram")
+		, m_blit_dst_ram_hiword(*this, "blitram_hiword")
+		, m_blit_vregs(*this, "blit_vregs")
+		, m_blit_transpen(*this, "blit_transpen")
+		, m_leds0(*this, "leds0")
+		, m_leds1(*this, "leds1")
+		, m_leds2(*this, "leds2")
+		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
+		, m_crtc(*this, "crtc")
+		, m_leds(*this, "led%u", 0U)
+	{ }
 
-	optional_shared_ptr<uint16_t> m_nvram;
-	std::unique_ptr<uint8_t[]> m_blit_buffer;
-	optional_shared_ptr<uint16_t> m_frame_buffer;
-	optional_shared_ptr<uint16_t> m_blit_romaddr;
-	optional_shared_ptr<uint16_t> m_blit_attr1_ram;
-	optional_shared_ptr<uint16_t> m_blit_dst_ram_loword;
-	optional_shared_ptr<uint16_t> m_blit_attr2_ram;
-	optional_shared_ptr<uint16_t> m_blit_dst_ram_hiword;
-	optional_shared_ptr<uint16_t> m_blit_vregs;
-	optional_shared_ptr<uint16_t> m_blit_transpen;
-	optional_shared_ptr<uint16_t> m_leds0;
-	optional_shared_ptr<uint16_t> m_leds1;
-	optional_shared_ptr<uint16_t> m_leds2;
+	void init_bankrob();
+	void init_cjffruit();
+	void init_deucesw2();
+	void init_megadble();
+	void init_bankroba();
+	void init_maxidbl();
+	void init_cj3play();
+	void init_megadblj();
+	void init_hermit();
+	void init_dualgame();
+
+	void hermit(machine_config &config);
+	void bankrob(machine_config &config);
+	void cjffruit(machine_config &config);
+	void steaser(machine_config &config);
+	void deucesw2(machine_config &config);
+	void ilpag(machine_config &config);
+	void maxidbl(machine_config &config);
+	void dualgame(machine_config &config);
+	void bankroba(machine_config &config);
+	void ramdac_config(machine_config &config);
+private:
+
 	DECLARE_WRITE16_MEMBER(blit_copy_w);
 	DECLARE_READ8_MEMBER(blit_status_r);
 	DECLARE_WRITE8_MEMBER(blit_x_w);
@@ -166,33 +180,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq1);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq3);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq5);
-	DECLARE_DRIVER_INIT(bankrob);
-	DECLARE_DRIVER_INIT(cjffruit);
-	DECLARE_DRIVER_INIT(deucesw2);
-	DECLARE_DRIVER_INIT(megadble);
-	DECLARE_DRIVER_INIT(bankroba);
-	DECLARE_DRIVER_INIT(maxidbl);
-	DECLARE_DRIVER_INIT(cj3play);
-	DECLARE_DRIVER_INIT(megadblj);
-	DECLARE_DRIVER_INIT(hermit);
-	DECLARE_DRIVER_INIT(dualgame);
 	DECLARE_VIDEO_START(blitz68k);
 	DECLARE_VIDEO_START(blitz68k_addr_factor1);
 	uint32_t screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(steaser_mcu_sim);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
-	void hermit(machine_config &config);
-	void bankrob(machine_config &config);
-	void cjffruit(machine_config &config);
-	void steaser(machine_config &config);
-	void deucesw2(machine_config &config);
-	void ilpag(machine_config &config);
-	void maxidbl(machine_config &config);
-	void dualgame(machine_config &config);
-	void bankroba(machine_config &config);
 	void bankrob_map(address_map &map);
 	void bankroba_map(address_map &map);
 	void cjffruit_map(address_map &map);
@@ -203,6 +196,26 @@ public:
 	void maxidbl_map(address_map &map);
 	void ramdac_map(address_map &map);
 	void steaser_map(address_map &map);
+
+	virtual void machine_start() override { m_leds.resolve(); }
+
+	optional_shared_ptr<uint16_t> m_nvram;
+	std::unique_ptr<uint8_t[]> m_blit_buffer;
+	optional_shared_ptr<uint16_t> m_frame_buffer;
+	optional_shared_ptr<uint16_t> m_blit_romaddr;
+	optional_shared_ptr<uint16_t> m_blit_attr1_ram;
+	optional_shared_ptr<uint16_t> m_blit_dst_ram_loword;
+	optional_shared_ptr<uint16_t> m_blit_attr2_ram;
+	optional_shared_ptr<uint16_t> m_blit_dst_ram_hiword;
+	optional_shared_ptr<uint16_t> m_blit_vregs;
+	optional_shared_ptr<uint16_t> m_blit_transpen;
+	optional_shared_ptr<uint16_t> m_leds0;
+	optional_shared_ptr<uint16_t> m_leds1;
+	optional_shared_ptr<uint16_t> m_leds2;
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	optional_device<mc6845_device> m_crtc;
+	output_finder<17> m_leds;
 };
 
 /*************************************************************************************************************
@@ -638,10 +651,10 @@ void blitz68k_state::ilpag_map(address_map &map)
 	map(0x9a0000, 0x9a0001).ram().share("blit_attr1_ram");
 	map(0x9a8000, 0x9a8001).ram().share("blitram_loword");
 	map(0x9b0000, 0x9b0001).ram().share("blit_attr2_ram");
-	map(0x9b8000, 0x9b8001).ram().w(this, FUNC(blitz68k_state::blit_copy_w)).share("blitram_hiword");
-	map(0x9e0000, 0x9e0001).r(this, FUNC(blitz68k_state::blitter_status_r));
+	map(0x9b8000, 0x9b8001).ram().w(FUNC(blitz68k_state::blit_copy_w)).share("blitram_hiword");
+	map(0x9e0000, 0x9e0001).r(FUNC(blitz68k_state::blitter_status_r));
 
-	map(0xc00000, 0xc00001).w(this, FUNC(blitz68k_state::lamps_w));
+	map(0xc00000, 0xc00001).w(FUNC(blitz68k_state::lamps_w));
 	map(0xc00180, 0xc00181).portr("IN2");
 //  AM_RANGE(0xc00200, 0xc00201) AM_WRITE(sound_write_w)
 	map(0xc00380, 0xc00381).portr("IN3");
@@ -654,9 +667,9 @@ void blitz68k_state::steaser_map(address_map &map)
 	map(0x100000, 0x1fffff).rom().region("blitter", 0);
 	map(0x200000, 0x20ffff).ram().share("nvram");
 
-	map(0x800000, 0x800001).r(this, FUNC(blitz68k_state::test_r));
+	map(0x800000, 0x800001).r(FUNC(blitz68k_state::test_r));
 //  AM_RANGE(0x840000, 0x840001) AM_WRITE(sound_write_w)
-	map(0x880000, 0x880001).r(this, FUNC(blitz68k_state::test_r));
+	map(0x880000, 0x880001).r(FUNC(blitz68k_state::test_r));
 //  AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE(sound_write_w)
 
 	map(0x900000, 0x900000).w("ramdac", FUNC(ramdac_device::index_w));
@@ -669,14 +682,14 @@ void blitz68k_state::steaser_map(address_map &map)
 	map(0x9a0000, 0x9a0001).ram().share("blit_attr1_ram");
 	map(0x9a8000, 0x9a8001).ram().share("blitram_loword");
 	map(0x9b0000, 0x9b0001).ram().share("blit_attr2_ram");
-	map(0x9b8000, 0x9b8001).ram().w(this, FUNC(blitz68k_state::blit_copy_w)).share("blitram_hiword");
+	map(0x9b8000, 0x9b8001).ram().w(FUNC(blitz68k_state::blit_copy_w)).share("blitram_hiword");
 	map(0x9c0002, 0x9c0003).nopr(); //pen control?
 	map(0x9d0000, 0x9d0001).nopr(); //?
-	map(0x9e0000, 0x9e0001).r(this, FUNC(blitz68k_state::blitter_status_r));
+	map(0x9e0000, 0x9e0001).r(FUNC(blitz68k_state::blitter_status_r));
 	map(0x9f0000, 0x9f0001).nopw(); //???
 
 //  AM_RANGE(0xc00000, 0xc00001) AM_WRITE(lamps_w)
-	map(0xbd0000, 0xbd0001).r(this, FUNC(blitz68k_state::test_r));
+	map(0xbd0000, 0xbd0001).r(FUNC(blitz68k_state::test_r));
 //  AM_RANGE(0xc00200, 0xc00201) AM_WRITE(sound_write_w)
 //  AM_RANGE(0xc00380, 0xc00381) AM_READ_PORT("IN3")
 //  AM_RANGE(0xc00300, 0xc00301) AM_WRITE(irq_callback_w)
@@ -727,48 +740,48 @@ void blitz68k_state::bankrob_map(address_map &map)
 	map(0x220000, 0x220000).r("ramdac", FUNC(ramdac_device::index_r));
 	map(0x220002, 0x220002).r("ramdac", FUNC(ramdac_device::pal_r));
 
-	map(0x240000, 0x240000).w(this, FUNC(blitz68k_state::blit_addr0_w));
-	map(0x240002, 0x240002).w(this, FUNC(blitz68k_state::blit_addr1_w));
-	map(0x240004, 0x240004).w(this, FUNC(blitz68k_state::blit_addr2_w));
+	map(0x240000, 0x240000).w(FUNC(blitz68k_state::blit_addr0_w));
+	map(0x240002, 0x240002).w(FUNC(blitz68k_state::blit_addr1_w));
+	map(0x240004, 0x240004).w(FUNC(blitz68k_state::blit_addr2_w));
 
-	map(0x240006, 0x240006).w(this, FUNC(blitz68k_state::blit_x_w));
-	map(0x240008, 0x240008).w(this, FUNC(blitz68k_state::blit_y_w));
+	map(0x240006, 0x240006).w(FUNC(blitz68k_state::blit_x_w));
+	map(0x240008, 0x240008).w(FUNC(blitz68k_state::blit_y_w));
 
-	map(0x24000a, 0x24000a).w(this, FUNC(blitz68k_state::blit_w_w));
-	map(0x24000c, 0x24000c).w(this, FUNC(blitz68k_state::blit_h_w));
+	map(0x24000a, 0x24000a).w(FUNC(blitz68k_state::blit_w_w));
+	map(0x24000c, 0x24000c).w(FUNC(blitz68k_state::blit_h_w));
 
-	map(0x24000e, 0x24000e).w(this, FUNC(blitz68k_state::blit_draw_w));
+	map(0x24000e, 0x24000e).w(FUNC(blitz68k_state::blit_draw_w));
 
-	map(0x260000, 0x260000).w(this, FUNC(blitz68k_state::blit_pen0_w));
-	map(0x260002, 0x260002).w(this, FUNC(blitz68k_state::blit_pen1_w));
-	map(0x260004, 0x260004).w(this, FUNC(blitz68k_state::blit_pen2_w));
-	map(0x260006, 0x260006).w(this, FUNC(blitz68k_state::blit_pen3_w));
+	map(0x260000, 0x260000).w(FUNC(blitz68k_state::blit_pen0_w));
+	map(0x260002, 0x260002).w(FUNC(blitz68k_state::blit_pen1_w));
+	map(0x260004, 0x260004).w(FUNC(blitz68k_state::blit_pen2_w));
+	map(0x260006, 0x260006).w(FUNC(blitz68k_state::blit_pen3_w));
 
-	map(0x280000, 0x280001).r(this, FUNC(blitz68k_state::blitter_status_r));
+	map(0x280000, 0x280001).r(FUNC(blitz68k_state::blitter_status_r));
 
 	map(0x2c0000, 0x2c0001).nopw();    // 1->0
 
-	map(0x2e0000, 0x2e0000).w(this, FUNC(blitz68k_state::blit_flag0_w));
-	map(0x2e0002, 0x2e0002).w(this, FUNC(blitz68k_state::blit_flag1_w));
-	map(0x2e0004, 0x2e0004).w(this, FUNC(blitz68k_state::blit_flipx_w));
-	map(0x2e0006, 0x2e0006).w(this, FUNC(blitz68k_state::blit_flipy_w));
-	map(0x2e0008, 0x2e0008).w(this, FUNC(blitz68k_state::blit_solid_w));
-	map(0x2e000a, 0x2e000a).w(this, FUNC(blitz68k_state::blit_trans_w));
-	map(0x2e000c, 0x2e000c).w(this, FUNC(blitz68k_state::blit_flag6_w));
-	map(0x2e000e, 0x2e000e).w(this, FUNC(blitz68k_state::blit_flag7_w));
+	map(0x2e0000, 0x2e0000).w(FUNC(blitz68k_state::blit_flag0_w));
+	map(0x2e0002, 0x2e0002).w(FUNC(blitz68k_state::blit_flag1_w));
+	map(0x2e0004, 0x2e0004).w(FUNC(blitz68k_state::blit_flipx_w));
+	map(0x2e0006, 0x2e0006).w(FUNC(blitz68k_state::blit_flipy_w));
+	map(0x2e0008, 0x2e0008).w(FUNC(blitz68k_state::blit_solid_w));
+	map(0x2e000a, 0x2e000a).w(FUNC(blitz68k_state::blit_trans_w));
+	map(0x2e000c, 0x2e000c).w(FUNC(blitz68k_state::blit_flag6_w));
+	map(0x2e000e, 0x2e000e).w(FUNC(blitz68k_state::blit_flag7_w));
 
 	map(0x300000, 0x300000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x300002, 0x300002).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x300004, 0x300004).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	map(0x400001, 0x400001).r(this, FUNC(blitz68k_state::bankrob_mcu_status_write_r));
-	map(0x400003, 0x400003).r(this, FUNC(blitz68k_state::bankrob_mcu_status_read_r));
+	map(0x400001, 0x400001).r(FUNC(blitz68k_state::bankrob_mcu_status_write_r));
+	map(0x400003, 0x400003).r(FUNC(blitz68k_state::bankrob_mcu_status_read_r));
 
-	map(0x400005, 0x400005).rw(this, FUNC(blitz68k_state::bankrob_mcu1_r), FUNC(blitz68k_state::bankrob_mcu1_w));
-	map(0x400006, 0x400006).rw(this, FUNC(blitz68k_state::bankrob_mcu2_r), FUNC(blitz68k_state::bankrob_mcu2_w));
+	map(0x400005, 0x400005).rw(FUNC(blitz68k_state::bankrob_mcu1_r), FUNC(blitz68k_state::bankrob_mcu1_w));
+	map(0x400006, 0x400006).rw(FUNC(blitz68k_state::bankrob_mcu2_r), FUNC(blitz68k_state::bankrob_mcu2_w));
 
-	map(0x800000, 0x800000).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));    // triggered by MCU?
-	map(0x800002, 0x800002).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x800000, 0x800000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));    // triggered by MCU?
+	map(0x800002, 0x800002).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
 
 // bankroba:
@@ -810,11 +823,11 @@ void blitz68k_state::bankroba_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x200000, 0x20ffff).ram();
 
-	map(0x800001, 0x800001).r(this, FUNC(blitz68k_state::bankroba_mcu1_r));  // lev 4
-	map(0x840001, 0x840001).w(this, FUNC(blitz68k_state::bankroba_mcu1_w));
+	map(0x800001, 0x800001).r(FUNC(blitz68k_state::bankroba_mcu1_r));  // lev 4
+	map(0x840001, 0x840001).w(FUNC(blitz68k_state::bankroba_mcu1_w));
 
-	map(0x880001, 0x880001).r(this, FUNC(blitz68k_state::bankroba_mcu2_r));  // lev 3
-	map(0x8c0001, 0x8c0001).w(this, FUNC(blitz68k_state::bankroba_mcu2_w));
+	map(0x880001, 0x880001).r(FUNC(blitz68k_state::bankroba_mcu2_r));  // lev 3
+	map(0x8c0001, 0x8c0001).w(FUNC(blitz68k_state::bankroba_mcu2_w));
 
 	map(0x900000, 0x900000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x900002, 0x900002).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -822,39 +835,39 @@ void blitz68k_state::bankroba_map(address_map &map)
 
 //  AM_RANGE(0x940000, 0x940001) AM_WRITE   // lev 6
 
-	map(0x980000, 0x980000).w(this, FUNC(blitz68k_state::blit_flag0_w));
-	map(0x980002, 0x980002).w(this, FUNC(blitz68k_state::blit_flag1_w));
-	map(0x980004, 0x980004).w(this, FUNC(blitz68k_state::blit_flipx_w));
-	map(0x980006, 0x980006).w(this, FUNC(blitz68k_state::blit_flipy_w));
-	map(0x980008, 0x980008).w(this, FUNC(blitz68k_state::blit_solid_w));
-	map(0x98000a, 0x98000a).w(this, FUNC(blitz68k_state::blit_trans_w));
-	map(0x98000c, 0x98000c).w(this, FUNC(blitz68k_state::blit_flag6_w));
-	map(0x98000e, 0x98000e).w(this, FUNC(blitz68k_state::blit_flag7_w));
+	map(0x980000, 0x980000).w(FUNC(blitz68k_state::blit_flag0_w));
+	map(0x980002, 0x980002).w(FUNC(blitz68k_state::blit_flag1_w));
+	map(0x980004, 0x980004).w(FUNC(blitz68k_state::blit_flipx_w));
+	map(0x980006, 0x980006).w(FUNC(blitz68k_state::blit_flipy_w));
+	map(0x980008, 0x980008).w(FUNC(blitz68k_state::blit_solid_w));
+	map(0x98000a, 0x98000a).w(FUNC(blitz68k_state::blit_trans_w));
+	map(0x98000c, 0x98000c).w(FUNC(blitz68k_state::blit_flag6_w));
+	map(0x98000e, 0x98000e).w(FUNC(blitz68k_state::blit_flag7_w));
 
-	map(0x990000, 0x990000).w(this, FUNC(blitz68k_state::blit_pen0_w));
-	map(0x990002, 0x990002).w(this, FUNC(blitz68k_state::blit_pen1_w));
-	map(0x990004, 0x990004).w(this, FUNC(blitz68k_state::blit_pen2_w));
-	map(0x990006, 0x990006).w(this, FUNC(blitz68k_state::blit_pen3_w));
+	map(0x990000, 0x990000).w(FUNC(blitz68k_state::blit_pen0_w));
+	map(0x990002, 0x990002).w(FUNC(blitz68k_state::blit_pen1_w));
+	map(0x990004, 0x990004).w(FUNC(blitz68k_state::blit_pen2_w));
+	map(0x990006, 0x990006).w(FUNC(blitz68k_state::blit_pen3_w));
 
-	map(0x998000, 0x998001).w(this, FUNC(blitz68k_state::blit_addr01_w));
-	map(0x9a0000, 0x9a0000).w(this, FUNC(blitz68k_state::blit_addr2_w));
+	map(0x998000, 0x998001).w(FUNC(blitz68k_state::blit_addr01_w));
+	map(0x9a0000, 0x9a0000).w(FUNC(blitz68k_state::blit_addr2_w));
 
-	map(0x9a8000, 0x9a8001).w(this, FUNC(blitz68k_state::blit_xy_w));
+	map(0x9a8000, 0x9a8001).w(FUNC(blitz68k_state::blit_xy_w));
 
-	map(0x9b0000, 0x9b0001).w(this, FUNC(blitz68k_state::blit_wh_w));
+	map(0x9b0000, 0x9b0001).w(FUNC(blitz68k_state::blit_wh_w));
 
-	map(0x9b8001, 0x9b8001).w(this, FUNC(blitz68k_state::blit_draw_w));
+	map(0x9b8001, 0x9b8001).w(FUNC(blitz68k_state::blit_draw_w));
 
 	map(0x9c0000, 0x9c0000).r("ramdac", FUNC(ramdac_device::index_r));
 	map(0x9c0002, 0x9c0002).r("ramdac", FUNC(ramdac_device::pal_r));
 
-	map(0x9d0000, 0x9d0000).r(this, FUNC(blitz68k_state::bankroba_mcu1_status_write_r));
+	map(0x9d0000, 0x9d0000).r(FUNC(blitz68k_state::bankroba_mcu1_status_write_r));
 
-	map(0x9e0000, 0x9e0001).r(this, FUNC(blitz68k_state::blitter_status_r));
+	map(0x9e0000, 0x9e0001).r(FUNC(blitz68k_state::blitter_status_r));
 
 	map(0x9f0000, 0x9f0001).nopw(); // 1
 
-	map(0xbd0000, 0xbd0000).r(this, FUNC(blitz68k_state::bankroba_mcu2_status_write_r));
+	map(0xbd0000, 0xbd0000).r(FUNC(blitz68k_state::bankroba_mcu2_status_write_r));
 
 	// CRTC connected to MCU?
 }
@@ -869,13 +882,13 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds1_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x0100);    // coin in
-		output().set_led_value(0, data & 0x0200);    // win???
+		m_leds[0] = BIT(data, 9);     // win???
 //                                     1  data & 0x0400     // win???
-		output().set_led_value(2, data & 0x0800);    // small
-		output().set_led_value(3, data & 0x1000);    // big
-		output().set_led_value(4, data & 0x2000);    // take
-		output().set_led_value(5, data & 0x4000);    // double up
-		output().set_led_value(6, data & 0x8000);    // cancel
+		m_leds[2] = BIT(data, 11);    // small
+		m_leds[3] = BIT(data, 12);    // big
+		m_leds[4] = BIT(data, 13);    // take
+		m_leds[5] = BIT(data, 14);    // double up
+		m_leds[6] = BIT(data, 15);    // cancel
 		show_leds123();
 	}
 }
@@ -885,14 +898,14 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds2_w)
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value( 7, data & 0x0100);   // start
-		output().set_led_value( 8, data & 0x0200);   // bet
-		output().set_led_value( 9, data & 0x0400);   // hold 5
-		output().set_led_value(10, data & 0x0800);   // hold 4
-		output().set_led_value(11, data & 0x1000);   // hold 3
-		output().set_led_value(12, data & 0x2000);   // hold 2
-		output().set_led_value(13, data & 0x4000);   // collect
-		output().set_led_value(14, data & 0x8000);   // call attendant
+		m_leds[ 7] = BIT(data, 8);    // start
+		m_leds[ 8] = BIT(data, 9);    // bet
+		m_leds[ 9] = BIT(data, 10);   // hold 5
+		m_leds[10] = BIT(data, 11);   // hold 4
+		m_leds[11] = BIT(data, 12);   // hold 3
+		m_leds[12] = BIT(data, 13);   // hold 2
+		m_leds[13] = BIT(data, 14);   // collect
+		m_leds[14] = BIT(data, 15);   // call attendant
 		show_leds123();
 	}
 }
@@ -902,8 +915,8 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
 	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(15, data & 0x0100);   // hopper coins?
-		output().set_led_value(16, data & 0x0400);   // coin out?
+		m_leds[15] = BIT(data, 8);    // hopper coins?
+		m_leds[16] = BIT(data, 10);   // coin out?
 		show_leds123();
 	}
 }
@@ -911,28 +924,25 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
 // CRTC
 READ8_MEMBER(blitz68k_state::crtc_r)
 {
-	mc6845_device *mc6845 = machine().device<mc6845_device>("crtc");
 	if (offset)
-		return mc6845->register_r(space, 0);
+		return m_crtc->register_r(space, 0);
 	else
-		return mc6845->status_r(space, 0);
+		return m_crtc->status_r(space, 0);
 }
 
 WRITE8_MEMBER(blitz68k_state::crtc_w)
 {
-	mc6845_device *mc6845 = machine().device<mc6845_device>("crtc");
 	if (offset)
-		mc6845->register_w(space, 0, data);
+		m_crtc->register_w(space, 0, data);
 	else
-		mc6845->address_w(space, 0, data);
+		m_crtc->address_w(space, 0, data);
 }
 
 WRITE16_MEMBER(blitz68k_state::crtc_lpen_w)
 {
-	device_t *device = machine().device("crtc");
 	// 8fe0006: 0->1
 	if (ACCESSING_BITS_8_15 && (data & 0x0100))
-		downcast<mc6845_device *>(device)->assert_light_pen_input();
+		m_crtc->assert_light_pen_input();
 	// 8fe0007: 1->0 (MCU irq?)
 }
 
@@ -955,9 +965,9 @@ void blitz68k_state::cjffruit_map(address_map &map)
 	map(0x400000, 0x41ffff).ram().share("nvram");
 	map(0x480000, 0x4807ff).ram();
 
-	map(0x820000, 0x820007).w(this, FUNC(blitz68k_state::blit_hwyxa_draw_w));
+	map(0x820000, 0x820007).w(FUNC(blitz68k_state::blit_hwyxa_draw_w));
 
-	map(0x850000, 0x850001).r(this, FUNC(blitz68k_state::cjffruit_mcu_r));
+	map(0x850000, 0x850001).r(FUNC(blitz68k_state::cjffruit_mcu_r));
 
 	map(0x870000, 0x870001).portr("IN0");
 	map(0x872000, 0x872001).portr("IN1");
@@ -970,21 +980,21 @@ void blitz68k_state::cjffruit_map(address_map &map)
 	map(0x880000, 0x880000).r("ramdac", FUNC(ramdac_device::index_r));
 	map(0x880001, 0x880001).r("ramdac", FUNC(ramdac_device::pal_r));
 
-	map(0x8a0000, 0x8a0007).w(this, FUNC(blitz68k_state::blit_hwyxa_draw_w));
+	map(0x8a0000, 0x8a0007).w(FUNC(blitz68k_state::blit_hwyxa_draw_w));
 
-	map(0x8b0000, 0x8b0003).w(this, FUNC(blitz68k_state::blit_pens_w));
+	map(0x8b0000, 0x8b0003).w(FUNC(blitz68k_state::blit_pens_w));
 
-	map(0x8e0000, 0x8e0001).w(this, FUNC(blitz68k_state::cjffruit_mcu_w));
+	map(0x8e0000, 0x8e0001).w(FUNC(blitz68k_state::cjffruit_mcu_w));
 
-	map(0x8f8000, 0x8f8001).w(this, FUNC(blitz68k_state::cjffruit_leds1_w)).share("leds0");
-	map(0x8fa000, 0x8fa001).w(this, FUNC(blitz68k_state::cjffruit_leds2_w)).share("leds1");
-	map(0x8fc000, 0x8fc001).w(this, FUNC(blitz68k_state::cjffruit_leds3_w)).share("leds2");
+	map(0x8f8000, 0x8f8001).w(FUNC(blitz68k_state::cjffruit_leds1_w)).share("leds0");
+	map(0x8fa000, 0x8fa001).w(FUNC(blitz68k_state::cjffruit_leds2_w)).share("leds1");
+	map(0x8fc000, 0x8fc001).w(FUNC(blitz68k_state::cjffruit_leds3_w)).share("leds2");
 
-	map(0x8fe000, 0x8fe003).w(this, FUNC(blitz68k_state::blit_flags_w));    // flipx,y,solid,trans
+	map(0x8fe000, 0x8fe003).w(FUNC(blitz68k_state::blit_flags_w));    // flipx,y,solid,trans
 	map(0x8fe004, 0x8fe005).writeonly();
-	map(0x8fe006, 0x8fe007).w(this, FUNC(blitz68k_state::crtc_lpen_w));  // 0x8fe006: 0->1, 0x8fe007: 1->0
+	map(0x8fe006, 0x8fe007).w(FUNC(blitz68k_state::crtc_lpen_w));  // 0x8fe006: 0->1, 0x8fe007: 1->0
 
-	map(0xc40000, 0xc40001).rw(this, FUNC(blitz68k_state::crtc_r), FUNC(blitz68k_state::crtc_w));
+	map(0xc40000, 0xc40001).rw(FUNC(blitz68k_state::crtc_r), FUNC(blitz68k_state::crtc_w));
 }
 
 /*************************************************************************************************************
@@ -1010,13 +1020,13 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds1_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x0100);    // coin in
-		output().set_led_value(0, data & 0x0200);    // win???
+		m_leds[0] = BIT(data, 9);     // win???
 //                                     1  data & 0x0400     // win???
-		output().set_led_value(2, data & 0x0800);    // small
-		output().set_led_value(3, data & 0x1000);    // big
-		output().set_led_value(4, data & 0x2000);    // take
-		output().set_led_value(5, data & 0x4000);    // double up
-		output().set_led_value(6, data & 0x8000);    // cancel
+		m_leds[2] = BIT(data, 11);    // small
+		m_leds[3] = BIT(data, 12);    // big
+		m_leds[4] = BIT(data, 13);    // take
+		m_leds[5] = BIT(data, 14);    // double up
+		m_leds[6] = BIT(data, 15);    // cancel
 		show_leds123();
 	}
 }
@@ -1026,14 +1036,14 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds2_w)
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value( 7, data & 0x0100);   // start
-		output().set_led_value( 8, data & 0x0200);   // bet
-		output().set_led_value( 9, data & 0x0400);   // hold 5
-		output().set_led_value(10, data & 0x0800);   // hold 4
-		output().set_led_value(11, data & 0x1000);   // hold 3
-		output().set_led_value(12, data & 0x2000);   // hold 2
-		output().set_led_value(13, data & 0x4000);   // hold 1
-		output().set_led_value(14, data & 0x8000);   // call attendant
+		m_leds[ 7] = BIT(data, 8);    // start
+		m_leds[ 8] = BIT(data, 9);    // bet
+		m_leds[ 9] = BIT(data, 10);   // hold 5
+		m_leds[10] = BIT(data, 11);   // hold 4
+		m_leds[11] = BIT(data, 12);   // hold 3
+		m_leds[12] = BIT(data, 13);   // hold 2
+		m_leds[13] = BIT(data, 14);   // hold 1
+		m_leds[14] = BIT(data, 15);   // call attendant
 		show_leds123();
 	}
 }
@@ -1043,8 +1053,8 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds3_w)
 	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value(15, data & 0x0100);   // hopper coins?
-		output().set_led_value(16, data & 0x0400);   // coin out?
+		m_leds[15] = BIT(data, 8);    // hopper coins?
+		m_leds[16] = BIT(data, 10);   // coin out?
 		show_leds123();
 	}
 }
@@ -1054,37 +1064,37 @@ void blitz68k_state::deucesw2_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x400000, 0x41ffff).ram();
 
-	map(0x800000, 0x800007).w(this, FUNC(blitz68k_state::blit_hwyxa_draw_w));
+	map(0x800000, 0x800007).w(FUNC(blitz68k_state::blit_hwyxa_draw_w));
 
 	map(0x812000, 0x812000).r("ramdac", FUNC(ramdac_device::index_r));
 	map(0x812001, 0x812001).r("ramdac", FUNC(ramdac_device::pal_r));
 
-	map(0x830000, 0x830001).r(this, FUNC(blitz68k_state::deucesw2_mcu_r));
+	map(0x830000, 0x830001).r(FUNC(blitz68k_state::deucesw2_mcu_r));
 
 	map(0x840000, 0x840001).portr("IN0");
 	map(0x850000, 0x850001).portr("IN1");
 	map(0x860000, 0x860001).portr("IN2");
 	map(0x870000, 0x870001).portr("DSW");
 
-	map(0x880000, 0x880007).w(this, FUNC(blitz68k_state::blit_hwyxa_draw_w));
+	map(0x880000, 0x880007).w(FUNC(blitz68k_state::blit_hwyxa_draw_w));
 
 	map(0x890000, 0x890000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x890001, 0x890001).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x890002, 0x890002).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	map(0x894000, 0x894003).w(this, FUNC(blitz68k_state::blit_pens_w));
+	map(0x894000, 0x894003).w(FUNC(blitz68k_state::blit_pens_w));
 
-	map(0x896000, 0x896001).w(this, FUNC(blitz68k_state::deucesw2_mcu_w));
+	map(0x896000, 0x896001).w(FUNC(blitz68k_state::deucesw2_mcu_w));
 
-	map(0x898000, 0x898001).w(this, FUNC(blitz68k_state::deucesw2_leds1_w)).share("leds0");
-	map(0x89a000, 0x89a001).w(this, FUNC(blitz68k_state::deucesw2_leds2_w)).share("leds1");
-	map(0x89c000, 0x89c001).w(this, FUNC(blitz68k_state::deucesw2_leds3_w)).share("leds2");
+	map(0x898000, 0x898001).w(FUNC(blitz68k_state::deucesw2_leds1_w)).share("leds0");
+	map(0x89a000, 0x89a001).w(FUNC(blitz68k_state::deucesw2_leds2_w)).share("leds1");
+	map(0x89c000, 0x89c001).w(FUNC(blitz68k_state::deucesw2_leds3_w)).share("leds2");
 
-	map(0x89e000, 0x89e003).w(this, FUNC(blitz68k_state::blit_flags_w));    // flipx,y,solid,trans
+	map(0x89e000, 0x89e003).w(FUNC(blitz68k_state::blit_flags_w));    // flipx,y,solid,trans
 	map(0x89e004, 0x89e005).writeonly();
-	map(0x89e006, 0x89e007).w(this, FUNC(blitz68k_state::crtc_lpen_w));  // 0x89e006: 0->1, 0x89e007: 1->0
+	map(0x89e006, 0x89e007).w(FUNC(blitz68k_state::crtc_lpen_w));  // 0x89e006: 0->1, 0x89e007: 1->0
 
-	map(0xc00000, 0xc00001).rw(this, FUNC(blitz68k_state::crtc_r), FUNC(blitz68k_state::crtc_w));
+	map(0xc00000, 0xc00001).rw(FUNC(blitz68k_state::crtc_r), FUNC(blitz68k_state::crtc_w));
 }
 
 /*************************************************************************************************************
@@ -1132,51 +1142,51 @@ void blitz68k_state::dualgame_map(address_map &map)
 	map(0x220002, 0x220002).r("ramdac", FUNC(ramdac_device::index_r));
 	map(0x220003, 0x220003).r("ramdac", FUNC(ramdac_device::pal_r));
 
-	map(0x240000, 0x240000).w(this, FUNC(blitz68k_state::blit_addr0_w));
-	map(0x240002, 0x240002).w(this, FUNC(blitz68k_state::blit_addr1_w));
-	map(0x240004, 0x240004).w(this, FUNC(blitz68k_state::blit_addr2_w));
+	map(0x240000, 0x240000).w(FUNC(blitz68k_state::blit_addr0_w));
+	map(0x240002, 0x240002).w(FUNC(blitz68k_state::blit_addr1_w));
+	map(0x240004, 0x240004).w(FUNC(blitz68k_state::blit_addr2_w));
 
-	map(0x240006, 0x240006).w(this, FUNC(blitz68k_state::blit_x_w));
-	map(0x240008, 0x240008).w(this, FUNC(blitz68k_state::blit_y_w));
+	map(0x240006, 0x240006).w(FUNC(blitz68k_state::blit_x_w));
+	map(0x240008, 0x240008).w(FUNC(blitz68k_state::blit_y_w));
 
-	map(0x24000a, 0x24000a).w(this, FUNC(blitz68k_state::blit_w_w));
-	map(0x24000c, 0x24000c).w(this, FUNC(blitz68k_state::blit_h_w));
+	map(0x24000a, 0x24000a).w(FUNC(blitz68k_state::blit_w_w));
+	map(0x24000c, 0x24000c).w(FUNC(blitz68k_state::blit_h_w));
 
-	map(0x24000e, 0x24000e).w(this, FUNC(blitz68k_state::blit_draw_w));
+	map(0x24000e, 0x24000e).w(FUNC(blitz68k_state::blit_draw_w));
 
-	map(0x260000, 0x260000).w(this, FUNC(blitz68k_state::blit_pen0_w));
-	map(0x260002, 0x260002).w(this, FUNC(blitz68k_state::blit_pen1_w));
-	map(0x260004, 0x260004).w(this, FUNC(blitz68k_state::blit_pen2_w));
-	map(0x260006, 0x260006).w(this, FUNC(blitz68k_state::blit_pen3_w));
+	map(0x260000, 0x260000).w(FUNC(blitz68k_state::blit_pen0_w));
+	map(0x260002, 0x260002).w(FUNC(blitz68k_state::blit_pen1_w));
+	map(0x260004, 0x260004).w(FUNC(blitz68k_state::blit_pen2_w));
+	map(0x260006, 0x260006).w(FUNC(blitz68k_state::blit_pen3_w));
 
-	map(0x280000, 0x280000).r(this, FUNC(blitz68k_state::blit_status_r));
+	map(0x280000, 0x280000).r(FUNC(blitz68k_state::blit_status_r));
 
-	map(0x2a0000, 0x2a0001).w(this, FUNC(blitz68k_state::crtc_lpen_w));
+	map(0x2a0000, 0x2a0001).w(FUNC(blitz68k_state::crtc_lpen_w));
 	map(0x2a0000, 0x2a0001).nopr();
 
 	map(0x2c0000, 0x2c0001).nopw();    // 1->0 (MCU related?)
 
-	map(0x2e0000, 0x2e0000).w(this, FUNC(blitz68k_state::blit_flag0_w));
-	map(0x2e0002, 0x2e0002).w(this, FUNC(blitz68k_state::blit_flag1_w));
-	map(0x2e0004, 0x2e0004).w(this, FUNC(blitz68k_state::blit_flipx_w));    // flipx
-	map(0x2e0006, 0x2e0006).w(this, FUNC(blitz68k_state::blit_flipy_w));    // flipy
-	map(0x2e0008, 0x2e0008).w(this, FUNC(blitz68k_state::blit_solid_w));    // solid
-	map(0x2e000a, 0x2e000a).w(this, FUNC(blitz68k_state::blit_trans_w));    // transparency
-	map(0x2e000c, 0x2e000c).w(this, FUNC(blitz68k_state::blit_flag6_w));
-	map(0x2e000e, 0x2e000e).w(this, FUNC(blitz68k_state::blit_flag7_w));
+	map(0x2e0000, 0x2e0000).w(FUNC(blitz68k_state::blit_flag0_w));
+	map(0x2e0002, 0x2e0002).w(FUNC(blitz68k_state::blit_flag1_w));
+	map(0x2e0004, 0x2e0004).w(FUNC(blitz68k_state::blit_flipx_w));    // flipx
+	map(0x2e0006, 0x2e0006).w(FUNC(blitz68k_state::blit_flipy_w));    // flipy
+	map(0x2e0008, 0x2e0008).w(FUNC(blitz68k_state::blit_solid_w));    // solid
+	map(0x2e000a, 0x2e000a).w(FUNC(blitz68k_state::blit_trans_w));    // transparency
+	map(0x2e000c, 0x2e000c).w(FUNC(blitz68k_state::blit_flag6_w));
+	map(0x2e000e, 0x2e000e).w(FUNC(blitz68k_state::blit_flag7_w));
 
 	map(0x300000, 0x300000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x300002, 0x300002).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x300004, 0x300004).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	map(0x400001, 0x400001).r(this, FUNC(blitz68k_state::dualgame_mcu_status_write_r));
-	map(0x400003, 0x400003).r(this, FUNC(blitz68k_state::dualgame_mcu_status_read_r));
+	map(0x400001, 0x400001).r(FUNC(blitz68k_state::dualgame_mcu_status_write_r));
+	map(0x400003, 0x400003).r(FUNC(blitz68k_state::dualgame_mcu_status_read_r));
 
-	map(0x400005, 0x400005).rw(this, FUNC(blitz68k_state::dualgame_mcu1_r), FUNC(blitz68k_state::dualgame_mcu1_w));
-	map(0x400006, 0x400006).rw(this, FUNC(blitz68k_state::dualgame_mcu2_r), FUNC(blitz68k_state::dualgame_mcu2_w));
+	map(0x400005, 0x400005).rw(FUNC(blitz68k_state::dualgame_mcu1_r), FUNC(blitz68k_state::dualgame_mcu1_w));
+	map(0x400006, 0x400006).rw(FUNC(blitz68k_state::dualgame_mcu2_r), FUNC(blitz68k_state::dualgame_mcu2_w));
 
-	map(0x800000, 0x800000).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
-	map(0x800002, 0x800002).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x800000, 0x800000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x800002, 0x800002).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
 
 /*************************************************************************************************************
@@ -1211,7 +1221,7 @@ WRITE16_MEMBER(blitz68k_state::hermit_leds2_w)
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		output().set_led_value( 7, data & 0x0100);   // button
+		m_leds[7] = BIT(data, 8);    // button
 		show_leds12();
 	}
 }
@@ -1243,26 +1253,26 @@ void blitz68k_state::hermit_map(address_map &map)
 	map(0x840001, 0x840001).r("ramdac", FUNC(ramdac_device::pal_r));
 
 
-	map(0x8c0000, 0x8c0003).w(this, FUNC(blitz68k_state::blit_pens_w));
+	map(0x8c0000, 0x8c0003).w(FUNC(blitz68k_state::blit_pens_w));
 
-	map(0x940000, 0x940001).r(this, FUNC(blitz68k_state::hermit_mcu_r));
-	map(0x980000, 0x980001).w(this, FUNC(blitz68k_state::hermit_mcu_w));
+	map(0x940000, 0x940001).r(FUNC(blitz68k_state::hermit_mcu_r));
+	map(0x980000, 0x980001).w(FUNC(blitz68k_state::hermit_mcu_w));
 
 	map(0x9c0000, 0x9c0001).portr("IN0");
-	map(0x9c8000, 0x9c8001).r(this, FUNC(blitz68k_state::hermit_track_r));
+	map(0x9c8000, 0x9c8001).r(FUNC(blitz68k_state::hermit_track_r));
 	map(0x9d0000, 0x9d0001).portr("IN2");
 	map(0x9d8000, 0x9d8001).portr("DSW");
 
-	map(0x9e0000, 0x9e0001).w(this, FUNC(blitz68k_state::hermit_leds1_w)).share("leds0");
-	map(0x9e8000, 0x9e8001).w(this, FUNC(blitz68k_state::hermit_leds2_w)).share("leds1");
+	map(0x9e0000, 0x9e0001).w(FUNC(blitz68k_state::hermit_leds1_w)).share("leds0");
+	map(0x9e8000, 0x9e8001).w(FUNC(blitz68k_state::hermit_leds2_w)).share("leds1");
 
-	map(0x9f0000, 0x9f0003).w(this, FUNC(blitz68k_state::blit_flags_w));    // flipx,y,solid,trans
+	map(0x9f0000, 0x9f0003).w(FUNC(blitz68k_state::blit_flags_w));    // flipx,y,solid,trans
 	map(0x9f0004, 0x9f0005).writeonly();
-	map(0x9f0006, 0x9f0007).w(this, FUNC(blitz68k_state::crtc_lpen_w));  // 0x9f0006: 0->1, 0x9f0007: 1->0
+	map(0x9f0006, 0x9f0007).w(FUNC(blitz68k_state::crtc_lpen_w));  // 0x9f0006: 0->1, 0x9f0007: 1->0
 
-	map(0xb00000, 0xb00001).rw(this, FUNC(blitz68k_state::crtc_r), FUNC(blitz68k_state::crtc_w));  // triggered by MCU?
+	map(0xb00000, 0xb00001).rw(FUNC(blitz68k_state::crtc_r), FUNC(blitz68k_state::crtc_w));  // triggered by MCU?
 
-	map(0xc80000, 0xc80007).w(this, FUNC(blitz68k_state::blit_hwyxa_draw_w));
+	map(0xc80000, 0xc80007).w(FUNC(blitz68k_state::blit_hwyxa_draw_w));
 }
 
 /*************************************************************************************************************
@@ -1312,14 +1322,14 @@ void blitz68k_state::maxidbl_map(address_map &map)
 	map(0x30000c, 0x30000d).nopw();    // 0->1 (IRQ3 ack.?)
 	map(0x30000e, 0x30000f).nopw();    // 1->0 (MCU related?)
 
-	map(0x500001, 0x500001).r(this, FUNC(blitz68k_state::maxidbl_mcu_status_write_r));
-	map(0x500003, 0x500003).r(this, FUNC(blitz68k_state::maxidbl_mcu_status_read_r));
+	map(0x500001, 0x500001).r(FUNC(blitz68k_state::maxidbl_mcu_status_write_r));
+	map(0x500003, 0x500003).r(FUNC(blitz68k_state::maxidbl_mcu_status_read_r));
 
-	map(0x500005, 0x500005).rw(this, FUNC(blitz68k_state::maxidbl_mcu1_r), FUNC(blitz68k_state::maxidbl_mcu1_w));
-	map(0x500006, 0x500006).rw(this, FUNC(blitz68k_state::maxidbl_mcu2_r), FUNC(blitz68k_state::maxidbl_mcu2_w));
+	map(0x500005, 0x500005).rw(FUNC(blitz68k_state::maxidbl_mcu1_r), FUNC(blitz68k_state::maxidbl_mcu1_w));
+	map(0x500006, 0x500006).rw(FUNC(blitz68k_state::maxidbl_mcu2_r), FUNC(blitz68k_state::maxidbl_mcu2_w));
 
-	map(0x600000, 0x600000).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));    // triggered by MCU?
-	map(0x600002, 0x600002).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x600000, 0x600000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));    // triggered by MCU?
+	map(0x600002, 0x600002).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
 
 
@@ -1703,10 +1713,17 @@ void blitz68k_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
+void blitz68k_state::ramdac_config(machine_config &config)
+{
+	PALETTE(config, m_palette).set_entries(0x100);
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &blitz68k_state::ramdac_map);
+}
+
 MACHINE_CONFIG_START(blitz68k_state::ilpag)
-	MCFG_CPU_ADD("maincpu", M68000, 11059200 )  // ?
-	MCFG_CPU_PROGRAM_MAP(ilpag_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state, irq4_line_hold) //3 & 6 used, mcu comms?
+	MCFG_DEVICE_ADD(m_maincpu, M68000, 11059200 )  // ?
+	MCFG_DEVICE_PROGRAM_MAP(ilpag_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state, irq4_line_hold) //3 & 6 used, mcu comms?
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1715,13 +1732,11 @@ MACHINE_CONFIG_START(blitz68k_state::ilpag)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 MACHINE_CONFIG_END
 
 /*
@@ -1764,20 +1779,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(blitz68k_state::steaser_mcu_sim)
 
 MACHINE_CONFIG_START(blitz68k_state::steaser)
 	ilpag(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(steaser_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state, irq5_line_hold) //3, 4 & 6 used, mcu comms?
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(steaser_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state, irq5_line_hold) //3, 4 & 6 used, mcu comms?
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", blitz68k_state, steaser_mcu_sim, attotime::from_hz(10000))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(blitz68k_state::cjffruit)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'118'400)/2)
-	MCFG_CPU_PROGRAM_MAP(cjffruit_map)
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(22'118'400)/2)
+	MCFG_DEVICE_PROGRAM_MAP(cjffruit_map)
 
 	// MC68HC705C8P (Sound MCU)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1786,30 +1801,30 @@ MACHINE_CONFIG_START(blitz68k_state::cjffruit)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(22'118'400)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq1))
+	R6545_1(config, m_crtc, XTAL(22'118'400)/8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(4);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq1));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::bankrob)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(11'059'200))
-	MCFG_CPU_PROGRAM_MAP(bankrob_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200))
+	MCFG_DEVICE_PROGRAM_MAP(bankrob_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU1)
 
 	// MC68HC705C8P (MCU2)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1818,28 +1833,28 @@ MACHINE_CONFIG_START(blitz68k_state::bankrob)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq3))
+	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(4);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::bankroba)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(11'059'200) )
-	MCFG_CPU_PROGRAM_MAP(bankroba_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq5_line_hold)   // protection prevents correct irq frequency by crtc
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200) )
+	MCFG_DEVICE_PROGRAM_MAP(bankroba_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq5_line_hold)   // protection prevents correct irq frequency by crtc
 	// irq 3,4 read from MCUs
 
 	// MC68HC705C8P (MCU)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1848,27 +1863,27 @@ MACHINE_CONFIG_START(blitz68k_state::bankroba)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+7, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq5))
+	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(4);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq5));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k_addr_factor1)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::deucesw2)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'118'400) / 2)
-	MCFG_CPU_PROGRAM_MAP(deucesw2_map)
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(22'118'400) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(deucesw2_map)
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1877,29 +1892,29 @@ MACHINE_CONFIG_START(blitz68k_state::deucesw2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(22'118'400)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq3))
+	R6545_1(config, m_crtc, XTAL(22'118'400)/8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(4);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::dualgame)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(11'059'200) )
-	MCFG_CPU_PROGRAM_MAP(dualgame_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq2_line_hold) // lev 2 = MCUs, lev 3 = vblank
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200) )
+	MCFG_DEVICE_PROGRAM_MAP(dualgame_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq2_line_hold) // lev 2 = MCUs, lev 3 = vblank
 
 	// MC68HC705C8P (MCU1)
 
 	// MC68HC705C8P (MCU2)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1908,27 +1923,27 @@ MACHINE_CONFIG_START(blitz68k_state::dualgame)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq3))
+	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(4);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::hermit)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'118'400)/2 )
-	MCFG_CPU_PROGRAM_MAP(hermit_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq1_line_hold)   // protection prevents correct irq frequency by crtc
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(22'118'400)/2 )
+	MCFG_DEVICE_PROGRAM_MAP(hermit_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq1_line_hold)   // protection prevents correct irq frequency by crtc
 
 	// MC68HC705C8P (MCU)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1937,23 +1952,22 @@ MACHINE_CONFIG_START(blitz68k_state::hermit)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(22'118'400)/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq1))
+	H46505(config, m_crtc, XTAL(22'118'400)/8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(4);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq1));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	ramdac_config(config);
 
 	MCFG_VIDEO_START_OVERRIDE(blitz68k_state,blitz68k)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 MACHINE_CONFIG_END
 
-
 MACHINE_CONFIG_START(blitz68k_state::maxidbl)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(11'059'200))
-	MCFG_CPU_PROGRAM_MAP(maxidbl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(11'059'200))
+	MCFG_DEVICE_PROGRAM_MAP(maxidbl_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
 
 	// MC68HC705C8P (MCU1)
@@ -1962,7 +1976,7 @@ MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 
 	// MC68HC705C8P (MCU3)
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1971,19 +1985,18 @@ MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k_noblit)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(blitz68k_state, crtc_vsync_irq3))
+	H46505(config, m_crtc, XTAL(11'059'200)/4);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(4);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_config(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SAA1099_ADD("saa", XTAL(8'000'000)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	SAA1099(config, "saa", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*************************************************************************************************************
@@ -2769,7 +2782,7 @@ ROM_END
     ROM patches
 *************************************************************************************************************/
 
-DRIVER_INIT_MEMBER(blitz68k_state,bankrob)
+void blitz68k_state::init_bankrob()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2784,7 +2797,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,bankrob)
 	ROM[0x1d4d4/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,bankroba)
+void blitz68k_state::init_bankroba()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2799,7 +2812,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,bankroba)
 	ROM[0x178ec/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,cj3play)
+void blitz68k_state::init_cj3play()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2815,7 +2828,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,cj3play)
 	ROM[0x20ab0/2] = 0x6050;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,cjffruit)
+void blitz68k_state::init_cjffruit()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2826,7 +2839,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,cjffruit)
 	ROM[0x1e7b8/2] = 0x6050;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,deucesw2)
+void blitz68k_state::init_deucesw2()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2837,7 +2850,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,deucesw2)
 	ROM[0x12f70/2] = 0x6054;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,dualgame)
+void blitz68k_state::init_dualgame()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2848,7 +2861,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,dualgame)
 	ROM[0x1739c/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,hermit)
+void blitz68k_state::init_hermit()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2865,7 +2878,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,hermit)
 	ROM[0x3238/2] = 0x4e75;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,maxidbl)
+void blitz68k_state::init_maxidbl()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2876,7 +2889,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,maxidbl)
 	ROM[0x17ca/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,megadblj)
+void blitz68k_state::init_megadblj()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2887,7 +2900,7 @@ DRIVER_INIT_MEMBER(blitz68k_state,megadblj)
 	ROM[0x19d4/2] = 0x4e71;
 }
 
-DRIVER_INIT_MEMBER(blitz68k_state,megadble)
+void blitz68k_state::init_megadble()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -2900,16 +2913,16 @@ DRIVER_INIT_MEMBER(blitz68k_state,megadble)
 
 
 
-GAME( 1992,  maxidbl,  0,       maxidbl,  maxidbl,  blitz68k_state, maxidbl,  ROT0,  "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS )
-GAME( 1990,  megadblj, 0,       maxidbl,  maxidbl,  blitz68k_state, megadblj, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // JUNE 28TH, 1993
-GAME( 1990,  megadble, 0,       maxidbl,  maxidbl,  blitz68k_state, megadble, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker (Ver. 1.63 Espagnol)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS ) // NOVEMBER 1994
-GAME( 1993,  steaser,  0,       steaser,  steaser,  blitz68k_state, 0,        ROT0,  "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
-GAME( 1993,  bankrob,  0,       bankrob,  bankrob,  blitz68k_state, bankrob,  ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC APRIL 1995
-GAME( 1993,  bankroba, bankrob, bankroba, bankrob,  blitz68k_state, bankroba, ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC MAY 10TH, 1993
-GAME( 1993?, poker52,  0,       maxidbl,  maxidbl,  blitz68k_state, 0,        ROT0,  "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                  // MARCH 10TH, 1994
-GAME( 1995,  dualgame, 0,       dualgame, dualgame, blitz68k_state, dualgame, ROT0,  "Labtronix Technologies",         "Dual Games (prototype)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // SEPTEMBER 5TH, 1995
-GAME( 1995,  hermit,   0,       hermit,   hermit,   blitz68k_state, hermit,   ROT0,  "Dugamex",                        "The Hermit (Ver. 1.14)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 1995
-GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, deucesw2, ROT0,  "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 10TH, 1997
-GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, blitz68k_state, cj3play,  ROT0,  "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999
-GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, blitz68k_state, cjffruit, ROT0,  "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 21ST, 1999
-GAME( 199?,  ilpag,    0,       ilpag,    ilpag,    blitz68k_state, 0,        ROT0,  "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )
+GAME( 1992,  maxidbl,  0,       maxidbl,  maxidbl,  blitz68k_state, init_maxidbl,  ROT0, "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS )
+GAME( 1990,  megadblj, 0,       maxidbl,  maxidbl,  blitz68k_state, init_megadblj, ROT0, "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // JUNE 28TH, 1993
+GAME( 1990,  megadble, 0,       maxidbl,  maxidbl,  blitz68k_state, init_megadble, ROT0, "Blitz Systems Inc.",             "Mega Double Poker (Ver. 1.63 Espagnol)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS ) // NOVEMBER 1994
+GAME( 1993,  steaser,  0,       steaser,  steaser,  blitz68k_state, empty_init,    ROT0, "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
+GAME( 1993,  bankrob,  0,       bankrob,  bankrob,  blitz68k_state, init_bankrob,  ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC APRIL 1995
+GAME( 1993,  bankroba, bankrob, bankroba, bankrob,  blitz68k_state, init_bankroba, ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC MAY 10TH, 1993
+GAME( 1993?, poker52,  0,       maxidbl,  maxidbl,  blitz68k_state, empty_init,    ROT0, "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                  // MARCH 10TH, 1994
+GAME( 1995,  dualgame, 0,       dualgame, dualgame, blitz68k_state, init_dualgame, ROT0, "Labtronix Technologies",         "Dual Games (prototype)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // SEPTEMBER 5TH, 1995
+GAME( 1995,  hermit,   0,       hermit,   hermit,   blitz68k_state, init_hermit,   ROT0, "Dugamex",                        "The Hermit (Ver. 1.14)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 1995
+GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, init_deucesw2, ROT0, "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 10TH, 1997
+GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, blitz68k_state, init_cj3play,  ROT0, "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999
+GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, blitz68k_state, init_cjffruit, ROT0, "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 21ST, 1999
+GAME( 199?,  ilpag,    0,       ilpag,    ilpag,    blitz68k_state, empty_init,    ROT0, "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )

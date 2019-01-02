@@ -13,9 +13,10 @@
 
 #pragma once
 
+#include "emupal.h"
 
 #define MCFG_EF9345_PALETTE(_palette_tag) \
-	downcast<ef9345_device &>(*device).set_palette_tag("^" _palette_tag);
+	downcast<ef9345_device &>(*device).set_palette_tag(_palette_tag);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -32,7 +33,7 @@ public:
 	ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 
 	// device interface
 	DECLARE_READ8_MEMBER( data_r );

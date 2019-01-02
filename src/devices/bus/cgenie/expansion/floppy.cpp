@@ -32,8 +32,8 @@ DEFINE_DEVICE_TYPE(CGENIE_FDC, cgenie_fdc_device, "cgenie_fdc", "Colour Genie FD
 
 void cgenie_fdc_device::mmio(address_map &map)
 {
-	map(0xe0, 0xe3).mirror(0x10).rw(this, FUNC(cgenie_fdc_device::irq_r), FUNC(cgenie_fdc_device::select_w));
-	map(0xec, 0xec).mirror(0x10).r("fd1793", FUNC(fd1793_device::status_r)).w(this, FUNC(cgenie_fdc_device::command_w));
+	map(0xe0, 0xe3).mirror(0x10).rw(FUNC(cgenie_fdc_device::irq_r), FUNC(cgenie_fdc_device::select_w));
+	map(0xec, 0xec).mirror(0x10).r("fd1793", FUNC(fd1793_device::status_r)).w(FUNC(cgenie_fdc_device::command_w));
 	map(0xed, 0xed).mirror(0x10).rw("fd1793", FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
 	map(0xee, 0xee).mirror(0x10).rw("fd1793", FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
 	map(0xef, 0xef).mirror(0x10).rw("fd1793", FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
@@ -43,14 +43,15 @@ FLOPPY_FORMATS_MEMBER( cgenie_fdc_device::floppy_formats )
 	FLOPPY_CGENIE_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( cgenie_floppies )
-	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
-	SLOT_INTERFACE("sd",   FLOPPY_525_SD)
-	SLOT_INTERFACE("ssdd", FLOPPY_525_SSDD)
-	SLOT_INTERFACE("dd",   FLOPPY_525_DD)
-	SLOT_INTERFACE("ssqd", FLOPPY_525_SSQD)
-	SLOT_INTERFACE("qd",   FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void cgenie_floppies(device_slot_interface &device)
+{
+	device.option_add("sssd", FLOPPY_525_SSSD);
+	device.option_add("sd",   FLOPPY_525_SD);
+	device.option_add("ssdd", FLOPPY_525_SSDD);
+	device.option_add("dd",   FLOPPY_525_DD);
+	device.option_add("ssqd", FLOPPY_525_SSQD);
+	device.option_add("qd",   FLOPPY_525_QD);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -73,8 +74,8 @@ const tiny_rom_entry *cgenie_fdc_device::device_rom_region() const
 MACHINE_CONFIG_START(cgenie_fdc_device::device_add_mconfig)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", cgenie_fdc_device, timer_callback, attotime::from_msec(25))
 
-	MCFG_FD1793_ADD("fd1793", XTAL(1'000'000))
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(cgenie_fdc_device, intrq_w))
+	FD1793(config, m_fdc, 1_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set(FUNC(cgenie_fdc_device::intrq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:1", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats)

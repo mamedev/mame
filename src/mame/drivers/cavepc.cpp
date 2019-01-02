@@ -52,6 +52,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -65,7 +66,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_DRIVER_INIT(cavepc);
+	void init_cavepc();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -113,9 +114,9 @@ void cavepc_state::machine_reset()
 
 MACHINE_CONFIG_START(cavepc_state::cavepc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 200000000) /*  AMD Athlon 64 X2 5050e Brisbane 2.60GHz, 1024KB L2 Cache ! */
-	MCFG_CPU_PROGRAM_MAP(cavepc_map)
-	MCFG_CPU_IO_MAP(cavepc_io)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 200000000) /*  AMD Athlon 64 X2 5050e Brisbane 2.60GHz, 1024KB L2 Cache ! */
+	MCFG_DEVICE_PROGRAM_MAP(cavepc_map)
+	MCFG_DEVICE_IO_MAP(cavepc_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -131,7 +132,7 @@ MACHINE_CONFIG_END
 
 
 
-DRIVER_INIT_MEMBER(cavepc_state,cavepc)
+void cavepc_state::init_cavepc()
 {
 }
 
@@ -179,4 +180,4 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(2009, deathsm2, 0,        cavepc, cavepc, cavepc_state, cavepc, ROT0, "Cave", "Deathsmiles II: Makai no Merry Christmas (2009/10/14 MASTER VER 4.00)", MACHINE_IS_SKELETON )
+GAME(2009, deathsm2, 0, cavepc, cavepc, cavepc_state, init_cavepc, ROT0, "Cave", "Deathsmiles II: Makai no Merry Christmas (2009/10/14 MASTER VER 4.00)", MACHINE_IS_SKELETON )

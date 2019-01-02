@@ -252,11 +252,6 @@ dgc (dg(no!spam)cx@mac.com)
 class dectalk_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_OUTFIFO_READ
-	};
-
 	dectalk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -266,6 +261,14 @@ public:
 		m_dac(*this, "dac")
 	{
 	}
+
+	void dectalk(machine_config &config);
+
+private:
+	enum
+	{
+		TIMER_OUTFIFO_READ
+	};
 
 	// input fifo, between m68k and tms32010
 	uint16_t m_infifo[32]; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
@@ -290,7 +293,7 @@ public:
 	bool m_hack_self_test_is_second_read; // temp variable for hack below
 
 	required_device<m68000_base_device> m_maincpu;
-	required_device<cpu_device> m_dsp;
+	required_device<tms32010_device> m_dsp;
 	required_device<scn2681_device> m_duart;
 	required_device<x2212_device> m_nvram;
 	required_device<dac_word_interface> m_dac;
@@ -321,11 +324,10 @@ public:
 	uint16_t dsp_outfifo_r();
 	DECLARE_WRITE_LINE_MEMBER(dectalk_reset);
 
-	void dectalk(machine_config &config);
 	void m68k_mem(address_map &map);
 	void tms32010_io(address_map &map);
 	void tms32010_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -436,9 +438,9 @@ WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
 {
 	m_hack_self_test_is_second_read = false; // hack
 	// stuff that is DIRECTLY affected by the RESET line
-	machine().device<x2212_device>("x2212")->recall(0);
-	machine().device<x2212_device>("x2212")->recall(1);
-	machine().device<x2212_device>("x2212")->recall(0); // nvram recall
+	m_nvram->recall(0);
+	m_nvram->recall(1);
+	m_nvram->recall(0); // nvram recall
 	m_m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
 	m_m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
 	m_duart->reset(); // reset the DUART
@@ -797,14 +799,14 @@ void dectalk_state::m68k_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).mirror(0x740000).rom(); /* ROM */
 	map(0x080000, 0x093fff).mirror(0x760000).ram(); /* RAM */
-	map(0x094000, 0x0943ff).mirror(0x763c00).w(this, FUNC(dectalk_state::led_write)).umask16(0x00ff);  /* LED array */
+	map(0x094000, 0x0943ff).mirror(0x763c00).w(FUNC(dectalk_state::led_write)).umask16(0x00ff);  /* LED array */
 	map(0x094000, 0x0941ff).mirror(0x763c00).rw(m_nvram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0xff00); /* Xicor X2212 NVRAM */
-	map(0x094200, 0x0943ff).mirror(0x763c00).rw(this, FUNC(dectalk_state::nvram_recall), FUNC(dectalk_state::nvram_store)).umask16(0xff00); /* Xicor X2212 NVRAM */
+	map(0x094200, 0x0943ff).mirror(0x763c00).rw(FUNC(dectalk_state::nvram_recall), FUNC(dectalk_state::nvram_store)).umask16(0xff00); /* Xicor X2212 NVRAM */
 	map(0x098000, 0x09801f).mirror(0x763fe0).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff); /* DUART */
-	map(0x09c000, 0x09c001).mirror(0x763ff8).rw(this, FUNC(dectalk_state::m68k_spcflags_r), FUNC(dectalk_state::m68k_spcflags_w)); /* SPC flags reg */
-	map(0x09c002, 0x09c003).mirror(0x763ff8).w(this, FUNC(dectalk_state::m68k_infifo_w)); /* SPC fifo reg */
-	map(0x09c004, 0x09c005).mirror(0x763ff8).rw(this, FUNC(dectalk_state::m68k_tlcflags_r), FUNC(dectalk_state::m68k_tlcflags_w)); /* telephone status flags */
-	map(0x09c006, 0x09c007).mirror(0x763ff8).r(this, FUNC(dectalk_state::m68k_tlc_dtmf_r)); /* telephone dtmf read */
+	map(0x09c000, 0x09c001).mirror(0x763ff8).rw(FUNC(dectalk_state::m68k_spcflags_r), FUNC(dectalk_state::m68k_spcflags_w)); /* SPC flags reg */
+	map(0x09c002, 0x09c003).mirror(0x763ff8).w(FUNC(dectalk_state::m68k_infifo_w)); /* SPC fifo reg */
+	map(0x09c004, 0x09c005).mirror(0x763ff8).rw(FUNC(dectalk_state::m68k_tlcflags_r), FUNC(dectalk_state::m68k_tlcflags_w)); /* telephone status flags */
+	map(0x09c006, 0x09c007).mirror(0x763ff8).r(FUNC(dectalk_state::m68k_tlc_dtmf_r)); /* telephone dtmf read */
 }
 
 void dectalk_state::tms32010_mem(address_map &map)
@@ -814,8 +816,8 @@ void dectalk_state::tms32010_mem(address_map &map)
 
 void dectalk_state::tms32010_io(address_map &map)
 {
-	map(0, 0).w(this, FUNC(dectalk_state::spc_latch_outfifo_error_stats)); // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
-	map(1, 1).rw(this, FUNC(dectalk_state::spc_infifo_data_r), FUNC(dectalk_state::spc_outfifo_data_w)); //read from input fifo, write to sound fifo
+	map(0, 0).w(FUNC(dectalk_state::spc_latch_outfifo_error_stats)); // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
+	map(1, 1).rw(FUNC(dectalk_state::spc_infifo_data_r), FUNC(dectalk_state::spc_outfifo_data_w)); //read from input fifo, write to sound fifo
 	//AM_RANGE(8, 8) //the newer firmware seems to want something mapped here?
 }
 
@@ -868,48 +870,48 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 	m_dac->write(data >> 4);
 	// hack for break key, requires hacked up duart core so disabled for now
 	// also it doesn't work well, the setup menu is badly corrupt
-	/*device_t *duart = machine().device("duart");
-	if (machine.input().code_pressed(KEYCODE_F1))
-	    duart_rx_break(duart, 1, 1);
+	/*if (machine.input().code_pressed(KEYCODE_F1))
+	    m_duart->duart_rx_break(1, 1);
 	else
-	    duart_rx_break(duart, 1, 0);*/
+	    m_duart->duart_rx_break(1, 0);*/
 }
 
 MACHINE_CONFIG_START(dectalk_state::dectalk)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* E74 20MHz OSC (/2) */
-	MCFG_CPU_PROGRAM_MAP(m68k_mem)
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400)) // MC2681 DUART ; Y3 3.6864MHz xtal */
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(dectalk_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(dectalk_state, duart_txa))
-	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(dectalk_state, duart_input))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(dectalk_state, duart_output))
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* E74 20MHz OSC (/2) */
+	MCFG_DEVICE_PROGRAM_MAP(m68k_mem)
+	MCFG_DEVICE_ADD(m_duart, SCN2681, XTAL(3'686'400)) // MC2681 DUART ; Y3 3.6864MHz xtal */
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, dectalk_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, dectalk_state, duart_txa))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, dectalk_state, duart_input))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, dectalk_state, duart_output))
 
-	MCFG_CPU_ADD("dsp", TMS32010, XTAL(20'000'000)) /* Y1 20MHz xtal */
-	MCFG_CPU_PROGRAM_MAP(tms32010_mem)
-	MCFG_CPU_IO_MAP(tms32010_io)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(dectalk_state, spc_semaphore_r)) //read infifo-has-data-in-it fifo readable status
+	TMS32010(config, m_dsp, XTAL(20'000'000)); /* Y1 20MHz xtal */
+	m_dsp->set_addrmap(AS_PROGRAM, &dectalk_state::tms32010_mem);
+	m_dsp->set_addrmap(AS_IO, &dectalk_state::tms32010_io);
+	m_dsp->bio().set(FUNC(dectalk_state::spc_semaphore_r)); //read infifo-has-data-in-it fifo readable status
+
 #ifdef USE_LOOSE_TIMING
 	MCFG_QUANTUM_TIME(attotime::from_hz(100))
 #else
 	MCFG_QUANTUM_PERFECT_CPU("dsp")
 #endif
 
-	MCFG_X2212_ADD("x2212")
+	X2212(config, "x2212");
 
 	/* video hardware */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", AD7541, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9) // ad7541.e107 (E88 10KHz OSC, handled by timer)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", AD7541, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9) // ad7541.e107 (E88 10KHz OSC, handled by timer)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_b_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
 MACHINE_CONFIG_END
 
 
@@ -934,55 +936,55 @@ ROM_START( dectalk )
 	 *   for proms it is: a1 = 82s123(0x20, 8b TS); a2 = 82s129(0x100 4b TS); a9 = 82s131(0x200 4b TS); b1 = 82s135(0x100 8b TS); f1 = 82s137(0x400 4b TS); f4 = 82s191(0x800 8b TS); s0 = MC68HC05; m2 = i8051 or other MCS-51; (there are more)
 	 */
 	ROM_SYSTEM_BIOS( 0, "v20", "DTC-01 Version 2.0")
-	ROMX_LOAD("23-123e5.e8", 0x00000, 0x4000, CRC(03e1eefa) SHA1(e586de03e113683c2534fca1f3f40ba391193044), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510123E5" @ E8
-	ROMX_LOAD("23-119e5.e22", 0x00001, 0x4000, CRC(af20411f) SHA1(7954bb56b7591f8954403a22d34de31c7d5441ac), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510119E5" @ E22
-	ROMX_LOAD("23-124e5.e7", 0x08000, 0x4000, CRC(9edeafcb) SHA1(7724babf4ae5d77c0b4200f608d599058d04b25c), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510124E5" @ E7
-	ROMX_LOAD("23-120e5.e21", 0x08001, 0x4000, CRC(f2a346a6) SHA1(af5e4ea0b3631f7d6f16c22e86a33fa2cb520ee0), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510120E5" @ E21
-	ROMX_LOAD("23-125e5.e6", 0x10000, 0x4000, CRC(1c0100d1) SHA1(1b60cd71dfa83408b17e13f683b6bf3198c905cc), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510125E5" @ E6
-	ROMX_LOAD("23-121e5.e20", 0x10001, 0x4000, CRC(4cb081bd) SHA1(4ad0b00628a90085cd7c78a354256c39fd14db6c), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510121E5" @ E20
-	ROMX_LOAD("23-126e5.e5", 0x18000, 0x4000, CRC(7823dedb) SHA1(e2b2415eec838ddd46094f2fea93fd289dd0caa2), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510126E5" @ E5
-	ROMX_LOAD("23-122e5.e19", 0x18001, 0x4000, CRC(b86370e6) SHA1(92ab22a24484ad0d0f5c8a07347105509999f3ee), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510122E5" @ E19
-	ROMX_LOAD("23-103e5.e4", 0x20000, 0x4000, CRC(35aac6b9) SHA1(b5aec0bf37a176ff4d66d6a10357715957662ebd), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510103E5" @ E4
-	ROMX_LOAD("23-095e5.e18", 0x20001, 0x4000, CRC(2296fe39) SHA1(891f3a3b4ce75ef14001257bc8f1f60463a9a7cb), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510095E5" @ E18
-	ROMX_LOAD("23-104e5.e3", 0x28000, 0x4000, CRC(9658b43c) SHA1(4d6808f67cbdd316df23adc8ddf701df57aa854a), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510104E5" @ E3
-	ROMX_LOAD("23-096e5.e17", 0x28001, 0x4000, CRC(cf236077) SHA1(496c69e52cfa013173f7b9c500ce544a03ad01f7), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510096E5" @ E17
-	ROMX_LOAD("23-105e5.e2", 0x30000, 0x4000, CRC(09cddd28) SHA1(de0c25687bab3ff0c88c98622092e0b58331aa16), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510105E5" @ E2
-	ROMX_LOAD("23-097e5.e16", 0x30001, 0x4000, CRC(49434da1) SHA1(c450abae0ccf372d7eb87370b8a8c97a45e164d3), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510097E5" @ E16
-	ROMX_LOAD("23-106e5.e1", 0x38000, 0x4000, CRC(a389ab31) SHA1(355348bfc96a04193136cdde3418366e6476c3ca), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510106E5" @ E1
-	ROMX_LOAD("23-098e5.e15", 0x38001, 0x4000, CRC(3d8910e7) SHA1(01921e77b46c2d4845023605239c45ffa4a35872), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "SP8510098E5" @ E15
+	ROMX_LOAD("23-123e5.e8", 0x00000, 0x4000, CRC(03e1eefa) SHA1(e586de03e113683c2534fca1f3f40ba391193044), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510123E5" @ E8
+	ROMX_LOAD("23-119e5.e22", 0x00001, 0x4000, CRC(af20411f) SHA1(7954bb56b7591f8954403a22d34de31c7d5441ac), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510119E5" @ E22
+	ROMX_LOAD("23-124e5.e7", 0x08000, 0x4000, CRC(9edeafcb) SHA1(7724babf4ae5d77c0b4200f608d599058d04b25c), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510124E5" @ E7
+	ROMX_LOAD("23-120e5.e21", 0x08001, 0x4000, CRC(f2a346a6) SHA1(af5e4ea0b3631f7d6f16c22e86a33fa2cb520ee0), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510120E5" @ E21
+	ROMX_LOAD("23-125e5.e6", 0x10000, 0x4000, CRC(1c0100d1) SHA1(1b60cd71dfa83408b17e13f683b6bf3198c905cc), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510125E5" @ E6
+	ROMX_LOAD("23-121e5.e20", 0x10001, 0x4000, CRC(4cb081bd) SHA1(4ad0b00628a90085cd7c78a354256c39fd14db6c), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510121E5" @ E20
+	ROMX_LOAD("23-126e5.e5", 0x18000, 0x4000, CRC(7823dedb) SHA1(e2b2415eec838ddd46094f2fea93fd289dd0caa2), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510126E5" @ E5
+	ROMX_LOAD("23-122e5.e19", 0x18001, 0x4000, CRC(b86370e6) SHA1(92ab22a24484ad0d0f5c8a07347105509999f3ee), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510122E5" @ E19
+	ROMX_LOAD("23-103e5.e4", 0x20000, 0x4000, CRC(35aac6b9) SHA1(b5aec0bf37a176ff4d66d6a10357715957662ebd), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510103E5" @ E4
+	ROMX_LOAD("23-095e5.e18", 0x20001, 0x4000, CRC(2296fe39) SHA1(891f3a3b4ce75ef14001257bc8f1f60463a9a7cb), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510095E5" @ E18
+	ROMX_LOAD("23-104e5.e3", 0x28000, 0x4000, CRC(9658b43c) SHA1(4d6808f67cbdd316df23adc8ddf701df57aa854a), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510104E5" @ E3
+	ROMX_LOAD("23-096e5.e17", 0x28001, 0x4000, CRC(cf236077) SHA1(496c69e52cfa013173f7b9c500ce544a03ad01f7), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510096E5" @ E17
+	ROMX_LOAD("23-105e5.e2", 0x30000, 0x4000, CRC(09cddd28) SHA1(de0c25687bab3ff0c88c98622092e0b58331aa16), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510105E5" @ E2
+	ROMX_LOAD("23-097e5.e16", 0x30001, 0x4000, CRC(49434da1) SHA1(c450abae0ccf372d7eb87370b8a8c97a45e164d3), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510097E5" @ E16
+	ROMX_LOAD("23-106e5.e1", 0x38000, 0x4000, CRC(a389ab31) SHA1(355348bfc96a04193136cdde3418366e6476c3ca), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510106E5" @ E1
+	ROMX_LOAD("23-098e5.e15", 0x38001, 0x4000, CRC(3d8910e7) SHA1(01921e77b46c2d4845023605239c45ffa4a35872), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "SP8510098E5" @ E15
 
 	// DECtalk DTC-01 firmware v1.8 (first half: 05Dec83 tag; second half: 11Oct83 tag), all roms are 27128 eproms
 	ROM_SYSTEM_BIOS( 1, "v18", "DTC-01 Version 1.8")
-	ROMX_LOAD("23-063e5.e8", 0x00000, 0x4000, CRC(9f5ca045) SHA1(1b1b9c1e092c44329b385fb04001e13422eb8d39), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-059e5.e22", 0x00001, 0x4000, CRC(b299cf64) SHA1(84bbe9ff303ea6ce7b1c0b1ad05421edd18fae49), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-064e5.e7", 0x08000, 0x4000, CRC(e4ff20f4) SHA1(fdd91e4d2ef92608a08b2e78b6108e31ff53a1f9), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-060e5.e21", 0x08001, 0x4000, CRC(213c65ba) SHA1(c95662d0d40499af01cdc23f05936762ab54081a), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-065e5.e6", 0x10000, 0x4000, CRC(38ea0c75) SHA1(232b622cef6d69a493db1ed02e5236235c68daba), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-061e5.e20", 0x10001, 0x4000, CRC(44f6fe5c) SHA1(81daa4abae273c7f0aead902b5c3c842f7e7f116), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-066e5.e5", 0x18000, 0x4000, CRC(957aa8cf) SHA1(5f9f916b99867d1adbafd58d411feb630f6e4b6d), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-062e5.e19", 0x18001, 0x4000, CRC(10ab969c) SHA1(46ee22a295b8709b6f829751aca5f92e4f459a9f), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-032e5.e4", 0x20000, 0x4000, CRC(0f805e3a) SHA1(1d8008e30a448358224364fd8237dbb08907b219), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-031e5.e18", 0x20001, 0x4000, CRC(846b5b68) SHA1(55c759b3fb927d2dfc9d77e8e080748866bea854), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-034e5.e3", 0x28000, 0x4000, CRC(90700738) SHA1(738337c5b6acd3f30c3c4be2457370d2ce9313f9), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-033e5.e17", 0x28001, 0x4000, CRC(48756a4d) SHA1(5946ccd367d88a484bb1549d0cc990b9b7d88f0c), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-036e5.e2", 0x30000, 0x4000, CRC(5c2d4f73) SHA1(30f95e5383c4f71bc700346e2d49e8ad70b94c8c), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-035e5.e16", 0x30001, 0x4000, CRC(80116443) SHA1(7b3b68e61b421dedaad88b5600c739943a316c9e), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-038e5.e1", 0x38000, 0x4000, CRC(c840493f) SHA1(abd6af442690e981a9089f19febffc8f3fb52717), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("23-037e5.e15", 0x38001, 0x4000, CRC(d62ab309) SHA1(a743a23625feadf6e46ef889e2bb04af88589992), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("23-063e5.e8", 0x00000, 0x4000, CRC(9f5ca045) SHA1(1b1b9c1e092c44329b385fb04001e13422eb8d39), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-059e5.e22", 0x00001, 0x4000, CRC(b299cf64) SHA1(84bbe9ff303ea6ce7b1c0b1ad05421edd18fae49), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-064e5.e7", 0x08000, 0x4000, CRC(e4ff20f4) SHA1(fdd91e4d2ef92608a08b2e78b6108e31ff53a1f9), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-060e5.e21", 0x08001, 0x4000, CRC(213c65ba) SHA1(c95662d0d40499af01cdc23f05936762ab54081a), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-065e5.e6", 0x10000, 0x4000, CRC(38ea0c75) SHA1(232b622cef6d69a493db1ed02e5236235c68daba), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-061e5.e20", 0x10001, 0x4000, CRC(44f6fe5c) SHA1(81daa4abae273c7f0aead902b5c3c842f7e7f116), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-066e5.e5", 0x18000, 0x4000, CRC(957aa8cf) SHA1(5f9f916b99867d1adbafd58d411feb630f6e4b6d), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-062e5.e19", 0x18001, 0x4000, CRC(10ab969c) SHA1(46ee22a295b8709b6f829751aca5f92e4f459a9f), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-032e5.e4", 0x20000, 0x4000, CRC(0f805e3a) SHA1(1d8008e30a448358224364fd8237dbb08907b219), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-031e5.e18", 0x20001, 0x4000, CRC(846b5b68) SHA1(55c759b3fb927d2dfc9d77e8e080748866bea854), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-034e5.e3", 0x28000, 0x4000, CRC(90700738) SHA1(738337c5b6acd3f30c3c4be2457370d2ce9313f9), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-033e5.e17", 0x28001, 0x4000, CRC(48756a4d) SHA1(5946ccd367d88a484bb1549d0cc990b9b7d88f0c), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-036e5.e2", 0x30000, 0x4000, CRC(5c2d4f73) SHA1(30f95e5383c4f71bc700346e2d49e8ad70b94c8c), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-035e5.e16", 0x30001, 0x4000, CRC(80116443) SHA1(7b3b68e61b421dedaad88b5600c739943a316c9e), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-038e5.e1", 0x38000, 0x4000, CRC(c840493f) SHA1(abd6af442690e981a9089f19febffc8f3fb52717), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-037e5.e15", 0x38001, 0x4000, CRC(d62ab309) SHA1(a743a23625feadf6e46ef889e2bb04af88589992), ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_REGION(0x2000,"dsp", 0)
 	// older dsp firmware from earlier dectalk firmware 2.0 units, both proms are 82s191 equivalent; this dsp firmware clips with the 1.8 dectalk firmware. this lacks the debug code?
-	ROMX_LOAD("23-205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "LM8506205F4 // M1-76161-5" @ E70
-	ROMX_LOAD("23-204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "LM8504204F4 // 78S191" @ E69
+	ROMX_LOAD("23-205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
+	ROMX_LOAD("23-204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "LM8504204F4 // 78S191" @ E69
 	// Final? firmware from 2.0 dectalk firmware units; this dsp firmware clips with the 1.8 dectalk firmware
 	// this firmware seems to have some leftover test garbage mapped into its space, which is not present on the dtc-01 board
 	// it writes 0x0000 to 0x90 on start, and it writes a sequence of values to 0xFF down to 0xE9
 	// it also wants something readable mapped at 0x08 (for debug purposes?) or else it waits for an interrupt (as the older firmware always does)
-	ROMX_LOAD("23-410f4.e70", 0x000, 0x800, CRC(121e2ec3) SHA1(3fabe018d0e0b478093951cb20501853358faa18), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("23-409f4.e69", 0x001, 0x800, CRC(61f67c79) SHA1(9a13426c92f879f2953f180f805990a91c37ac43), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("23-410f4.e70", 0x000, 0x800, CRC(121e2ec3) SHA1(3fabe018d0e0b478093951cb20501853358faa18), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("23-409f4.e69", 0x001, 0x800, CRC(61f67c79) SHA1(9a13426c92f879f2953f180f805990a91c37ac43), ROM_SKIP(1) | ROM_BIOS(0))
 	// older dsp firmware from dectalk firmware 1.8 units; while this dsp firmware works with 2.0 dectalk firmware, its a bit quieter than the proper one.
-	ROMX_LOAD("23-166f4.e70", 0x000, 0x800, CRC(2d036ffc) SHA1(e8c25ca092dde2dc0aec73921af806026bdfbbc3), ROM_SKIP(1) | ROM_BIOS(2)) // HM1-76161-5
-	ROMX_LOAD("23-165f4.e69", 0x001, 0x800, CRC(a3019ca4) SHA1(249f269c38f7f44edb6d025bcc867c8ca0de3e9c), ROM_SKIP(1) | ROM_BIOS(2)) // HM1-76161-5
+	ROMX_LOAD("23-166f4.e70", 0x000, 0x800, CRC(2d036ffc) SHA1(e8c25ca092dde2dc0aec73921af806026bdfbbc3), ROM_SKIP(1) | ROM_BIOS(1)) // HM1-76161-5
+	ROMX_LOAD("23-165f4.e69", 0x001, 0x800, CRC(a3019ca4) SHA1(249f269c38f7f44edb6d025bcc867c8ca0de3e9c), ROM_SKIP(1) | ROM_BIOS(1)) // HM1-76161-5
 
 	// TODO: load this as default if the nvram file is missing, OR get the setup page working enough that it can be saved properly to the chip from an NVR FAULT state!
 	// NOTE: this nvram image is ONLY VALID for v2.0; v1.8 expects a different image.
@@ -1011,5 +1013,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT      COMPANY                          FULLNAME            FLAGS */
-COMP( 1984, dectalk,    0,      0,      dectalk,    dectalk, dectalk_state, 0,        "Digital Equipment Corporation", "DECtalk DTC-01",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                          FULLNAME          FLAGS */
+COMP( 1984, dectalk, 0,      0,      dectalk, dectalk, dectalk_state, empty_init, "Digital Equipment Corporation", "DECtalk DTC-01", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

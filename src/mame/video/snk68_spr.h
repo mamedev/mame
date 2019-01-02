@@ -9,13 +9,6 @@
 
 typedef device_delegate<void (int&, int&, int&, int&)> snk68_tile_indirection_delegate;
 
-#define MCFG_SNK68_SPR_GFXDECODE(_gfxtag) \
-	downcast<snk68_spr_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
-#define MCFG_SNK68_SPR_SET_TILE_INDIRECT( _class, _method) \
-	downcast<snk68_spr_device &>(*device).set_tile_indirect_cb(snk68_tile_indirection_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
-#define MCFG_SNK68_SPR_NO_PARTIAL \
-	downcast<snk68_spr_device &>(*device).set_no_partial();
-
 
 class snk68_spr_device : public device_t
 {
@@ -23,8 +16,8 @@ public:
 	snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
-	template <typename Object> void set_tile_indirect_cb(Object &&cb) { m_newtilecb = std::forward<Object>(cb); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	template <typename... T> void set_tile_indirect_cb(T &&... args) { m_newtilecb = snk68_tile_indirection_delegate(std::forward<T>(args)...); }
 	void set_no_partial() { m_partialupdates = 0; }
 
 	DECLARE_READ16_MEMBER(spriteram_r);

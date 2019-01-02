@@ -36,14 +36,18 @@ void univ_slot_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("Card device %s (%s) does not implement device_univ_card_interface\n", card->tag(), card->name());
 }
 
-void univ_slot_device::device_start()
+void univ_slot_device::device_resolve_objects()
 {
-	device_t *const card_device(get_card_device());
-	device_univ_card_interface *const univ_card(dynamic_cast<device_univ_card_interface *>(card_device));
-	if (card_device && !univ_card)
-		throw emu_fatalerror("univ_slot_device: card device %s (%s) does not implement device_univ_card_interface\n", card_device->tag(), card_device->name());
+	device_univ_card_interface *const univ_card(dynamic_cast<device_univ_card_interface *>(get_card_device()));
 	if (univ_card)
 		univ_card->set_bus(*m_bus);
+}
+
+void univ_slot_device::device_start()
+{
+	device_t *const card(get_card_device());
+	if (card && !dynamic_cast<device_univ_card_interface *>(card))
+		throw emu_fatalerror("univ_slot_device: card device %s (%s) does not implement device_univ_card_interface\n", card->tag(), card->name());
 }
 
 
@@ -272,6 +276,8 @@ device_univ_card_interface::device_univ_card_interface(const machine_config &mco
 
 void device_univ_card_interface::interface_pre_start()
 {
+	device_slot_card_interface::interface_pre_start();
+
 	if (!m_bus)
 		throw device_missing_dependencies();
 }
@@ -290,8 +296,9 @@ void device_univ_card_interface::set_bus(univ_bus_device &bus)
 #include "prommemory.h"
 #include "tapereader.h"
 
-SLOT_INTERFACE_START(intellec4_univ_cards)
-	SLOT_INTERFACE("imm4_22", INTELLEC4_INST_DATA_STORAGE)
-	SLOT_INTERFACE("imm6_26", INTELLEC4_PROM_MEMORY)
-	SLOT_INTERFACE("imm4_90", INTELLEC4_TAPE_READER)
-SLOT_INTERFACE_END
+void intellec4_univ_cards(device_slot_interface &device)
+{
+	device.option_add("imm4_22", INTELLEC4_INST_DATA_STORAGE);
+	device.option_add("imm6_26", INTELLEC4_PROM_MEMORY);
+	device.option_add("imm4_90", INTELLEC4_TAPE_READER);
+}

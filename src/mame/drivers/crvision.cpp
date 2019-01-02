@@ -146,16 +146,16 @@ void crvision_state::crvision_map(address_map &map)
 {
 	map(0x0000, 0x03ff).mirror(0x0c00).ram();
 	map(0x1000, 0x1003).mirror(0x0ffc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x2000, 0x2000).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::vram_read));
-	map(0x2001, 0x2001).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::register_read));
-	map(0x3000, 0x3000).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::vram_write));
-	map(0x3001, 0x3001).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::register_write));
+	map(0x2000, 0x2000).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::vram_r));
+	map(0x2001, 0x2001).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::register_r));
+	map(0x3000, 0x3000).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::vram_w));
+	map(0x3001, 0x3001).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::register_w));
 	map(0x4000, 0x7fff).bankr(BANK_ROM2);
 	map(0x8000, 0xbfff).bankr(BANK_ROM1);
 //  AM_RANGE(0xc000, 0xe7ff) AM_RAMBANK(3)
-	map(0xe800, 0xe800).w(m_cent_data_out, FUNC(output_latch_device::write));
-	map(0xe801, 0xe801).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0xe801, 0xe801).w("cent_ctrl_out", FUNC(output_latch_device::write));
+	map(0xe800, 0xe800).w(m_cent_data_out, FUNC(output_latch_device::bus_w));
+	map(0xe801, 0xe801).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0xe801, 0xe801).w("cent_ctrl_out", FUNC(output_latch_device::bus_w));
 //  AM_RANGE(0xe802, 0xf7ff) AM_RAMBANK(4)
 	map(0xf800, 0xffff).rom().region(M6502_TAG, 0);
 }
@@ -168,10 +168,10 @@ void laser2001_state::lasr2001_map(address_map &map)
 {
 	map(0x0000, 0x03ff).mirror(0x0c00).ram();
 	map(0x1000, 0x1003).mirror(0x0ffc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x2000, 0x2000).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::vram_read));
-	map(0x2001, 0x2001).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::register_read));
-	map(0x3000, 0x3000).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::vram_write));
-	map(0x3001, 0x3001).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::register_write));
+	map(0x2000, 0x2000).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::vram_r));
+	map(0x2001, 0x2001).mirror(0x0ffe).r(TMS9929_TAG, FUNC(tms9928a_device::register_r));
+	map(0x3000, 0x3000).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::vram_w));
+	map(0x3001, 0x3001).mirror(0x0ffe).w(TMS9929_TAG, FUNC(tms9928a_device::register_w));
 	map(0x4000, 0x7fff).bankrw(BANK_ROM2);
 	map(0x8000, 0xbfff).bankrw(BANK_ROM1);
 	map(0xc000, 0xffff).rom().region(M6502_TAG, 0);
@@ -187,7 +187,7 @@ void laser2001_state::lasr2001_map(address_map &map)
 
 INPUT_CHANGED_MEMBER( crvision_state::trigger_nmi )
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(m6502_device::NMI_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*-------------------------------------------------
@@ -642,7 +642,7 @@ WRITE8_MEMBER( laser2001_state::pia_pb_w )
 	m_keylatch = data;
 
 	/* centronics data */
-	m_cent_data_out->write(space, 0, data);
+	m_cent_data_out->write(data);
 }
 
 READ_LINE_MEMBER( laser2001_state::pia_ca1_r )
@@ -722,150 +722,153 @@ void laser2001_state::machine_start()
     MACHINE DRIVERS
 ***************************************************************************/
 
-static SLOT_INTERFACE_START(crvision_cart)
-	SLOT_INTERFACE_INTERNAL("crv_rom4k",  CRVISION_ROM_4K)
-	SLOT_INTERFACE_INTERNAL("crv_rom6k",  CRVISION_ROM_6K)
-	SLOT_INTERFACE_INTERNAL("crv_rom8k",  CRVISION_ROM_8K)
-	SLOT_INTERFACE_INTERNAL("crv_rom10k", CRVISION_ROM_10K)
-	SLOT_INTERFACE_INTERNAL("crv_rom12k", CRVISION_ROM_12K)
-	SLOT_INTERFACE_INTERNAL("crv_rom16k", CRVISION_ROM_16K)
-	SLOT_INTERFACE_INTERNAL("crv_rom18k", CRVISION_ROM_18K)
-SLOT_INTERFACE_END
+static void crvision_cart(device_slot_interface &device)
+{
+	device.option_add_internal("crv_rom4k",  CRVISION_ROM_4K);
+	device.option_add_internal("crv_rom6k",  CRVISION_ROM_6K);
+	device.option_add_internal("crv_rom8k",  CRVISION_ROM_8K);
+	device.option_add_internal("crv_rom10k", CRVISION_ROM_10K);
+	device.option_add_internal("crv_rom12k", CRVISION_ROM_12K);
+	device.option_add_internal("crv_rom16k", CRVISION_ROM_16K);
+	device.option_add_internal("crv_rom18k", CRVISION_ROM_18K);
+}
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( creativision )
+    creativision machine configuration
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(crvision_state::creativision)
+void crvision_state::creativision(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(crvision_map)
+	M6502(config, m_maincpu, XTAL(2'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &crvision_state::crvision_map);
 
 	// devices
-	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(crvision_state, pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(crvision_state, pia_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(crvision_state, pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8(SN76489_TAG, sn76496_base_device, write))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(crvision_state::pia_pa_r));
+	m_pia->readpb_handler().set(FUNC(crvision_state::pia_pb_r));
+	m_pia->writepa_handler().set(FUNC(crvision_state::pia_pa_w));
+	m_pia->writepb_handler().set(SN76489_TAG, FUNC(sn76496_base_device::command_w));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit7));
 
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, "cent_status_in", 0);
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
-	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
+	OUTPUT_LATCH(config, "cent_ctrl_out").bit_handler<4>().set(m_centronics, FUNC(centronics_device::write_strobe));
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489_TAG, SN76489A, XTAL(2'000'000))
-	MCFG_SN76496_READY_HANDLER(DEVWRITELINE(PIA6821_TAG, pia6821_device, cb1_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER(config, "mono").front_center();
+	SN76489A(config, m_psg, XTAL(2'000'000));
+	m_psg->ready_cb().set(m_pia, FUNC(pia6821_device::cb1_w));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	WAVE(config, "wave", m_cassette).add_route(1, "mono", 0.25);
 
 	// cartridge
-	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
+	CRVISION_CART_SLOT(config, m_cart, crvision_cart, nullptr);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K") // MAIN RAM
-	MCFG_RAM_EXTRA_OPTIONS("15K") // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
+	RAM(config, m_ram);
+	m_ram->set_default_size("1K"); // main RAM
+	m_ram->set_extra_options("15K"); // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "crvision")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("crvision");
+}
 
 /*-------------------------------------------------
     MACHINE_CONFIG_START( ntsc )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(crvision_state::ntsc)
+void crvision_state::ntsc(machine_config &config)
+{
 	creativision(config);
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9918, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9918_device, screen_update )
-MACHINE_CONFIG_END
+	tms9918_device &vdp(TMS9918(config, TMS9929_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+}
 
 /*-------------------------------------------------
     MACHINE_CONFIG_START( pal )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(crvision_pal_state::pal)
+void crvision_pal_state::pal(machine_config &config)
+{
 	creativision(config);
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9929, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9929_device, screen_update )
-MACHINE_CONFIG_END
+	tms9929_device &vdp(TMS9929(config, TMS9929_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+}
 
 /*-------------------------------------------------
     MACHINE_CONFIG_START( lasr2001 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(laser2001_state::lasr2001)
+void laser2001_state::lasr2001(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL(17'734'470)/9)
-	MCFG_CPU_PROGRAM_MAP(lasr2001_map)
+	M6502(config, m_maincpu, XTAL(17'734'470)/9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &laser2001_state::lasr2001_map);
 
 	// devices
-	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(laser2001_state, pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(laser2001_state, pia_pb_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(laser2001_state, pia_ca1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(laser2001_state, pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(laser2001_state, pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(laser2001_state, pia_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(laser2001_state, pia_cb2_w))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(laser2001_state::pia_pa_r));
+	m_pia->readpb_handler().set(FUNC(laser2001_state::pia_pb_r));
+	m_pia->readca1_handler().set(FUNC(laser2001_state::pia_ca1_r));
+	m_pia->writepa_handler().set(FUNC(laser2001_state::pia_pa_w));
+	m_pia->writepb_handler().set(FUNC(laser2001_state::pia_pb_w));
+	m_pia->ca2_handler().set(FUNC(laser2001_state::pia_ca2_w));
+	m_pia->cb2_handler().set(FUNC(laser2001_state::pia_cb2_w));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(laser2001_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(laser2001_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	// video hardware
-	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9929A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9929_TAG, tms9929a_device, screen_update )
+	tms9929a_device &vdp(TMS9929A(config, TMS9929_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489_TAG, SN76489A, XTAL(17'734'470)/9)
-	MCFG_SN76496_READY_HANDLER(WRITELINE(laser2001_state, write_psg_ready))
+	SPEAKER(config, "mono").front_center();
+	SN76489A(config, m_psg, XTAL(17'734'470)/9);
+	m_psg->ready_cb().set(FUNC(laser2001_state::write_psg_ready));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	WAVE(config, "wave", m_cassette).add_route(1, "mono", 0.25);
 
 	// cartridge
-	MCFG_CRVISION_CARTRIDGE_ADD("cartslot", crvision_cart, nullptr)
+	CRVISION_CART_SLOT(config, m_cart, crvision_cart, nullptr);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, m_ram);
+	m_ram->set_default_size("16K");
+	m_ram->set_extra_options("32K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list","crvision")
-	MCFG_SOFTWARE_LIST_ADD("cart_list2","laser2001_cart")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("crvision");
+	SOFTWARE_LIST(config, "cart_list2").set_original("laser2001_cart");
+}
 
 /***************************************************************************
     ROMS
@@ -902,14 +905,14 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE   INPUT     STATE               INIT  COMPANY                   FULLNAME                       FLAGS
-CONS( 1982, crvision,   0,          0,      pal,      crvision, crvision_pal_state, 0,    "Video Technology",       "CreatiVision",                0 )
-CONS( 1982, fnvision,   crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Video Technology",       "FunVision",                   0 )
-CONS( 1982, crvisioj,   crvision,   0,      ntsc,     crvision, crvision_state,     0,    "Cheryco",                "CreatiVision (Japan)",        0 )
-CONS( 1982, wizzard,    crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Dick Smith Electronics", "Wizzard (Oceania)",           0 )
-CONS( 1982, rameses,    crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Hanimex",                "Rameses (Oceania)",           0 )
-CONS( 1983, vz2000,     crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Dick Smith Electronics", "VZ 2000 (Oceania)",           0 )
-CONS( 1983, crvisio2,   crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Video Technology",       "CreatiVision MK-II (Europe)", 0 )
-COMP( 1983, lasr2001,   0,          0,      lasr2001, manager,  laser2001_state,    0,    "Video Technology",       "Laser 2001",                  0 )
-//COMP( 1983, vz2001,     lasr2001,   0,      lasr2001, lasr2001, laser2001_state,    0,    "Dick Smith Electronics", "VZ 2001 (Oceania)",           0 )
-COMP( 1983, manager,    0,          0,      lasr2001, manager, laser2001_state,     0,     "Salora",                "Manager (Finland)",           0 )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS               INIT        COMPANY                   FULLNAME                       FLAGS
+CONS( 1982, crvision, 0,        0,      pal,      crvision, crvision_pal_state, empty_init, "Video Technology",       "CreatiVision",                0 )
+CONS( 1982, fnvision, crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Video Technology",       "FunVision",                   0 )
+CONS( 1982, crvisioj, crvision, 0,      ntsc,     crvision, crvision_state,     empty_init, "Cheryco",                "CreatiVision (Japan)",        0 )
+CONS( 1982, wizzard,  crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Dick Smith Electronics", "Wizzard (Oceania)",           0 )
+CONS( 1982, rameses,  crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Hanimex",                "Rameses (Oceania)",           0 )
+CONS( 1983, vz2000,   crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Dick Smith Electronics", "VZ 2000 (Oceania)",           0 )
+CONS( 1983, crvisio2, crvision, 0,      pal,      crvision, crvision_pal_state, empty_init, "Video Technology",       "CreatiVision MK-II (Europe)", 0 )
+COMP( 1983, lasr2001, 0,        0,      lasr2001, manager,  laser2001_state,    empty_init, "Video Technology",       "Laser 2001",                  0 )
+//COMP( 1983, vz2001,   lasr2001, 0,      lasr2001, lasr2001, laser2001_state,    empty_init, "Dick Smith Electronics", "VZ 2001 (Oceania)",           0 )
+COMP( 1983, manager,  0,        0,      lasr2001, manager, laser2001_state,     empty_init, "Salora",                 "Manager (Finland)",           0 )

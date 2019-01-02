@@ -431,7 +431,7 @@ void core_options::add_entry(entry::shared_ptr &&entry, const char *after_header
 
 void core_options::add_to_entry_map(std::string &&name, entry::shared_ptr &entry)
 {
-	// it is illegal to call this method for something that already ex0ists
+	// it is illegal to call this method for something that already exists
 	assert(m_entrymap.find(name) == m_entrymap.end());
 
 	// append the entry
@@ -1024,4 +1024,31 @@ bool core_options::header_exists(const char *description) const
 		});
 
 	return iter != m_entries.end();
+}
+
+//-------------------------------------------------
+//  revert - revert options at or below a certain
+//  priority back to their defaults
+//-------------------------------------------------
+
+void core_options::revert(int priority_hi, int priority_lo)
+{
+	for (entry::shared_ptr &curentry : m_entries)
+		if (curentry->type() != option_type::HEADER)
+			curentry->revert(priority_hi, priority_lo);
+}
+
+//-------------------------------------------------
+//  revert - revert back to our default if we are
+//  within the given priority range
+//-------------------------------------------------
+
+void core_options::simple_entry::revert(int priority_hi, int priority_lo)
+{
+	// if our priority is within the range, revert to the default
+	if (priority() <= priority_hi && priority() >= priority_lo)
+	{
+		set_value(std::string(default_value()), priority(), true);
+		set_priority(OPTION_PRIORITY_DEFAULT);
+	}
 }

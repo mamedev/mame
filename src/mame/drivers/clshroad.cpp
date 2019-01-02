@@ -78,10 +78,10 @@ void clshroad_state::clshroad_map(address_map &map)
 	map(0x9800, 0x9dff).ram();
 	map(0x9e00, 0x9fff).ram().share("spriteram");
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xa100, 0xa107).r(this, FUNC(clshroad_state::input_r));
-	map(0xa800, 0xafff).ram().w(this, FUNC(clshroad_state::vram_1_w)).share("vram_1"); // Layer 1
+	map(0xa100, 0xa107).r(FUNC(clshroad_state::input_r));
+	map(0xa800, 0xafff).ram().w(FUNC(clshroad_state::vram_1_w)).share("vram_1"); // Layer 1
 	map(0xb000, 0xb003).writeonly().share("vregs"); // Scroll
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(clshroad_state::vram_0_w)).share("vram_0"); // Layer 0
+	map(0xc000, 0xc7ff).ram().w(FUNC(clshroad_state::vram_0_w)).share("vram_0"); // Layer 0
 }
 
 void clshroad_state::clshroad_sound_map(address_map &map)
@@ -246,13 +246,13 @@ static const gfx_layout layout_16x16x4 =
 	16*16*2
 };
 
-static GFXDECODE_START( firebatl )
+static GFXDECODE_START( gfx_firebatl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,   0, 16 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,  16,  1 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x2,   512, 64 ) // [2] Layer 1
 GFXDECODE_END
 
-static GFXDECODE_START( clshroad )
+static GFXDECODE_START( gfx_clshroad )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,    0, 16 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x90,  1 ) // [1] Layer 0
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x4,      0, 16 ) // [2] Layer 1
@@ -275,19 +275,19 @@ INTERRUPT_GEN_MEMBER(clshroad_state::sound_timer_irq)
 MACHINE_CONFIG_START(clshroad_state::firebatl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)   /* ? */
-	MCFG_CPU_PROGRAM_MAP(clshroad_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK)   /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(clshroad_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK)  /* ? */
-	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
+	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_CLOCK)  /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(clshroad_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(clshroad_state, main_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(clshroad_state, sound_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(clshroad_state, flipscreen_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert();
+	mainlatch.q_out_cb<1>().set(FUNC(clshroad_state::main_irq_mask_w));
+	mainlatch.q_out_cb<3>().set(FUNC(clshroad_state::sound_irq_mask_w));
+	mainlatch.q_out_cb<4>().set(FUNC(clshroad_state::flipscreen_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -296,39 +296,37 @@ MACHINE_CONFIG_START(clshroad_state::firebatl)
 	MCFG_SCREEN_SIZE(0x120, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firebatl)
-	MCFG_PALETTE_ADD("palette", 512+64*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(clshroad_state,firebatl)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_firebatl);
+	PALETTE(config, m_palette, FUNC(clshroad_state::firebatl_palette), 512+64*4, 256);
 
 	MCFG_VIDEO_START_OVERRIDE(clshroad_state,firebatl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("custom", WIPING_CUSTOM, 96000)
+	MCFG_DEVICE_ADD("custom", WIPING_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(clshroad_state::clshroad)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)  /* ? real speed unknown. 3MHz is too low and causes problems */
-	MCFG_CPU_PROGRAM_MAP(clshroad_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK)  /* ? real speed unknown. 3MHz is too low and causes problems */
+	MCFG_DEVICE_PROGRAM_MAP(clshroad_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK) /* ? */
-	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
-	MCFG_CPU_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 60)    /* periodic interrupt, don't know about the frequency */
+	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_CLOCK) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(clshroad_sound_map)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 60)    /* periodic interrupt, don't know about the frequency */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // never writes here?
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(clshroad_state, main_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(clshroad_state, sound_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(clshroad_state, flipscreen_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set_nop(); // never writes here?
+	mainlatch.q_out_cb<1>().set(FUNC(clshroad_state::main_irq_mask_w));
+	mainlatch.q_out_cb<3>().set(FUNC(clshroad_state::sound_irq_mask_w));
+	mainlatch.q_out_cb<4>().set(FUNC(clshroad_state::flipscreen_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -337,18 +335,17 @@ MACHINE_CONFIG_START(clshroad_state::clshroad)
 	MCFG_SCREEN_SIZE(0x120, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(clshroad_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", clshroad)
-	MCFG_PALETTE_ADD("palette", 256)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_clshroad);
+	PALETTE(config, m_palette, FUNC(clshroad_state::clshroad_palette), 256);
 
-	MCFG_PALETTE_INIT_OWNER(clshroad_state,clshroad)
 	MCFG_VIDEO_START_OVERRIDE(clshroad_state,clshroad)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("custom", WIPING_CUSTOM, 96000)
+	MCFG_DEVICE_ADD("custom", WIPING_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -560,7 +557,7 @@ ROM_START( clshroadd )
 	ROM_LOAD( "clashrd.g7",  0x0100, 0x0100, CRC(4017a2a6) SHA1(dadef2de7a1119758c8e6d397aa42815b0218889) ) /* high 4 bits */
 ROM_END
 
-DRIVER_INIT_MEMBER(clshroad_state,firebatl)
+void clshroad_state::init_firebatl()
 {
 	// applying HACK to fix the game
 	// without this the death sequence never ends so the game is unplayable after you
@@ -572,7 +569,7 @@ DRIVER_INIT_MEMBER(clshroad_state,firebatl)
 	ROM[0x05C8] = 0x23;
 }
 
-GAME( 1984, firebatl, 0,        firebatl, firebatl, clshroad_state, firebatl, ROT90, "Wood Place Inc. (Taito license)",             "Fire Battle",                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, clshroad, 0,        clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc.",                             "Clash-Road",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, clshroads,clshroad, clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1986, clshroadd,clshroad, clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc. (Data East license)",         "Clash-Road (Data East license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, firebatl,  0,        firebatl, firebatl, clshroad_state, init_firebatl, ROT90, "Wood Place Inc. (Taito license)",             "Fire Battle",                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, clshroad,  0,        clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Wood Place Inc.",                             "Clash-Road",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, clshroads, clshroad, clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, clshroadd, clshroad, clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Wood Place Inc. (Data East license)",         "Clash-Road (Data East license)", MACHINE_SUPPORTS_SAVE )

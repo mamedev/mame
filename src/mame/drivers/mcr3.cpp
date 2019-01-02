@@ -319,9 +319,9 @@ WRITE8_MEMBER(mcr3_state::powerdrv_op5_w)
 	/* bit 3 -> J1-10 = lamp 1 */
 	/* bit 2 -> J1-8 = lamp 2 */
 	/* bit 1 -> J1-6 = lamp 3 */
-	output().set_led_value(0, (data >> 3) & 1);
-	output().set_led_value(1, (data >> 2) & 1);
-	output().set_led_value(2, (data >> 1) & 1);
+	m_lamps[0] = BIT(data, 3);
+	m_lamps[1] = BIT(data, 2);
+	m_lamps[2] = BIT(data, 1);
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
@@ -362,9 +362,9 @@ WRITE8_MEMBER(mcr3_state::stargrds_op5_w)
 	/* bit 2 controls light #0 */
 	/* bit 3 controls light #1 */
 	/* bit 4 controls light #2 */
-	output().set_led_value(0, (data >> 2) & 1);
-	output().set_led_value(1, (data >> 3) & 1);
-	output().set_led_value(2, (data >> 4) & 1);
+	m_lamps[0] = BIT(data, 2);
+	m_lamps[1] = BIT(data, 3);
+	m_lamps[2] = BIT(data, 4);
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
@@ -435,13 +435,6 @@ WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 }
 
 
-template<int n>
-WRITE_LINE_MEMBER(mcr3_state::spyhunt_lamp_w)
-{
-	m_spyhunt_lamp[n] = state;
-}
-
-
 
 /*************************************
  *
@@ -488,8 +481,8 @@ void mcr3_state::mcrmono_map(address_map &map)
 	map(0xe000, 0xe7ff).ram().share("nvram");
 	map(0xe800, 0xe9ff).ram().share("spriteram");
 	map(0xea00, 0xebff).ram();
-	map(0xec00, 0xec7f).mirror(0x0380).w(this, FUNC(mcr3_state::mcr_paletteram9_w)).share("paletteram");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(mcr3_state::mcr3_videoram_w)).share("videoram");
+	map(0xec00, 0xec7f).mirror(0x0380).w(FUNC(mcr3_state::mcr_paletteram9_w)).share("paletteram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(mcr3_state::mcr3_videoram_w)).share("videoram");
 	map(0xf800, 0xffff).rom();     /* schematics show a 2716 @ 2B here, but nobody used it */
 }
 
@@ -503,7 +496,7 @@ void mcr3_state::mcrmono_portmap(address_map &map)
 	map(0x02, 0x02).mirror(0x78).portr("MONO.IP2");
 	map(0x03, 0x03).mirror(0x78).portr("MONO.IP3");
 	map(0x04, 0x04).mirror(0x78).portr("MONO.IP4");
-	map(0x05, 0x05).mirror(0x78).w(this, FUNC(mcr3_state::mcrmono_control_port_w));
+	map(0x05, 0x05).mirror(0x78).w(FUNC(mcr3_state::mcrmono_control_port_w));
 	map(0x07, 0x07).mirror(0x78).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xf0, 0xf3).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
@@ -521,11 +514,11 @@ void mcr3_state::spyhunt_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xdfff).rom();
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(mcr3_state::spyhunt_videoram_w)).share("videoram");
-	map(0xe800, 0xebff).mirror(0x0400).ram().w(this, FUNC(mcr3_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
+	map(0xe000, 0xe7ff).ram().w(FUNC(mcr3_state::spyhunt_videoram_w)).share("videoram");
+	map(0xe800, 0xebff).mirror(0x0400).ram().w(FUNC(mcr3_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
 	map(0xf000, 0xf7ff).ram().share("nvram");
 	map(0xf800, 0xf9ff).ram().share("spriteram");
-	map(0xfa00, 0xfa7f).mirror(0x0180).w(this, FUNC(mcr3_state::mcr_paletteram9_w)).share("paletteram");
+	map(0xfa00, 0xfa7f).mirror(0x0180).w(FUNC(mcr3_state::mcr_paletteram9_w)).share("paletteram");
 }
 
 /* upper I/O map determined by PAL; only SSIO ports and scroll registers are verified from schematics */
@@ -533,8 +526,8 @@ void mcr3_state::spyhunt_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
-	map(0x84, 0x86).w(this, FUNC(mcr3_state::spyhunt_scroll_value_w));
+	midway_ssio_device::ssio_input_ports(map, "ssio");
+	map(0x84, 0x86).w(FUNC(mcr3_state::spyhunt_scroll_value_w));
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -1065,13 +1058,13 @@ static const gfx_layout spyhunt_alphalayout =
 };
 
 
-static GFXDECODE_START( mcr3 )
+static GFXDECODE_START( gfx_mcr3 )
 	GFXDECODE_SCALE( "gfx1", 0, mcr_bg_layout,     0, 4, 2, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout, 0, 4 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( spyhunt )
+static GFXDECODE_START( gfx_spyhunt )
 	GFXDECODE_ENTRY( "gfx1", 0, spyhunt_charlayout,  3*16, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout,   0*16, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spyhunt_alphalayout, 4*16, 1 )
@@ -1088,26 +1081,27 @@ GFXDECODE_END
 MACHINE_CONFIG_START(mcr3_state::mcrmono)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(mcrmono_map)
-	MCFG_CPU_IO_MAP(mcrmono_portmap)
-	MCFG_Z80_DAISY_CHAIN(mcr_daisy_chain)
+	Z80(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr3_state::mcrmono_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr3_state::mcrmono_portmap);
+	m_maincpu->set_daisy_config(mcr_daisy_chain);
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr3_state, mcr_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK/4 /* same as "maincpu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
+	Z80CTC(config, m_ctc, MASTER_CLOCK/4 /* same as "maincpu" */);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(30)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -1116,8 +1110,8 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_mcr3)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr3)
-	MCFG_PALETTE_ADD("palette", 64)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_mcr3);
+	PALETTE(config, "palette").set_entries(64);
 MACHINE_CONFIG_END
 
 
@@ -1129,19 +1123,21 @@ MACHINE_CONFIG_START(mcr3_state::mono_tcs)
 	mcrmono(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
+	MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mcr3_state::maxrpm)
+void mcr3_state::maxrpm(machine_config &config)
+{
 	mono_tcs(config);
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_CH1_CB(IOPORT("MONO.IP1"))
-	MCFG_ADC0844_CH2_CB(IOPORT("MONO.IP1.ALT1"))
-	MCFG_ADC0844_CH3_CB(IOPORT("MONO.IP1.ALT2"))
-	MCFG_ADC0844_CH4_CB(IOPORT("MONO.IP1.ALT3"))
-MACHINE_CONFIG_END
+
+	ADC0844(config, m_maxrpm_adc);
+	m_maxrpm_adc->ch1_callback().set_ioport("MONO.IP1");
+	m_maxrpm_adc->ch2_callback().set_ioport("MONO.IP1.ALT1");
+	m_maxrpm_adc->ch3_callback().set_ioport("MONO.IP1.ALT2");
+	m_maxrpm_adc->ch4_callback().set_ioport("MONO.IP1.ALT3");
+}
 
 
 /* Rampage/Power Drive/Star Guards = MCR monoboard with Sounds Good */
@@ -1149,7 +1145,7 @@ MACHINE_CONFIG_START(mcr3_state::mono_sg)
 	mcrmono(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
+	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1163,24 +1159,21 @@ MACHINE_CONFIG_START(mcr3_state::mcrscroll)
 	mcrmono(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("ssio", MIDWAY_SSIO, 0)
+	MCFG_DEVICE_ADD("ssio", MIDWAY_SSIO)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spyhunt_map)
-	MCFG_CPU_IO_MAP(spyhunt_portmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr3_state::spyhunt_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr3_state::spyhunt_portmap);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(30*16, 30*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_spyhunt)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", spyhunt)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64+4)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spyhunt)
+	subdevice<palette_device>("palette")->set_entries(64 + 4).set_init(FUNC(mcr3_state::spyhunt_palette));
 
-	MCFG_PALETTE_INIT_OWNER(mcr3_state,spyhunt)
 	MCFG_VIDEO_START_OVERRIDE(mcr3_state,spyhunt)
 MACHINE_CONFIG_END
 
@@ -1190,19 +1183,19 @@ MACHINE_CONFIG_START(mcr3_state::mcrsc_csd)
 	mcrscroll(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE, 0)
+	MCFG_DEVICE_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("lamplatch", CD4099, 0) // U1 on Lamp Driver Board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<2>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<3>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<4>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<5>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<6>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<7>))
+	CD4099(config, m_lamplatch); // U1 on Lamp Driver Board
+	m_lamplatch->q_out_cb<0>().set_output("lamp0");
+	m_lamplatch->q_out_cb<1>().set_output("lamp1");
+	m_lamplatch->q_out_cb<2>().set_output("lamp2");
+	m_lamplatch->q_out_cb<3>().set_output("lamp3");
+	m_lamplatch->q_out_cb<4>().set_output("lamp4");
+	m_lamplatch->q_out_cb<5>().set_output("lamp5");
+	m_lamplatch->q_out_cb<6>().set_output("lamp6");
+	m_lamplatch->q_out_cb<7>().set_output("lamp7");
 MACHINE_CONFIG_END
 
 
@@ -1576,7 +1569,7 @@ void mcr3_state::mcr_common_init()
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,demoderm)
+void mcr3_state::init_demoderm()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(FUNC(mcr3_state::demoderm_ip1_r),this));
@@ -1585,14 +1578,14 @@ DRIVER_INIT_MEMBER(mcr3_state,demoderm)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,sarge)
+void mcr3_state::init_sarge()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(midway_turbo_cheap_squeak_device::write),m_turbo_cheap_squeak.target()));
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,maxrpm)
+void mcr3_state::init_maxrpm()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(FUNC(mcr3_state::maxrpm_ip1_r),this));
@@ -1607,7 +1600,7 @@ DRIVER_INIT_MEMBER(mcr3_state,maxrpm)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,rampage)
+void mcr3_state::init_rampage()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x04, read8_delegate(FUNC(mcr3_state::rampage_ip4_r),this));
@@ -1615,7 +1608,7 @@ DRIVER_INIT_MEMBER(mcr3_state,rampage)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,powerdrv)
+void mcr3_state::init_powerdrv()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(FUNC(mcr3_state::powerdrv_ip2_r),this));
@@ -1624,7 +1617,7 @@ DRIVER_INIT_MEMBER(mcr3_state,powerdrv)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,stargrds)
+void mcr3_state::init_stargrds()
 {
 	mcr_common_init();
 	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(mcr3_state::stargrds_ip0_r),this));
@@ -1633,14 +1626,12 @@ DRIVER_INIT_MEMBER(mcr3_state,stargrds)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
+void mcr3_state::init_spyhunt()
 {
 	mcr_common_init();
 	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
 	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
 	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
-
-	m_spyhunt_lamp.resolve();
 
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 16;
@@ -1648,7 +1639,7 @@ DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
 
 
 
-DRIVER_INIT_MEMBER(mcr3_state,crater)
+void mcr3_state::init_crater()
 {
 	mcr_common_init();
 
@@ -1657,20 +1648,18 @@ DRIVER_INIT_MEMBER(mcr3_state,crater)
 }
 
 
-DRIVER_INIT_MEMBER(mcr3_state,turbotag)
+void mcr3_state::init_turbotag()
 {
 	mcr_common_init();
 	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
 	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),this));
 	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
 
-	m_spyhunt_lamp.resolve();
-
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 88;
 
-	/* the SSIO Z80 doesn't have any program to execute */
-	machine().device<cpu_device>("csd:cpu")->suspend(SUSPEND_REASON_DISABLE, 1);
+	/* the CSD 68k doesn't have any program to execute */
+	m_cheap_squeak_deluxe->suspend_cpu();
 
 	/* kludge for bad ROM read */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0b53, 0x0b53, read8_delegate(FUNC(mcr3_state::turbotag_kludge_r),this));
@@ -1685,16 +1674,16 @@ DRIVER_INIT_MEMBER(mcr3_state,turbotag)
  *************************************/
 
 /* MCR monoboard games */
-GAME( 1984, demoderm, demoderb, mono_tcs,  demoderm, mcr3_state, demoderm, ROT0,  "Bally Midway", "Demolition Derby (MCR-3 Mono Board Version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sarge,    0,        mono_tcs,  sarge,    mcr3_state, sarge,    ROT0,  "Bally Midway", "Sarge", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, maxrpm,   0,        maxrpm,    maxrpm,   mcr3_state, maxrpm,   ROT0,  "Bally Midway", "Max RPM (ver 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rampage,  0,        mono_sg,   rampage,  mcr3_state, rampage,  ROT0,  "Bally Midway", "Rampage (Rev 3, 8/27/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rampage2, rampage,  mono_sg,   rampage,  mcr3_state, rampage,  ROT0,  "Bally Midway", "Rampage (Rev 2, 8/4/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, powerdrv, 0,        mono_sg,   powerdrv, mcr3_state, powerdrv, ROT0,  "Bally Midway", "Power Drive", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, stargrds, 0,        mono_sg,   stargrds, mcr3_state, stargrds, ROT0,  "Bally Midway", "Star Guards", MACHINE_SUPPORTS_SAVE )
+GAME(  1984, demoderm, demoderb, mono_tcs,  demoderm, mcr3_state, init_demoderm, ROT0,  "Bally Midway", "Demolition Derby (MCR-3 Mono Board Version)", MACHINE_SUPPORTS_SAVE )
+GAME(  1985, sarge,    0,        mono_tcs,  sarge,    mcr3_state, init_sarge,    ROT0,  "Bally Midway", "Sarge", MACHINE_SUPPORTS_SAVE )
+GAME(  1986, maxrpm,   0,        maxrpm,    maxrpm,   mcr3_state, init_maxrpm,   ROT0,  "Bally Midway", "Max RPM (ver 2)", MACHINE_SUPPORTS_SAVE )
+GAME(  1986, rampage,  0,        mono_sg,   rampage,  mcr3_state, init_rampage,  ROT0,  "Bally Midway", "Rampage (Rev 3, 8/27/86)", MACHINE_SUPPORTS_SAVE )
+GAME(  1986, rampage2, rampage,  mono_sg,   rampage,  mcr3_state, init_rampage,  ROT0,  "Bally Midway", "Rampage (Rev 2, 8/4/86)", MACHINE_SUPPORTS_SAVE )
+GAME(  1986, powerdrv, 0,        mono_sg,   powerdrv, mcr3_state, init_powerdrv, ROT0,  "Bally Midway", "Power Drive", MACHINE_SUPPORTS_SAVE )
+GAME(  1987, stargrds, 0,        mono_sg,   stargrds, mcr3_state, init_stargrds, ROT0,  "Bally Midway", "Star Guards", MACHINE_SUPPORTS_SAVE )
 
 /* MCR scrolling games */
-GAMEL(1983, spyhunt,  0,        mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway", "Spy Hunter", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
-GAMEL(1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  mcr3_state,  spyhunt,  ROT90, "Bally Midway (Playtronic license)", "Spy Hunter (Playtronic license)", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
-GAME( 1984, crater,   0,        mcrscroll, crater,   mcr3_state, crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", MACHINE_SUPPORTS_SAVE )
-GAMEL(1985, turbotag, 0,        mcrsc_csd, turbotag, mcr3_state, turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", MACHINE_SUPPORTS_SAVE, layout_turbotag )
+GAMEL( 1983, spyhunt,  0,        mcrsc_csd, spyhunt,  mcr3_state, init_spyhunt,  ROT90, "Bally Midway", "Spy Hunter", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
+GAMEL( 1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  mcr3_state, init_spyhunt,  ROT90, "Bally Midway (Playtronic license)", "Spy Hunter (Playtronic license)", MACHINE_SUPPORTS_SAVE, layout_spyhunt )
+GAME(  1984, crater,   0,        mcrscroll, crater,   mcr3_state, init_crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1985, turbotag, 0,        mcrsc_csd, turbotag, mcr3_state, init_turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", MACHINE_SUPPORTS_SAVE, layout_turbotag )

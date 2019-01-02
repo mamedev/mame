@@ -61,10 +61,17 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(atla_ltd);
-	DECLARE_DRIVER_INIT(bhol_ltd);
-	DECLARE_DRIVER_INIT(zephy);
-	DECLARE_DRIVER_INIT(ltd);
+	void ltd4(machine_config &config);
+	void ltd3(machine_config &config);
+
+	void init_atla_ltd();
+	void init_bhol_ltd();
+	void init_zephy();
+	void init_ltd();
+
+	DECLARE_INPUT_CHANGED_MEMBER(ficha);
+
+private:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(port1_r);
@@ -72,14 +79,10 @@ public:
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_WRITE8_MEMBER(count_reset_w);
-	DECLARE_INPUT_CHANGED_MEMBER(ficha);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
-	void ltd4(machine_config &config);
-	void ltd3(machine_config &config);
 	void ltd3_map(address_map &map);
-	void ltd4_io(address_map &map);
 	void ltd4_map(address_map &map);
-private:
+
 	bool m_timer_r;
 	bool m_clear;
 	uint8_t m_counter;
@@ -98,8 +101,8 @@ private:
 void ltd_state::ltd3_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram().share("nvram"); // internal to the cpu
-	map(0x0080, 0x0087).mirror(0x78).r(this, FUNC(ltd_state::io_r));
-	map(0x0800, 0x2fff).w(this, FUNC(ltd_state::io_w));
+	map(0x0080, 0x0087).mirror(0x78).r(FUNC(ltd_state::io_r));
+	map(0x0800, 0x2fff).w(FUNC(ltd_state::io_w));
 	map(0xc000, 0xcfff).rom().mirror(0x3000).region("roms", 0);
 }
 
@@ -108,7 +111,7 @@ void ltd_state::ltd4_map(address_map &map)
 	map(0x0000, 0x001f).ram(); // internal to the cpu
 	map(0x0080, 0x00ff).ram();
 	map(0x0100, 0x01ff).ram().share("nvram");
-	map(0x0800, 0x0800).w(this, FUNC(ltd_state::count_reset_w));
+	map(0x0800, 0x0800).w(FUNC(ltd_state::count_reset_w));
 	map(0x0c00, 0x0c00).w("aysnd_1", FUNC(ay8910_device::reset_w));
 	map(0x1000, 0x1000).w("aysnd_0", FUNC(ay8910_device::address_w));
 	map(0x1400, 0x1400).w("aysnd_0", FUNC(ay8910_device::reset_w));
@@ -117,12 +120,6 @@ void ltd_state::ltd4_map(address_map &map)
 	map(0x3000, 0x3000).w("aysnd_0", FUNC(ay8910_device::data_w));
 	map(0x3800, 0x3800).w("aysnd_1", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xdfff).rom().mirror(0x2000).region("roms", 0);
-}
-
-void ltd_state::ltd4_io(address_map &map)
-{
-	map(0x0100, 0x0100).rw(this, FUNC(ltd_state::port1_r), FUNC(ltd_state::port1_w));
-	map(0x0101, 0x0101).rw(this, FUNC(ltd_state::port2_r), FUNC(ltd_state::port2_w));
 }
 
 // bits 6,7 not connected to data bus
@@ -249,7 +246,7 @@ INPUT_PORTS_END
 INPUT_CHANGED_MEMBER( ltd_state::ficha )
 {
 	if(newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 // switches
@@ -379,22 +376,22 @@ void ltd_state::machine_reset()
 	m_timer_r = 0;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, ltd )
+void ltd_state::init_ltd()
 {
 	m_game = 0;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, atla_ltd )
+void ltd_state::init_atla_ltd()
 {
 	m_game = 1;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, bhol_ltd )
+void ltd_state::init_bhol_ltd()
 {
 	m_game = 2;
 }
 
-DRIVER_INIT_MEMBER( ltd_state, zephy )
+void ltd_state::init_zephy()
 {
 	m_game = 3;
 }
@@ -528,13 +525,13 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 
 MACHINE_CONFIG_START(ltd_state::ltd3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(ltd3_map)
+	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(ltd3_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_ltd)
+	config.set_default_layout(layout_ltd);
 
 	/* Sound */
 	genpin_audio(config);
@@ -544,23 +541,24 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ltd_state::ltd4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6803, XTAL(3'579'545)) // guess, no details available
-	MCFG_CPU_PROGRAM_MAP(ltd4_map)
-	MCFG_CPU_IO_MAP(ltd4_io)
+	m6803_cpu_device &maincpu(M6803(config, "maincpu", XTAL(3'579'545))); // guess, no details available
+	maincpu.set_addrmap(AS_PROGRAM, &ltd_state::ltd4_map);
+	maincpu.in_p1_cb().set(FUNC(ltd_state::port1_r));
+	maincpu.out_p1_cb().set(FUNC(ltd_state::port1_w));
+	maincpu.in_p2_cb().set(FUNC(ltd_state::port2_r));
+	maincpu.out_p2_cb().set(FUNC(ltd_state::port2_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_ltd)
+	config.set_default_layout(layout_ltd);
 
 	/* Sound */
 	genpin_audio(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd_0", AY8910, XTAL(3'579'545)/2) /* guess */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
-	MCFG_SOUND_ADD("aysnd_1", AY8910, XTAL(3'579'545)/2) /* guess */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, "aysnd_0", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.3); /* guess */
+	AY8910(config, "aysnd_1", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.3); /* guess */
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -750,24 +748,24 @@ ROM_START(tricksht)
 ROM_END
 
 // system 3
-GAME(1981, arizona,          0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Arizona",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, atla_ltd,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1981, discodan,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Disco Dancing",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, hustlerp,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Hustler",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, kkongltd,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "King Kong",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?, vikngkng,         0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Viking King",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, force,            0,  ltd3,  ltd3, ltd_state, atla_ltd, ROT0, "LTD", "Force",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, bhol_ltd,         0,  ltd3,  ltd3, ltd_state, bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1981, cowboy,           0,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Cowboy Eight Ball",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, zephy,            0,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Zephy",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, zephya,       zephy,  ltd3,  ltd3, ltd_state, zephy,    ROT0, "LTD", "Zephy (alternate set)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, arizona,  0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Arizona",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, atla_ltd, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1981, discodan, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Disco Dancing",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, hustlerp, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Hustler",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, kkongltd, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "King Kong",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?, vikngkng, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Viking King",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, force,    0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Force",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, bhol_ltd, 0,        ltd3, ltd3, ltd_state, init_bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1981, cowboy,   0,        ltd3, ltd3, ltd_state, init_zephy,    ROT0, "LTD", "Cowboy Eight Ball",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, zephy,    0,        ltd3, ltd3, ltd_state, init_zephy,    ROT0, "LTD", "Zephy",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, zephya,   zephy,    ltd3, ltd3, ltd_state, init_zephy,    ROT0, "LTD", "Zephy (alternate set)",             MACHINE_IS_SKELETON_MECHANICAL)
 
 // system 4
-GAME(1982, cowboy2,          0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Cowboy Eight Ball 2",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, hhotel,           0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Haunted Hotel",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, pecmen,           0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Mr. & Mrs. Pec-Men",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, alcapone,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Al Capone",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982, columbia,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Columbia",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, tmacltd4,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Time Machine (LTD, 4 players)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, tmacltd2,  tmacltd4,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Time Machine (LTD, 2 players)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982, tricksht,         0,  ltd4,  ltd4, ltd_state, ltd,      ROT0, "LTD", "Trick Shooter",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, cowboy2,  0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Cowboy Eight Ball 2",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, hhotel,   0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Haunted Hotel",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, pecmen,   0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Mr. & Mrs. Pec-Men",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, alcapone, 0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Al Capone",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, columbia, 0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Columbia",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, tmacltd4, 0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Time Machine (LTD, 4 players)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, tmacltd2, tmacltd4, ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Time Machine (LTD, 2 players)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, tricksht, 0,        ltd4, ltd4, ltd_state, init_ltd,      ROT0, "LTD", "Trick Shooter",                     MACHINE_IS_SKELETON_MECHANICAL)

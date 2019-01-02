@@ -57,19 +57,23 @@ public:
 	ecoinfr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_reel0(*this, "reel0"),
-		m_reel1(*this, "reel1"),
-		m_reel2(*this, "reel2"),
-		m_reel3(*this, "reel3"),
+		m_reel(*this, "reel%u", 0U),
 		m_digits(*this, "digit%u", 0U)
 		{ }
 
+	void ecoinfr(machine_config &config);
+
+	void init_ecoinfrbr();
+	void init_ecoinfr();
+	void init_ecoinfrmab();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel1_opto_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel2_opto_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel3_opto_r);
+
+private:
 	int irq_toggle;
 	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 
 	uint8_t port09_value;
 	uint8_t port10_value;
@@ -81,6 +85,7 @@ public:
 	uint8_t port16_value;
 	uint8_t port17_value;
 
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	DECLARE_WRITE8_MEMBER(ec_port00_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port01_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port02_out_w);
@@ -106,13 +111,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ec_port16_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port17_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port18_out_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel1_opto_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel2_opto_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel3_opto_r);
 
-	DECLARE_DRIVER_INIT(ecoinfrbr);
-	DECLARE_DRIVER_INIT(ecoinfr);
-	DECLARE_DRIVER_INIT(ecoinfrmab);
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
@@ -121,12 +120,8 @@ public:
 	uint8_t m_credsel;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<stepper_device> m_reel0;
-	required_device<stepper_device> m_reel1;
-	required_device<stepper_device> m_reel2;
-	required_device<stepper_device> m_reel3;
+	required_device_array<stepper_device, 4> m_reel;
 	output_finder<16> m_digits;
-	void ecoinfr(machine_config &config);
 	void memmap(address_map &map);
 	void portmap(address_map &map);
 };
@@ -172,9 +167,9 @@ WRITE8_MEMBER(ecoinfr_state::ec_port00_out_w)
 		printf("ec_port0a_out_w (reel 1 port) unk bits used %02x\n", data);
 	}
 
-	m_reel0->update(data&0x0f);
+	m_reel[0]->update(data&0x0f);
 
-	awp_draw_reel(machine(),"reel1", *m_reel0);
+	awp_draw_reel(machine(),"reel1", *m_reel[0]);
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
@@ -184,9 +179,9 @@ WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
 		printf("ec_port01_out_w (reel 2 port) unk bits used %02x\n", data);
 	}
 
-	m_reel1->update(data&0x0f);
+	m_reel[1]->update(data&0x0f);
 
-	awp_draw_reel(machine(),"reel2", *m_reel1);
+	awp_draw_reel(machine(),"reel2", *m_reel[1]);
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
@@ -196,9 +191,9 @@ WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
 		printf("ec_port02_out_w (reel 3 port) unk bits used %02x\n", data);
 	}
 
-	m_reel2->update(data&0x0f);
+	m_reel[2]->update(data&0x0f);
 
-	awp_draw_reel(machine(),"reel3", *m_reel2);
+	awp_draw_reel(machine(),"reel3", *m_reel[2]);
 }
 
 
@@ -484,8 +479,7 @@ void ecoinfr_state::memmap(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
 
-	map(0xa000, 0xa000).rw(UPD8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xa001, 0xa001).rw(UPD8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xa000, 0xa001).rw(UPD8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 
 }
 
@@ -494,31 +488,31 @@ void ecoinfr_state::memmap(address_map &map)
 void ecoinfr_state::portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(ecoinfr_state::ec_port00_out_w)).portr("IN0"); // Reel 1 Write
-	map(0x01, 0x01).w(this, FUNC(ecoinfr_state::ec_port01_out_w)).portr("IN1"); // Reel 2 Write + Reels Opto Read
-	map(0x02, 0x02).w(this, FUNC(ecoinfr_state::ec_port02_out_w)).portr("IN2"); // Reel 3 Write
-	map(0x03, 0x03).w(this, FUNC(ecoinfr_state::ec_port03_out_w)).portr("IN3");
-	map(0x04, 0x04).w(this, FUNC(ecoinfr_state::ec_port04_out_w)).portr("IN4");
-	map(0x05, 0x05).w(this, FUNC(ecoinfr_state::ec_port05_out_w)).portr("IN5");
-	map(0x06, 0x06).w(this, FUNC(ecoinfr_state::ec_port06_out_w)).portr("IN6");
-	map(0x07, 0x07).w(this, FUNC(ecoinfr_state::ec_port07_out_w)).portr("IN7");
-	map(0x08, 0x08).w(this, FUNC(ecoinfr_state::ec_port08_out_bank_strobe_w));
-	map(0x09, 0x09).w(this, FUNC(ecoinfr_state::ec_port09_out_reelen_w)); // 09 Reel Enables
-	map(0x0a, 0x0a).w(this, FUNC(ecoinfr_state::ec_port0a_out_w)); // 10 (Sound 1)
-	map(0x0b, 0x0b).w(this, FUNC(ecoinfr_state::ec_port0b_out_w)); // 11 (Sound 2)
-	map(0x0c, 0x0c).w(this, FUNC(ecoinfr_state::ec_port0c_out_cred_strobe_w));
-	map(0x0d, 0x0d).w(this, FUNC(ecoinfr_state::ec_port0d_out_cred_data_w));
+	map(0x00, 0x00).w(FUNC(ecoinfr_state::ec_port00_out_w)).portr("IN0"); // Reel 1 Write
+	map(0x01, 0x01).w(FUNC(ecoinfr_state::ec_port01_out_w)).portr("IN1"); // Reel 2 Write + Reels Opto Read
+	map(0x02, 0x02).w(FUNC(ecoinfr_state::ec_port02_out_w)).portr("IN2"); // Reel 3 Write
+	map(0x03, 0x03).w(FUNC(ecoinfr_state::ec_port03_out_w)).portr("IN3");
+	map(0x04, 0x04).w(FUNC(ecoinfr_state::ec_port04_out_w)).portr("IN4");
+	map(0x05, 0x05).w(FUNC(ecoinfr_state::ec_port05_out_w)).portr("IN5");
+	map(0x06, 0x06).w(FUNC(ecoinfr_state::ec_port06_out_w)).portr("IN6");
+	map(0x07, 0x07).w(FUNC(ecoinfr_state::ec_port07_out_w)).portr("IN7");
+	map(0x08, 0x08).w(FUNC(ecoinfr_state::ec_port08_out_bank_strobe_w));
+	map(0x09, 0x09).w(FUNC(ecoinfr_state::ec_port09_out_reelen_w)); // 09 Reel Enables
+	map(0x0a, 0x0a).w(FUNC(ecoinfr_state::ec_port0a_out_w)); // 10 (Sound 1)
+	map(0x0b, 0x0b).w(FUNC(ecoinfr_state::ec_port0b_out_w)); // 11 (Sound 2)
+	map(0x0c, 0x0c).w(FUNC(ecoinfr_state::ec_port0c_out_cred_strobe_w));
+	map(0x0d, 0x0d).w(FUNC(ecoinfr_state::ec_port0d_out_cred_data_w));
 //  AM_RANGE(0x0e, 0x0e) AM_WRITE(ec_port0e_out_w)
-	map(0x0f, 0x0f).w(this, FUNC(ecoinfr_state::ec_port0f_out_bank_segdata_w));
-	map(0x10, 0x10).w(this, FUNC(ecoinfr_state::ec_port10_out_w)); // 16 (Meter)
-	map(0x11, 0x11).w(this, FUNC(ecoinfr_state::ec_port11_out_w)); // SEC
-	map(0x12, 0x12).w(this, FUNC(ecoinfr_state::ec_port12_out_w)); // SEC
-	map(0x13, 0x13).w(this, FUNC(ecoinfr_state::ec_port13_out_w));
-	map(0x14, 0x14).w(this, FUNC(ecoinfr_state::ec_port14_out_w));
-	map(0x15, 0x15).w(this, FUNC(ecoinfr_state::ec_port15_out_w)); // SEC + VDF (3rd party)
-	map(0x16, 0x16).w(this, FUNC(ecoinfr_state::ec_port16_out_w));
-	map(0x17, 0x17).w(this, FUNC(ecoinfr_state::ec_port17_out_w)); // Hopper + VDF (3rd party)
-	map(0x18, 0x18).w(this, FUNC(ecoinfr_state::ec_port18_out_w)); // 24 (Watchdog)
+	map(0x0f, 0x0f).w(FUNC(ecoinfr_state::ec_port0f_out_bank_segdata_w));
+	map(0x10, 0x10).w(FUNC(ecoinfr_state::ec_port10_out_w)); // 16 (Meter)
+	map(0x11, 0x11).w(FUNC(ecoinfr_state::ec_port11_out_w)); // SEC
+	map(0x12, 0x12).w(FUNC(ecoinfr_state::ec_port12_out_w)); // SEC
+	map(0x13, 0x13).w(FUNC(ecoinfr_state::ec_port13_out_w));
+	map(0x14, 0x14).w(FUNC(ecoinfr_state::ec_port14_out_w));
+	map(0x15, 0x15).w(FUNC(ecoinfr_state::ec_port15_out_w)); // SEC + VDF (3rd party)
+	map(0x16, 0x16).w(FUNC(ecoinfr_state::ec_port16_out_w));
+	map(0x17, 0x17).w(FUNC(ecoinfr_state::ec_port17_out_w)); // Hopper + VDF (3rd party)
+	map(0x18, 0x18).w(FUNC(ecoinfr_state::ec_port18_out_w)); // 24 (Watchdog)
 }
 
 CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel1_opto_r)
@@ -778,32 +772,28 @@ void ecoinfr_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(ecoinfr_state::ecoinfr)
+void ecoinfr_state::ecoinfr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_IO_MAP(portmap)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ectimer", ecoinfr_state, ecoinfr_irq_timer, attotime::from_hz(250))
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinfr_state::memmap);
+	m_maincpu->set_addrmap(AS_IO, &ecoinfr_state::portmap);
+	TIMER(config , "ectimer" , 0).configure_periodic(timer_device::expired_delegate(FUNC(ecoinfr_state::ecoinfr_irq_timer) , this) , attotime::from_hz(250));
 
-	MCFG_DEFAULT_LAYOUT(layout_ecoinfr)
-
-
-	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
-
-	MCFG_ECOIN_200STEP_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinfr_state, reel0_optic_cb))
-	MCFG_ECOIN_200STEP_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinfr_state, reel1_optic_cb))
-	MCFG_ECOIN_200STEP_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinfr_state, reel2_optic_cb))
-	MCFG_ECOIN_200STEP_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinfr_state, reel3_optic_cb))
-MACHINE_CONFIG_END
+	config.set_default_layout(layout_ecoinfr);
 
 
+	I8251(config, UPD8251_TAG, 0);
 
-
-
+	REEL(config, m_reel[0], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reel[0]->optic_handler().set(FUNC(ecoinfr_state::reel_optic_cb<0>));
+	REEL(config, m_reel[1], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reel[1]->optic_handler().set(FUNC(ecoinfr_state::reel_optic_cb<1>));
+	REEL(config, m_reel[2], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reel[2]->optic_handler().set(FUNC(ecoinfr_state::reel_optic_cb<2>));
+	REEL(config, m_reel[3], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
+	m_reel[3]->optic_handler().set(FUNC(ecoinfr_state::reel_optic_cb<3>));
+}
 
 
 /********************************************************************************************************************
@@ -825,7 +815,7 @@ MACHINE_CONFIG_END
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_BARX_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfr, ROT0, company, title, GAME_FLAGS )
 
 /* 32Kb With Header / Space for Header */
 
@@ -955,7 +945,7 @@ GAME_CUSTOM( 199?, ec_bx180a,   ec_bx180,   "bxc1+6c.rom",  0x0000, 0x008000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_BIG7_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfr, ROT0, company, title, GAME_FLAGS )
 // This is almost certainly a mix of 'Big7' and 'Super Big7' ROMs
 /* All have 'BIG7' and type info in header */
 GAME_CUSTOM( 199?, ec_big7,     0,          "big7.bin",                 0x0000, 0x008000, CRC(12a08de2) SHA1(cce3526d3b47567d240739111ed4b7e2ba994de6), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 1)" )
@@ -1043,7 +1033,7 @@ GAME_CUSTOM( 199?, ec_big7__ay, ec_big7,    "bigcon8t.hex",             0x0000, 
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_SBARX_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfr, ROT0, company, title, GAME_FLAGS )
 
 /* Identified as 'SBARX2' header like BIG7 */
 GAME_CUSTOM( 199?, ec_sbarx,       0,          "iss3001.rom",                          0x0000, 0x008000, CRC(01390318) SHA1(e01a4160f774e376b5527ddee084a0be3eef865e), "Electrocoin","Super Bar X (Electrocoin) (set 1)" )
@@ -1134,7 +1124,7 @@ GAME_CUSTOM( 199?, ec_sbarx__a4,   ec_sbarx,   "sbx8elac",                      
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_SBARX_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfrbr ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrbr, ROT0, company, title, GAME_FLAGS )
 
 /* No Header - very similar to Brunel sets, but no device at 0xa000 */ // spin the reels a lot more than anything else
 GAME_CUSTOM( 1991, ec_sbxbr,         0,          "sbx5nc.10",                            0x0000, 0x008000, CRC(beb7254a) SHA1(137e91e0b92d970d09d165a42b890a5d31d795d9), "Brunel Research","Super Bar X (Brunel Research) (set 1)" )
@@ -1160,7 +1150,7 @@ GAME_CUSTOM( 1991, ec_sbxbrh,        ec_sbxbr,   "super bar x 8 1-0.bin",       
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_MAG7S_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfr, ROT0, company, title, GAME_FLAGS )
 
 
 
@@ -1246,7 +1236,7 @@ GAME_CUSTOM( 199?, ec_mag7s__a0,   ec_mag7s,   "majic",   0x0000, 0x008000, CRC(
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_REDBR_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfr, ROT0, company, title, GAME_FLAGS )
 // These are '2001 REDBAR' (older header type with 0 at end)
 GAME_CUSTOM( 199?, ec_redbr,       0,          "issa101",                  0x0000, 0x008000, CRC(05bba52d) SHA1(fe1f80a6621564f8ea0fd741618ebd80a78a0055), "Electrocoin","Red Bar (Electrocoin) (set 1)" )
 GAME_CUSTOM( 199?, ec_redbr__a,    ec_redbr,   "issa102",                  0x0000, 0x008000, CRC(9aebf74c) SHA1(4da5d9240a2dcfdaa96a8a784ea5745c90108f9e), "Electrocoin","Red Bar (Electrocoin) (set 2)" )
@@ -1366,7 +1356,7 @@ GAME_CUSTOM( 199?, ec_redbr__b1,   ec_redbr,   "sbig78t",                  0x000
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_BXD7S_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfr, ROT0, company, title, GAME_FLAGS )
 
 // These are '2006 COOL7'
 GAME_CUSTOM( 199?, ec_bxd7s,       0,          "issc193.dat",  0x0000, 0x008000, CRC(2f3fb9e2) SHA1(426f7436c8a22f1d8a05a5ccef6b6b5551441028), "Electrocoin","Bar X Diamond 7s (2006 COOL7) (Electrocoin) (set 1)" )  // P-2S K---
@@ -1389,7 +1379,7 @@ GAME_CUSTOM( 199?, ec_bxd7s__d,    ec_bxd7s,   "issc337",      0x0000, 0x008000,
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_CASBX_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfr, ROT0, company, title, GAME_FLAGS )
 
 
 /* (C)1993-97/2002-03 ELECTROCOIN */
@@ -1416,7 +1406,7 @@ GAME_CUSTOM( 2005, ec_bx125a,  ec_bx125,   "x125n34.bin",  0x0000, 0x010000, CRC
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_SPBDX_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfr, ROT0, company, title, GAME_FLAGS )
 
 /* No header (space for one, but 0x00 fill) - Electrocoin 1993 copyright near end */
 GAME_CUSTOM( 199?, ec_spbdx,       0,          "iss132.rom",   0x0000, 0x008000, CRC(fd2ea535) SHA1(6deda1825bfce9481bf85a500e031242a2c9cf8c), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 1)" ) // ELCNSBRX - Sat Jun 22 13:28:41 1996
@@ -1436,7 +1426,7 @@ GAME_CUSTOM( 199?, ec_spbdx__d,    ec_spbdx,   "300615",       0x0000, 0x008000,
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_UNK5_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
+	GAME(year, setname, parent, ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfr, ROT0, company, title, GAME_FLAGS )
 
 // No Header info (all 0x00)
 // (C)1993/97 ELECTROCOIN
@@ -1677,39 +1667,39 @@ ROM_START( ec_unkt )
 	ROM_LOAD( "t2.bin", 0x0000, 0x000989, CRC(0992ffa6) SHA1(cffb6e0a9a72bb2bf9a6e262074062bd06cfa1fb) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfr)
+void ecoinfr_state::init_ecoinfr()
 {
 }
 
-DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfrmab)
+void ecoinfr_state::init_ecoinfrmab()
 {
 	// descramble here
 }
 
 // for the Brunel Research sets
-DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfrbr)
+void ecoinfr_state::init_ecoinfrbr()
 {
 }
 
 // 3rd party sets with MAB scrambling, game names might be incorrect, should be the same basic hardware as these tho.
-GAME( 19??, ec_barxmab, ec_barx  , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Electrocoin",       "Bar X (MAB PCB) (Electrocoin)",                   GAME_FLAGS ) // scrambled roms
-GAME( 19??, ec_spbg7mab,ec_big7  , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Electrocoin",       "Super Big 7 (MAB PCB) (Electrocoin) (?)",         GAME_FLAGS )
-GAME( 19??, ec_supbxmab,ec_sbarx , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Electrocoin",       "Super Bar X (MAB PCB) (Electrocoin) (?)",         GAME_FLAGS )
+GAME( 19??, ec_barxmab,  ec_barx,   ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Electrocoin",       "Bar X (MAB PCB) (Electrocoin)",                   GAME_FLAGS ) // scrambled roms
+GAME( 19??, ec_spbg7mab, ec_big7,   ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Electrocoin",       "Super Big 7 (MAB PCB) (Electrocoin) (?)",         GAME_FLAGS )
+GAME( 19??, ec_supbxmab, ec_sbarx,  ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Electrocoin",       "Super Bar X (MAB PCB) (Electrocoin) (?)",         GAME_FLAGS )
 
 //Games using the MAB scrambling, but identified as being from Concept Games
-GAME( 19??, ec_casbxcon,ec_casbx , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Casino Bar X (Concept Games Ltd) (?)",            GAME_FLAGS )
-GAME( 19??, ec_multb,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Multi Bar (Concept Games Ltd) (?)",               GAME_FLAGS )
-GAME( 19??, ec_supbxcon,ec_sbarx , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Super Bar X (MAB PCB) (Concept Games Ltd) (?)",   GAME_FLAGS )
-GAME( 19??, ec_casmb,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Casino Multi Bar (Concept Games Ltd) (?)",        GAME_FLAGS )
-GAME( 19??, ec_supmb,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Super Multi Bar (Concept Games Ltd) (?)",         GAME_FLAGS )
-GAME( 19??, ec_stkex,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Stake X (Concept Games Ltd) (?)",                 GAME_FLAGS )
-GAME( 19??, ec_bar7,    0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Bar 7 (Concept Games Ltd) (?)",                   GAME_FLAGS )
-GAME( 19??, ec_fltr,    0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Flutter (Concept Games Ltd) (?)",                 GAME_FLAGS )
-GAME( 19??, ec_rdht7,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Red Hot 7 (MAB PCB?) (Concept Games Ltd) (?)",    GAME_FLAGS )
-GAME( 19??, ec_unkt,    0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "unknown 'T' (MAB PCB?) (Concept Games Ltd) (?)",  GAME_FLAGS )
+GAME( 19??, ec_casbxcon, ec_casbx,  ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Concept Games Ltd", "Casino Bar X (Concept Games Ltd) (?)",            GAME_FLAGS )
+GAME( 19??, ec_multb,    0,         ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Concept Games Ltd", "Multi Bar (Concept Games Ltd) (?)",               GAME_FLAGS )
+GAME( 19??, ec_supbxcon, ec_sbarx,  ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Concept Games Ltd", "Super Bar X (MAB PCB) (Concept Games Ltd) (?)",   GAME_FLAGS )
+GAME( 19??, ec_casmb,    0,         ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Concept Games Ltd", "Casino Multi Bar (Concept Games Ltd) (?)",        GAME_FLAGS )
+GAME( 19??, ec_supmb,    0,         ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Concept Games Ltd", "Super Multi Bar (Concept Games Ltd) (?)",         GAME_FLAGS )
+GAME( 19??, ec_stkex,    0,         ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Concept Games Ltd", "Stake X (Concept Games Ltd) (?)",                 GAME_FLAGS )
+GAME( 19??, ec_bar7,     0,         ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Concept Games Ltd", "Bar 7 (Concept Games Ltd) (?)",                   GAME_FLAGS )
+GAME( 19??, ec_fltr,     0,         ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Concept Games Ltd", "Flutter (Concept Games Ltd) (?)",                 GAME_FLAGS )
+GAME( 19??, ec_rdht7,    0,         ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Concept Games Ltd", "Red Hot 7 (MAB PCB?) (Concept Games Ltd) (?)",    GAME_FLAGS )
+GAME( 19??, ec_unkt,     0,         ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Concept Games Ltd", "unknown 'T' (MAB PCB?) (Concept Games Ltd) (?)",  GAME_FLAGS )
 
 //These look more like some variant of Astra Gaming hardware than the MAB PCB, but I can't be sure. Certainly they don't seem to be on the base hardware
-GAME( 19??, ec_gold7,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Golden 7 (Concept Games Ltd) (?)",                GAME_FLAGS )
-GAME( 19??, ec_mgbel,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Megabell (Concept Games Ltd) (?)",                GAME_FLAGS )
-GAME( 19??, ec_jackb,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Jackpot Bars (MAB PCB?) (Concept Games Ltd) (?)", GAME_FLAGS )
-GAME( 19??, ec_ndgxs,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Nudge Xcess (MAB PCB?) (Concept Games Ltd) (?)",  GAME_FLAGS )
+GAME( 19??, ec_gold7,    0,         ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Concept Games Ltd", "Golden 7 (Concept Games Ltd) (?)",                GAME_FLAGS )
+GAME( 19??, ec_mgbel,    0,         ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Concept Games Ltd", "Megabell (Concept Games Ltd) (?)",                GAME_FLAGS )
+GAME( 19??, ec_jackb,    0,         ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Concept Games Ltd", "Jackpot Bars (MAB PCB?) (Concept Games Ltd) (?)", GAME_FLAGS )
+GAME( 19??, ec_ndgxs,    0,         ecoinfr, ecoinfr_barx, ecoinfr_state, init_ecoinfrmab, ROT0, "Concept Games Ltd", "Nudge Xcess (MAB PCB?) (Concept Games Ltd) (?)",  GAME_FLAGS )

@@ -5,11 +5,16 @@
     Sega Z80-3D system
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_TURBO_H
+#define MAME_INCLUDES_TURBO_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* sprites are scaled in the analog domain; to give a better */
@@ -41,7 +46,20 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_digits(*this, "digit%u", 0U)
+		, m_lamp(*this, "lamp")
 	{ }
+
+	void turbo(machine_config &config);
+	void buckrog(machine_config &config);
+	void buckroge(machine_config &config);
+	void buckrogu(machine_config &config);
+	void subroc3d(machine_config &config);
+	void turbo_samples(machine_config &config);
+	void subroc3d_samples(machine_config &config);
+	void buckrog_samples(machine_config &config);
+
+	void init_turbo_enc();
+	void init_turbo_noenc();
 
 private:
 	/* device/memory pointers */
@@ -67,9 +85,10 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	output_finder<32> m_digits;
+	output_finder<> m_lamp;
 
 	std::unique_ptr<uint8_t[]>     m_buckrog_bitmap_ram;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override { m_digits.resolve(); m_lamp.resolve(); }
 
 	/* machine states */
 	uint8_t       m_i8279_scanlines;
@@ -129,7 +148,6 @@ private:
 		uint32_t  step[8];            /* stepping value */
 	};
 
-public:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(turbo_collision_r);
@@ -161,15 +179,14 @@ public:
 	DECLARE_WRITE8_MEMBER(buckrog_i8255_0_w);
 	DECLARE_READ8_MEMBER(spriteram_r);
 	DECLARE_WRITE8_MEMBER(spriteram_w);
-	DECLARE_DRIVER_INIT(turbo_enc);
-	DECLARE_DRIVER_INIT(turbo_noenc);
+
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_VIDEO_START(turbo);
-	DECLARE_PALETTE_INIT(turbo);
-	DECLARE_PALETTE_INIT(subroc3d);
+	void turbo_palette(palette_device &palette) const;
+	void subroc3d_palette(palette_device &palette) const;
 	DECLARE_MACHINE_RESET(buckrog);
 	DECLARE_VIDEO_START(buckrog);
-	DECLARE_PALETTE_INIT(buckrog);
+	void buckrog_palette(palette_device &palette) const;
 	uint32_t screen_update_turbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_subroc3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_buckrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -193,14 +210,7 @@ public:
 	void turbo_update_samples();
 	inline void subroc3d_update_volume(int leftchan, uint8_t dis, uint8_t dir);
 	void buckrog_update_samples();
-	void turbo(machine_config &config);
-	void buckrog(machine_config &config);
-	void buckroge(machine_config &config);
-	void buckrogu(machine_config &config);
-	void subroc3d(machine_config &config);
-	void turbo_samples(machine_config &config);
-	void subroc3d_samples(machine_config &config);
-	void buckrog_samples(machine_config &config);
+
 	void buckrog_cpu2_map(address_map &map);
 	void buckrog_cpu2_portmap(address_map &map);
 	void buckrog_map(address_map &map);
@@ -208,3 +218,5 @@ public:
 	void subroc3d_map(address_map &map);
 	void turbo_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TURBO_H

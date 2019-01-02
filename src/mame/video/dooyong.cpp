@@ -232,7 +232,7 @@ void dooyong_ram_tilemap_device::device_start()
 	std::fill(m_tileram.get(), m_tileram.get() + (64 * 32), 0U);
 	m_palette_bank = 0U;
 
-	save_pointer(NAME(m_tileram.get()), 64 * 32);
+	save_pointer(NAME(m_tileram), 64 * 32);
 	save_item(NAME(m_palette_bank));
 }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Master Disks -->
+<!-- Acorn BBC Master Disks -->
 
 <!-- Loading Instructions:
 
@@ -12,7 +12,7 @@
       - MFM requires ADFS (A and BREAK)
 -->
 
-<softwarelist name="bbcm_flop" description="BBC Master disks">
+<softwarelist name="bbcm_flop" description="Acorn BBC Master disks">
 
 	<software name="welcomem">
 		<description>Welcome &amp; Utilities Disc</description>

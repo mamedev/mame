@@ -1157,7 +1157,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( lc89510_temp_device::segacd_access_timer_callback 
 MACHINE_CONFIG_START(lc89510_temp_device::device_add_mconfig)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hock_timer", lc89510_temp_device, segacd_access_timer_callback, attotime::from_hz(75))
 
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_DEVICE_ADD( "cdda", CDDA )
 	MCFG_SOUND_ROUTE( 0, ":lspeaker", 0.50 ) // TODO: accurate volume balance
 	MCFG_SOUND_ROUTE( 1, ":rspeaker", 0.50 )
 MACHINE_CONFIG_END

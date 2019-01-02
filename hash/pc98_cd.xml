@@ -20,8 +20,9 @@
 
 	Current status of Windows OSes:
 
-	Windows 95: hangs at hardware detection after the first boot
+	Windows 95: works, but the PC-9801-86 driver has some trouble playing sounds
 	Windows 98: installer complains about not having at least a 66 MHz CPU
+	Windows NT 3.51: installs ok, but graphics are broken after the switch to 256-color mode
 	Windows NT 4.0: works
 	Windows 2000: fails to boot after the initial file copy
 
@@ -173,6 +174,54 @@
 	</software>
 
 	<!-- Supports IBM PC-AT, PC-98, Alpha, MIPS and PowerPC -->
+	<software name="winn351w" supported="no">
+		<!--
+		Origin: WinWorld
+		<rom name="winn351_wks_jpn.iso" size="544534528" crc="3e416147" sha1="86e724f0ae050bfdbe8a795f97f3afb7db4db57d"/>
+		-->
+		<description>Windows NT 3.51 Workstation</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="winn351_wks_jpn" sha1="592a0e61e1d34e3a53c5cec397b7f0a588b33d3c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Supports IBM PC-AT, PC-98, Alpha, MIPS and PowerPC -->
+	<software name="winn351wc" supported="no">
+		<!--
+		Origin: WinWorld
+		<rom name="winn351_wks_jpn-chk.iso" size="544534528" crc="0b9952f3" sha1="606553951efc84c33549e84f0a782075480b4016"/>
+		-->
+		<description>Windows NT 3.51 Workstation (Checked Build)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="winn351_wks_jpn-chk" sha1="8fb3f84765d38dfe12462df9e856cb69261a62da" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Supports IBM PC-AT, PC-98, Alpha, MIPS and PowerPC -->
+	<software name="winnt40s">
+		<!--
+		Origin: WinWorld
+		<rom name="jp_winnt_4.0_srv.iso" size="650047488" crc="ffffffff" sha1="a866123e88359a41dee9ffef8688ec3ca9b47abd"/>
+		-->
+		<description>Windows NT 4.0 Server</description>
+		<year>1997</year>
+		<publisher>Microsoft</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jp_winnt_4.0_srv" sha1="6b2dc3f8c4cb818cd8ed9699e4c9af79bd85679f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Supports IBM PC-AT, PC-98, Alpha, MIPS and PowerPC -->
 	<software name="winnt40w">
 		<!--
 		Origin: Unknown
@@ -198,7 +247,7 @@
 		</part>
 	</software>
 
-	<software name="win95" supported="no">
+	<software name="win95" supported="partial">
 		<!--
 		Origin: Unknown
 		<rom name="Microsoft Windows 95 PC-98 (JPN).iso" size="81395712" crc="d402c155" sha1="14d10f62db11397ea46bdf02d1619f1b8e1ff345"/>
@@ -215,6 +264,8 @@
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- MAME doesn't support the Epson PC-98 clones yet, so we'll keep these as non-working -->
 
 	<software name="win95edk" supported="no">
 		<!--
@@ -254,7 +305,7 @@
 		</part>
 	</software>
 
-	<software name="win95o2" supported="no">
+	<software name="win95o2" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -273,7 +324,7 @@
 		</part>
 	</software>
 
-	<software name="win95ndk" supported="no">
+	<software name="win95ndk" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -991,8 +1042,7 @@
 	</software>
 
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
-	<!-- Missing voices -->
-	<software name="crystalr" supported="partial">
+	<software name="crystalr">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Crystal Rinal.ccd" size="4493" crc="f5c45a4a" sha1="8355ecfcc6f7474de451783582200ecbba475b6a"/>
@@ -1049,8 +1099,7 @@
 	</software>
 
 	<!-- Hybrid disc, also included in fmtowns_cd.xml -->
-	<!-- Missing voices -->
-	<software name="dangel" supported="partial">
+	<software name="dangel">
 		<!--
 		Origin: redump.org
 		<rom name="Dangel (Japan).cue" size="80" crc="afbb2b04" md5="09b954697d11ce8413adae4c80715f65" sha1="c18f1bd180c4b87a3f7167cab436a31d4dd36f55"/>
@@ -1105,8 +1154,7 @@
 		</part>
 	</software>
 
-	<!-- Black screen on boot after installation -->
-	<software name="debut" supported="no">
+	<software name="debut">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -1141,7 +1189,7 @@
 		<rom name="De.FaNa.img" size="462657216" crc="98e1bb0f" sha1="fc6208362b828a436445e864fcfbd49297e93d9c"/>
 		<rom name="De.FaNa.sub" size="18883968" crc="febc7304" sha1="1186a2b181aa3fd341b39b1b9d8481a74e45fbac"/>
 		-->
-		<description>De.FaNa</description>
+		<description>De.FaNa - Full Animation Adventure Series #2</description>
 		<year>1995</year>
 		<publisher>姫屋ソフト (Himeya Soft)</publisher>
 		<info name="release" value="199511xx" />
@@ -1153,11 +1201,7 @@
 	</software>
 
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
-	<!--
-	This game requires the AVSDRV.SYS sound driver, but the PC-9801-86 emulation in MAME doesn't seem to work with any of the
-	available versions. Without it, the game can only run in text mode.
-	-->
-	<software name="desire" supported="partial">
+	<software name="desire">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Desire.ccd" size="1727" crc="4d8d3af5" sha1="5719fdc09d1c88238cd839f78573e28669f3f00e"/>
@@ -1560,11 +1604,7 @@
 		</part>
 	</software>
 
-	<!--
-	This game requires the AVSDRV.SYS sound driver, but the PC-9801-86 emulation in MAME doesn't seem to work with any of the
-	available versions. Without it, the game runs without sound.
-	-->
-	<software name="elhazard" supported="partial">
+	<software name="elhazard">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -1692,9 +1732,7 @@
 	</software>
 
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
-	<!-- Voice mode requires the AVSDRV.SYS driver, but the PC-9801-86 emulation in MAME doesn't seem to work with any of the
-	available versions. Without it the game runs without voices. -->
-	<software name="etsuraku" supported="partial">
+	<software name="etsuraku">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Etsuraku no Gakuen.ccd" size="2669" crc="839fb7cf" sha1="83db98dcf7bdfbb5c2faaa1588a9b96fe585e54f"/>
@@ -2262,11 +2300,7 @@
 	</software>
 
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
-	<!--
-	This game requires the AVSDRV.SYS sound driver, but the PC-9801-86 emulation in MAME doesn't seem to work with any of the
-	available versions. Without it, the game runs without voices.
-	-->
-	<software name="kindanke" supported="partial">
+	<software name="kindanke">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Kindan no Ketsuzoku.ccd" size="2823" crc="0eb0eeae" sha1="0c2bdf0b806b1264c57468c1e0461a2f30502b88"/>
@@ -2410,7 +2444,7 @@
 		<rom name="lptv.bin" size="629345808" crc="c255cd67" sha1="88870768ff5291369264043e4179d8add509cfe6"/>
 		<rom name="lptv.cue" size="173" crc="e9325e8e" sha1="df5078e1cc21a684e0e4f34b455e5bb9d11621aa"/>
 		-->
-		<description>Let's! Pirates</description>
+		<description>Let's! Pirates - Trouble Vacances</description>
 		<year>1997</year>
 		<publisher>ジックス (ZyX)</publisher>
 		<info name="alt_title" value="Ｌｅｔ＇ｓ！パイレーツ とらぶるばかんす  ~ Let's! Pirates - Trouble Vacances" />
@@ -2501,8 +2535,7 @@
 		</part>
 	</software>
 
-	<!-- Hangs after starting a new game, but only on PC-9821 machines. Considering the game's release date it's probably not the expected behavior. -->
-	<software name="loveesc" supported="partial">
+	<software name="loveesc">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -2648,8 +2681,7 @@
 		</part>
 	</software>
 
-	<!-- Sound works but nothing shows up on screen -->
-	<software name="msdet1" supported="no">
+	<software name="msdet1">
 		<!--
 		Origin: P2P
 		<rom name="msdetecticve1.ccd" size="772" crc="92ccce73" sha1="717957cf8f02b585c5845347035cafca1be9613c"/>
@@ -2680,8 +2712,7 @@
 		</part>
 	</software>
 
-	<!-- Hangs on boot -->
-	<software name="msdet2" supported="no">
+	<software name="msdet2">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -2707,8 +2738,11 @@
 		</part>
 	</software>
 
-	<!-- Displays everything at double size, making it unplayable -->
-	<software name="msquadro" supported="no">
+	<!--
+	Needs the mouse driver loaded, otherwise displays everything at double size. Doesn't happen on real hardware.
+	Also, CDDA playback is a bit spotty. Sometimes tracks restart when they shouldn't.
+	-->
+	<software name="msquadro" supported="partial">
 		<!--
 		Origin: P2P
 		<rom name="Magical Squadron CD (1996)(KOGADO).cue" size="984" crc="df807cc0" sha1="a652dfe75e37e96527ad45ad4931871dcb9a9309"/>
@@ -2941,8 +2975,7 @@
 	</software>
 
 	<!-- PC-98x1 / DOS/V hybrid -->
-	<!-- No sound after the intro -->
-	<software name="pgatour3" supported="partial">
+	<software name="pgatour3">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -3001,11 +3034,7 @@
 		</part>
 	</software>
 
-	<!--
-	This game requires the AVSDRV.SYS sound driver, but the PC-9801-86 emulation in MAME doesn't seem to work with any of the
-	available versions. Without it, the game doesn't work.
-	-->
-	<software name="pnauts" supported="no">
+	<software name="pnauts">
 		<!--
 		Origin: redump.org
 		<rom name="Policenauts (Japan).cue" size="591" crc="33715417" md5="ae17a348af34b2f7bddd0695d976f61c" sha1="2e41266a1a1e82eaa6a2b85858aec7af8ad93e33"/>
@@ -3021,6 +3050,7 @@
 		<publisher>コナミ (Konami)</publisher>
 		<info name="alt_title" value="ポリスノーツ" />
 		<info name="release" value="19940729" />
+		<info name="usage" value="Works best with MS-DOS 5.0 and AVSDRV.SYS v3.10 Rev 1" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="policenauts (japan) (system disk).fdi" size="1265664" crc="ef3e4428" sha1="246b674a48903ff7e3fe90292b1236d75a8d6c23" offset="000000" />
@@ -3115,8 +3145,7 @@
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="psydet1" supported="no">
+	<software name="psydet1">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -3129,6 +3158,7 @@
 		<year>1993</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="alt_title" value="サイキックディテクティヴィシリーズ Vol.1 インビテーション 影からの招待状" />
+		<info name="usage" value="Replace DWCD98.SYS with the appropriate CD-ROM driver" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="psychic detective series vol. 1 - invitation (cd boot disk) [original].hdm" size="1261568" crc="03ba40f0" sha1="befb2ce9bd31f2eaeb347717241d7b885da881da" offset="0" />
@@ -3141,8 +3171,7 @@
 		</part>
 	</software>
 
-	<!-- Crashes with メモリが足りません (not enough memory) error -->
-	<software name="psydet2" supported="no">
+	<software name="psydet2">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -3168,8 +3197,7 @@
 		</part>
 	</software>
 
-	<!-- Sounds play but nothing shows up on screen -->
-	<software name="psydet3" supported="no">
+	<software name="psydet3">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -3236,8 +3264,7 @@
 	</software>
 
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
-	<!-- Voice mode doesn't work -->
-	<software name="raidy" supported="partial">
+	<software name="raidy">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ikazuchi no Senshi Raidy.ccd" size="3636" crc="f35a60da" sha1="7c0a1ca01cdf442d09f5c94ae288f71a56136c7f"/>
@@ -3511,8 +3538,7 @@
 		</part>
 	</software>
 
-	<!-- Hangs shortly after starting the game -->
-	<software name="ryouki2" supported="no">
+	<software name="ryouki2">
 		<!--
 		Origin: P2P
 		<rom name="Ryouki no Ori 2 (1997)(PLANTECH-ZEROSYSTEM).ISO" size="119138304" crc="193e09d1" sha1="caffe3f19e618cc10af3fcbe6df7c48ab717a928"/>
@@ -3634,10 +3660,7 @@
 		</part>
 	</software>
 
-	<!--
-	This game requires the AVSDRV.SYS sound driver, but the PC-9801-86 emulation in MAME doesn't seem to work with any of the
-	available versions. Without it, the game boots (without sound) but hangs after the intro.
-	-->
+	<!-- Runs way too fast -->
 	<software name="samykou" supported="no">
 		<!--
 		Origin: P2P
@@ -3658,10 +3681,7 @@
 		</part>
 	</software>
 
-	<!--
-	This game requires the AVSDRV.SYS sound driver, but the PC-9801-86 emulation in MAME doesn't seem to work with any of the
-	available versions. Without it, the game boots (without sound) but hangs after the intro.
-	-->
+	<!-- Runs way too fast -->
 	<software name="samyzen" supported="no">
 		<!--
 		Origin: redump.org
@@ -3790,8 +3810,8 @@
 		</part>
 	</software>
 
-	<!-- Displays everything at double size, making it unplayable -->
-	<software name="schwargx" supported="no">
+	<!-- Needs the mouse driver loaded, otherwise displays everything at double size. Doesn't happen on real hardware. -->
+	<software name="schwargx">
 		<!--
 		Origin: P2P
 		<rom name="Schwarzschild GX CD (1997)(KOGADO).ccd" size="7542" crc="ac4f05b3" sha1="add60653a0482dddd836c9de107b90b61eae96d2"/>
@@ -3895,8 +3915,7 @@
 		</part>
 	</software>
 
-	<!-- Sounds play but nothing shows up on screen -->
-	<software name="sensangl" supported="no">
+	<software name="sensangl">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -3909,6 +3928,7 @@
 		<year>1994</year>
 		<publisher>JHV</publisher>
 		<info name="release" value="199401xx" />
+		<info name="usage" value="Replace DWCD98.SYS with the appropriate CD-ROM driver" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="sensual angels (cd boot disk) [original].hdm" size="1261568" crc="bec41290" sha1="58a8701c158470f66da3e03179fd53a9b70d17cf" offset="0"/>
@@ -3939,11 +3959,7 @@
 		</part>
 	</software>
 
-	<!--
-	This game requires the AVSDRV.SYS sound driver, but the PC-9801-86 emulation in MAME doesn't seem to work with any of the
-	available versions. Without it, the game crashes on boot.
-	-->
-	<software name="shamhat" supported="no">
+	<software name="shamhat" >
 		<!--
 		Origin unknown
 		<rom name="shamhat the holy circlet (1994)(datewest).bin" size="242197200" crc="91d12ee2" sha1="30a9e0886155de2a5bbac037dffdd6095a245d4e"/>
@@ -4240,8 +4256,7 @@
 		</part>
 	</software>
 
-	<!-- No sound -->
-	<software name="tunedhrt" supported="partial">
+	<software name="tunedhrt">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -4282,10 +4297,7 @@
 	</software>
 
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
-	<!--
-	This game requires the AVSDRV.SYS sound driver, but the PC-9801-86 emulation in MAME doesn't seem to work with any of the
-	available versions. Without it, the game doesn't work.
-	-->
+	<!-- Hangs at the text / voice selection screen -->
 	<software name="vastness" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
@@ -4405,8 +4417,7 @@
 		</part>
 	</software>
 
-	<!-- Hangs after starting a new game, but only on PC-9821 machines. Considering the game's release date it's probably not the expected behavior. -->
-	<software name="watashi" supported="partial">
+	<software name="watashi">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -4436,7 +4447,7 @@
 		<rom name="Xenon.img" size="326937408" crc="594213b2" sha1="1307189e44ccca2154486421f82b9b1df393b73a"/>
 		<rom name="Xenon.sub" size="13344384" crc="257b6cd3" sha1="51a3f6a3ff4646cce4f7130a4ae550d95e79330b"/>
 		-->
-		<description>Xenon</description>
+		<description>Xenon - Mugen no Shitai</description>
 		<year>1995</year>
 		<publisher>シーズウェア (C's Ware)</publisher>
 		<info name="release" value="199503xx" />

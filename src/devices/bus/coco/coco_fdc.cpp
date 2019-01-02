@@ -45,7 +45,7 @@
 #include "emu.h"
 #include "cococart.h"
 #include "coco_fdc.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/msm6242.h"
 #include "machine/ds1315.h"
 #include "machine/wd_fdc.h"
@@ -64,6 +64,10 @@
 #define WD2797_TAG              "wd2797"
 #define DISTO_TAG               "disto"
 #define CLOUD9_TAG              "cloud9"
+
+
+template class device_finder<coco_family_fdc_device_base, false>;
+template class device_finder<coco_family_fdc_device_base, true>;
 
 
 /***************************************************************************
@@ -117,27 +121,26 @@ FLOPPY_FORMATS_MEMBER( coco_family_fdc_device_base::floppy_formats )
 	FLOPPY_SDF_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( coco_fdc_floppies )
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void coco_fdc_floppies(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
-MACHINE_CONFIG_START(coco_fdc_device_base::device_add_mconfig)
-	MCFG_WD1773_ADD(WD_TAG, XTAL(8'000'000))
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(coco_fdc_device_base, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(coco_fdc_device_base, fdc_drq_w))
+void coco_fdc_device_base::device_add_mconfig(machine_config &config)
+{
+	WD1773(config, m_wd17xx, 8_MHz_XTAL);
+	m_wd17xx->intrq_wr_callback().set(FUNC(coco_fdc_device_base::fdc_intrq_w));
+	m_wd17xx->drq_wr_callback().set(FUNC(coco_fdc_device_base::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":0", coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":1", coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":2", coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD_TAG ":3", coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, m_floppies[0], coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[1], coco_fdc_floppies, "qd", coco_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[2], coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[3], coco_fdc_floppies, nullptr, coco_fdc_device_base::floppy_formats).enable_sound(true);
 
-	MCFG_DEVICE_ADD(DISTO_TAG, MSM6242, XTAL(32'768))
-	MCFG_DS1315_ADD(CLOUD9_TAG)
-MACHINE_CONFIG_END
+	MSM6242(config, m_disto_msm6242, 32.768_kHz_XTAL);
+
+	DS1315(config, CLOUD9_TAG, 0);
+}
 
 
 //***************************************************************************
@@ -308,16 +311,16 @@ READ8_MEMBER(coco_fdc_device_base::scs_read)
 	switch(offset & 0x1F)
 	{
 		case 8:
-			result = m_wd17xx->status_r(space, 0);
+			result = m_wd17xx->status_r();
 			break;
 		case 9:
-			result = m_wd17xx->track_r(space, 0);
+			result = m_wd17xx->track_r();
 			break;
 		case 10:
-			result = m_wd17xx->sector_r(space, 0);
+			result = m_wd17xx->sector_r();
 			break;
 		case 11:
-			result = m_wd17xx->data_r(space, 0);
+			result = m_wd17xx->data_r();
 			break;
 	}
 
@@ -361,16 +364,16 @@ WRITE8_MEMBER(coco_fdc_device_base::scs_write)
 			dskreg_w(data);
 			break;
 		case 8:
-			m_wd17xx->cmd_w(space, 0, data);
+			m_wd17xx->cmd_w(data);
 			break;
 		case 9:
-			m_wd17xx->track_w(space, 0, data);
+			m_wd17xx->track_w(data);
 			break;
 		case 10:
-			m_wd17xx->sector_w(space, 0, data);
+			m_wd17xx->sector_w(data);
 			break;
 		case 11:
-			m_wd17xx->data_w(space, 0, data);
+			m_wd17xx->data_w(data);
 			break;
 	};
 
@@ -396,7 +399,7 @@ WRITE8_MEMBER(coco_fdc_device_base::scs_write)
 
 ROM_START(coco_fdc)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("disk10.rom", 0x0000, 0x2000, CRC(b4f9968e) SHA1(04115be3f97952b9d9310b52f806d04f80b40d03))
+	ROM_LOAD("disk10.rom", 0x0000, 0x2000, CRC(b4f9968e) SHA1(04115be3f97952b9d9310b52f806d04f80b40d03))
 ROM_END
 
 namespace
@@ -421,7 +424,7 @@ namespace
 
 }
 
-DEFINE_DEVICE_TYPE(COCO_FDC, coco_fdc_device, "coco_fdc", "CoCo FDC")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_FDC, coco_family_fdc_device_base, coco_fdc_device, "coco_fdc", "CoCo FDC")
 
 
 //**************************************************************************
@@ -430,7 +433,7 @@ DEFINE_DEVICE_TYPE(COCO_FDC, coco_fdc_device, "coco_fdc", "CoCo FDC")
 
 ROM_START(coco_fdc_v11)
 	ROM_REGION(0x8000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("disk11.rom", 0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
+	ROM_LOAD("disk11.rom", 0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
 	ROM_RELOAD(0x2000, 0x2000)
 	ROM_RELOAD(0x4000, 0x2000)
 	ROM_RELOAD(0x6000, 0x2000)
@@ -456,7 +459,7 @@ namespace
 	};
 }
 
-DEFINE_DEVICE_TYPE(COCO_FDC_V11, coco_fdc_v11_device, "coco_fdc_v11", "CoCo FDC v1.1")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_FDC_V11, coco_family_fdc_device_base, coco_fdc_v11_device, "coco_fdc_v11", "CoCo FDC v1.1")
 
 
 //**************************************************************************
@@ -491,7 +494,7 @@ namespace
 	};
 }
 
-DEFINE_DEVICE_TYPE(COCO3_HDB1, coco3_hdb1_device, "coco3_hdb1", "CoCo3 HDB-DOS")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO3_HDB1, coco_family_fdc_device_base, coco3_hdb1_device, "coco3_hdb1", "CoCo3 HDB-DOS")
 
 //**************************************************************************
 //              COCO-2 HDB-DOS
@@ -525,7 +528,7 @@ namespace
 	};
 }
 
-DEFINE_DEVICE_TYPE(COCO2_HDB1, coco2_hdb1_device, "coco2_hdb1", "CoCo2 HDB-DOS")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO2_HDB1, coco_family_fdc_device_base, coco2_hdb1_device, "coco2_hdb1", "CoCo2 HDB-DOS")
 
 //**************************************************************************
 //              Prológica CP-450 BASIC Disco V. 1.0 (1984)
@@ -561,7 +564,7 @@ namespace
 	};
 }
 
-DEFINE_DEVICE_TYPE(CP450_FDC, cp450_fdc_device, "cp450_fdc", "Prológica CP-450 BASIC Disco V. 1.0 (1984)")
+DEFINE_DEVICE_TYPE_PRIVATE(CP450_FDC, coco_family_fdc_device_base, cp450_fdc_device, "cp450_fdc", "Prológica CP-450 BASIC Disco V. 1.0 (1984)")
 
 //**************************************************************************
 //              Codimex CD-6809 FDC (1986)
@@ -595,4 +598,4 @@ namespace
 	};
 }
 
-DEFINE_DEVICE_TYPE(CD6809_FDC, cd6809_fdc_device, "cd6809_fdc", "Codimex CD-6809 Disk BASIC (1986)")
+DEFINE_DEVICE_TYPE_PRIVATE(CD6809_FDC, coco_family_fdc_device_base, cd6809_fdc_device, "cd6809_fdc", "Codimex CD-6809 Disk BASIC (1986)")

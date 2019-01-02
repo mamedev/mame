@@ -13,16 +13,17 @@ public:
 	{ }
 
 	void alvg(machine_config &config);
+
+	void init_alvg();
+
+private:
 	void alvg_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
-public:
-	DECLARE_DRIVER_INIT(alvg);
 };
 
 
@@ -40,14 +41,14 @@ void alvg_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(alvg_state,alvg)
+void alvg_state::init_alvg()
 {
 }
 
 MACHINE_CONFIG_START(alvg_state::alvg)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
-	MCFG_CPU_PROGRAM_MAP(alvg_map)
+	MCFG_DEVICE_ADD("maincpu", M65C02, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(alvg_map)
 MACHINE_CONFIG_END
 
 /*----------------------------------------------------------------------------
@@ -376,17 +377,17 @@ ROM_START(usafootba)
 ROM_END
 
 
-GAME(1991,  agsoccer,   0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "A.G. Soccer Ball (R18u)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1991,  agsoccer07, agsoccer,   alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "A.G. Soccer Ball (R07u)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  wrldtour,   0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "Al's Garage Band Goes On A World Tour",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  wrldtour2,  wrldtour,   alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "Al's Garage Band Goes On A World Tour (R02b)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  wrldtour3,  wrldtour,   alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "Al's Garage Band Goes On A World Tour (R06a)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  usafootb,   0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "U.S.A. Football",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  usafootba,  usafootb,   alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "U.S.A. Football (R01u)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  mystcast,   0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "Mystery Castle (R02)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  mystcasta,  mystcast,   alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "Mystery Castle (R03)",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  pstlpkr,    0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "Pistol Poker (R02)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  pstlpkr1,   pstlpkr,    alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "Pistol Poker (R01)",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  punchy,     0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "Punchy The Clown (R02)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  punchy3,    punchy,     alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "Punchy The Clown (R03)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  dinoeggs,   0,          alvg,   alvg, alvg_state,   alvg,   ROT0,   "Alvin G",  "Dinosaur Eggs",                                MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1991, agsoccer,   0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "A.G. Soccer Ball (R18u)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1991, agsoccer07, agsoccer, alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "A.G. Soccer Ball (R07u)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1992, wrldtour,   0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1992, wrldtour2,  wrldtour, alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R02b)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1992, wrldtour3,  wrldtour, alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Al's Garage Band Goes On A World Tour (R06a)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, usafootb,   0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "U.S.A. Football",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, usafootba,  usafootb, alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "U.S.A. Football (R01u)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, mystcast,   0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Mystery Castle (R02)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, mystcasta,  mystcast, alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Mystery Castle (R03)",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, pstlpkr,    0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Pistol Poker (R02)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, pstlpkr1,   pstlpkr,  alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Pistol Poker (R01)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, punchy,     0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Punchy The Clown (R02)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, punchy3,    punchy,   alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Punchy The Clown (R03)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1993, dinoeggs,   0,        alvg, alvg, alvg_state, init_alvg, ROT0, "Alvin G", "Dinosaur Eggs",                                MACHINE_IS_SKELETON_MECHANICAL)

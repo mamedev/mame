@@ -40,18 +40,20 @@
   Tech notes...
 
   About the unknown ICs:
-  DIP64 (U101) CPU with Xtal tied to pins 30 % 31. --> TMS9900? (ROM 9)
+  DIP64 (U101) CPU with Xtal tied to pins 30 % 31. --> NEC uPD78C11? (ROM 9)
   DIP40 (U64) CPU or sound IC driving 128k (ROM 10) data? (pin 20 tied to GND)
 
 
 *************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms9900/tms9980a.h"
-//#include "cpu/tms9900/tms9900.h"
+#include "cpu/upd7810/upd7811.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK    XTAL(12'000'000)
@@ -60,28 +62,36 @@
 class nibble_state : public driver_device
 {
 public:
-	nibble_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	nibble_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
-	required_shared_ptr<uint16_t> m_videoram;
-	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE16_MEMBER(nibble_videoram_w);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void nibble(machine_config &config);
 
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(nibble);
-	uint32_t screen_update_nibble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(nibble_interrupt);
+
+private:
+	required_shared_ptr<uint8_t> m_videoram;
+	tilemap_t *m_bg_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void nibble(machine_config &config);
-	void nibble_cru_map(address_map &map);
+
+	DECLARE_WRITE8_MEMBER(nibble_videoram_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	void nibble_palette(palette_device &palette) const;
+	uint32_t screen_update_nibble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(nibble_interrupt);
+
 	void nibble_map(address_map &map);
+	void ramdac1_map(address_map &map);
+	void ramdac2_map(address_map &map);
 };
 
 
@@ -89,7 +99,7 @@ public:
 *     Video Hardware     *
 *************************/
 
-WRITE16_MEMBER(nibble_state::nibble_videoram_w)
+WRITE8_MEMBER(nibble_state::nibble_videoram_w)
 {
 	COMBINE_DATA(m_videoram+offset);
 	m_bg_tilemap->mark_tile_dirty(offset*2);
@@ -105,7 +115,7 @@ TILE_GET_INFO_MEMBER(nibble_state::get_bg_tile_info)
     ---- ----   color code.
     ---- ----   seems unused.
 */
-	uint8_t code = m_videoram[tile_index/2] >> (tile_index & 1 ? 0 : 8);
+	uint8_t code = m_videoram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0 /* bank */, code, 0 /* color */, 0);
 }
@@ -121,7 +131,7 @@ uint32_t nibble_state::screen_update_nibble(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(nibble_state, nibble)
+void nibble_state::nibble_palette(palette_device &palette) const
 {
 }
 
@@ -154,16 +164,33 @@ void nibble_state::machine_reset()
 
 void nibble_state::nibble_map(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc3ff).w(this, FUNC(nibble_state::nibble_videoram_w)).share("videoram");   // placeholder
-//  AM_RANGE(0xff00, 0xff01) AM_DEVWRITE("crtc", mc6845_device, address_w)
-//  AM_RANGE(0xff02, 0xff03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	map(0xc000, 0xcbff).ram();
+	map(0xd000, 0xdbff).ram();
+	map(0xdc00, 0xdfff).ram().w(FUNC(nibble_state::nibble_videoram_w)).share("videoram");
+	map(0xe000, 0xebff).ram();
+	map(0xec00, 0xec00).rw("ramdac1", FUNC(ramdac_device::index_r), FUNC(ramdac_device::index_w));
+	map(0xec01, 0xec01).rw("ramdac1", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
+	map(0xec02, 0xec02).rw("ramdac1", FUNC(ramdac_device::mask_r), FUNC(ramdac_device::mask_w));
+	map(0xec40, 0xec40).rw("ramdac2", FUNC(ramdac_device::index_r), FUNC(ramdac_device::index_w));
+	map(0xec41, 0xec41).rw("ramdac2", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
+	map(0xec42, 0xec42).rw("ramdac2", FUNC(ramdac_device::mask_r), FUNC(ramdac_device::mask_w));
+	map(0xec88, 0xec89).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xecc8, 0xecc8).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xecc9, 0xecc9).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xf000, 0xfbff).ram();
 }
 
 
-void nibble_state::nibble_cru_map(address_map &map)
+void nibble_state::ramdac1_map(address_map &map)
 {
+	map(0x000, 0x3ff).rw("ramdac1", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
+
+
+void nibble_state::ramdac2_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac2", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
 
@@ -297,7 +324,7 @@ static const gfx_layout charlayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( nibble )
+static GFXDECODE_START( gfx_nibble )
 	GFXDECODE_ENTRY( "gfx", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -308,8 +335,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(nibble_state::nibble)
 
-	MCFG_TMS99xx_ADD("maincpu", TMS9900, MASTER_CLOCK/4, nibble_map, nibble_cru_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nibble_state,  nibble_interrupt)
+	UPD7811(config, m_maincpu, MASTER_CLOCK / 3); // type guessed; clock not verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &nibble_state::nibble_map);
+	//m_maincpu->set_vblank_int("screen", FUNC(nibble_state::nibble_interrupt));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -320,15 +348,25 @@ MACHINE_CONFIG_START(nibble_state::nibble)
 	MCFG_SCREEN_UPDATE_DRIVER(nibble_state, screen_update_nibble)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nibble)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_nibble);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(nibble_state, nibble)
+	ramdac_device &ramdac1(RAMDAC(config, "ramdac1", 0, "palette"));
+	ramdac1.set_addrmap(0, &nibble_state::ramdac1_map);
+	ramdac1.set_color_base(0);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, "palette"));
+	ramdac2.set_addrmap(0, &nibble_state::ramdac2_map);
+	ramdac2.set_color_base(0x100);
 
+	PALETTE(config, "palette", FUNC(nibble_state::nibble_palette), 0x200);
+
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/8)); /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, "aysnd", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 
@@ -338,7 +376,11 @@ MACHINE_CONFIG_END
 
 ROM_START( l9nibble )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "09.u123", 0x00000, 0x10000, CRC(dfef685d) SHA1(0aeb4257e408e8549df629a0cdb5f2b6790e32de) ) // tms9900 code?
+	ROM_LOAD( "u101",    0x00000, 0x01000, NO_DUMP ) // first 4K of code likely contained in undumped internal ROM
+	ROM_LOAD( "09.u123", 0x00000, 0x10000, CRC(dfef685d) SHA1(0aeb4257e408e8549df629a0cdb5f2b6790e32de) ) // 0000-0FFF matches 3090-408F
+	ROM_FILL( 0x00000, 1, 0x54 ) // JMP to likely entrypoint
+	ROM_FILL( 0x00001, 1, 0x3c )
+	ROM_FILL( 0x00002, 1, 0x10 )
 
 	ROM_REGION( 0x80000, "gfx", 0 )
 	ROM_LOAD( "01.u139", 0x00000, 0x10000, CRC(aba06e58) SHA1(5841beec122613eed2ba9f48cb1d51bfa0ff450c) )
@@ -364,5 +406,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT   STATE         INIT  ROT   COMPANY   FULLNAME    FLAGS
-GAME( 19??, l9nibble, 0,      nibble,  nibble, nibble_state, 0,    ROT0, "Nibble", "Lucky 9",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE  INPUT   STATE         INIT        ROT   COMPANY   FULLNAME    FLAGS
+GAME( 19??, l9nibble, 0,      nibble,  nibble, nibble_state, empty_init, ROT0, "Nibble", "Lucky 9",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

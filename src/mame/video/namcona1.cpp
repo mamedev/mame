@@ -385,12 +385,12 @@ void namcona1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 		if( color&8 )
 		{
-			palbase = ((color>>4)&0xf) * 0x10 + ((color & 0xf00) >> 8);
+			palbase = (color&0xf0) | ((color & 0xf00) >> 8);
 			bpp4 = 1;
 		}
 		else
 		{
-			palbase = (color>>4)&0xf;
+			palbase = (color&0xf0)>>4;
 			bpp4 = 0;
 		}
 

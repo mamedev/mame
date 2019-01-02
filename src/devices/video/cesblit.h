@@ -25,7 +25,7 @@
 	downcast<cesblit_device &>(*device).set_compute_addr(_compute_addr);
 
 #define MCFG_CESBLIT_IRQ_CB(_devcb) \
-	devcb = &downcast<cesblit_device &>(*device).set_irq_callback(DEVCB_##_devcb);
+	downcast<cesblit_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 /***************************************************************************
     TYPE DEFINITIONS

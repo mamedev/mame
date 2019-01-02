@@ -147,10 +147,10 @@ Updates by Bryan McPhail, 12/12/2004:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL(12'000'000)
-#define CPU_CLOCK           MASTER_CLOCK / 8
-#define MCU_CLOCK           MASTER_CLOCK / 4
-#define PIXEL_CLOCK         MASTER_CLOCK / 2
+static constexpr XTAL MASTER_CLOCK(12_MHz_XTAL);
+static constexpr XTAL CPU_CLOCK(MASTER_CLOCK / 8);
+static constexpr XTAL MCU_CLOCK(MASTER_CLOCK / 4);
+static constexpr XTAL PIXEL_CLOCK(MASTER_CLOCK / 2);
 
 
 /*
@@ -170,7 +170,7 @@ Updates by Bryan McPhail, 12/12/2004:
 
 inline int xain_state::scanline_to_vcount(int scanline)
 {
-	int vcount = scanline + 8;
+	int const vcount = scanline + 8;
 	if (vcount < 0x100)
 		return vcount;
 	else
@@ -179,49 +179,41 @@ inline int xain_state::scanline_to_vcount(int scanline)
 
 TIMER_DEVICE_CALLBACK_MEMBER(xain_state::scanline)
 {
-	int scanline = param;
-	int screen_height = m_screen->height();
-	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
-	int vcount = scanline_to_vcount(scanline);
+	int const scanline = param;
+	int const screen_height = m_screen->height();
+	int const vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
+	int const vcount = scanline_to_vcount(scanline);
 
-	/* update to the current point */
+	// update to the current point
 	if (scanline > 0)
 	{
 		m_screen->update_partial(scanline - 1);
 	}
 
-	/* FIRQ (IMS) fires every on every 8th scanline (except 0) */
+	// FIRQ (IMS) fires every on every 8th scanline (except 0)
 	if (!(vcount_old & 8) && (vcount & 8))
-	{
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
-	}
 
-	/* NMI fires on scanline 248 (VBL) and is latched */
+	// NMI fires on scanline 248 (VBL) and is latched
 	if (vcount == 0xf8)
-	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	}
 
-	/* VBLANK input bit is held high from scanlines 248-255 */
+	// VBLANK input bit is held high from scanlines 248-255
 	if (vcount >= 248-1)    // -1 is a hack - see notes above
-	{
 		m_vblank = 1;
-	}
 	else
-	{
 		m_vblank = 0;
-	}
 }
 
 WRITE8_MEMBER(xain_state::cpuA_bankswitch_w)
 {
 	m_pri = data & 0x7;
-	membank("bank1")->set_entry((data >> 3) & 1);
+	m_rom_banks[0]->set_entry((data >> 3) & 1);
 }
 
 WRITE8_MEMBER(xain_state::cpuB_bankswitch_w)
 {
-	membank("bank2")->set_entry(data & 1);
+	m_rom_banks[1]->set_entry(data & 1);
 }
 
 WRITE8_MEMBER(xain_state::main_irq_w)
@@ -275,36 +267,63 @@ CUSTOM_INPUT_MEMBER(xain_state::mcu_status_r)
 
 READ8_MEMBER(xain_state::mcu_comm_reset_r)
 {
-	if (m_mcu)
-		m_mcu->reset_w(PULSE_LINE);
-
+	if (m_mcu.found() && !machine().side_effects_disabled())
+	{
+		m_mcu->reset_w(ASSERT_LINE);
+		m_mcu->reset_w(CLEAR_LINE);
+	}
 	return 0xff;
+}
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+template <unsigned N> WRITE8_MEMBER(xain_state::bgram_w)
+{
+	m_bgram[N][offset] = data;
+	m_bg_tilemaps[N]->mark_tile_dirty(offset & 0x3ff);
+}
+
+template <unsigned N> WRITE8_MEMBER(xain_state::scrollx_w)
+{
+	m_scrollx[N][offset] = data;
+	m_bg_tilemaps[N]->set_scrollx(0, m_scrollx[N][0] | (m_scrollx[N][1] << 8));
+}
+
+template <unsigned N> WRITE8_MEMBER(xain_state::scrolly_w)
+{
+	m_scrolly[N][offset] = data;
+	m_bg_tilemaps[N]->set_scrolly(0, m_scrolly[N][0] | (m_scrolly[N][1] << 8));
 }
 
 
 void xain_state::bootleg_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("share1");
-	map(0x2000, 0x27ff).ram().w(this, FUNC(xain_state::charram_w)).share("charram");
-	map(0x2800, 0x2fff).ram().w(this, FUNC(xain_state::bgram1_w)).share("bgram1");
-	map(0x3000, 0x37ff).ram().w(this, FUNC(xain_state::bgram0_w)).share("bgram0");
-	map(0x3800, 0x397f).ram().share("spriteram");
+	map(0x2000, 0x27ff).ram().w(FUNC(xain_state::charram_w)).share(m_charram);
+	map(0x2800, 0x2fff).ram().w(FUNC(xain_state::bgram_w<1>)).share(m_bgram[1]);
+	map(0x3000, 0x37ff).ram().w(FUNC(xain_state::bgram_w<0>)).share(m_bgram[0]);
+	map(0x3800, 0x397f).ram().share(m_spriteram);
 	map(0x3a00, 0x3a00).portr("P1");
-	map(0x3a00, 0x3a01).w(this, FUNC(xain_state::scrollxP1_w));
+	map(0x3a00, 0x3a01).w(FUNC(xain_state::scrollx_w<1>));
 	map(0x3a01, 0x3a01).portr("P2");
 	map(0x3a02, 0x3a02).portr("DSW0");
-	map(0x3a02, 0x3a03).w(this, FUNC(xain_state::scrollyP1_w));
+	map(0x3a02, 0x3a03).w(FUNC(xain_state::scrolly_w<1>));
 	map(0x3a03, 0x3a03).portr("DSW1");
-	map(0x3a04, 0x3a05).w(this, FUNC(xain_state::scrollxP0_w));
+	map(0x3a04, 0x3a05).w(FUNC(xain_state::scrollx_w<0>));
 	map(0x3a05, 0x3a05).portr("VBLANK");
-	map(0x3a06, 0x3a07).w(this, FUNC(xain_state::scrollyP0_w));
+	map(0x3a06, 0x3a07).w(FUNC(xain_state::scrolly_w<0>));
 	map(0x3a08, 0x3a08).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x3a09, 0x3a0c).w(this, FUNC(xain_state::main_irq_w));
-	map(0x3a0d, 0x3a0d).w(this, FUNC(xain_state::flipscreen_w));
-	map(0x3a0f, 0x3a0f).w(this, FUNC(xain_state::cpuA_bankswitch_w));
+	map(0x3a09, 0x3a0c).w(FUNC(xain_state::main_irq_w));
+	map(0x3a0d, 0x3a0d).w(FUNC(xain_state::flipscreen_w));
+	map(0x3a0f, 0x3a0f).w(FUNC(xain_state::cpuA_bankswitch_w));
 	map(0x3c00, 0x3dff).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x3e00, 0x3fff).w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankr(m_rom_banks[0]);
 	map(0x8000, 0xffff).rom();
 }
 
@@ -312,17 +331,17 @@ void xain_state::main_map(address_map &map)
 {
 	bootleg_map(map);
 	map(0x3a04, 0x3a04).r(m_mcu, FUNC(taito68705_mcu_device::data_r));
-	map(0x3a06, 0x3a06).r(this, FUNC(xain_state::mcu_comm_reset_r));
+	map(0x3a06, 0x3a06).r(FUNC(xain_state::mcu_comm_reset_r));
 	map(0x3a0e, 0x3a0e).w(m_mcu, FUNC(taito68705_mcu_device::data_w));
 }
 
 void xain_state::cpu_map_B(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("share1");
-	map(0x2000, 0x2000).w(this, FUNC(xain_state::irqA_assert_w));
-	map(0x2800, 0x2800).w(this, FUNC(xain_state::irqB_clear_w));
-	map(0x3000, 0x3000).w(this, FUNC(xain_state::cpuB_bankswitch_w));
-	map(0x4000, 0x7fff).bankr("bank2");
+	map(0x2000, 0x2000).w(FUNC(xain_state::irqA_assert_w));
+	map(0x2800, 0x2800).w(FUNC(xain_state::irqB_clear_w));
+	map(0x3000, 0x3000).w(FUNC(xain_state::cpuB_bankswitch_w));
+	map(0x4000, 0x7fff).bankr(m_rom_banks[1]);
 	map(0x8000, 0xffff).rom();
 }
 
@@ -434,7 +453,7 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static GFXDECODE_START( xain )
+static GFXDECODE_START( gfx_xain )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )    /* 8x8 text */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 256, 8 )    /* 16x16 Background */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 384, 8 )    /* 16x16 Background */
@@ -444,66 +463,65 @@ GFXDECODE_END
 
 void xain_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x4000, 0xc000);
-	membank("bank2")->configure_entries(0, 2, memregion("sub")->base()  + 0x4000, 0xc000);
-	membank("bank1")->set_entry(0);
-	membank("bank2")->set_entry(0);
+	m_rom_banks[0]->configure_entries(0, 2, memregion("maincpu")->base() + 0x4000, 0xc000);
+	m_rom_banks[1]->configure_entries(0, 2, memregion("sub")->base()  + 0x4000, 0xc000);
+	m_rom_banks[0]->set_entry(0);
+	m_rom_banks[1]->set_entry(0);
 
 	save_item(NAME(m_vblank));
 }
 
 MACHINE_CONFIG_START(xain_state::xsleena)
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, CPU_CLOCK) // 68B09E
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	// basic machine hardware
+	MCFG_DEVICE_ADD(m_maincpu, MC6809E, CPU_CLOCK) // 68B09E
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xain_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", MC6809E, CPU_CLOCK) // 68B09E
-	MCFG_CPU_PROGRAM_MAP(cpu_map_B)
+	MCFG_DEVICE_ADD(m_subcpu, MC6809E, CPU_CLOCK) // 68B09E
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map_B)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, PIXEL_CLOCK) // 68A09
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD(m_audiocpu, MC6809, PIXEL_CLOCK) // 68A09
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("mcu", TAITO68705_MCU, MCU_CLOCK)
+	TAITO68705_MCU(config, m_mcu, MCU_CLOCK);
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)   /* based on ddragon driver */
+	// video hardware
+	MCFG_SCREEN_ADD(m_screen, RASTER)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)   // based on ddragon driver
 	MCFG_SCREEN_UPDATE_DRIVER(xain_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xain)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xain);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
-	MCFG_SOUND_ADD("ym1", YM2203, MCU_CLOCK)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
-	MCFG_SOUND_ROUTE(2, "mono", 0.50)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", MCU_CLOCK));
+	ym1.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
+	ym1.add_route(0, "mono", 0.50);
+	ym1.add_route(1, "mono", 0.50);
+	ym1.add_route(2, "mono", 0.50);
+	ym1.add_route(3, "mono", 0.40);
 
-	MCFG_SOUND_ADD("ym2", YM2203, MCU_CLOCK)
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
-	MCFG_SOUND_ROUTE(2, "mono", 0.50)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	ym2203_device &ym2(YM2203(config, "ym2", MCU_CLOCK));
+	ym2.add_route(0, "mono", 0.50);
+	ym2.add_route(1, "mono", 0.50);
+	ym2.add_route(2, "mono", 0.50);
+	ym2.add_route(3, "mono", 0.40);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(xain_state::xsleenab)
 	xsleena(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_map)
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
@@ -780,8 +798,8 @@ ROM_START( xsleenaba )
 ROM_END
 
 
-GAME( 1986, xsleena,   0,       xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan (Taito license)",            "Xain'd Sleena (World)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, xsleenaj,  xsleena, xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan",                            "Xain'd Sleena (Japan)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, solrwarr,  xsleena, xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan (Taito / Memetron license)", "Solar-Warrior (US)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1986, xsleenab,  xsleena, xsleenab, xsleena, xain_state, 0, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1987, xsleenaba, xsleena, xsleenab, xsleena, xain_state, 0, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg, bugfixed)", MACHINE_SUPPORTS_SAVE ) // newer bootleg, fixes some of the issues with the other one
+GAME( 1986, xsleena,   0,       xsleena,  xsleena, xain_state, empty_init, ROT0, "Technos Japan (Taito license)",            "Xain'd Sleena (World)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, xsleenaj,  xsleena, xsleena,  xsleena, xain_state, empty_init, ROT0, "Technos Japan",                            "Xain'd Sleena (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, solrwarr,  xsleena, xsleena,  xsleena, xain_state, empty_init, ROT0, "Technos Japan (Taito / Memetron license)", "Solar-Warrior (US)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1986, xsleenab,  xsleena, xsleenab, xsleena, xain_state, empty_init, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1987, xsleenaba, xsleena, xsleenab, xsleena, xain_state, empty_init, ROT0, "bootleg",                                  "Xain'd Sleena (bootleg, bugfixed)", MACHINE_SUPPORTS_SAVE ) // newer bootleg, fixes some of the issues with the other one

@@ -162,7 +162,7 @@ MACHINE_RESET_MEMBER(pgm_028_025_state,olds)
 	MACHINE_RESET_CALL_MEMBER(pgm);
 }
 
-DRIVER_INIT_MEMBER(pgm_028_025_state,olds)
+void pgm_028_025_state::init_olds()
 {
 	pgm_basic_init();
 
@@ -189,13 +189,13 @@ void pgm_028_025_state::igs025_to_igs028_callback( void )
 MACHINE_CONFIG_START(pgm_028_025_state::pgm_028_025_ol)
 	pgmbase(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(olds_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(olds_mem)
 
-	MCFG_DEVICE_ADD("igs025", IGS025, 0)
-	MCFG_IGS025_SET_EXTERNAL_EXECUTE( pgm_028_025_state, igs025_to_igs028_callback )
+	IGS025(config, m_igs025, 0);
+	m_igs025->set_external_cb(FUNC(pgm_028_025_state::igs025_to_igs028_callback), this);
 
-	MCFG_DEVICE_ADD("igs028", IGS028, 0)
+	IGS028(config, m_igs028, 0);
 
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_028_025_state,olds)
 MACHINE_CONFIG_END

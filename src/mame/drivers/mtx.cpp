@@ -25,7 +25,7 @@
 
 #include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"
@@ -57,26 +57,26 @@ void mtx_state::mtx_mem(address_map &map)
 void mtx_state::mtx_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(mtx_state::mtx_strobe_r), FUNC(mtx_state::mtx_bankswitch_w));
-	map(0x01, 0x01).rw("tms9929a", FUNC(tms9929a_device::vram_read), FUNC(tms9929a_device::vram_write));
-	map(0x02, 0x02).rw("tms9929a", FUNC(tms9929a_device::register_read), FUNC(tms9929a_device::register_write));
-	map(0x03, 0x03).rw(this, FUNC(mtx_state::mtx_sound_strobe_r), FUNC(mtx_state::mtx_cst_w));
-	map(0x04, 0x04).r(this, FUNC(mtx_state::mtx_prt_r)).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x05, 0x05).rw(this, FUNC(mtx_state::mtx_key_lo_r), FUNC(mtx_state::mtx_sense_w));
-	map(0x06, 0x06).rw(this, FUNC(mtx_state::mtx_key_hi_r), FUNC(mtx_state::mtx_sound_latch_w));
+	map(0x00, 0x00).rw(FUNC(mtx_state::mtx_strobe_r), FUNC(mtx_state::mtx_bankswitch_w));
+	map(0x01, 0x01).rw("tms9929a", FUNC(tms9929a_device::vram_r), FUNC(tms9929a_device::vram_w));
+	map(0x02, 0x02).rw("tms9929a", FUNC(tms9929a_device::register_r), FUNC(tms9929a_device::register_w));
+	map(0x03, 0x03).rw(FUNC(mtx_state::mtx_sound_strobe_r), FUNC(mtx_state::mtx_cst_w));
+	map(0x04, 0x04).r(FUNC(mtx_state::mtx_prt_r)).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x05, 0x05).rw(FUNC(mtx_state::mtx_key_lo_r), FUNC(mtx_state::mtx_sense_w));
+	map(0x06, 0x06).rw(FUNC(mtx_state::mtx_key_hi_r), FUNC(mtx_state::mtx_sound_latch_w));
 //  map(0x07, 0x07) PIO
 	map(0x08, 0x0b).rw(m_z80ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x1f, 0x1f).w(this, FUNC(mtx_state::mtx_cst_motor_w));
-	map(0x30, 0x31).w(this, FUNC(mtx_state::hrx_address_w));
-	map(0x32, 0x32).rw(this, FUNC(mtx_state::hrx_data_r), FUNC(mtx_state::hrx_data_w));
-	map(0x33, 0x33).rw(this, FUNC(mtx_state::hrx_attr_r), FUNC(mtx_state::hrx_attr_w));
+	map(0x1f, 0x1f).w(FUNC(mtx_state::mtx_cst_motor_w));
+	map(0x30, 0x31).w(FUNC(mtx_state::hrx_address_w));
+	map(0x32, 0x32).rw(FUNC(mtx_state::hrx_data_r), FUNC(mtx_state::hrx_data_w));
+	map(0x33, 0x33).rw(FUNC(mtx_state::hrx_attr_r), FUNC(mtx_state::hrx_attr_w));
 //  map(0x38, 0x38).w(MC6845_TAG, FUNC(mc6845_device::address_w));
 //  map(0x39, 0x39).rw(MC6845_TAG, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 /*  map(0x40, 0x43).rw(FD1791_TAG, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
-    map(0x44, 0x44).rw(this, FUNC(mtx_state::fdx_status_r), FUNC(mtx_state::fdx_control_w));
-    map(0x45, 0x45).w(this, FUNC(mtx_state::fdx_drv_sel_w));
-    map(0x46, 0x46).w(this, FUNC(mtx_state::fdx_dma_lo_w));
-    map(0x47, 0x47).w(this, FUNC(mtx_state::fdx_dma_hi_w);*/
+    map(0x44, 0x44).rw(FUNC(mtx_state::fdx_status_r), FUNC(mtx_state::fdx_control_w));
+    map(0x45, 0x45).w(FUNC(mtx_state::fdx_drv_sel_w));
+    map(0x46, 0x46).w(FUNC(mtx_state::fdx_dma_lo_w));
+    map(0x47, 0x47).w(FUNC(mtx_state::fdx_dma_hi_w);*/
 }
 
 /*-------------------------------------------------
@@ -286,39 +286,39 @@ WRITE_LINE_MEMBER(mtx_state::mtx_tms9929a_interrupt)
 MACHINE_CONFIG_START(mtx_state::mtx512)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mtx_mem)
-	MCFG_CPU_IO_MAP(mtx_io)
-	MCFG_Z80_DAISY_CHAIN(mtx_daisy_chain)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mtx_state::mtx_mem);
+	m_maincpu->set_addrmap(AS_IO, &mtx_state::mtx_io);
+	m_maincpu->set_daisy_config(mtx_daisy_chain);
 
 	MCFG_MACHINE_START_OVERRIDE(mtx_state,mtx512)
 	MCFG_MACHINE_RESET_OVERRIDE(mtx_state,mtx512)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9929a", TMS9929A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(mtx_state, mtx_tms9929a_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9929a", tms9929a_device, screen_update )
+	tms9929a_device &vdp(TMS9929A(config, "tms9929a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(mtx_state::mtx_tms9929a_interrupt));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL(4'000'000))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(SN76489A_TAG, SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(mtx_state, ctc_trg1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(mtx_state, ctc_trg2_w))
+	Z80CTC(config, m_z80ctc, XTAL(4'000'000));
+	m_z80ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_z80ctc->zc_callback<1>().set(FUNC(mtx_state::ctc_trg1_w));
+	m_z80ctc->zc_callback<2>().set(FUNC(mtx_state::ctc_trg2_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_timer", mtx_state, ctc_tick, attotime::from_hz(XTAL(4'000'000)/13))
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(mtx_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(mtx_state, write_centronics_fault))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(mtx_state, write_centronics_perror))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(mtx_state, write_centronics_select))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, mtx_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, mtx_state, write_centronics_fault))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, mtx_state, write_centronics_perror))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, mtx_state, write_centronics_select))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -330,9 +330,7 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", mtx_state, cassette_tick, attotime::from_hz(44100))
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("96K,128K,192K,320K,448K,512K")
+	RAM(config, m_ram).set_default_size("64K").set_extra_options("96K,128K,192K,320K,448K,512K");
 
 	/* rom extension board */
 	MCFG_GENERIC_SOCKET_ADD("extrom", generic_plain_slot, "mtx_rom")
@@ -350,40 +348,33 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	MCFG_SOFTWARE_LIST_ADD("rom_list", "mtx_rom")
 MACHINE_CONFIG_END
 
-/*-------------------------------------------------
-    MACHINE_CONFIG_START( mtx500 )
--------------------------------------------------*/
-
-MACHINE_CONFIG_START(mtx_state::mtx500)
+void mtx_state::mtx500(machine_config &config)
+{
 	mtx512(config);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("64K,96K,128K,160K,288K,416K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("32K").set_extra_options("64K,96K,128K,160K,288K,416K");
+}
 
 /*-------------------------------------------------
     MACHINE_CONFIG_START( rs128 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(mtx_state::rs128)
+void mtx_state::rs128(machine_config &config)
+{
 	mtx512(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY(Z80_TAG)
-	MCFG_CPU_IO_MAP(rs128_io)
-	MCFG_Z80_DAISY_CHAIN(rs128_daisy_chain)
+	m_maincpu->set_addrmap(AS_IO, &mtx_state::rs128_io);
+	m_maincpu->set_daisy_config(rs128_daisy_chain);
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL(4'000'000))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80DART(config, m_z80dart, XTAL(4'000'000));
+	m_z80dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("192K,320K,448K,512K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("128K").set_extra_options("192K,320K,448K,512K");
+}
 
 /***************************************************************************
     ROMS
@@ -403,9 +394,9 @@ ROM_START( mtx512 )
 	ROM_DEFAULT_BIOS("us")
 	ROM_SYSTEM_BIOS( 0, "us", "U.S.A." )
 	ROM_SYSTEM_BIOS( 1, "dk", "Denmark" )
-	ROMX_LOAD( "danish.rom",  0xe000, 0x2000, CRC(9c1b3fae) SHA1(82bc021660d88eebcf0c4d3856558ee9acc1c348), ROM_BIOS(2) )
+	ROMX_LOAD( "danish.rom",  0xe000, 0x2000, CRC(9c1b3fae) SHA1(82bc021660d88eebcf0c4d3856558ee9acc1c348), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "fi", "Finland" )
-	ROMX_LOAD( "finnish.rom", 0xe000, 0x2000, CRC(9b96cf72) SHA1(b46d1a733e0e635ccdaf4752cc370d793c3b5c55), ROM_BIOS(3) )
+	ROMX_LOAD( "finnish.rom", 0xe000, 0x2000, CRC(9b96cf72) SHA1(b46d1a733e0e635ccdaf4752cc370d793c3b5c55), ROM_BIOS(2) )
 
 	ROM_REGION( 0x2000, "sdx", 0 )
 	ROM_LOAD( "sdx", 0x0000, 0x2000, NO_DUMP )
@@ -428,10 +419,10 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   STATE        INIT    COMPANY         FULLNAME   FLAGS
-COMP( 1983, mtx512,   0,        0,      mtx512,   mtx512, mtx_state,   0,      "Memotech Ltd", "MTX 512", 0 )
-COMP( 1983, mtx500,   mtx512,   0,      mtx500,   mtx512, mtx_state,   0,      "Memotech Ltd", "MTX 500", 0 )
-COMP( 1984, rs128,    mtx512,   0,      rs128,    mtx512, mtx_state,   0,      "Memotech Ltd", "RS 128",  0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS      INIT        COMPANY         FULLNAME   FLAGS
+COMP( 1983, mtx512, 0,      0,      mtx512,  mtx512, mtx_state, empty_init, "Memotech Ltd", "MTX 512", 0 )
+COMP( 1983, mtx500, mtx512, 0,      mtx500,  mtx512, mtx_state, empty_init, "Memotech Ltd", "MTX 500", 0 )
+COMP( 1984, rs128,  mtx512, 0,      rs128,   mtx512, mtx_state, empty_init, "Memotech Ltd", "RS 128",  0 )
 
 
 /*

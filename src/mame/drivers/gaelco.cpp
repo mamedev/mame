@@ -28,6 +28,7 @@ Year   Game                PCB            NOTES
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -58,26 +59,24 @@ WRITE_LINE_MEMBER(gaelco_state::coin2_counter_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-WRITE8_MEMBER(gaelco_state::OKIM6295_bankswitch_w)
+WRITE8_MEMBER(gaelco_state::oki_bankswitch_w)
 {
-	membank("okibank")->set_entry(data & 0x0f);
+	m_okibank->set_entry(data & 0x0f);
 }
 
 /*********** Squash Encryption Related Code ******************/
 
-WRITE16_MEMBER(gaelco_state::gaelco_vram_encrypted_w)
+WRITE16_MEMBER(gaelco_state::vram_encrypted_w)
 {
-	// osd_printf_debug("gaelco_vram_encrypted_w!!\n");
+	// osd_printf_debug("vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
-	COMBINE_DATA(&m_videoram[offset]);
-
-	m_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
+	vram_w(offset, data, mem_mask);
 }
 
 
-WRITE16_MEMBER(gaelco_state::gaelco_encrypted_w)
+WRITE16_MEMBER(gaelco_state::encrypted_w)
 {
-	// osd_printf_debug("gaelco_encrypted_w!!\n");
+	// osd_printf_debug("encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
 	COMBINE_DATA(&m_screenram[offset]);
 }
@@ -86,16 +85,14 @@ WRITE16_MEMBER(gaelco_state::gaelco_encrypted_w)
 
 WRITE16_MEMBER(gaelco_state::thoop_vram_encrypted_w)
 {
-	// osd_printf_debug("gaelco_vram_encrypted_w!!\n");
+	// osd_printf_debug("vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
-	COMBINE_DATA(&m_videoram[offset]);
-
-	m_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
+	vram_w(offset, data, mem_mask);
 }
 
 WRITE16_MEMBER(gaelco_state::thoop_encrypted_w)
 {
-	// osd_printf_debug("gaelco_encrypted_w!!\n");
+	// osd_printf_debug("encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
 	COMBINE_DATA(&m_screenram[offset]);
 }
@@ -109,7 +106,7 @@ WRITE16_MEMBER(gaelco_state::thoop_encrypted_w)
 void gaelco_state::bigkarnk_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                         /* ROM */
-	map(0x100000, 0x101fff).ram().w(this, FUNC(gaelco_state::gaelco_vram_w)).share("videoram");               /* Video RAM */
+	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_w)).share("videoram");               /* Video RAM */
 	map(0x102000, 0x103fff).ram();                                                         /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_DEVWRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
@@ -141,7 +138,7 @@ void gaelco_state::bigkarnk_snd_map(address_map &map)
 void gaelco_state::maniacsq_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                         /* ROM */
-	map(0x100000, 0x101fff).ram().w(this, FUNC(gaelco_state::gaelco_vram_w)).share("videoram");               /* Video RAM */
+	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_w)).share("videoram");               /* Video RAM */
 	map(0x102000, 0x103fff).ram();                                                         /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
@@ -151,7 +148,7 @@ void gaelco_state::maniacsq_map(address_map &map)
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
-	map(0x70000d, 0x70000d).w(this, FUNC(gaelco_state::OKIM6295_bankswitch_w));
+	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::oki_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                      /* OKI6295 status register */
 	map(0xff0000, 0xffffff).ram();                                                         /* Work RAM */
 }
@@ -159,8 +156,8 @@ void gaelco_state::maniacsq_map(address_map &map)
 void gaelco_state::squash_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                         /* ROM */
-	map(0x100000, 0x101fff).ram().w(this, FUNC(gaelco_state::gaelco_vram_encrypted_w)).share("videoram");         /* Video RAM */
-	map(0x102000, 0x103fff).ram().w(this, FUNC(gaelco_state::gaelco_encrypted_w)).share("screenram");                /* Screen RAM */
+	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_encrypted_w)).share("videoram");         /* Video RAM */
+	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::encrypted_w)).share("screenram");                /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    /* Palette */
@@ -173,7 +170,7 @@ void gaelco_state::squash_map(address_map &map)
 												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
 												 });
-	map(0x70000d, 0x70000d).w(this, FUNC(gaelco_state::OKIM6295_bankswitch_w));
+	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::oki_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                      /* OKI6295 status register */
 	map(0xff0000, 0xffffff).ram();                                                         /* Work RAM */
 }
@@ -181,8 +178,8 @@ void gaelco_state::squash_map(address_map &map)
 void gaelco_state::thoop_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                         /* ROM */
-	map(0x100000, 0x101fff).ram().w(this, FUNC(gaelco_state::thoop_vram_encrypted_w)).share("videoram");          /* Video RAM */
-	map(0x102000, 0x103fff).ram().w(this, FUNC(gaelco_state::thoop_encrypted_w)).share("screenram");             /* Screen RAM */
+	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::thoop_vram_encrypted_w)).share("videoram");          /* Video RAM */
+	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::thoop_encrypted_w)).share("screenram");             /* Screen RAM */
 	map(0x108000, 0x108007).writeonly().share("vregs");                         /* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                     /* INT 6 ACK/Watchdog timer */
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");        /* Palette */
@@ -195,7 +192,7 @@ void gaelco_state::thoop_map(address_map &map)
 												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
 												 });
-	map(0x70000d, 0x70000d).w(this, FUNC(gaelco_state::OKIM6295_bankswitch_w));
+	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::oki_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));                      /* OKI6295 status register */
 	map(0xff0000, 0xffffff).ram();                                                         /* Work RAM */
 }
@@ -349,6 +346,36 @@ static INPUT_PORTS_START( biomtoy )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( biomtoyc )
+	PORT_INCLUDE( biomtoy )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:8,7,6,5")
+	PORT_DIPSETTING(    0x0e, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x08, "Free Play (if Coin A too)" )
+	PORT_DIPSETTING(    0x0c, "Free Play (if Coin A too)" )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too)" )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:4,3,2,1")
+	PORT_DIPSETTING(    0xe0, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x80, "Free Play (if Coin B too)" )
+	PORT_DIPSETTING(    0xc0, "Free Play (if Coin B too)" )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin B too)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bioplayc )
@@ -577,39 +604,32 @@ INPUT_PORTS_END
  *
  *************************************/
 
-#define TILELAYOUT8(NUM) static const gfx_layout tilelayout8_##NUM =    \
-{                                                                       \
-	8,8,                                    /* 8x8 tiles */             \
-	NUM/8,                                  /* number of tiles */       \
-	4,                                      /* bitplanes */             \
-	{ 0*NUM*8, 1*NUM*8, 2*NUM*8, 3*NUM*8 }, /* plane offsets */         \
-	{ 0,1,2,3,4,5,6,7 },                                                \
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },                                \
-	8*8                                                                 \
-}
+static const gfx_layout tilelayout8 =
+{
+	8,8,                                                /* 8x8 tiles */
+	RGN_FRAC(1,4),                                      /* number of tiles */
+	4,                                                  /* bitplanes */
+	{ 0, RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) }, /* plane offsets */
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
+};
 
-#define TILELAYOUT16(NUM) static const gfx_layout tilelayout16_##NUM =              \
-{                                                                                   \
-	16,16,                                  /* 16x16 tiles */                       \
-	NUM/32,                                 /* number of tiles */                   \
-	4,                                      /* bitplanes */                         \
-	{ 0*NUM*8, 1*NUM*8, 2*NUM*8, 3*NUM*8 }, /* plane offsets */                     \
-	{ 0,1,2,3,4,5,6,7, 16*8+0,16*8+1,16*8+2,16*8+3,16*8+4,16*8+5,16*8+6,16*8+7 },   \
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8, 8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },     \
-	32*8                                                                            \
-}
+static const gfx_layout tilelayout16 =
+{
+	16,16,                                              /* 16x16 tiles */
+	RGN_FRAC(1,4),                                      /* number of tiles */
+	4,                                                  /* bitplanes */
+	{ 0, RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) }, /* plane offsets */
+	{ STEP8(0,1), STEP8(16*8,1) },
+	{ STEP16(0,8) },
+	32*8
+};
 
-#define GFXDECODEINFO(NUM,ENTRIES) \
-static GFXDECODE_START( NUM )\
-	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout8_##NUM,0, ENTRIES )                           \
-	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout16_##NUM,0,    ENTRIES )                           \
+static GFXDECODE_START( gfx_gaelco )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout8,  0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout16, 0, 64 )
 GFXDECODE_END
-
-
-TILELAYOUT8(0x100000);
-TILELAYOUT16(0x100000);
-
-GFXDECODEINFO(0x100000,64)
 
 
 /*************************************
@@ -620,27 +640,27 @@ GFXDECODEINFO(0x100000,64)
 
 void gaelco_state::machine_start()
 {
-	if (memregion("oki")->bytes() > 0x040000) //bigkarnk oki isn't banked
-		membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+	if (m_okibank) //bigkarnk oki isn't banked
+		m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
 MACHINE_CONFIG_START(gaelco_state::bigkarnk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* MC68000P10, 10 MHz */
-	MCFG_CPU_PROGRAM_MAP(bigkarnk_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* MC68000P10, 10 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bigkarnk_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, 8867000/4)  /* 68B09EP, 2.21675 MHz? */
-	MCFG_CPU_PROGRAM_MAP(bigkarnk_snd_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, 8867000/4)  /* 68B09EP, 2.21675 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(bigkarnk_snd_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco_state, coin1_lockout_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco_state, coin2_lockout_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gaelco_state, coin2_counter_w))
+	LS259(config, m_outlatch);
+	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)).invert();
+	m_outlatch->q_out_cb<1>().set(FUNC(gaelco_state::coin2_lockout_w)).invert();
+	m_outlatch->q_out_cb<2>().set(FUNC(gaelco_state::coin1_counter_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(gaelco_state::coin2_counter_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -649,33 +669,32 @@ MACHINE_CONFIG_START(gaelco_state::bigkarnk)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_bigkarnk)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x100000)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco_state,bigkarnk)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3580000)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 3580000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaelco_state::maniacsq)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2 ) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(maniacsq_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2 ) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(maniacsq_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -684,18 +703,17 @@ MACHINE_CONFIG_START(gaelco_state::maniacsq)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_maniacsq)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x100000)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco_state,maniacsq)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) // pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -703,18 +721,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gaelco_state::squash)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2 ) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(squash_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2 ) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(squash_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // B8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco_state, coin1_lockout_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco_state, coin2_lockout_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gaelco_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // used
+	LS259(config, m_outlatch); // B8
+	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)).invert();
+	m_outlatch->q_out_cb<1>().set(FUNC(gaelco_state::coin2_lockout_w)).invert();
+	m_outlatch->q_out_cb<2>().set(FUNC(gaelco_state::coin1_counter_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(gaelco_state::coin2_counter_w));
+	m_outlatch->q_out_cb<4>().set_nop(); // used
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -723,18 +741,17 @@ MACHINE_CONFIG_START(gaelco_state::squash)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_maniacsq)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x100000)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco_state,maniacsq)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) /* verified on pcb */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -742,18 +759,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gaelco_state::thoop)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2 ) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(thoop_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2 ) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(thoop_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // B8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco_state, coin1_lockout_w)) // not inverted
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco_state, coin2_lockout_w)) // not inverted
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gaelco_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // used
+	LS259(config, m_outlatch); // B8
+	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)); // not inverted
+	m_outlatch->q_out_cb<1>().set(FUNC(gaelco_state::coin2_lockout_w)); // not inverted
+	m_outlatch->q_out_cb<2>().set(FUNC(gaelco_state::coin1_counter_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(gaelco_state::coin2_counter_w));
+	m_outlatch->q_out_cb<4>().set_nop(); // used
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -762,18 +779,17 @@ MACHINE_CONFIG_START(gaelco_state::thoop)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco_state, screen_update_maniacsq)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x100000)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco_state,maniacsq)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) // pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) // pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -793,15 +809,11 @@ ROM_START( bigkarnk ) /* PCB silkscreened REF.901112 */
 	ROM_REGION( 0x01e000, "audiocpu", 0 )   /* 6809 code */
 	ROM_LOAD(   "d5",   0x000000, 0x010000, CRC(3b73b9c5) SHA1(1b1c5545609a695dab87d611bd53e0c3dd91e6b7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "h5", 0x000000, 0x080000, CRC(20e239ff) SHA1(685059340f0f3a8e3c98702bd760dae685a58ddb) )
-	ROM_RELOAD(     0x080000, 0x080000 )
-	ROM_LOAD( "h10",0x100000, 0x080000, CRC(ab442855) SHA1(bcd69d4908ff8dc1b2215d2c2d2e54b950e0c015) )
-	ROM_RELOAD(     0x180000, 0x080000 )
-	ROM_LOAD( "h8", 0x200000, 0x080000, CRC(83dce5a3) SHA1(b4f9473e93c96f4b86c446e89d13fd3ef2b03996) )
-	ROM_RELOAD(     0x280000, 0x080000 )
-	ROM_LOAD( "h6", 0x300000, 0x080000, CRC(24e84b24) SHA1(c0ad6ce1e4b8aa7b9c9a3db8bb0165e90f4b48ed) )
-	ROM_RELOAD(     0x380000, 0x080000 )
+	ROM_LOAD( "h10",0x080000, 0x080000, CRC(ab442855) SHA1(bcd69d4908ff8dc1b2215d2c2d2e54b950e0c015) )
+	ROM_LOAD( "h8", 0x100000, 0x080000, CRC(83dce5a3) SHA1(b4f9473e93c96f4b86c446e89d13fd3ef2b03996) )
+	ROM_LOAD( "h6", 0x180000, 0x080000, CRC(24e84b24) SHA1(c0ad6ce1e4b8aa7b9c9a3db8bb0165e90f4b48ed) )
 
 	ROM_REGION( 0x040000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "d1", 0x000000, 0x040000, CRC(26444ad1) SHA1(804101b9bbb6e1b6d43a1e9d91737f9c3b27802a) )
@@ -812,19 +824,15 @@ ROM_START( maniacsp ) /* PCB - REF 922804/2 */
 	ROM_LOAD16_BYTE(    "d18",  0x000000, 0x020000, CRC(740ecab2) SHA1(8d8583364cc6aeea58ea2b9cb9a2aab2a43a44df) )
 	ROM_LOAD16_BYTE(    "d16",  0x000001, 0x020000, CRC(c6c42729) SHA1(1aac9f93d47a4eb57e06e206e9f50e349b1817da) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "f3", 0x000000, 0x040000, CRC(e7f6582b) SHA1(9e352edf2f71d0edecb54a11ab3fd0e3ec867d42) )
-	ROM_RELOAD(     0x080000, 0x040000 )
-	/* 0x040000-0x07ffff and 0x0c0000-0x0fffff empty */
-	ROM_LOAD( "f2", 0x100000, 0x040000, CRC(ca43a5ae) SHA1(8d2ed537be1dee60096a58b68b735fb50cab3285) )
-	ROM_RELOAD(     0x180000, 0x040000 )
-	/* 0x140000-0x17ffff and 0x1c0000-0x1fffff empty */
-	ROM_LOAD( "f1", 0x200000, 0x040000, CRC(fca112e8) SHA1(2a1412f8f1c856b18b6cc7794191d327a415266f) )
-	ROM_RELOAD(     0x280000, 0x040000 )
-	/* 0x240000-0x27ffff and 0x2c0000-0x2fffff empty */
-	ROM_LOAD( "f0", 0x300000, 0x040000, CRC(6e829ee8) SHA1(b602da8d987c1bafa41baf5d5e5d753e29ff5403) )
-	ROM_RELOAD(     0x380000, 0x040000 )
-	/* 0x340000-0x37ffff and 0x3c0000-0x3fffff empty */
+	/* 0x040000-0x07ffff empty */
+	ROM_LOAD( "f2", 0x080000, 0x040000, CRC(ca43a5ae) SHA1(8d2ed537be1dee60096a58b68b735fb50cab3285) )
+	/* 0x0c0000-0x0fffff empty */
+	ROM_LOAD( "f1", 0x100000, 0x040000, CRC(fca112e8) SHA1(2a1412f8f1c856b18b6cc7794191d327a415266f) )
+	/* 0x140000-0x17ffff empty */
+	ROM_LOAD( "f0", 0x180000, 0x040000, CRC(6e829ee8) SHA1(b602da8d987c1bafa41baf5d5e5d753e29ff5403) )
+	/* 0x1c0000-0x1fffff empty */
 
 	ROM_REGION( 0x080000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(2557f2d6) SHA1(3a99388f2d845281f73a427d6dc797dce87b2f82) )
@@ -867,13 +875,17 @@ Video: TMS TCP1020AFN-084C (x2)
   VR1: Volume pot
    SW: Two 8 switch dipswitches
 
+NOTE: Sadly Gaelco didn't differentiate between versions on the ROM labels.
+      Just a version number on the initial boot up screen and ROM checksum
+      on the calibration screen which followed.
+
 ***************************************************************************/
 
 
 ROM_START( biomtoy ) /* PCB - REF.922804/2 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE(    "d18",  0x000000, 0x080000, CRC(4569ce64) SHA1(96557aca55779c23f7c2c11fddc618823c04ead0) ) /* v1.0.1885 */
-	ROM_LOAD16_BYTE(    "d16",  0x000001, 0x080000, CRC(739449bd) SHA1(711a8ea5081f15dea6067577516c9296239c4145) ) /* v1.0.1885 */
+	ROM_LOAD16_BYTE( "18.d18",  0x000000, 0x080000, CRC(4569ce64) SHA1(96557aca55779c23f7c2c11fddc618823c04ead0) ) /* v1.0.1885 */
+	ROM_LOAD16_BYTE( "16.d16",  0x000001, 0x080000, CRC(739449bd) SHA1(711a8ea5081f15dea6067577516c9296239c4145) ) /* v1.0.1885 */
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	/* weird gfx ordering */
@@ -903,8 +915,8 @@ ROM_END
 
 ROM_START( biomtoya ) /* PCB - REF.922804/2 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "biomtoya.d18", 0x000000, 0x080000, CRC(39b6cdbd) SHA1(3a22eb2e304d85ecafff677d83c3c4fca3f869d5) ) /* v1.0.1884 */
-	ROM_LOAD16_BYTE( "biomtoya.d16", 0x000001, 0x080000, CRC(ab340671) SHA1(83f708a535048e927fd1c7de85a65282e460f98a) ) /* v1.0.1884 */
+	ROM_LOAD16_BYTE( "18.d18", 0x000000, 0x080000, CRC(39b6cdbd) SHA1(3a22eb2e304d85ecafff677d83c3c4fca3f869d5) ) /* v1.0.1884 - sldh */
+	ROM_LOAD16_BYTE( "16.d16", 0x000001, 0x080000, CRC(ab340671) SHA1(83f708a535048e927fd1c7de85a65282e460f98a) ) /* v1.0.1884 - sldh */
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	/* weird gfx ordering */
@@ -934,8 +946,8 @@ ROM_END
 
 ROM_START( biomtoyb ) /* PCB - REF.922804/2 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "18.d18", 0x000000, 0x080000, CRC(2dfadee3) SHA1(55ab563a9a69da940ca015f292476068cf21b01c) ) /* v1.0.1878 */
-	ROM_LOAD16_BYTE( "16.d16", 0x000001, 0x080000, CRC(b35e3ca6) SHA1(b323fcca99d088e6fbf6a1d660ef860987af77e4) ) /* v1.0.1878 */
+	ROM_LOAD16_BYTE( "18.d18", 0x000000, 0x080000, CRC(2dfadee3) SHA1(55ab563a9a69da940ca015f292476068cf21b01c) ) /* v1.0.1878 - sldh */
+	ROM_LOAD16_BYTE( "16.d16", 0x000001, 0x080000, CRC(b35e3ca6) SHA1(b323fcca99d088e6fbf6a1d660ef860987af77e4) ) /* v1.0.1878 - sldh */
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Graphics & Sound ROMs soldered in, not verified 100% correct for this set */
 	/* weird gfx ordering */
@@ -955,6 +967,37 @@ ROM_START( biomtoyb ) /* PCB - REF.922804/2 */
 	ROM_CONTINUE(       0x3c0000, 0x040000 )
 	ROM_LOAD( "j10",    0x300000, 0x040000, CRC(8e3e96cc) SHA1(761009f3f32b18139e98f20a22c433b6a49d9168) )
 	ROM_CONTINUE(       0x380000, 0x040000 )
+
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
+	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "c3", 0x080000, 0x080000, CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
+ROM_END
+
+
+ROM_START( biomtoyc ) /* PCB - REF.922804/1 & REF.922804/2 */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "18.d18", 0x000000, 0x080000, CRC(05ad7d30) SHA1(4b2596d225bf9b314db5a150921d7d6c99096ddb) ) /* v1.0.1870 - sldh */
+	ROM_LOAD16_BYTE( "16.d16", 0x000001, 0x080000, CRC(a288e73f) SHA1(13a53981e3fe6961494013e7466badae56481958) ) /* v1.0.1870 - sldh */
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Graphics & Sound ROMs soldered in, not verified 100% correct for this set Using prototype graphics from the set below */
+	/* weird gfx ordering */
+	ROM_LOAD( "toy-high-3.h6",  0x040000, 0x040000, CRC(ab19a1ce) SHA1(3cc896f8c20f692b02d43db8c30f410bd93fe3ca))
+	ROM_CONTINUE(               0x0c0000, 0x040000 )
+	ROM_LOAD( "toy-low-3.j6",   0x000000, 0x040000, CRC(927f5cd7) SHA1(ad5e75091146ca7935a18e5dd045410e28d8b170) )
+	ROM_CONTINUE(               0x080000, 0x040000 )
+	ROM_LOAD( "toy-high-2.h7",  0x140000, 0x040000, CRC(fd975d89) SHA1(89bb85ccb1ba0bb82f393ef27757c0778dd696b3) )
+	ROM_CONTINUE(               0x1c0000, 0x040000 )
+	ROM_LOAD( "toy-low-2.j7",   0x100000, 0x040000, CRC(6cbf9937) SHA1(77123a8afea3108df54f45033dfb7f86c1d0d1b8) )
+	ROM_CONTINUE(               0x180000, 0x040000 )
+	ROM_LOAD( "toy-high-1.h9",  0x240000, 0x040000, CRC(09de4799) SHA1(120b7bd8e20288c3aec62d3b2bf3f87e251c3eea) )
+	ROM_CONTINUE(               0x2c0000, 0x040000 )
+	ROM_LOAD( "toy-low-1.j9",   0x200000, 0x040000, CRC(57922c41) SHA1(ffbe5b418ed93e8705a7aabe69d3fad2919a160f) )
+	ROM_CONTINUE(               0x280000, 0x040000 )
+	ROM_LOAD( "toy-high-0.h10", 0x340000, 0x040000, CRC(5bee6df7) SHA1(ecf759de2f0909f793c84c71feb08801896e2474) )
+	ROM_CONTINUE(               0x3c0000, 0x040000 )
+	ROM_LOAD( "toy-low-0.j10",  0x300000, 0x040000, CRC(26c49ca2) SHA1(82079eaa2c9523c9acb72fccfbbe9493bc62e84f) )
+	ROM_CONTINUE(               0x380000, 0x040000 )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
@@ -988,7 +1031,6 @@ ROM_START( bioplayc ) /* PCB - REF.922804/2??  -  Spanish version */
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	// Missing the audio rom, the board didn't have it populated. The programmer said it was not there because the audio was ripped from other games.
-	// however these roms, strangely from the newer revision not the older ones, give good sound for most situations.
 	ROM_LOAD( "c1", 0x000000, 0x080000, BAD_DUMP CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
 	ROM_LOAD( "c3", 0x080000, 0x080000, BAD_DUMP CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
@@ -999,18 +1041,11 @@ ROM_START( lastkm ) /* PCB - REF 922804/2 */
 	ROM_LOAD16_BYTE(    "prog-bici-e-8.11.95.d18",  0x000000, 0x080000, CRC(1fc5fba0) SHA1(1f954fca9f25df7379eff4ea905810fa06fcebb0)) /*1.0.0275 */
 	ROM_LOAD16_BYTE(    "prog-bici-o-8.11.95.d16",  0x000001, 0x080000, CRC(b93e57e3) SHA1(df307191a214a32a26018ca2a9200742e39939d2)) /*1.0.0275 */
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "bici-f3.h6",     0x000000, 0x080000, CRC(0bf9f213) SHA1(052abef60df419d32bf8a86c89d87e5bb281b4eb))
-	ROM_RELOAD(0x80000,0x80000)
-
-	ROM_LOAD( "bici-f2.h7",     0x100000, 0x080000, CRC(c48d5376) SHA1(8e987839e7254e0fa631802733482726a289439c))
-	ROM_RELOAD(0x180000, 0x80000)
-
-	ROM_LOAD( "bici-f1.h9",     0x200000, 0x080000, CRC(e7958070) SHA1(7f065b429a500b714dfbf497b1353e90137abbd7))
-	ROM_RELOAD(0x280000, 0x80000)
-
-	ROM_LOAD( "bici-f0.h10",    0x300000, 0x080000, CRC(73d4b29f) SHA1(e2563562cb5fbaba7e0517ec9811645aca56f374))
-	ROM_RELOAD(0x380000, 0x80000)
+	ROM_LOAD( "bici-f2.h7",     0x080000, 0x080000, CRC(c48d5376) SHA1(8e987839e7254e0fa631802733482726a289439c))
+	ROM_LOAD( "bici-f1.h9",     0x100000, 0x080000, CRC(e7958070) SHA1(7f065b429a500b714dfbf497b1353e90137abbd7))
+	ROM_LOAD( "bici-f0.h10",    0x180000, 0x080000, CRC(73d4b29f) SHA1(e2563562cb5fbaba7e0517ec9811645aca56f374))
 
 	ROM_REGION( 0x80000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "sonido-bici-0-8.11.95.c1", 0x000000, 0x080000, CRC(7380c963) SHA1(d1d90912f986b944cd95bd773c9f5502d837ce3e))
@@ -1069,15 +1104,11 @@ ROM_START( squash ) /* PCB - REF.922804/1 */
 	ROM_LOAD16_BYTE( "squash.d18", 0x000000, 0x20000, CRC(ce7aae96) SHA1(4fe8666ae571bffc5a08fa68346c0623282989eb) )
 	ROM_LOAD16_BYTE( "squash.d16", 0x000001, 0x20000, CRC(8ffaedd7) SHA1(f4aada17ba67dd8b6c5a395e832bcbba2764c59d) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD( "squash.c09", 0x300000, 0x80000, CRC(0bb91c69) SHA1(8be945049ab411a4d49bd64bd3937542ec9ef9fb) ) /* encrypted video ram */
-	ROM_RELOAD(             0x380000, 0x80000 )
-	ROM_LOAD( "squash.c10", 0x200000, 0x80000, CRC(892a035c) SHA1(d0156ceb9aa6639a1124c17fb12389be319bb51f) ) /* encrypted video ram */
-	ROM_RELOAD(             0x280000, 0x80000 )
-	ROM_LOAD( "squash.c11", 0x100000, 0x80000, CRC(9e19694d) SHA1(1df4646f3147719fef516a37aa361ae26d9b23a2) ) /* encrypted video ram */
-	ROM_RELOAD(             0x180000, 0x80000 )
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "squash.c09", 0x180000, 0x80000, CRC(0bb91c69) SHA1(8be945049ab411a4d49bd64bd3937542ec9ef9fb) ) /* encrypted video ram */
+	ROM_LOAD( "squash.c10", 0x100000, 0x80000, CRC(892a035c) SHA1(d0156ceb9aa6639a1124c17fb12389be319bb51f) ) /* encrypted video ram */
+	ROM_LOAD( "squash.c11", 0x080000, 0x80000, CRC(9e19694d) SHA1(1df4646f3147719fef516a37aa361ae26d9b23a2) ) /* encrypted video ram */
 	ROM_LOAD( "squash.c12", 0x000000, 0x80000, CRC(5c440645) SHA1(4f2fc1647ffc549fa079f2dc0aaaceb447afdf44) ) /* encrypted video ram */
-	ROM_RELOAD(             0x080000, 0x80000 )
 
 	ROM_REGION( 0x80000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "squash.d01", 0x000000, 0x80000, CRC(a1b9651b) SHA1(a396ba94889f70ea06d6330e3606b0f2497ff6ce) )
@@ -1121,12 +1152,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, bigkarnk, 0,        bigkarnk, bigkarnk, gaelco_state, 0, ROT0, "Gaelco", "Big Karnak", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  gaelco_state, 0, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1885)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, biomtoya, biomtoy,  maniacsq, biomtoy,  gaelco_state, 0, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1884)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, biomtoyb, biomtoy,  maniacsq, biomtoy,  gaelco_state, 0, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1878)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, bioplayc, biomtoy,  maniacsq, bioplayc, gaelco_state, 0, ROT0, "Gaelco", "Bioplaything Cop (Ver. 1.0.1823, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, maniacsp, maniacsq, maniacsq, maniacsq, gaelco_state, 0, ROT0, "Gaelco", "Maniac Square (prototype)", MACHINE_SUPPORTS_SAVE ) // sometimes listed as a 1992 proto?
-GAME( 1995, lastkm,   0,        maniacsq, lastkm,   gaelco_state, 0, ROT0, "Gaelco", "Last KM (Ver 1.0.0275)", MACHINE_SUPPORTS_SAVE ) // used on 'Salter' exercise bikes
-GAME( 1992, squash,   0,        squash,   squash,   gaelco_state, 0, ROT0, "Gaelco", "Squash (Ver. 1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, 0, ROT0, "Gaelco", "Thunder Hoop (Ver. 1, Checksum 02A09F7D)", MACHINE_SUPPORTS_SAVE ) // could be other versions, still Ver. 1 but different checksum listed on boot
+GAME( 1991, bigkarnk, 0,        bigkarnk, bigkarnk, gaelco_state, empty_init, ROT0, "Gaelco", "Big Karnak", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1885)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, biomtoya, biomtoy,  maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1884)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, biomtoyb, biomtoy,  maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1878)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, biomtoyc, biomtoy,  maniacsq, biomtoyc, gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1870)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bioplayc, biomtoy,  maniacsq, bioplayc, gaelco_state, empty_init, ROT0, "Gaelco", "Bioplaything Cop (Ver. 1.0.1823, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // copyright based on Ver. 1.0.1870
+GAME( 1996, maniacsp, maniacsq, maniacsq, maniacsq, gaelco_state, empty_init, ROT0, "Gaelco", "Maniac Square (prototype)", MACHINE_SUPPORTS_SAVE ) // sometimes listed as a 1992 proto?
+GAME( 1995, lastkm,   0,        maniacsq, lastkm,   gaelco_state, empty_init, ROT0, "Gaelco", "Last KM (Ver 1.0.0275)", MACHINE_SUPPORTS_SAVE ) // used on 'Salter' exercise bikes
+GAME( 1992, squash,   0,        squash,   squash,   gaelco_state, empty_init, ROT0, "Gaelco", "Squash (Ver. 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, empty_init, ROT0, "Gaelco", "Thunder Hoop (Ver. 1, Checksum 02A09F7D)", MACHINE_SUPPORTS_SAVE ) // could be other versions, still Ver. 1 but different checksum listed on boot

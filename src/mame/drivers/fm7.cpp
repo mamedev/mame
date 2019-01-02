@@ -52,7 +52,6 @@
 #include "bus/centronics/dsjoy.h"
 
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
 
 #include "formats/fm7_cas.h"
 
@@ -445,13 +444,13 @@ READ8_MEMBER(fm7_state::fm7_fdc_r)
 	switch(offset)
 	{
 		case 0:
-			return m_fdc->status_r(space, offset);
+			return m_fdc->status_r();
 		case 1:
-			return m_fdc->track_r(space, offset);
+			return m_fdc->track_r();
 		case 2:
-			return m_fdc->sector_r(space, offset);
+			return m_fdc->sector_r();
 		case 3:
-			return m_fdc->data_r(space, offset);
+			return m_fdc->data_r();
 		case 4:
 			return m_fdc_side | 0xfe;
 		case 5:
@@ -476,16 +475,16 @@ WRITE8_MEMBER(fm7_state::fm7_fdc_w)
 	switch(offset)
 	{
 		case 0:
-			m_fdc->cmd_w(space, offset,data);
+			m_fdc->cmd_w(data);
 			break;
 		case 1:
-			m_fdc->track_w(space, offset,data);
+			m_fdc->track_w(data);
 			break;
 		case 2:
-			m_fdc->sector_w(space, offset,data);
+			m_fdc->sector_w(data);
 			break;
 		case 3:
-			m_fdc->data_w(space, offset,data);
+			m_fdc->data_w(data);
 			break;
 		case 4:
 			m_fdc_side = data & 0x01;
@@ -824,7 +823,7 @@ WRITE8_MEMBER(fm7_state::fm7_cassette_printer_w)
 			break;
 		case 1:
 		// Printer data
-			m_cent_data_out->write(space, 0, data);
+			m_cent_data_out->write(data);
 			break;
 	}
 }
@@ -1267,7 +1266,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_timer_irq)
 TIMER_CALLBACK_MEMBER(fm7_state::fm7_subtimer_irq)
 {
 	if(m_video.nmi_mask == 0 && m_video.sub_halt == 0)
-		m_sub->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		m_sub->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 // When a key is pressed or released (in scan mode only), an IRQ is generated on the main CPU,
@@ -1432,28 +1431,28 @@ void fm7_state::fm7_mem(address_map &map)
 	map(0x0000, 0x7fff).ram();
 	map(0x8000, 0xfbff).bankr("bank1").bankw("bank2"); // also F-BASIC ROM, when enabled
 	map(0xfc00, 0xfc7f).ram();
-	map(0xfc80, 0xfcff).rw(this, FUNC(fm7_state::fm7_main_shared_r), FUNC(fm7_state::fm7_main_shared_w));
+	map(0xfc80, 0xfcff).rw(FUNC(fm7_state::fm7_main_shared_r), FUNC(fm7_state::fm7_main_shared_w));
 	// I/O space (FD00-FDFF)
-	map(0xfd00, 0xfd01).rw(this, FUNC(fm7_state::fm7_keyboard_r), FUNC(fm7_state::fm7_cassette_printer_w));
-	map(0xfd02, 0xfd02).rw(this, FUNC(fm7_state::fm7_cassette_printer_r), FUNC(fm7_state::fm7_irq_mask_w));  // IRQ mask
-	map(0xfd03, 0xfd03).rw(this, FUNC(fm7_state::fm7_irq_cause_r), FUNC(fm7_state::fm7_beeper_w));  // IRQ flags
-	map(0xfd04, 0xfd04).r(this, FUNC(fm7_state::fm7_fd04_r));
-	map(0xfd05, 0xfd05).rw(this, FUNC(fm7_state::fm7_subintf_r), FUNC(fm7_state::fm7_subintf_w));
-	map(0xfd06, 0xfd0c).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd0d, 0xfd0d).rw(this, FUNC(fm7_state::fm7_psg_select_r), FUNC(fm7_state::fm7_psg_select_w));
-	map(0xfd0e, 0xfd0e).rw(this, FUNC(fm7_state::fm7_psg_data_r), FUNC(fm7_state::fm7_psg_data_w));
-	map(0xfd0f, 0xfd0f).rw(this, FUNC(fm7_state::fm7_rom_en_r), FUNC(fm7_state::fm7_rom_en_w));
-	map(0xfd10, 0xfd17).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd18, 0xfd1f).rw(this, FUNC(fm7_state::fm7_fdc_r), FUNC(fm7_state::fm7_fdc_w));
-	map(0xfd20, 0xfd23).rw(this, FUNC(fm7_state::fm7_kanji_r), FUNC(fm7_state::fm7_kanji_w));
-	map(0xfd24, 0xfd36).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd37, 0xfd37).w(this, FUNC(fm7_state::fm7_multipage_w));
-	map(0xfd38, 0xfd3f).rw(this, FUNC(fm7_state::fm7_palette_r), FUNC(fm7_state::fm7_palette_w));
-	map(0xfd40, 0xfdff).r(this, FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd00, 0xfd01).rw(FUNC(fm7_state::fm7_keyboard_r), FUNC(fm7_state::fm7_cassette_printer_w));
+	map(0xfd02, 0xfd02).rw(FUNC(fm7_state::fm7_cassette_printer_r), FUNC(fm7_state::fm7_irq_mask_w));  // IRQ mask
+	map(0xfd03, 0xfd03).rw(FUNC(fm7_state::fm7_irq_cause_r), FUNC(fm7_state::fm7_beeper_w));  // IRQ flags
+	map(0xfd04, 0xfd04).r(FUNC(fm7_state::fm7_fd04_r));
+	map(0xfd05, 0xfd05).rw(FUNC(fm7_state::fm7_subintf_r), FUNC(fm7_state::fm7_subintf_w));
+	map(0xfd06, 0xfd0c).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd0d, 0xfd0d).rw(FUNC(fm7_state::fm7_psg_select_r), FUNC(fm7_state::fm7_psg_select_w));
+	map(0xfd0e, 0xfd0e).rw(FUNC(fm7_state::fm7_psg_data_r), FUNC(fm7_state::fm7_psg_data_w));
+	map(0xfd0f, 0xfd0f).rw(FUNC(fm7_state::fm7_rom_en_r), FUNC(fm7_state::fm7_rom_en_w));
+	map(0xfd10, 0xfd17).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd18, 0xfd1f).rw(FUNC(fm7_state::fm7_fdc_r), FUNC(fm7_state::fm7_fdc_w));
+	map(0xfd20, 0xfd23).rw(FUNC(fm7_state::fm7_kanji_r), FUNC(fm7_state::fm7_kanji_w));
+	map(0xfd24, 0xfd36).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd37, 0xfd37).w(FUNC(fm7_state::fm7_multipage_w));
+	map(0xfd38, 0xfd3f).rw(FUNC(fm7_state::fm7_palette_r), FUNC(fm7_state::fm7_palette_w));
+	map(0xfd40, 0xfdff).r(FUNC(fm7_state::fm7_unknown_r));
 	// Boot ROM
 	map(0xfe00, 0xffdf).bankr("bank17");
 	map(0xffe0, 0xffef).ram();
-	map(0xfff0, 0xffff).rw(this, FUNC(fm7_state::vector_r), FUNC(fm7_state::vector_w));
+	map(0xfff0, 0xffff).rw(FUNC(fm7_state::vector_r), FUNC(fm7_state::vector_w));
 }
 
 void fm7_state::fm8_mem(address_map &map)
@@ -1461,26 +1460,26 @@ void fm7_state::fm8_mem(address_map &map)
 	map(0x0000, 0x7fff).ram();
 	map(0x8000, 0xfbff).bankr("bank1").bankw("bank2"); // also F-BASIC ROM, when enabled
 	map(0xfc00, 0xfc7f).ram();
-	map(0xfc80, 0xfcff).rw(this, FUNC(fm7_state::fm7_main_shared_r), FUNC(fm7_state::fm7_main_shared_w));
+	map(0xfc80, 0xfcff).rw(FUNC(fm7_state::fm7_main_shared_r), FUNC(fm7_state::fm7_main_shared_w));
 	// I/O space (FD00-FDFF)
-	map(0xfd00, 0xfd01).rw(this, FUNC(fm7_state::fm7_keyboard_r), FUNC(fm7_state::fm7_cassette_printer_w));
-	map(0xfd02, 0xfd02).rw(this, FUNC(fm7_state::fm7_cassette_printer_r), FUNC(fm7_state::fm7_irq_mask_w));  // IRQ mask
-	map(0xfd03, 0xfd03).rw(this, FUNC(fm7_state::fm7_irq_cause_r), FUNC(fm7_state::fm7_beeper_w));  // IRQ flags
-	map(0xfd04, 0xfd04).r(this, FUNC(fm7_state::fm7_fd04_r));
-	map(0xfd05, 0xfd05).rw(this, FUNC(fm7_state::fm7_subintf_r), FUNC(fm7_state::fm7_subintf_w));
-	map(0xfd06, 0xfd0c).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd0f, 0xfd0f).rw(this, FUNC(fm7_state::fm7_rom_en_r), FUNC(fm7_state::fm7_rom_en_w));
-	map(0xfd10, 0xfd17).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd18, 0xfd1f).rw(this, FUNC(fm7_state::fm7_fdc_r), FUNC(fm7_state::fm7_fdc_w));
-	map(0xfd20, 0xfd23).rw(this, FUNC(fm7_state::fm7_kanji_r), FUNC(fm7_state::fm7_kanji_w));
-	map(0xfd24, 0xfd36).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd37, 0xfd37).w(this, FUNC(fm7_state::fm7_multipage_w));
-	map(0xfd38, 0xfd3f).rw(this, FUNC(fm7_state::fm7_palette_r), FUNC(fm7_state::fm7_palette_w));
-	map(0xfd40, 0xfdff).r(this, FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd00, 0xfd01).rw(FUNC(fm7_state::fm7_keyboard_r), FUNC(fm7_state::fm7_cassette_printer_w));
+	map(0xfd02, 0xfd02).rw(FUNC(fm7_state::fm7_cassette_printer_r), FUNC(fm7_state::fm7_irq_mask_w));  // IRQ mask
+	map(0xfd03, 0xfd03).rw(FUNC(fm7_state::fm7_irq_cause_r), FUNC(fm7_state::fm7_beeper_w));  // IRQ flags
+	map(0xfd04, 0xfd04).r(FUNC(fm7_state::fm7_fd04_r));
+	map(0xfd05, 0xfd05).rw(FUNC(fm7_state::fm7_subintf_r), FUNC(fm7_state::fm7_subintf_w));
+	map(0xfd06, 0xfd0c).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd0f, 0xfd0f).rw(FUNC(fm7_state::fm7_rom_en_r), FUNC(fm7_state::fm7_rom_en_w));
+	map(0xfd10, 0xfd17).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd18, 0xfd1f).rw(FUNC(fm7_state::fm7_fdc_r), FUNC(fm7_state::fm7_fdc_w));
+	map(0xfd20, 0xfd23).rw(FUNC(fm7_state::fm7_kanji_r), FUNC(fm7_state::fm7_kanji_w));
+	map(0xfd24, 0xfd36).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd37, 0xfd37).w(FUNC(fm7_state::fm7_multipage_w));
+	map(0xfd38, 0xfd3f).rw(FUNC(fm7_state::fm7_palette_r), FUNC(fm7_state::fm7_palette_w));
+	map(0xfd40, 0xfdff).r(FUNC(fm7_state::fm7_unknown_r));
 	// Boot ROM
 	map(0xfe00, 0xffdf).bankr("bank17");
 	map(0xffe0, 0xffef).ram();
-	map(0xfff0, 0xffff).rw(this, FUNC(fm7_state::vector_r), FUNC(fm7_state::vector_w));
+	map(0xfff0, 0xffff).rw(FUNC(fm7_state::vector_r), FUNC(fm7_state::vector_w));
 }
 
 /*
@@ -1496,84 +1495,72 @@ void fm7_state::fm8_mem(address_map &map)
 
 void fm7_state::fm7_sub_mem(address_map &map)
 {
-	map(0x0000, 0xbfff).rw(this, FUNC(fm7_state::fm7_vram_r), FUNC(fm7_state::fm7_vram_w)); // VRAM
+	map(0x0000, 0xbfff).rw(FUNC(fm7_state::fm7_vram_r), FUNC(fm7_state::fm7_vram_w)); // VRAM
 	map(0xc000, 0xcfff).ram(); // Console RAM
 	map(0xd000, 0xd37f).ram(); // Work RAM
 	map(0xd380, 0xd3ff).ram().share("shared_ram");
 	// I/O space (D400-D4FF)
-	map(0xd400, 0xd401).r(this, FUNC(fm7_state::fm7_sub_keyboard_r));
-	map(0xd402, 0xd402).r(this, FUNC(fm7_state::fm7_cancel_ack));
-	map(0xd403, 0xd403).r(this, FUNC(fm7_state::fm7_sub_beeper_r));
-	map(0xd404, 0xd404).r(this, FUNC(fm7_state::fm7_attn_irq_r));
-	map(0xd408, 0xd408).rw(this, FUNC(fm7_state::fm7_crt_r), FUNC(fm7_state::fm7_crt_w));
-	map(0xd409, 0xd409).rw(this, FUNC(fm7_state::fm7_vram_access_r), FUNC(fm7_state::fm7_vram_access_w));
-	map(0xd40a, 0xd40a).rw(this, FUNC(fm7_state::fm7_sub_busyflag_r), FUNC(fm7_state::fm7_sub_busyflag_w));
-	map(0xd40e, 0xd40f).w(this, FUNC(fm7_state::fm7_vram_offset_w));
+	map(0xd400, 0xd401).r(FUNC(fm7_state::fm7_sub_keyboard_r));
+	map(0xd402, 0xd402).r(FUNC(fm7_state::fm7_cancel_ack));
+	map(0xd403, 0xd403).r(FUNC(fm7_state::fm7_sub_beeper_r));
+	map(0xd404, 0xd404).r(FUNC(fm7_state::fm7_attn_irq_r));
+	map(0xd408, 0xd408).rw(FUNC(fm7_state::fm7_crt_r), FUNC(fm7_state::fm7_crt_w));
+	map(0xd409, 0xd409).rw(FUNC(fm7_state::fm7_vram_access_r), FUNC(fm7_state::fm7_vram_access_w));
+	map(0xd40a, 0xd40a).rw(FUNC(fm7_state::fm7_sub_busyflag_r), FUNC(fm7_state::fm7_sub_busyflag_w));
+	map(0xd40e, 0xd40f).w(FUNC(fm7_state::fm7_vram_offset_w));
 	map(0xd800, 0xffff).rom();
 }
 
 void fm7_state::fm11_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).rw("av_bank1", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x1000, 0x1fff).rw("av_bank2", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x2000, 0x2fff).rw("av_bank3", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x3000, 0x3fff).rw("av_bank4", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x4000, 0x4fff).rw("av_bank5", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x5000, 0x5fff).rw("av_bank6", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x6000, 0x6fff).rw("av_bank7", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x7000, 0x7fff).rw("av_bank8", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x8000, 0x8fff).rw("av_bank9", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x9000, 0x9fff).rw("av_bank10", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xa000, 0xafff).rw("av_bank11", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xb000, 0xbfff).rw("av_bank12", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xc000, 0xcfff).rw("av_bank13", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xd000, 0xdfff).rw("av_bank14", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xe000, 0xefff).rw("av_bank15", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xf000, 0xfbff).rw("av_bank16", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	for (int bank = 0; bank < 16; bank++)
+	{
+		map(bank << 12, (bank << 12) | 0x0fff).rw(m_avbank[bank], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	}
 	map(0xfc00, 0xfc7f).ram();
-	map(0xfc80, 0xfcff).rw(this, FUNC(fm7_state::fm7_main_shared_r), FUNC(fm7_state::fm7_main_shared_w));
+	map(0xfc80, 0xfcff).rw(FUNC(fm7_state::fm7_main_shared_r), FUNC(fm7_state::fm7_main_shared_w));
 	// I/O space (FD00-FDFF)
-	map(0xfd00, 0xfd01).rw(this, FUNC(fm7_state::fm7_keyboard_r), FUNC(fm7_state::fm7_cassette_printer_w));
-	map(0xfd02, 0xfd02).rw(this, FUNC(fm7_state::fm7_cassette_printer_r), FUNC(fm7_state::fm7_irq_mask_w));  // IRQ mask
-	map(0xfd03, 0xfd03).rw(this, FUNC(fm7_state::fm7_irq_cause_r), FUNC(fm7_state::fm7_beeper_w));  // IRQ flags
-	map(0xfd04, 0xfd04).r(this, FUNC(fm7_state::fm7_fd04_r));
-	map(0xfd05, 0xfd05).rw(this, FUNC(fm7_state::fm7_subintf_r), FUNC(fm7_state::fm7_subintf_w));
-	map(0xfd06, 0xfd0a).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd0b, 0xfd0b).r(this, FUNC(fm7_state::fm77av_boot_mode_r));
-	map(0xfd0c, 0xfd0c).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd0f, 0xfd0f).rw(this, FUNC(fm7_state::fm7_rom_en_r), FUNC(fm7_state::fm7_rom_en_w));
-	map(0xfd10, 0xfd10).w(this, FUNC(fm7_state::fm7_init_en_w));
-	map(0xfd11, 0xfd11).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd12, 0xfd12).rw(this, FUNC(fm7_state::fm77av_sub_modestatus_r), FUNC(fm7_state::fm77av_sub_modestatus_w));
-	map(0xfd13, 0xfd13).w(this, FUNC(fm7_state::fm77av_sub_bank_w));
-	map(0xfd14, 0xfd14).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd17, 0xfd17).r(this, FUNC(fm7_state::fm7_fmirq_r));
-	map(0xfd18, 0xfd1f).rw(this, FUNC(fm7_state::fm7_fdc_r), FUNC(fm7_state::fm7_fdc_w));
-	map(0xfd20, 0xfd23).rw(this, FUNC(fm7_state::fm7_kanji_r), FUNC(fm7_state::fm7_kanji_w));
-	map(0xfd24, 0xfd2b).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd30, 0xfd34).w(this, FUNC(fm7_state::fm77av_analog_palette_w));
-	map(0xfd35, 0xfd36).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd37, 0xfd37).w(this, FUNC(fm7_state::fm7_multipage_w));
-	map(0xfd38, 0xfd3f).rw(this, FUNC(fm7_state::fm7_palette_r), FUNC(fm7_state::fm7_palette_w));
-	map(0xfd40, 0xfd7f).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd80, 0xfd93).rw(this, FUNC(fm7_state::fm7_mmr_r), FUNC(fm7_state::fm7_mmr_w));
-	map(0xfd94, 0xfdff).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfe00, 0xffdf).ram().w(this, FUNC(fm7_state::fm77av_bootram_w)).share("boot_ram");
+	map(0xfd00, 0xfd01).rw(FUNC(fm7_state::fm7_keyboard_r), FUNC(fm7_state::fm7_cassette_printer_w));
+	map(0xfd02, 0xfd02).rw(FUNC(fm7_state::fm7_cassette_printer_r), FUNC(fm7_state::fm7_irq_mask_w));  // IRQ mask
+	map(0xfd03, 0xfd03).rw(FUNC(fm7_state::fm7_irq_cause_r), FUNC(fm7_state::fm7_beeper_w));  // IRQ flags
+	map(0xfd04, 0xfd04).r(FUNC(fm7_state::fm7_fd04_r));
+	map(0xfd05, 0xfd05).rw(FUNC(fm7_state::fm7_subintf_r), FUNC(fm7_state::fm7_subintf_w));
+	map(0xfd06, 0xfd0a).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd0b, 0xfd0b).r(FUNC(fm7_state::fm77av_boot_mode_r));
+	map(0xfd0c, 0xfd0c).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd0f, 0xfd0f).rw(FUNC(fm7_state::fm7_rom_en_r), FUNC(fm7_state::fm7_rom_en_w));
+	map(0xfd10, 0xfd10).w(FUNC(fm7_state::fm7_init_en_w));
+	map(0xfd11, 0xfd11).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd12, 0xfd12).rw(FUNC(fm7_state::fm77av_sub_modestatus_r), FUNC(fm7_state::fm77av_sub_modestatus_w));
+	map(0xfd13, 0xfd13).w(FUNC(fm7_state::fm77av_sub_bank_w));
+	map(0xfd14, 0xfd14).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd17, 0xfd17).r(FUNC(fm7_state::fm7_fmirq_r));
+	map(0xfd18, 0xfd1f).rw(FUNC(fm7_state::fm7_fdc_r), FUNC(fm7_state::fm7_fdc_w));
+	map(0xfd20, 0xfd23).rw(FUNC(fm7_state::fm7_kanji_r), FUNC(fm7_state::fm7_kanji_w));
+	map(0xfd24, 0xfd2b).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd30, 0xfd34).w(FUNC(fm7_state::fm77av_analog_palette_w));
+	map(0xfd35, 0xfd36).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd37, 0xfd37).w(FUNC(fm7_state::fm7_multipage_w));
+	map(0xfd38, 0xfd3f).rw(FUNC(fm7_state::fm7_palette_r), FUNC(fm7_state::fm7_palette_w));
+	map(0xfd40, 0xfd7f).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd80, 0xfd93).rw(FUNC(fm7_state::fm7_mmr_r), FUNC(fm7_state::fm7_mmr_w));
+	map(0xfd94, 0xfdff).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfe00, 0xffdf).ram().w(FUNC(fm7_state::fm77av_bootram_w)).share("boot_ram");
 	map(0xffe0, 0xffef).ram();
-	map(0xfff0, 0xffff).rw(this, FUNC(fm7_state::vector_r), FUNC(fm7_state::vector_w));
+	map(0xfff0, 0xffff).rw(FUNC(fm7_state::vector_r), FUNC(fm7_state::vector_w));
 }
 
 // Much of this is guesswork at the moment
 void fm7_state::fm11_sub_mem(address_map &map)
 {
-	map(0x0000, 0x7fff).rw(this, FUNC(fm7_state::fm7_vram_r), FUNC(fm7_state::fm7_vram_w)); // VRAM
+	map(0x0000, 0x7fff).rw(FUNC(fm7_state::fm7_vram_r), FUNC(fm7_state::fm7_vram_w)); // VRAM
 	map(0x8000, 0x8fff).ram(); // Console RAM(?)
 	map(0x9000, 0x9f7f).ram(); // Work RAM(?)
 	map(0x9f80, 0x9fff).ram().share("shared_ram");
 	map(0xafe0, 0xafe3).ram();
 //  AM_RANGE(0xafe4,0xafe4) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
-	map(0xafe6, 0xafe6).rw(this, FUNC(fm7_state::fm77av_video_flags_r), FUNC(fm7_state::fm77av_video_flags_w));
-	map(0xaff0, 0xaff0).rw(this, FUNC(fm7_state::fm7_sub_busyflag_r), FUNC(fm7_state::fm7_sub_busyflag_w));
+	map(0xafe6, 0xafe6).rw(FUNC(fm7_state::fm77av_video_flags_r), FUNC(fm7_state::fm77av_video_flags_w));
+	map(0xaff0, 0xaff0).rw(FUNC(fm7_state::fm7_sub_busyflag_r), FUNC(fm7_state::fm7_sub_busyflag_w));
 	map(0xc000, 0xffff).rom(); // sybsystem ROM
 }
 
@@ -1586,20 +1573,20 @@ void fm7_state::fm11_x86_mem(address_map &map)
 
 void fm7_state::fm11_x86_io(address_map &map)
 {
-	map(0xfd00, 0xfd01).rw(this, FUNC(fm7_state::fm7_keyboard_r), FUNC(fm7_state::fm7_cassette_printer_w));
-	map(0xfd02, 0xfd02).rw(this, FUNC(fm7_state::fm7_cassette_printer_r), FUNC(fm7_state::fm7_irq_mask_w));  // IRQ mask
-	map(0xfd03, 0xfd03).rw(this, FUNC(fm7_state::fm7_irq_cause_r), FUNC(fm7_state::fm7_beeper_w));  // IRQ flags
-	map(0xfd04, 0xfd04).r(this, FUNC(fm7_state::fm7_fd04_r));
-	map(0xfd05, 0xfd05).rw(this, FUNC(fm7_state::fm7_subintf_r), FUNC(fm7_state::fm7_subintf_w));
-	map(0xfd06, 0xfd0c).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd0f, 0xfd0f).rw(this, FUNC(fm7_state::fm7_rom_en_r), FUNC(fm7_state::fm7_rom_en_w));
-	map(0xfd10, 0xfd17).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd18, 0xfd1f).rw(this, FUNC(fm7_state::fm7_fdc_r), FUNC(fm7_state::fm7_fdc_w));
-	map(0xfd20, 0xfd23).rw(this, FUNC(fm7_state::fm7_kanji_r), FUNC(fm7_state::fm7_kanji_w));
-	map(0xfd24, 0xfd36).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd37, 0xfd37).w(this, FUNC(fm7_state::fm7_multipage_w));
-	map(0xfd38, 0xfd3f).rw(this, FUNC(fm7_state::fm7_palette_r), FUNC(fm7_state::fm7_palette_w));
-	map(0xfd40, 0xfdff).r(this, FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd00, 0xfd01).rw(FUNC(fm7_state::fm7_keyboard_r), FUNC(fm7_state::fm7_cassette_printer_w));
+	map(0xfd02, 0xfd02).rw(FUNC(fm7_state::fm7_cassette_printer_r), FUNC(fm7_state::fm7_irq_mask_w));  // IRQ mask
+	map(0xfd03, 0xfd03).rw(FUNC(fm7_state::fm7_irq_cause_r), FUNC(fm7_state::fm7_beeper_w));  // IRQ flags
+	map(0xfd04, 0xfd04).r(FUNC(fm7_state::fm7_fd04_r));
+	map(0xfd05, 0xfd05).rw(FUNC(fm7_state::fm7_subintf_r), FUNC(fm7_state::fm7_subintf_w));
+	map(0xfd06, 0xfd0c).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd0f, 0xfd0f).rw(FUNC(fm7_state::fm7_rom_en_r), FUNC(fm7_state::fm7_rom_en_w));
+	map(0xfd10, 0xfd17).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd18, 0xfd1f).rw(FUNC(fm7_state::fm7_fdc_r), FUNC(fm7_state::fm7_fdc_w));
+	map(0xfd20, 0xfd23).rw(FUNC(fm7_state::fm7_kanji_r), FUNC(fm7_state::fm7_kanji_w));
+	map(0xfd24, 0xfd36).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd37, 0xfd37).w(FUNC(fm7_state::fm7_multipage_w));
+	map(0xfd38, 0xfd3f).rw(FUNC(fm7_state::fm7_palette_r), FUNC(fm7_state::fm7_palette_w));
+	map(0xfd40, 0xfdff).r(FUNC(fm7_state::fm7_unknown_r));
 }
 
 void fm7_state::fm16_mem(address_map &map)
@@ -1610,102 +1597,90 @@ void fm7_state::fm16_mem(address_map &map)
 
 void fm7_state::fm16_io(address_map &map)
 {
-	map(0xfd00, 0xfd01).rw(this, FUNC(fm7_state::fm7_keyboard_r), FUNC(fm7_state::fm7_cassette_printer_w));
-	map(0xfd02, 0xfd02).rw(this, FUNC(fm7_state::fm7_cassette_printer_r), FUNC(fm7_state::fm7_irq_mask_w));  // IRQ mask
-	map(0xfd03, 0xfd03).rw(this, FUNC(fm7_state::fm7_irq_cause_r), FUNC(fm7_state::fm7_beeper_w));  // IRQ flags
-	map(0xfd04, 0xfd04).r(this, FUNC(fm7_state::fm7_fd04_r));
-	map(0xfd05, 0xfd05).rw(this, FUNC(fm7_state::fm7_subintf_r), FUNC(fm7_state::fm7_subintf_w));
+	map(0xfd00, 0xfd01).rw(FUNC(fm7_state::fm7_keyboard_r), FUNC(fm7_state::fm7_cassette_printer_w));
+	map(0xfd02, 0xfd02).rw(FUNC(fm7_state::fm7_cassette_printer_r), FUNC(fm7_state::fm7_irq_mask_w));  // IRQ mask
+	map(0xfd03, 0xfd03).rw(FUNC(fm7_state::fm7_irq_cause_r), FUNC(fm7_state::fm7_beeper_w));  // IRQ flags
+	map(0xfd04, 0xfd04).r(FUNC(fm7_state::fm7_fd04_r));
+	map(0xfd05, 0xfd05).rw(FUNC(fm7_state::fm7_subintf_r), FUNC(fm7_state::fm7_subintf_w));
 //  AM_RANGE(0xfd06,0xfd0c) AM_READ8(fm7_unknown_r,0xffff)
-	map(0xfd0f, 0xfd0f).rw(this, FUNC(fm7_state::fm7_rom_en_r), FUNC(fm7_state::fm7_rom_en_w));
+	map(0xfd0f, 0xfd0f).rw(FUNC(fm7_state::fm7_rom_en_r), FUNC(fm7_state::fm7_rom_en_w));
 //  AM_RANGE(0xfd10,0xfd17) AM_READ8(fm7_unknown_r,0xffff)
-	map(0xfd18, 0xfd1f).rw(this, FUNC(fm7_state::fm7_fdc_r), FUNC(fm7_state::fm7_fdc_w));
-	map(0xfd20, 0xfd23).rw(this, FUNC(fm7_state::fm7_kanji_r), FUNC(fm7_state::fm7_kanji_w));
+	map(0xfd18, 0xfd1f).rw(FUNC(fm7_state::fm7_fdc_r), FUNC(fm7_state::fm7_fdc_w));
+	map(0xfd20, 0xfd23).rw(FUNC(fm7_state::fm7_kanji_r), FUNC(fm7_state::fm7_kanji_w));
 //  AM_RANGE(0xfd24,0xfd36) AM_READ8(fm7_unknown_r,0xffff)
-	map(0xfd37, 0xfd37).w(this, FUNC(fm7_state::fm7_multipage_w));
-	map(0xfd38, 0xfd3f).rw(this, FUNC(fm7_state::fm7_palette_r), FUNC(fm7_state::fm7_palette_w));
+	map(0xfd37, 0xfd37).w(FUNC(fm7_state::fm7_multipage_w));
+	map(0xfd38, 0xfd3f).rw(FUNC(fm7_state::fm7_palette_r), FUNC(fm7_state::fm7_palette_w));
 //  AM_RANGE(0xfd40,0xfdff) AM_READ8(fm7_unknown_r,0xffff)
 }
 
 void fm7_state::fm16_sub_mem(address_map &map)
 {
-	map(0x0000, 0xafff).rw(this, FUNC(fm7_state::fm7_vram_r), FUNC(fm7_state::fm7_vram_w)); // VRAM
+	map(0x0000, 0xafff).rw(FUNC(fm7_state::fm7_vram_r), FUNC(fm7_state::fm7_vram_w)); // VRAM
 	map(0xb000, 0xffff).rom(); // subsystem ROM
 }
 
 void fm7_state::fm77av_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).rw("av_bank1", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x1000, 0x1fff).rw("av_bank2", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x2000, 0x2fff).rw("av_bank3", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x3000, 0x3fff).rw("av_bank4", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x4000, 0x4fff).rw("av_bank5", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x5000, 0x5fff).rw("av_bank6", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x6000, 0x6fff).rw("av_bank7", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x7000, 0x7fff).rw("av_bank8", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x8000, 0x8fff).rw("av_bank9", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x9000, 0x9fff).rw("av_bank10", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xa000, 0xafff).rw("av_bank11", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xb000, 0xbfff).rw("av_bank12", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xc000, 0xcfff).rw("av_bank13", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xd000, 0xdfff).rw("av_bank14", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xe000, 0xefff).rw("av_bank15", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xf000, 0xfbff).rw("av_bank16", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	for (int bank = 0; bank < 16; bank++)
+	{
+		map(bank << 12, (bank << 12) | 0x0fff).rw(m_avbank[bank], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	}
 	map(0xfc00, 0xfc7f).ram();
-	map(0xfc80, 0xfcff).rw(this, FUNC(fm7_state::fm7_main_shared_r), FUNC(fm7_state::fm7_main_shared_w));
+	map(0xfc80, 0xfcff).rw(FUNC(fm7_state::fm7_main_shared_r), FUNC(fm7_state::fm7_main_shared_w));
 	// I/O space (FD00-FDFF)
-	map(0xfd00, 0xfd01).rw(this, FUNC(fm7_state::fm7_keyboard_r), FUNC(fm7_state::fm7_cassette_printer_w));
-	map(0xfd02, 0xfd02).rw(this, FUNC(fm7_state::fm7_cassette_printer_r), FUNC(fm7_state::fm7_irq_mask_w));  // IRQ mask
-	map(0xfd03, 0xfd03).rw(this, FUNC(fm7_state::fm7_irq_cause_r), FUNC(fm7_state::fm7_beeper_w));  // IRQ flags
-	map(0xfd04, 0xfd04).r(this, FUNC(fm7_state::fm7_fd04_r));
-	map(0xfd05, 0xfd05).rw(this, FUNC(fm7_state::fm7_subintf_r), FUNC(fm7_state::fm7_subintf_w));
-	map(0xfd06, 0xfd0a).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd0b, 0xfd0b).r(this, FUNC(fm7_state::fm77av_boot_mode_r));
-	map(0xfd0c, 0xfd0c).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd0d, 0xfd0d).rw(this, FUNC(fm7_state::fm7_psg_select_r), FUNC(fm7_state::fm7_psg_select_w));
-	map(0xfd0e, 0xfd0e).rw(this, FUNC(fm7_state::fm7_psg_data_r), FUNC(fm7_state::fm7_psg_data_w));
-	map(0xfd0f, 0xfd0f).rw(this, FUNC(fm7_state::fm7_rom_en_r), FUNC(fm7_state::fm7_rom_en_w));
-	map(0xfd10, 0xfd10).w(this, FUNC(fm7_state::fm7_init_en_w));
-	map(0xfd11, 0xfd11).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd12, 0xfd12).rw(this, FUNC(fm7_state::fm77av_sub_modestatus_r), FUNC(fm7_state::fm77av_sub_modestatus_w));
-	map(0xfd13, 0xfd13).w(this, FUNC(fm7_state::fm77av_sub_bank_w));
-	map(0xfd14, 0xfd14).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd15, 0xfd15).rw(this, FUNC(fm7_state::fm7_psg_select_r), FUNC(fm7_state::fm77av_ym_select_w));
-	map(0xfd16, 0xfd16).rw(this, FUNC(fm7_state::fm7_psg_data_r), FUNC(fm7_state::fm7_psg_data_w));
-	map(0xfd17, 0xfd17).r(this, FUNC(fm7_state::fm7_fmirq_r));
-	map(0xfd18, 0xfd1f).rw(this, FUNC(fm7_state::fm7_fdc_r), FUNC(fm7_state::fm7_fdc_w));
-	map(0xfd20, 0xfd23).rw(this, FUNC(fm7_state::fm7_kanji_r), FUNC(fm7_state::fm7_kanji_w));
-	map(0xfd24, 0xfd2b).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd30, 0xfd34).w(this, FUNC(fm7_state::fm77av_analog_palette_w));
-	map(0xfd35, 0xfd36).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd37, 0xfd37).w(this, FUNC(fm7_state::fm7_multipage_w));
-	map(0xfd38, 0xfd3f).rw(this, FUNC(fm7_state::fm7_palette_r), FUNC(fm7_state::fm7_palette_w));
-	map(0xfd40, 0xfd7f).r(this, FUNC(fm7_state::fm7_unknown_r));
-	map(0xfd80, 0xfd93).rw(this, FUNC(fm7_state::fm7_mmr_r), FUNC(fm7_state::fm7_mmr_w));
-	map(0xfd94, 0xfdff).r(this, FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd00, 0xfd01).rw(FUNC(fm7_state::fm7_keyboard_r), FUNC(fm7_state::fm7_cassette_printer_w));
+	map(0xfd02, 0xfd02).rw(FUNC(fm7_state::fm7_cassette_printer_r), FUNC(fm7_state::fm7_irq_mask_w));  // IRQ mask
+	map(0xfd03, 0xfd03).rw(FUNC(fm7_state::fm7_irq_cause_r), FUNC(fm7_state::fm7_beeper_w));  // IRQ flags
+	map(0xfd04, 0xfd04).r(FUNC(fm7_state::fm7_fd04_r));
+	map(0xfd05, 0xfd05).rw(FUNC(fm7_state::fm7_subintf_r), FUNC(fm7_state::fm7_subintf_w));
+	map(0xfd06, 0xfd0a).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd0b, 0xfd0b).r(FUNC(fm7_state::fm77av_boot_mode_r));
+	map(0xfd0c, 0xfd0c).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd0d, 0xfd0d).rw(FUNC(fm7_state::fm7_psg_select_r), FUNC(fm7_state::fm7_psg_select_w));
+	map(0xfd0e, 0xfd0e).rw(FUNC(fm7_state::fm7_psg_data_r), FUNC(fm7_state::fm7_psg_data_w));
+	map(0xfd0f, 0xfd0f).rw(FUNC(fm7_state::fm7_rom_en_r), FUNC(fm7_state::fm7_rom_en_w));
+	map(0xfd10, 0xfd10).w(FUNC(fm7_state::fm7_init_en_w));
+	map(0xfd11, 0xfd11).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd12, 0xfd12).rw(FUNC(fm7_state::fm77av_sub_modestatus_r), FUNC(fm7_state::fm77av_sub_modestatus_w));
+	map(0xfd13, 0xfd13).w(FUNC(fm7_state::fm77av_sub_bank_w));
+	map(0xfd14, 0xfd14).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd15, 0xfd15).rw(FUNC(fm7_state::fm7_psg_select_r), FUNC(fm7_state::fm77av_ym_select_w));
+	map(0xfd16, 0xfd16).rw(FUNC(fm7_state::fm7_psg_data_r), FUNC(fm7_state::fm7_psg_data_w));
+	map(0xfd17, 0xfd17).r(FUNC(fm7_state::fm7_fmirq_r));
+	map(0xfd18, 0xfd1f).rw(FUNC(fm7_state::fm7_fdc_r), FUNC(fm7_state::fm7_fdc_w));
+	map(0xfd20, 0xfd23).rw(FUNC(fm7_state::fm7_kanji_r), FUNC(fm7_state::fm7_kanji_w));
+	map(0xfd24, 0xfd2b).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd30, 0xfd34).w(FUNC(fm7_state::fm77av_analog_palette_w));
+	map(0xfd35, 0xfd36).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd37, 0xfd37).w(FUNC(fm7_state::fm7_multipage_w));
+	map(0xfd38, 0xfd3f).rw(FUNC(fm7_state::fm7_palette_r), FUNC(fm7_state::fm7_palette_w));
+	map(0xfd40, 0xfd7f).r(FUNC(fm7_state::fm7_unknown_r));
+	map(0xfd80, 0xfd93).rw(FUNC(fm7_state::fm7_mmr_r), FUNC(fm7_state::fm7_mmr_w));
+	map(0xfd94, 0xfdff).r(FUNC(fm7_state::fm7_unknown_r));
 	// Boot ROM (RAM on FM77AV and later)
-	map(0xfe00, 0xffdf).ram().w(this, FUNC(fm7_state::fm77av_bootram_w)).share("boot_ram");
+	map(0xfe00, 0xffdf).ram().w(FUNC(fm7_state::fm77av_bootram_w)).share("boot_ram");
 	map(0xffe0, 0xffef).ram();
-	map(0xfff0, 0xffff).rw(this, FUNC(fm7_state::vector_r), FUNC(fm7_state::vector_w));
+	map(0xfff0, 0xffff).rw(FUNC(fm7_state::vector_r), FUNC(fm7_state::vector_w));
 }
 
 void fm7_state::fm77av_sub_mem(address_map &map)
 {
-	map(0x0000, 0xbfff).rw(this, FUNC(fm7_state::fm7_vram_r), FUNC(fm7_state::fm7_vram_w)); // VRAM
+	map(0x0000, 0xbfff).rw(FUNC(fm7_state::fm7_vram_r), FUNC(fm7_state::fm7_vram_w)); // VRAM
 	map(0xc000, 0xcfff).ram().region("maincpu", 0x1c000); // Console RAM
 	map(0xd000, 0xd37f).ram().region("maincpu", 0x1d000); // Work RAM
 	map(0xd380, 0xd3ff).ram().share("shared_ram");
 	// I/O space (D400-D4FF)
-	map(0xd400, 0xd401).r(this, FUNC(fm7_state::fm7_sub_keyboard_r));
-	map(0xd402, 0xd402).r(this, FUNC(fm7_state::fm7_cancel_ack));
-	map(0xd403, 0xd403).r(this, FUNC(fm7_state::fm7_sub_beeper_r));
-	map(0xd404, 0xd404).r(this, FUNC(fm7_state::fm7_attn_irq_r));
-	map(0xd408, 0xd408).rw(this, FUNC(fm7_state::fm7_crt_r), FUNC(fm7_state::fm7_crt_w));
-	map(0xd409, 0xd409).rw(this, FUNC(fm7_state::fm7_vram_access_r), FUNC(fm7_state::fm7_vram_access_w));
-	map(0xd40a, 0xd40a).rw(this, FUNC(fm7_state::fm7_sub_busyflag_r), FUNC(fm7_state::fm7_sub_busyflag_w));
-	map(0xd40e, 0xd40f).w(this, FUNC(fm7_state::fm7_vram_offset_w));
-	map(0xd410, 0xd42b).rw(this, FUNC(fm7_state::fm77av_alu_r), FUNC(fm7_state::fm77av_alu_w));
-	map(0xd430, 0xd430).rw(this, FUNC(fm7_state::fm77av_video_flags_r), FUNC(fm7_state::fm77av_video_flags_w));
-	map(0xd431, 0xd432).rw(this, FUNC(fm7_state::fm77av_key_encoder_r), FUNC(fm7_state::fm77av_key_encoder_w));
+	map(0xd400, 0xd401).r(FUNC(fm7_state::fm7_sub_keyboard_r));
+	map(0xd402, 0xd402).r(FUNC(fm7_state::fm7_cancel_ack));
+	map(0xd403, 0xd403).r(FUNC(fm7_state::fm7_sub_beeper_r));
+	map(0xd404, 0xd404).r(FUNC(fm7_state::fm7_attn_irq_r));
+	map(0xd408, 0xd408).rw(FUNC(fm7_state::fm7_crt_r), FUNC(fm7_state::fm7_crt_w));
+	map(0xd409, 0xd409).rw(FUNC(fm7_state::fm7_vram_access_r), FUNC(fm7_state::fm7_vram_access_w));
+	map(0xd40a, 0xd40a).rw(FUNC(fm7_state::fm7_sub_busyflag_r), FUNC(fm7_state::fm7_sub_busyflag_w));
+	map(0xd40e, 0xd40f).w(FUNC(fm7_state::fm7_vram_offset_w));
+	map(0xd410, 0xd42b).rw(FUNC(fm7_state::fm77av_alu_r), FUNC(fm7_state::fm77av_alu_w));
+	map(0xd430, 0xd430).rw(FUNC(fm7_state::fm77av_video_flags_r), FUNC(fm7_state::fm77av_video_flags_w));
+	map(0xd431, 0xd432).rw(FUNC(fm7_state::fm77av_key_encoder_r), FUNC(fm7_state::fm77av_key_encoder_w));
 	map(0xd500, 0xd7ff).ram().region("maincpu", 0x1d500); // Work RAM
 	map(0xd800, 0xdfff).bankr("bank20");
 	map(0xe000, 0xffff).bankr("bank21");
@@ -1717,22 +1692,22 @@ void fm7_state::fm7_banked_mem(address_map &map)
 	map(0x00000, 0x0ffff).ram().region("maincpu", 0x00000);
 
 	// Sub CPU space
-	map(0x10000, 0x1bfff).rw(this, FUNC(fm7_state::fm7_vram_r), FUNC(fm7_state::fm7_vram_w)); // VRAM
+	map(0x10000, 0x1bfff).rw(FUNC(fm7_state::fm7_vram_r), FUNC(fm7_state::fm7_vram_w)); // VRAM
 	map(0x1c000, 0x1cfff).ram().region("maincpu", 0x1c000); // Console RAM
 	map(0x1d000, 0x1d37f).ram().region("maincpu", 0x1d000); // Work RAM
 	map(0x1d380, 0x1d3ff).ram().share("shared_ram");
 	// I/O space (D400-D4FF)
-	map(0x1d400, 0x1d401).r(this, FUNC(fm7_state::fm7_sub_keyboard_r));
-	map(0x1d402, 0x1d402).r(this, FUNC(fm7_state::fm7_cancel_ack));
-	map(0x1d403, 0x1d403).r(this, FUNC(fm7_state::fm7_sub_beeper_r));
-	map(0x1d404, 0x1d404).r(this, FUNC(fm7_state::fm7_attn_irq_r));
-	map(0x1d408, 0x1d408).rw(this, FUNC(fm7_state::fm7_crt_r), FUNC(fm7_state::fm7_crt_w));
-	map(0x1d409, 0x1d409).rw(this, FUNC(fm7_state::fm7_vram_access_r), FUNC(fm7_state::fm7_vram_access_w));
-	map(0x1d40a, 0x1d40a).rw(this, FUNC(fm7_state::fm7_sub_busyflag_r), FUNC(fm7_state::fm7_sub_busyflag_w));
-	map(0x1d40e, 0x1d40f).w(this, FUNC(fm7_state::fm7_vram_offset_w));
-	map(0x1d410, 0x1d42b).rw(this, FUNC(fm7_state::fm77av_alu_r), FUNC(fm7_state::fm77av_alu_w));
-	map(0x1d430, 0x1d430).rw(this, FUNC(fm7_state::fm77av_video_flags_r), FUNC(fm7_state::fm77av_video_flags_w));
-	map(0x1d431, 0x1d432).rw(this, FUNC(fm7_state::fm77av_key_encoder_r), FUNC(fm7_state::fm77av_key_encoder_w));
+	map(0x1d400, 0x1d401).r(FUNC(fm7_state::fm7_sub_keyboard_r));
+	map(0x1d402, 0x1d402).r(FUNC(fm7_state::fm7_cancel_ack));
+	map(0x1d403, 0x1d403).r(FUNC(fm7_state::fm7_sub_beeper_r));
+	map(0x1d404, 0x1d404).r(FUNC(fm7_state::fm7_attn_irq_r));
+	map(0x1d408, 0x1d408).rw(FUNC(fm7_state::fm7_crt_r), FUNC(fm7_state::fm7_crt_w));
+	map(0x1d409, 0x1d409).rw(FUNC(fm7_state::fm7_vram_access_r), FUNC(fm7_state::fm7_vram_access_w));
+	map(0x1d40a, 0x1d40a).rw(FUNC(fm7_state::fm7_sub_busyflag_r), FUNC(fm7_state::fm7_sub_busyflag_w));
+	map(0x1d40e, 0x1d40f).w(FUNC(fm7_state::fm7_vram_offset_w));
+	map(0x1d410, 0x1d42b).rw(FUNC(fm7_state::fm77av_alu_r), FUNC(fm7_state::fm77av_alu_w));
+	map(0x1d430, 0x1d430).rw(FUNC(fm7_state::fm77av_video_flags_r), FUNC(fm7_state::fm77av_video_flags_w));
+	map(0x1d431, 0x1d432).rw(FUNC(fm7_state::fm77av_key_encoder_r), FUNC(fm7_state::fm77av_key_encoder_w));
 	map(0x1d500, 0x1d7ff).ram().region("maincpu", 0x1d500); // Work RAM
 	map(0x1d800, 0x1dfff).bankr("bank20");
 	map(0x1e000, 0x1ffff).bankr("bank21");
@@ -1905,7 +1880,7 @@ static INPUT_PORTS_START( fm8 )
 	PORT_DIPSETTING(0x02,"BASIC")
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(fm7_state,fm7)
+void fm7_state::init_fm7()
 {
 //  m_shared_ram = std::make_unique<uint8_t[]>(0x80);
 	m_video_ram = std::make_unique<uint8_t[]>(0x18000);  // 2 pages on some systems
@@ -2052,47 +2027,37 @@ void fm7_state::machine_reset()
 }
 
 
-static SLOT_INTERFACE_START( fm7_floppies )
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
-
-
-#define MCFG_ADDRESS_BANK(tag) \
-MCFG_DEVICE_ADD(tag, ADDRESS_MAP_BANK, 0) \
-MCFG_DEVICE_PROGRAM_MAP(fm7_banked_mem) \
-MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE) \
-MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8) \
-MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+static void fm7_floppies(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 
 MACHINE_CONFIG_START(fm7_state::fm7)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(16'128'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(fm7_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
+	MCFG_DEVICE_ADD("maincpu", MC6809, 16.128_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(fm7_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", MC6809, XTAL(16'128'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
+	MCFG_DEVICE_ADD("sub", MC6809, 16.128_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(fm7_sub_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("psg", AY8910, XTAL(4'915'200) / 4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 1.00)
-	MCFG_SOUND_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, m_psg, 4.9152_MHz_XTAL / 4).add_route(ALL_OUTPUTS,"mono", 1.00);
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'128'000), 1024, 0, 640, 262, 0, 200) // H = 15.75 KHz, V = 60.1145 Hz
+	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200) // H = 15.75 KHz, V = 60.1145 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
@@ -2101,121 +2066,105 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","fm7_cass")
 
-	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_drq_w))
+	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","fm7_disk")
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_SLOT_OPTION_ADD( "dsjoy", DEMPA_SHINBUNSHA_JOYSTICK )
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fm7_state, write_centronics_perror))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm8)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'915'200))  // 1.2MHz 68A09
-	MCFG_CPU_PROGRAM_MAP(fm8_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
+	MCFG_DEVICE_ADD("maincpu", MC6809, 4.9152_MHz_XTAL)  // 1.2MHz 68A09
+	MCFG_DEVICE_PROGRAM_MAP(fm8_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", MC6809, XTAL(16'128'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(fm7_sub_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
+	MCFG_DEVICE_ADD("sub", MC6809, 16.128_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(fm7_sub_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'128'000), 1024, 0, 640, 262, 0, 200)
+	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_drq_w))
+	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fm7_state, write_centronics_perror))
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm77av)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(16'128'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(fm77av_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 16.128_MHz_XTAL / 8)
+	MCFG_DEVICE_PROGRAM_MAP(fm77av_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", MC6809E, XTAL(16'128'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(fm77av_sub_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
+	MCFG_DEVICE_ADD("sub", MC6809E, 16.128_MHz_XTAL / 8)
+	MCFG_DEVICE_PROGRAM_MAP(fm77av_sub_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ym", YM2203, XTAL(4'915'200) / 4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(fm7_state, fm77av_fmirq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(fm7_state, fm77av_joy_1_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(fm7_state, fm77av_joy_2_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
-	MCFG_SOUND_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
+	SPEAKER(config, "mono").front_center();
+	YM2203(config, m_ym, 4.9152_MHz_XTAL / 4);
+	m_ym->irq_handler().set(FUNC(fm7_state::fm77av_fmirq));
+	m_ym->port_a_read_callback().set(FUNC(fm7_state::fm77av_joy_1_r));
+	m_ym->port_b_read_callback().set(FUNC(fm7_state::fm77av_joy_2_r));
+	m_ym->add_route(ALL_OUTPUTS,"mono", 1.00);
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm77av)
 
-	MCFG_ADDRESS_BANK("av_bank1")
-	MCFG_ADDRESS_BANK("av_bank2")
-	MCFG_ADDRESS_BANK("av_bank3")
-	MCFG_ADDRESS_BANK("av_bank4")
-	MCFG_ADDRESS_BANK("av_bank5")
-	MCFG_ADDRESS_BANK("av_bank6")
-	MCFG_ADDRESS_BANK("av_bank7")
-	MCFG_ADDRESS_BANK("av_bank8")
-	MCFG_ADDRESS_BANK("av_bank9")
-	MCFG_ADDRESS_BANK("av_bank10")
-	MCFG_ADDRESS_BANK("av_bank11")
-	MCFG_ADDRESS_BANK("av_bank12")
-	MCFG_ADDRESS_BANK("av_bank13")
-	MCFG_ADDRESS_BANK("av_bank14")
-	MCFG_ADDRESS_BANK("av_bank15")
-	MCFG_ADDRESS_BANK("av_bank16")
+	for (int bank = 0; bank < 16; bank++)
+	{
+		ADDRESS_MAP_BANK(config, m_avbank[bank]).set_map(&fm7_state::fm7_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x1000);
+	}
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'128'000), 1024, 0, 640, 262, 0, 200)
+	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 	MCFG_PALETTE_ADD("av_palette", 4096)
 
 	MCFG_CASSETTE_ADD("cassette")
@@ -2225,111 +2174,95 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_list", "fm7_cass")
 
-	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_drq_w))
+	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
 	MCFG_SOFTWARE_LIST_ADD("av_flop_list", "fm77av")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_list", "fm7_disk")
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fm7_state, write_centronics_perror))
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm11)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)  // 2MHz 68B09E
-	MCFG_CPU_PROGRAM_MAP(fm11_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)  // 2MHz 68B09E
+	MCFG_DEVICE_PROGRAM_MAP(fm11_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", MC6809, 8000000)  // 2MHz 68B09
-	MCFG_CPU_PROGRAM_MAP(fm11_sub_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
+	MCFG_DEVICE_ADD("sub", MC6809, 8000000)  // 2MHz 68B09
+	MCFG_DEVICE_PROGRAM_MAP(fm11_sub_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
-	MCFG_CPU_ADD("x86", I8088, 8000000)  // 8MHz i8088
-	MCFG_CPU_PROGRAM_MAP(fm11_x86_mem)
-	MCFG_CPU_IO_MAP(fm11_x86_io)
+	MCFG_DEVICE_ADD("x86", I8088, 8000000)  // 8MHz i8088
+	MCFG_DEVICE_PROGRAM_MAP(fm11_x86_mem)
+	MCFG_DEVICE_IO_MAP(fm11_x86_io)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm11)
 
-	MCFG_ADDRESS_BANK("av_bank1")
-	MCFG_ADDRESS_BANK("av_bank2")
-	MCFG_ADDRESS_BANK("av_bank3")
-	MCFG_ADDRESS_BANK("av_bank4")
-	MCFG_ADDRESS_BANK("av_bank5")
-	MCFG_ADDRESS_BANK("av_bank6")
-	MCFG_ADDRESS_BANK("av_bank7")
-	MCFG_ADDRESS_BANK("av_bank8")
-	MCFG_ADDRESS_BANK("av_bank9")
-	MCFG_ADDRESS_BANK("av_bank10")
-	MCFG_ADDRESS_BANK("av_bank11")
-	MCFG_ADDRESS_BANK("av_bank12")
-	MCFG_ADDRESS_BANK("av_bank13")
-	MCFG_ADDRESS_BANK("av_bank14")
-	MCFG_ADDRESS_BANK("av_bank15")
-	MCFG_ADDRESS_BANK("av_bank16")
+	for (int bank = 0; bank < 16; bank++)
+	{
+		ADDRESS_MAP_BANK(config, m_avbank[bank]).set_map(&fm7_state::fm7_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x1000);
+	}
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(16128000, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_drq_w))
+	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fm7_state, write_centronics_perror))
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fm7_state::fm16beta)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 8000000)  // 8MHz i8086
-	MCFG_CPU_PROGRAM_MAP(fm16_mem)
-	MCFG_CPU_IO_MAP(fm16_io)
+	MCFG_DEVICE_ADD("maincpu", I8086, 8000000)  // 8MHz i8086
+	MCFG_DEVICE_PROGRAM_MAP(fm16_mem)
+	MCFG_DEVICE_IO_MAP(fm16_io)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("sub", MC6809, 8000000)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
-	MCFG_CPU_PROGRAM_MAP(fm16_sub_mem)
+	MCFG_DEVICE_ADD("sub", MC6809, 8000000)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(fm7_state,fm7_sub_irq_ack)
+	MCFG_DEVICE_PROGRAM_MAP(fm16_sub_mem)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1200)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm16)
 
@@ -2338,25 +2271,25 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 	MCFG_SCREEN_RAW_PARAMS(16128000, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("fm7_cass")
 
-	MCFG_MB8877_ADD("fdc", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(fm7_state, fm7_fdc_drq_w))
+	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(fm7_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(fm7_state, write_centronics_fault))
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(fm7_state, write_centronics_ack))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(fm7_state, write_centronics_perror))
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, fm7_state, write_centronics_fault))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, fm7_state, write_centronics_ack))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, fm7_state, write_centronics_perror))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 MACHINE_CONFIG_END
@@ -2523,13 +2456,13 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT  COMPANY      FULLNAME         FLAGS */
-COMP( 1981, fm8,      0,      0,      fm8,     fm8,   fm7_state,  fm7,  "Fujitsu",   "FM-8",          0)
-COMP( 1982, fm7,      0,      0,      fm7,     fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-7",          0)
-COMP( 1984, fmnew7,   fm7,    0,      fm7,     fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-NEW7",       0)
-COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-77AV",       MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,   fm7_state,  fm7,  "Fujitsu",   "FM-77AV40SX",   MACHINE_NOT_WORKING)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS      INIT      COMPANY    FULLNAME         FLAGS */
+COMP( 1981, fm8,      0,      0,      fm8,      fm8,   fm7_state, init_fm7, "Fujitsu", "FM-8",          0)
+COMP( 1982, fm7,      0,      0,      fm7,      fm7,   fm7_state, init_fm7, "Fujitsu", "FM-7",          0)
+COMP( 1984, fmnew7,   fm7,    0,      fm7,      fm7,   fm7_state, init_fm7, "Fujitsu", "FM-NEW7",       0)
+COMP( 1985, fm77av,   fm7,    0,      fm77av,   fm7,   fm7_state, init_fm7, "Fujitsu", "FM-77AV",       MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1985, fm7740sx, fm7,    0,      fm77av,   fm7,   fm7_state, init_fm7, "Fujitsu", "FM-77AV40SX",   MACHINE_NOT_WORKING)
 
 // These may be separated into a separate driver, depending on how different they are to the FM-8/FM-7
-COMP( 1982, fm11,     0,      0,      fm11,     fm7,   fm7_state,  fm7, "Fujitsu",   "FM-11 EX",      MACHINE_NOT_WORKING)
-COMP( 1982, fm16beta, 0,      0,      fm16beta, fm7,   fm7_state,  fm7, "Fujitsu",   "FM-16\xCE\xB2", MACHINE_NOT_WORKING)
+COMP( 1982, fm11,     0,      0,      fm11,     fm7,   fm7_state, init_fm7, "Fujitsu", "FM-11 EX",      MACHINE_NOT_WORKING)
+COMP( 1982, fm16beta, 0,      0,      fm16beta, fm7,   fm7_state, init_fm7, "Fujitsu", "FM-16\xCE\xB2", MACHINE_NOT_WORKING)

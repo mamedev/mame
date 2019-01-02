@@ -126,13 +126,14 @@ void snes_control_port_device::port_poll()
 //  SLOT_INTERFACE( snes_control_port_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( snes_control_port_devices )
-	SLOT_INTERFACE("joypad", SNES_JOYPAD)
-	SLOT_INTERFACE("mouse", SNES_MOUSE)
-	SLOT_INTERFACE("multitap", SNES_MULTITAP)
-	SLOT_INTERFACE("pachinko", SNES_PACHINKO)
-	SLOT_INTERFACE("sscope", SNES_SUPERSCOPE)
-	SLOT_INTERFACE("twintap", SNES_TWINTAP)
-	SLOT_INTERFACE("barcode_battler", SNES_BARCODE_BATTLER)
-	SLOT_INTERFACE("miracle_piano", SNES_MIRACLE)
-SLOT_INTERFACE_END
+void snes_control_port_devices(device_slot_interface &device)
+{
+	device.option_add("joypad", SNES_JOYPAD);
+	device.option_add("mouse", SNES_MOUSE);
+	device.option_add("multitap", SNES_MULTITAP);
+	device.option_add("pachinko", SNES_PACHINKO);
+	device.option_add("sscope", SNES_SUPERSCOPE);
+	device.option_add("twintap", SNES_TWINTAP);
+	device.option_add("barcode_battler", SNES_BARCODE_BATTLER);
+	device.option_add("miracle_piano", SNES_MIRACLE);
+}

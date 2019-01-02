@@ -43,9 +43,6 @@
 
 #pragma once
 
-#include "emu.h"
-#include "screen.h"
-
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
@@ -54,7 +51,11 @@
 #include "machine/i8255.h"
 #include "machine/ncr5385.h"
 #include "machine/saa1043.h"
+
 #include "video/mb88303.h"
+
+#include "screen.h"
+
 
 class vp415_state : public driver_device
 {
@@ -63,19 +64,19 @@ public:
 
 	void vp415(machine_config &config);
 
-	static const char* DATACPU_TAG;
-	static const char* DATAMCU_TAG;
+	static const char *const DATACPU_TAG;
+	static const char *const DATAMCU_TAG;
 
-	static const char* DESCRAMBLE_ROM_TAG;
-	static const char* SYNC_ROM_TAG;
-	static const char* DRIVE_ROM_TAG;
+	static const char *const DESCRAMBLE_ROM_TAG;
+	static const char *const SYNC_ROM_TAG;
+	static const char *const DRIVE_ROM_TAG;
 
-	static const char* CTRLMCU_TAG;
-	static const char* CONTROL_ROM_TAG;
+	static const char *const CTRLMCU_TAG;
+	static const char *const CONTROL_ROM_TAG;
 
-	static const char* SWITCHES_TAG;
+	static const char *const SWITCHES_TAG;
 
-protected:
+private:
 	void machine_reset() override;
 	void machine_start() override;
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -262,17 +263,17 @@ protected:
 	emu_timer *m_drive_2ppr_timer;
 	uint8_t m_drive_2ppr;
 
-	static const char* DATARAM_TAG;
-	static const char* SCSI_TAG;
+	static const char *const DATARAM_TAG;
+	static const char *const SCSI_TAG;
 
-	static const char* CTRLCPU_TAG;
-	static const char* CTRLRAM_TAG;
+	static const char *const CTRLCPU_TAG;
+	static const char *const CTRLRAM_TAG;
 
-	static const char* DRIVECPU_TAG;
-	static const char* I8155_TAG;
-	static const char* I8255_TAG;
-	static const char* CHARGEN_TAG;
-	static const char* SYNCGEN_TAG;
+	static const char *const DRIVECPU_TAG;
+	static const char *const I8155_TAG;
+	static const char *const I8255_TAG;
+	static const char *const CHARGEN_TAG;
+	static const char *const SYNCGEN_TAG;
 
 	static const device_timer_id DRIVE_2PPR_ID;
 };

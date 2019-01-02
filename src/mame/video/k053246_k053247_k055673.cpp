@@ -60,8 +60,6 @@ void k053247_device::clear_all()
 
 	m_objcha_line = 0;
 	m_z_rejection = 0;
-
-	m_memory_region = nullptr;
 }
 
 void k053247_device::k053247_get_ram( uint16_t **ram )
@@ -133,9 +131,9 @@ WRITE8_MEMBER( k053247_device::k053247_w )
 // FIXME: rearrange ROM loading so this can be merged with the 4/6/8bpp version
 READ16_MEMBER( k053247_device::k055673_5bpp_rom_word_r ) // 5bpp
 {
-	uint8_t *ROM8 = (uint8_t *)machine().root_device().memregion(m_memory_region)->base();
-	uint16_t *ROM = (uint16_t *)machine().root_device().memregion(m_memory_region)->base();
-	int size4 = (machine().root_device().memregion(m_memory_region)->bytes() / (1024 * 1024)) / 5;
+	uint8_t *ROM8 = (uint8_t *)&m_gfxrom[0];
+	uint16_t *ROM = (uint16_t *)&m_gfxrom[0];
+	int size4 = (m_gfxrom.length() / (1024 * 1024)) / 5;
 	int romofs;
 
 	size4 *= 4 * 1024 * 1024;   // get offset to 5th bit
@@ -174,7 +172,7 @@ READ16_MEMBER( k053247_device::k055673_rom_word_r )
 	if (m_bpp == 5)
 		return k055673_5bpp_rom_word_r(space, offset, mem_mask);
 
-	uint16_t *ROM = (uint16_t *)machine().root_device().memregion(m_memory_region)->base();
+	uint16_t *ROM = (uint16_t *)&m_gfxrom[0];
 	int romofs;
 
 	romofs = m_kx46_regs[6] << 16 | m_kx46_regs[7] << 8 | m_kx46_regs[4];
@@ -188,7 +186,7 @@ READ16_MEMBER( k053247_device::k055673_rom_word_r )
 
 READ16_MEMBER( k053247_device::k055673_ps_rom_word_r )
 {
-	uint8_t *ROM = (uint8_t *)machine().root_device().memregion(m_memory_region)->base();
+	uint8_t *ROM = (uint8_t *)&m_gfxrom[0];
 	int romofs;
 	int magic = (offset & 1);
 
@@ -207,8 +205,8 @@ READ8_MEMBER( k053247_device::k053246_r )
 		int addr;
 
 		addr = (m_kx46_regs[6] << 17) | (m_kx46_regs[7] << 9) | (m_kx46_regs[4] << 1) | ((offset & 1) ^ 1);
-		addr &= machine().root_device().memregion(m_memory_region)->bytes() - 1;
-		return machine().root_device().memregion(m_memory_region)->base()[addr];
+		addr &= m_gfxrom.mask();
+		return m_gfxrom[addr];
 	}
 	else
 	{
@@ -989,19 +987,19 @@ void k055673_device::device_start()
 	uint16_t *alt_k055673_rom;
 	int size4;
 
-	alt_k055673_rom = (uint16_t *)machine().root_device().memregion(m_memory_region)->base();
+	alt_k055673_rom = (uint16_t *)&m_gfxrom[0];
 
 	/* decode the graphics */
 	switch (m_bpp)
 	{
 		case K055673_LAYOUT_GX:
-			size4 = (machine().root_device().memregion(m_memory_region)->bytes()/(1024*1024))/5;
+			size4 = (m_gfxrom.length()/(1024*1024))/5;
 			size4 *= 4*1024*1024;
 			/* set the # of tiles based on the 4bpp section */
 			alt_k055673_rom = auto_alloc_array(machine(), uint16_t, size4 * 5 / 2);
 			d = (uint8_t *)alt_k055673_rom;
 			// now combine the graphics together to form 5bpp
-			s1 = machine().root_device().memregion(m_memory_region)->base(); // 4bpp area
+			s1 = (uint8_t *)&m_gfxrom[0]; // 4bpp area
 			s2 = s1 + (size4);   // 1bpp area
 			for (i = 0; i < size4; i+= 4)
 			{
@@ -1017,22 +1015,22 @@ void k055673_device::device_start()
 			break;
 
 		case K055673_LAYOUT_RNG:
-			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16/2);
+			total = m_gfxrom.length() / (16*16/2);
 			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout2, 4);
 			break;
 
 		case K055673_LAYOUT_PS:
-			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16/2);
+			total = m_gfxrom.length() / (16*16/2);
 			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout5, 4);
 			break;
 
 		case K055673_LAYOUT_LE2:
-			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16);
+			total = m_gfxrom.length() / (16*16);
 			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout3, 8);
 			break;
 
 		case K055673_LAYOUT_GX6:
-			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16*6/8);
+			total = m_gfxrom.length() / (16*16*6/8);
 			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout4, 6);
 			break;
 
@@ -1052,7 +1050,7 @@ void k055673_device::device_start()
 	memset(m_kx46_regs, 0, 8);
 	memset(m_kx47_regs, 0, 32);
 
-	save_pointer(NAME(m_ram.get()), 0x800);
+	save_pointer(NAME(m_ram), 0x800);
 	save_item(NAME(m_kx46_regs));
 	save_item(NAME(m_kx47_regs));
 	save_item(NAME(m_objcha_line));
@@ -1065,7 +1063,7 @@ void k055673_device::device_start()
 
 
 DEFINE_DEVICE_TYPE(K053247, k053247_device, "k053247", "K053246/K053247 Sprite Generator")
-device_type const K053246 = K053247;
+decltype(K053247) K053246 = K053247;
 
 k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: k053247_device(mconfig, K053247, tag, owner, clock)
@@ -1076,6 +1074,7 @@ k053247_device::k053247_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		device_gfx_interface(mconfig, *this, nullptr),
+		m_gfxrom(*this, finder_base::DUMMY_TAG),
 		m_gfx_num(0)
 {
 	clear_all();
@@ -1108,8 +1107,8 @@ void k053247_device::device_start()
 	switch (m_bpp)
 	{
 	case NORMAL_PLANE_ORDER:
-		total = machine().root_device().memregion(m_memory_region)->bytes() / 128;
-		konami_decode_gfx(*this, m_gfx_num, machine().root_device().memregion(m_memory_region)->base(), total, &spritelayout, 4);
+		total = m_gfxrom.length() / 128;
+		konami_decode_gfx(*this, m_gfx_num, (uint8_t *)&m_gfxrom[0], total, &spritelayout, 4);
 		break;
 
 	default:
@@ -1134,7 +1133,7 @@ void k053247_device::device_start()
 
 	m_ram = make_unique_clear<uint16_t[]>(0x1000 / 2);
 
-	save_pointer(NAME(m_ram.get()), 0x1000 / 2);
+	save_pointer(NAME(m_ram), 0x1000 / 2);
 	save_item(NAME(m_kx46_regs));
 	save_item(NAME(m_kx47_regs));
 	save_item(NAME(m_objcha_line));

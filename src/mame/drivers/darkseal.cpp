@@ -41,28 +41,28 @@ WRITE16_MEMBER(darkseal_state::irq_ack_w)
 void darkseal_state::darkseal_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x103fff).ram().share("ram");
+	map(0x100000, 0x103fff).ram();
 	map(0x120000, 0x1207ff).ram().share("spriteram");
-	map(0x140000, 0x140fff).ram().w(this, FUNC(darkseal_state::palette_24bit_rg_w)).share("paletteram");
-	map(0x141000, 0x141fff).ram().w(this, FUNC(darkseal_state::palette_24bit_b_w)).share("paletteram2");
+	map(0x140000, 0x140fff).ram().w(FUNC(darkseal_state::palette_w)).share("palette");
+	map(0x141000, 0x141fff).ram().w(FUNC(darkseal_state::palette_ext_w)).share("palette_ext");
 	map(0x180000, 0x180001).portr("DSW");
 	map(0x180002, 0x180003).portr("P1_P2");
 	map(0x180004, 0x180005).portr("SYSTEM");
 	map(0x180006, 0x180007).nopr().w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x180008, 0x180009).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16);
-	map(0x18000a, 0x18000b).nopr().w(this, FUNC(darkseal_state::irq_ack_w));
+	map(0x18000a, 0x18000b).nopr().w(FUNC(darkseal_state::irq_ack_w));
 
-	map(0x200000, 0x201fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x202000, 0x203fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x240000, 0x24000f).w(m_deco_tilegen2, FUNC(deco16ic_device::pf_control_w));
+	map(0x200000, 0x201fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x202000, 0x203fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x240000, 0x24000f).w(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_w));
 
 	map(0x220000, 0x220fff).ram().share("pf1_rowscroll");
 	// pf2 & 4 rowscrolls are where? (maybe don't exist?)
 	map(0x222000, 0x222fff).ram().share("pf3_rowscroll");
 
-	map(0x260000, 0x261fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x262000, 0x263fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x2a0000, 0x2a000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x260000, 0x261fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x262000, 0x263fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x2a0000, 0x2a000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
 }
 
 /******************************************************************************/
@@ -75,9 +75,7 @@ void darkseal_state::sound_map(address_map &map)
 	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8");
-	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f1fff).ram();
 }
 
 /******************************************************************************/
@@ -167,8 +165,8 @@ static const gfx_layout charlayout =
 	4096,
 	4,      /* 4 bits per pixel  */
 	{ 0x00000*8, 0x10000*8, 0x8000*8, 0x18000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
@@ -178,10 +176,8 @@ static const gfx_layout seallayout =
 	4096,
 	4,
 	{ 8, 0,  0x40000*8+8, 0x40000*8 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
@@ -191,14 +187,12 @@ static const gfx_layout seallayout2 =
 	4096*2,
 	4,
 	{ 8, 0, 0x80000*8+8, 0x80000*8 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
-static GFXDECODE_START( darkseal )
+static GFXDECODE_START( gfx_darkseal )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 16 )  /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, seallayout,  768, 16 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, seallayout, 1024, 16 )  /* Tiles 16x16 */
@@ -210,12 +204,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(darkseal_state::darkseal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* Custom chip 59 */
-	MCFG_CPU_PROGRAM_MAP(darkseal_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", darkseal_state,  irq6_line_assert)/* VBL */
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(24'000'000)/2) /* Custom chip 59 */
+	MCFG_DEVICE_PROGRAM_MAP(darkseal_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", darkseal_state,  irq6_line_assert)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, XTAL(32'220'000)/4); /* Custom chip 45, Audio section crystal is 32.220 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &darkseal_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -224,64 +219,63 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darkseal_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE("colors")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darkseal)
-	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_darkseal)
+	MCFG_PALETTE_ADD(m_palette, 2048)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x64)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x64)     // both these tilemaps need to be twice the y size of usual!
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x00)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[0], 0);
+	m_deco_tilegen[0]->set_split(0);
+	m_deco_tilegen[0]->set_pf1_size(DECO_64x64);
+	m_deco_tilegen[0]->set_pf2_size(DECO_64x64);     // both these tilemaps need to be twice the y size of usual!
+	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[0]->set_pf2_col_bank(0x00);
+	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
+	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x00)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(2)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[1], 0);
+	m_deco_tilegen[1]->set_split(0);
+	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[1]->set_pf2_col_bank(0x00);
+	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
+	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(3)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(3);
+	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000)/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
-	MCFG_YM2151_ADD("ym2", XTAL(32'220'000)/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
-	MCFG_SOUND_ROUTE(0, "mono", 0.55)
-	MCFG_SOUND_ROUTE(1, "mono", 0.55)
+	ym2151_device &ym2(YM2151(config, "ym2", XTAL(32'220'000)/9));
+	ym2.irq_handler().set_inputline(m_audiocpu, 1); // IRQ2
+	ym2.add_route(0, "mono", 0.55);
+	ym2.add_route(1, "mono", 0.55);
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(32'220'000)/32, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(32'220'000)/16, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -444,20 +438,18 @@ ROM_END
 
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(darkseal_state,darkseal)
+void darkseal_state::init_darkseal()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
-	int i;
-
-	for (i=0x00000; i<0x80000; i++)
+	for (int i = 0x00000; i < 0x80000; i++)
 		RAM[i]=(RAM[i] & 0xbd) | ((RAM[i] & 0x02) << 5) | ((RAM[i] & 0x40) >> 5);
 
 }
 
 /******************************************************************************/
 
-GAME( 1990, darkseal,  0,        darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Dark Seal (World revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, darkseal1, darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Dark Seal (World revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, darksealj, darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Dark Seal (Japan revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gatedoom,  darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gatedoom1, darkseal, darkseal, darkseal, darkseal_state, darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, darkseal,  0,        darkseal, darkseal, darkseal_state, init_darkseal, ROT0, "Data East Corporation", "Dark Seal (World revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, darkseal1, darkseal, darkseal, darkseal, darkseal_state, init_darkseal, ROT0, "Data East Corporation", "Dark Seal (World revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, darksealj, darkseal, darkseal, darkseal, darkseal_state, init_darkseal, ROT0, "Data East Corporation", "Dark Seal (Japan revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gatedoom,  darkseal, darkseal, darkseal, darkseal_state, init_darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gatedoom1, darkseal, darkseal, darkseal, darkseal_state, init_darkseal, ROT0, "Data East Corporation", "Gate of Doom (US revision 1)", MACHINE_SUPPORTS_SAVE )

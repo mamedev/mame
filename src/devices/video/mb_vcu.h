@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -90,9 +92,9 @@ DECLARE_DEVICE_TYPE(MB_VCU, mb_vcu_device)
 //**************************************************************************
 
 #define MCFG_MB_VCU_CPU(_tag) \
-	downcast<mb_vcu_device &>(*device).set_cpu_tag("^" _tag);
+	downcast<mb_vcu_device &>(*device).set_cpu_tag(_tag);
 
 #define MCFG_MB_VCU_PALETTE(_palette_tag) \
-	downcast<mb_vcu_device &>(*device).set_palette_tag("^" _palette_tag);
+	downcast<mb_vcu_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_VIDEO_MB_VCU_H

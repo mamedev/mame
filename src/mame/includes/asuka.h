@@ -63,7 +63,8 @@ public:
 	uint32_t screen_update_asuka(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_asuka);
 	INTERRUPT_GEN_MEMBER(cadash_interrupt);
-	DECLARE_DRIVER_INIT(cadash);
+	void init_cadash();
+	void init_earthjkr();
 	INTERRUPT_GEN_MEMBER(bonze_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 

@@ -20,7 +20,7 @@ driver by Mirko Buffoni
 WRITE8_MEMBER(solomon_state::solomon_sh_command_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /* this is checked on the title screen and when you reach certain scores in the game
@@ -53,22 +53,22 @@ void solomon_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(solomon_state::solomon_colorram_w)).share("colorram");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(solomon_state::solomon_videoram_w)).share("videoram");
-	map(0xd800, 0xdbff).ram().w(this, FUNC(solomon_state::solomon_colorram2_w)).share("colorram2");
-	map(0xdc00, 0xdfff).ram().w(this, FUNC(solomon_state::solomon_videoram2_w)).share("videoram2");
+	map(0xd000, 0xd3ff).ram().w(FUNC(solomon_state::solomon_colorram_w)).share("colorram");
+	map(0xd400, 0xd7ff).ram().w(FUNC(solomon_state::solomon_videoram_w)).share("videoram");
+	map(0xd800, 0xdbff).ram().w(FUNC(solomon_state::solomon_colorram2_w)).share("colorram2");
+	map(0xdc00, 0xdfff).ram().w(FUNC(solomon_state::solomon_videoram2_w)).share("videoram2");
 	map(0xe000, 0xe07f).ram().share("spriteram");
 	map(0xe400, 0xe5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xe600, 0xe600).portr("P1");
 	map(0xe601, 0xe601).portr("P2");
 	map(0xe602, 0xe602).portr("SYSTEM");
-	map(0xe603, 0xe603).r(this, FUNC(solomon_state::solomon_0xe603_r));
+	map(0xe603, 0xe603).r(FUNC(solomon_state::solomon_0xe603_r));
 	map(0xe604, 0xe604).portr("DSW1");
 	map(0xe605, 0xe605).portr("DSW2");
 	map(0xe606, 0xe606).nopr(); /* watchdog? */
-	map(0xe600, 0xe600).w(this, FUNC(solomon_state::nmi_mask_w));
-	map(0xe604, 0xe604).w(this, FUNC(solomon_state::solomon_flipscreen_w));
-	map(0xe800, 0xe800).w(this, FUNC(solomon_state::solomon_sh_command_w));
+	map(0xe600, 0xe600).w(FUNC(solomon_state::nmi_mask_w));
+	map(0xe604, 0xe604).w(FUNC(solomon_state::solomon_flipscreen_w));
+	map(0xe800, 0xe800).w(FUNC(solomon_state::solomon_sh_command_w));
 	map(0xf000, 0xffff).rom();
 }
 
@@ -195,7 +195,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( solomon )
+static GFXDECODE_START( gfx_solomon )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )  /* colors   0-127 */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   128, 8 )  /* colors 128-255 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0, 8 )  /* colors   0-127 */
@@ -204,7 +204,7 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(solomon_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -212,14 +212,14 @@ INTERRUPT_GEN_MEMBER(solomon_state::vblank_irq)
 MACHINE_CONFIG_START(solomon_state::solomon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4.0 MHz (?????) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", solomon_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4.0 MHz (?????) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", solomon_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(solomon_state, irq0_line_hold, 2*60)   /* ??? */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(solomon_state, irq0_line_hold, 2*60)   /* ??? */
 						/* NMIs are caused by the main CPU */
 
 	/* video hardware */
@@ -229,25 +229,19 @@ MACHINE_CONFIG_START(solomon_state::solomon)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(solomon_state, screen_update_solomon)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", solomon)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_solomon);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
-
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
-
-	MCFG_SOUND_ADD("ay3", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
+	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
+	AY8910(config, "ay3", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -310,5 +304,5 @@ ROM_END
 
 
 
-GAME( 1986, solomon,  0,       solomon, solomon, solomon_state, 0, ROT0, "Tecmo", "Solomon's Key (US)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, solomonj, solomon, solomon, solomon, solomon_state, 0, ROT0, "Tecmo", "Solomon no Kagi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, solomon,  0,       solomon, solomon, solomon_state, empty_init, ROT0, "Tecmo", "Solomon's Key (US)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, solomonj, solomon, solomon, solomon, solomon_state, empty_init, ROT0, "Tecmo", "Solomon no Kagi (Japan)", MACHINE_SUPPORTS_SAVE )

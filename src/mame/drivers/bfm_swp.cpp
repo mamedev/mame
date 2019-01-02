@@ -184,7 +184,7 @@ WRITE32_MEMBER(bfm_swp_state::bfm_swp_mem_w)
 
 void bfm_swp_state::bfm_swp_map(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(this, FUNC(bfm_swp_state::bfm_swp_mem_r), FUNC(bfm_swp_state::bfm_swp_mem_w));
+	map(0x00000000, 0xffffffff).rw(FUNC(bfm_swp_state::bfm_swp_mem_r), FUNC(bfm_swp_state::bfm_swp_mem_w));
 	map(0x00000000, 0x000fffff).rom();
 }
 
@@ -204,8 +204,8 @@ void bfm_swp_state::machine_start()
 MACHINE_CONFIG_START(bfm_swp_state::bfm_swp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68340, 16000000)
-	MCFG_CPU_PROGRAM_MAP(bfm_swp_map)
+	M68340(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_swp_state::bfm_swp_map);
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -215,9 +215,9 @@ MACHINE_CONFIG_START(bfm_swp_state::bfm_swp)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 10000000 )
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 10000000 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -304,7 +304,7 @@ ROM_END
 
 
 
-GAME( 199?, c3_rtime        , 0         , bfm_swp, bfm_swp, bfm_swp_state, 0, ROT0, "BFM", "Radio Times (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
-GAME( 199?, c3_telly        , 0         , bfm_swp, bfm_swp, bfm_swp_state, 0, ROT0, "BFM", "Telly Addicts (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
-GAME( 199?, c3_totp         , 0         , bfm_swp, bfm_swp, bfm_swp_state, 0, ROT0, "BFM", "Top of the Pops (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )
-GAME( 199?, c3_ppays        , 0         , bfm_swp, bfm_swp, bfm_swp_state, 0, ROT0, "BFM", "The Phrase That Pays (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_rtime, 0, bfm_swp, bfm_swp, bfm_swp_state, empty_init, ROT0, "BFM", "Radio Times (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_telly, 0, bfm_swp, bfm_swp, bfm_swp_state, empty_init, ROT0, "BFM", "Telly Addicts (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_totp,  0, bfm_swp, bfm_swp, bfm_swp_state, empty_init, ROT0, "BFM", "Top of the Pops (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_ppays, 0, bfm_swp, bfm_swp, bfm_swp_state, empty_init, ROT0, "BFM", "The Phrase That Pays (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )

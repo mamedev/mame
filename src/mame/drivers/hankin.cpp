@@ -47,7 +47,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 	void hankin(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE_LINE_MEMBER(ic10_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(ic10_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(ic11_ca2_w);
@@ -70,7 +70,6 @@ protected:
 	void hankin_map(address_map &map);
 	void hankin_sub_map(address_map &map);
 
-private:
 	bool m_timer_x;
 	bool m_timer_sb;
 	uint8_t m_timer_s[3];
@@ -475,55 +474,55 @@ WRITE_LINE_MEMBER( hankin_state::ic2_cb2_w )
 
 MACHINE_CONFIG_START(hankin_state::hankin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, 3276800)
-	MCFG_CPU_PROGRAM_MAP(hankin_map)
+	MCFG_DEVICE_ADD("maincpu", M6802, 3276800)
+	MCFG_DEVICE_PROGRAM_MAP(hankin_map)
 
-	MCFG_CPU_ADD("audiocpu", M6802, 3276800) // guess, xtal value not shown
-	MCFG_CPU_PROGRAM_MAP(hankin_sub_map)
+	MCFG_DEVICE_ADD("audiocpu", M6802, 3276800) // guess, xtal value not shown
+	MCFG_DEVICE_PROGRAM_MAP(hankin_sub_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_hankin)
+	config.set_default_layout(layout_hankin);
 
 	/* Sound */
 	genpin_audio(config);
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ic10", PIA6821, 0)
-	//MCFG_PIA_READPA_HANDLER(READ8(hankin_state, ic10_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(hankin_state, ic10_a_w))
-	//MCFG_PIA_READPB_HANDLER(READ8(hankin_state, ic10_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(hankin_state, ic10_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(hankin_state, ic10_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(hankin_state, ic10_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
+	PIA6821(config, m_ic10, 0);
+	//m_ic10->readpa_handler().set(FUNC(hankin_state::ic10_a_r));
+	m_ic10->writepa_handler().set(FUNC(hankin_state::ic10_a_w));
+	//m_ic10->readpb_handler().set(FUNC(hankin_state::ic10_b_r));
+	m_ic10->writepb_handler().set(FUNC(hankin_state::ic10_b_w));
+	m_ic10->ca2_handler().set(FUNC(hankin_state::ic10_ca2_w));
+	m_ic10->cb2_handler().set(FUNC(hankin_state::ic10_cb2_w));
+	m_ic10->irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
+	m_ic10->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("ic11", PIA6821, 0)
-	//MCFG_PIA_READPA_HANDLER(READ8(hankin_state, ic11_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(hankin_state, ic11_a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(hankin_state, ic11_b_r))
-	//MCFG_PIA_WRITEPB_HANDLER(WRITE8(hankin_state, ic11_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(hankin_state, ic11_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(hankin_state, ic11_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
+	PIA6821(config, m_ic11, 0);
+	//m_ic11->readpa_handler().set(FUNC(hankin_state::ic11_a_r));
+	m_ic11->writepa_handler().set(FUNC(hankin_state::ic11_a_w));
+	m_ic11->readpb_handler().set(FUNC(hankin_state::ic11_b_r));
+	//m_ic11->writepb_handler().set(FUNC(hankin_state::ic11_b_w));
+	m_ic11->ca2_handler().set(FUNC(hankin_state::ic11_ca2_w));
+	m_ic11->cb2_handler().set(FUNC(hankin_state::ic11_cb2_w));
+	m_ic11->irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
+	m_ic11->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("ic2", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(hankin_state, ic2_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(hankin_state, ic2_a_w))
-	//MCFG_PIA_READPB_HANDLER(READ8(hankin_state, ic2_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(hankin_state, ic2_b_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(hankin_state, ic2_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(hankin_state, ic2_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
+	PIA6821(config, m_ic2, 0);
+	m_ic2->readpa_handler().set(FUNC(hankin_state::ic2_a_r));
+	m_ic2->writepa_handler().set(FUNC(hankin_state::ic2_a_w));
+	//m_ic2->readpb_handler().set(FUNC(hankin_state::ic2_b_r));
+	m_ic2->writepb_handler().set(FUNC(hankin_state::ic2_b_w));
+	m_ic2->ca2_handler().set(FUNC(hankin_state::ic2_ca2_w));
+	m_ic2->cb2_handler().set(FUNC(hankin_state::ic2_cb2_w));
+	m_ic2->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
+	m_ic2->irqb_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x", hankin_state, timer_x, attotime::from_hz(120)) // mains freq*2
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s", hankin_state, timer_s, attotime::from_hz(94000)) // 555 on sound board*2
@@ -605,8 +604,8 @@ ROM_START(empsback)
 ROM_END
 
 
-GAME(1978,  fjholden,  0,  hankin,  hankin, hankin_state, 0,  ROT0,  "Hankin", "FJ Holden",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  orbit1,    0,  hankin,  hankin, hankin_state, 0,  ROT0,  "Hankin", "Orbit 1",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  shark,     0,  hankin,  hankin, hankin_state, 0,  ROT0,  "Hankin", "Shark",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  howzat,    0,  hankin,  hankin, hankin_state, 0,  ROT0,  "Hankin", "Howzat!",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1981,  empsback,  0,  hankin,  hankin, hankin_state, 0,  ROT0,  "Hankin", "The Empire Strike Back", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  fjholden, 0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "FJ Holden",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  orbit1,   0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Orbit 1",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  shark,    0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Shark",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  howzat,   0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "Howzat!",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1981,  empsback, 0, hankin, hankin, hankin_state, empty_init, ROT0, "Hankin", "The Empire Strike Back", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

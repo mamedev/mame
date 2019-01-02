@@ -88,6 +88,7 @@ TODO:
 #include "bus/generic/slot.h"
 #include "machine/bankdev.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -96,15 +97,8 @@ TODO:
 class socrates_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_KBMCU_SIM,
-		TIMER_CLEAR_SPEECH,
-		TIMER_CLEAR_IRQ
-	};
-
-	socrates_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	socrates_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "soc_snd"),
 		m_screen(*this, "screen"),
@@ -116,7 +110,22 @@ public:
 		m_rambank1(*this, "rambank1"),
 		m_rambank2(*this, "rambank2"),
 		m_kbdrow(*this, "IN%u", 0)
-		{ }
+	{ }
+
+	void socrates_pal(machine_config &config);
+	void socrates(machine_config &config);
+
+	void init_socrates();
+	void init_iqunlimz();
+
+protected:
+	enum
+	{
+		TIMER_KBMCU_SIM,
+		TIMER_CLEAR_SPEECH,
+		TIMER_CLEAR_IRQ
+	};
+
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
 	required_device<screen_device> m_screen;
@@ -129,8 +138,6 @@ public:
 	required_device<address_map_bank_device> m_rambank1;
 	required_device<address_map_bank_device> m_rambank2;
 	optional_ioport_array<0xC> m_kbdrow;
-
-	rgb_t m_palette_val[256];
 
 	uint8_t m_rom_bank[2];
 	uint8_t m_ram_bank;
@@ -147,6 +154,21 @@ public:
 	uint8_t m_speech_dummy_read; // have we done a dummy read yet?
 	uint8_t m_speech_load_address_count; // number of times load address has happened
 	uint8_t m_speech_load_settings_count; // number of times load settings has happened
+
+	emu_timer *m_kbmcu_sim_timer;
+	emu_timer *m_clear_speech_timer;
+	emu_timer *m_clear_irq_timer;
+
+	struct
+	{
+		uint16_t   buffer[8];
+		uint8_t    head;
+		uint8_t    tail;
+		uint8_t    count;
+	} m_kb_queue;
+
+	void socrates_palette(palette_device &palete) const;
+
 	DECLARE_READ8_MEMBER(common_rom_bank_r);
 	DECLARE_WRITE8_MEMBER(common_rom_bank_w);
 	DECLARE_READ8_MEMBER(common_ram_bank_r);
@@ -166,12 +188,11 @@ public:
 	DECLARE_WRITE8_MEMBER(reset_speech);
 	DECLARE_WRITE8_MEMBER(socrates_scroll_w);
 	DECLARE_WRITE8_MEMBER(socrates_sound_w);
-	DECLARE_DRIVER_INIT(socrates);
-	DECLARE_DRIVER_INIT(iqunlimz);
+
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(socrates);
+
 	uint32_t screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(assert_irq);
 	TIMER_CALLBACK_MEMBER(kbmcu_sim_cb);
@@ -179,26 +200,13 @@ public:
 	TIMER_CALLBACK_MEMBER(clear_irq_cb);
 	void socrates_update_kb();
 	void socrates_check_kb_latch();
-	rgb_t socrates_create_color(uint8_t color);
-	emu_timer *m_kbmcu_sim_timer;
-	emu_timer *m_clear_speech_timer;
-	emu_timer *m_clear_irq_timer;
+	static rgb_t socrates_create_color(uint8_t color);
 
-	struct
-	{
-		uint16_t   buffer[8];
-		uint8_t    head;
-		uint8_t    tail;
-		uint8_t    count;
-	} m_kb_queue;
-
-	void socrates_pal(machine_config &config);
-	void socrates(machine_config &config);
 	void socrates_rambank_map(address_map &map);
 	void socrates_rombank_map(address_map &map);
 	void z80_io(address_map &map);
 	void z80_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -206,27 +214,31 @@ protected:
 class iqunlimz_state : public socrates_state
 {
 public:
-	iqunlimz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: socrates_state(mconfig, type, tag)
-		{ }
+	iqunlimz_state(const machine_config &mconfig, device_type type, const char *tag) :
+		socrates_state(mconfig, type, tag)
+	{ }
 
+	void iqunlimz(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( send_input );
+
+protected:
+	virtual void machine_reset() override;
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER( colors_w );
 	DECLARE_READ8_MEMBER( video_regs_r );
 	DECLARE_WRITE8_MEMBER( video_regs_w );
 	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_INPUT_CHANGED_MEMBER( send_input );
 
-	void iqunlimz(machine_config &config);
 	void iqunlimz_io(address_map &map);
 	void iqunlimz_mem(address_map &map);
 	void iqunlimz_rambank_map(address_map &map);
 	void iqunlimz_rombank_map(address_map &map);
-protected:
-	virtual void machine_reset() override;
+
 	int get_color(int index, int y);
 
-private:
 	uint8_t   m_colors[8];
 	uint8_t   m_video_regs[4];
 
@@ -385,7 +397,7 @@ void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-DRIVER_INIT_MEMBER(socrates_state,socrates)
+void socrates_state::init_socrates()
 {
 	uint8_t *gfx = memregion("vram")->base();
 
@@ -396,7 +408,7 @@ DRIVER_INIT_MEMBER(socrates_state,socrates)
 	m_kbmcu_type = 0;
 }
 
-DRIVER_INIT_MEMBER(socrates_state,iqunlimz)
+void socrates_state::init_iqunlimz()
 {
 	uint8_t *gfx = memregion("vram")->base();
 
@@ -435,7 +447,7 @@ WRITE8_MEMBER(socrates_state::common_ram_bank_w)
 
 READ8_MEMBER(socrates_state::socrates_cart_r)
 {
-	///TODO: do m_rombank->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::write), (dac_byte_interface *)m_dac)); style stuff
+	///TODO: do m_rombank->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::data_w), (dac_byte_interface *)m_dac)); style stuff
 	// demangle the offset, offset passed is bits 11111111 11111111 00000000 00000000
 	// where . is 0                               EDCBA987 65432.10 FEDCBA98 76543210
 	offset = ((offset&0x3FFFF)|((offset&0xF80000)>>1));
@@ -687,43 +699,40 @@ WRITE8_MEMBER(socrates_state::socrates_scroll_w)
 
 rgb_t socrates_state::socrates_create_color(uint8_t color)
 {
-	rgb_t composedcolor;
-	static const double lumatable[256] = {
-	LUMA_COL_0
-	LUMA_COL_COMMON
-	LUMA_COL_2
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_5
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_COMMON
-	LUMA_COL_F
-	};
-	static const double chromaintensity[256] = {
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	CHROMA_COL_COMMON
-	CHROMA_COL_2
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_5
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	CHROMA_COL_COMMON
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-	};
+	static constexpr double lumatable[256] = {
+			LUMA_COL_0
+			LUMA_COL_COMMON
+			LUMA_COL_2
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_5
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_COMMON
+			LUMA_COL_F };
+	static constexpr double chromaintensity[256] = {
+			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+			CHROMA_COL_COMMON
+			CHROMA_COL_2
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_5
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			CHROMA_COL_COMMON
+			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 	/* chroma colors and phases:
 	 0: black-through-grey (0 assumed chroma)
 	 1: purple (90 chroma seems correct)
@@ -742,19 +751,18 @@ rgb_t socrates_state::socrates_create_color(uint8_t color)
 	 E: blue-purple (more blue than color 1, 120 is closest)
 	 F: grey-through-white (0 assumed chroma)
 	*/
-	static const double phaseangle[16] = { 0, 90, 220, 150, 270, 40, 0, 315, 180, 210, 240, 300, 330, 60, 120, 0 }; // note: these are guessed, not measured yet!
-	int chromaindex = color&0x0F;
-	int swappedcolor = ((color&0xf0)>>4)|((color&0x0f)<<4);
-	double finalY, finalI, finalQ, finalR, finalG, finalB;
-	finalY = (1/LUMAMAX) * lumatable[swappedcolor];
-	finalI = (M_I * (cos((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
-	finalQ = (M_Q * (sin((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+	static constexpr double phaseangle[16] = { 0, 90, 220, 150, 270, 40, 0, 315, 180, 210, 240, 300, 330, 60, 120, 0 }; // note: these are guessed, not measured yet!
+	int const chromaindex = color&0x0F;
+	int const swappedcolor = ((color&0xf0)>>4)|((color&0x0f)<<4);
+	double finalY = (1/LUMAMAX) * lumatable[swappedcolor];
+	double const finalI = (M_I * (cos((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+	double const finalQ = (M_Q * (sin((phaseangle[chromaindex]/180)*3.141592653589793)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
 	if (finalY > 1) finalY = 1; // clamp luma
-	/* calculate the R, G and B values here, neato matrix math */
-	finalR = (finalY*1)+(finalI*0.9563)+(finalQ*0.6210);
-	finalG = (finalY*1)+(finalI*-0.2721)+(finalQ*-0.6474);
-	finalB = (finalY*1)+(finalI*-1.1070)+(finalQ*1.7046);
-	/* scale/clamp to 0-255 range */
+	// calculate the R, G and B values here, neato matrix math
+	double finalR = (finalY*1)+(finalI*0.9563)+(finalQ*0.6210);
+	double finalG = (finalY*1)+(finalI*-0.2721)+(finalQ*-0.6474);
+	double finalB = (finalY*1)+(finalI*-1.1070)+(finalQ*1.7046);
+	// scale/clamp to 0-255 range
 	if (finalR<0) finalR = 0;
 	if (finalR>1) finalR = 1;
 	if (finalG<0) finalG = 0;
@@ -765,19 +773,14 @@ rgb_t socrates_state::socrates_create_color(uint8_t color)
 	finalR = pow(finalR, 1/GAMMA)*255;
 	finalG = pow(finalG, 1/GAMMA)*255;
 	finalB = pow(finalB, 1/GAMMA)*255;
-composedcolor = rgb_t((int)finalR,(int)finalG,(int)finalB);
-return composedcolor;
+	return rgb_t((int)finalR,(int)finalG,(int)finalB);
 }
 
 
-PALETTE_INIT_MEMBER(socrates_state, socrates)
+void socrates_state::socrates_palette(palette_device &palette) const
 {
-	int i; // iterator
-	for (i = 0; i < 256; i++)
-	{
-		m_palette_val[i] = socrates_create_color(i);
-	}
-	palette.set_pen_colors(0, m_palette_val, ARRAY_LENGTH(m_palette_val));
+	for (int i = 0; i < 256; i++)
+		palette.set_pen_color(i, socrates_create_color(i));
 }
 
 void socrates_state::video_start()
@@ -990,8 +993,8 @@ void socrates_state::socrates_rombank_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0).mirror(0xF00000);      // xxxx 00** **** **** **** ****
-	map(0x040000, 0x07ffff).r(this, FUNC(socrates_state::socrates_cart_r)).select(0xF80000);            // **** *1** **** **** **** ****
-	map(0x080000, 0x0bffff).r(this, FUNC(socrates_state::read_f3));                                        // xxxx 10** **** **** **** ****
+	map(0x040000, 0x07ffff).r(FUNC(socrates_state::socrates_cart_r)).select(0xF80000);            // **** *1** **** **** **** ****
+	map(0x080000, 0x0bffff).r(FUNC(socrates_state::read_f3));                                        // xxxx 10** **** **** **** ****
 }
 
 void socrates_state::socrates_rambank_map(address_map &map)
@@ -1004,9 +1007,9 @@ void socrates_state::z80_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(socrates_state::common_rom_bank_r), FUNC(socrates_state::common_rom_bank_w)).mirror(0x7); /* rom bank select - RW - 8 bits */
-	map(0x08, 0x08).rw(this, FUNC(socrates_state::common_ram_bank_r), FUNC(socrates_state::common_ram_bank_w)).mirror(0x7); /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
-	map(0x10, 0x17).rw(this, FUNC(socrates_state::read_f3), FUNC(socrates_state::socrates_sound_w)).mirror(0x8); /* sound section:
+	map(0x00, 0x00).rw(FUNC(socrates_state::common_rom_bank_r), FUNC(socrates_state::common_rom_bank_w)).mirror(0x7); /* rom bank select - RW - 8 bits */
+	map(0x08, 0x08).rw(FUNC(socrates_state::common_ram_bank_r), FUNC(socrates_state::common_ram_bank_w)).mirror(0x7); /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
+	map(0x10, 0x17).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::socrates_sound_w)).mirror(0x8); /* sound section:
 	0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL(21'477'272)/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
 	0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
 	0x12 - W - 0b***EVVVV enable, volume control for channel 1
@@ -1018,12 +1021,12 @@ void socrates_state::z80_io(address_map &map)
 	0xC0 produces a DMC wave read from an unknown address at around 342hz
 	<todo: test the others, maybe take samples?>
 	*/
-	map(0x20, 0x21).rw(this, FUNC(socrates_state::read_f3), FUNC(socrates_state::socrates_scroll_w)).mirror(0xE);
-	map(0x30, 0x30).rw(this, FUNC(socrates_state::read_f3), FUNC(socrates_state::kbmcu_reset)).mirror(0xF); /* resets the keyboard IR decoder MCU */
-	map(0x40, 0x40).rw(this, FUNC(socrates_state::status_and_speech), FUNC(socrates_state::speech_command)).mirror(0xF); /* reads status register for vblank/hblank/speech, also reads and writes speech module */
-	map(0x50, 0x51).rw(this, FUNC(socrates_state::keyboard_buffer_read), FUNC(socrates_state::keyboard_buffer_update)).mirror(0xE); /* Keyboard fifo read, pop fifo on write */
-	map(0x60, 0x60).rw(this, FUNC(socrates_state::read_f3), FUNC(socrates_state::reset_speech)).mirror(0xF); /* reset the speech module, or perhaps fire an NMI?  */
-	map(0x70, 0xFF).r(this, FUNC(socrates_state::read_f3)); // nothing mapped here afaik
+	map(0x20, 0x21).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::socrates_scroll_w)).mirror(0xE);
+	map(0x30, 0x30).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::kbmcu_reset)).mirror(0xF); /* resets the keyboard IR decoder MCU */
+	map(0x40, 0x40).rw(FUNC(socrates_state::status_and_speech), FUNC(socrates_state::speech_command)).mirror(0xF); /* reads status register for vblank/hblank/speech, also reads and writes speech module */
+	map(0x50, 0x51).rw(FUNC(socrates_state::keyboard_buffer_read), FUNC(socrates_state::keyboard_buffer_update)).mirror(0xE); /* Keyboard fifo read, pop fifo on write */
+	map(0x60, 0x60).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::reset_speech)).mirror(0xF); /* reset the speech module, or perhaps fire an NMI?  */
+	map(0x70, 0xFF).r(FUNC(socrates_state::read_f3)); // nothing mapped here afaik
 }
 
 void iqunlimz_state::iqunlimz_mem(address_map &map)
@@ -1039,7 +1042,7 @@ void iqunlimz_state::iqunlimz_rombank_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0).mirror(0xF00000);      // xxxx 00** **** **** **** ****
-	map(0x040000, 0x07ffff).r(this, FUNC(iqunlimz_state::socrates_cart_r)).select(0xF80000);            // **** *1** **** **** **** ****
+	map(0x040000, 0x07ffff).r(FUNC(iqunlimz_state::socrates_cart_r)).select(0xF80000);            // **** *1** **** **** **** ****
 	map(0x080000, 0x0bffff).rom().region("maincpu", 0x40000).mirror(0xF00000);// xxxx 10** **** **** **** ****
 }
 
@@ -1053,19 +1056,19 @@ void iqunlimz_state::iqunlimz_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x01).rw(this, FUNC(iqunlimz_state::common_rom_bank_r), FUNC(iqunlimz_state::common_rom_bank_w)).mirror(0x06);
-	map(0x08, 0x08).rw(this, FUNC(iqunlimz_state::common_ram_bank_r), FUNC(iqunlimz_state::common_ram_bank_w)).mirror(0x07);
-	map(0x10, 0x17).w(this, FUNC(iqunlimz_state::socrates_sound_w)).mirror(0x08);
-	map(0x20, 0x21).w(this, FUNC(iqunlimz_state::socrates_scroll_w)).mirror(0x0E);
+	map(0x00, 0x01).rw(FUNC(iqunlimz_state::common_rom_bank_r), FUNC(iqunlimz_state::common_rom_bank_w)).mirror(0x06);
+	map(0x08, 0x08).rw(FUNC(iqunlimz_state::common_ram_bank_r), FUNC(iqunlimz_state::common_ram_bank_w)).mirror(0x07);
+	map(0x10, 0x17).w(FUNC(iqunlimz_state::socrates_sound_w)).mirror(0x08);
+	map(0x20, 0x21).w(FUNC(iqunlimz_state::socrates_scroll_w)).mirror(0x0E);
 	// 30: writes an incrementing value here, once per keypress?
 	// 40: some sort of serial select/reset or enable, related to 0x60
-	map(0x50, 0x51).rw(this, FUNC(iqunlimz_state::keyboard_buffer_read), FUNC(iqunlimz_state::keyboard_buffer_update)).mirror(0xE);
+	map(0x50, 0x51).rw(FUNC(iqunlimz_state::keyboard_buffer_read), FUNC(iqunlimz_state::keyboard_buffer_update)).mirror(0xE);
 	// 60: some sort of serial read/write port, related to 0x40
-	map(0x70, 0x73).rw(this, FUNC(iqunlimz_state::video_regs_r), FUNC(iqunlimz_state::video_regs_w)).mirror(0x0C);
+	map(0x70, 0x73).rw(FUNC(iqunlimz_state::video_regs_r), FUNC(iqunlimz_state::video_regs_w)).mirror(0x0C);
 	map(0x80, 0x81).nopw(); // LCD
 	map(0xb1, 0xb1).nopw();
-	map(0xa0, 0xa0).r(this, FUNC(iqunlimz_state::status_r)).mirror(0x0F);
-	map(0xe0, 0xe7).w(this, FUNC(iqunlimz_state::colors_w)).mirror(0x08);
+	map(0xa0, 0xa0).r(FUNC(iqunlimz_state::status_r)).mirror(0x0F);
+	map(0xe0, 0xe7).w(FUNC(iqunlimz_state::colors_w)).mirror(0x08);
 }
 
 
@@ -1464,29 +1467,15 @@ TIMER_CALLBACK_MEMBER(socrates_state::kbmcu_sim_cb)
 
 MACHINE_CONFIG_START(socrates_state::socrates)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272)/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
+	MCFG_DEVICE_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
 
-	MCFG_DEVICE_ADD("rombank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(socrates_rombank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("rambank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(socrates_rambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("rambank2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(socrates_rambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "rombank1").set_map(&socrates_state::socrates_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, "rambank1").set_map(&socrates_state::socrates_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, "rambank2").set_map(&socrates_state::socrates_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1497,12 +1486,11 @@ MACHINE_CONFIG_START(socrates_state::socrates)
 	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
+	PALETTE(config, "palette", FUNC(socrates_state::socrates_palette), 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256)) // this is correct, as strange as it sounds.
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256)) // this is correct, as strange as it sounds.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "socrates_cart")
@@ -1513,11 +1501,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(socrates_state::socrates_pal)
 	socrates(config);
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(26'601'712)/8)
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-	MCFG_CPU_IO_MAP(z80_io)
+
+	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(26'601'712)/8)
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
+	MCFG_DEVICE_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -1526,40 +1515,21 @@ MACHINE_CONFIG_START(socrates_state::socrates_pal)
 	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 229) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
 	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
 
-	MCFG_SOUND_REPLACE("soc_snd", SOCRATES_SOUND, XTAL(26'601'712)/(512+256)) // this is correct, as strange as it sounds.
+	MCFG_DEVICE_REPLACE("soc_snd", SOCRATES_SOUND, XTAL(26'601'712)/(512+256)) // this is correct, as strange as it sounds.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iqunlimz_state::iqunlimz)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000)) /* not accurate */
-	MCFG_CPU_PROGRAM_MAP(iqunlimz_mem)
-	MCFG_CPU_IO_MAP(iqunlimz_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", iqunlimz_state,  assert_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000)) /* not accurate */
+	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_mem)
+	MCFG_DEVICE_IO_MAP(iqunlimz_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", iqunlimz_state,  assert_irq)
 
-	MCFG_DEVICE_ADD("rombank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_rombank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("rombank2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_rombank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("rambank1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_rambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("rambank2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_rambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "rombank1").set_map(&iqunlimz_state::iqunlimz_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, "rombank2").set_map(&iqunlimz_state::iqunlimz_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, "rambank1").set_map(&iqunlimz_state::iqunlimz_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, "rambank2").set_map(&iqunlimz_state::iqunlimz_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1570,12 +1540,11 @@ MACHINE_CONFIG_START(iqunlimz_state::iqunlimz)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(socrates_state, socrates)
+	PALETTE(config, "palette", FUNC(iqunlimz_state::socrates_palette), 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
@@ -1663,9 +1632,9 @@ ROM_START(profweis)
 	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEVAL(0xF3))
 	/* Yeno Professor Weiss-Alles (German PAL) */
 	ROM_SYSTEM_BIOS(0, "89", "1989")
-	ROMX_LOAD("lh53216d.u1", 0x00000, 0x40000, CRC(6e801762) SHA1(b80574a3abacf18133dacb9d3a8d9e2916730423), ROM_BIOS(1)) // Label: "(Vtech) LH53216D // (C)1989 VIDEO TECHNOLOGY // 9119 D"
+	ROMX_LOAD("lh53216d.u1", 0x00000, 0x40000, CRC(6e801762) SHA1(b80574a3abacf18133dacb9d3a8d9e2916730423), ROM_BIOS(0)) // Label: "(Vtech) LH53216D // (C)1989 VIDEO TECHNOLOGY // 9119 D"
 	ROM_SYSTEM_BIOS(1, "88", "1988")
-	ROMX_LOAD("27-00885-001-000.u1", 0x00000, 0x40000, CRC(fcaf8850) SHA1(a99011ee6a1ef63461c00d062278951252f117db), ROM_BIOS(2)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
+	ROMX_LOAD("27-00885-001-000.u1", 0x00000, 0x40000, CRC(fcaf8850) SHA1(a99011ee6a1ef63461c00d062278951252f117db), ROM_BIOS(1)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
 
 	ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
@@ -1692,11 +1661,11 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE       INPUT     STATE           INIT      COMPANY                  FULLNAME                             FLAGS
-COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, socrates, "Video Technology",      "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // English NTSC, no title copyright
-COMP( 1988, socratfc, socrates, 0,      socrates,     socrates, socrates_state, socrates, "Video Technology",      "Socrates SAITOUT",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // French Canandian NTSC, 1988 title copyright
-COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, socrates, "Video Technology / Yeno", "Professor Weiss-Alles",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // German PAL, 1988 title copyright
+//    YEAR  NAME      PARENT    COMPAT  MACHINE       INPUT     STATE           INIT           COMPANY                    FULLNAME                             FLAGS
+COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // English NTSC, no title copyright
+COMP( 1988, socratfc, socrates, 0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates SAITOUT",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // French Canandian NTSC, 1988 title copyright
+COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, init_socrates, "Video Technology / Yeno", "Professor Weiss-Alles",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // German PAL, 1988 title copyright
 // Yeno Professeur Saitout goes here (french SECAM)
 // ? goes here (spanish PAL)
 
-COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlimz_state, iqunlimz, "Video Technology",      "IQ Unlimited (Z80)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlimz_state, init_iqunlimz, "Video Technology",        "IQ Unlimited (Z80)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

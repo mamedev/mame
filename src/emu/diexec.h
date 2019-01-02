@@ -35,8 +35,7 @@ enum line_state
 {
 	CLEAR_LINE = 0,             // clear (a fired or held) line
 	ASSERT_LINE,                // assert an interrupt immediately
-	HOLD_LINE,                  // hold interrupt line until acknowledged
-	PULSE_LINE                  // pulse interrupt line instantaneously (only for NMI, RESET)
+	HOLD_LINE                   // hold interrupt line until acknowledged
 };
 
 
@@ -44,7 +43,7 @@ enum line_state
 enum
 {
 	// input lines
-	MAX_INPUT_LINES = 32+3,
+	MAX_INPUT_LINES = 64+3,
 	INPUT_LINE_IRQ0 = 0,
 	INPUT_LINE_IRQ1 = 1,
 	INPUT_LINE_IRQ2 = 2,
@@ -136,21 +135,59 @@ public:
 	attotime cycles_to_attotime(u64 cycles) const { return device().clocks_to_attotime(cycles_to_clocks(cycles)); }
 	u64 attotime_to_cycles(const attotime &duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
 	u32 input_lines() const { return execute_input_lines(); }
-	u32 default_irq_vector() const { return execute_default_irq_vector(); }
+	u32 default_irq_vector(int linenum) const { return execute_default_irq_vector(linenum); }
+	bool input_edge_triggered(int linenum) const { return execute_input_edge_triggered(linenum); }
 
 	// inline configuration helpers
 	void set_disable() { m_disabled = true; }
-	template <typename Object> void set_vblank_int(Object &&cb, const char *tag, int rate = 0)
+	template <typename Object> void set_vblank_int(Object &&cb, const char *tag)
 	{
 		m_vblank_interrupt = std::forward<Object>(cb);
 		m_vblank_interrupt_screen = tag;
 	}
+	void set_vblank_int(device_interrupt_delegate callback, const char *tag)
+	{
+		m_vblank_interrupt = callback;
+		m_vblank_interrupt_screen = tag;
+	}
+	template <class FunctionClass> void set_vblank_int(const char *tag, const char *devname, void (FunctionClass::*callback)(device_t &), const char *name)
+	{
+		set_vblank_int(device_interrupt_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)), tag);
+	}
+	template <class FunctionClass> void set_vblank_int(const char *tag, void (FunctionClass::*callback)(device_t &), const char *name)
+	{
+		set_vblank_int(device_interrupt_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)), tag);
+	}
+
 	template <typename Object> void set_periodic_int(Object &&cb, const attotime &rate)
 	{
 		m_timed_interrupt = std::forward<Object>(cb);
 		m_timed_interrupt_period = rate;
 	}
+	void set_periodic_int(device_interrupt_delegate callback, const attotime &rate)
+	{
+		m_timed_interrupt = callback;
+		m_timed_interrupt_period = rate;
+	}
+	template <class FunctionClass> void set_periodic_int(const char *devname, void (FunctionClass::*callback)(device_t &), const char *name, const attotime &rate)
+	{
+		set_periodic_int(device_interrupt_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)), rate);
+	}
+	template <class FunctionClass> void set_periodic_int(void (FunctionClass::*callback)(device_t &), const char *name, const attotime &rate)
+	{
+		set_periodic_int(device_interrupt_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)), rate);
+	}
+
 	template <typename Object> void set_irq_acknowledge_callback(Object &&cb) { m_driver_irq = std::forward<Object>(cb); }
+	void set_irq_acknowledge_callback(device_irq_acknowledge_delegate callback) { m_driver_irq = callback; }
+	template <class FunctionClass> void set_irq_acknowledge_callback(const char *devname, int (FunctionClass::*callback)(device_t &, int), const char *name)
+	{
+		set_irq_acknowledge_callback(device_irq_acknowledge_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_irq_acknowledge_callback(int (FunctionClass::*callback)(device_t &, int), const char *name)
+	{
+		set_irq_acknowledge_callback(device_irq_acknowledge_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	// execution management
 	device_scheduler &scheduler() const { assert(m_scheduler != nullptr); return *m_scheduler; }
@@ -203,7 +240,8 @@ protected:
 
 	// input line information getters
 	virtual u32 execute_input_lines() const;
-	virtual u32 execute_default_irq_vector() const;
+	virtual u32 execute_default_irq_vector(int linenum) const;
+	virtual bool execute_input_edge_triggered(int linenum) const;
 
 	// optional operation overrides
 	virtual void execute_run() = 0;
@@ -236,10 +274,11 @@ protected:
 		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
 			device().debug()->exception_hook(exception);
 	}
-	void debugger_interrupt_hook(int irqline)
+
+	void debugger_privilege_hook()
 	{
 		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
-			device().debug()->interrupt_hook(irqline);
+			device().debug()->privilege_hook();
 	}
 
 private:

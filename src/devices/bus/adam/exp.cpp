@@ -156,24 +156,27 @@ void adam_expansion_slot_device::bd_w(address_space &space, offs_t offset, uint8
 //  SLOT_INTERFACE( adam_slot1_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( adam_slot1_devices )
-	SLOT_INTERFACE("adamlink", ADAMLINK)
-SLOT_INTERFACE_END
+void adam_slot1_devices(device_slot_interface &device)
+{
+	device.option_add("adamlink", ADAMLINK);
+}
 
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( adam_slot2_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( adam_slot2_devices )
-	SLOT_INTERFACE("ide", ADAM_IDE)
-SLOT_INTERFACE_END
+void adam_slot2_devices(device_slot_interface &device)
+{
+	device.option_add("ide", ADAM_IDE);
+}
 
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( adam_slot3_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( adam_slot3_devices )
-	SLOT_INTERFACE("ram", ADAM_RAM)
-SLOT_INTERFACE_END
+void adam_slot3_devices(device_slot_interface &device)
+{
+	device.option_add("ram", ADAM_RAM);
+}

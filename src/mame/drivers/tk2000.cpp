@@ -19,12 +19,12 @@
 
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -41,8 +41,8 @@
 class tk2000_state : public driver_device
 {
 public:
-	tk2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tk2000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, A2_CPU_TAG),
 		m_ram(*this, RAM_TAG),
 		m_screen(*this, "screen"),
@@ -60,7 +60,7 @@ public:
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
 		m_upperbank(*this, A2_UPPERBANK_TAG)
-		{ }
+	{ }
 
 	void tk2000(machine_config &config);
 
@@ -92,7 +92,6 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 
-	DECLARE_PALETTE_INIT(tk2000);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(ram_r);
@@ -160,11 +159,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(tk2000_state::apple2_interrupt)
 	{
 		m_video->m_sysconfig = m_sysconfig->read();
 	}
-}
-
-PALETTE_INIT_MEMBER(tk2000_state, tk2000)
-{
-	m_video->palette_init_apple2(palette);
 }
 
 uint32_t tk2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -455,16 +449,16 @@ WRITE8_MEMBER(tk2000_state::ram_w)
 
 void tk2000_state::apple2_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rw(this, FUNC(tk2000_state::ram_r), FUNC(tk2000_state::ram_w));
-	map(0xc000, 0xc07f).rw(this, FUNC(tk2000_state::c000_r), FUNC(tk2000_state::c000_w));
-	map(0xc080, 0xc0ff).rw(this, FUNC(tk2000_state::c080_r), FUNC(tk2000_state::c080_w));
+	map(0x0000, 0xbfff).rw(FUNC(tk2000_state::ram_r), FUNC(tk2000_state::ram_w));
+	map(0xc000, 0xc07f).rw(FUNC(tk2000_state::c000_r), FUNC(tk2000_state::c000_w));
+	map(0xc080, 0xc0ff).rw(FUNC(tk2000_state::c080_r), FUNC(tk2000_state::c080_w));
 	map(0xc100, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
 }
 
 void tk2000_state::inhbank_map(address_map &map)
 {
 	map(0x0000, 0x3eff).rom().region("maincpu", 0x100);
-	map(0x4000, 0x7eff).rw(this, FUNC(tk2000_state::c100_r), FUNC(tk2000_state::c100_w));
+	map(0x4000, 0x7eff).rw(FUNC(tk2000_state::c100_r), FUNC(tk2000_state::c100_w));
 }
 
 /***************************************************************************
@@ -574,12 +568,12 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(tk2000_state::tk2000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
-	MCFG_CPU_PROGRAM_MAP(apple2_map)
+	MCFG_DEVICE_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(apple2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tk2000_state, apple2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD(A2_VIDEO_TAG, APPLE2_VIDEO, XTAL(14'318'181))
+	APPLE2_VIDEO(config, m_video, XTAL(14'318'181));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -587,25 +581,17 @@ MACHINE_CONFIG_START(tk2000_state::tk2000)
 	MCFG_SCREEN_SIZE(280*2, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, (280*2)-1,0,192-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tk2000_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(tk2000_state, tk2000)
+	MCFG_SCREEN_PALETTE(m_video)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(A2_SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* /INH banking */
-	MCFG_DEVICE_ADD(A2_UPPERBANK_TAG, ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(inhbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, A2_UPPERBANK_TAG).set_map(&tk2000_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	MCFG_CASSETTE_ADD(A2_CASSETTE_TAG)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
@@ -621,5 +607,5 @@ ROM_START(tk2000)
 	ROM_LOAD( "tk2000.rom",   0x000000, 0x004000, CRC(dfdbacc3) SHA1(bb37844c31616046630868a4399ee3d55d6df277) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT    STATE INIT      INIT  COMPANY            FULLNAME */
-COMP( 1984, tk2000,   0,        0,        tk2000,      tk2000,  tk2000_state,   0,    "Microdigital",    "TK2000", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME */
+COMP( 1984, tk2000, 0,      0,      tk2000,  tk2000, tk2000_state, empty_init, "Microdigital", "TK2000", MACHINE_NOT_WORKING )

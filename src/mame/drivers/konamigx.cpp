@@ -719,7 +719,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type4_scanline)
 
 /* National Semiconductor ADC0834 4-channel serial ADC emulation */
 
-ADC083X_INPUT_CB(konamigx_state::adc0834_callback)
+double konamigx_state::adc0834_callback(uint8_t input)
 {
 	switch (input)
 	{
@@ -785,8 +785,10 @@ READ32_MEMBER(konamigx_state::type3_sync_r)
 /*
     Run and Gun 2, Rushing Heroes, Winning Spike, and Vs. Net Soccer contain a XILINX FPGA that serves as security.
 
-    RnG2's version is stamped "K002204", while Rushing Heroes' is "K0000035891".  Vs Net's is unknown at this time.
-    Winning Spike's is "0000032652".
+    RnG2's version is "K002204"
+    Rushing Heroes' is "K0000035891"
+    Vs Net Soccer is "003462"
+    Winning Spike's is "0000032652"
 
     RnG2's is used to generate the sprite list just like the ESC, among other tasks.  (RnG2 sends many commands per frame to the protection).
 
@@ -978,7 +980,7 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 // cabinet lamps for type 1 games
 WRITE32_MEMBER(konamigx_state::type1_cablamps_w)
 {
-	output().set_led_value(0, (data>>24)&1);
+	m_lamp = BIT(data, 24);
 }
 
 /**********************************************************************************/
@@ -996,7 +998,7 @@ void konamigx_state::gx_base_memmap(address_map &map)
 	map(0xd21000, 0xd21fff).ram(); // second bank of sprite RAM, accessed thru ESC
 	map(0xd22000, 0xd23fff).ram(); // extra bank checked at least by sexyparo, pending further investigation.
 	map(0xd40000, 0xd4003f).w(m_k056832, FUNC(k056832_device::long_w));
-	map(0xd44000, 0xd4400f).w(this, FUNC(konamigx_state::konamigx_tilebank_w));
+	map(0xd44000, 0xd4400f).w(FUNC(konamigx_state::konamigx_tilebank_w));
 	map(0xd48000, 0xd48007).w(m_k055673, FUNC(k055673_device::k053246_word_w));
 	map(0xd4a000, 0xd4a00f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
 	map(0xd4a010, 0xd4a01f).w(m_k055673, FUNC(k055673_device::k055673_reg_word_w));
@@ -1004,8 +1006,8 @@ void konamigx_state::gx_base_memmap(address_map &map)
 	map(0xd4e000, 0xd4e01f).nopw(); // left-over for "secondary" CCU, apparently (used by type 3/4 for slave screen?)
 	map(0xd50000, 0xd500ff).w(m_k055555, FUNC(k055555_device::K055555_long_w));
 	map(0xd52000, 0xd5201f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w)).umask32(0xff00ff00);
-	map(0xd56000, 0xd56003).w(this, FUNC(konamigx_state::eeprom_w));
-	map(0xd58000, 0xd58003).w(this, FUNC(konamigx_state::control_w));
+	map(0xd56000, 0xd56003).w(FUNC(konamigx_state::eeprom_w));
+	map(0xd58000, 0xd58003).w(FUNC(konamigx_state::control_w));
 	map(0xd5a000, 0xd5a003).portr("SYSTEM_DSW");
 	map(0xd5c000, 0xd5c003).portr("INPUTS");
 	map(0xd5e000, 0xd5e003).portr("SERVICE");
@@ -1022,14 +1024,14 @@ void konamigx_state::gx_type1_map(address_map &map)
 	map(0xdd0000, 0xdd00ff).nopr().nopw(); // LAN board
 	map(0xdda000, 0xddafff).portw("ADC-WRPORT");
 	map(0xddc000, 0xddcfff).portr("ADC-RDPORT");
-	map(0xdde000, 0xdde003).w(this, FUNC(konamigx_state::type1_cablamps_w));
+	map(0xdde000, 0xdde003).w(FUNC(konamigx_state::type1_cablamps_w));
 	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
 	map(0xe20000, 0xe2000f).nopw();
 	map(0xe40000, 0xe40003).nopw();
 	map(0xe80000, 0xe81fff).ram().share("k053936_0_line");  // chips 21L+19L / S
-	map(0xec0000, 0xedffff).ram().w(this, FUNC(konamigx_state::konamigx_t1_psacmap_w)).share("psacram");  // chips 20J+23J+18J / S
-	map(0xf00000, 0xf3ffff).r(this, FUNC(konamigx_state::type1_roz_r1));  // ROM readback
-	map(0xf40000, 0xf7ffff).r(this, FUNC(konamigx_state::type1_roz_r2));  // ROM readback
+	map(0xec0000, 0xedffff).ram().w(FUNC(konamigx_state::konamigx_t1_psacmap_w)).share("psacram");  // chips 20J+23J+18J / S
+	map(0xf00000, 0xf3ffff).r(FUNC(konamigx_state::type1_roz_r1));  // ROM readback
+	map(0xf40000, 0xf7ffff).r(FUNC(konamigx_state::type1_roz_r2));  // ROM readback
 	map(0xf80000, 0xf80fff).ram(); // chip 21Q / S
 	map(0xfc0000, 0xfc00ff).ram(); // chip 22N / S
 }
@@ -1037,7 +1039,7 @@ void konamigx_state::gx_type1_map(address_map &map)
 void konamigx_state::gx_type2_map(address_map &map)
 {
 	gx_base_memmap(map);
-	map(0xcc0000, 0xcc0003).w(this, FUNC(konamigx_state::esc_w));
+	map(0xcc0000, 0xcc0003).w(FUNC(konamigx_state::esc_w));
 	map(0xd90000, 0xd97fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 }
 
@@ -1048,18 +1050,18 @@ void konamigx_state::gx_type3_map(address_map &map)
 	//AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
 	//AM_RANGE(0xe20000, 0xe20003) AM_WRITENOP
-	map(0xe40000, 0xe40003).w(this, FUNC(konamigx_state::konamigx_type3_psac2_bank_w)).share("psac2_bank");
+	map(0xe40000, 0xe40003).w(FUNC(konamigx_state::konamigx_type3_psac2_bank_w)).share("psac2_bank");
 	map(0xe60000, 0xe60fff).ram().share("k053936_0_line");
 	map(0xe80000, 0xe83fff).ram().share("paletteram");  // main monitor palette
 	map(0xea0000, 0xea3fff).ram().share("subpaletteram");
-	map(0xec0000, 0xec0003).r(this, FUNC(konamigx_state::type3_sync_r));
+	map(0xec0000, 0xec0003).r(FUNC(konamigx_state::type3_sync_r));
 	//AM_RANGE(0xf00000, 0xf07fff) AM_RAM
 }
 
 void konamigx_state::gx_type4_map(address_map &map)
 {
 	gx_base_memmap(map);
-	map(0xcc0000, 0xcc0007).w(this, FUNC(konamigx_state::type4_prot_w));
+	map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
 	map(0xd90000, 0xd97fff).ram();
 	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
 	map(0xe20000, 0xe20003).nopw();
@@ -1067,8 +1069,8 @@ void konamigx_state::gx_type4_map(address_map &map)
 	map(0xe60000, 0xe60fff).ram().share("k053936_0_line");  // 29C & 29G (PSAC2 line control)
 	map(0xe80000, 0xe87fff).ram().share("paletteram"); // 11G/13G/15G (main screen palette RAM)
 	map(0xea0000, 0xea7fff).ram().share("subpaletteram"); // 5G/7G/9G (sub screen palette RAM)
-	map(0xec0000, 0xec0003).r(this, FUNC(konamigx_state::type3_sync_r));      // type 4 polls this too
-	map(0xf00000, 0xf07fff).ram().w(this, FUNC(konamigx_state::konamigx_t4_psacmap_w)).share("psacram");    // PSAC2 tilemap
+	map(0xec0000, 0xec0003).r(FUNC(konamigx_state::type3_sync_r));      // type 4 polls this too
+	map(0xf00000, 0xf07fff).ram().w(FUNC(konamigx_state::konamigx_t4_psacmap_w)).share("psacram");    // PSAC2 tilemap
 //  AM_RANGE(0xf00000, 0xf07fff) AM_RAM
 }
 
@@ -1115,9 +1117,9 @@ void konamigx_state::gxsndmap(address_map &map)
 	map(0x100000, 0x10ffff).ram();
 	map(0x200000, 0x2004ff).rw(m_k054539_1, FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0xff00);
 	map(0x200000, 0x2004ff).rw(m_k054539_2, FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0x00ff);
-	map(0x300000, 0x300001).rw(this, FUNC(konamigx_state::tms57002_data_word_r), FUNC(konamigx_state::tms57002_data_word_w));
+	map(0x300000, 0x300001).rw(FUNC(konamigx_state::tms57002_data_word_r), FUNC(konamigx_state::tms57002_data_word_w));
 	map(0x400000, 0x40001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
-	map(0x500000, 0x500001).rw(this, FUNC(konamigx_state::tms57002_status_word_r), FUNC(konamigx_state::tms57002_control_word_w));
+	map(0x500000, 0x500001).rw(FUNC(konamigx_state::tms57002_status_word_r), FUNC(konamigx_state::tms57002_control_word_w));
 	map(0x580000, 0x580001).nopw(); // 'NRES' - D2: K056602 /RESET
 }
 
@@ -1579,22 +1581,22 @@ static const gfx_layout t1_charlayout8 =
 };
 
 /* type 1 (opengolf + racinfrc) use 6 and 8 bpp planar layouts for the 53936 */
-static GFXDECODE_START( opengolf )
+static GFXDECODE_START( gfx_opengolf )
 	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout8, 0x0000, 8 )
 	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( racinfrc )
+static GFXDECODE_START( gfx_racinfrc )
 	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout6, 0x0000, 8 )
 	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 8 )
 GFXDECODE_END
 
 /* type 3 & 4 games use a simple 8bpp decode for the 53936 */
-static GFXDECODE_START( type3 )
+static GFXDECODE_START( gfx_type3 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1000, 8 )
 GFXDECODE_END
 
-static GFXDECODE_START( type4 )
+static GFXDECODE_START( gfx_type4 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1800, 8 )
 GFXDECODE_END
 
@@ -1610,347 +1612,324 @@ WRITE_LINE_MEMBER(konamigx_state::hblank_irq_ack_w)
 	m_gx_syncen |= 0x40;
 }
 
-MACHINE_CONFIG_START(konamigx_state::konamigx)
+void konamigx_state::konamigx(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(gx_type2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", konamigx_state, konamigx_type2_vblank_irq)
+	M68EC020(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::gx_type2_map);
+	m_maincpu->set_vblank_int("screen", FUNC(konamigx_state::konamigx_type2_vblank_irq));
 
-	MCFG_CPU_ADD("soundcpu", M68000, SUB_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(gxsndmap)
+	M68000(config, m_soundcpu, SUB_CLOCK/2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &konamigx_state::gxsndmap);
 
-	MCFG_CPU_ADD("dasp", TMS57002, MASTER_CLOCK/2)
-	MCFG_CPU_DATA_MAP(gxtmsmap)
+	TMS57002(config, m_dasp, MASTER_CLOCK/2);
+	m_dasp->set_addrmap(AS_DATA, &konamigx_state::gxtmsmap);
 
-	MCFG_DEVICE_ADD("k053252", K053252, MASTER_CLOCK/4)
-	MCFG_K053252_OFFSETS(24, 16)
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(konamigx_state, vblank_irq_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(konamigx_state, hblank_irq_ack_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	K053252(config, m_k053252, MASTER_CLOCK/4);
+	m_k053252->set_offsets(24, 16);
+	m_k053252->int1_ack().set(FUNC(konamigx_state::vblank_irq_ack_w));
+	m_k053252->int2_ack().set(FUNC(konamigx_state::hblank_irq_ack_w));
+	m_k053252->set_screen("screen");
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MCFG_MACHINE_START_OVERRIDE(konamigx_state,konamigx)
 	MCFG_MACHINE_RESET_OVERRIDE(konamigx_state,konamigx)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
 	/* These parameters are actual value written to the CCU.
 	tbyahhoo attract mode desync is caused by another matter. */
 
 	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
 	// TODO: WTF, without these most games crashes? Some legacy call in video code???
-	MCFG_SCREEN_SIZE(1024, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx)
+	m_screen->set_size(1024, 1024);
+	m_screen->set_visarea(24, 24+288-1, 16, 16+224-1);
+	m_screen->set_screen_update(FUNC(konamigx_state::screen_update_konamigx));
 
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(konamigx_state, type2_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(konamigx_state::type2_tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_5, 0, 0);
+	m_k056832->set_palette(m_palette);
 
-	MCFG_K055555_ADD("k055555")
+	K055555(config, m_k055555, 0);
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
-	MCFG_K054338_MIXER("k055555")
-	MCFG_K054338_SET_SCREEN("screen")
-	MCFG_K054338_ALPHAINV(1)
+	K054338(config, m_k054338, 0, m_k055555);
+	m_k054338->set_screen(m_screen);
+	m_k054338->set_alpha_invert(1);
 
-	MCFG_DEVICE_ADD("k055673", K055673, 0)
-	MCFG_K055673_CB(konamigx_state, type2_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -26, -23)
-	MCFG_K055673_SET_SCREEN("screen")
-	MCFG_K055673_PALETTE("palette")
+	K055673(config, m_k055673, 0);
+	m_k055673->set_sprite_callback(FUNC(konamigx_state::type2_sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX, -26, -23);
+	m_k055673->set_screen(m_screen);
+	m_k055673->set_palette(m_palette);
 
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_5bpp)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_MODIFY("dasp")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.3)
+	m_dasp->add_route(0, "lspeaker", 0.3); // Connected to the aux input of respective 54539.
+	m_dasp->add_route(1, "rspeaker", 0.3);
+	m_dasp->add_route(2, "lspeaker", 0.3);
+	m_dasp->add_route(3, "rspeaker", 0.3);
 
-	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
-	MCFG_K056800_INT_HANDLER(INPUTLINE("soundcpu", M68K_IRQ_1))
+	K056800(config, m_k056800, XTAL(18'432'000));
+	m_k056800->int_callback().set_inputline(m_soundcpu, M68K_IRQ_1);
 
-	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
-	MCFG_DEVICE_ROM("k054539")
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(konamigx_state, k054539_irq_gen))
-	MCFG_SOUND_ROUTE_EX(0, "dasp", 0.5, 0)
-	MCFG_SOUND_ROUTE_EX(1, "dasp", 0.5, 1)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	K054539(config, m_k054539_1, XTAL(18'432'000));
+	m_k054539_1->set_device_rom_tag("k054539");
+	m_k054539_1->timer_handler().set(FUNC(konamigx_state::k054539_irq_gen));
+	m_k054539_1->add_route(0, "dasp", 0.5, 0);
+	m_k054539_1->add_route(1, "dasp", 0.5, 1);
+	m_k054539_1->add_route(0, "lspeaker", 1.0);
+	m_k054539_1->add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL(18'432'000))
-	MCFG_DEVICE_ROM("k054539")
-	MCFG_SOUND_ROUTE_EX(0, "dasp", 0.5, 2)
-	MCFG_SOUND_ROUTE_EX(1, "dasp", 0.5, 3)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	K054539(config, m_k054539_2, XTAL(18'432'000));
+	m_k054539_2->set_device_rom_tag("k054539");
+	m_k054539_2->add_route(0, "dasp", 0.5, 2);
+	m_k054539_2->add_route(1, "dasp", 0.5, 3);
+	m_k054539_2->add_route(0, "lspeaker", 1.0);
+	m_k054539_2->add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(konamigx_state::konamigx_bios)
+void konamigx_state::konamigx_bios(machine_config &config)
+{
 	konamigx(config);
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 0, 0, "k055555")
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(konamigx_state::gokuparo)
+	m_k056832->set_config("gfx1", K056832_BPP_4, 0, 0);
+}
+
+void konamigx_state::gokuparo(machine_config &config)
+{
 	konamigx(config);
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -46, -23)
-MACHINE_CONFIG_END
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX, -46, -23);
+}
 
-MACHINE_CONFIG_START(konamigx_state::sexyparo)
+void konamigx_state::sexyparo(machine_config &config)
+{
 	konamigx(config);
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(konamigx_state, alpha_tile_callback)
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -42, -23)
-MACHINE_CONFIG_END
+	m_k056832->set_tile_callback(FUNC(konamigx_state::alpha_tile_callback), this);
 
-MACHINE_CONFIG_START(konamigx_state::tbyahhoo)
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX, -42, -23);
+}
+
+void konamigx_state::tbyahhoo(machine_config &config)
+{
 	konamigx(config);
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0, "k055555")
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(konamigx_state::dragoonj)
+	m_k056832->set_config("gfx1", K056832_BPP_5, 0, 0);
+}
+
+void konamigx_state::dragoonj(machine_config &config)
+{
 	konamigx(config);
-	MCFG_SCREEN_MODIFY("screen")
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, dragoonj)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24+16, 16)
+	m_k053252->set_offsets(24+16, 16);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 1, 0, "none")
+	m_k056832->set_config("gfx1", K056832_BPP_5, 1, 0);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(konamigx_state, dragoonj_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -53, -23)
-MACHINE_CONFIG_END
+	m_k055673->set_sprite_callback(FUNC(konamigx_state::dragoonj_sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_RNG, -53, -23);
+}
 
-MACHINE_CONFIG_START(konamigx_state::le2)
+void konamigx_state::le2(machine_config &config)
+{
 	konamigx(config);
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, le2)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_type2_scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0, "none")
+	TIMER(config, "scantimer").configure_scanline(FUNC(konamigx_state::konamigx_type2_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(konamigx_state, le2_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_LE2, -46, -23)
-MACHINE_CONFIG_END
+	m_k056832->set_config("gfx1", K056832_BPP_8, 1, 0);
 
-MACHINE_CONFIG_START(konamigx_state::konamigx_6bpp)
+	m_k055673->set_sprite_callback(FUNC(konamigx_state::le2_sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_LE2, -46, -23);
+}
+
+void konamigx_state::konamigx_6bpp(machine_config &config)
+{
 	konamigx(config);
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_6bpp)
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 0, "none")
+	m_k056832->set_config("gfx1", K056832_BPP_6, 0, 0);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -46, -23)
-MACHINE_CONFIG_END
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX, -46, -23);
+}
 
-MACHINE_CONFIG_START(konamigx_state::salmndr2)
+void konamigx_state::salmndr2(machine_config &config)
+{
 	konamigx(config);
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 1, 0, "none")
+	m_k056832->set_config("gfx1", K056832_BPP_6, 1, 0);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(konamigx_state, salmndr2_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -48, -23)
-MACHINE_CONFIG_END
+	m_k055673->set_sprite_callback(FUNC(konamigx_state::salmndr2_sprite_callback), this);
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX6, -48, -23);
+}
 
-MACHINE_CONFIG_START(konamigx_state::opengolf)
+void konamigx_state::opengolf(machine_config &config)
+{
 	konamigx(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
-	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", opengolf)
+	m_screen->set_raw(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
+	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_opengolf);
+
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, opengolf)
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -53, -23)
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX6, -53, -23);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gx_type1_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::gx_type1_map);
 
-	MCFG_DEVICE_ADD("adc0834", ADC0834, 0)
-	MCFG_ADC083X_INPUT_CB(konamigx_state, adc0834_callback)
-MACHINE_CONFIG_END
+	adc0834_device &adc(ADC0834(config, "adc0834"));
+	adc.set_input_callback(FUNC(konamigx_state::adc0834_callback));
+}
 
-MACHINE_CONFIG_START(konamigx_state::racinfrc)
+void konamigx_state::racinfrc(machine_config &config)
+{
 	konamigx(config);
-	MCFG_SCREEN_MODIFY("screen")
-	//MCFG_SCREEN_RAW_PARAMS(6000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
-	//MCFG_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
+	//m_screen->set_raw(6000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
+	//m_screen->set_visarea(32, 32+384-1, 16, 16+224-1);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", racinfrc)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_racinfrc);
+
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, racinfrc)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24-8+16, 0)
+	m_k053252->set_offsets(24-8+16, 0);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 0, "none")
+	m_k056832->set_config("gfx1", K056832_BPP_6, 0, 0);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -53, -23)
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX, -53, -23);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gx_type1_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::gx_type1_map);
 
-	MCFG_DEVICE_ADD("adc0834", ADC0834, 0)
-	MCFG_ADC083X_INPUT_CB(konamigx_state, adc0834_callback)
-MACHINE_CONFIG_END
+	adc0834_device &adc(ADC0834(config, "adc0834", 0));
+	adc.set_input_callback(FUNC(konamigx_state::adc0834_callback));
+}
 
-MACHINE_CONFIG_START(konamigx_state::gxtype3)
+void konamigx_state::gxtype3(machine_config &config)
+{
 	konamigx(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gx_type3_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_type4_scanline, "screen", 0, 1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::gx_type3_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(konamigx_state::konamigx_type4_scanline), "screen", 0, 1);
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", type3)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_type3);
+
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type3)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(0, 16)
-	MCFG_K053252_SET_SLAVE_SCREEN("screen2")
+	m_k053252->set_offsets(0, 16);
+	m_k053252->set_slave_screen("screen2");
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_6, 0, 2, "none")
+	m_k056832->set_config("gfx1", K056832_BPP_6, 0, 2);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -132, -23)
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX6, -132, -23);
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 16384)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config.replace(), m_palette).set_entries(16384);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_SIZE(1024, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx_left)
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
+	m_screen->set_size(1024, 1024);
+	m_screen->set_visarea(0, 576-1, 16, 32*8-1-16);
+	m_screen->set_screen_update(FUNC(konamigx_state::screen_update_konamigx_left));
 
-	MCFG_SCREEN_ADD("screen2", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
-	MCFG_SCREEN_SIZE(1024, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx_right)
-MACHINE_CONFIG_END
+	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen2.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
+	screen2.set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223);
+	screen2.set_size(1024, 1024);
+	screen2.set_visarea(0, 576-1, 16, 32*8-1-16);
+	screen2.set_screen_update(FUNC(konamigx_state::screen_update_konamigx_right));
+}
 
-MACHINE_CONFIG_START(konamigx_state::gxtype4)
+void konamigx_state::gxtype4(machine_config &config)
+{
 	konamigx(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gx_type4_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_type4_scanline, "screen", 0, 1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::gx_type4_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(konamigx_state::konamigx_type4_scanline), "screen", 0, 1);
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
-	//MCFG_SCREEN_SIZE(128*8, 264)
-	//MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 32*8-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx_left)
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
+	//m_screen->set_size(128*8, 264);
+	//m_screen->set_visarea(0, 384-1, 16, 32*8-1-16);
+	m_screen->set_screen_update(FUNC(konamigx_state::screen_update_konamigx_left));
 
-	MCFG_SCREEN_ADD("screen2", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
-	MCFG_SCREEN_SIZE(1024, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 32*8-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(konamigx_state, screen_update_konamigx_right)
+	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen2.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
+	screen2.set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223);
+	screen2.set_size(1024, 1024);
+	screen2.set_visarea(0, 384-1, 16, 32*8-1-16);
+	screen2.set_screen_update(FUNC(konamigx_state::screen_update_konamigx_right));
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config.replace(), m_palette).set_entries(8192);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", type4)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_type4);
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4)
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(0, 16)
-	MCFG_K053252_SET_SLAVE_SCREEN("screen2")
+	m_k053252->set_offsets(0, 16);
+	m_k053252->set_slave_screen("screen2");
 
+	m_k056832->set_config("gfx1", K056832_BPP_8, 0, 0);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 0, 0, "none")
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX6, -79, -24); // -23 looks better in intro
+}
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -79, -24) // -23 looks better in intro
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(konamigx_state::gxtype4_vsn)
+void konamigx_state::gxtype4_vsn(machine_config &config)
+{
 	gxtype4(config);
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
-	//MCFG_SCREEN_MODIFY("screen")
-	//MCFG_SCREEN_SIZE(128*8, 32*8)
-	//MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
+	//m_screen->set_size(128*8, 32*8);
+	//m_screen->set_visarea(0, 576-1, 16, 32*8-1-16);
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(0, 16)
+	m_k053252->set_offsets(0, 16);
 
-
-	MCFG_SCREEN_MODIFY("screen2")
-	MCFG_SCREEN_SIZE(1024, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
+	subdevice<screen_device>("screen2")->set_size(1024, 1024);
+	subdevice<screen_device>("screen2")->set_visarea(0, 576-1, 16, 32*8-1-16);
 
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4_vsn)
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 0, 2, "none")   // set djmain_hack to 2 to kill layer association or half the tilemaps vanish on screen 0
+	m_k056832->set_config("gfx1", K056832_BPP_8, 0, 2);   // set djmain_hack to 2 to kill layer association or half the tilemaps vanish on screen 0
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -132, -23)
-MACHINE_CONFIG_END
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX6, -132, -23);
+}
 
-MACHINE_CONFIG_START(konamigx_state::gxtype4sd2)
+void konamigx_state::gxtype4sd2(machine_config &config)
+{
 	gxtype4(config);
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4_sd2)
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -81, -23)
-MACHINE_CONFIG_END
+	m_k055673->set_config("gfx2", K055673_LAYOUT_GX6, -81, -23);
+}
 
-MACHINE_CONFIG_START(konamigx_state::winspike)
+void konamigx_state::winspike(machine_config &config)
+{
 	konamigx(config);
-	//MCFG_SCREEN_MODIFY("screen")
-	//MCFG_SCREEN_VISIBLE_AREA(38, 38+384-1, 16, 16+224-1)
+	//m_screen->set_visible_area(38, 38+384-1, 16, 16+224-1);
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24+15, 16)
+	m_k053252->set_offsets(24+15, 16);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(konamigx_state, alpha_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 0, 2, "none")
+	m_k056832->set_tile_callback(FUNC(konamigx_state::alpha_tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_8, 0, 2);
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_LE2, -53, -23)
-MACHINE_CONFIG_END
+	m_k055673->set_config("gfx2", K055673_LAYOUT_LE2, -53, -23);
+}
 
 
 /**********************************************************************************/
@@ -3177,9 +3156,9 @@ Notes:
                      058143      - QFP160
                      058142      - QFP120
                      058141      - QFP120
-                     056832      - QFP120
-                     055555      - QFP160
-                     055673      - QFP160
+                     056832      - TQFP144
+                     055555      - TQFP176
+                     055673      - TQFP176
 
 
 Game Board (This sits on top of the Mother PCB)
@@ -3215,8 +3194,8 @@ Notes:
 
       Konami Customs:
                      003462 - Xilinx PLCC84 FPGA stamped 003462
-                     053936 - QFP100, also marked KS10011-PF PSAC2
-                     058146 - QFP160
+                     053936 - QFP80, also marked KS10011-PF PSAC2
+                     058146 - TQFP176
 
       RAM:
           814260 : 256K x16 DRAM
@@ -3726,6 +3705,8 @@ ROM_END
 
 MACHINE_START_MEMBER(konamigx_state,konamigx)
 {
+	m_lamp.resolve();
+
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_intck));
 
@@ -3858,11 +3839,8 @@ READ32_MEMBER( konamigx_state::k_6bpp_rom_long_r )
 	return m_k056832->k_6bpp_rom_long_r(space,offset,mem_mask);
 }
 
-DRIVER_INIT_MEMBER(konamigx_state,konamigx)
+void konamigx_state::init_konamigx()
 {
-	int i, match;
-	int readback = 0;
-
 	m_gx_cfgport = -1;
 	m_last_prot_op = -1;
 	m_last_prot_clk = 0;
@@ -3873,7 +3851,7 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 	m_dmadelay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(konamigx_state::dmaend_callback),this));
 	m_boothack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(konamigx_state::boothack_callback),this));
 
-	i = match = 0;
+	int i = 0, match = 0, readback = 0;
 	while ((gameDefs[i].cfgport != 0xff) && (!match))
 	{
 		if (!strcmp(machine().system().name, gameDefs[i].romname))
@@ -3946,10 +3924,10 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 #undef BPP66
 }
 
-DRIVER_INIT_MEMBER(konamigx_state,posthack)
+void konamigx_state::init_posthack()
 {
 	m_use_68020_post_clock_hack = 1;
-	DRIVER_INIT_CALL(konamigx);
+	init_konamigx();
 }
 
 
@@ -3957,7 +3935,7 @@ DRIVER_INIT_MEMBER(konamigx_state,posthack)
 /*     year  ROM       parent    machine   inp       init */
 
 /* dummy parent for the BIOS */
-GAME( 1994, konamigx, 0,        konamigx_bios, konamigx, konamigx_state, konamigx, ROT0, "Konami", "System GX", MACHINE_IS_BIOS_ROOT )
+GAME( 1994, konamigx,  0,        konamigx_bios, konamigx, konamigx_state, init_konamigx, ROT0, "Konami", "System GX", MACHINE_IS_BIOS_ROOT )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 1: standard with an add-on 53936 on the ROM board, analog inputs, */
@@ -3965,72 +3943,72 @@ GAME( 1994, konamigx, 0,        konamigx_bios, konamigx, konamigx_state, konamig
 /* needs the ROZ layer to be playable */
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1994, racinfrc, konamigx, racinfrc,  racinfrc, konamigx_state, posthack, ROT0, "Konami", "Racin' Force (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
-GAME( 1994, racinfrcu,racinfrc, racinfrc,  racinfrc, konamigx_state, posthack, ROT0, "Konami", "Racin' Force (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
+GAME( 1994, racinfrc,  konamigx, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
+GAME( 1994, racinfrcu, racinfrc, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
 
-GAME( 1994, opengolf, konamigx, opengolf,  racinfrc, konamigx_state, posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAE)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
-GAME( 1994, opengolf2,opengolf, opengolf,  racinfrc, konamigx_state, posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
-GAME( 1994, ggreats2, opengolf, opengolf,  racinfrc, konamigx_state, posthack, ROT0, "Konami", "Golfing Greats 2 (ver JAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1994, opengolf,  konamigx, opengolf,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAE)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
+GAME( 1994, opengolf2, opengolf, opengolf,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
+GAME( 1994, ggreats2,  opengolf, opengolf,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Golfing Greats 2 (ver JAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 2: totally stock, sometimes with funny protection chips on the ROM board */
 /* these games work and are playable with minor graphics glitches */
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1994, le2,      konamigx, le2,      le2, konamigx_state,      konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, le2u,     le2,      le2,      le2_flip, konamigx_state, konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: Gun Fighters (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, le2j,     le2,      le2,      le2_flip, konamigx_state, konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: The Western (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, le2,       konamigx, le2,           le2,      konamigx_state, init_konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, le2u,      le2,      le2,           le2_flip, konamigx_state, init_konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: Gun Fighters (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, le2j,      le2,      le2,           le2_flip, konamigx_state, init_konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: The Western (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, fantjour, konamigx, gokuparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Fantastic Journey (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, fantjoura,fantjour, gokuparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Fantastic Journey (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, gokuparo, fantjour, gokuparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Gokujyou Parodius (ver JAD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, fantjour,  konamigx, gokuparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Fantastic Journey (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, fantjoura, fantjour, gokuparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Fantastic Journey (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, gokuparo,  fantjour, gokuparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Gokujyou Parodius (ver JAD)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, crzcross, konamigx, gokuparo, puzldama, konamigx_state, posthack, ROT0, "Konami", "Crazy Cross (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, puzldama, crzcross, gokuparo, puzldama, konamigx_state, posthack, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, crzcross,  konamigx, gokuparo,      puzldama, konamigx_state, init_posthack, ROT0, "Konami", "Crazy Cross (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, puzldama,  crzcross, gokuparo,      puzldama, konamigx_state, init_posthack, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1995, tbyahhoo, konamigx, tbyahhoo, gokuparo, konamigx_state, posthack, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, tbyahhoo,  konamigx, tbyahhoo,      gokuparo, konamigx_state, init_posthack, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1995, tkmmpzdm, konamigx, konamigx_6bpp, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Tokimeki Memorial Taisen Puzzle-dama (ver JAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, tkmmpzdm,  konamigx, konamigx_6bpp, puzldama, konamigx_state, init_konamigx, ROT0, "Konami", "Tokimeki Memorial Taisen Puzzle-dama (ver JAB)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1995, dragoona, konamigx, dragoonj, dragoonj, konamigx_state, posthack, ROT0, "Konami", "Dragoon Might (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, dragoonj, dragoona, dragoonj, dragoonj, konamigx_state, posthack, ROT0, "Konami", "Dragoon Might (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, dragoona,  konamigx, dragoonj,      dragoonj, konamigx_state, init_posthack, ROT0, "Konami", "Dragoon Might (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, dragoonj,  dragoona, dragoonj,      dragoonj, konamigx_state, init_posthack, ROT0, "Konami", "Dragoon Might (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1996, sexyparo, konamigx, sexyparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Sexy Parodius (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, sexyparoa,sexyparo, sexyparo, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Sexy Parodius (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, sexyparo,  konamigx, sexyparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Sexy Parodius (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, sexyparoa, sexyparo, sexyparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Sexy Parodius (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1996, daiskiss, konamigx, konamigx, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Daisu-Kiss (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, daiskiss,  konamigx, konamigx,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Daisu-Kiss (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1996, tokkae,   konamigx, konamigx_6bpp, puzldama, konamigx_state, konamigx, ROT0, "Konami", "Taisen Tokkae-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, tokkae,    konamigx, konamigx_6bpp, puzldama, konamigx_state, init_konamigx, ROT0, "Konami", "Taisen Tokkae-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* protection controls player ship direction in attract mode - doesn't impact playability */
-GAME( 1996, salmndr2, konamigx, salmndr2, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Salamander 2 (ver JAA)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, salmndr2a,salmndr2, salmndr2, gokuparo, konamigx_state, konamigx, ROT0, "Konami", "Salamander 2 (ver AAB)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, salmndr2,  konamigx, salmndr2,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Salamander 2 (ver JAA)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, salmndr2a, salmndr2, salmndr2,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Salamander 2 (ver AAB)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )
 
 /* bad sprite colours, part of tilemap gets blanked out when a game starts (might be more protection) */
-GAME( 1997, winspike, konamigx, winspike, konamigx, konamigx_state, konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, winspikej,winspike, winspike, konamigx, konamigx_state, konamigx, ROT0, "Konami", "Winning Spike (ver JAA)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, winspike,  konamigx, winspike,      konamigx, konamigx_state, init_konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, winspikej, winspike, winspike,      konamigx, konamigx_state, init_konamigx, ROT0, "Konami", "Winning Spike (ver JAA)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 3: dual monitor output and 53936 on the ROM board, external palette RAM */
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1994, soccerss,  konamigx, gxtype3,  type3, konamigx_state, posthack, ROT0, "Konami", "Soccer Superstars (ver EAC)", MACHINE_IMPERFECT_GRAPHICS ) // writes EAA to EEPROM, but should be version EAC according to labels
-GAME( 1994, soccerssu, soccerss, gxtype3,  type3, konamigx_state, posthack, ROT0, "Konami", "Soccer Superstars (ver UAC)", MACHINE_IMPERFECT_GRAPHICS ) // writes UAA to EEPROM, but should be version UAC according to labels
-GAME( 1994, soccerssj, soccerss, gxtype3,  type3, konamigx_state, posthack, ROT0, "Konami", "Soccer Superstars (ver JAC)", MACHINE_IMPERFECT_GRAPHICS ) // writes JAB to EEPROM, but should be version JAC according to labels
-GAME( 1994, soccerssja,soccerss, gxtype3,  type3, konamigx_state, posthack, ROT0, "Konami", "Soccer Superstars (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, soccerssa, soccerss, gxtype3,  type3, konamigx_state, posthack, ROT0, "Konami", "Soccer Superstars (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, soccerss,  konamigx, gxtype3, type3, konamigx_state, init_posthack, ROT0, "Konami", "Soccer Superstars (ver EAC)", MACHINE_IMPERFECT_GRAPHICS ) // writes EAA to EEPROM, but should be version EAC according to labels
+GAME( 1994, soccerssu, soccerss, gxtype3, type3, konamigx_state, init_posthack, ROT0, "Konami", "Soccer Superstars (ver UAC)", MACHINE_IMPERFECT_GRAPHICS ) // writes UAA to EEPROM, but should be version UAC according to labels
+GAME( 1994, soccerssj, soccerss, gxtype3, type3, konamigx_state, init_posthack, ROT0, "Konami", "Soccer Superstars (ver JAC)", MACHINE_IMPERFECT_GRAPHICS ) // writes JAB to EEPROM, but should be version JAC according to labels
+GAME( 1994, soccerssja,soccerss, gxtype3, type3, konamigx_state, init_posthack, ROT0, "Konami", "Soccer Superstars (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, soccerssa, soccerss, gxtype3, type3, konamigx_state, init_posthack, ROT0, "Konami", "Soccer Superstars (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /* Type 4: dual monitor output and 53936 on the ROM board, external palette RAM, DMA protection */
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1996, vsnetscr,  konamigx, gxtype4_vsn, type3, konamigx_state, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAD)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vsnetscreb,vsnetscr, gxtype4_vsn, type3, konamigx_state, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAB)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vsnetscru, vsnetscr, gxtype4_vsn, type3, konamigx_state, konamigx, ROT0, "Konami", "Versus Net Soccer (ver UAB)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vsnetscra, vsnetscr, gxtype4_vsn, type3, konamigx_state, konamigx, ROT0, "Konami", "Versus Net Soccer (ver AAA)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vsnetscrj, vsnetscr, gxtype4_vsn, type3, konamigx_state, konamigx, ROT0, "Konami", "Versus Net Soccer (ver JAB)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vsnetscr,  konamigx, gxtype4_vsn, type3, konamigx_state, init_konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAD)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vsnetscreb,vsnetscr, gxtype4_vsn, type3, konamigx_state, init_konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAB)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vsnetscru, vsnetscr, gxtype4_vsn, type3, konamigx_state, init_konamigx, ROT0, "Konami", "Versus Net Soccer (ver UAB)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vsnetscra, vsnetscr, gxtype4_vsn, type3, konamigx_state, init_konamigx, ROT0, "Konami", "Versus Net Soccer (ver AAA)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vsnetscrj, vsnetscr, gxtype4_vsn, type3, konamigx_state, init_konamigx, ROT0, "Konami", "Versus Net Soccer (ver JAB)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
 
-GAME( 1996, rungun2,   konamigx, gxtype4sd2,  type3, konamigx_state, konamigx, ROT0, "Konami", "Run and Gun 2 (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, slamdnk2,  rungun2,  gxtype4sd2,  type3, konamigx_state, konamigx, ROT0, "Konami", "Slam Dunk 2 (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rungun2,   konamigx, gxtype4sd2,  type3, konamigx_state, init_konamigx, ROT0, "Konami", "Run and Gun 2 (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, slamdnk2,  rungun2,  gxtype4sd2,  type3, konamigx_state, init_konamigx, ROT0, "Konami", "Slam Dunk 2 (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1996, rushhero,  konamigx, gxtype4,     type3, konamigx_state, konamigx, ROT0, "Konami", "Rushing Heroes (ver UAB)", MACHINE_IMPERFECT_GRAPHICS  )
+GAME( 1996, rushhero,  konamigx, gxtype4,     type3, konamigx_state, init_konamigx, ROT0, "Konami", "Rushing Heroes (ver UAB)", MACHINE_IMPERFECT_GRAPHICS  )

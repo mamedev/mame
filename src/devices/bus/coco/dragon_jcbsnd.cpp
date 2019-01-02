@@ -4,6 +4,8 @@
 
     JCB Sound Extension Module
 
+    http://archive.worldofdragon.org/index.php?title=Dragon_32_Sound_Extension_Module
+
     The Dragon 32 Sound Extension Module is a cartridge by J.C.B. (Microsystems),
     that contains a General Instruments AY-3-8910 sound chip. This allows the
     Dragon to play interesting sound effects and complex chiptunes without
@@ -51,20 +53,10 @@ dragon_jcbsnd_device::dragon_jcbsnd_device(const machine_config &mconfig, const 
 
 void dragon_jcbsnd_device::device_start()
 {
-	m_cart = dynamic_cast<cococart_slot_device *>(owner());
-}
+	install_write_handler(0xfefe, 0xfefe, write8_delegate(FUNC(ay8910_device::address_w), (ay8910_device *)m_ay8910));
+	install_readwrite_handler(0xfeff, 0xfeff, read8_delegate(FUNC(ay8910_device::data_r), (ay8910_device *)m_ay8910), write8_delegate(FUNC(ay8910_device::data_w), (ay8910_device *)m_ay8910));
 
-//-------------------------------------------------
-//  device_reset - device-specific startup
-//-------------------------------------------------
-
-void dragon_jcbsnd_device::device_reset()
-{
 	set_line_value(line::CART, line_value::Q);
-
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	space.install_write_handler(0xfefe, 0xfefe, WRITE8_DEVICE_DELEGATE(m_ay8910, ay8910_device, address_w));
-	space.install_readwrite_handler(0xfeff, 0xfeff, READ8_DEVICE_DELEGATE(m_ay8910, ay8910_device, data_r), WRITE8_DEVICE_DELEGATE(m_ay8910, ay8910_device, data_w));
 }
 
 //-------------------------------------------------
@@ -80,11 +72,12 @@ uint8_t* dragon_jcbsnd_device::get_cart_base()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(dragon_jcbsnd_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, DERIVED_CLOCK(1, 1)) /* AY-3-8910 - clock not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+void dragon_jcbsnd_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, m_ay8910, DERIVED_CLOCK(1, 1)); /* AY-3-8910 - clock not verified */
+	m_ay8910->add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

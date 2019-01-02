@@ -104,18 +104,21 @@ void device_ti99_joyport_interface::interface_config_complete()
 
 } } } // end namespace bus::ti99::joyport
 
-SLOT_INTERFACE_START( ti99_joystick_port )
-	SLOT_INTERFACE("twinjoy", TI99_JOYSTICK)
-	SLOT_INTERFACE("mecmouse", TI99_MECMOUSE)
-SLOT_INTERFACE_END
+void ti99_joyport_options_plain(device_slot_interface &device)
+{
+	device.option_add("twinjoy", TI99_JOYSTICK);
+}
 
-SLOT_INTERFACE_START( ti99_joystick_port_gen )
-	SLOT_INTERFACE("twinjoy", TI99_JOYSTICK)
-SLOT_INTERFACE_END
+void ti99_joyport_options_mouse(device_slot_interface &device)
+{
+	device.option_add("twinjoy", TI99_JOYSTICK);
+	device.option_add("mecmouse", TI99_MECMOUSE);
+}
 
-SLOT_INTERFACE_START( ti99_joystick_port_994 )
-	SLOT_INTERFACE("twinjoy", TI99_JOYSTICK)
-	SLOT_INTERFACE("mecmouse", TI99_MECMOUSE)
-	SLOT_INTERFACE("handset", TI99_HANDSET)
-SLOT_INTERFACE_END
+void ti99_joyport_options_994(device_slot_interface &device)
+{
+	device.option_add("twinjoy", TI99_JOYSTICK);
+	device.option_add("handset", TI99_HANDSET);
+	device.option_add("mecmouse", TI99_MECMOUSE);
+}
 

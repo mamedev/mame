@@ -21,11 +21,10 @@ public:
 
 	void ecoinf1_older(machine_config &config);
 
-protected:
+private:
 	void older_memmap(address_map &map);
 	void older_portmap(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -256,9 +255,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(ecoinf1_state::ecoinf1_older)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)
-	MCFG_CPU_PROGRAM_MAP(older_memmap)
-	MCFG_CPU_IO_MAP(older_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)
+	MCFG_DEVICE_PROGRAM_MAP(older_memmap)
+	MCFG_DEVICE_IO_MAP(older_portmap)
 MACHINE_CONFIG_END
 
 
@@ -362,12 +361,12 @@ ROM_END
 
 // all roms might really be for the same game, just in different cabinet styles
 // these ALL contain "Ver 3 BAR-X V1:84 TYPE T" strings
-GAME( 19??, ec_barxo,  0         , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 1)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_barxoa, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 2)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_barxob, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 3)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_barxoc, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 4)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_barxod, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 5)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_barxoe, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 6)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_bar5,   ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Bar 5 (older PCB) (Electrocoin)",                MACHINE_IS_SKELETON_MECHANICAL) // or just another Bar X set?
-GAME( 19??, ec_casbxo, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Casino Bar X (older PCB) (Electrocoin) (set 1)", MACHINE_IS_SKELETON_MECHANICAL) // this one actually has some code offset changes
-GAME( 19??, ec_casbxoa,ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Casino Bar X (older PCB) (Electrocoin) (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_barxo,   0,        ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 1)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_barxoa,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 2)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_barxob,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 3)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_barxoc,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 4)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_barxod,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 5)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_barxoe,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 6)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_bar5,    ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Bar 5 (older PCB) (Electrocoin)",                MACHINE_IS_SKELETON_MECHANICAL) // or just another Bar X set?
+GAME( 19??, ec_casbxo,  ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Casino Bar X (older PCB) (Electrocoin) (set 1)", MACHINE_IS_SKELETON_MECHANICAL) // this one actually has some code offset changes
+GAME( 19??, ec_casbxoa, ec_barxo, ecoinf1_older, ecoinf1, ecoinf1_state, empty_init, ROT0, "Electrocoin", "Casino Bar X (older PCB) (Electrocoin) (set 2)", MACHINE_IS_SKELETON_MECHANICAL)

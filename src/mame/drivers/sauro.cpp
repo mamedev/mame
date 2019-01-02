@@ -126,7 +126,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "includes/sauro.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/3812intf.h"
@@ -182,7 +181,7 @@ WRITE_LINE_MEMBER(sauro_state::flip_screen_w)
 
 WRITE8_MEMBER(sauro_state::adpcm_w)
 {
-	m_sp0256->ald_w(space, 0, data);
+	m_sp0256->ald_w(data);
 }
 
 void sauro_state::sauro_map(address_map &map)
@@ -190,10 +189,10 @@ void sauro_state::sauro_map(address_map &map)
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram().share("nvram");
 	map(0xe800, 0xebff).ram().share("spriteram");
-	map(0xf000, 0xf3ff).ram().w(this, FUNC(sauro_state::videoram_w)).share("videoram");
-	map(0xf400, 0xf7ff).ram().w(this, FUNC(sauro_state::colorram_w)).share("colorram");
-	map(0xf800, 0xfbff).ram().w(this, FUNC(sauro_state::sauro_videoram2_w)).share("videoram2");
-	map(0xfc00, 0xffff).ram().w(this, FUNC(sauro_state::sauro_colorram2_w)).share("colorram2");
+	map(0xf000, 0xf3ff).ram().w(FUNC(sauro_state::videoram_w)).share("videoram");
+	map(0xf400, 0xf7ff).ram().w(FUNC(sauro_state::colorram_w)).share("colorram");
+	map(0xf800, 0xfbff).ram().w(FUNC(sauro_state::sauro_videoram2_w)).share("videoram2");
+	map(0xfc00, 0xffff).ram().w(FUNC(sauro_state::sauro_colorram2_w)).share("colorram2");
 }
 
 void sauro_state::sauro_io_map(address_map &map)
@@ -203,10 +202,10 @@ void sauro_state::sauro_io_map(address_map &map)
 	map(0x20, 0x20).portr("DSW2");
 	map(0x40, 0x40).portr("P1");
 	map(0x60, 0x60).portr("P2");
-	map(0x80, 0x80).w(this, FUNC(sauro_state::sauro_sound_command_w));
-	map(0xa0, 0xa0).w(this, FUNC(sauro_state::scroll_bg_w));
-	map(0xa1, 0xa1).w(this, FUNC(sauro_state::sauro_scroll_fg_w));
-	map(0xc0, 0xcf).w("mainlatch", FUNC(ls259_device::write_a0));
+	map(0x80, 0x80).w(FUNC(sauro_state::sauro_sound_command_w));
+	map(0xa0, 0xa0).w(FUNC(sauro_state::scroll_bg_w));
+	map(0xa1, 0xa1).w(FUNC(sauro_state::sauro_scroll_fg_w));
+	map(0xc0, 0xcf).w(m_mainlatch, FUNC(ls259_device::write_a0));
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -215,8 +214,8 @@ void sauro_state::sauro_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0xc000, 0xc001).w("ymsnd", FUNC(ym3812_device::write));
-	map(0xa000, 0xa000).w(this, FUNC(sauro_state::adpcm_w));
-	map(0xe000, 0xe000).r(this, FUNC(sauro_state::sauro_sound_command_r));
+	map(0xa000, 0xa000).w(FUNC(sauro_state::adpcm_w));
+	map(0xe000, 0xe000).r(FUNC(sauro_state::sauro_sound_command_r));
 	map(0xe000, 0xe006).nopw();    /* echo from write to e0000 */
 	map(0xe00e, 0xe00f).nopw();
 }
@@ -228,7 +227,7 @@ void sauro_state::saurob_sound_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0xc000, 0xc001).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xa000, 0xa000).nopw();
-	map(0xe000, 0xe000).r(this, FUNC(sauro_state::sauro_sound_command_r));
+	map(0xe000, 0xe000).r(FUNC(sauro_state::sauro_sound_command_r));
 	map(0xe000, 0xe006).nopw();    /* echo from write to e0000 */
 	map(0xe00e, 0xe00f).nopw();
 }
@@ -239,16 +238,16 @@ void sauro_state::trckydoc_map(address_map &map)
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram().share("nvram");
 	map(0xe800, 0xebff).ram().mirror(0x400).share("spriteram");
-	map(0xf000, 0xf3ff).ram().w(this, FUNC(sauro_state::videoram_w)).share("videoram");
-	map(0xf400, 0xf7ff).ram().w(this, FUNC(sauro_state::colorram_w)).share("colorram");
+	map(0xf000, 0xf3ff).ram().w(FUNC(sauro_state::videoram_w)).share("videoram");
+	map(0xf400, 0xf7ff).ram().w(FUNC(sauro_state::colorram_w)).share("colorram");
 	map(0xf800, 0xf800).portr("DSW1");
 	map(0xf808, 0xf808).portr("DSW2");
 	map(0xf810, 0xf810).portr("P1");
 	map(0xf818, 0xf818).portr("P2");
 	map(0xf820, 0xf821).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xf828, 0xf828).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0xf830, 0xf830).w(this, FUNC(sauro_state::scroll_bg_w));
-	map(0xf838, 0xf83f).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xf830, 0xf830).w(FUNC(sauro_state::scroll_bg_w));
+	map(0xf838, 0xf83f).w(m_mainlatch, FUNC(ls259_device::write_d0));
 }
 
 
@@ -435,13 +434,13 @@ static const gfx_layout sauro_spritelayout =
 	16*16     /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( sauro )
+static GFXDECODE_START( gfx_sauro )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx3", 0, sauro_spritelayout, 0, 64 )
 GFXDECODE_END
 
-static GFXDECODE_START( trckydoc )
+static GFXDECODE_START( gfx_trckydoc )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, trckydoc_spritelayout, 0, 64 )
 GFXDECODE_END
@@ -450,14 +449,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sauro_state::tecfri)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(20'000'000)/4)       /* verified on pcb */
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(20'000'000)/4)       /* verified on pcb */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(sauro_state, irq_reset_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<4>().set(FUNC(sauro_state::irq_reset_w));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -465,15 +464,15 @@ MACHINE_CONFIG_START(sauro_state::tecfri)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000))  // frames per second, vblank duration (otherwise sprites lag)
 	MCFG_SCREEN_SIZE(32 * 8, 32 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(1 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sauro_state, vblank_irq))
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sauro_state, vblank_irq))
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 1024);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(20'000'000)/8)       /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(20'000'000)/8)       /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
@@ -481,15 +480,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sauro_state::trckydoc)
 	tecfri(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(trckydoc_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(trckydoc_map)
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sauro_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(sauro_state, coin1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(sauro_state, coin2_w))
+	m_mainlatch->q_out_cb<1>().set(FUNC(sauro_state::flip_screen_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(sauro_state::coin1_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(sauro_state::coin2_w));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trckydoc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trckydoc)
 
 	MCFG_VIDEO_START_OVERRIDE(sauro_state,trckydoc)
 	MCFG_SCREEN_MODIFY("screen")
@@ -500,43 +498,43 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sauro_state::sauro)
 	tecfri(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sauro_map)
-	MCFG_CPU_IO_MAP(sauro_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sauro_map)
+	MCFG_DEVICE_IO_MAP(sauro_io_map)
 
-	MCFG_DEVICE_MODIFY("mainlatch") // Z3
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sauro_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sauro_state, coin1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(sauro_state, coin2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // sound IRQ trigger?
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(sauro_state, sauro_palette_bank0_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(sauro_state, sauro_palette_bank1_w))
+	// Z3
+	m_mainlatch->q_out_cb<0>().set(FUNC(sauro_state::flip_screen_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(sauro_state::coin1_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(sauro_state::coin2_w));
+	m_mainlatch->q_out_cb<3>().set_nop(); // sound IRQ trigger?
+	m_mainlatch->q_out_cb<5>().set(FUNC(sauro_state::sauro_palette_bank0_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(sauro_state::sauro_palette_bank1_w));
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(20'000'000)/5)     /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sauro_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(sauro_state, irq0_line_hold,  8*60) // ?
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(20'000'000) / 5)     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sauro_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(sauro_state, irq0_line_hold, 8 * 60) // ?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sauro)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sauro)
 
-	MCFG_VIDEO_START_OVERRIDE(sauro_state,sauro)
+	MCFG_VIDEO_START_OVERRIDE(sauro_state, sauro)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(sauro_state, screen_update_sauro)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_MODIFY("ymsnd")
-	MCFG_DEVICE_CLOCK(XTAL(20'000'000)/5)     /* verified on pcb */
+	MCFG_DEVICE_MODIFY("ymsnd")
+	MCFG_DEVICE_CLOCK(XTAL(20'000'000) / 5)     /* verified on pcb */
 
-	MCFG_SOUND_ADD("speech", SP0256, XTAL(20'000'000)/5)     /* verified on pcb */
-	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SP0256(config, m_sp0256, XTAL(20'000'000) / 5);     /* verified on pcb */
+	m_sp0256->data_request_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	m_sp0256->add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sauro_state::saurob)
 	sauro(config);
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(saurob_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(saurob_sound_map)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("speech")
@@ -741,7 +739,7 @@ ROM_START( trckydoca )
 	ROM_LOAD( "tdprm.prm",    0x0000, 0x0200,  CRC(5261bc11) SHA1(1cc7a9a7376e65f4587b75ef9382049458656372) )
 ROM_END
 
-DRIVER_INIT_MEMBER(sauro_state,tecfri)
+void sauro_state::init_tecfri()
 {
 	/* This game doesn't like all memory to be initialized to zero, it won't
 	   initialize the high scores */
@@ -752,10 +750,10 @@ DRIVER_INIT_MEMBER(sauro_state,tecfri)
 	RAM[0xe000] = 1;
 }
 
-GAME( 1987, sauro,    0,        sauro,    tecfri,    sauro_state, tecfri, ROT0, "Tecfri",                                "Sauro", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, saurop,   sauro,    sauro,    tecfri,    sauro_state, tecfri, ROT0, "Tecfri (Philko license)",               "Sauro (Philko license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, saurorr,  sauro,    sauro,    tecfri,    sauro_state, tecfri, ROT0, "Tecfri (Recreativos Real S.A. license)","Sauro (Recreativos Real S.A. license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, saurob,   sauro,    saurob,   saurob,    sauro_state, tecfri, ROT0, "bootleg",                               "Sauro (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, sauro,    0,        sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri",                                "Sauro", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, saurop,   sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri (Philko license)",               "Sauro (Philko license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, saurorr,  sauro,    sauro,    tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri (Recreativos Real S.A. license)","Sauro (Recreativos Real S.A. license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, saurob,   sauro,    saurob,   saurob,    sauro_state, init_tecfri, ROT0, "bootleg",                               "Sauro (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, trckydoc, 0,        trckydoc, tecfri,    sauro_state, tecfri, ROT0, "Tecfri", "Tricky Doc (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, trckydoca,trckydoc, trckydoc, trckydoca, sauro_state, tecfri, ROT0, "Tecfri", "Tricky Doc (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, trckydoc, 0,        trckydoc, tecfri,    sauro_state, init_tecfri, ROT0, "Tecfri", "Tricky Doc (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, trckydoca,trckydoc, trckydoc, trckydoca, sauro_state, init_tecfri, ROT0, "Tecfri", "Tricky Doc (set 2)", MACHINE_SUPPORTS_SAVE )

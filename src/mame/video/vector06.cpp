@@ -54,9 +54,3 @@ uint32_t vector06_state::screen_update_vector06(screen_device &screen, bitmap_in
 	}
 	return 0;
 }
-
-PALETTE_INIT_MEMBER(vector06_state, vector06)
-{
-	for (uint8_t i=0; i<16; i++)
-		m_palette->set_pen_color(i, rgb_t::black());
-}

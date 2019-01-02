@@ -13,22 +13,13 @@
 #include "includes/midtunit.h"
 #include "includes/midwunit.h"
 
-/*************************************
- *
- *  State saving
- *
- *************************************/
+#define LOG_UNKNOWN (1 << 0)
+#define LOG_CMOS    (1 << 1)
+#define LOG_IO      (1 << 2)
+#define LOG_SOUND   (1 << 3)
 
-void midwunit_state::register_state_saving()
-{
-	save_item(NAME(m_cmos_write_enable));
-	save_item(NAME(m_iodata));
-	save_item(NAME(m_ioshuffle));
-	save_item(NAME(m_uart));
-	save_item(NAME(m_security_bits));
-}
-
-
+#define VERBOSE     (0)
+#include "logmacro.h"
 
 /*************************************
  *
@@ -51,7 +42,7 @@ WRITE16_MEMBER(midwunit_state::midwunit_cmos_w)
 	}
 	else
 	{
-		logerror("%08X:Unexpected CMOS W @ %05X\n", m_maincpu->pc(), offset);
+		LOGMASKED(LOG_CMOS | LOG_UNKNOWN, "%s: Unexpected CMOS W @ %05X\n", machine().describe_context(), offset);
 		popmessage("Bad CMOS write");
 	}
 }
@@ -73,17 +64,15 @@ READ16_MEMBER(midwunit_state::midwunit_cmos_r)
 
 WRITE16_MEMBER(midwunit_state::midwunit_io_w)
 {
-	int oldword, newword;
-
 	offset %= 8;
-	oldword = m_iodata[offset];
-	newword = oldword;
+	int oldword = m_iodata[offset];
+	int newword = oldword;
 	COMBINE_DATA(&newword);
 
 	switch (offset)
 	{
 		case 1:
-			logerror("%08X:Control W @ %05X = %04X\n", m_maincpu->pc(), offset, data);
+			LOGMASKED(LOG_IO, "%s: Control W @ %05X = %04X\n", machine().describe_context(), offset, data);
 
 			/* bit 4 reset sound CPU */
 			m_dcs->reset_w(newword & 0x10);
@@ -99,7 +88,7 @@ WRITE16_MEMBER(midwunit_state::midwunit_io_w)
 			break;
 
 		default:
-			logerror("%08X:Unknown I/O write to %d = %04X\n", m_maincpu->pc(), offset, data);
+			LOGMASKED(LOG_IO | LOG_UNKNOWN, "%s: Unknown I/O write to %d = %04X\n", machine().describe_context(), offset, data);
 			break;
 	}
 	m_iodata[offset] = newword;
@@ -134,7 +123,7 @@ READ16_MEMBER(midwunit_state::midwunit_io_r)
 			return (picret << 12) | midwunit_sound_state_r(space, 0, 0xffff);
 		}
 		default:
-			logerror("%08X:Unknown I/O read from %d\n", m_maincpu->pc(), offset);
+			LOGMASKED(LOG_IO | LOG_UNKNOWN, "%s: Unknown I/O read from %d\n", machine().describe_context(), offset);
 			break;
 	}
 	return ~0;
@@ -148,10 +137,13 @@ READ16_MEMBER(midwunit_state::midwunit_io_r)
  *
  *************************************/
 
-void midwunit_state::init_wunit_generic()
+void midwunit_state::machine_start()
 {
-	/* register for state saving */
-	register_state_saving();
+	save_item(NAME(m_cmos_write_enable));
+	save_item(NAME(m_iodata));
+	save_item(NAME(m_ioshuffle));
+	save_item(NAME(m_uart));
+	save_item(NAME(m_security_bits));
 }
 
 
@@ -195,36 +187,33 @@ WRITE16_MEMBER(midwunit_state::umk3_palette_hack_w)
 
 void midwunit_state::init_mk3_common()
 {
-	/* common init */
-	init_wunit_generic();
-
 	/* serial prefixes 439, 528 */
 	//midway_serial_pic_init(machine(), 528);
 }
 
-DRIVER_INIT_MEMBER(midwunit_state,mk3)
+void midwunit_state::init_mk3()
 {
 	init_mk3_common();
 }
 
-DRIVER_INIT_MEMBER(midwunit_state,mk3r20)
+void midwunit_state::init_mk3r20()
 {
 	init_mk3_common();
 }
 
-DRIVER_INIT_MEMBER(midwunit_state,mk3r10)
+void midwunit_state::init_mk3r10()
 {
 	init_mk3_common();
 }
 
-DRIVER_INIT_MEMBER(midwunit_state,umk3)
+void midwunit_state::init_umk3()
 {
 	init_mk3_common();
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),this));
 	m_umk3_palette = m_mainram + (0x6a060>>4);
 }
 
-DRIVER_INIT_MEMBER(midwunit_state,umk3r11)
+void midwunit_state::init_umk3r11()
 {
 	init_mk3_common();
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f,write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),this));
@@ -234,11 +223,8 @@ DRIVER_INIT_MEMBER(midwunit_state,umk3r11)
 
 /********************** 2 On 2 Open Ice Challenge **********************/
 
-DRIVER_INIT_MEMBER(midwunit_state,openice)
+void midwunit_state::init_openice()
 {
-	/* common init */
-	init_wunit_generic();
-
 	/* serial prefixes 438, 528 */
 	//midway_serial_pic_init(machine(), 528);
 }
@@ -246,11 +232,8 @@ DRIVER_INIT_MEMBER(midwunit_state,openice)
 
 /********************** NBA Hangtime & NBA Maximum Hangtime **********************/
 
-DRIVER_INIT_MEMBER(midwunit_state,nbahangt)
+void midwunit_state::init_nbahangt()
 {
-	/* common init */
-	init_wunit_generic();
-
 	/* serial prefixes 459, 470, 528 */
 	//midway_serial_pic_init(machine(), 528);
 }
@@ -260,10 +243,8 @@ DRIVER_INIT_MEMBER(midwunit_state,nbahangt)
 
 WRITE16_MEMBER(midwunit_state::wwfmania_io_0_w)
 {
-	int i;
-
 	/* start with the originals */
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		m_ioshuffle[i] = i % 8;
 
 	/* based on the data written, shuffle */
@@ -304,14 +285,11 @@ WRITE16_MEMBER(midwunit_state::wwfmania_io_0_w)
 			m_ioshuffle[8] = 4;
 			break;
 	}
-	logerror("Changed I/O swiching to %d\n", data);
+	LOGMASKED(LOG_IO, "Changed I/O swiching to %d\n", data);
 }
 
-DRIVER_INIT_MEMBER(midwunit_state,wwfmania)
+void midwunit_state::init_wwfmania()
 {
-	/* common init */
-	init_wunit_generic();
-
 	/* enable I/O shuffling */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01800000, 0x0180000f, write16_delegate(FUNC(midwunit_state::wwfmania_io_0_w),this));
 
@@ -322,11 +300,8 @@ DRIVER_INIT_MEMBER(midwunit_state,wwfmania)
 
 /********************** Rampage World Tour **********************/
 
-DRIVER_INIT_MEMBER(midwunit_state,rmpgwt)
+void midwunit_state::init_rmpgwt()
 {
-	/* common init */
-	init_wunit_generic();
-
 	/* serial prefixes 465, 528 */
 	//midway_serial_pic_init(machine(), 528);
 }
@@ -334,20 +309,18 @@ DRIVER_INIT_MEMBER(midwunit_state,rmpgwt)
 
 /*************************************
  *
- *  Machine init
+ *  Machine reset
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(midwunit_state,midwunit)
+void midwunit_state::machine_reset()
 {
-	int i;
-
 	/* reset sound */
 	m_dcs->reset_w(1);
 	m_dcs->reset_w(0);
 
 	/* reset I/O shuffling */
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		m_ioshuffle[i] = i % 8;
 }
 
@@ -385,7 +358,7 @@ WRITE16_MEMBER(midwunit_state::midwunit_security_w)
 
 READ16_MEMBER(midwunit_state::midwunit_sound_r)
 {
-	logerror("%08X:Sound read\n", m_maincpu->pc());
+	LOGMASKED(LOG_SOUND, "%s: Sound read\n", machine().describe_context());
 
 	return m_dcs->data_r() & 0xff;
 }
@@ -402,14 +375,14 @@ WRITE16_MEMBER(midwunit_state::midwunit_sound_w)
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", m_maincpu->pc(), data);
+		LOGMASKED(LOG_SOUND | LOG_UNKNOWN, "%s: Unexpected write to sound (hi) = %04X\n", machine().describe_context(), data);
 		return;
 	}
 
 	/* call through based on the sound type */
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("%08X:Sound write = %04X\n", m_maincpu->pc(), data);
+		LOGMASKED(LOG_SOUND, "%s: Sound write = %04X\n", machine().describe_context(), data);
 		m_dcs->data_w(data & 0xff);
 	}
 }

@@ -186,7 +186,7 @@ dsp16_device_base::dsp16_device_base(
 			{ "ram", ENDIANNESS_BIG, 16, yaau_bits, -1, std::move(data_map) },
 			{ "exm", ENDIANNESS_BIG, 16, 16, -1 } }
 	, m_yaau_bits(yaau_bits)
-	, m_workram(*this, "workram"), m_spaces{ nullptr, nullptr, nullptr }, m_direct(nullptr), m_workram_mask(0U)
+	, m_workram(*this, "workram"), m_spaces{ nullptr, nullptr, nullptr }, m_pcache(nullptr), m_workram_mask(0U)
 	, m_drc_cache(CACHE_SIZE), m_core(nullptr, [] (core_state *core) { core->~core_state(); }), m_recompiler()
 	, m_cache_mode(cache::NONE), m_phase(phase::PURGE), m_int_enable{ 0U, 0U }, m_flags(FLAGS_NONE), m_cache_ptr(0U), m_cache_limit(0U), m_cache_iterations(0U)
 	, m_exm_in(1U), m_int_in(CLEAR_LINE), m_iack_out(1U)
@@ -231,7 +231,7 @@ void dsp16_device_base::device_start()
 	m_spaces[AS_PROGRAM] = &space(AS_PROGRAM);
 	m_spaces[AS_DATA] = &space(AS_DATA);
 	m_spaces[AS_IO] = &space(AS_IO);
-	m_direct = m_spaces[AS_PROGRAM]->direct<-1>();
+	m_pcache = m_spaces[AS_PROGRAM]->cache<1, -1, ENDIANNESS_BIG>();
 	m_workram_mask = u16((m_workram.bytes() >> 1) - 1);
 
 	if (allow_drc())
@@ -805,7 +805,7 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 					s64 const d(m_core->dau_f1(op));
 					m_core->dau_temp = u16(u64(dau_saturate(op_d(~op))) >> (op_x(op) ? 16 : 0));
 					m_core->op_dau_ad(op) = d;
-					m_core->dau_set_at(op, yaau_read<Debugger>(op));
+					m_core->dau_set_atx(op, yaau_read<Debugger>(op));
 					m_phase = phase::OP2;
 				}
 				break;
@@ -817,7 +817,7 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 
 			case 0x07: // F1 ; aT[l] = Y
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
-				m_core->dau_set_at(op, yaau_read<Debugger>(op));
+				m_core->dau_set_atx(op, yaau_read<Debugger>(op));
 				break;
 
 			case 0x08: // aT = R
@@ -1133,7 +1133,7 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 		set_predicate(predicate);
 
 		if (fetch_target)
-			*fetch_target = m_direct->read_word(fetch_addr);
+			*fetch_target = m_pcache->read_word(fetch_addr);
 
 		if (phase::OP1 == m_phase)
 		{
@@ -1179,7 +1179,7 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 					s64 const d(m_core->dau_f1(op));
 					m_core->dau_temp = u16(u64(dau_saturate(op_d(~op))) >> (op_x(op) ? 16 : 0));
 					m_core->op_dau_ad(op) = d;
-					m_core->dau_set_at(op, yaau_read<Debugger>(op));
+					m_core->dau_set_atx(op, yaau_read<Debugger>(op));
 					m_phase = phase::OP2;
 				}
 				break;
@@ -1191,7 +1191,7 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 
 			case 0x07: // F1 ; aT[l] = Y
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
-				m_core->dau_set_at(op, yaau_read<Debugger>(op));
+				m_core->dau_set_atx(op, yaau_read<Debugger>(op));
 				break;
 
 			case 0x08: // aT = R
@@ -1274,7 +1274,7 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 					m_core->op_dau_ad(op) = d;
 					if (last_instruction)
 					{
-						m_rom_data = m_direct->read_word(m_core->xaau_pt);
+						m_rom_data = m_pcache->read_word(m_core->xaau_pt);
 						m_phase = phase::OP2;
 					}
 					else
@@ -1289,7 +1289,7 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
 				m_core->dau_temp = s16(m_core->dau_y >> 16);
 				m_core->dau_set_y(yaau_read<Debugger>(op));
-				m_rom_data = m_direct->read_word(m_core->xaau_pt);
+				m_rom_data = m_pcache->read_word(m_core->xaau_pt);
 				m_phase = phase::OP2;
 				break;
 
@@ -1298,7 +1298,7 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 				m_core->dau_set_y(yaau_read<Debugger>(op));
 				if (last_instruction)
 				{
-					m_rom_data = m_direct->read_word(m_core->xaau_pt);
+					m_rom_data = m_pcache->read_word(m_core->xaau_pt);
 					m_phase = phase::OP2;
 				}
 				else
@@ -1384,7 +1384,7 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 				// overlapped fetch of next instruction from ROM
 				mode_change = true;
 				m_cache_mode = cache::NONE;
-				m_cache[m_cache_ptr = 0] = m_direct->read_word(m_core->xaau_pc);
+				m_cache[m_cache_ptr = 0] = m_pcache->read_word(m_core->xaau_pc);
 				m_st_pcbase = m_core->xaau_pc;
 			}
 			else
@@ -1420,7 +1420,7 @@ inline void dsp16_device_base::overlap_rom_data_read()
 	case 0x19: // F1 ; y = a0 ; x = *pt++[i]
 	case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
 	case 0x1f: // F1 ; y = Y ; x = *pt++[i]
-		m_rom_data = m_direct->read_word(m_core->xaau_pt);
+		m_rom_data = m_pcache->read_word(m_core->xaau_pt);
 		break;
 	}
 }

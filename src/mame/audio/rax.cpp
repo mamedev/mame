@@ -225,7 +225,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( acclaim_rax_device::dma_timer_callback )
 	m_control_regs[BDMA_CONTROL_REG] |= ((param >> 14) & 0xff) << 8;
 
 	if (m_control_regs[BDMA_CONTROL_REG] & 8)
-		m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	else
 		m_cpu->pulse_input_line(ADSP2181_BDMA, m_cpu->minimum_quantum_time());
 
@@ -283,15 +283,15 @@ void acclaim_rax_device::adsp_data_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).bankrw("databank");
 	map(0x2000, 0x3fdf).ram(); // Internal RAM
-	map(0x3fe0, 0x3fff).rw(this, FUNC(acclaim_rax_device::adsp_control_r), FUNC(acclaim_rax_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(acclaim_rax_device::adsp_control_r), FUNC(acclaim_rax_device::adsp_control_w));
 }
 
 void acclaim_rax_device::adsp_io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0000).w(this, FUNC(acclaim_rax_device::ram_bank_w));
-	map(0x0001, 0x0001).w(this, FUNC(acclaim_rax_device::rom_bank_w));
-	map(0x0003, 0x0003).rw(this, FUNC(acclaim_rax_device::host_r), FUNC(acclaim_rax_device::host_w));
+	map(0x0000, 0x0000).w(FUNC(acclaim_rax_device::ram_bank_w));
+	map(0x0001, 0x0001).w(FUNC(acclaim_rax_device::rom_bank_w));
+	map(0x0003, 0x0003).rw(FUNC(acclaim_rax_device::host_r), FUNC(acclaim_rax_device::host_w));
 }
 
 
@@ -390,7 +390,7 @@ void acclaim_rax_device::recompute_sample_rate(int which)
 
 	/* now put it down to samples, so we know what the channel frequency has to be */
 	sample_period = sample_period * (16 * 1);
-	dmadac_set_frequency(&m_dmadac[0], 2, ATTOSECONDS_TO_HZ(sample_period.attoseconds()));
+	dmadac_set_frequency(&m_dmadac[0], 2, sample_period.as_hz());
 	dmadac_enable(&m_dmadac[0], 2, 1);
 
 	/* fire off a timer which will hit every half-buffer */
@@ -490,26 +490,25 @@ acclaim_rax_device::acclaim_rax_device(const machine_config &mconfig, const char
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(acclaim_rax_device::device_add_mconfig)
-	MCFG_CPU_ADD("adsp", ADSP2181, XTAL(16'670'000))
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(acclaim_rax_device, adsp_sound_tx_callback))      /* callback for serial transmit */
-	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(acclaim_rax_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
-	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
-	MCFG_CPU_DATA_MAP(adsp_data_map)
-	MCFG_CPU_IO_MAP(adsp_io_map)
+void acclaim_rax_device::device_add_mconfig(machine_config &config)
+{
+	ADSP2181(config, m_cpu, XTAL(16'670'000));
+	m_cpu->sport_tx().set(FUNC(acclaim_rax_device::adsp_sound_tx_callback)); /* callback for serial transmit */
+	m_cpu->dmovlay().set(FUNC(acclaim_rax_device::dmovlay_callback)); /* callback for adsp 2181 dmovlay instruction */
+	m_cpu->set_addrmap(AS_PROGRAM, &acclaim_rax_device::adsp_program_map);
+	m_cpu->set_addrmap(AS_DATA, &acclaim_rax_device::adsp_data_map);
+	m_cpu->set_addrmap(AS_IO, &acclaim_rax_device::adsp_io_map);
 
-	MCFG_TIMER_DEVICE_ADD("adsp_reg_timer0", DEVICE_SELF, acclaim_rax_device, adsp_irq0)
-	MCFG_TIMER_DEVICE_ADD("adsp_dma_timer", DEVICE_SELF, acclaim_rax_device, dma_timer_callback)
+	TIMER(config, "adsp_reg_timer0").configure_generic(FUNC(acclaim_rax_device::adsp_irq0));
+	TIMER(config, "adsp_dma_timer").configure_generic(FUNC(acclaim_rax_device::dma_timer_callback));
 
-	MCFG_GENERIC_LATCH_16_ADD("data_in")
-	MCFG_GENERIC_LATCH_16_ADD("data_out")
+	GENERIC_LATCH_16(config, m_data_in);
+	GENERIC_LATCH_16(config, m_data_out);
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("dacl", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-
-	MCFG_SOUND_ADD("dacr", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	DMADAC(config, "dacl").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	DMADAC(config, "dacr").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 

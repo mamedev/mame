@@ -80,6 +80,7 @@ DEBUG TRICKS:
 #include "cpu/m6502/m6502.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -118,17 +119,18 @@ class supracan_state : public driver_device
 {
 public:
 	supracan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_cart(*this, "cartslot"),
-			m_vram(*this, "vram"),
-			m_soundram(*this, "soundram"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_cart(*this, "cartslot")
+		, m_vram(*this, "vram")
+		, m_soundram(*this, "soundram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
 	{
-		m_m6502_reset = 0;
 	}
+
+	void supracan(machine_config &config);
 
 private:
 	DECLARE_READ16_MEMBER(_68k_soundram_r);
@@ -159,25 +161,25 @@ private:
 	acan_dma_regs_t m_acan_dma_regs;
 	acan_sprdma_regs_t m_acan_sprdma_regs;
 
-	uint16_t m_m6502_reset;
-	uint8_t m_sound_irq_enable_reg;
-	uint8_t m_sound_irq_source_reg;
-	uint8_t m_sound_cpu_68k_irq_reg;
+	uint16_t m_m6502_reset = 0;
+	uint8_t m_sound_irq_enable_reg = 0;
+	uint8_t m_sound_irq_source_reg = 0;
+	uint8_t m_sound_cpu_68k_irq_reg = 0;
 
-	emu_timer *m_video_timer;
-	emu_timer *m_hbl_timer;
-	emu_timer *m_line_on_timer;
-	emu_timer *m_line_off_timer;
+	emu_timer *m_video_timer = nullptr;
+	emu_timer *m_hbl_timer = nullptr;
+	emu_timer *m_line_on_timer = nullptr;
+	emu_timer *m_line_off_timer = nullptr;
 
 	std::vector<uint8_t> m_vram_addr_swapped;
 
 #if 0
-	uint16_t *m_pram;
+	uint16_t *m_pram = nullptr;
 #endif
 
-	uint16_t m_sprite_count;
-	uint32_t m_sprite_base_addr;
-	uint8_t m_sprite_flags;
+	uint16_t m_sprite_count = 0;
+	uint32_t m_sprite_base_addr = 0;
+	uint8_t m_sprite_flags = 0;
 
 	uint32_t m_tilemap_base_addr[3];
 	int m_tilemap_scrollx[3];
@@ -217,7 +219,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(supracan);
+	void supracan_palette(palette_device &palette) const;
 	uint32_t screen_update_supracan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(supracan_irq);
 	INTERRUPT_GEN_MEMBER(supracan_sound_irq);
@@ -236,8 +238,6 @@ private:
 	void supracan_suprnova_draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask);
 	void supracan_mem(address_map &map);
 	void supracan_sound_mem(address_map &map);
-public:
-	void supracan(machine_config &config);
 };
 
 
@@ -1123,18 +1123,18 @@ WRITE16_MEMBER( supracan_state::vram_w )
 void supracan_state::supracan_mem(address_map &map)
 {
 	//AM_RANGE( 0x000000, 0x3fffff )        // mapped by the cartslot
-	map(0xe80000, 0xe8ffff).rw(this, FUNC(supracan_state::_68k_soundram_r), FUNC(supracan_state::_68k_soundram_w));
+	map(0xe80000, 0xe8ffff).rw(FUNC(supracan_state::_68k_soundram_r), FUNC(supracan_state::_68k_soundram_w));
 	map(0xe80200, 0xe80201).portr("P1");
 	map(0xe80202, 0xe80203).portr("P2");
 	map(0xe80208, 0xe80209).portr("P3");
 	map(0xe8020c, 0xe8020d).portr("P4");
-	map(0xe90000, 0xe9001f).rw(this, FUNC(supracan_state::sound_r), FUNC(supracan_state::sound_w));
-	map(0xe90020, 0xe9002f).w(this, FUNC(supracan_state::dma_channel0_w));
-	map(0xe90030, 0xe9003f).w(this, FUNC(supracan_state::dma_channel1_w));
+	map(0xe90000, 0xe9001f).rw(FUNC(supracan_state::sound_r), FUNC(supracan_state::sound_w));
+	map(0xe90020, 0xe9002f).w(FUNC(supracan_state::dma_channel0_w));
+	map(0xe90030, 0xe9003f).w(FUNC(supracan_state::dma_channel1_w));
 
-	map(0xf00000, 0xf001ff).rw(this, FUNC(supracan_state::video_r), FUNC(supracan_state::video_w));
+	map(0xf00000, 0xf001ff).rw(FUNC(supracan_state::video_r), FUNC(supracan_state::video_w));
 	map(0xf00200, 0xf003ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0xf40000, 0xf5ffff).ram().w(this, FUNC(supracan_state::vram_w)).share("vram");
+	map(0xf40000, 0xf5ffff).ram().w(FUNC(supracan_state::vram_w)).share("vram");
 	map(0xfc0000, 0xfcffff).mirror(0x30000).ram(); /* System work ram */
 }
 
@@ -1234,7 +1234,7 @@ WRITE8_MEMBER( supracan_state::_6502_soundmem_w )
 
 void supracan_state::supracan_sound_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(supracan_state::_6502_soundmem_r), FUNC(supracan_state::_6502_soundmem_w)).share("soundram");
+	map(0x0000, 0xffff).rw(FUNC(supracan_state::_6502_soundmem_r), FUNC(supracan_state::_6502_soundmem_w)).share("soundram");
 }
 
 static INPUT_PORTS_START( supracan )
@@ -1351,20 +1351,18 @@ static INPUT_PORTS_START( supracan )
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Button A")
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(supracan_state, supracan)
+void supracan_state::supracan_palette(palette_device &palette) const
 {
 	// Used for debugging purposes for now
-	//#if 0
-	int i, r, g, b;
-
-	for( i = 0; i < 32768; i++ )
+//#if 0
+	for (int i = 0; i < 32768; i++)
 	{
-		r = (i & 0x1f) << 3;
-		g = ((i >> 5) & 0x1f) << 3;
-		b = ((i >> 10) & 0x1f) << 3;
-		palette.set_pen_color( i, r, g, b );
+		int const r = (i & 0x1f) << 3;
+		int const g = ((i >> 5) & 0x1f) << 3;
+		int const b = ((i >> 10) & 0x1f) << 3;
+		palette.set_pen_color(i, r, g, b);
 	}
-	//#endif
+//#endif
 }
 
 WRITE16_MEMBER( supracan_state::_68k_soundram_w )
@@ -1850,7 +1848,7 @@ static const gfx_layout supracan_gfx1bpp_alt =
 };
 
 
-static GFXDECODE_START( supracan )
+static GFXDECODE_START( gfx_supracan )
 	GFXDECODE_RAM( "vram",  0, supracan_gfx8bpp,   0, 1 )
 	GFXDECODE_RAM( "vram",  0, supracan_gfx4bpp,   0, 0x10 )
 	GFXDECODE_RAM( "vram",  0, supracan_gfx2bpp,   0, 0x40 )
@@ -1885,13 +1883,13 @@ INTERRUPT_GEN_MEMBER(supracan_state::supracan_sound_irq)
 
 MACHINE_CONFIG_START(supracan_state::supracan)
 
-	MCFG_CPU_ADD( "maincpu", M68000, XTAL(10'738'635) )        /* Correct frequency unknown */
-	MCFG_CPU_PROGRAM_MAP( supracan_mem )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_irq)
+	MCFG_DEVICE_ADD( "maincpu", M68000, XTAL(10'738'635) )        /* Correct frequency unknown */
+	MCFG_DEVICE_PROGRAM_MAP( supracan_mem )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_irq)
 
-	MCFG_CPU_ADD( "soundcpu", M6502, XTAL(3'579'545) )     /* TODO: Verify actual clock */
-	MCFG_CPU_PROGRAM_MAP( supracan_sound_mem )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_sound_irq)
+	MCFG_DEVICE_ADD( "soundcpu", M6502, XTAL(3'579'545) )     /* TODO: Verify actual clock */
+	MCFG_DEVICE_PROGRAM_MAP( supracan_sound_mem )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_sound_irq)
 
 #if !(SOUNDCPU_BOOT_HACK)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -1903,11 +1901,9 @@ MACHINE_CONFIG_START(supracan_state::supracan)
 	MCFG_SCREEN_UPDATE_DRIVER(supracan_state, screen_update_supracan)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD( "palette", 32768 )
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(supracan_state, supracan)
+	PALETTE(config, "palette", FUNC(supracan_state::supracan_palette)).set_format(palette_device::xBGR_555, 32768);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supracan)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supracan)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "supracan_cart")
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
@@ -1922,5 +1918,5 @@ ROM_START( supracan )
 ROM_END
 
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     STATE           INIT    COMPANY                  FULLNAME        FLAGS */
-CONS( 1995, supracan,   0,      0,      supracan,   supracan, supracan_state, 0,      "Funtech Entertainment", "Super A'Can",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY                  FULLNAME        FLAGS */
+CONS( 1995, supracan, 0,      0,      supracan, supracan, supracan_state, empty_init, "Funtech Entertainment", "Super A'Can",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

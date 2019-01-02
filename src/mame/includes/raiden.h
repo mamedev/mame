@@ -5,15 +5,20 @@
     Seibu Raiden hardware
 
 *******************************************************************************/
+#ifndef MAME_INCLUDES_RAIDEN_H
+#define MAME_INCLUDES_RAIDEN_H
+
+#pragma once
 
 #include "audio/seibu.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 
-class raiden_state : public driver_device, protected seibu_sound_common
+class raiden_state : public driver_device, public seibu_sound_common
 {
 public:
-	raiden_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	raiden_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_seibu_sound(*this, "seibu_sound"),
@@ -57,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(raidenb_control_w);
 	DECLARE_WRITE16_MEMBER(raidenb_layer_enable_w);
 	DECLARE_WRITE16_MEMBER(raidenb_layer_scroll_w);
-	DECLARE_DRIVER_INIT(raiden);
+	void init_raiden();
 
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
@@ -88,3 +93,5 @@ public:
 	void sei80bu_encrypted_full_map(address_map &map);
 	void sub_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_RAIDEN_H

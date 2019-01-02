@@ -60,7 +60,7 @@ uint32_t rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &b
 		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 		break;
 	case 2:
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0/*TILEMAP_DRAW_OPAQUE*/, 1);
 		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
 		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 		break;
@@ -95,12 +95,12 @@ void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &clipre
 	uint32_t* dstline;
 
 
-	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for (y=cliprect.top();y<=cliprect.bottom();y++)
 	{
 		srcline=&sprite_bitmap->pix16(y,0);
 		dstline=&bitmap.pix32(y,0);
 
-		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
+		for (x=cliprect.left();x<=cliprect.right();x++)
 		{
 			uint16_t pix = srcline[x];
 
@@ -183,7 +183,7 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 	uint16_t *srcline1, *srcline2;
 	uint8_t *srcpriline;
 
-	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for (y=cliprect.top();y<=cliprect.bottom();y++)
 	{
 		srcline1=&sprite_bitmap1->pix16(y,0);
 		srcline2=&sprite_bitmap2->pix16(y,0);
@@ -191,7 +191,7 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		dstline=&bitmap.pix32(y,0);
 
-		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
+		for (x=cliprect.left();x<=cliprect.right();x++)
 		{
 			uint16_t pix1 = srcline1[x];
 			uint16_t pix2 = srcline2[x];

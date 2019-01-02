@@ -1,11 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_AEROFGT_H
+#define MAME_INCLUDES_AEROFGT_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "video/vsystem_spr.h"
 #include "video/vsystem_spr2.h"
 #include "sound/okim6295.h"
 #include "sound/upd7759.h"
+#include "emupal.h"
 
 class aerofgt_state : public driver_device
 {
@@ -112,8 +117,8 @@ public:
 	DECLARE_VIDEO_START(spinlbrk);
 	DECLARE_VIDEO_START(turbofrc);
 	DECLARE_VIDEO_START(wbbc97);
-	DECLARE_DRIVER_INIT(banked_oki);
-	DECLARE_DRIVER_INIT(kickball);
+	void init_banked_oki();
+	void init_kickball();
 	uint32_t screen_update_pspikes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spikes91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pspikesb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -171,3 +176,5 @@ public:
 	void wbbc97_map(address_map &map);
 	void wbbc97_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_AEROFGT_H

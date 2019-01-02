@@ -145,7 +145,7 @@ std::unique_ptr<util::disasm_interface> v810_device::create_disassembler()
 #define WIO_H(addr, val) (m_io->write_word(addr,val))
 #define WIO_W(addr, val) (m_io->write_dword(addr,val))
 
-#define R_OP(addr)  (m_direct->read_word(addr))
+#define R_OP(addr)  (m_cache->read_word(addr))
 
 #define GET1 (op&0x1f)
 #define GET2 ((op>>5)&0x1f)
@@ -1256,7 +1256,7 @@ const v810_device::opcode_func v810_device::s_OpCodeTable[64] =
 void v810_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
 	m_io = &space(AS_IO);
 
 	m_irq_line = 0;

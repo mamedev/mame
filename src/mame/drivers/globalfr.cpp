@@ -30,6 +30,9 @@ public:
 		m_vfd(*this, "vfd")
 	{ }
 
+	void globalfr(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<s16lf01_device> m_vfd;
 
@@ -37,7 +40,6 @@ public:
 
 	DECLARE_WRITE16_MEMBER(vfd_w);
 
-	void globalfr(machine_config &config);
 	void globalfr_map(address_map &map);
 };
 
@@ -57,7 +59,7 @@ void globalfr_state::globalfr_map(address_map &map)
 	map(0x002000, 0x002fff).ram();
 	map(0x008000, 0x07ffff).rom().region("maincpu", 0x8000);
 	map(0x0a0000, 0x0a01ff).ram();
-	map(0x7e0040, 0x7e0041).w(this, FUNC(globalfr_state::vfd_w));
+	map(0x7e0040, 0x7e0041).w(FUNC(globalfr_state::vfd_w));
 }
 
 static INPUT_PORTS_START( globalfr )
@@ -66,13 +68,14 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-MACHINE_CONFIG_START(globalfr_state::globalfr)
+void globalfr_state::globalfr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M37702S1, 4000000)
-	MCFG_CPU_PROGRAM_MAP(globalfr_map)
-	MCFG_S16LF01_ADD("vfd",0)
-	MCFG_DEFAULT_LAYOUT(layout_globalfr)
-MACHINE_CONFIG_END
+	M37702S1(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &globalfr_state::globalfr_map);
+	S16LF01(config, m_vfd);
+	config.set_default_layout(layout_globalfr);
+}
 
 /******************************************************************************/
 
@@ -200,32 +203,32 @@ ROM_END
 /******************************************************************************/
 
 // standalone game or topbox?
-GAME( 199?, gl_snbev,   0,        globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Saturday Night Beaver (Global) (Stealth?) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_snbeva,  gl_snbev, globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Saturday Night Beaver (Global) (Stealth?) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_snbev,   0,        globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Saturday Night Beaver (Global) (Stealth?) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_snbeva,  gl_snbev, globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Saturday Night Beaver (Global) (Stealth?) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 // standalone game or topbox?
-GAME( 199?, gl_grncl,   0,        globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Grid Runner Club (Global) (Stealth?) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_grncla,  gl_grncl, globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Grid Runner Club (Global) (Stealth?) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_grncl,   0,        globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Grid Runner Club (Global) (Stealth?) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_grncla,  gl_grncl, globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Grid Runner Club (Global) (Stealth?) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, gl_dow,     0,        globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Deals On Wheels (Global) (v1.4) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_dowp,    gl_dow,   globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Deals On Wheels (Global) (v1.4 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_dow,     0,        globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Deals On Wheels (Global) (v1.4) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_dowp,    gl_dow,   globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Deals On Wheels (Global) (v1.4 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, gl_dowcl,   0,        globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Deals On Wheels Club (Global) (v1.6) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_dowclp,  gl_dowcl, globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Deals On Wheels Club (Global) (v1.6 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_dowcl,   0,        globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Deals On Wheels Club (Global) (v1.6) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_dowclp,  gl_dowcl, globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Deals On Wheels Club (Global) (v1.6 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, gl_wywh,    0,        globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Wish You Were Here Club (Global) (v2.9) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_wywhp,   gl_wywh,  globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Wish You Were Here Club (Global) (v2.9 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_wywh24,  gl_wywh,  globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Wish You Were Here Club (Global) (v2.4) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_wywh24p, gl_wywh,  globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Wish You Were Here Club (Global) (v2.4 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_wywh,    0,        globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Wish You Were Here Club (Global) (v2.9) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_wywhp,   gl_wywh,  globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Wish You Were Here Club (Global) (v2.9 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_wywh24,  gl_wywh,  globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Wish You Were Here Club (Global) (v2.4) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_wywh24p, gl_wywh,  globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Wish You Were Here Club (Global) (v2.4 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, gl_coc,     0,        globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Carry On Clubbin' (Global) (v3.0) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_cocp,    gl_coc,   globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Carry On Clubbin' (Global) (v3.0 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_coc29,   gl_coc,   globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Carry On Clubbin' (Global) (v2.9) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_coc29p,  gl_coc,   globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Carry On Clubbin' (Global) (v2.9 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_coc,     0,        globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Carry On Clubbin' (Global) (v3.0) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_cocp,    gl_coc,   globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Carry On Clubbin' (Global) (v3.0 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_coc29,   gl_coc,   globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Carry On Clubbin' (Global) (v2.9) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_coc29p,  gl_coc,   globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Carry On Clubbin' (Global) (v2.9 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, gl_uyr,     0,        globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Up Yer Riggin Club (Global) (v2.8) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_uyrp,    gl_uyr,   globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Up Yer Riggin Club (Global) (v2.8 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_uyr,     0,        globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Up Yer Riggin Club (Global) (v2.8) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_uyrp,    gl_uyr,   globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Up Yer Riggin Club (Global) (v2.8 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, gl_hbh,     0,        globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Heartbreak Hotel (Global) (v1.0) (Stealth)",               MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_hbhcl,   0,        globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Heartbreak Hotel Club (Global) (v1.9) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_hbhclp,  gl_hbhcl, globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Heartbreak Hotel Club (Global) (v1.9 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_hbhcla,  gl_hbhcl, globalfr, globalfr, globalfr_state, 0, ROT0, "Global", "Heartbreak Hotel Club (Global) (Set 2) (Stealth)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_hbh,     0,        globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Heartbreak Hotel (Global) (v1.0) (Stealth)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_hbhcl,   0,        globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Heartbreak Hotel Club (Global) (v1.9) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_hbhclp,  gl_hbhcl, globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Heartbreak Hotel Club (Global) (v1.9 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_hbhcla,  gl_hbhcl, globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Heartbreak Hotel Club (Global) (Set 2) (Stealth)",         MACHINE_IS_SKELETON_MECHANICAL )

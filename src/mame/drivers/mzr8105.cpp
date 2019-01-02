@@ -6,7 +6,7 @@
  *
  *  19/08/2015
  *
- * I baught this board from http://www.retrotechnology.com without documentation.
+ * I bought this board from http://www.retrotechnology.com without documentation.
  * It has a Motorola 68000 CPU @ 10MHz and two 27128 EPROMS with OS9 DEBUG labels
  * and not much more except 16 or so TTLs, 2 PALs and a VME P1 connector. It is a
  * 2 layered pcb so it shold be possible to trace the schematics quite easily.
@@ -91,7 +91,7 @@
  * mailbox interrupt support. Standard MXbus side modules include additional DRAM.
  * SRAM, and I/O.
  *
- * Mizar's standard double- height (6U) processors provide additional features such
+ * Mizar's standard double-height (6U) processors provide additional features such
  * as a high-speed cache to enhance 68030 performance, floating, point coprocessor
  * support, up to four MB dual ported DRAM, VSB memory interface, Ethernet, and SCSI.
  *
@@ -179,8 +179,9 @@ mzr8105_state(const machine_config &mconfig, device_type type, const char *tag) 
 	}
 
 	void mzr8105(machine_config &config);
-	void mzr8105_mem(address_map &map);
+
 private:
+	void mzr8105_mem(address_map &map);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -199,16 +200,17 @@ void mzr8105_state::mzr8105_mem(address_map &map)
 static INPUT_PORTS_START (mzr8105)
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(mzr8105_vme_cards)
-	SLOT_INTERFACE("mzr8300", VME_MZR8300)
-SLOT_INTERFACE_END
+static void mzr8105_vme_cards(device_slot_interface &device)
+{
+	device.option_add("mzr8300", VME_MZR8300);
+}
 
 /*
  * Machine configuration
  */
 MACHINE_CONFIG_START(mzr8105_state::mzr8105)
-	MCFG_CPU_ADD ("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP (mzr8105_mem)
+	MCFG_DEVICE_ADD ("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP (mzr8105_mem)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_BUS_OWNER_SPACES()
 	MCFG_VME_SLOT_ADD ("vme", 1, mzr8105_vme_cards, "mzr8300")
@@ -230,5 +232,5 @@ ROM_START (mzr8105)
 ROM_END
 
 /* Driver */
-//    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT    CLASS           INIT  COMPANY      FULLNAME          FLAGS
-COMP (1987, mzr8105,      0,      0,       mzr8105,        mzr8105, mzr8105_state,  0,    "Mizar Inc", "Mizar VME8105",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME         FLAGS
+COMP( 1987, mzr8105, 0,      0,      mzr8105, mzr8105, mzr8105_state, empty_init, "Mizar Inc", "Mizar VME8105", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

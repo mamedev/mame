@@ -260,13 +260,13 @@ void smsbootleg_state::sms_supergame_io(address_map &map)
 	map.unmap_value_high();
 
 	map(0x04, 0x04).nopr(); //AM_READ_PORT("IN0") // these
-	map(0x08, 0x08).w(this, FUNC(smsbootleg_state::port08_w));
+	map(0x08, 0x08).w(FUNC(smsbootleg_state::port08_w));
 	map(0x14, 0x14).nopr(); //AM_READ_PORT("IN1") // seem to be from a coinage / timer MCU, changing them directly changes the credits / time value
-	map(0x18, 0x18).w(this, FUNC(smsbootleg_state::port18_w));
+	map(0x18, 0x18).w(FUNC(smsbootleg_state::port18_w));
 
-	map(0x40, 0x7f).rw(this, FUNC(smsbootleg_state::sms_count_r), FUNC(smsbootleg_state::sms_psg_w));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0x40, 0x7f).rw(FUNC(smsbootleg_state::sms_count_r), FUNC(smsbootleg_state::sms_psg_w));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
 
 	map(0xdc, 0xdc).portr("IN2");
 }
@@ -275,19 +275,16 @@ void smsbootleg_state::sms_supergame_io(address_map &map)
 
 MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635)/3)
-	MCFG_CPU_PROGRAM_MAP(sms_supergame_map)
-	MCFG_CPU_IO_MAP(sms_supergame_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'738'635)/3)
+	MCFG_DEVICE_PROGRAM_MAP(sms_supergame_map)
+	MCFG_DEVICE_IO_MAP(sms_supergame_io)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START_OVERRIDE(sms_state,sms)
-	MCFG_MACHINE_RESET_OVERRIDE(sms_state,sms)
-
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("segapsg", SEGAPSG, XTAL(10'738'635)/3)
+	MCFG_DEVICE_ADD("segapsg", SEGAPSG, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -301,7 +298,7 @@ MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	MCFG_SEGA315_5246_SET_SCREEN("screen")
 	MCFG_SEGA315_5246_IS_PAL(false)
 	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(sms_state, sms_pause_callback))
+	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
 
 MACHINE_CONFIG_END
 
@@ -377,12 +374,12 @@ static INPUT_PORTS_START( sms_supergame )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(smsbootleg_state,sms_supergame)
+void smsbootleg_state::init_sms_supergame()
 {
 	uint8_t* rom = memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes();
 
-	for (int i = 0;i < size;i++)
+	for (int i = 0; i < size; i++)
 	{
 		rom[i] ^= 0x80;
 	}
@@ -437,5 +434,5 @@ ROM_END
 
 
 // these haven't been set as clones because they contain different games
-GAME( 199?, smssgame,  0,    sms_supergame, sms_supergame, smsbootleg_state,  sms_supergame,  ROT0, "Sono Corp Japan", "Super Game (Sega Master System Multi-game bootleg)", MACHINE_NOT_WORKING )
-GAME( 1990, smssgamea, 0,    sms_supergame, sms_supergame, smsbootleg_state,  sms_supergame,  ROT0, "Seo Jin (TV-Tuning license)", "Super Game (Sega Master System Multi-game bootleg) (alt games)", MACHINE_NOT_WORKING ) // for German market?
+GAME( 199?, smssgame,  0,    sms_supergame, sms_supergame, smsbootleg_state, init_sms_supergame, ROT0, "Sono Corp Japan", "Super Game (Sega Master System Multi-game bootleg)", MACHINE_NOT_WORKING )
+GAME( 1990, smssgamea, 0,    sms_supergame, sms_supergame, smsbootleg_state, init_sms_supergame, ROT0, "Seo Jin (TV-Tuning license)", "Super Game (Sega Master System Multi-game bootleg) (alt games)", MACHINE_NOT_WORKING ) // for German market?

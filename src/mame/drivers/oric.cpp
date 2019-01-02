@@ -33,6 +33,7 @@
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,23 +55,26 @@ public:
 	};
 
 	oric_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_palette(*this, "palette"),
-			m_psg(*this, "ay8912"),
-			m_centronics(*this, "centronics"),
-			m_cent_data_out(*this, "cent_data_out"),
-			m_cassette(*this, "cassette"),
-			m_via(*this, "via6522"),
-			m_ram(*this, "ram"),
-			m_rom(*this, "maincpu"),
-			m_bank_c000_r(*this, "bank_c000_r"),
-			m_bank_e000_r(*this, "bank_e000_r"),
-			m_bank_f800_r(*this, "bank_f800_r"),
-			m_bank_c000_w(*this, "bank_c000_w"),
-			m_bank_e000_w(*this, "bank_e000_w"),
-			m_bank_f800_w(*this, "bank_f800_w"),
-			m_config(*this, "CONFIG") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
+		, m_psg(*this, "ay8912")
+		, m_centronics(*this, "centronics")
+		, m_cent_data_out(*this, "cent_data_out")
+		, m_cassette(*this, "cassette")
+		, m_via(*this, "via6522")
+		, m_ram(*this, "ram")
+		, m_rom(*this, "maincpu")
+		, m_bank_c000_r(*this, "bank_c000_r")
+		, m_bank_e000_r(*this, "bank_e000_r")
+		, m_bank_f800_r(*this, "bank_f800_r")
+		, m_bank_c000_w(*this, "bank_c000_w")
+		, m_bank_e000_w(*this, "bank_e000_w")
+		, m_bank_f800_w(*this, "bank_f800_w")
+		, m_config(*this, "CONFIG")
+		, m_kbd_row(*this, "ROW%u", 0U)
+		, m_tape_timer(nullptr)
+	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_pressed);
 	DECLARE_WRITE8_MEMBER(via_a_w);
@@ -80,18 +84,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(ext_irq_w);
 	DECLARE_WRITE8_MEMBER(psg_a_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_tape);
+	TIMER_CALLBACK_MEMBER(update_tape);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	void oric(machine_config &config);
+	void oric(machine_config &config, bool add_ext = true);
 	void prav8d(machine_config &config);
 	void oric_mem(address_map &map);
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<m6502_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<ay8910_device> m_psg;
 	required_device<centronics_device> m_centronics;
@@ -107,7 +111,9 @@ protected:
 	optional_memory_bank m_bank_e000_w;
 	optional_memory_bank m_bank_f800_w;
 	required_ioport m_config;
-	ioport_port *m_kbd_row[8];
+	required_ioport_array<8> m_kbd_row;
+
+	emu_timer *m_tape_timer;
 
 	int m_blink_counter;
 	uint8_t m_pattr;
@@ -141,9 +147,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via2_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(via2_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via2_irq_w);
-	DECLARE_WRITE8_MEMBER(port_314_w);
-	DECLARE_READ8_MEMBER(port_314_r);
-	DECLARE_READ8_MEMBER(port_318_r);
 
 	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
 
@@ -187,6 +190,9 @@ protected:
 
 	virtual void update_irq() override;
 	void remap();
+	void port_314_w(u8 data);
+	u8 port_314_r();
+	u8 port_318_r();
 };
 
 /* Ram is 64K, with 16K hidden by the rom.  The 300-3ff is also hidden by the i/o */
@@ -207,8 +213,8 @@ void telestrat_state::telestrat_mem(address_map &map)
 	map(0x0000, 0xffff).ram().share("ram");
 	map(0x0300, 0x030f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0x0310, 0x0313).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
-	map(0x0314, 0x0314).rw(this, FUNC(telestrat_state::port_314_r), FUNC(telestrat_state::port_314_w));
-	map(0x0318, 0x0318).r(this, FUNC(telestrat_state::port_318_r));
+	map(0x0314, 0x0314).rw(FUNC(telestrat_state::port_314_r), FUNC(telestrat_state::port_314_w));
+	map(0x0318, 0x0318).r(FUNC(telestrat_state::port_318_r));
 	map(0x031c, 0x031f).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x0320, 0x032f).rw(m_via2, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0xc000, 0xffff).bankr("bank_c000_r").bankw("bank_c000_w");
@@ -320,7 +326,7 @@ INPUT_CHANGED_MEMBER(oric_state::nmi_pressed)
 WRITE8_MEMBER(oric_state::via_a_w)
 {
 	m_via_a = data;
-	m_cent_data_out->write(space, 0, m_via_a);
+	m_cent_data_out->write(m_via_a);
 	update_psg(space);
 }
 
@@ -364,7 +370,7 @@ WRITE8_MEMBER(oric_state::psg_a_w)
 	update_keyboard();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(oric_state::update_tape)
+TIMER_CALLBACK_MEMBER(oric_state::update_tape)
 {
 	if(!m_config->read())
 		m_via->write_cb1(m_cassette->input() > 0.0038);
@@ -392,11 +398,8 @@ void oric_state::machine_start_common()
 	m_via_irq = false;
 	m_ext_irq = false;
 
-	for(int i=0; i<8; i++) {
-		char name[10];
-		sprintf(name, "ROW%d", i);
-		m_kbd_row[i] = machine().root_device().ioport(name);
-	}
+	if (!m_tape_timer)
+		m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(oric_state::update_tape), this));
 }
 
 void oric_state::machine_start()
@@ -474,7 +477,7 @@ WRITE_LINE_MEMBER(telestrat_state::via2_irq_w)
 	update_irq();
 }
 
-WRITE8_MEMBER(telestrat_state::port_314_w)
+void telestrat_state::port_314_w(u8 data)
 {
 	m_port_314 = data;
 	floppy_image_device *floppy = m_floppies[(m_port_314 >> 5) & 3];
@@ -487,12 +490,12 @@ WRITE8_MEMBER(telestrat_state::port_314_w)
 	update_irq();
 }
 
-READ8_MEMBER(telestrat_state::port_314_r)
+u8 telestrat_state::port_314_r()
 {
 	return (m_fdc_irq && (m_port_314 & P_IRQEN)) ? 0x7f : 0xff;
 }
 
-READ8_MEMBER(telestrat_state::port_318_r)
+u8 telestrat_state::port_318_r()
 {
 	return m_fdc_drq ? 0x7f : 0xff;
 }
@@ -774,100 +777,100 @@ static INPUT_PORTS_START(telstrat)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(oric_state::oric)
+void oric_state::oric(machine_config &config, bool add_ext)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000)/12)
-	MCFG_CPU_PROGRAM_MAP(oric_mem)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	M6502(config, m_maincpu, 12_MHz_XTAL / 12);
+	m_maincpu->set_addrmap(AS_PROGRAM, &oric_state::oric_mem);
+
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 64*6, 0, 40*6, 312, 0, 28*8) // 260 lines in 60 Hz mode
-	MCFG_SCREEN_UPDATE_DRIVER(oric_state, screen_update_oric)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(oric_state, vblank_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12_MHz_XTAL / 2, 64*6, 0, 40*6, 312, 0, 28*8); // 260 lines in 60 Hz mode
+	screen.set_screen_update(FUNC(oric_state::screen_update_oric));
+	screen.screen_vblank().set(FUNC(oric_state::vblank_w));
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay8912", AY8912, XTAL(12'000'000)/12)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(4700, 4700, 4700)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(oric_state, psg_a_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	AY8912(config, m_psg, 12_MHz_XTAL / 12);
+	m_psg->set_flags(AY8910_DISCRETE_OUTPUT);
+	m_psg->set_resistors_load(4700, 4700, 4700);
+	m_psg->port_a_write_callback().set(FUNC(oric_state::psg_a_w));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522", via6522_device, write_ca1))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(m_via, FUNC(via6522_device::write_ca1));
+
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(oric_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape_timer", oric_state, update_tape, attotime::from_hz(4800))
+	CASSETTE(config, m_cassette, 0);
+	m_cassette->set_formats(oric_cassette_formats);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED));
 
 	/* via */
-	MCFG_DEVICE_ADD( "via6522", VIA6522, XTAL(12'000'000)/12 )
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(oric_state, via_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(oric_state, via_b_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(oric_state, via_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(oric_state, via_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(oric_state, via_irq_w))
+	VIA6522(config, m_via, 12_MHz_XTAL / 12);
+	m_via->writepa_handler().set(FUNC(oric_state::via_a_w));
+	m_via->writepb_handler().set(FUNC(oric_state::via_b_w));
+	m_via->ca2_handler().set(FUNC(oric_state::via_ca2_w));
+	m_via->cb2_handler().set(FUNC(oric_state::via_cb2_w));
+	m_via->irq_handler().set(FUNC(oric_state::via_irq_w));
 
 	/* extension port */
-	MCFG_ORICEXT_ADD( "ext", oricext_intf, nullptr, "maincpu", WRITELINE(oric_state, ext_irq_w))
-MACHINE_CONFIG_END
+	ORICEXT_CONNECTOR(config, "ext", oricext_intf, nullptr, "maincpu").irq_callback().set(FUNC(oric_state::ext_irq_w));
+}
 
-MACHINE_CONFIG_START(oric_state::prav8d)
-	oric(config);
-MACHINE_CONFIG_END
+void oric_state::prav8d(machine_config &config)
+{
+	oric(config, true);
+}
 
 FLOPPY_FORMATS_MEMBER( telestrat_state::floppy_formats )
 	FLOPPY_ORIC_DSK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( telestrat_floppies )
-	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
-SLOT_INTERFACE_END
+static void telestrat_floppies(device_slot_interface &device)
+{
+	device.option_add("3dsdd", FLOPPY_3_DSDD);
+}
 
-MACHINE_CONFIG_START(telestrat_state::telstrat)
-	oric(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(telestrat_mem)
+void telestrat_state::telstrat(machine_config &config)
+{
+	oric(config, false);
+	m_maincpu->set_addrmap(AS_PROGRAM, &telestrat_state::telestrat_mem);
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(telestrat_state, acia_irq_w))
+	mos6551_device &acia(MOS6551(config, "acia", 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
+	acia.irq_handler().set(FUNC(telestrat_state::acia_irq_w));
 
 	/* via */
-	MCFG_DEVICE_ADD( "via6522_2", VIA6522, XTAL(12'000'000)/12 )
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(telestrat_state, via2_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(telestrat_state, via2_b_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(telestrat_state, via2_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(telestrat_state, via2_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(telestrat_state, via2_irq_w))
+	VIA6522(config, m_via2, 12_MHz_XTAL / 12);
+	m_via2->writepa_handler().set(FUNC(telestrat_state::via2_a_w));
+	m_via2->writepb_handler().set(FUNC(telestrat_state::via2_b_w));
+	m_via2->ca2_handler().set(FUNC(telestrat_state::via2_ca2_w));
+	m_via2->cb2_handler().set(FUNC(telestrat_state::via2_cb2_w));
+	m_via2->irq_handler().set(FUNC(telestrat_state::via2_irq_w));
 
 	/* microdisc */
-	MCFG_FD1793_ADD("fdc", XTAL(8'000'000)/8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(telestrat_state, fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(telestrat_state, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(telestrat_state, fdc_hld_w))
-	MCFG_WD_FDC_FORCE_READY
+	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(telestrat_state::fdc_irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(telestrat_state::fdc_drq_w));
+	m_fdc->hld_wr_callback().set(FUNC(telestrat_state::fdc_hld_w));
+	m_fdc->set_force_ready(true);
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", telestrat_floppies, "3dsdd", telestrat_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", telestrat_floppies, nullptr,    telestrat_state::floppy_formats)
-
-	// [RH] 30 August 2016: Based on the French Wikipedia page for the Oric, it does not appear
-	// that the Telestrat supported the same expansions as the Oric-1 and Atmos.
-	MCFG_DEVICE_REMOVE("ext")
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", telestrat_floppies, "3dsdd", telestrat_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", telestrat_floppies, nullptr, telestrat_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", telestrat_floppies, nullptr, telestrat_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", telestrat_floppies, nullptr, telestrat_state::floppy_formats);
+}
 
 
 ROM_START(oric1)
@@ -878,53 +881,53 @@ ROM_END
 ROM_START(orica)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "ver11", "Basic 1.1")
-	ROMX_LOAD ("basic11b.rom", 0, 0x04000, CRC(c3a92bef) SHA1(9451a1a09d8f75944dbd6f91193fc360f1de80ac), ROM_BIOS(1) )
+	ROMX_LOAD ("basic11b.rom", 0, 0x04000, CRC(c3a92bef) SHA1(9451a1a09d8f75944dbd6f91193fc360f1de80ac), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "ver12", "Basic 1.2 (Pascal Leclerc)")      // 1987/1999 - various enhancements and bugfixes
-	ROMX_LOAD ("basic12.rom",  0, 0x04000, CRC(dc4f22dc) SHA1(845e1a893de3dc0f856fdf2f69c3b73770b4094f), ROM_BIOS(2) )
+	ROMX_LOAD ("basic12.rom",  0, 0x04000, CRC(dc4f22dc) SHA1(845e1a893de3dc0f856fdf2f69c3b73770b4094f), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "ver121", "Basic 1.21 (Pascal Leclerc)")        // 07.1999 - DRAW enhancement
-	ROMX_LOAD ("basic121.rom", 0, 0x04000, CRC(0a2860b1) SHA1(b727d5c3bbc8cb1d510f224eb1e0d90d609e8506), ROM_BIOS(3) )
+	ROMX_LOAD ("basic121.rom", 0, 0x04000, CRC(0a2860b1) SHA1(b727d5c3bbc8cb1d510f224eb1e0d90d609e8506), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "ver122", "Basic 1.22 (Pascal Leclerc)")        // 08.2001 - added EUR symbol
-	ROMX_LOAD ("basic122.rom", 0, 0x04000, CRC(5ef2a861) SHA1(9ab6dc47b6e9dc65a4137ce0f0f12fc2b6ca8442), ROM_BIOS(4) )
+	ROMX_LOAD ("basic122.rom", 0, 0x04000, CRC(5ef2a861) SHA1(9ab6dc47b6e9dc65a4137ce0f0f12fc2b6ca8442), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "ver11de", "Basic 1.1 DE")
-	ROMX_LOAD( "bas11_de.rom", 0, 0x04000, CRC(65233b2d) SHA1(b01cabb1a21980a6785a2fe37a8f8572c892123f), ROM_BIOS(5))
+	ROMX_LOAD( "bas11_de.rom", 0, 0x04000, CRC(65233b2d) SHA1(b01cabb1a21980a6785a2fe37a8f8572c892123f), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS( 5, "ver11es", "Basic 1.1 ES")
-	ROMX_LOAD( "bas11_es.rom", 0, 0x04000, CRC(47bf26c7) SHA1(4fdbadd68db9ab8ad1cd56b4e5cbe51a9c3f11ae), ROM_BIOS(6))
+	ROMX_LOAD( "bas11_es.rom", 0, 0x04000, CRC(47bf26c7) SHA1(4fdbadd68db9ab8ad1cd56b4e5cbe51a9c3f11ae), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS( 6, "ver11fr", "Basic 1.1 FR")
-	ROMX_LOAD( "bas11_fr.rom", 0, 0x04000, CRC(603b1fbf) SHA1(2a4583df3b59ca454d67d5631f242c96ec4cf99a), ROM_BIOS(7))
+	ROMX_LOAD( "bas11_fr.rom", 0, 0x04000, CRC(603b1fbf) SHA1(2a4583df3b59ca454d67d5631f242c96ec4cf99a), ROM_BIOS(6))
 	ROM_SYSTEM_BIOS( 7, "ver11se", "Basic 1.1 SE")
-	ROMX_LOAD( "bas11_se.rom", 0, 0x04000, CRC(a71523ac) SHA1(ce53acf84baec6ab5cbac9f9cefa71b3efeb2ead), ROM_BIOS(8))
+	ROMX_LOAD( "bas11_se.rom", 0, 0x04000, CRC(a71523ac) SHA1(ce53acf84baec6ab5cbac9f9cefa71b3efeb2ead), ROM_BIOS(7))
 	ROM_SYSTEM_BIOS( 8, "ver11uk", "Basic 1.1 UK")
-	ROMX_LOAD( "bas11_uk.rom", 0, 0x04000, CRC(303370d1) SHA1(589ff66fac8e06d65af3369491faa67a71f1322a), ROM_BIOS(9))
+	ROMX_LOAD( "bas11_uk.rom", 0, 0x04000, CRC(303370d1) SHA1(589ff66fac8e06d65af3369491faa67a71f1322a), ROM_BIOS(8))
 	ROM_SYSTEM_BIOS( 9, "ver12es", "Basic 1.2 ES")
-	ROMX_LOAD( "bas12es_le.rom", 0, 0x04000, CRC(70de4aeb) SHA1(b327418aa7d8a5a03c135e3d8acdd511df625893), ROM_BIOS(10))
+	ROMX_LOAD( "bas12es_le.rom", 0, 0x04000, CRC(70de4aeb) SHA1(b327418aa7d8a5a03c135e3d8acdd511df625893), ROM_BIOS(9))
 	ROM_SYSTEM_BIOS( 10, "ver12fr", "Basic 1.2 FR")
-	ROMX_LOAD( "bas12fr_le.rom", 0, 0x04000, CRC(47a437fc) SHA1(70271bc3ed5c3bf4d339d6f5de3de8c3c50ff573), ROM_BIOS(11))
+	ROMX_LOAD( "bas12fr_le.rom", 0, 0x04000, CRC(47a437fc) SHA1(70271bc3ed5c3bf4d339d6f5de3de8c3c50ff573), ROM_BIOS(10))
 	ROM_SYSTEM_BIOS( 11, "ver12ge", "Basic 1.2 GE")
-	ROMX_LOAD( "bas12ge_le.rom", 0, 0x04000, CRC(f5f0dd52) SHA1(75359302452ee7b19537698f124aaefd333688d0), ROM_BIOS(12))
+	ROMX_LOAD( "bas12ge_le.rom", 0, 0x04000, CRC(f5f0dd52) SHA1(75359302452ee7b19537698f124aaefd333688d0), ROM_BIOS(11))
 	ROM_SYSTEM_BIOS( 12, "ver12sw", "Basic 1.2 SW")
-	ROMX_LOAD( "bas12sw_le.rom", 0, 0x04000, CRC(100abe68) SHA1(6211d5969c4d7a6acb86ed19c5e51a33a3bef431), ROM_BIOS(13))
+	ROMX_LOAD( "bas12sw_le.rom", 0, 0x04000, CRC(100abe68) SHA1(6211d5969c4d7a6acb86ed19c5e51a33a3bef431), ROM_BIOS(12))
 	ROM_SYSTEM_BIOS( 13, "ver12uk", "Basic 1.2 UK")
-	ROMX_LOAD( "bas12uk_le.rom", 0, 0x04000, CRC(00fce8a6) SHA1(d40558bdf61b8aba6260293c9424fd463be7fad8), ROM_BIOS(14))
+	ROMX_LOAD( "bas12uk_le.rom", 0, 0x04000, CRC(00fce8a6) SHA1(d40558bdf61b8aba6260293c9424fd463be7fad8), ROM_BIOS(13))
 	ROM_SYSTEM_BIOS( 14, "ver121es", "Basic 1.211 ES")
-	ROMX_LOAD( "bas121es_le.rom", 0, 0x04000, CRC(87ec679b) SHA1(5de6a5f5121f69069c9b93d678046e814b5b64e9), ROM_BIOS(15))
+	ROMX_LOAD( "bas121es_le.rom", 0, 0x04000, CRC(87ec679b) SHA1(5de6a5f5121f69069c9b93d678046e814b5b64e9), ROM_BIOS(14))
 	ROM_SYSTEM_BIOS( 15, "ver121fr", "Basic 1.211 FR")
-	ROMX_LOAD( "bas121fr_le.rom", 0, 0x04000, CRC(e683dec2) SHA1(20df7ebc0f13aa835f286d50137f1a7ff7430c29), ROM_BIOS(16))
+	ROMX_LOAD( "bas121fr_le.rom", 0, 0x04000, CRC(e683dec2) SHA1(20df7ebc0f13aa835f286d50137f1a7ff7430c29), ROM_BIOS(15))
 	ROM_SYSTEM_BIOS( 16, "ver121ge", "Basic 1.211 GE")
-	ROMX_LOAD( "bas121ge_le.rom", 0, 0x04000, CRC(94fe32bf) SHA1(1024776d20030d602e432e50014502524658643a), ROM_BIOS(17))
+	ROMX_LOAD( "bas121ge_le.rom", 0, 0x04000, CRC(94fe32bf) SHA1(1024776d20030d602e432e50014502524658643a), ROM_BIOS(16))
 	ROM_SYSTEM_BIOS( 17, "ver121sw", "Basic 1.211 SW")
-	ROMX_LOAD( "bas121sw_le.rom", 0, 0x04000, CRC(e6ad11c7) SHA1(309c94a9861fcb770636dcde1801a5c68ca819b4), ROM_BIOS(18))
+	ROMX_LOAD( "bas121sw_le.rom", 0, 0x04000, CRC(e6ad11c7) SHA1(309c94a9861fcb770636dcde1801a5c68ca819b4), ROM_BIOS(17))
 	ROM_SYSTEM_BIOS( 18, "ver121uk", "Basic 1.211 UK")
-	ROMX_LOAD( "bas121uk_le.rom", 0, 0x04000, CRC(75aa1aa9) SHA1(ca99e244d9cbef625344c2054023504a4f9dcfe4), ROM_BIOS(19))
+	ROMX_LOAD( "bas121uk_le.rom", 0, 0x04000, CRC(75aa1aa9) SHA1(ca99e244d9cbef625344c2054023504a4f9dcfe4), ROM_BIOS(18))
 	ROM_SYSTEM_BIOS( 19, "ver122es", "Basic 1.22 ES")
-	ROMX_LOAD( "bas122es_le.rom", 0, 0x04000, CRC(9144f9e0) SHA1(acf2094078af057e74a31d90d7010be51b9033fa), ROM_BIOS(20))
+	ROMX_LOAD( "bas122es_le.rom", 0, 0x04000, CRC(9144f9e0) SHA1(acf2094078af057e74a31d90d7010be51b9033fa), ROM_BIOS(19))
 	ROM_SYSTEM_BIOS( 20, "ver122fr", "Basic 1.22 FR")
-	ROMX_LOAD( "bas122fr_le.rom", 0, 0x04000, CRC(370cfda4) SHA1(fad9a0661256e59bcc2915578647573e4128e1bb), ROM_BIOS(21))
+	ROMX_LOAD( "bas122fr_le.rom", 0, 0x04000, CRC(370cfda4) SHA1(fad9a0661256e59bcc2915578647573e4128e1bb), ROM_BIOS(20))
 	ROM_SYSTEM_BIOS( 21, "ver122ge", "Basic 1.22 GE")
-	ROMX_LOAD( "bas122ge_le.rom", 0, 0x04000, CRC(9a42bd62) SHA1(8a9c80f314daf4e5e64fa202e583b8a65796db8b), ROM_BIOS(22))
+	ROMX_LOAD( "bas122ge_le.rom", 0, 0x04000, CRC(9a42bd62) SHA1(8a9c80f314daf4e5e64fa202e583b8a65796db8b), ROM_BIOS(21))
 	ROM_SYSTEM_BIOS( 22, "ver122sw", "Basic 1.22 SW")
-	ROMX_LOAD( "bas122sw_le.rom", 0, 0x04000, CRC(e7fd57a4) SHA1(c75cbf7cfafaa02712dc7ca2f972220aef86fb8d), ROM_BIOS(23))
+	ROMX_LOAD( "bas122sw_le.rom", 0, 0x04000, CRC(e7fd57a4) SHA1(c75cbf7cfafaa02712dc7ca2f972220aef86fb8d), ROM_BIOS(22))
 	ROM_SYSTEM_BIOS( 23, "ver122uk", "Basic 1.22 UK")
-	ROMX_LOAD( "bas122uk_le.rom", 0, 0x04000, CRC(9865bcd7) SHA1(2a92e2d119463e682bf10647e3880e26656d65b5), ROM_BIOS(24))
+	ROMX_LOAD( "bas122uk_le.rom", 0, 0x04000, CRC(9865bcd7) SHA1(2a92e2d119463e682bf10647e3880e26656d65b5), ROM_BIOS(23))
 ROM_END
 
 ROM_START(telstrat)
@@ -952,17 +955,17 @@ ROM_END
 ROM_START(prav8dd)
 	ROM_REGION(0x4000, "maincpu", 0)   /* 0x10000 + 0x04000 + 0x00100 + 0x00200 */
 	ROM_SYSTEM_BIOS( 0, "default", "Disk ROM, 1989")
-	ROMX_LOAD( "8d.rom",       0, 0x4000, CRC(b48973ef) SHA1(fd47c977fc215a3b577596a7483df53e8a1e9c83), ROM_BIOS(1) )
+	ROMX_LOAD( "8d.rom",       0, 0x4000, CRC(b48973ef) SHA1(fd47c977fc215a3b577596a7483df53e8a1e9c83), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "radosoft", "RadoSoft Disk ROM, 1992")
-	ROMX_LOAD( "pravetzd.rom", 0, 0x4000, CRC(f8d23821) SHA1(f87ad3c5832773b6e0614905552a80c98dc8e2a5), ROM_BIOS(2) )
+	ROMX_LOAD( "pravetzd.rom", 0, 0x4000, CRC(f8d23821) SHA1(f87ad3c5832773b6e0614905552a80c98dc8e2a5), ROM_BIOS(1) )
 //  ROM_LOAD_OPTIONAL( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
 //  ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
 ROM_END
 
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE     INPUT     STATE            INIT  COMPANY      FULLNAME                 FLAGS
-COMP( 1983, oric1,     0,      0,      oric,       oric,     oric_state,      0,    "Tangerine", "Oric 1" ,               0 )
-COMP( 1984, orica,     oric1,  0,      oric,       orica,    oric_state,      0,    "Tangerine", "Oric Atmos" ,           0 )
-COMP( 1985, prav8d,    oric1,  0,      prav8d,     prav8d,   oric_state,      0,    "Pravetz",   "Pravetz 8D",            0 )
-COMP( 1989, prav8dd,   oric1,  0,      prav8d,     prav8d,   oric_state,      0,    "Pravetz",   "Pravetz 8D (Disk ROM)", MACHINE_UNOFFICIAL )
-COMP( 1986, telstrat,  oric1,  0,      telstrat,   telstrat, telestrat_state, 0,    "Tangerine", "Oric Telestrat",        0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY      FULLNAME                 FLAGS
+COMP( 1983, oric1,    0,      0,      oric,     oric,     oric_state,      empty_init, "Tangerine", "Oric 1" ,               0 )
+COMP( 1984, orica,    oric1,  0,      oric,     orica,    oric_state,      empty_init, "Tangerine", "Oric Atmos" ,           0 )
+COMP( 1985, prav8d,   oric1,  0,      prav8d,   prav8d,   oric_state,      empty_init, "Pravetz",   "Pravetz 8D",            0 )
+COMP( 1989, prav8dd,  oric1,  0,      prav8d,   prav8d,   oric_state,      empty_init, "Pravetz",   "Pravetz 8D (Disk ROM)", MACHINE_UNOFFICIAL )
+COMP( 1986, telstrat, oric1,  0,      telstrat, telstrat, telestrat_state, empty_init, "Tangerine", "Oric Telestrat",        0 )

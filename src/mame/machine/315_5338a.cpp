@@ -33,16 +33,11 @@ DEFINE_DEVICE_TYPE(SEGA_315_5338A, sega_315_5338a_device, "315_5338a", "Sega 315
 sega_315_5338a_device::sega_315_5338a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SEGA_315_5338A, tag, owner, clock),
 	m_read_cb(*this), m_write_cb(*this),
-	m_out0_cb(*this),
-	m_in1_cb(*this),
-	m_in2_cb(*this),
-	m_in3_cb(*this),
-	m_in4_cb(*this),
-	m_out4_cb(*this),
-	m_out5_cb(*this),
-	m_in6_cb(*this),
-	m_port0(0xff), m_config(0), m_serial_output(0), m_address(0)
+	m_in_port_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
+	m_out_port_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
+	m_port_config(0), m_serial_output(0), m_address(0)
 {
+	std::fill(std::begin(m_port_value), std::end(m_port_value), 0xff);
 }
 
 //-------------------------------------------------
@@ -54,18 +49,16 @@ void sega_315_5338a_device::device_start()
 	// resolve callbacks
 	m_read_cb.resolve_safe(0xff);
 	m_write_cb.resolve_safe();
-	m_out0_cb.resolve_safe();
-	m_in1_cb.resolve_safe(0xff);
-	m_in2_cb.resolve_safe(0xff);
-	m_in3_cb.resolve_safe(0xff);
-	m_in4_cb.resolve_safe(0xff);
-	m_out4_cb.resolve_safe();
-	m_out5_cb.resolve_safe();
-	m_in6_cb.resolve_safe(0xff);
+
+	for (unsigned i = 0; i < 7; i++)
+	{
+		m_in_port_cb[i].resolve_safe(0xff);
+		m_out_port_cb[i].resolve_safe();
+	}
 
 	// register for save states
-	save_item(NAME(m_port0));
-	save_item(NAME(m_config));
+	save_pointer(NAME(m_port_value), 7);
+	save_item(NAME(m_port_config));
 	save_item(NAME(m_serial_output));
 	save_item(NAME(m_address));
 }
@@ -81,19 +74,21 @@ READ8_MEMBER( sega_315_5338a_device::read )
 
 	switch (offset)
 	{
-	// return output latch
-	case 0x00: data = m_port0; break;
+	// port 0 to 6
+	case 0x00:
+	case 0x01:
+	case 0x02:
+	case 0x03:
+	case 0x04:
+	case 0x05:
+	case 0x06:
+		if (BIT(m_port_config, offset))
+			data = m_in_port_cb[offset](0);
+		else
+			data = m_port_value[offset];
+		break;
 
-	// standard input ports
-	case 0x01: data = m_in1_cb(0); break;
-	case 0x02: data = m_in2_cb(0); break;
-	case 0x03: data = m_in3_cb(0); break;
-
-	// input/output port
-	case 0x04: data = m_in4_cb(0); break;
-
-	// input port
-	case 0x06: data = m_in6_cb(0); break;
+	case 0x08: data = m_port_config; break;
 
 	// serial data read back?
 	case 0x0a: data = m_serial_output; break;
@@ -122,21 +117,30 @@ WRITE8_MEMBER( sega_315_5338a_device::write )
 
 	switch (offset)
 	{
-	// latched output port
-	case 0x00: m_port0 = data; m_out0_cb(data); break;
+	// port 0 to 6
+	case 0x00:
+	case 0x01:
+	case 0x02:
+	case 0x03:
+	case 0x04:
+	case 0x05:
+	case 0x06:
+		m_port_value[offset] = data;
+		if (BIT(m_port_config, offset) == 0)
+			m_out_port_cb[offset](data);
+		break;
 
-	// input/output port
-	case 0x04: m_out4_cb(data); break;
-
-	// output port
-	case 0x05: m_out5_cb(data); break;
-
-	// config register?
+	// port direction register (0 = output, 1 = input)
 	case 0x08:
-		// 765-----  unknown
-		// ---4----  port 4 direction (0 = output, 1 = input)
-		// ----3210  unknown
-		m_config = data;
+		// handle ports that were previously set to input and are now output
+		{
+			uint8_t changed = data ^ m_port_config;
+			for (unsigned i = 0; i < 7; i++)
+				if (BIT(changed, i) && BIT(data, i) == 0)
+					m_out_port_cb[i](m_port_value[i]);
+		}
+
+		m_port_config = data;
 		break;
 
 	// command register

@@ -33,19 +33,17 @@ constexpr unsigned huc6260_device::PALETTE_SIZE;
 constexpr unsigned huc6260_device::WPF;
 constexpr unsigned huc6260_device::LPF;
 
-PALETTE_INIT_MEMBER(huc6260_device, huc6260)
+void huc6260_device::palette_init()
 {
-	int i;
-
-	for ( i = 0; i < 512; i++ )
+	for (int i = 0; i < 512; i++)
 	{
 		int r = pal3bit( ( i >> 3 ) & 7 );
 		int g = pal3bit( ( i >> 6 ) & 7 );
 		int b = pal3bit( ( i      ) & 7 );
 		int y = ( ( 66 * r + 129 * g + 25 * b + 128 ) >> 8 ) + 16;
 
-		palette.set_pen_color( i, r, g, b );
-		palette.set_pen_color( 512 + i, y, y, y );
+		set_pen_color(i, r, g, b);
+		set_pen_color(512 + i, y, y, y);
 	}
 }
 
@@ -55,6 +53,7 @@ DEFINE_DEVICE_TYPE(HUC6260, huc6260_device, "huc6260", "Hudson HuC6260 VCE")
 
 huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, HUC6260, tag, owner, clock),
+		device_palette_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		m_next_pixel_data_cb(*this),
 		m_time_til_next_event_cb(*this),
@@ -271,6 +270,8 @@ void huc6260_device::device_start()
 	assert( ! m_next_pixel_data_cb.isnull() );
 	assert( ! m_time_til_next_event_cb.isnull() );
 
+	palette_init();
+
 	save_item(NAME(m_last_h));
 	save_item(NAME(m_last_v));
 	save_item(NAME(m_height));
@@ -298,12 +299,3 @@ void huc6260_device::device_reset()
 	m_last_h = screen().hpos();
 	m_timer->adjust( screen().time_until_pos( ( screen().vpos() + 1 ) % 263, 0 ) );
 }
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(huc6260_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette",  huc6260_device::PALETTE_SIZE)
-	MCFG_PALETTE_INIT_OWNER(huc6260_device, huc6260)
-MACHINE_CONFIG_END

@@ -22,7 +22,7 @@
 #include "speaker.h"
 
 
-static GFXDECODE_START( galeb )
+static GFXDECODE_START( gfx_galeb )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galeb_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -67,10 +67,10 @@ READ8_MEMBER(galeb_state::tape_data_r)
 void galeb_state::galeb_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();  // RAM
-	map(0xbfe0, 0xbfe7).r(this, FUNC(galeb_state::keyboard_r));
-	map(0xbfe0, 0xbfe0).w(this, FUNC(galeb_state::dac_w));
-	map(0xbffe, 0xbffe).r(this, FUNC(galeb_state::tape_status_r));
-	map(0xbfff, 0xbfff).rw(this, FUNC(galeb_state::tape_data_r), FUNC(galeb_state::tape_data_w));
+	map(0xbfe0, 0xbfe7).r(FUNC(galeb_state::keyboard_r));
+	map(0xbfe0, 0xbfe0).w(FUNC(galeb_state::dac_w));
+	map(0xbffe, 0xbffe).r(FUNC(galeb_state::tape_status_r));
+	map(0xbfff, 0xbfff).rw(FUNC(galeb_state::tape_data_r), FUNC(galeb_state::tape_data_w));
 	map(0xb000, 0xb3ff).ram().share("video_ram"); // video ram
 	map(0xc000, 0xc7ff).rom();  // BASIC 01 ROM
 	map(0xc800, 0xcfff).rom();  // BASIC 02 ROM
@@ -166,8 +166,8 @@ INPUT_PORTS_END
 /* Machine driver */
 MACHINE_CONFIG_START(galeb_state::galeb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1000000)
-	MCFG_CPU_PROGRAM_MAP(galeb_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(galeb_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -176,18 +176,18 @@ MACHINE_CONFIG_START(galeb_state::galeb)
 	MCFG_SCREEN_SIZE(48*8, 16*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*8-1, 0, 16*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galeb_state, screen_update_galeb)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galeb )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galeb )
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // unknown DAC
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -205,5 +205,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE         INIT  COMPANY         FULLNAME   FLAGS
-COMP( 1981, galeb, 0,      0,      galeb,   galeb, galeb_state,  0,    "PEL Varazdin", "Galeb",   0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY         FULLNAME  FLAGS
+COMP( 1981, galeb, 0,      0,      galeb,   galeb, galeb_state, empty_init, "PEL Varazdin", "Galeb",  0 )

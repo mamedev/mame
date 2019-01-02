@@ -58,6 +58,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -79,6 +80,9 @@ public:
 		m_dsw(*this, {"DSW1", "DSW2", "DSW3", "DSW4", "DSW5"}),
 		m_service(*this, "SERVICE") { }
 
+	void dunhuang(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(pos_x_w);
 	DECLARE_WRITE8_MEMBER(pos_y_w);
 	DECLARE_WRITE8_MEMBER(tile_w);
@@ -102,16 +106,13 @@ public:
 	DECLARE_READ8_MEMBER(dsw_r);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void dunhuang(machine_config &config);
 	void dunhuang_io_map(address_map &map);
 	void dunhuang_map(address_map &map);
 	void ramdac_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-
-private:
 
 	/* video-related */
 	tilemap_t         *m_tmap;
@@ -486,28 +487,28 @@ WRITE8_MEMBER(dunhuang_state::rombank_w)
 
 void dunhuang_state::dunhuang_io_map(address_map &map)
 {
-	map(0x0000, 0x0000).w(this, FUNC(dunhuang_state::pos_x_w));
-	map(0x0001, 0x0001).w(this, FUNC(dunhuang_state::pos_y_w));
-	map(0x0002, 0x0004).w(this, FUNC(dunhuang_state::tile_w));
-	map(0x0005, 0x0007).w(this, FUNC(dunhuang_state::tile2_w));
+	map(0x0000, 0x0000).w(FUNC(dunhuang_state::pos_x_w));
+	map(0x0001, 0x0001).w(FUNC(dunhuang_state::pos_y_w));
+	map(0x0002, 0x0004).w(FUNC(dunhuang_state::tile_w));
+	map(0x0005, 0x0007).w(FUNC(dunhuang_state::tile2_w));
 
-	map(0x0008, 0x0008).w(this, FUNC(dunhuang_state::vert_clear_w));
+	map(0x0008, 0x0008).w(FUNC(dunhuang_state::vert_clear_w));
 
 	map(0x000c, 0x000c).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 
-	map(0x000f, 0x000f).w(this, FUNC(dunhuang_state::block_addr_lo_w));
-	map(0x0010, 0x0010).w(this, FUNC(dunhuang_state::block_addr_hi_w));
+	map(0x000f, 0x000f).w(FUNC(dunhuang_state::block_addr_lo_w));
+	map(0x0010, 0x0010).w(FUNC(dunhuang_state::block_addr_hi_w));
 //  AM_RANGE( 0x0011, 0x0011 ) ?
-	map(0x0012, 0x0012).w(this, FUNC(dunhuang_state::block_c_w));
-	map(0x0015, 0x0015).w(this, FUNC(dunhuang_state::block_x_w));
-	map(0x0016, 0x0016).w(this, FUNC(dunhuang_state::block_y_w));
-	map(0x0017, 0x0017).w(this, FUNC(dunhuang_state::block_w_w));
-	map(0x0018, 0x0018).w(this, FUNC(dunhuang_state::block_h_w));
+	map(0x0012, 0x0012).w(FUNC(dunhuang_state::block_c_w));
+	map(0x0015, 0x0015).w(FUNC(dunhuang_state::block_x_w));
+	map(0x0016, 0x0016).w(FUNC(dunhuang_state::block_y_w));
+	map(0x0017, 0x0017).w(FUNC(dunhuang_state::block_w_w));
+	map(0x0018, 0x0018).w(FUNC(dunhuang_state::block_h_w));
 
-	map(0x0019, 0x0019).w(this, FUNC(dunhuang_state::clear_y_w));
-	map(0x001a, 0x001a).w(this, FUNC(dunhuang_state::horiz_clear_w));
+	map(0x0019, 0x0019).w(FUNC(dunhuang_state::clear_y_w));
+	map(0x001a, 0x001a).w(FUNC(dunhuang_state::horiz_clear_w));
 
-	map(0x001b, 0x001b).w(this, FUNC(dunhuang_state::block_dest_w));
+	map(0x001b, 0x001b).w(FUNC(dunhuang_state::block_dest_w));
 
 	map(0x0081, 0x0081).w("ymsnd", FUNC(ym2413_device::register_port_w));
 	map(0x0089, 0x0089).w("ymsnd", FUNC(ym2413_device::data_port_w));
@@ -518,11 +519,11 @@ void dunhuang_state::dunhuang_io_map(address_map &map)
 	map(0x008b, 0x008b).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x0093, 0x0093).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	map(0x0084, 0x0084).r(this, FUNC(dunhuang_state::service_r));
-	map(0x0085, 0x0085).r(this, FUNC(dunhuang_state::input_r));
+	map(0x0084, 0x0084).r(FUNC(dunhuang_state::service_r));
+	map(0x0085, 0x0085).r(FUNC(dunhuang_state::input_r));
 
-	map(0x0086, 0x0086).w(this, FUNC(dunhuang_state::rombank_w));
-	map(0x0087, 0x0087).w(this, FUNC(dunhuang_state::layers_w));
+	map(0x0086, 0x0086).w(FUNC(dunhuang_state::rombank_w));
+	map(0x0087, 0x0087).w(FUNC(dunhuang_state::layers_w));
 
 	map(0x0088, 0x0088).r("ay8910", FUNC(ay8910_device::data_r));
 	map(0x0090, 0x0090).w("ay8910", FUNC(ay8910_device::data_w));
@@ -750,7 +751,7 @@ static const gfx_layout layout_8x32 =
 	32*32
 };
 
-static GFXDECODE_START( dunhuang )
+static GFXDECODE_START( gfx_dunhuang )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x32, 0, 16 )
 GFXDECODE_END
@@ -806,13 +807,12 @@ void dunhuang_state::machine_reset()
 MACHINE_CONFIG_START(dunhuang_state::dunhuang)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
-	MCFG_CPU_PROGRAM_MAP(dunhuang_map)
-	MCFG_CPU_IO_MAP(dunhuang_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dunhuang_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(dunhuang_map)
+	MCFG_DEVICE_IO_MAP(dunhuang_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dunhuang_state, irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(5))
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(5));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -823,23 +823,23 @@ MACHINE_CONFIG_START(dunhuang_state::dunhuang)
 	MCFG_SCREEN_UPDATE_DRIVER(dunhuang_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dunhuang)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dunhuang)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &dunhuang_state::ramdac_map);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_SOUND_ADD("ay8910", AY8910, 12000000/8)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(dunhuang_state, dsw_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(dunhuang_state, input_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &ay8910(AY8910(config, "ay8910", 12000000/8));
+	ay8910.port_b_read_callback().set(FUNC(dunhuang_state::dsw_r));
+	ay8910.port_a_write_callback().set(FUNC(dunhuang_state::input_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_OKIM6295_ADD("oki", 12000000/8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -864,4 +864,4 @@ ROM_START( dunhuang )
 	ROM_LOAD( "rom6.u1", 0x00000, 0x20000, CRC(31cfdc29) SHA1(725249eae9227eadf05418b799e0da0254bb2f51) )
 ROM_END
 
-GAME( 1995, dunhuang, 0, dunhuang, dunhuang, dunhuang_state, 0, ROT0, "Spirit", "Mahjong Dunhuang", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dunhuang, 0, dunhuang, dunhuang, dunhuang_state, empty_init, ROT0, "Spirit", "Mahjong Dunhuang", MACHINE_SUPPORTS_SAVE )

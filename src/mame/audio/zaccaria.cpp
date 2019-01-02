@@ -134,9 +134,9 @@ void zac1b11142_audio_device::zac1b11142_audio_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x007f).ram(); // 6802 internal RAM
 	map(0x0090, 0x0093).mirror(0x8f6c).rw("pia_1i", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x1000).mirror(0x83ff).w("dac", FUNC(dac_byte_interface::write));
-	map(0x1400, 0x1400).mirror(0xc3ff).w(this, FUNC(zac1b11142_audio_device::melody_command_w));
-	map(0x1800, 0x1800).mirror(0xc3ff).r(this, FUNC(zac1b11142_audio_device::host_command_r));
+	map(0x1000, 0x1000).mirror(0x83ff).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x1400, 0x1400).mirror(0xc3ff).w(FUNC(zac1b11142_audio_device::melody_command_w));
+	map(0x1800, 0x1800).mirror(0xc3ff).r(FUNC(zac1b11142_audio_device::host_command_r));
 	map(0x2000, 0x2fff).mirror(0x8000).rom(); // ROM 8 with A12 low
 	map(0x3000, 0x3fff).mirror(0x8000).rom(); // ROM 7 with A12 low
 	map(0x6000, 0x6fff).mirror(0x8000).rom(); // ROM 8 with A12 high
@@ -222,25 +222,26 @@ READ8_MEMBER(zac1b111xx_melody_base::melodypsg1_portb_r)
 	return m_melody_command;
 }
 
-MACHINE_CONFIG_START(zac1b111xx_melody_base::device_add_mconfig)
-	MCFG_CPU_ADD("melodycpu", M6802, XTAL(3'579'545)) // verified on pcb
-	MCFG_CPU_PROGRAM_MAP(zac1b111xx_melody_base_map)
+void zac1b111xx_melody_base::device_add_mconfig(machine_config &config)
+{
+	M6802(config, m_melodycpu, XTAL(3'579'545)); // verified on pcb
+	m_melodycpu->set_addrmap(AS_PROGRAM, &zac1b111xx_melody_base::zac1b111xx_melody_base_map);
 
-	MCFG_DEVICE_ADD("timebase", CLOCK, XTAL(3'579'545)/4096/2) // CPU clock divided using 4040 and half of 74LS74
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("melodypia", pia6821_device, cb1_w))
+	clock_device &timebase(CLOCK(config, "timebase", XTAL(3'579'545)/4096/2)); // CPU clock divided using 4040 and half of 74LS74
+	timebase.signal_handler().set(m_melodypia, FUNC(pia6821_device::cb1_w));
 
-	MCFG_DEVICE_ADD("melodypia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(zac1b111xx_melody_base, melodypia_porta_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zac1b111xx_melody_base, melodypia_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(zac1b111xx_melody_base, melodypia_portb_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("melodycpu", INPUT_LINE_NMI))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("melodycpu", M6802_IRQ_LINE))
+	PIA6821(config, m_melodypia, 0);
+	m_melodypia->readpa_handler().set(FUNC(zac1b111xx_melody_base::melodypia_porta_r));
+	m_melodypia->writepa_handler().set(FUNC(zac1b111xx_melody_base::melodypia_porta_w));
+	m_melodypia->writepb_handler().set(FUNC(zac1b111xx_melody_base::melodypia_portb_w));
+	m_melodypia->irqa_handler().set_inputline("melodycpu", INPUT_LINE_NMI);
+	m_melodypia->irqb_handler().set_inputline("melodycpu", M6802_IRQ_LINE);
 
-	MCFG_SOUND_ADD("melodypsg1", AY8910, XTAL(3'579'545)/2) // CPU clock divided using 4040
-	MCFG_AY8910_PORT_B_READ_CB(READ8(zac1b111xx_melody_base, melodypsg1_portb_r))
+	AY8910(config, m_melodypsg1, XTAL(3'579'545)/2); // CPU clock divided using 4040
+	m_melodypsg1->port_b_read_callback().set(FUNC(zac1b111xx_melody_base::melodypsg1_portb_r));
 
-	MCFG_SOUND_ADD("melodypsg2", AY8910, XTAL(3'579'545)/2) // CPU clock divided using 4040
-MACHINE_CONFIG_END
+	AY8910(config, m_melodypsg2, XTAL(3'579'545)/2); // CPU clock divided using 4040
+}
 
 void zac1b111xx_melody_base::device_start()
 {
@@ -301,20 +302,18 @@ WRITE8_MEMBER(zac1b11107_audio_device::melodypsg2_porta_w)
 	// TODO: assume LEVELT is controlled here as is the case for 1B11142?
 }
 
-MACHINE_CONFIG_START(zac1b11107_audio_device::device_add_mconfig)
+void zac1b11107_audio_device::device_add_mconfig(machine_config &config)
+{
 	zac1b111xx_melody_base::device_add_mconfig(config);
 
-	MCFG_CPU_MODIFY("melodycpu")
-	MCFG_CPU_PROGRAM_MAP(zac1b11107_melody_map)
+	m_melodycpu->set_addrmap(AS_PROGRAM, &zac1b11107_audio_device::zac1b11107_melody_map);
 
-	MCFG_DEVICE_MODIFY("melodypsg1")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(zac1b11107_audio_device, melodypsg1_porta_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5, 0)
+	m_melodypsg1->port_a_write_callback().set(FUNC(zac1b11107_audio_device::melodypsg1_porta_w));
+	m_melodypsg1->add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0);
 
-	MCFG_DEVICE_MODIFY("melodypsg2")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(zac1b11107_audio_device, melodypsg2_porta_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5, 0)
-MACHINE_CONFIG_END
+	m_melodypsg2->port_a_write_callback().set(FUNC(zac1b11107_audio_device::melodypsg2_porta_w));
+	m_melodypsg2->add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0);
+}
 
 
 
@@ -404,67 +403,66 @@ WRITE8_MEMBER(zac1b11142_audio_device::pia_1i_portb_w)
 	// TODO: a LED output().set_led_value(0, BIT(data, 4));
 }
 
-MACHINE_CONFIG_START(zac1b11142_audio_device::device_add_mconfig)
+void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
+{
 	zac1b111xx_melody_base::device_add_mconfig(config);
 
-	MCFG_CPU_MODIFY("melodycpu")
-	MCFG_CPU_PROGRAM_MAP(zac1b11142_melody_map)
+	m_melodycpu->set_addrmap(AS_PROGRAM, &zac1b11142_audio_device::zac1b11142_melody_map);
 
-	MCFG_DEVICE_MODIFY("melodypsg1")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(zac1b11142_audio_device, ay_4g_porta_w))
-	MCFG_SOUND_ROUTE_EX(0, "sound_nl", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "sound_nl", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "sound_nl", 1.0, 2)
+	m_melodypsg1->port_a_write_callback().set(FUNC(zac1b11142_audio_device::ay_4g_porta_w));
+	m_melodypsg1->add_route(0, "sound_nl", 1.0, 0);
+	m_melodypsg1->add_route(1, "sound_nl", 1.0, 1);
+	m_melodypsg1->add_route(2, "sound_nl", 1.0, 2);
 
-	MCFG_DEVICE_MODIFY("melodypsg2")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(zac1b11142_audio_device, ay_4h_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(zac1b11142_audio_device, ay_4h_portb_w))
-	MCFG_SOUND_ROUTE_EX(0, "sound_nl", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(1, "sound_nl", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(2, "sound_nl", 1.0, 5)
+	m_melodypsg2->port_a_write_callback().set(FUNC(zac1b11142_audio_device::ay_4h_porta_w));
+	m_melodypsg2->port_b_write_callback().set(FUNC(zac1b11142_audio_device::ay_4h_portb_w));
+	m_melodypsg2->add_route(0, "sound_nl", 1.0, 3);
+	m_melodypsg2->add_route(1, "sound_nl", 1.0, 4);
+	m_melodypsg2->add_route(2, "sound_nl", 1.0, 5);
 
-	MCFG_CPU_ADD("audiocpu", M6802, XTAL(3'579'545)) // verified on pcb
-	MCFG_CPU_PROGRAM_MAP(zac1b11142_audio_map)
+	M6802(config, m_audiocpu, XTAL(3'579'545)); // verified on pcb
+	m_audiocpu->set_addrmap(AS_PROGRAM, &zac1b11142_audio_device::zac1b11142_audio_map);
 
-	MCFG_DEVICE_ADD("pia_1i", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(DEVREAD8("speech", tms5220_device, status_r))
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("speech", tms5220_device, data_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(zac1b11142_audio_device, pia_1i_portb_w))
+	PIA6821(config, m_pia_1i, 0);
+	m_pia_1i->readpa_handler().set(m_speech, FUNC(tms5220_device::status_r));
+	m_pia_1i->writepa_handler().set(m_speech, FUNC(tms5220_device::data_w));
+	m_pia_1i->writepb_handler().set(FUNC(zac1b11142_audio_device::pia_1i_portb_w));
 
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.40, 0) // mc1408.1f
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.40, AUTO_ALLOC_INPUT, 0); // mc1408.1f
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	// There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF)
 	// 162kHz measured on pin 3 20 minutes after power on, clock would then be 162.3*4=649.2kHz
-	MCFG_SOUND_ADD("speech", TMS5200, 649200) // ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that)
-	MCFG_TMS52XX_IRQ_HANDLER(DEVWRITELINE("pia_1i", pia6821_device, cb1_w))
-	MCFG_TMS52XX_READYQ_HANDLER(DEVWRITELINE("pia_1i", pia6821_device, ca2_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.80, 0)
+	TMS5200(config, m_speech, 649200); // ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that)
+	m_speech->irq_cb().set(m_pia_1i, FUNC(pia6821_device::cb1_w));
+	m_speech->ready_cb().set(m_pia_1i, FUNC(pia6821_device::ca2_w));
+	m_speech->add_route(ALL_OUTPUTS, *this, 0.80, AUTO_ALLOC_INPUT, 0);
 
-	MCFG_SOUND_ADD("sound_nl", NETLIST_SOUND, 48000)
-	MCFG_NETLIST_SETUP(zac1b11142)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0, 0)
+	netlist_mame_sound_device &sound_nl(NETLIST_SOUND(config, "sound_nl", 48000));
+	sound_nl.set_constructor(netlist_zac1b11142);
+	sound_nl.add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "ioa0",   "I_IOA0.IN",   0)
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "ioa1",   "I_IOA1.IN",   0)
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "ioa2",   "I_IOA2.IN",   0)
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "ioa3",   "I_IOA3.IN",   0)
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "ioa4",   "I_IOA4.IN",   0)
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "level",  "I_LEVEL.IN",  0)
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "levelt", "I_LEVELT.IN", 0)
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "sw1",    "I_SW1.IN",    0)
+	NETLIST_LOGIC_INPUT(config, "sound_nl:ioa0",   "I_IOA0.IN",   0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:ioa1",   "I_IOA1.IN",   0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:ioa2",   "I_IOA2.IN",   0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:ioa3",   "I_IOA3.IN",   0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:ioa4",   "I_IOA4.IN",   0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:level",  "I_LEVEL.IN",  0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:levelt", "I_LEVELT.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:sw1",    "I_SW1.IN",    0);
 
-	MCFG_NETLIST_STREAM_INPUT("sound_nl", 0, "R_AY4G_A.R")
-	MCFG_NETLIST_STREAM_INPUT("sound_nl", 1, "R_AY4G_B.R")
-	MCFG_NETLIST_STREAM_INPUT("sound_nl", 2, "R_AY4G_C.R")
-	MCFG_NETLIST_STREAM_INPUT("sound_nl", 3, "R_AY4H_A.R")
-	MCFG_NETLIST_STREAM_INPUT("sound_nl", 4, "R_AY4H_B.R")
-	MCFG_NETLIST_STREAM_INPUT("sound_nl", 5, "R_AY4H_C.R")
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin0", 0, "R_AY4G_A.R");
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin1", 1, "R_AY4G_B.R");
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin2", 2, "R_AY4G_C.R");
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin3", 3, "R_AY4H_A.R");
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin4", 4, "R_AY4H_B.R");
+	NETLIST_STREAM_INPUT(config, "sound_nl:cin5", 5, "R_AY4H_C.R");
 
-	MCFG_NETLIST_STREAM_OUTPUT("sound_nl", 0, "P1.2")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(3000.0 * 10.0, 0.0) // FIXME: no clue what numbers to use here
-MACHINE_CONFIG_END
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "P1.2").set_mult_offset(3000.0 * 10.0, 0.0); // FIXME: no clue what numbers to use here
+}
 
 ioport_constructor zac1b11142_audio_device::device_input_ports() const
 {

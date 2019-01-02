@@ -32,6 +32,10 @@ constexpr int M68K_IRQ_5    = 5;
 constexpr int M68K_IRQ_6    = 6;
 constexpr int M68K_IRQ_7    = 7;
 
+constexpr int M68K_SZ_LONG = 0;
+constexpr int M68K_SZ_BYTE = 1;
+constexpr int M68K_SZ_WORD = 2;
+
 // special input lines
 constexpr int M68K_LINE_BUSERROR = 16;
 
@@ -94,7 +98,9 @@ enum
 	M68K_D0, M68K_D1, M68K_D2, M68K_D3, M68K_D4, M68K_D5, M68K_D6, M68K_D7,
 	M68K_A0, M68K_A1, M68K_A2, M68K_A3, M68K_A4, M68K_A5, M68K_A6, M68K_A7,
 	M68K_FP0, M68K_FP1, M68K_FP2, M68K_FP3, M68K_FP4, M68K_FP5, M68K_FP6, M68K_FP7,
-	M68K_FPSR, M68K_FPCR
+	M68K_FPSR, M68K_FPCR, M68K_CRP_LIMIT, M68K_CRP_APTR, M68K_SRP_LIMIT, M68K_SRP_APTR,
+	M68K_MMU_TC, M68K_TT0, M68K_TT1, M68K_MMU_SR, M68K_ITT0, M68K_ITT1,
+	M68K_DTT0, M68K_DTT1, M68K_URP_APTR
 };
 
 class m68000_base_device : public cpu_device
@@ -117,6 +123,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 	virtual uint32_t execute_input_lines() const override { return 8; }; // number of input lines
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return M68K_INT_ACK_AUTOVECTOR; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == M68K_IRQ_7; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -236,54 +244,21 @@ protected:
 
 	/* Redirect memory calls */
 
-	typedef delegate<uint8_t (offs_t)> m68k_read8_delegate;
-	typedef delegate<uint16_t (offs_t)> m68k_readimm16_delegate;
-	typedef delegate<uint16_t (offs_t)> m68k_read16_delegate;
-	typedef delegate<uint32_t (offs_t)> m68k_read32_delegate;
-	typedef delegate<void (offs_t, uint8_t)> m68k_write8_delegate;
-	typedef delegate<void (offs_t, uint16_t)> m68k_write16_delegate;
-	typedef delegate<void (offs_t, uint32_t)> m68k_write32_delegate;
+	void init8(address_space &space, address_space &ospace);
+	void init16(address_space &space, address_space &ospace);
+	void init32(address_space &space, address_space &ospace);
+	void init32mmu(address_space &space, address_space &ospace);
+	void init32hmmu(address_space &space, address_space &ospace);
 
-		void init8(address_space &space, address_space &ospace);
-		void init16(address_space &space, address_space &ospace);
-		void init32(address_space &space, address_space &ospace);
-		void init32mmu(address_space &space, address_space &ospace);
-		void init32hmmu(address_space &space, address_space &ospace);
-
-		offs_t  m_opcode_xor;                     // Address Calculation
-		m68k_readimm16_delegate m_readimm16;      // Immediate read 16 bit
-		m68k_read8_delegate m_read8;
-		m68k_read16_delegate m_read16;
-		m68k_read32_delegate m_read32;
-		m68k_write8_delegate m_write8;
-		m68k_write16_delegate m_write16;
-		m68k_write32_delegate m_write32;
-
-		uint16_t m68008_read_immediate_16(offs_t address);
-		uint16_t read_immediate_16(offs_t address);
-		uint16_t simple_read_immediate_16(offs_t address);
-
-		void m68000_write_byte(offs_t address, uint8_t data);
-
-		uint8_t read_byte_32_mmu(offs_t address);
-		void write_byte_32_mmu(offs_t address, uint8_t data);
-		uint16_t read_immediate_16_mmu(offs_t address);
-		uint16_t readword_d32_mmu(offs_t address);
-		void writeword_d32_mmu(offs_t address, uint16_t data);
-		uint32_t readlong_d32_mmu(offs_t address);
-		void writelong_d32_mmu(offs_t address, uint32_t data);
-
-		uint8_t read_byte_32_hmmu(offs_t address);
-		void write_byte_32_hmmu(offs_t address, uint8_t data);
-		uint16_t read_immediate_16_hmmu(offs_t address);
-		uint16_t readword_d32_hmmu(offs_t address);
-		void writeword_d32_hmmu(offs_t address, uint16_t data);
-		uint32_t readlong_d32_hmmu(offs_t address);
-		void writelong_d32_hmmu(offs_t address, uint32_t data);
-
+	std::function<u16 (offs_t)> m_readimm16;      // Immediate read 16 bit
+	std::function<u8  (offs_t)> m_read8;
+	std::function<u16 (offs_t)> m_read16;
+	std::function<u32 (offs_t)> m_read32;
+	std::function<void (offs_t, u8 )> m_write8;
+	std::function<void (offs_t, u16)> m_write16;
+	std::function<void (offs_t, u32)> m_write32;
 
 	address_space *m_space, *m_ospace;
-	direct_read_data<0> *m_direct, *m_odirect;
 
 	uint32_t      m_iotemp;
 
@@ -309,11 +284,16 @@ protected:
 	uint16_t m_mmu_tmp_sr;      /* temporary hack: status code for ptest and to handle write protection */
 	uint16_t m_mmu_tmp_fc;      /* temporary hack: function code for the mmu (moves) */
 	uint16_t m_mmu_tmp_rw;      /* temporary hack: read/write (1/0) for the mmu */
+	uint8_t m_mmu_tmp_sz;       /* temporary hack: size for mmu */
+
 	uint32_t m_mmu_tmp_buserror_address;   /* temporary hack: (first) bus error address */
 	uint16_t m_mmu_tmp_buserror_occurred;  /* temporary hack: flag that bus error has occurred from mmu */
 	uint16_t m_mmu_tmp_buserror_fc;   /* temporary hack: (first) bus error fc */
 	uint16_t m_mmu_tmp_buserror_rw;   /* temporary hack: (first) bus error rw */
+	uint16_t m_mmu_tmp_buserror_sz;   /* temporary hack: (first) bus error size` */
 
+	bool m_mmu_tablewalk;             /* set when MMU walks page tables */
+	uint32_t m_mmu_last_logical_addr;
 	uint32_t m_ic_address[M68K_IC_SIZE];   /* instruction cache address data */
 	uint32_t m_ic_data[M68K_IC_SIZE];      /* instruction cache content data */
 	bool   m_ic_valid[M68K_IC_SIZE];     /* instruction cache valid flags */
@@ -385,8 +365,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -408,8 +386,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -428,8 +404,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -444,8 +418,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -462,8 +434,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -478,8 +448,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -496,8 +464,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -512,8 +478,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -530,8 +494,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -546,8 +508,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	virtual bool memory_translate(int space, int intention, offs_t &address) override;
 
@@ -566,8 +526,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -582,8 +540,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -600,8 +556,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -616,8 +570,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -634,8 +586,6 @@ public:
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
 
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
-
 	// device-level overrides
 	virtual void device_start() override;
 };
@@ -650,8 +600,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -670,8 +618,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -693,8 +639,6 @@ public:
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
-
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
 
 
 	// device-level overrides

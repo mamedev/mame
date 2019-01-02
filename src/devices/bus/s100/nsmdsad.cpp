@@ -48,9 +48,10 @@ const tiny_rom_entry *s100_mds_ad_device::device_rom_region() const
 //  SLOT_INTERFACE( mds_ad_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( mds_ad_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD ) // Shugart SA-400
-SLOT_INTERFACE_END
+static void mds_ad_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD); // Shugart SA-400
+}
 
 
 //-------------------------------------------------
@@ -108,5 +109,5 @@ void s100_mds_ad_device::device_reset()
 
 uint8_t s100_mds_ad_device::s100_smemr_r(address_space &space, offs_t offset)
 {
-	return 0;
+	return 0xff;
 }

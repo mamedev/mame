@@ -61,6 +61,8 @@ Mighty Guy board layout:
 #include "sound/3526intf.h"
 #include "screen.h"
 #include "speaker.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 #define MIGHTGUY_HACK    0
@@ -127,9 +129,9 @@ void cop01_state::cop01_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram(); /* c000-c7ff in cop01 */
-	map(0xd000, 0xdfff).ram().w(this, FUNC(cop01_state::cop01_background_w)).share("bgvideoram");
+	map(0xd000, 0xdfff).ram().w(FUNC(cop01_state::cop01_background_w)).share("bgvideoram");
 	map(0xe000, 0xe0ff).writeonly().share("spriteram");
-	map(0xf000, 0xf3ff).w(this, FUNC(cop01_state::cop01_foreground_w)).share("fgvideoram");
+	map(0xf000, 0xf3ff).w(FUNC(cop01_state::cop01_foreground_w)).share("fgvideoram");
 }
 
 void cop01_state::io_map(address_map &map)
@@ -140,9 +142,9 @@ void cop01_state::io_map(address_map &map)
 	map(0x02, 0x02).portr("SYSTEM");
 	map(0x03, 0x03).portr("DSW1");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x40, 0x43).w(this, FUNC(cop01_state::cop01_vreg_w));
-	map(0x44, 0x44).w(this, FUNC(cop01_state::cop01_sound_command_w));
-	map(0x45, 0x45).w(this, FUNC(cop01_state::cop01_irq_ack_w)); /* ? */
+	map(0x40, 0x43).w(FUNC(cop01_state::cop01_vreg_w));
+	map(0x44, 0x44).w(FUNC(cop01_state::cop01_sound_command_w));
+	map(0x45, 0x45).w(FUNC(cop01_state::cop01_irq_ack_w)); /* ? */
 }
 
 void mightguy_state::mightguy_io_map(address_map &map)
@@ -153,15 +155,15 @@ void mightguy_state::mightguy_io_map(address_map &map)
 	map(0x02, 0x02).portr("SYSTEM");
 	map(0x03, 0x03).portr("DSW1");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x40, 0x43).w(this, FUNC(cop01_state::cop01_vreg_w));
-	map(0x44, 0x44).w(this, FUNC(cop01_state::cop01_sound_command_w));
-	map(0x45, 0x45).w(this, FUNC(cop01_state::cop01_irq_ack_w)); /* ? */
+	map(0x40, 0x43).w(FUNC(cop01_state::cop01_vreg_w));
+	map(0x44, 0x44).w(FUNC(cop01_state::cop01_sound_command_w));
+	map(0x45, 0x45).w(FUNC(cop01_state::cop01_irq_ack_w)); /* ? */
 }
 
 void cop01_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8000).r(this, FUNC(cop01_state::cop01_sound_irq_ack_w));
+	map(0x8000, 0x8000).r(FUNC(cop01_state::cop01_sound_irq_ack_w));
 	map(0xc000, 0xc7ff).ram();
 }
 
@@ -171,7 +173,7 @@ void cop01_state::audio_io_map(address_map &map)
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x04, 0x05).w("ay3", FUNC(ay8910_device::address_data_w));
-	map(0x06, 0x06).r(this, FUNC(cop01_state::cop01_sound_command_r));
+	map(0x06, 0x06).r(FUNC(cop01_state::cop01_sound_command_r));
 }
 
 void mightguy_state::mightguy_audio_io_map(address_map &map)
@@ -180,7 +182,7 @@ void mightguy_state::mightguy_audio_io_map(address_map &map)
 	map(0x00, 0x01).w("ymsnd", FUNC(ym3526_device::write));
 	map(0x02, 0x02).w("prot_chip", FUNC(nb1412m2_device::command_w));
 	map(0x03, 0x03).rw("prot_chip", FUNC(nb1412m2_device::data_r), FUNC(nb1412m2_device::data_w));
-	map(0x06, 0x06).r(this, FUNC(cop01_state::cop01_sound_command_r));
+	map(0x06, 0x06).r(FUNC(cop01_state::cop01_sound_command_r));
 }
 
 
@@ -412,7 +414,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( cop01 )
+static GFXDECODE_START( gfx_cop01 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        16,  8 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 16+8*16, 16 )
@@ -447,14 +449,14 @@ void cop01_state::machine_reset()
 MACHINE_CONFIG_START(cop01_state::cop01)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown clock / divider */
-	MCFG_CPU_PROGRAM_MAP(cop01_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown clock / divider */
+	MCFG_DEVICE_PROGRAM_MAP(cop01_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'000'000))    /* unknown clock / divider, hand-tuned to match audio reference */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(audio_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'000'000))    /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(audio_io_map)
 
 
 	/* video hardware */
@@ -464,41 +466,37 @@ MACHINE_CONFIG_START(cop01_state::cop01)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cop01_state, screen_update_cop01)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cop01)
-	MCFG_PALETTE_ADD("palette", 16+8*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(cop01_state, cop01)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cop01);
+	PALETTE(config, m_palette, FUNC(cop01_state::cop01_palette), 16+8*16+16*16, 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, "ay1", 1250000).add_route(ALL_OUTPUTS, "mono", 0.50); /* unknown clock / divider, hand-tuned to match audio reference */
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay2", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); /* unknown clock / divider, hand-tuned to match audio reference */
 
-	MCFG_SOUND_ADD("ay3", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay3", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); /* unknown clock / divider, hand-tuned to match audio reference */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mightguy_state::mightguy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown divider */
-	MCFG_CPU_PROGRAM_MAP(cop01_map)
-	MCFG_CPU_IO_MAP(mightguy_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown divider */
+	MCFG_DEVICE_PROGRAM_MAP(cop01_map)
+	MCFG_DEVICE_IO_MAP(mightguy_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, AUDIOCPU_CLOCK/2) /* unknown divider */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(mightguy_audio_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, AUDIOCPU_CLOCK/2) /* unknown divider */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(mightguy_audio_io_map)
 
-	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(8'000'000)/2) // divided by 2 maybe
+	NB1412M2(config, m_prot, XTAL(8'000'000)/2); // divided by 2 maybe
+	m_prot->dac_callback().set("dac", FUNC(dac_byte_interface::data_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -507,20 +505,23 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cop01_state, screen_update_cop01)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cop01)
-	MCFG_PALETTE_ADD("palette", 16+8*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(cop01_state, cop01)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cop01);
+	PALETTE(config, m_palette, FUNC(cop01_state::cop01_palette), 16+8*16+16*16, 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, AUDIOCPU_CLOCK/2) /* unknown divider */
+	MCFG_DEVICE_ADD("ymsnd", YM3526, AUDIOCPU_CLOCK/2) /* unknown divider */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) // unknown DAC
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -644,7 +645,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cop01_state,mightguy)
+void cop01_state::init_mightguy()
 {
 #if MIGHTGUY_HACK
 	/* This is a hack to fix the game code to get a fully working
@@ -666,6 +667,6 @@ DRIVER_INIT_MEMBER(cop01_state,mightguy)
  *
  *************************************/
 
-GAME( 1985, cop01,    0,     cop01,    cop01,    cop01_state,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cop01a,   cop01, cop01,    cop01,    cop01_state,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mightguy, 0,     mightguy, mightguy, mightguy_state, mightguy, ROT270, "Nichibutsu", "Mighty Guy",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01,    0,     cop01,    cop01,    cop01_state,    empty_init,    ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01a,   cop01, cop01,    cop01,    cop01_state,    empty_init,    ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mightguy, 0,     mightguy, mightguy, mightguy_state, init_mightguy, ROT270, "Nichibutsu", "Mighty Guy",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

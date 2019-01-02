@@ -250,10 +250,10 @@ void qix_state::main_map(address_map &map)
 	map(0x8000, 0x83ff).ram().share("share1");
 	map(0x8400, 0x87ff).ram();
 	map(0x8800, 0x8bff).nopr();   /* 6850 ACIA */
-	map(0x8c00, 0x8c00).mirror(0x3fe).rw(this, FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
-	map(0x8c01, 0x8c01).mirror(0x3fe).rw(this, FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
+	map(0x8c00, 0x8c00).mirror(0x3fe).rw(FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x3fe).rw(FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
 	map(0x9000, 0x93ff).rw(m_sndpia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x9400, 0x97ff).r(m_pia0, FUNC(pia6821_device::read)).w(this, FUNC(qix_state::qix_pia_w));
+	map(0x9400, 0x97ff).r(m_pia0, FUNC(pia6821_device::read)).w(FUNC(qix_state::qix_pia_w));
 	map(0x9800, 0x9bff).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x9c00, 0x9fff).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xa000, 0xffff).rom();
@@ -265,10 +265,10 @@ void qix_state::kram3_main_map(address_map &map)
 	map(0x8000, 0x83ff).ram().share("share1");
 	map(0x8400, 0x87ff).ram();
 	map(0x8800, 0x8bff).nopr();   /* 6850 ACIA */
-	map(0x8c00, 0x8c00).mirror(0x3fe).rw(this, FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
-	map(0x8c01, 0x8c01).mirror(0x3fe).rw(this, FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
+	map(0x8c00, 0x8c00).mirror(0x3fe).rw(FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x3fe).rw(FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
 	map(0x9000, 0x93ff).rw(m_sndpia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x9400, 0x97ff).r(m_pia0, FUNC(pia6821_device::read)).w(this, FUNC(qix_state::qix_pia_w));
+	map(0x9400, 0x97ff).r(m_pia0, FUNC(pia6821_device::read)).w(FUNC(qix_state::qix_pia_w));
 	map(0x9800, 0x9bff).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x9c00, 0x9fff).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xa000, 0xffff).bankr("bank0");
@@ -276,15 +276,15 @@ void qix_state::kram3_main_map(address_map &map)
 
 
 
-void qix_state::zoo_main_map(address_map &map)
+void zookeep_state::main_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram().share("share1");
 	map(0x0400, 0x07ff).ram();
 	map(0x0800, 0x0bff).nopr();   /* ACIA */
-	map(0x0c00, 0x0c00).mirror(0x3fe).rw(this, FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
-	map(0x0c01, 0x0c01).mirror(0x3fe).rw(this, FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
+	map(0x0c00, 0x0c00).mirror(0x3fe).rw(FUNC(zookeep_state::qix_video_firq_r), FUNC(zookeep_state::qix_video_firq_w));
+	map(0x0c01, 0x0c01).mirror(0x3fe).rw(FUNC(zookeep_state::qix_data_firq_ack_r), FUNC(zookeep_state::qix_data_firq_ack_w));
 	map(0x1000, 0x13ff).rw(m_sndpia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1400, 0x17ff).r(m_pia0, FUNC(pia6821_device::read)).w(this, FUNC(qix_state::qix_pia_w));
+	map(0x1400, 0x17ff).r(m_pia0, FUNC(pia6821_device::read)).w(FUNC(zookeep_state::qix_pia_w));
 	map(0x1800, 0x1bff).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1c00, 0x1fff).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8000, 0xffff).rom();
@@ -601,48 +601,49 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(qix_state::qix_base)
-
+void qix_state::qix_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK_OSC/4/4)  /* 1.25 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MC6809E(config, m_maincpu, MAIN_CLOCK_OSC/4/4);  /* 1.25 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &qix_state::main_map);
 
 	/* high interleave needed to ensure correct text in service mode */
 	/* Zookeeper settings and high score table seem especially sensitive to this */
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("P1"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("COIN"))
+	PIA6821(config, m_pia0, 0);
+	m_pia0->readpa_handler().set_ioport("P1");
+	m_pia0->readpb_handler().set_ioport("COIN");
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("SPARE"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN0"))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readpa_handler().set_ioport("SPARE");
+	m_pia1->readpb_handler().set_ioport("IN0");
 
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("P2"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, qix_coinctl_w))
+	PIA6821(config, m_pia2, 0);
+	m_pia2->readpa_handler().set_ioport("P2");
+	m_pia2->writepb_handler().set(FUNC(qix_state::qix_coinctl_w));
 
 	/* video hardware */
 	qix_video(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(qix_state::qix)
+void qix_state::qix(machine_config &config)
+{
 	qix_base(config);
 	qix_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(qix_state::kram3)
+void qix_state::kram3(machine_config &config)
+{
 	qix(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kram3_main_map)
-	MCFG_MC6809E_LIC_CB(WRITELINE(qix_state, kram3_lic_maincpu_changed))
+	m_maincpu->set_addrmap(AS_PROGRAM, &qix_state::kram3_main_map);
+	m_maincpu->lic().set(FUNC(qix_state::kram3_lic_maincpu_changed));
 
 	kram3_video(config);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 
@@ -651,39 +652,31 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(qix_state::mcu)
+void qixmcu_state::mcu(machine_config &config)
+{
 	qix(config);
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("mcu", M68705P3, COIN_CLOCK_OSC) /* 1.00 MHz */
-	MCFG_M68705_PORTB_R_CB(READ8(qix_state, qix_68705_portB_r))
-	MCFG_M68705_PORTC_R_CB(READ8(qix_state, qix_68705_portC_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(qix_state, qix_68705_portA_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(qix_state, qix_68705_portB_w))
+	M68705P3(config, m_mcu, COIN_CLOCK_OSC); /* 1.00 MHz */
+	m_mcu->portb_r().set(FUNC(qixmcu_state::mcu_portb_r));
+	m_mcu->portc_r().set(FUNC(qixmcu_state::mcu_portc_r));
+	m_mcu->porta_w().set(FUNC(qixmcu_state::mcu_porta_w));
+	m_mcu->portb_w().set(FUNC(qixmcu_state::mcu_portb_w));
 
-	MCFG_MACHINE_START_OVERRIDE(qix_state,qixmcu)
+	m_pia0->readpb_handler().set(FUNC(qixmcu_state::coin_r));
+	m_pia0->writepb_handler().set(FUNC(qixmcu_state::coin_w));
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPB_HANDLER(READ8(qix_state, qixmcu_coin_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, qixmcu_coin_w))
-
-	MCFG_DEVICE_MODIFY("pia2")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, qixmcu_coinctrl_w))
-MACHINE_CONFIG_END
+	m_pia2->writepb_handler().set(FUNC(qixmcu_state::coinctrl_w));
+}
 
 
-MACHINE_CONFIG_START(qix_state::zookeep)
+void zookeep_state::zookeep(machine_config &config)
+{
 	mcu(config);
-
-	/* basic machine hardware */
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(zoo_main_map)
-
-	/* video hardware */
-	zookeep_video(config);
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &zookeep_state::main_map);
+	video(config);
+}
 
 
 
@@ -694,30 +687,28 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(qix_state::slither)
+void qix_state::slither(machine_config &config)
+{
 	qix_base(config);
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)   /* 1.34 MHz */
+	m_maincpu->set_clock(SLITHER_CLOCK_OSC/4/4);   /* 1.34 MHz */
 
-	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA_READPA_HANDLER(READ8(qix_state, slither_trak_lr_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, slither_76489_0_w))
-	MCFG_PIA_READPB_HANDLER(NOOP)
+	m_pia1->readpa_handler().set(FUNC(qix_state::slither_trak_lr_r));
+	m_pia1->writepb_handler().set(FUNC(qix_state::slither_76489_0_w));
+	m_pia1->readpb_handler().set_constant(0);
 
-	MCFG_DEVICE_MODIFY("pia2")
-	MCFG_PIA_READPA_HANDLER(READ8(qix_state, slither_trak_ud_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(qix_state, slither_76489_1_w))
-	MCFG_PIA_READPB_HANDLER(NOOP)
+	m_pia2->readpa_handler().set(FUNC(qix_state::slither_trak_ud_r));
+	m_pia2->writepb_handler().set(FUNC(qix_state::slither_76489_1_w));
+	m_pia2->readpb_handler().set_constant(0);
 
 	/* video hardware */
 	slither_video(config);
 
 	/* audio hardware */
 	slither_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -1374,12 +1365,9 @@ int qix_state::kram3_decrypt(int address, int value)
 	return ((bits2 & 0xe) << 4) | ((bits1 & 0x8) << 1) | ((bits2 & 0x1) << 3) | ((bits1 & 0x7) << 0);
 }
 
-DRIVER_INIT_MEMBER(qix_state,kram3)
+void qix_state::init_kram3()
 {
 	//const uint8_t *patch;
-	uint8_t *rom, *decrypted;
-	int i;
-
 	assert(m_bank0);
 	assert(m_bank1);
 
@@ -1397,13 +1385,12 @@ DRIVER_INIT_MEMBER(qix_state,kram3)
 
 	 ********************************/
 
-	i = 0;
 	//patch = memregion("user1")->base();
-	rom = memregion("maincpu")->base();
-	decrypted = auto_alloc_array(machine(), uint8_t, 0x6000);
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *decrypted = auto_alloc_array(machine(), uint8_t, 0x6000);
 
 	memcpy(decrypted,&rom[0xa000],0x6000);
-	for (i = 0xa000; i < 0x10000; ++i)
+	for (int i = 0xa000; i < 0x10000; ++i)
 	{
 		decrypted[i-0xa000] = kram3_decrypt(i, rom[i]);
 	}
@@ -1412,13 +1399,12 @@ DRIVER_INIT_MEMBER(qix_state,kram3)
 	m_bank0->configure_entry(1, decrypted);
 	m_bank0->set_entry(0);
 
-	i = 0;
 	//patch = memregion("user2")->base();
 	rom = memregion("videocpu")->base();
 	decrypted = auto_alloc_array(machine(), uint8_t, 0x6000);
 
 	memcpy(decrypted,&rom[0xa000],0x6000);
-	for (i = 0xa000; i < 0x10000; ++i)
+	for (int i = 0xa000; i < 0x10000; ++i)
 	{
 		decrypted[i-0xa000] = kram3_decrypt(i, rom[i]);
 	}
@@ -1438,43 +1424,27 @@ WRITE_LINE_MEMBER(qix_state::kram3_lic_videocpu_changed)
 	m_bank1->set_entry( state ? 1 : 0 );
 }
 
-
-DRIVER_INIT_MEMBER(qix_state,zookeep)
-{
-	/* configure the banking */
-	membank("bank1")->configure_entry(0, memregion("videocpu")->base() + 0xa000);
-	membank("bank1")->configure_entry(1, memregion("videocpu")->base() + 0x10000);
-	membank("bank1")->set_entry(0);
-}
-
-
-DRIVER_INIT_MEMBER(qix_state,slither)
-{
-}
-
-
-
 /*************************************
  *
  *  Game drivers
  *
  *************************************/
 
-GAME( 1981, qix,      0,        qix,      qix,      qix_state, 0,        ROT270, "Taito America Corporation", "Qix (Rev 2)", MACHINE_SUPPORTS_SAVE ) // newest set?  closest to 'qix2'
-GAME( 1981, qixa,     qix,      qix,      qix,      qix_state, 0,        ROT270, "Taito America Corporation", "Qix (set 2, smaller roms)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, qixb,     qix,      qix,      qix,      qix_state, 0,        ROT270, "Taito America Corporation", "Qix (set 2, larger roms)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, qixo,     qix,      qix,      qix,      qix_state, 0,        ROT270, "Taito America Corporation", "Qix (set 3, earlier)", MACHINE_SUPPORTS_SAVE ) // oldest set / prototype? has incorrect spelling 'deutch' and doesn't allow language selection to be changed
-GAME( 1981, qix2,     qix,      qix,      qix,      qix_state, 0,        ROT270, "Taito America Corporation", "Qix II (Tournament)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, sdungeon, 0,        mcu,      sdungeon, qix_state, 0,        ROT270, "Taito America Corporation", "Space Dungeon", MACHINE_SUPPORTS_SAVE ) // actually released July 1982
-GAME( 1981, sdungeona, sdungeon,mcu,      sdungeon, qix_state, 0,        ROT270, "Taito America Corporation", "Space Dungeon (larger roms)", MACHINE_SUPPORTS_SAVE ) // same as above but uses larger ROMs
-GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, qix_state, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
-GAMEL(1982, elecyoyo2,elecyoyo, mcu,      elecyoyo, qix_state, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
-GAME( 1982, kram,     0,        mcu,      kram,     qix_state, 0,        ROT0,   "Taito America Corporation", "Kram (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kram2,    kram,     mcu,      kram,     qix_state, 0,        ROT0,   "Taito America Corporation", "Kram (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kram3,    kram,     kram3,    kram,     qix_state, kram3,    ROT0,   "Taito America Corporation", "Kram (encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zookeep,  0,        zookeep,  zookeep,  qix_state, zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zookeep2, zookeep,  zookeep,  zookeep,  qix_state, zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zookeep3, zookeep,  zookeep,  zookeep,  qix_state, zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, slither,  0,        slither,  slither,  qix_state, slither,  ROT270, "Century II", "Slither (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, slithera, slither,  slither,  slither,  qix_state, slither,  ROT270, "Century II", "Slither (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, complexx, 0,        qix,      complexx, qix_state, 0,        ROT270, "Taito America Corporation", "Complex X", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, qix,       0,        qix,     qix,      qix_state,     empty_init,   ROT270, "Taito America Corporation", "Qix (Rev 2)", MACHINE_SUPPORTS_SAVE ) // newest set?  closest to 'qix2'
+GAME( 1981, qixa,      qix,      qix,     qix,      qix_state,     empty_init,   ROT270, "Taito America Corporation", "Qix (set 2, smaller roms)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, qixb,      qix,      qix,     qix,      qix_state,     empty_init,   ROT270, "Taito America Corporation", "Qix (set 2, larger roms)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, qixo,      qix,      qix,     qix,      qix_state,     empty_init,   ROT270, "Taito America Corporation", "Qix (set 3, earlier)", MACHINE_SUPPORTS_SAVE ) // oldest set / prototype? has incorrect spelling 'deutch' and doesn't allow language selection to be changed
+GAME( 1981, qix2,      qix,      qix,     qix,      qix_state,     empty_init,   ROT270, "Taito America Corporation", "Qix II (Tournament)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, sdungeon,  0,        mcu,     sdungeon, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "Space Dungeon", MACHINE_SUPPORTS_SAVE ) // actually released July 1982
+GAME( 1981, sdungeona, sdungeon, mcu,     sdungeon, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "Space Dungeon (larger roms)", MACHINE_SUPPORTS_SAVE ) // same as above but uses larger ROMs
+GAMEL(1982, elecyoyo,  0,        mcu,     elecyoyo, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
+GAMEL(1982, elecyoyo2, elecyoyo, mcu,     elecyoyo, qixmcu_state,  empty_init,   ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
+GAME( 1982, kram,      0,        mcu,     kram,     qixmcu_state,  empty_init,   ROT0,   "Taito America Corporation", "Kram (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kram2,     kram,     mcu,     kram,     qixmcu_state,  empty_init,   ROT0,   "Taito America Corporation", "Kram (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kram3,     kram,     kram3,   kram,     qix_state,     init_kram3,   ROT0,   "Taito America Corporation", "Kram (encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zookeep,   0,        zookeep, zookeep,  zookeep_state, empty_init,   ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zookeep2,  zookeep,  zookeep, zookeep,  zookeep_state, empty_init,   ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zookeep3,  zookeep,  zookeep, zookeep,  zookeep_state, empty_init,   ROT0,   "Taito America Corporation", "Zoo Keeper (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, slither,   0,        slither, slither,  qix_state,     empty_init,   ROT270, "Century II", "Slither (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, slithera,  slither,  slither, slither,  qix_state,     empty_init,   ROT270, "Century II", "Slither (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, complexx,  0,        qix,     complexx, qix_state,     empty_init,   ROT270, "Taito America Corporation", "Complex X", MACHINE_SUPPORTS_SAVE )

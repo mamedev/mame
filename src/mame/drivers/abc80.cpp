@@ -180,7 +180,7 @@ WRITE8_MEMBER( abc80_state::csg_w )
 void abc80_state::abc80_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(abc80_state::read), FUNC(abc80_state::write));
+	map(0x0000, 0xffff).rw(FUNC(abc80_state::read), FUNC(abc80_state::write));
 }
 
 
@@ -198,7 +198,7 @@ void abc80_state::abc80_io(address_map &map)
 	map(0x03, 0x03).w(m_bus, FUNC(abcbus_slot_device::c2_w));
 	map(0x04, 0x04).w(m_bus, FUNC(abcbus_slot_device::c3_w));
 	map(0x05, 0x05).w(m_bus, FUNC(abcbus_slot_device::c4_w));
-	map(0x06, 0x06).w(this, FUNC(abc80_state::csg_w));
+	map(0x06, 0x06).w(FUNC(abc80_state::csg_w));
 	map(0x07, 0x07).r(m_bus, FUNC(abcbus_slot_device::rst_r));
 	map(0x10, 0x13).mirror(0x04).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }
@@ -341,7 +341,7 @@ static const z80_daisy_config abc80_daisy_chain[] =
 
 
 //-------------------------------------------------
-//  ABC80_KEYBOARD_INTERFACE( kb_intf )
+//  ABC80_KEYBOARD_INTERFACE
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( abc80_state::keydown_w )
@@ -487,56 +487,54 @@ QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
 
 MACHINE_CONFIG_START(abc80_state::abc80)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(11'980'800)/2/2) // 2.9952 MHz
-	MCFG_CPU_PROGRAM_MAP(abc80_mem)
-	MCFG_CPU_IO_MAP(abc80_io)
-	MCFG_Z80_DAISY_CHAIN(abc80_daisy_chain)
+	Z80(config, m_maincpu, XTAL(11'980'800)/2/2); // 2.9952 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc80_state::abc80_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc80_state::abc80_io);
+	m_maincpu->set_daisy_config(abc80_daisy_chain);
 
 	// video hardware
 	abc80_video(config);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76477_TAG, SN76477, 0)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(390)) // noise + filter: R26 47k - R24 330k - C52 390p
-	MCFG_SN76477_DECAY_RES(RES_K(47))                   //  decay_res: R23 47k
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(10), RES_K(2.2))   // attack_decay_cap + attack_res: C50 10u/35V - R21 2.2k
-	MCFG_SN76477_AMP_RES(RES_K(33))                     // amplitude_res: R19 33k
-	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res: R18 10k
-	MCFG_SN76477_VCO_PARAMS(0, CAP_N(10), RES_K(100))   // VCO volt + cap + res: 0V/2.5V (voltage divider R17 1k / R16 1k) - C48 10n - R20 100k
-	MCFG_SN76477_PITCH_VOLTAGE(0)                       // pitch_voltage: N/C
-	MCFG_SN76477_SLF_PARAMS(CAP_U(1), RES_K(220))       // slf caps + res: C51 1u/35V - R22 220k
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.1), RES_K(330)) // oneshot caps + res: C53 0.1u - R25 330k
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SN76477(config, m_csg);
+	m_csg->set_noise_params(RES_K(47), RES_K(330), CAP_P(390));
+	m_csg->set_decay_res(RES_K(47));
+	m_csg->set_attack_params(CAP_U(10), RES_K(2.2));
+	m_csg->set_amp_res(RES_K(33));
+	m_csg->set_feedback_res(RES_K(10));
+	m_csg->set_vco_params(0, CAP_N(10), RES_K(100));
+	m_csg->set_pitch_voltage(0);
+	m_csg->set_slf_params(CAP_U(1), RES_K(220));
+	m_csg->set_oneshot_params(CAP_U(0.1), RES_K(330));
+	m_csg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	WAVE(config, "wave", CASSETTE_TAG).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(11'980'800)/2/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(abc80_state, pio_pa_r))
-	MCFG_Z80PIO_IN_PB_CB(READ8(abc80_state, pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(abc80_state, pio_pb_w))
+	Z80PIO(config, m_pio, XTAL(11'980'800)/2/2);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(abc80_state::pio_pa_r));
+	m_pio->in_pb_callback().set(FUNC(abc80_state::pio_pb_r));
+	m_pio->out_pb_callback().set(FUNC(abc80_state::pio_pb_w));
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("abc80_cass")
 
-	MCFG_DEVICE_ADD(ABC80_KEYBOARD_TAG, ABC80_KEYBOARD, 0)
-	MCFG_ABC80_KEYBOARD_KEYDOWN_CALLBACK(WRITELINE(abc80_state, keydown_w))
+	ABC80_KEYBOARD(config, m_kb, 0);
+	m_kb->keydown_wr_callback().set(FUNC(abc80_state::keydown_w));
 
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abc80_cards, "abcexp")
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(abc80_state, kbd_w))
+	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	keyboard.set_keyboard_callback(FUNC(abc80_state::kbd_w));
 
 	MCFG_QUICKLOAD_ADD("quickload", abc80_state, bac, "bac", 2)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
+	RAM(config, RAM_TAG).set_default_size("16K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "abc80_cass")
@@ -557,15 +555,15 @@ ROM_START( abc80 )
 	ROM_REGION( 0x4000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS("v2")
 	ROM_SYSTEM_BIOS( 0, "v1", "V1" )
-	ROMX_LOAD( "3506_3.a5", 0x0000, 0x1000, CRC(7c004fb6) SHA1(9aee1d085122f4537c3e6ecdab9d799bd429ef52), ROM_BIOS(1) )
-	ROMX_LOAD( "3507_3.a3", 0x1000, 0x1000, CRC(d1850a84) SHA1(f7719f3af9173601a2aa23ae38ae00de1a387ad8), ROM_BIOS(1) )
-	ROMX_LOAD( "3508_3.a4", 0x2000, 0x1000, CRC(b55528e9) SHA1(3e5017e8cacad1f13215242f1bbd89d1d3eee131), ROM_BIOS(1) )
-	ROMX_LOAD( "3509_3.a2", 0x3000, 0x1000, CRC(659cab1e) SHA1(181db748cef22cdcccd311a60aa6189c85343db7), ROM_BIOS(1) )
+	ROMX_LOAD( "3506_3.a5", 0x0000, 0x1000, CRC(7c004fb6) SHA1(9aee1d085122f4537c3e6ecdab9d799bd429ef52), ROM_BIOS(0) )
+	ROMX_LOAD( "3507_3.a3", 0x1000, 0x1000, CRC(d1850a84) SHA1(f7719f3af9173601a2aa23ae38ae00de1a387ad8), ROM_BIOS(0) )
+	ROMX_LOAD( "3508_3.a4", 0x2000, 0x1000, CRC(b55528e9) SHA1(3e5017e8cacad1f13215242f1bbd89d1d3eee131), ROM_BIOS(0) )
+	ROMX_LOAD( "3509_3.a2", 0x3000, 0x1000, CRC(659cab1e) SHA1(181db748cef22cdcccd311a60aa6189c85343db7), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v2", "V2" )
-	ROMX_LOAD( "3506_3_v2.a5", 0x0000, 0x1000, CRC(e2afbf48) SHA1(9883396edd334835a844dcaa792d29599a8c67b9), ROM_BIOS(2) )
-	ROMX_LOAD( "3507_3_v2.a3", 0x1000, 0x1000, CRC(d224412a) SHA1(30968054bba7c2aecb4d54864b75a446c1b8fdb1), ROM_BIOS(2) )
-	ROMX_LOAD( "3508_3_v2.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b), ROM_BIOS(2) )
-	ROMX_LOAD( "3509_3_v2.a2", 0x3000, 0x1000, CRC(bc8860b7) SHA1(28b6cf7f5a4f81e017c2af091c3719657f981710), ROM_BIOS(2) )
+	ROMX_LOAD( "3506_3_v2.a5", 0x0000, 0x1000, CRC(e2afbf48) SHA1(9883396edd334835a844dcaa792d29599a8c67b9), ROM_BIOS(1) )
+	ROMX_LOAD( "3507_3_v2.a3", 0x1000, 0x1000, CRC(d224412a) SHA1(30968054bba7c2aecb4d54864b75a446c1b8fdb1), ROM_BIOS(1) )
+	ROMX_LOAD( "3508_3_v2.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b), ROM_BIOS(1) )
+	ROMX_LOAD( "3509_3_v2.a2", 0x3000, 0x1000, CRC(bc8860b7) SHA1(28b6cf7f5a4f81e017c2af091c3719657f981710), ROM_BIOS(1) )
 
 	ROM_REGION( 0xa00, "chargen", 0 )
 	ROM_LOAD( "sn74s263.h2", 0x0000, 0x0a00, BAD_DUMP CRC(9e064e91) SHA1(354783c8f2865f73dc55918c9810c66f3aca751f) ) // created by hand
@@ -592,5 +590,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE         INIT    COMPANY              FULLNAME    FLAGS
-COMP( 1978, abc80,  0,      0,      abc80,  0,     abc80_state,  0,      "Luxor Datorer AB",  "ABC 80",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY             FULLNAME  FLAGS
+COMP( 1978, abc80, 0,      0,      abc80,   0,     abc80_state,  empty_init, "Luxor Datorer AB", "ABC 80", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

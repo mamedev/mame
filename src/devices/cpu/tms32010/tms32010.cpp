@@ -214,7 +214,7 @@ std::unique_ptr<util::disasm_interface> tms32010_device::create_disassembler()
  *  used to greatly speed up emulation
  */
 
-#define TMS32010_RDOP(A) (m_direct->read_word(A))
+#define TMS32010_RDOP(A) (m_cache->read_word(A))
 
 
 /****************************************************************************
@@ -223,7 +223,7 @@ std::unique_ptr<util::disasm_interface> tms32010_device::create_disassembler()
  *  that use different encoding mechanisms for opcodes and opcode arguments
  */
 
-#define TMS32010_RDOP_ARG(A) (m_direct->read_word(A))
+#define TMS32010_RDOP_ARG(A) (m_cache->read_word(A))
 
 
 /************************************************************************
@@ -836,7 +836,7 @@ void tms32010_device::device_start()
 	save_item(NAME(m_addr_mask));
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-1>();
+	m_cache = m_program->cache<1, -1, ENDIANNESS_BIG>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 

@@ -109,6 +109,7 @@
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -118,8 +119,8 @@ void pass_state::pass_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x083fff).ram();
-	map(0x200000, 0x200fff).ram().w(this, FUNC(pass_state::pass_bg_videoram_w)).share("bg_videoram"); // Background
-	map(0x210000, 0x213fff).ram().w(this, FUNC(pass_state::pass_fg_videoram_w)).share("fg_videoram"); // Foreground
+	map(0x200000, 0x200fff).ram().w(FUNC(pass_state::pass_bg_videoram_w)).share("bg_videoram"); // Background
+	map(0x210000, 0x213fff).ram().w(FUNC(pass_state::pass_fg_videoram_w)).share("fg_videoram"); // Foreground
 	map(0x220000, 0x2203ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x230001, 0x230001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x230100, 0x230101).portr("DSW");
@@ -234,7 +235,7 @@ static const gfx_layout tiles4x4_fg_layout =
 	4*32
 };
 
-static GFXDECODE_START( pass )
+static GFXDECODE_START( gfx_pass )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles4x4_fg_layout, 256, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 2 )
 GFXDECODE_END
@@ -243,14 +244,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(pass_state::pass)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14318180/2 )
-	MCFG_CPU_PROGRAM_MAP(pass_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pass_state,  irq1_line_hold) /* all the same */
+	MCFG_DEVICE_ADD("maincpu", M68000, 14318180/2 )
+	MCFG_DEVICE_PROGRAM_MAP(pass_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pass_state,  irq1_line_hold) /* all the same */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4 )
-	MCFG_CPU_PROGRAM_MAP(pass_sound_map)
-	MCFG_CPU_IO_MAP(pass_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(pass_state, irq0_line_hold, 60) /* probably not accurate, unknown timing and generation (ym2203 sound chip?). */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4 )
+	MCFG_DEVICE_PROGRAM_MAP(pass_sound_map)
+	MCFG_DEVICE_IO_MAP(pass_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(pass_state, irq0_line_hold, 60) /* probably not accurate, unknown timing and generation (ym2203 sound chip?). */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -261,20 +262,19 @@ MACHINE_CONFIG_START(pass_state::pass)
 	MCFG_SCREEN_UPDATE_DRIVER(pass_state, screen_update_pass)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pass)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_pass);
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 14318180/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 14318180/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", 792000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 792000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -302,4 +302,4 @@ ROM_START( pass )
 ROM_END
 
 
-GAME( 1992, pass, 0, pass, pass, pass_state, 0, ROT0, "Oksan", "Pass", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, pass, 0, pass, pass, pass_state, empty_init, ROT0, "Oksan", "Pass", MACHINE_SUPPORTS_SAVE )

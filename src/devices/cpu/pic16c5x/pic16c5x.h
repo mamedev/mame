@@ -35,36 +35,6 @@ enum
 	PIC16C5x_PORTD
 };
 
-// port a, 4 or 8 bits, 2-way
-#define MCFG_PIC16C5x_READ_A_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_read_a_callback(DEVCB_##_devcb);
-#define MCFG_PIC16C5x_WRITE_A_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_write_a_callback(DEVCB_##_devcb);
-
-// port b, 8 bits, 2-way
-#define MCFG_PIC16C5x_READ_B_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_read_b_callback(DEVCB_##_devcb);
-#define MCFG_PIC16C5x_WRITE_B_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_write_b_callback(DEVCB_##_devcb);
-
-// port c, 8 bits, 2-way
-#define MCFG_PIC16C5x_READ_C_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_read_c_callback(DEVCB_##_devcb);
-#define MCFG_PIC16C5x_WRITE_C_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_write_c_callback(DEVCB_##_devcb);
-
-// port d, 8 bits, 2-way
-#define MCFG_PIC16C5x_READ_D_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_read_d_callback(DEVCB_##_devcb);
-#define MCFG_PIC16C5x_WRITE_D_CB(_devcb) \
-	devcb = &downcast<pic16c5x_device &>(*device).set_write_d_callback(DEVCB_##_devcb);
-
-// CONFIG register
-#define MCFG_PIC16C5x_SET_CONFIG(_data) \
-	downcast<pic16c5x_device &>(*device).pic16c5x_set_config(_data);
-
-
-
 DECLARE_DEVICE_TYPE(PIC16C54, pic16c54_device)
 DECLARE_DEVICE_TYPE(PIC16C55, pic16c55_device)
 DECLARE_DEVICE_TYPE(PIC16C56, pic16c56_device)
@@ -78,29 +48,34 @@ DECLARE_DEVICE_TYPE(PIC1655,  pic1655_device)
 class pic16c5x_device : public cpu_device
 {
 public:
-	// configuration helpers
-	template <class Object> devcb_base &set_read_a_callback(Object &&cb) { return m_read_a.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_b_callback(Object &&cb) { return m_read_b.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_c_callback(Object &&cb) { return m_read_c.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_d_callback(Object &&cb) { return m_read_d.set_callback(std::forward<Object>(cb)); }
+	// port a, 4 or 8 bits, 2-way
+	auto read_a() { return m_read_a.bind(); }
+	auto write_a() { return m_write_a.bind(); }
 
-	template <class Object> devcb_base &set_write_a_callback(Object &&cb) { return m_write_a.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_b_callback(Object &&cb) { return m_write_b.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_c_callback(Object &&cb) { return m_write_c.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_d_callback(Object &&cb) { return m_write_d.set_callback(std::forward<Object>(cb)); }
+	// port b, 8 bits, 2-way
+	auto read_b() { return m_read_b.bind(); }
+	auto write_b() { return m_write_b.bind(); }
+
+	// port c, 8 bits, 2-way
+	auto read_c() { return m_read_c.bind(); }
+	auto write_c() { return m_write_c.bind(); }
+
+	// port d, 8 bits, 2-way
+	auto read_d() { return m_read_d.bind(); }
+	auto write_d() { return m_write_d.bind(); }
 
 	/****************************************************************************
 	 *  Function to configure the CONFIG register. This is actually hard-wired
 	 *  during ROM programming, so should be called in the driver INIT, with
 	 *  the value if known (available in HEX dumps of the ROM).
 	 */
-	void pic16c5x_set_config(uint16_t data);
+	void set_config(uint16_t data);
 
-	void pic16c5x_ram_5(address_map &map);
-	void pic16c5x_ram_7(address_map &map);
-	void pic16c5x_rom_10(address_map &map);
-	void pic16c5x_rom_11(address_map &map);
-	void pic16c5x_rom_9(address_map &map);
+	void ram_5(address_map &map);
+	void ram_7(address_map &map);
+	void rom_10(address_map &map);
+	void rom_11(address_map &map);
+	void rom_9(address_map &map);
 protected:
 	// construction/destruction
 	pic16c5x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, int picmodel);
@@ -122,7 +97,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 2; }
 	virtual uint32_t execute_input_lines() const override { return 1; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == PIC16C5x_RTCC; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int line, int state) override;
 
@@ -169,7 +144,7 @@ private:
 	int     m_inst_cycles;
 
 	address_space *m_program;
-	direct_read_data<-1> *m_direct;
+	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_data;
 
 	// i/o handlers

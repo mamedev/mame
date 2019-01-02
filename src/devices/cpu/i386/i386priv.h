@@ -5,7 +5,6 @@
 #ifndef __I386_H__
 #define __I386_H__
 
-#include "i386.h"
 #include "i386dasm.h"
 
 //#define DEBUG_MISSING_OPCODE
@@ -322,6 +321,12 @@ extern int i386_parity_table[256];
 #define MMX(n)              (*((MMX_REG *)(&m_x87_reg[(n)].low)))
 #define XMM(n)              m_sse_reg[(n)]
 
+#define VTLB_FLAG_DIRTY     0x100
+#define CYCLES_NUM(x)       (m_cycles -= (x))
+
+#define FAULT(fault,error)  {m_ext = 1; i386_trap_with_error(fault,0,0,error); return;}
+#define FAULT_EXP(fault,error) {m_ext = 1; i386_trap_with_error(fault,0,trap_level+1,error); return;}
+
 /***********************************************************************************/
 
 struct MODRM_TABLE {
@@ -361,167 +366,6 @@ extern MODRM_TABLE i386_MODRM_table[256];
 
 /***********************************************************************************/
 
-uint32_t i386_device::i386_translate(int segment, uint32_t ip, int rwn)
-{
-	// TODO: segment limit access size, execution permission, handle exception thrown from exception handler
-	if(PROTECTED_MODE && !V8086_MODE && (rwn != -1))
-	{
-		if(!(m_sreg[segment].valid))
-			FAULT_THROW((segment==SS)?FAULT_SS:FAULT_GP, 0);
-		if(i386_limit_check(segment, ip))
-			FAULT_THROW((segment==SS)?FAULT_SS:FAULT_GP, 0);
-		if((rwn == 0) && ((m_sreg[segment].flags & 8) && !(m_sreg[segment].flags & 2)))
-			FAULT_THROW(FAULT_GP, 0);
-		if((rwn == 1) && ((m_sreg[segment].flags & 8) || !(m_sreg[segment].flags & 2)))
-			FAULT_THROW(FAULT_GP, 0);
-	}
-	return m_sreg[segment].base + ip;
-}
-
-#define VTLB_FLAG_DIRTY 0x100
-
-vtlb_entry i386_device::get_permissions(uint32_t pte, int wp)
-{
-	vtlb_entry ret = VTLB_READ_ALLOWED | ((pte & 4) ? VTLB_USER_READ_ALLOWED : 0);
-	if(!wp)
-		ret |= VTLB_WRITE_ALLOWED;
-	if(pte & 2)
-		ret |= VTLB_WRITE_ALLOWED | ((pte & 4) ? VTLB_USER_WRITE_ALLOWED : 0);
-	return ret;
-}
-
-bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_entry *entry)
-{
-	uint32_t a = *address;
-	uint32_t pdbr = m_cr[3] & 0xfffff000;
-	uint32_t directory = (a >> 22) & 0x3ff;
-	uint32_t table = (a >> 12) & 0x3ff;
-	vtlb_entry perm = 0;
-	bool ret;
-	bool user = (intention & TRANSLATE_USER_MASK) ? true : false;
-	bool write = (intention & TRANSLATE_WRITE) ? true : false;
-	bool debug = (intention & TRANSLATE_DEBUG_MASK) ? true : false;
-
-	if(!(m_cr[0] & 0x80000000))
-	{
-		if(entry)
-			*entry = 0x77;
-		return true;
-	}
-
-	uint32_t page_dir = m_program->read_dword(pdbr + directory * 4);
-	if(page_dir & 1)
-	{
-		if ((page_dir & 0x80) && (m_cr[4] & 0x10))
-		{
-			a = (page_dir & 0xffc00000) | (a & 0x003fffff);
-			if(debug)
-			{
-				*address = a;
-				return true;
-			}
-			perm = get_permissions(page_dir, WP);
-			if(write && (!(perm & VTLB_WRITE_ALLOWED) || (user && !(perm & VTLB_USER_WRITE_ALLOWED))))
-				ret = false;
-			else if(user && !(perm & VTLB_USER_READ_ALLOWED))
-				ret = false;
-			else
-			{
-				if(write)
-					perm |= VTLB_FLAG_DIRTY;
-				if(!(page_dir & 0x40) && write)
-					m_program->write_dword(pdbr + directory * 4, page_dir | 0x60);
-				else if(!(page_dir & 0x20))
-					m_program->write_dword(pdbr + directory * 4, page_dir | 0x20);
-				ret = true;
-			}
-		}
-		else
-		{
-			uint32_t page_entry = m_program->read_dword((page_dir & 0xfffff000) + (table * 4));
-			if(!(page_entry & 1))
-				ret = false;
-			else
-			{
-				a = (page_entry & 0xfffff000) | (a & 0xfff);
-				if(debug)
-				{
-					*address = a;
-					return true;
-				}
-				perm = get_permissions(page_entry, WP);
-				if(write && (!(perm & VTLB_WRITE_ALLOWED) || (user && !(perm & VTLB_USER_WRITE_ALLOWED))))
-					ret = false;
-				else if(user && !(perm & VTLB_USER_READ_ALLOWED))
-					ret = false;
-				else
-				{
-					if(write)
-						perm |= VTLB_FLAG_DIRTY;
-					if(!(page_dir & 0x20))
-						m_program->write_dword(pdbr + directory * 4, page_dir | 0x20);
-					if(!(page_entry & 0x40) && write)
-						m_program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x60);
-					else if(!(page_entry & 0x20))
-						m_program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x20);
-					ret = true;
-				}
-			}
-		}
-	}
-	else
-		ret = false;
-	if(entry)
-		*entry = perm;
-	if(ret)
-		*address = a;
-	return ret;
-}
-
-//#define TEST_TLB
-
-bool i386_device::translate_address(int pl, int type, uint32_t *address, uint32_t *error)
-{
-	if(!(m_cr[0] & 0x80000000)) // Some (very few) old OS's won't work with this
-		return true;
-
-	const vtlb_entry *table = vtlb_table();
-	uint32_t index = *address >> 12;
-	vtlb_entry entry = table[index];
-	if(type == TRANSLATE_FETCH)
-		type = TRANSLATE_READ;
-	if(pl == 3)
-		type |= TRANSLATE_USER_MASK;
-#ifdef TEST_TLB
-	uint32_t test_addr = *address;
-#endif
-
-	if(!(entry & VTLB_FLAG_VALID) || ((type & TRANSLATE_WRITE) && !(entry & VTLB_FLAG_DIRTY)))
-	{
-		if(!i386_translate_address(type, address, &entry))
-		{
-			*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0);
-			if(entry)
-				*error |= 1;
-			return false;
-		}
-		vtlb_dynload(index, *address, entry);
-		return true;
-	}
-	if(!(entry & (1 << type)))
-	{
-		*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0) | 1;
-		return false;
-	}
-	*address = (entry & 0xfffff000) | (*address & 0xfff);
-#ifdef TEST_TLB
-	int test_ret = i386_translate_address(type | TRANSLATE_DEBUG_MASK, &test_addr, nullptr);
-	if(!test_ret || (test_addr != *address))
-		logerror("TLB-PTE mismatch! %06X %06X %06x\n", *address, test_addr, m_pc);
-#endif
-	return true;
-}
-
 void i386_device::CHANGE_PC(uint32_t pc)
 {
 	m_pc = i386_translate(CS, pc, -1 );
@@ -542,7 +386,7 @@ uint8_t i386_device::FETCH()
 	if(!translate_address(m_CPL,TRANSLATE_FETCH,&address,&error))
 		PF_THROW(error);
 
-	value = m_direct->read_byte(address & m_a20_mask);
+	value = m_pr8(address & m_a20_mask);
 #ifdef DEBUG_MISSING_OPCODE
 	m_opcode_bytes[m_opcode_bytes_length] = value;
 	m_opcode_bytes_length = (m_opcode_bytes_length + 1) & 15;
@@ -563,7 +407,7 @@ uint16_t i386_device::FETCH16()
 		if(!translate_address(m_CPL,TRANSLATE_FETCH,&address,&error))
 			PF_THROW(error);
 		address &= m_a20_mask;
-		value = m_direct->read_word(address);
+		value = m_pr16(address);
 		m_eip += 2;
 		m_pc += 2;
 	}
@@ -584,7 +428,7 @@ uint32_t i386_device::FETCH32()
 			PF_THROW(error);
 
 		address &= m_a20_mask;
-		value = m_direct->read_dword(address);
+		value = m_pr32(address);
 		m_eip += 4;
 		m_pc += 4;
 	}
@@ -1093,6 +937,44 @@ void i386_device::BUMP_DI(int adjustment)
 		REG16(DI) += ((m_DF) ? -adjustment : +adjustment);
 }
 
+void i386_device::CYCLES(int x)
+{
+	if (PROTECTED_MODE)
+	{
+		m_cycles -= m_cycle_table_pm[x];
+	}
+	else
+	{
+		m_cycles -= m_cycle_table_rm[x];
+	}
+}
+
+void i386_device::CYCLES_RM(int modrm, int r, int m)
+{
+	if (modrm >= 0xc0)
+	{
+		if (PROTECTED_MODE)
+		{
+			m_cycles -= m_cycle_table_pm[r];
+		}
+		else
+		{
+			m_cycles -= m_cycle_table_rm[r];
+		}
+	}
+	else
+	{
+		if (PROTECTED_MODE)
+		{
+			m_cycles -= m_cycle_table_pm[m];
+		}
+		else
+		{
+			m_cycles -= m_cycle_table_rm[m];
+		}
+	}
+}
+
 
 
 /***********************************************************************************
@@ -1197,229 +1079,6 @@ void i386_device::WRITEPORT32(offs_t port, uint32_t value)
 	{
 		check_ioperm(port, 0xf);
 		m_io->write_dword(port, value);
-	}
-}
-
-/***********************************************************************************
-    MSR ACCESS
-***********************************************************************************/
-
-// Pentium MSR handling
-uint64_t i386_device::pentium_msr_read(uint32_t offset,uint8_t *valid_msr)
-{
-	switch(offset)
-	{
-	// Machine Check Exception (TODO)
-	case 0x00:
-		*valid_msr = 1;
-		popmessage("RDMSR: Reading P5_MC_ADDR");
-		return 0;
-	case 0x01:
-		*valid_msr = 1;
-		popmessage("RDMSR: Reading P5_MC_TYPE");
-		return 0;
-	// Time Stamp Counter
-	case 0x10:
-		*valid_msr = 1;
-		popmessage("RDMSR: Reading TSC");
-		return m_tsc;
-	// Event Counters (TODO)
-	case 0x11:  // CESR
-		*valid_msr = 1;
-		popmessage("RDMSR: Reading CESR");
-		return 0;
-	case 0x12:  // CTR0
-		*valid_msr = 1;
-		return m_perfctr[0];
-	case 0x13:  // CTR1
-		*valid_msr = 1;
-		return m_perfctr[1];
-	default:
-		if(!(offset & ~0xf)) // 2-f are test registers
-		{
-			*valid_msr = 1;
-			logerror("RDMSR: Reading test MSR %x", offset);
-			return 0;
-		}
-		logerror("RDMSR: invalid P5 MSR read %08x at %08x\n",offset,m_pc-2);
-		*valid_msr = 0;
-		return 0;
-	}
-	return -1;
-}
-
-void i386_device::pentium_msr_write(uint32_t offset, uint64_t data, uint8_t *valid_msr)
-{
-	switch(offset)
-	{
-	// Machine Check Exception (TODO)
-	case 0x00:
-		popmessage("WRMSR: Writing P5_MC_ADDR");
-		*valid_msr = 1;
-		break;
-	case 0x01:
-		popmessage("WRMSR: Writing P5_MC_TYPE");
-		*valid_msr = 1;
-		break;
-	// Time Stamp Counter
-	case 0x10:
-		m_tsc = data;
-		popmessage("WRMSR: Writing to TSC");
-		*valid_msr = 1;
-		break;
-	// Event Counters (TODO)
-	case 0x11:  // CESR
-		popmessage("WRMSR: Writing to CESR");
-		*valid_msr = 1;
-		break;
-	case 0x12:  // CTR0
-		m_perfctr[0] = data;
-		*valid_msr = 1;
-		break;
-	case 0x13:  // CTR1
-		m_perfctr[1] = data;
-		*valid_msr = 1;
-		break;
-	default:
-		if(!(offset & ~0xf)) // 2-f are test registers
-		{
-			*valid_msr = 1;
-			logerror("WRMSR: Writing test MSR %x", offset);
-			break;
-		}
-		logerror("WRMSR: invalid MSR write %08x (%08x%08x) at %08x\n",offset,(uint32_t)(data >> 32),(uint32_t)data,m_pc-2);
-		*valid_msr = 0;
-		break;
-	}
-}
-
-// P6 (Pentium Pro, Pentium II, Pentium III) MSR handling
-uint64_t i386_device::p6_msr_read(uint32_t offset,uint8_t *valid_msr)
-{
-	switch(offset)
-	{
-	// Machine Check Exception (TODO)
-	case 0x00:
-		*valid_msr = 1;
-		popmessage("RDMSR: Reading P5_MC_ADDR");
-		return 0;
-	case 0x01:
-		*valid_msr = 1;
-		popmessage("RDMSR: Reading P5_MC_TYPE");
-		return 0;
-	// Time Stamp Counter
-	case 0x10:
-		*valid_msr = 1;
-		popmessage("RDMSR: Reading TSC");
-		return m_tsc;
-	// Performance Counters (TODO)
-	case 0xc1:  // PerfCtr0
-		*valid_msr = 1;
-		return m_perfctr[0];
-	case 0xc2:  // PerfCtr1
-		*valid_msr = 1;
-		return m_perfctr[1];
-	default:
-		logerror("RDMSR: unimplemented register called %08x at %08x\n",offset,m_pc-2);
-		*valid_msr = 1;
-		return 0;
-	}
-	return -1;
-}
-
-void i386_device::p6_msr_write(uint32_t offset, uint64_t data, uint8_t *valid_msr)
-{
-	switch(offset)
-	{
-	// Time Stamp Counter
-	case 0x10:
-		m_tsc = data;
-		popmessage("WRMSR: Writing to TSC");
-		*valid_msr = 1;
-		break;
-	// Performance Counters (TODO)
-	case 0xc1:  // PerfCtr0
-		m_perfctr[0] = data;
-		*valid_msr = 1;
-		break;
-	case 0xc2:  // PerfCtr1
-		m_perfctr[1] = data;
-		*valid_msr = 1;
-		break;
-	default:
-		logerror("WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n",offset,(uint32_t)(data >> 32),(uint32_t)data,m_pc-2);
-		*valid_msr = 1;
-		break;
-	}
-}
-
-
-// PIV (Pentium 4+)
-uint64_t i386_device::piv_msr_read(uint32_t offset,uint8_t *valid_msr)
-{
-	switch(offset)
-	{
-	default:
-		logerror("RDMSR: unimplemented register called %08x at %08x\n",offset,m_pc-2);
-		*valid_msr = 1;
-		return 0;
-	}
-	return -1;
-}
-
-void i386_device::piv_msr_write(uint32_t offset, uint64_t data, uint8_t *valid_msr)
-{
-	switch(offset)
-	{
-	default:
-		logerror("WRMSR: unimplemented register called %08x (%08x%08x) at %08x\n",offset,(uint32_t)(data >> 32),(uint32_t)data,m_pc-2);
-		*valid_msr = 1;
-		break;
-	}
-}
-
-uint64_t i386_device::MSR_READ(uint32_t offset,uint8_t *valid_msr)
-{
-	uint64_t res;
-	uint8_t cpu_type = (m_cpu_version >> 8) & 0x0f;
-
-	*valid_msr = 0;
-
-	switch(cpu_type)
-	{
-	case 5:  // Pentium
-		res = pentium_msr_read(offset,valid_msr);
-		break;
-	case 6:  // Pentium Pro, Pentium II, Pentium III
-		res = p6_msr_read(offset,valid_msr);
-		break;
-	case 15:  // Pentium 4+
-		res = piv_msr_read(offset,valid_msr);
-		break;
-	default:
-		res = 0;
-		break;
-	}
-
-	return res;
-}
-
-void i386_device::MSR_WRITE(uint32_t offset, uint64_t data, uint8_t *valid_msr)
-{
-	*valid_msr = 0;
-	uint8_t cpu_type = (m_cpu_version >> 8) & 0x0f;
-
-	switch(cpu_type)
-	{
-	case 5:  // Pentium
-		pentium_msr_write(offset,data,valid_msr);
-		break;
-	case 6:  // Pentium Pro, Pentium II, Pentium III
-		p6_msr_write(offset,data,valid_msr);
-		break;
-	case 15:  // Pentium 4+
-		piv_msr_write(offset,data,valid_msr);
-		break;
 	}
 }
 

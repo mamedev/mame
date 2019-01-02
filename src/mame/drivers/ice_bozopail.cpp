@@ -29,11 +29,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void ice_bozo(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
-	void ice_bozo(machine_config &config);
 	void ice_bozo_map(address_map &map);
 };
 
@@ -59,11 +61,11 @@ void ice_bozopail_state::machine_reset()
 MACHINE_CONFIG_START(ice_bozopail_state::ice_bozo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC68HC11, 8000000) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(ice_bozo_map)
+	MCFG_DEVICE_ADD("maincpu", MC68HC11, 8000000) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(ice_bozo_map)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 MACHINE_CONFIG_END
 
 
@@ -74,4 +76,4 @@ ROM_START( ice_bozo )
 	ROM_LOAD( "ice-bozo.u9",  0x100000, 0x100000, CRC(26fd9d60) SHA1(41fe8d42db1eb16b413bd5a0f16bf0d081c3cc97) )
 ROM_END
 
-GAME( 1997?, ice_bozo,  0,    ice_bozo, ice_bozo, ice_bozopail_state,  0, ROT0, "Innovative Creations in Entertainment", "Bozo's Pail Toss (v2.07)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1997?, ice_bozo, 0, ice_bozo, ice_bozo, ice_bozopail_state, empty_init, ROT0, "Innovative Creations in Entertainment", "Bozo's Pail Toss (v2.07)", MACHINE_IS_SKELETON_MECHANICAL )

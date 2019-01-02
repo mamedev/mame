@@ -47,13 +47,9 @@ Year + Game         PCB             Notes
                                 Burglar X
 ***************************************************************************/
 
-WRITE16_MEMBER(unico_state::burglarx_sound_bank_w)
+WRITE8_MEMBER(unico_state::burglarx_okibank_w)
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		int bank = (data >> 8 ) & 1;
-		m_oki->set_rom_bank(bank);
-	}
+	m_oki->set_rom_bank(data & 1);
 }
 
 void unico_state::burglarx_map(address_map &map)
@@ -65,16 +61,16 @@ void unico_state::burglarx_map(address_map &map)
 	map(0x80001a, 0x80001b).portr("DSW1");
 	map(0x80001c, 0x80001d).portr("DSW2");
 	map(0x800030, 0x800031).nopw();                                                // ? 0
-	map(0x80010c, 0x800121).rw(this, FUNC(unico_state::unico_scroll_r), FUNC(unico_state::unico_scroll_w));               // Scroll
+	map(0x80010c, 0x800121).rw(FUNC(unico_state::scroll_r), FUNC(unico_state::scroll_w)).share("scroll");               // Scroll
 	map(0x800189, 0x800189).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 	map(0x80018a, 0x80018a).w("ymsnd", FUNC(ym3812_device::write_port_w));
 	map(0x80018c, 0x80018c).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0x80018e, 0x80018f).w(this, FUNC(unico_state::burglarx_sound_bank_w));                    //
+	map(0x80018e, 0x80018e).w(FUNC(unico_state::burglarx_okibank_w));                    //
 	map(0x8001e0, 0x8001e1).nopw();                                                // IRQ Ack
-	map(0x904000, 0x90ffff).rw(this, FUNC(unico_state::unico_vram_r), FUNC(unico_state::unico_vram_w));         // Layers 1, 2, 0
+	map(0x904000, 0x90ffff).rw(FUNC(unico_state::vram_r), FUNC(unico_state::vram_w)).share("vram");         // Layers 1, 2, 0
 	map(0x920000, 0x923fff).ram();                                                     // ? 0
-	map(0x930000, 0x9307ff).rw(this, FUNC(unico_state::unico_spriteram_r), FUNC(unico_state::unico_spriteram_w));   // Sprites
-	map(0x940000, 0x947fff).ram().w(this, FUNC(unico_state::unico_palette_w)).share("paletteram");   // Palette
+	map(0x930000, 0x9307ff).rw(FUNC(unico_state::spriteram_r), FUNC(unico_state::spriteram_w)).share("spriteram");   // Sprites
+	map(0x940000, 0x947fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // Palette
 }
 
 
@@ -83,26 +79,20 @@ void unico_state::burglarx_map(address_map &map)
                                 Zero Point
 ***************************************************************************/
 
-WRITE16_MEMBER(zeropnt_state::zeropnt_sound_bank_w)
+WRITE8_MEMBER(zeropnt_state::zeropnt_okibank_leds_w)
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		/* Banked sound samples. The 3rd quarter of the ROM
-		   contains garbage. Indeed, only banks 0&1 are used */
+	/* Banked sound samples. The 3rd quarter of the ROM
+	   contains garbage. Indeed, only banks 0&1 are used */
 
-		int bank = (data >> 8 ) & 1;
-		uint8_t *dst  = memregion("oki")->base();
-		uint8_t *src  = dst + 0x80000 + 0x20000 + 0x20000 * bank;
-		memcpy(dst + 0x20000, src, 0x20000);
+	m_okibank->set_entry(data & 1);
 
-		machine().bookkeeping().coin_counter_w(0,data & 0x1000);
-		output().set_led_value(0,data & 0x0800); // Start 1
-		output().set_led_value(1,data & 0x0400); // Start 2
-	}
+	machine().bookkeeping().coin_counter_w(0,data & 0x10);
+	m_leds[0] = BIT(data, 3); // Start 1
+	m_leds[1] = BIT(data, 2); // Start 2
 }
 
 /* Light Gun - need to wiggle the input slightly otherwise fire doesn't work */
-READ16_MEMBER(zeropnt_state::unico_gunx_0_msb_r)
+READ16_MEMBER(zeropnt_state::gunx_0_msb_r)
 {
 	int x=m_gun_axes[X0]->read();
 
@@ -113,7 +103,7 @@ READ16_MEMBER(zeropnt_state::unico_gunx_0_msb_r)
 	return ((x&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-READ16_MEMBER(zeropnt_state::unico_guny_0_msb_r)
+READ16_MEMBER(zeropnt_state::guny_0_msb_r)
 {
 	int y=m_gun_axes[Y0]->read();
 
@@ -122,7 +112,7 @@ READ16_MEMBER(zeropnt_state::unico_guny_0_msb_r)
 	return ((y&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-READ16_MEMBER(zeropnt_state::unico_gunx_1_msb_r)
+READ16_MEMBER(zeropnt_state::gunx_1_msb_r)
 {
 	int x=m_gun_axes[X1]->read();
 
@@ -133,7 +123,7 @@ READ16_MEMBER(zeropnt_state::unico_gunx_1_msb_r)
 	return ((x&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-READ16_MEMBER(zeropnt_state::unico_guny_1_msb_r)
+READ16_MEMBER(zeropnt_state::guny_1_msb_r)
 {
 	int y=m_gun_axes[Y1]->read();
 
@@ -150,20 +140,26 @@ void zeropnt_state::zeropnt_map(address_map &map)
 	map(0x800018, 0x800019).portr("INPUTS");
 	map(0x80001a, 0x80001b).portr("DSW1");
 	map(0x80001c, 0x80001d).portr("DSW2");
-	map(0x80010c, 0x800121).rw(this, FUNC(zeropnt_state::unico_scroll_r), FUNC(zeropnt_state::unico_scroll_w));   // Scroll
-	map(0x800170, 0x800171).r(this, FUNC(zeropnt_state::unico_guny_0_msb_r));   // Light Guns
-	map(0x800174, 0x800175).r(this, FUNC(zeropnt_state::unico_gunx_0_msb_r));   //
-	map(0x800178, 0x800179).r(this, FUNC(zeropnt_state::unico_guny_1_msb_r));   //
-	map(0x80017c, 0x80017d).r(this, FUNC(zeropnt_state::unico_gunx_1_msb_r));   //
+	map(0x80010c, 0x800121).rw(FUNC(zeropnt_state::scroll_r), FUNC(zeropnt_state::scroll_w)).share("scroll");   // Scroll
+	map(0x800170, 0x800171).r(FUNC(zeropnt_state::guny_0_msb_r));   // Light Guns
+	map(0x800174, 0x800175).r(FUNC(zeropnt_state::gunx_0_msb_r));   //
+	map(0x800178, 0x800179).r(FUNC(zeropnt_state::guny_1_msb_r));   //
+	map(0x80017c, 0x80017d).r(FUNC(zeropnt_state::gunx_1_msb_r));   //
 	map(0x800189, 0x800189).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
 	map(0x80018a, 0x80018a).w("ymsnd", FUNC(ym3812_device::write_port_w));
 	map(0x80018c, 0x80018c).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0x80018e, 0x80018f).w(this, FUNC(zeropnt_state::zeropnt_sound_bank_w));   //
+	map(0x80018e, 0x80018e).w(FUNC(zeropnt_state::zeropnt_okibank_leds_w));   //
 	map(0x8001e0, 0x8001e1).writeonly();   // ? IRQ Ack
-	map(0x904000, 0x90ffff).rw(this, FUNC(zeropnt_state::unico_vram_r), FUNC(zeropnt_state::unico_vram_w));     // Layers 1, 2, 0
+	map(0x904000, 0x90ffff).rw(FUNC(zeropnt_state::vram_r), FUNC(zeropnt_state::vram_w)).share("vram");     // Layers 1, 2, 0
 	map(0x920000, 0x923fff).ram(); // ? 0
-	map(0x930000, 0x9307ff).rw(this, FUNC(zeropnt_state::unico_spriteram_r), FUNC(zeropnt_state::unico_spriteram_w));   // Sprites
-	map(0x940000, 0x947fff).ram().w(this, FUNC(zeropnt_state::unico_palette_w)).share("paletteram");   // Palette
+	map(0x930000, 0x9307ff).rw(FUNC(zeropnt_state::spriteram_r), FUNC(zeropnt_state::spriteram_w)).share("spriteram");   // Sprites
+	map(0x940000, 0x947fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // Palette
+}
+
+void zeropnt_state::zeropnt_oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank");
 }
 
 
@@ -171,33 +167,24 @@ void zeropnt_state::zeropnt_map(address_map &map)
                                 Zero Point 2
 ***************************************************************************/
 
-READ32_MEMBER(zeropnt2_state::zeropnt2_gunx_0_msb_r) { return (unico_gunx_0_msb_r(space,0,0xffff)-0x0800) << 16; }
-READ32_MEMBER(zeropnt2_state::zeropnt2_guny_0_msb_r) { return (unico_guny_0_msb_r(space,0,0xffff)+0x0800) << 16; }
-READ32_MEMBER(zeropnt2_state::zeropnt2_gunx_1_msb_r) { return (unico_gunx_1_msb_r(space,0,0xffff)-0x0800) << 16; }
-READ32_MEMBER(zeropnt2_state::zeropnt2_guny_1_msb_r) { return (unico_guny_1_msb_r(space,0,0xffff)+0x0800) << 16; }
+READ32_MEMBER(zeropnt2_state::zeropnt2_gunx_0_msb_r) { return (gunx_0_msb_r(space,0,0xffff)-0x0800) << 16; }
+READ32_MEMBER(zeropnt2_state::zeropnt2_guny_0_msb_r) { return (guny_0_msb_r(space,0,0xffff)+0x0800) << 16; }
+READ32_MEMBER(zeropnt2_state::zeropnt2_gunx_1_msb_r) { return (gunx_1_msb_r(space,0,0xffff)-0x0800) << 16; }
+READ32_MEMBER(zeropnt2_state::zeropnt2_guny_1_msb_r) { return (guny_1_msb_r(space,0,0xffff)+0x0800) << 16; }
 
-WRITE32_MEMBER(zeropnt2_state::zeropnt2_sound_bank_w)
+WRITE8_MEMBER(zeropnt2_state::zeropnt2_okibank)
 {
-	if (ACCESSING_BITS_24_31)
-	{
-		int bank = ((data >> 24) & 3) % 4;
-		uint8_t *dst  = memregion("oki1")->base();
-		uint8_t *src  = dst + 0x80000 + 0x20000 + 0x20000 * bank;
-		memcpy(dst + 0x20000, src, 0x20000);
-	}
+	m_okibank->set_entry((data & 3) % 4);
 }
 
-WRITE32_MEMBER(zeropnt2_state::zeropnt2_leds_w)
+WRITE8_MEMBER(zeropnt2_state::leds_w)
 {
-	if (ACCESSING_BITS_16_23)
-	{
-		machine().bookkeeping().coin_counter_w(0,data & 0x00010000);
-		output().set_led_value(0,data & 0x00800000); // Start 1
-		output().set_led_value(1,data & 0x00400000); // Start 2
-	}
+	machine().bookkeeping().coin_counter_w(0,data & 0x01);
+	m_leds[0] = BIT(data, 7); // Start 1
+	m_leds[1] = BIT(data, 6); // Start 2
 }
 
-WRITE32_MEMBER(zeropnt2_state::zeropnt2_eeprom_w)
+WRITE32_MEMBER(zeropnt2_state::eeprom_w)
 {
 	if (data & ~0xfe00000)
 		logerror("%s - Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
@@ -222,22 +209,22 @@ void zeropnt2_state::zeropnt2_map(address_map &map)
 	map(0x800025, 0x800025).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
 	map(0x800028, 0x80002f).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask32(0x00ff0000);  //
 	map(0x800031, 0x800031).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   //
-	map(0x800034, 0x800037).w(this, FUNC(zeropnt2_state::zeropnt2_sound_bank_w));   //
-	map(0x800038, 0x80003b).w(this, FUNC(zeropnt2_state::zeropnt2_leds_w));   // ?
-	map(0x80010c, 0x800123).rw(this, FUNC(zeropnt2_state::unico_scroll_r), FUNC(zeropnt2_state::unico_scroll_w));   // Scroll
-	map(0x800140, 0x800143).r(this, FUNC(zeropnt2_state::zeropnt2_guny_0_msb_r));   // Light Guns
-	map(0x800144, 0x800147).r(this, FUNC(zeropnt2_state::zeropnt2_gunx_0_msb_r));   //
-	map(0x800148, 0x80014b).r(this, FUNC(zeropnt2_state::zeropnt2_guny_1_msb_r));   //
-	map(0x80014c, 0x80014f).r(this, FUNC(zeropnt2_state::zeropnt2_gunx_1_msb_r));   //
+	map(0x800034, 0x800034).w(FUNC(zeropnt2_state::zeropnt2_okibank));   //
+	map(0x800039, 0x800039).w(FUNC(zeropnt2_state::leds_w));   // ?
+	map(0x80010c, 0x800123).rw(FUNC(zeropnt2_state::scroll_r), FUNC(zeropnt2_state::scroll_w)).share("scroll");   // Scroll
+	map(0x800140, 0x800143).r(FUNC(zeropnt2_state::zeropnt2_guny_0_msb_r));   // Light Guns
+	map(0x800144, 0x800147).r(FUNC(zeropnt2_state::zeropnt2_gunx_0_msb_r));   //
+	map(0x800148, 0x80014b).r(FUNC(zeropnt2_state::zeropnt2_guny_1_msb_r));   //
+	map(0x80014c, 0x80014f).r(FUNC(zeropnt2_state::zeropnt2_gunx_1_msb_r));   //
 	map(0x800150, 0x800153).portr("DSW1");
 	map(0x800154, 0x800157).portr("DSW2");
 	map(0x80015c, 0x80015f).portr("BUTTONS");
 	map(0x8001e0, 0x8001e3).nopw();                                    // ? IRQ Ack
-	map(0x8001f0, 0x8001f3).w(this, FUNC(zeropnt2_state::zeropnt2_eeprom_w));                    // EEPROM
-	map(0x904000, 0x90ffff).rw(this, FUNC(zeropnt2_state::unico_vram_r), FUNC(zeropnt2_state::unico_vram_w));     // Layers 1, 2, 0
+	map(0x8001f0, 0x8001f3).w(FUNC(zeropnt2_state::eeprom_w));                    // EEPROM
+	map(0x904000, 0x90ffff).rw(FUNC(zeropnt2_state::vram_r), FUNC(zeropnt2_state::vram_w)).share("vram");     // Layers 1, 2, 0
 	map(0x920000, 0x923fff).ram();                                         // ? 0
-	map(0x930000, 0x9307ff).rw(this, FUNC(zeropnt2_state::unico_spriteram_r), FUNC(zeropnt2_state::unico_spriteram_w));   // Sprites
-	map(0x940000, 0x947fff).ram().w(this, FUNC(zeropnt2_state::unico_palette32_w)).share("paletteram"); // Palette
+	map(0x930000, 0x9307ff).rw(FUNC(zeropnt2_state::spriteram_r), FUNC(zeropnt2_state::spriteram_w)).share("spriteram");   // Sprites
+	map(0x940000, 0x947fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");   // Palette
 	map(0xfe0000, 0xffffff).ram();                                         // RAM
 }
 
@@ -549,7 +536,7 @@ static const gfx_layout layout_16x16x8 =
 	16*16*2
 };
 
-static GFXDECODE_START( unico )
+static GFXDECODE_START( gfx_unico )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x0, 0x20 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8, 0x0, 0x20 ) // [1] Layers
 GFXDECODE_END
@@ -565,6 +552,12 @@ GFXDECODE_END
 ***************************************************************************/
 
 
+void unico_state::machine_start()
+{
+	m_leds.resolve();
+}
+
+
 /***************************************************************************
                                 Burglar X
 ***************************************************************************/
@@ -572,9 +565,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(unico_state::burglarx)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(burglarx_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(burglarx_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -582,20 +575,21 @@ MACHINE_CONFIG_START(unico_state::burglarx)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(unico_state, screen_update_unico)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DRIVER(unico_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
-	MCFG_PALETTE_ADD("palette", 8192)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
+	PALETTE(config, m_palette).set_format(4, &unico_state::unico_R6G6B6X, 8192);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 32_MHz_XTAL/32, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -606,12 +600,18 @@ MACHINE_CONFIG_END
                                 Zero Point
 ***************************************************************************/
 
+void zeropnt_state::machine_start()
+{
+	unico_state::machine_start();
+	m_okibank->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
+}
+
 MACHINE_CONFIG_START(zeropnt_state::zeropnt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(zeropnt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(zeropnt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -619,20 +619,22 @@ MACHINE_CONFIG_START(zeropnt_state::zeropnt)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(zeropnt_state, screen_update_unico)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DRIVER(zeropnt_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
-	MCFG_PALETTE_ADD("palette", 8192)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
+	PALETTE(config, m_palette).set_format(4, &zeropnt_state::unico_R6G6B6X, 8192);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 32_MHz_XTAL/32, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(0, zeropnt_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -643,14 +645,20 @@ MACHINE_CONFIG_END
                                 Zero Point 2
 ***************************************************************************/
 
+void zeropnt2_state::machine_start()
+{
+	unico_state::machine_start();
+	m_okibank->configure_entries(0, 4, memregion("oki1")->base() + 0x20000, 0x20000);
+}
+
 MACHINE_CONFIG_START(zeropnt2_state::zeropnt2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, 32_MHz_XTAL/2) /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(zeropnt2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state, irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 32_MHz_XTAL/2) /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(zeropnt2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", unico_state, irq2_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
+	EEPROM_93C46_8BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -658,24 +666,24 @@ MACHINE_CONFIG_START(zeropnt2_state::zeropnt2)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(384, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(zeropnt2_state, screen_update_unico)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DRIVER(zeropnt2_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unico)
-	MCFG_PALETTE_ADD("palette", 8192)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unico);
+	PALETTE(config, m_palette).set_format(4, &zeropnt2_state::unico_R6G6B6X, 8192);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
+	YM2151(config, "ymsnd", XTAL(14'318'181)/4).add_route(0, "lspeaker", 0.70).add_route(1, "rspeaker", 0.70); /* 3.579545 MHz */
 
-	MCFG_OKIM6295_ADD("oki1", 32_MHz_XTAL/32, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(0, zeropnt_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(14'318'181)/4, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(14'318'181)/4, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
@@ -787,7 +795,6 @@ ROM_START( zeropnt )
 
 	ROM_REGION( 0x80000 * 2, "oki", 0 ) /* Samples */
 	ROM_LOAD( "unico_1.rom1", 0x000000, 0x080000, CRC(fd2384fa) SHA1(8ae83665fe952c5d03bd62d2abb507c351cf0fb5) )
-	ROM_RELOAD(               0x080000, 0x080000 )
 ROM_END
 
 
@@ -810,7 +817,6 @@ ROM_START( zeropnta )
 
 	ROM_REGION( 0x80000 * 2, "oki", 0 ) /* Samples */
 	ROM_LOAD( "unico_1.rom1", 0x000000, 0x080000, CRC(fd2384fa) SHA1(8ae83665fe952c5d03bd62d2abb507c351cf0fb5) )
-	ROM_RELOAD(               0x080000, 0x080000 )
 ROM_END
 
 
@@ -833,7 +839,6 @@ ROM_START( zeropntj )
 
 	ROM_REGION( 0x80000 * 2, "oki", 0 ) /* Samples */
 	ROM_LOAD( "unico_1.rom1", 0x000000, 0x080000, CRC(fd2384fa) SHA1(8ae83665fe952c5d03bd62d2abb507c351cf0fb5) )
-	ROM_RELOAD(               0x080000, 0x080000 )
 ROM_END
 
 /***************************************************************************
@@ -1017,7 +1022,6 @@ ROM_START( zeropnt2 )
 
 	ROM_REGION( 0x80000 * 2, "oki1", 0 )    /* Samples */
 	ROM_LOAD( "uzp2-1.bin", 0x000000, 0x080000, CRC(ed0966ed) SHA1(a43b9c493f94d1fb11e1b189caaf37d3d792c730) )
-	ROM_RELOAD(             0x080000, 0x080000 )
 
 	ROM_REGION( 0x40000, "oki2", 0 )    /* Samples */
 	ROM_LOAD( "uzp2-2.bin", 0x000000, 0x040000, CRC(db8cb455) SHA1(6723b4018208d554bd1bf1e0640b72d2f4f47302) )
@@ -1032,8 +1036,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, burglarx, 0,       burglarx, burglarx, unico_state,    0, ROT0, "Unico", "Burglar X" ,         0 )
-GAME( 1998, zeropnt,  0,       zeropnt,  zeropnt,  zeropnt_state,  0, ROT0, "Unico", "Zero Point (set 1)", 0 )
-GAME( 1998, zeropnta, zeropnt, zeropnt,  zeropnt,  zeropnt_state,  0, ROT0, "Unico", "Zero Point (set 2)", 0 )
-GAME( 1998, zeropntj, zeropnt, zeropnt,  zeropnt,  zeropnt_state,  0, ROT0, "Unico", "Zero Point (Japan)", 0 )
-GAME( 1999, zeropnt2, 0,       zeropnt2, zeropnt2, zeropnt2_state, 0, ROT0, "Unico", "Zero Point 2",       0 )
+GAME( 1997, burglarx, 0,       burglarx, burglarx, unico_state,    empty_init, ROT0, "Unico", "Burglar X" ,         0 )
+GAME( 1998, zeropnt,  0,       zeropnt,  zeropnt,  zeropnt_state,  empty_init, ROT0, "Unico", "Zero Point (set 1)", 0 )
+GAME( 1998, zeropnta, zeropnt, zeropnt,  zeropnt,  zeropnt_state,  empty_init, ROT0, "Unico", "Zero Point (set 2)", 0 )
+GAME( 1998, zeropntj, zeropnt, zeropnt,  zeropnt,  zeropnt_state,  empty_init, ROT0, "Unico", "Zero Point (Japan)", 0 )
+GAME( 1999, zeropnt2, 0,       zeropnt2, zeropnt2, zeropnt2_state, empty_init, ROT0, "Unico", "Zero Point 2",       0 )

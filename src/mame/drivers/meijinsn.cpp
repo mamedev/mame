@@ -67,6 +67,7 @@ SOFT  PSG & VOICE  BY M.C & S.H
 #include "machine/timer.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -83,21 +84,21 @@ public:
 
 	void meijinsn(machine_config &config);
 
-protected:
+	void meijinsn_map(address_map &map);
+
+private:
 	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_READ16_MEMBER(alpha_mcu_r);
-	DECLARE_PALETTE_INIT(meijinsn);
+	void meijinsn_palette(palette_device &palette) const;
 	uint32_t screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(meijinsn_interrupt);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void meijinsn_map(address_map &map);
 	void meijinsn_sound_io_map(address_map &map);
 	void meijinsn_sound_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	/* memory pointers */
@@ -192,13 +193,13 @@ READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 void meijinsn_state::meijinsn_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x080e00, 0x080fff).r(this, FUNC(meijinsn_state::alpha_mcu_r)).nopw();
+	map(0x080e00, 0x080fff).r(FUNC(meijinsn_state::alpha_mcu_r)).nopw();
 	map(0x100000, 0x107fff).ram().share("videoram");
 	map(0x180000, 0x180dff).ram();
 	map(0x180e00, 0x180fff).ram().share("shared_ram");
 	map(0x181000, 0x181fff).ram();
 	map(0x1c0000, 0x1c0001).portr("P2");
-	map(0x1a0000, 0x1a0001).portr("P1").w(this, FUNC(meijinsn_state::sound_w));
+	map(0x1a0000, 0x1a0001).portr("P1").w(FUNC(meijinsn_state::sound_w));
 }
 
 void meijinsn_state::meijinsn_sound_map(address_map &map)
@@ -267,40 +268,38 @@ void meijinsn_state::video_start()
 {
 }
 
-PALETTE_INIT_MEMBER(meijinsn_state, meijinsn)
+void meijinsn_state::meijinsn_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 	static const int resistances_b[2]  = { 470, 220 };
 	static const int resistances_rg[3] = { 1000, 470, 220 };
+
 	double weights_r[3], weights_g[3], weights_b[2];
-
-
 	compute_resistor_weights(0, 255,    -1.0,
 			3,  resistances_rg, weights_r,  0,  1000+1000,
 			3,  resistances_rg, weights_g,  0,  1000+1000,
 			2,  resistances_b,  weights_b,  0,  1000+1000);
 
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
 		/* red component */
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		r = combine_3_weights(weights_r, bit0, bit1, bit2);
+		int const r = combine_3_weights(weights_r, bit0, bit1, bit2);
 
 		/* green component */
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		g = combine_3_weights(weights_g, bit0, bit1, bit2);
+		int const g = combine_3_weights(weights_g, bit0, bit1, bit2);
 
 		/* blue component */
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		b = combine_2_weights(weights_b, bit0, bit1);
+		int const b = combine_2_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -361,14 +360,14 @@ void meijinsn_state::machine_reset()
 MACHINE_CONFIG_START(meijinsn_state::meijinsn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 9000000 )
-	MCFG_CPU_PROGRAM_MAP(meijinsn_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 9000000 )
+	MCFG_DEVICE_PROGRAM_MAP(meijinsn_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", meijinsn_state, meijinsn_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(meijinsn_sound_map)
-	MCFG_CPU_IO_MAP(meijinsn_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(meijinsn_state, irq0_line_hold,  160*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(meijinsn_sound_map)
+	MCFG_DEVICE_IO_MAP(meijinsn_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(meijinsn_state, irq0_line_hold,  160*60)
 
 
 	/* video hardware */
@@ -380,18 +379,16 @@ MACHINE_CONFIG_START(meijinsn_state::meijinsn)
 	MCFG_SCREEN_UPDATE_DRIVER(meijinsn_state, screen_update_meijinsn)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(meijinsn_state, meijinsn)
+	PALETTE(config, "palette", FUNC(meijinsn_state::meijinsn_palette), 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-
+	ay8910_device &aysnd(AY8910(config, "aysnd", 2000000));
+	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.75);
 MACHINE_CONFIG_END
 
 
@@ -422,4 +419,4 @@ ROM_START( meijinsn )
 	ROM_LOAD( "clr", 0x00, 0x20, CRC(7b95b5a7) SHA1(c15be28bcd6f5ffdde659f2d352ae409f04b2557) )
 ROM_END
 
-GAME( 1986, meijinsn, 0, meijinsn, meijinsn, meijinsn_state, 0, ROT0, "SNK", "Meijinsen", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, meijinsn, 0, meijinsn, meijinsn, meijinsn_state, empty_init, ROT0, "SNK", "Meijinsen", MACHINE_SUPPORTS_SAVE )

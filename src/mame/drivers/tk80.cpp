@@ -60,16 +60,18 @@ public:
 	tk80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ppi(*this, "ppi8255")
 		, m_digit(*this, "digit%u", 0U)
 	{ }
 
+	void add_tk80_ppi(machine_config &config);
 	void ics8080(machine_config &config);
 	void tk80(machine_config &config);
 	void mikrolab(machine_config &config);
 	void nd80z(machine_config &config);
 	void tk85(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(key_matrix_r);
@@ -87,7 +89,6 @@ protected:
 	void tk80_mem(address_map &map);
 	void tk85_mem(address_map &map);
 
-private:
 	uint8_t m_term_data;
 	uint8_t m_keyb_press;
 	uint8_t m_keyb_press_flag;
@@ -95,6 +96,7 @@ private:
 	uint8_t m_ppi_portc;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<i8255_device> m_ppi;
 	output_finder<8> m_digit;
 };
 
@@ -127,7 +129,7 @@ void tk80_state::tk80_mem(address_map &map)
 	map(0x0000, 0x02ff).rom();
 	map(0x0300, 0x03ff).ram(); // EEPROM
 	map(0x8000, 0x83f7).ram(); // RAM
-	map(0x83f8, 0x83ff).ram().rw(this, FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
+	map(0x83f8, 0x83ff).ram().rw(FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
 }
 
 void tk80_state::tk85_mem(address_map &map)
@@ -136,7 +138,7 @@ void tk80_state::tk85_mem(address_map &map)
 	map.global_mask(0x87ff); // A10-14 not connected
 	map(0x0000, 0x07ff).rom();
 	map(0x8000, 0x83f7).ram();
-	map(0x83f8, 0x83ff).ram().rw(this, FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
+	map(0x83f8, 0x83ff).ram().rw(FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
 }
 
 void tk80_state::ics8080_mem(address_map &map)
@@ -145,7 +147,7 @@ void tk80_state::ics8080_mem(address_map &map)
 	//ADDRESS_MAP_GLOBAL_MASK(0x87ff) // A10-14 not connected
 	map(0x0000, 0x1fff).rom();
 	map(0x8000, 0x83f7).ram();
-	map(0x83f8, 0x83ff).ram().rw(this, FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
+	map(0x83f8, 0x83ff).ram().rw(FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));
 	map(0x8400, 0x8fff).ram();
 }
 
@@ -153,21 +155,21 @@ void tk80_state::tk80_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x03);
-	map(0x00, 0x03).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x00, 0x03).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 void tk80_state::mikrolab_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x03);
-	map(0x00, 0x03).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x00, 0x03).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 void tk80_state::nd80z_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x03);
-	map(0x00, 0x03).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x00, 0x03).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 /* Input ports */
@@ -284,63 +286,72 @@ WRITE8_MEMBER( tk80_state::mikrolab_serial_w )
 	m_ppi_portc = data;
 }
 
-MACHINE_CONFIG_START(tk80_state::tk80)
+void tk80_state::add_tk80_ppi(machine_config &config)
+{
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(tk80_state::key_matrix_r));
+	m_ppi->in_pb_callback().set(FUNC(tk80_state::serial_r));
+	m_ppi->out_pc_callback().set(FUNC(tk80_state::serial_w));
+}
+
+void tk80_state::tk80(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'432'000) / 9)
-	MCFG_CPU_PROGRAM_MAP(tk80_mem)
-	MCFG_CPU_IO_MAP(tk80_io)
+	I8080A(config, m_maincpu, XTAL(18'432'000) / 9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tk80_state::tk80_mem);
+	m_maincpu->set_addrmap(AS_IO, &tk80_state::tk80_io);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tk80)
+	config.set_default_layout(layout_tk80);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(tk80_state, key_matrix_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(tk80_state, serial_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(tk80_state, serial_w))
-MACHINE_CONFIG_END
+	add_tk80_ppi(config);
+}
 
-MACHINE_CONFIG_START(tk80_state::mikrolab)
+void tk80_state::mikrolab(machine_config &config)
+{
 	tk80(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tk85_mem)
-	MCFG_CPU_IO_MAP(mikrolab_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &tk80_state::tk85_mem);
+	m_maincpu->set_addrmap(AS_IO, &tk80_state::mikrolab_io);
 
 	/* Devices */
-	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(tk80_state, key_matrix_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(tk80_state, serial_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(tk80_state, mikrolab_serial_w))
-MACHINE_CONFIG_END
+	m_ppi->out_pc_callback().set(FUNC(tk80_state::mikrolab_serial_w));
+}
 
-MACHINE_CONFIG_START(tk80_state::nd80z)
-	MCFG_CPU_ADD("maincpu", Z80, 1e6 ) // Sharp LH0080A, can't see writing on xtal
-	MCFG_CPU_PROGRAM_MAP(tk85_mem)
-	MCFG_CPU_IO_MAP(nd80z_io)
+void tk80_state::nd80z(machine_config &config)
+{
+	Z80(config, m_maincpu, 1e6); // Sharp LH0080A, can't see writing on xtal
+	m_maincpu->set_addrmap(AS_PROGRAM, &tk80_state::tk85_mem);
+	m_maincpu->set_addrmap(AS_IO, &tk80_state::nd80z_io);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tk80)
+	config.set_default_layout(layout_tk80);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(tk80_state, nd80z_key_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(tk80_state, serial_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(tk80_state, mikrolab_serial_w))
-MACHINE_CONFIG_END
+	I8255(config, m_ppi, 0);
+	m_ppi->in_pa_callback().set(FUNC(tk80_state::nd80z_key_r));
+	m_ppi->in_pb_callback().set(FUNC(tk80_state::serial_r));
+	m_ppi->out_pc_callback().set(FUNC(tk80_state::mikrolab_serial_w));
+}
 
-MACHINE_CONFIG_START(tk80_state::tk85)
-	tk80(config);
-	MCFG_CPU_REPLACE("maincpu", I8085A, XTAL(4'915'200))
-	MCFG_CPU_PROGRAM_MAP(tk85_mem)
-	MCFG_CPU_IO_MAP(tk80_io)
-MACHINE_CONFIG_END
+void tk80_state::tk85(machine_config &config)
+{
+	I8085A(config, m_maincpu, XTAL(4'915'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tk80_state::tk85_mem);
+	m_maincpu->set_addrmap(AS_IO, &tk80_state::tk80_io);
 
-MACHINE_CONFIG_START(tk80_state::ics8080)
+	/* video hardware */
+	config.set_default_layout(layout_tk80);
+
+	/* Devices */
+	add_tk80_ppi(config);
+}
+
+void tk80_state::ics8080(machine_config &config)
+{
 	tk80(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ics8080_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &tk80_state::ics8080_mem);
+}
 
 
 /* ROM definition */
@@ -379,9 +390,9 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS       INIT  COMPANY      FULLNAME              FLAGS
-COMP( 1976, tk80,     0,      0,      tk80,     tk80,     tk80_state, 0,    "NEC",       "TK-80",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, nectk85,  tk80,   0,      tk85,     tk80,     tk80_state, 0,    "NEC",       "TK-85",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 19??, nd80z,    tk80,   0,      nd80z,    tk80,     tk80_state, 0,    "Chunichi",  "ND-80Z",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 19??, mikrolab, tk80,   0,      mikrolab, mikrolab, tk80_state, 0,    "<unknown>", "Mikrolab KR580IK80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 19??, ics8080,  tk80,   0,      ics8080,  ics8080,  tk80_state, 0,    "<unknown>", "ICS8080",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS       INIT        COMPANY      FULLNAME              FLAGS
+COMP( 1976, tk80,     0,      0,      tk80,     tk80,     tk80_state, empty_init, "NEC",       "TK-80",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, nectk85,  tk80,   0,      tk85,     tk80,     tk80_state, empty_init, "NEC",       "TK-85",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 19??, nd80z,    tk80,   0,      nd80z,    tk80,     tk80_state, empty_init, "Chunichi",  "ND-80Z",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 19??, mikrolab, tk80,   0,      mikrolab, mikrolab, tk80_state, empty_init, "<unknown>", "Mikrolab KR580IK80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 19??, ics8080,  tk80,   0,      ics8080,  ics8080,  tk80_state, empty_init, "<unknown>", "ICS8080",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

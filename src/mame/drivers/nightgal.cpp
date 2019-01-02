@@ -34,6 +34,7 @@ TODO:
 #include "sound/volt_reg.h"
 #include "video/jangou_blitter.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -43,8 +44,8 @@ TODO:
 class nightgal_state : public driver_device
 {
 public:
-	nightgal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	nightgal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_comms_ram(*this, "comms_ram"),
 		m_sound_ram(*this, "sound_ram"),
 		m_maincpu(*this, "maincpu"),
@@ -69,9 +70,19 @@ public:
 		m_io_dswb(*this, "DSWB"),
 		m_io_dswc(*this, "DSWC"),
 		m_palette(*this, "palette"),
-		m_blitter(*this, "blitter") { }
+		m_blitter(*this, "blitter")
+	{ }
 
+	void ngalsumr(machine_config &config);
+	void sexygal(machine_config &config);
+	void sweetgal(machine_config &config);
+	void sgaltrop(machine_config &config);
+	void royalqn(machine_config &config);
 
+	void init_ngalsumr();
+	void init_royalqn();
+
+private:
 	emu_timer *m_z80_wait_ack_timer;
 
 	required_shared_ptr<uint8_t> m_comms_ram;
@@ -99,21 +110,14 @@ public:
 	DECLARE_WRITE8_MEMBER(sexygal_audioff_w);
 	DECLARE_WRITE8_MEMBER(sexygal_audionmi_w);
 
-	DECLARE_DRIVER_INIT(ngalsumr);
-	DECLARE_DRIVER_INIT(royalqn);
 	DECLARE_WRITE8_MEMBER(ngalsumr_prot_latch_w);
 	DECLARE_READ8_MEMBER(ngalsumr_prot_value_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(nightgal);
+	void nightgal_palette(palette_device &palette) const;
 	uint32_t screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void ngalsumr(machine_config &config);
-	void sexygal(machine_config &config);
-	void sweetgal(machine_config &config);
-	void sgaltrop(machine_config &config);
-	void royalqn(machine_config &config);
 	void common_nsc_map(address_map &map);
 	void common_sexygal_io(address_map &map);
 	void royalqn_io(address_map &map);
@@ -126,7 +130,7 @@ public:
 	void sgaltrop_io(address_map &map);
 	void sgaltrop_nsc_map(address_map &map);
 	void sweetgal_map(address_map &map);
-protected:
+
 	required_ioport m_io_cr_clear;
 	required_ioport m_io_coins;
 	required_ioport m_io_pl1_1;
@@ -152,7 +156,6 @@ protected:
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 
-private:
 	/* video-related */
 	uint8_t m_blit_raw_data[3];
 
@@ -191,42 +194,40 @@ uint32_t nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_in
 	return 0;
 }
 
-/* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
-PALETTE_INIT_MEMBER(nightgal_state, nightgal)
+// guess: use the same resistor values as Crazy Climber (needs checking on the real HW)
+void nightgal_state::nightgal_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances_rg[3] = { 1000, 470, 220 };
-	static const int resistances_b [2] = { 470, 220 };
-	double weights_rg[3], weights_b[2];
-	int i;
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double weights_rg[3], weights_b[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 0,
 			2, resistances_b,  weights_b,  0, 0,
 			0, nullptr, nullptr, 0, 0);
 
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
+		// red component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		int const r = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
-		/* green component */
+		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		int const g = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
-		/* blue component */
+		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		b = combine_2_weights(weights_b, bit0, bit1);
+		int const b = combine_2_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -375,7 +376,7 @@ void nightgal_state::common_nsc_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram();
 	map(0x0080, 0x0080).portr("BLIT_PORT");
-	map(0x0081, 0x0083).r(this, FUNC(nightgal_state::royalqn_nsc_blit_r));
+	map(0x0081, 0x0083).r(FUNC(nightgal_state::royalqn_nsc_blit_r));
 	map(0x00a0, 0x00af).w(m_blitter, FUNC(jangou_blitter_device::vregs_w));
 	map(0x00b0, 0x00b0).w(m_blitter, FUNC(jangou_blitter_device::bltflip_w));
 }
@@ -410,7 +411,7 @@ WRITE8_MEMBER(nightgal_state::sexygal_audioff_w)
 
 WRITE8_MEMBER(nightgal_state::sexygal_audionmi_w)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	// doesn't seem to be any way around this blatant hack
 	m_audiocpu->reset();
@@ -421,25 +422,25 @@ void nightgal_state::sweetgal_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x807f).ram().share("sound_ram");
-	map(0xe000, 0xefff).rw(this, FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
+	map(0xe000, 0xefff).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
 	map(0xf000, 0xffff).ram();
 }
 
 void nightgal_state::sexygal_map(address_map &map)
 {
 	sweetgal_map(map);
-	map(0x8000, 0x807f).r(this, FUNC(nightgal_state::sexygal_soundram_r));
-	map(0xa000, 0xa000).w(this, FUNC(nightgal_state::sexygal_audioff_w));
+	map(0x8000, 0x807f).r(FUNC(nightgal_state::sexygal_soundram_r));
+	map(0xa000, 0xa000).w(FUNC(nightgal_state::sexygal_audioff_w));
 }
 
 void nightgal_state::common_sexygal_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x10).portr("DSWA").w(this, FUNC(nightgal_state::output_w));
-	map(0x11, 0x11).portr("SYSTEM").w(this, FUNC(nightgal_state::mux_w));
-	map(0x12, 0x12).mirror(0xe8).portr("DSWB").w(this, FUNC(nightgal_state::royalqn_blitter_0_w));
-	map(0x13, 0x13).mirror(0xe8).portr("DSWC").w(this, FUNC(nightgal_state::royalqn_blitter_1_w));
-	map(0x14, 0x14).mirror(0xe8).nopr().w(this, FUNC(nightgal_state::royalqn_blitter_2_w));
+	map(0x10, 0x10).portr("DSWA").w(FUNC(nightgal_state::output_w));
+	map(0x11, 0x11).portr("SYSTEM").w(FUNC(nightgal_state::mux_w));
+	map(0x12, 0x12).mirror(0xe8).portr("DSWB").w(FUNC(nightgal_state::royalqn_blitter_0_w));
+	map(0x13, 0x13).mirror(0xe8).portr("DSWC").w(FUNC(nightgal_state::royalqn_blitter_1_w));
+	map(0x14, 0x14).mirror(0xe8).nopr().w(FUNC(nightgal_state::royalqn_blitter_2_w));
 }
 
 void nightgal_state::sexygal_io(address_map &map)
@@ -463,7 +464,7 @@ void nightgal_state::sexygal_nsc_map(address_map &map)
 {
 	common_nsc_map(map);
 	map(0x0080, 0x0086).m(m_blitter, FUNC(jangou_blitter_device::blit_v2_regs));
-	map(0x1000, 0x13ff).mirror(0x2c00).rw(this, FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
+	map(0x1000, 0x13ff).mirror(0x2c00).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
 	map(0xc000, 0xdfff).mirror(0x2000).rom().region("subrom", 0);
 }
 
@@ -472,7 +473,7 @@ void nightgal_state::sgaltrop_nsc_map(address_map &map)
 	common_nsc_map(map);
 
 	map(0x0080, 0x0086).m(m_blitter, FUNC(jangou_blitter_device::blit_v2_regs));
-	map(0x1000, 0x13ff).mirror(0x2c00).rw(this, FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
+	map(0x1000, 0x13ff).mirror(0x2c00).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
 	map(0xc000, 0xffff).rom().region("subrom", 0);
 }
 
@@ -481,10 +482,10 @@ void nightgal_state::sgaltrop_nsc_map(address_map &map)
 void nightgal_state::sexygal_audio_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram();
-	map(0x0080, 0x0080).r(this, FUNC(nightgal_state::sexygal_unknown_sound_r));
-	map(0x1000, 0x1000).w("dac", FUNC(dac_byte_interface::write));
+	map(0x0080, 0x0080).r(FUNC(nightgal_state::sexygal_unknown_sound_r));
+	map(0x1000, 0x1000).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x2000, 0x207f).ram().share("sound_ram");
-	map(0x3000, 0x3000).w(this, FUNC(nightgal_state::sexygal_audionmi_w));
+	map(0x3000, 0x3000).w(FUNC(nightgal_state::sexygal_audionmi_w));
 	map(0x4000, 0xbfff).rom().region("samples", 0);
 	map(0xc000, 0xffff).rom().region("audiorom", 0);
 }
@@ -498,7 +499,7 @@ void nightgal_state::royalqn_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).noprw();
-	map(0xc000, 0xdfff).rw(this, FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
+	map(0xc000, 0xdfff).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w)).share("comms_ram");
 	map(0xe000, 0xffff).ram();
 }
 
@@ -507,11 +508,11 @@ void nightgal_state::royalqn_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).mirror(0xec).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).mirror(0xec).w("aysnd", FUNC(ay8910_device::data_address_w));
-	map(0x10, 0x10).mirror(0xe8).portr("DSWA").w(this, FUNC(nightgal_state::output_w));
-	map(0x11, 0x11).mirror(0xe8).portr("SYSTEM").w(this, FUNC(nightgal_state::mux_w));
-	map(0x12, 0x12).mirror(0xe8).portr("DSWB").w(this, FUNC(nightgal_state::royalqn_blitter_0_w));
-	map(0x13, 0x13).mirror(0xe8).portr("DSWC").w(this, FUNC(nightgal_state::royalqn_blitter_1_w));
-	map(0x14, 0x14).mirror(0xe8).nopr().w(this, FUNC(nightgal_state::royalqn_blitter_2_w));
+	map(0x10, 0x10).mirror(0xe8).portr("DSWA").w(FUNC(nightgal_state::output_w));
+	map(0x11, 0x11).mirror(0xe8).portr("SYSTEM").w(FUNC(nightgal_state::mux_w));
+	map(0x12, 0x12).mirror(0xe8).portr("DSWB").w(FUNC(nightgal_state::royalqn_blitter_0_w));
+	map(0x13, 0x13).mirror(0xe8).portr("DSWC").w(FUNC(nightgal_state::royalqn_blitter_1_w));
+	map(0x14, 0x14).mirror(0xe8).nopr().w(FUNC(nightgal_state::royalqn_blitter_2_w));
 	map(0x15, 0x15).mirror(0xe8).noprw();
 	map(0x16, 0x16).mirror(0xe8).noprw();
 	map(0x17, 0x17).mirror(0xe8).noprw();
@@ -522,7 +523,7 @@ void nightgal_state::royalqn_nsc_map(address_map &map)
 	common_nsc_map(map);
 
 	map(0x0080, 0x0086).m(m_blitter, FUNC(jangou_blitter_device::blit_v1_regs));
-	map(0x1000, 0x13ff).mirror(0x2c00).rw(this, FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w));
+	map(0x1000, 0x13ff).mirror(0x2c00).rw(FUNC(nightgal_state::royalqn_comm_r), FUNC(nightgal_state::royalqn_comm_w));
 	map(0x4000, 0x4000).noprw();
 	map(0x8000, 0x8000).noprw(); //open bus or protection check
 	map(0xc000, 0xdfff).mirror(0x2000).rom().region("subrom", 0);
@@ -790,13 +791,13 @@ void nightgal_state::machine_reset()
 MACHINE_CONFIG_START(nightgal_state::royalqn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK / 8)        /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(royalqn_map)
-	MCFG_CPU_IO_MAP(royalqn_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nightgal_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK / 8)        /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(royalqn_map)
+	MCFG_DEVICE_IO_MAP(royalqn_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nightgal_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", NSC8105, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(royalqn_nsc_map)
+	MCFG_DEVICE_ADD("sub", NSC8105, MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(royalqn_nsc_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -806,54 +807,53 @@ MACHINE_CONFIG_START(nightgal_state::royalqn)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4,320,0,256,264,16,240)
 	MCFG_SCREEN_UPDATE_DRIVER(nightgal_state, screen_update_nightgal)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x20)
-	MCFG_PALETTE_INIT_OWNER(nightgal_state, nightgal)
+	PALETTE(config, m_palette, FUNC(nightgal_state::nightgal_palette), 0x20);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(nightgal_state, input_1p_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(nightgal_state, input_2p_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK / 8));
+	aysnd.port_a_read_callback().set(FUNC(nightgal_state::input_1p_r));
+	aysnd.port_b_read_callback().set(FUNC(nightgal_state::input_2p_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nightgal_state::sexygal)
 	royalqn(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sexygal_map)
-	MCFG_CPU_IO_MAP(sexygal_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sexygal_map)
+	MCFG_DEVICE_IO_MAP(sexygal_io)
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(sexygal_nsc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nightgal_state,  irq0_line_hold)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(sexygal_nsc_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nightgal_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", NSC8105, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(sexygal_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", NSC8105, MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(sexygal_audio_map)
 
 	MCFG_DEVICE_ADD("sampleclk", CLOCK, 6000) // quite a wild guess
 	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_REMOVE("aysnd")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(nightgal_state, input_1p_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(nightgal_state, input_2p_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 8));
+	ymsnd.port_a_read_callback().set(FUNC(nightgal_state::input_1p_r));
+	ymsnd.port_b_read_callback().set(FUNC(nightgal_state::input_2p_r));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nightgal_state::sweetgal)
 	sexygal(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sweetgal_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sweetgal_map)
 
 	// doesn't have the extra NSC8105 (so how does this play samples?)
 	MCFG_DEVICE_REMOVE("audiocpu")
@@ -862,19 +862,19 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nightgal_state::ngalsumr)
 	royalqn(config);
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	// TODO: happens from protection device
-	MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nightgal_state::sgaltrop)
 	sexygal(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(sgaltrop_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(sgaltrop_io)
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(sgaltrop_nsc_map)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(sgaltrop_nsc_map)
 
 	MCFG_DEVICE_REMOVE("audiocpu")
 	MCFG_DEVICE_REMOVE("sampleclk")
@@ -1265,7 +1265,7 @@ ROM_START(sgaltrop)
 	ROM_LOAD( "gt.7f", 0x00, 0x20, CRC(59e36d6e) SHA1(2e0f3d4809ec727518e6ec883f67ede8831681bf) )
 ROM_END
 
-DRIVER_INIT_MEMBER(nightgal_state,royalqn)
+void nightgal_state::init_royalqn()
 {
 	uint8_t *ROM = memregion("subrom")->base();
 
@@ -1325,7 +1325,7 @@ READ8_MEMBER(nightgal_state::ngalsumr_prot_value_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
+void nightgal_state::init_ngalsumr()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(nightgal_state::ngalsumr_prot_latch_w), this) );
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6001, 0x6001, read8_delegate(FUNC(nightgal_state::ngalsumr_prot_value_r), this) );
@@ -1333,14 +1333,14 @@ DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
 }
 
 /* Type 1 HW */
-GAME( 1984, nightgal, 0,        royalqn, sexygal, nightgal_state, 0,        ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ngtbunny, 0,        royalqn, sexygal, nightgal_state, 0,        ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, royalngt, ngtbunny, royalqn, sexygal, nightgal_state, 0,        ROT0, "Royal Denshi", "Royal Night [BET] (Japan 840220 RN 2-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, royalqn,  0,        royalqn, sexygal, nightgal_state, royalqn,  ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, nightgal, 0,        royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ngtbunny, 0,        royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, royalngt, ngtbunny, royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Royal Denshi", "Royal Night [BET] (Japan 840220 RN 2-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, royalqn,  0,        royalqn,  sexygal, nightgal_state, init_royalqn,  ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 2 HW */
-GAME( 1985, sexygal,  0,        sexygal, sexygal, nightgal_state, 0,        ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sweetgal, sexygal,  sweetgal, sexygal, nightgal_state, 0,       ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sexygal,  0,        sexygal,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sweetgal, sexygal,  sweetgal, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* Type 3 HW */
-GAME( 1985, ngalsumr, 0,        ngalsumr,sexygal, nightgal_state, ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer [BET] (Japan 850702 NGS 0-01)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // protection
+GAME( 1985, ngalsumr, 0,        ngalsumr, sexygal, nightgal_state, init_ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer [BET] (Japan 850702 NGS 0-01)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // protection
 /* Type 4 HW */
-GAME( 1985, sgaltrop, 0,        sgaltrop,sexygal, nightgal_state, 0,        ROT0, "Nichibutsu",   "Sexy Gal Tropical [BET] (Japan 850805 SXG T-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sgaltrop, 0,        sgaltrop, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal Tropical [BET] (Japan 850805 SXG T-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

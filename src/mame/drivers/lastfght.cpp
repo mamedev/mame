@@ -37,8 +37,8 @@ PCB Layout
 
 Notes:
       H8/3044 - Subsino re-badged Hitachi H8/3044 HD6433044A22F Microcontroller (QFP100)
-                The H8/3044 is a H8/3002 with 24bit address bus and has 32k MASKROM and 2k RAM, clock input is 16.000MHz [32/2]
-                MD0,MD1 & MD2 are configured to MODE 6 16M-Byte Expanded Mode with the on-chip 32k MASKROM enabled.
+                The H8/3044 is a H8/3002 with 24bit address bus and has 32k mask ROM and 2k RAM, clock input is 16.000MHz [32/2]
+                MD0,MD1 & MD2 are configured to MODE 6 16M-Byte Expanded Mode with the on-chip 32k mask ROM enabled.
       EPM7032 - Altera EPM7032LC44-15T CPLD (PLCC44)
      CXK58257 - Sony CXK58257 32k x8 SRAM (SOP28)
     KM428C256 - Samsung Semiconductor KM428C256 256k x8 Dual Port DRAM (SOJ40)
@@ -52,7 +52,7 @@ Notes:
           SW1 - Push Button Test Switch
         HSync - 15.75kHz
         VSync - 60Hz
-    ROM BOARD - Small Daughterboard containing positions for 8x 16MBit SOP44 MASKROMs. Only positions 1-4 are populated.
+    ROM BOARD - Small Daughterboard containing positions for 8x 16MBit SOP44 mask ROMs. Only positions 1-4 are populated.
    Custom ICs -
                 U19     - SUBSINO 9623EX008 (QFP208)
                 H8/3044 - SUBSINO SS9689 6433044A22F, rebadged Hitachi H8/3044 MCU (QFP100)
@@ -68,6 +68,7 @@ Notes:
 #include "cpu/h8/h83048.h"
 #include "machine/nvram.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -81,6 +82,11 @@ public:
 		m_palette(*this, "palette")
 		{ }
 
+	void lastfght(machine_config &config);
+
+	void init_lastfght();
+
+private:
 	/* memory */
 	DECLARE_WRITE16_MEMBER(hi_w);
 	DECLARE_WRITE16_MEMBER(x_w);
@@ -99,18 +105,15 @@ public:
 	DECLARE_WRITE16_MEMBER(c00006_w);
 	DECLARE_READ16_MEMBER(sound_r);
 	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_DRIVER_INIT(lastfght);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void lastfght(machine_config &config);
 	void lastfght_map(address_map &map);
 	void ramdac_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	/* video-related */
 	bitmap_ind16 m_bitmap[2];
 	int m_dest;
@@ -416,27 +419,27 @@ void lastfght_state::lastfght_map(address_map &map)
 
 	map(0x200000, 0x20ffff).ram().share("nvram"); // battery
 
-	map(0x600000, 0x600001).w(this, FUNC(lastfght_state::hi_w));
-	map(0x600002, 0x600003).rw(this, FUNC(lastfght_state::sound_r), FUNC(lastfght_state::sound_w));
-	map(0x600006, 0x600007).w(this, FUNC(lastfght_state::blit_w));
+	map(0x600000, 0x600001).w(FUNC(lastfght_state::hi_w));
+	map(0x600002, 0x600003).rw(FUNC(lastfght_state::sound_r), FUNC(lastfght_state::sound_w));
+	map(0x600006, 0x600007).w(FUNC(lastfght_state::blit_w));
 	map(0x600009, 0x600009).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x600008, 0x600008).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x60000a, 0x60000a).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	map(0x800000, 0x800001).w(this, FUNC(lastfght_state::sx_w));
-	map(0x800002, 0x800003).w(this, FUNC(lastfght_state::sd_w));
-	map(0x800004, 0x800005).w(this, FUNC(lastfght_state::sy_w));
-	map(0x800006, 0x800007).w(this, FUNC(lastfght_state::sr_w));
-	map(0x800008, 0x800009).w(this, FUNC(lastfght_state::x_w));
-	map(0x80000a, 0x80000b).w(this, FUNC(lastfght_state::yw_w));
-	map(0x80000c, 0x80000d).w(this, FUNC(lastfght_state::h_w));
+	map(0x800000, 0x800001).w(FUNC(lastfght_state::sx_w));
+	map(0x800002, 0x800003).w(FUNC(lastfght_state::sd_w));
+	map(0x800004, 0x800005).w(FUNC(lastfght_state::sy_w));
+	map(0x800006, 0x800007).w(FUNC(lastfght_state::sr_w));
+	map(0x800008, 0x800009).w(FUNC(lastfght_state::x_w));
+	map(0x80000a, 0x80000b).w(FUNC(lastfght_state::yw_w));
+	map(0x80000c, 0x80000d).w(FUNC(lastfght_state::h_w));
 
-	map(0x800014, 0x800015).w(this, FUNC(lastfght_state::dest_w));
+	map(0x800014, 0x800015).w(FUNC(lastfght_state::dest_w));
 
-	map(0xc00000, 0xc00001).r(this, FUNC(lastfght_state::c00000_r));
-	map(0xc00002, 0xc00003).r(this, FUNC(lastfght_state::c00002_r));
-	map(0xc00004, 0xc00005).r(this, FUNC(lastfght_state::c00004_r));
-	map(0xc00006, 0xc00007).rw(this, FUNC(lastfght_state::c00006_r), FUNC(lastfght_state::c00006_w));
+	map(0xc00000, 0xc00001).r(FUNC(lastfght_state::c00000_r));
+	map(0xc00002, 0xc00003).r(FUNC(lastfght_state::c00002_r));
+	map(0xc00004, 0xc00005).r(FUNC(lastfght_state::c00004_r));
+	map(0xc00006, 0xc00007).rw(FUNC(lastfght_state::c00006_r), FUNC(lastfght_state::c00006_w));
 }
 
 void lastfght_state::ramdac_map(address_map &map)
@@ -553,17 +556,17 @@ void lastfght_state::machine_reset()
 MACHINE_CONFIG_START(lastfght_state::lastfght)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83044, 32000000/2)
-	MCFG_CPU_PROGRAM_MAP( lastfght_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lastfght_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", H83044, 32000000/2)
+	MCFG_DEVICE_PROGRAM_MAP( lastfght_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lastfght_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD( "palette", 256 )
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &lastfght_state::ramdac_map);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE( 512, 256 )
@@ -592,7 +595,7 @@ ROM_START( lastfght )
 	ROM_LOAD( "v100.u7", 0x000000, 0x100000, CRC(c134378c) SHA1(999c75f3a7890421cfd904a926ca377ee43a6825) )
 ROM_END
 
-DRIVER_INIT_MEMBER(lastfght_state,lastfght)
+void lastfght_state::init_lastfght()
 {
 	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -603,4 +606,4 @@ DRIVER_INIT_MEMBER(lastfght_state,lastfght)
 	rom[0x01b86 / 2] = 0x5670;
 }
 
-GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, init_lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

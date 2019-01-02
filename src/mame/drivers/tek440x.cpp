@@ -49,6 +49,7 @@
 #include "machine/mos6551.h"    // debug tty
 #include "machine/mc146818.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -58,14 +59,17 @@
 class tek440x_state : public driver_device
 {
 public:
-	tek440x_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tek440x_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_fdccpu(*this, "fdccpu"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram")
-	{}
+	{ }
 
+	void tek4404(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -73,7 +77,6 @@ public:
 	required_device<m6502_device> m_fdccpu;
 	required_shared_ptr<uint16_t> m_mainram;
 	required_shared_ptr<uint16_t> m_vram;
-	void tek4404(machine_config &config);
 	void fdccpu_map(address_map &map);
 	void maincpu_map(address_map &map);
 };
@@ -156,7 +159,7 @@ void tek440x_state::maincpu_map(address_map &map)
 	map(0x780000, 0x781fff).ram(); // map registers
 	// 782000-783fff: video address registers
 	// 784000-785fff: video control registers
-	map(0x788000, 0x788000).w("snsnd", FUNC(sn76496_device::write));
+	map(0x788000, 0x788000).w("snsnd", FUNC(sn76496_device::command_w));
 	// 78a000-78bfff: NS32081 FPU
 	map(0x78c000, 0x78c007).rw("aica", FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
 	// 7b1000-7b2fff: diagnostic registers
@@ -193,11 +196,11 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tek440x_state::tek4404)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, XTAL(40'000'000) / 4) // MC68010L10
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_ADD("maincpu", M68010, 40_MHz_XTAL / 4) // MC68010L10
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
 
-	MCFG_CPU_ADD("fdccpu", M6502, 1000000)
-	MCFG_CPU_PROGRAM_MAP(fdccpu_map)
+	MCFG_DEVICE_ADD("fdccpu", M6502, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(fdccpu_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -208,23 +211,23 @@ MACHINE_CONFIG_START(tek440x_state::tek4404)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(tek440x_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("aica", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	mos6551_device &aica(MOS6551(config, "aica", 0));
+	aica.set_xtal(1.8432_MHz_XTAL);
+	aica.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("timer", AM9513, XTAL(40'000'000) / 4 / 10) // from CPU E output
+	AM9513(config, "timer", 40_MHz_XTAL / 4 / 10); // from CPU E output
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("aica", mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("aica", mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("aica", mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("aica", mos6551_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("aica", FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set("aica", FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set("aica", FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set("aica", FUNC(mos6551_device::write_cts));
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76496, VIDEO_CLOCK / 8)
+	MCFG_DEVICE_ADD("snsnd", SN76496, VIDEO_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -253,5 +256,5 @@ ROM_END
  *  Game driver(s)
  *
  *************************************/
-//    YEAR  NAME      PARENT  COMPAT   MACHINE  INPUT    DEVICE         INIT  COMPANY      FULLNAME  FLAGS
-COMP( 1984, tek4404,  0,      0,       tek4404, tek4404, tek440x_state, 0,    "Tektronix", "4404 Artificial Intelligence System",   MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME                               FLAGS
+COMP( 1984, tek4404, 0,      0,      tek4404, tek4404, tek440x_state, empty_init, "Tektronix", "4404 Artificial Intelligence System", MACHINE_NOT_WORKING )

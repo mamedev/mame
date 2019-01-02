@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Al Kossow
+#ifndef MAME_INCLUDES_M79AMB_H
+#define MAME_INCLUDES_M79AMB_H
+
+#pragma once
+
 #include "sound/discrete.h"
 
 class m79amb_state : public driver_device
@@ -16,8 +21,9 @@ public:
 
 	void m79amb(machine_config &config);
 
-	DECLARE_DRIVER_INIT(m79amb);
+	void init_m79amb();
 
+private:
 	DECLARE_WRITE8_MEMBER(ramtek_videoram_w);
 	DECLARE_READ8_MEMBER(gray5bit_controller0_r);
 	DECLARE_READ8_MEMBER(gray5bit_controller1_r);
@@ -27,7 +33,6 @@ public:
 
 	INTERRUPT_GEN_MEMBER(m79amb_interrupt);
 
-protected:
 	void machine_start() override;
 
 	uint32_t screen_update_ramtek(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -48,4 +53,6 @@ protected:
 
 /*----------- defined in audio/m79amb.c -----------*/
 
-DISCRETE_SOUND_EXTERN( m79amb );
+DISCRETE_SOUND_EXTERN( m79amb_discrete );
+
+#endif // MAME_INCLUDES_M79AMB_H

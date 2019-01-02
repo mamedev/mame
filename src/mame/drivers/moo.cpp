@@ -308,16 +308,16 @@ void moo_state::moo_map(address_map &map)
 	map(0x0c4000, 0x0c4001).r(m_k053246, FUNC(k053247_device::k053246_word_r));
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));      /* K054338 alpha blending engine */
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::lsb_w));
-	map(0x0ce000, 0x0ce01f).w(this, FUNC(moo_state::moo_prot_w));
+	map(0x0ce000, 0x0ce01f).w(FUNC(moo_state::moo_prot_w));
 	map(0x0d0000, 0x0d001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);                  /* CCU regs (ignored) */
-	map(0x0d4000, 0x0d4001).w(this, FUNC(moo_state::sound_irq_w));
+	map(0x0d4000, 0x0d4001).w(FUNC(moo_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));        /* VSCCS regs */
 	map(0x0da000, 0x0da001).portr("P1_P3");
 	map(0x0da002, 0x0da003).portr("P2_P4");
 	map(0x0dc000, 0x0dc001).portr("IN0");
 	map(0x0dc002, 0x0dc003).portr("IN1");
-	map(0x0de000, 0x0de001).rw(this, FUNC(moo_state::control2_r), FUNC(moo_state::control2_w));
+	map(0x0de000, 0x0de001).rw(FUNC(moo_state::control2_r), FUNC(moo_state::control2_w));
 	map(0x100000, 0x17ffff).rom();
 	map(0x180000, 0x18ffff).ram().share("workram");     /* Work RAM */
 	map(0x190000, 0x19ffff).ram().share("spriteram");   /* Sprite RAM */
@@ -344,14 +344,14 @@ void moo_state::moobl_map(address_map &map)
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));       /* K054338 alpha blending engine */
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::lsb_w));
 	map(0x0d0000, 0x0d001f).writeonly();                   /* CCU regs (ignored) */
-	map(0x0d6ffc, 0x0d6ffd).w(this, FUNC(moo_state::moobl_oki_bank_w));
+	map(0x0d6ffc, 0x0d6ffd).w(FUNC(moo_state::moobl_oki_bank_w));
 	map(0x0d6fff, 0x0d6fff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));     /* VSCCS regs */
 	map(0x0da000, 0x0da001).portr("P1_P3");
 	map(0x0da002, 0x0da003).portr("P2_P4");
 	map(0x0dc000, 0x0dc001).portr("IN0");
 	map(0x0dc002, 0x0dc003).portr("IN1");
-	map(0x0de000, 0x0de001).rw(this, FUNC(moo_state::control2_r), FUNC(moo_state::control2_w));
+	map(0x0de000, 0x0de001).rw(FUNC(moo_state::control2_r), FUNC(moo_state::control2_w));
 	map(0x100000, 0x17ffff).rom();
 	map(0x180000, 0x18ffff).ram().share("workram");      /* Work RAM */
 	map(0x190000, 0x19ffff).ram().share("spriteram");    /* Sprite RAM */
@@ -372,17 +372,17 @@ void moo_state::bucky_map(address_map &map)
 	map(0x0c4000, 0x0c4001).r(m_k053246, FUNC(k053247_device::k053246_word_r));
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));      /* K054338 alpha blending engine */
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::lsb_w));
-	map(0x0ce000, 0x0ce01f).w(this, FUNC(moo_state::moo_prot_w));
+	map(0x0ce000, 0x0ce01f).w(FUNC(moo_state::moo_prot_w));
 	map(0x0d0000, 0x0d001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);                  /* CCU regs (ignored) */
 	map(0x0d2000, 0x0d20ff).rw("k054000", FUNC(k054000_device::lsb_r), FUNC(k054000_device::lsb_w));
-	map(0x0d4000, 0x0d4001).w(this, FUNC(moo_state::sound_irq_w));
+	map(0x0d4000, 0x0d4001).w(FUNC(moo_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));        /* VSCCS regs */
 	map(0x0da000, 0x0da001).portr("P1_P3");
 	map(0x0da002, 0x0da003).portr("P2_P4");
 	map(0x0dc000, 0x0dc001).portr("IN0");
 	map(0x0dc002, 0x0dc003).portr("IN1");
-	map(0x0de000, 0x0de001).rw(this, FUNC(moo_state::control2_r), FUNC(moo_state::control2_w));
+	map(0x0de000, 0x0de001).rw(FUNC(moo_state::control2_r), FUNC(moo_state::control2_w));
 	map(0x180000, 0x181fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  /* Graphic planes */
 	map(0x182000, 0x183fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  /* Graphic planes mirror */
 	map(0x184000, 0x187fff).ram();                         /* extra tile RAM? */
@@ -406,7 +406,7 @@ void moo_state::sound_map(address_map &map)
 	map(0xe000, 0xe22f).rw(m_k054539, FUNC(k054539_device::read), FUNC(k054539_device::write));
 	map(0xec00, 0xec01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
-	map(0xf800, 0xf800).w(this, FUNC(moo_state::sound_bankswitch_w));
+	map(0xf800, 0xf800).w(FUNC(moo_state::sound_bankswitch_w));
 }
 
 static INPUT_PORTS_START( moo )
@@ -497,20 +497,20 @@ MACHINE_RESET_MEMBER(moo_state,moo)
 MACHINE_CONFIG_START(moo_state::moo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) // 16MHz verified
-	MCFG_CPU_PROGRAM_MAP(moo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", moo_state,  moo_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // 16MHz verified
+	MCFG_DEVICE_PROGRAM_MAP(moo_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", moo_state,  moo_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(32'000'000)/4) // 8MHz verified
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(32'000'000)/4) // 8MHz verified
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
 	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4) // 8MHz
-	MCFG_K053252_OFFSETS(40, 16)
+	K053252(config, m_k053252, XTAL(32'000'000)/4); // 8MHz
+	m_k053252->set_offsets(40, 16);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -521,52 +521,50 @@ MACHINE_CONFIG_START(moo_state::moo)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(moo_state, screen_update_moo)
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(moo_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48+1, 23)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48+1, 23);
+	m_k053246->set_palette("palette");
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(moo_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_palette("palette");
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	K054338(config, m_k054338, 0);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'000'000)/8) // 4MHz verified
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	YM2151(config, "ymsnd", XTAL(32'000'000)/8).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50); // 4MHz verified
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.75)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(moo_state::moobl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16100000)
-	MCFG_CPU_PROGRAM_MAP(moobl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", moo_state,  moobl_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16100000)
+	MCFG_DEVICE_PROGRAM_MAP(moobl_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", moo_state,  moobl_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
 	MCFG_MACHINE_RESET_OVERRIDE(moo_state,moo)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -577,31 +575,31 @@ MACHINE_CONFIG_START(moo_state::moobl)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(moo_state, screen_update_moo)
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(moo_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48+1, 23)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48+1, 23);
+	m_k053246->set_palette("palette");
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(moo_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_palette("palette");
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
+	K054338(config, m_k054338, 0);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -609,20 +607,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(moo_state::bucky)
 	moo(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bucky_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bucky_map)
 
-	MCFG_K054000_ADD("k054000")
+	K054000(config, "k054000", 0);
 
-	MCFG_DEVICE_MODIFY("k053246")
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48, 23)
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48, 23);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(4096)
-	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	m_palette->set_format(palette_device::xRGB_888, 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,bucky)
 MACHINE_CONFIG_END
@@ -1040,14 +1033,14 @@ ROM_START( moomesabl )
 ROM_END
 
 
-GAME( 1992, moomesa,    0,       moo,     moo,   moo_state, 0, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver EAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, moomesauac, moomesa, moo,     moo,   moo_state, 0, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver UAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, moomesauab, moomesa, moo,     moo,   moo_state, 0, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, moomesaaab, moomesa, moo,     moo,   moo_state, 0, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver AAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, moomesabl,  moomesa, moobl,   moo,   moo_state, 0, ROT0, "bootleg", "Wild West C.O.W.-Boys of Moo Mesa (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // based on Version AA
-GAME( 1992, bucky,      0,       bucky,   bucky, moo_state, 0, ROT0, "Konami",  "Bucky O'Hare (ver EAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, buckyea,    bucky,   bucky,   bucky, moo_state, 0, ROT0, "Konami",  "Bucky O'Hare (ver EA)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, buckyjaa,   bucky,   bucky,   bucky, moo_state, 0, ROT0, "Konami",  "Bucky O'Hare (ver JAA)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, buckyuab,   bucky,   bucky,   bucky, moo_state, 0, ROT0, "Konami",  "Bucky O'Hare (ver UAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, buckyaab,   bucky,   bucky,   bucky, moo_state, 0, ROT0, "Konami",  "Bucky O'Hare (ver AAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, buckyaa,    bucky,   bucky,   bucky, moo_state, 0, ROT0, "Konami",  "Bucky O'Hare (ver AA)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, moomesa,    0,       moo,     moo,   moo_state, empty_init, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver EAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, moomesauac, moomesa, moo,     moo,   moo_state, empty_init, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver UAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, moomesauab, moomesa, moo,     moo,   moo_state, empty_init, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, moomesaaab, moomesa, moo,     moo,   moo_state, empty_init, ROT0, "Konami",  "Wild West C.O.W.-Boys of Moo Mesa (ver AAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, moomesabl,  moomesa, moobl,   moo,   moo_state, empty_init, ROT0, "bootleg", "Wild West C.O.W.-Boys of Moo Mesa (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // based on Version AA
+GAME( 1992, bucky,      0,       bucky,   bucky, moo_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver EAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyea,    bucky,   bucky,   bucky, moo_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver EA)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyjaa,   bucky,   bucky,   bucky, moo_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver JAA)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyuab,   bucky,   bucky,   bucky, moo_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver UAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyaab,   bucky,   bucky,   bucky, moo_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver AAB)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, buckyaa,    bucky,   bucky,   bucky, moo_state, empty_init, ROT0, "Konami",  "Bucky O'Hare (ver AA)",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

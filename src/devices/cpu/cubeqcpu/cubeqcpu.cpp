@@ -183,7 +183,7 @@ void cquestsnd_cpu_device::device_start()
 	m_sound_data = (uint16_t*)machine().root_device().memregion(m_sound_region_tag)->base();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-3>();
+	m_cache = m_program->cache<3, -3, ENDIANNESS_BIG>();
 
 	memset(m_ram, 0, sizeof(m_ram));
 	m_q = 0;
@@ -262,7 +262,7 @@ void cquestrot_cpu_device::device_start()
 	m_linedata_w.resolve_safe();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-3>();
+	m_cache = m_program->cache<3, -3, ENDIANNESS_BIG>();
 
 	memset(m_ram, 0, sizeof(m_ram));
 	m_q = 0;
@@ -393,7 +393,7 @@ void cquestlin_cpu_device::device_start()
 	m_linedata_r.resolve_safe(0);
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-3>();
+	m_cache = m_program->cache<3, -3, ENDIANNESS_BIG>();
 
 	memset(m_ram, 0, sizeof(m_ram));
 	m_q = 0;
@@ -542,7 +542,7 @@ void cquestsnd_cpu_device::execute_run()
 	do
 	{
 		/* Decode the instruction */
-		uint64_t inst = m_direct->read_qword(SND_PC);
+		uint64_t inst = m_cache->read_qword(SND_PC);
 		uint32_t inslow = inst & 0xffffffff;
 		uint32_t inshig = inst >> 32;
 
@@ -798,7 +798,7 @@ void cquestrot_cpu_device::execute_run()
 	do
 	{
 		/* Decode the instruction */
-		uint64_t inst = m_direct->read_qword(ROT_PC);
+		uint64_t inst = m_cache->read_qword(ROT_PC);
 
 		uint32_t inslow = inst & 0xffffffff;
 		uint32_t inshig = inst >> 32;
@@ -1218,7 +1218,7 @@ void cquestlin_cpu_device::execute_run()
 		int prog = (m_clkcnt & 3) ? BACKGROUND : FOREGROUND;
 
 		m_curpc = LINE_PC;
-		uint64_t inst = m_direct->read_qword(LINE_PC);
+		uint64_t inst = m_cache->read_qword(LINE_PC);
 
 		uint32_t inslow = inst & 0xffffffff;
 		uint32_t inshig = inst >> 32;

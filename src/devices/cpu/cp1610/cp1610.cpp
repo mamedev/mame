@@ -3369,7 +3369,7 @@ void cp1610_cpu_device::device_start()
 void cp1610_cpu_device::device_reset()
 {
 	/* This is how we set the reset vector */
-	set_input_line(CP1610_RESET, PULSE_LINE);
+	pulse_input_line(CP1610_RESET, attotime::zero);
 }
 
 void cp1610_cpu_device::execute_set_input(int irqline, int state)

@@ -15,6 +15,7 @@
 #include "textbuf.h"
 #include "debugger.h"
 #include <ctype.h>
+#include <fstream>
 
 /***************************************************************************
     CONSTANTS
@@ -389,6 +390,71 @@ void debugger_console::register_command(const char *command, u32 flags, int ref,
 	/* link it */
 	cmd->next = m_commandlist;
 	m_commandlist = cmd;
+}
+
+
+//-------------------------------------------------
+//  source_script - specifies a debug command
+//  script to execute
+//-------------------------------------------------
+
+void debugger_console::source_script(const char *file)
+{
+	// close any existing source file
+	m_source_file.reset();
+
+	// open a new one if requested
+	if (file != nullptr)
+	{
+		auto source_file = std::make_unique<std::ifstream>(file, std::ifstream::in);
+		if (source_file->fail())
+		{
+			if (m_machine.phase() == machine_phase::RUNNING)
+				printf("Cannot open command file '%s'\n", file);
+			else
+				fatalerror("Cannot open command file '%s'\n", file);
+		}
+		else
+		{
+			m_source_file = std::move(source_file);
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  process_source_file - executes commands from
+//  a source file
+//-------------------------------------------------
+
+void debugger_console::process_source_file()
+{
+	std::string buf;
+
+	// loop until the file is exhausted or until we are executing again
+	while (m_machine.debugger().cpu().is_stopped()
+			&& m_source_file
+			&& std::getline(*m_source_file, buf))
+	{
+		// strip out comments (text after '//')
+		size_t pos = buf.find("//");
+		if (pos != std::string::npos)
+			buf.resize(pos);
+
+		// strip whitespace
+		strtrimrightspace(buf);
+
+		// execute the command
+		if (!buf.empty())
+			execute_command(buf, true);
+	}
+
+	if (m_source_file && !m_source_file->good())
+	{
+		if (!m_source_file->eof())
+			printf("I/O error, script processing terminated\n");
+		m_source_file.reset();
+	}
 }
 
 

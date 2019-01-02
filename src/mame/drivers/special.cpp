@@ -50,9 +50,9 @@ void special_state::erik_mem(address_map &map)
 void special_state::erik_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf1, 0xf1).rw(this, FUNC(special_state::erik_rr_reg_r), FUNC(special_state::erik_rr_reg_w));
-	map(0xf2, 0xf2).rw(this, FUNC(special_state::erik_rc_reg_r), FUNC(special_state::erik_rc_reg_w));
-	map(0xf3, 0xf3).rw(this, FUNC(special_state::erik_disk_reg_r), FUNC(special_state::erik_disk_reg_w));
+	map(0xf1, 0xf1).rw(FUNC(special_state::erik_rr_reg_r), FUNC(special_state::erik_rr_reg_w));
+	map(0xf2, 0xf2).rw(FUNC(special_state::erik_rc_reg_r), FUNC(special_state::erik_rc_reg_w));
+	map(0xf3, 0xf3).rw(FUNC(special_state::erik_disk_reg_r), FUNC(special_state::erik_disk_reg_w));
 	map(0xf4, 0xf7).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 }
 
@@ -67,9 +67,9 @@ void special_state::specimx_mem(address_map &map)
 	map(0xffe4, 0xffe7).ram(); //external 8255
 	map(0xffe8, 0xffeb).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0xffec, 0xffef).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xfff0, 0xfff3).rw(this, FUNC(special_state::specimx_disk_ctrl_r), FUNC(special_state::specimx_disk_ctrl_w));
-	map(0xfff8, 0xfffb).rw(this, FUNC(special_state::specimx_video_color_r), FUNC(special_state::specimx_video_color_w));
-	map(0xfffc, 0xffff).w(this, FUNC(special_state::specimx_select_bank));
+	map(0xfff0, 0xfff3).rw(FUNC(special_state::specimx_disk_ctrl_r), FUNC(special_state::specimx_disk_ctrl_w));
+	map(0xfff8, 0xfffb).rw(FUNC(special_state::specimx_video_color_r), FUNC(special_state::specimx_video_color_w));
+	map(0xfffc, 0xffff).w(FUNC(special_state::specimx_select_bank));
 }
 
 /* Input ports */
@@ -358,15 +358,16 @@ FLOPPY_FORMATS_MEMBER( special_state::specimx_floppy_formats )
 	FLOPPY_SMX_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( specimx_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void specimx_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 /* Machine driver */
 MACHINE_CONFIG_START(special_state::special)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 2000000)
-	MCFG_CPU_PROGRAM_MAP(specialist_mem)
+	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(specialist_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(special_state, special )
 
 	/* video hardware */
@@ -375,29 +376,27 @@ MACHINE_CONFIG_START(special_state::special)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(384, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MCFG_VIDEO_START_OVERRIDE(special_state,special)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_special)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 2)
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.0625);
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(special_state, specialist_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(special_state, specialist_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(special_state, specialist_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(special_state, specialist_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(special_state, specialist_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(special_state::specialist_8255_porta_r));
+	m_ppi->out_pa_callback().set(FUNC(special_state::specialist_8255_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(special_state::specialist_8255_portb_r));
+	m_ppi->out_pb_callback().set(FUNC(special_state::specialist_8255_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(special_state::specialist_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(special_state::specialist_8255_portc_w));
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rks_cassette_formats)
@@ -410,32 +409,30 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(special_state::specialp)
 	special(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(specialp_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(specialp_mem)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_specialp)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_VIDEO_START_OVERRIDE(special_state,specialp)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(special_state::specialm)
+void special_state::specialm(machine_config &config)
+{
 	special(config);
-	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(special_state, specialist_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(special_state, specialist_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(special_state, specimx_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(special_state, specialist_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(special_state, specialist_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
-MACHINE_CONFIG_END
+	m_ppi->in_pa_callback().set(FUNC(special_state::specialist_8255_porta_r));
+	m_ppi->out_pa_callback().set(FUNC(special_state::specialist_8255_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(special_state::specimx_8255_portb_r));
+	m_ppi->out_pb_callback().set(FUNC(special_state::specialist_8255_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(special_state::specialist_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(special_state::specialist_8255_portc_w));
+}
 
 MACHINE_CONFIG_START(special_state::specimx)
 	special(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(specimx_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(specimx_mem)
 
 	MCFG_MACHINE_START_OVERRIDE (special_state, specimx )
 	MCFG_MACHINE_RESET_OVERRIDE (special_state, specimx )
@@ -445,49 +442,43 @@ MACHINE_CONFIG_START(special_state::specimx)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_specimx)
 	MCFG_VIDEO_START_OVERRIDE(special_state,specimx)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(special_state, specimx )
+	m_palette->set_init(FUNC(special_state::specimx_palette));
+	m_palette->set_entries(16);
 
 	/* audio hardware */
-	MCFG_SOUND_ADD("custom", SPECIMX_SND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	SPECIMX_SND(config, "custom", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	/* Devices */
-	MCFG_DEVICE_ADD( "pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(2000000)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("custom", specimx_sound_device, set_input_ch0))
-	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("custom", specimx_sound_device, set_input_ch1))
-	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("custom", specimx_sound_device, set_input_ch2))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(2000000);
+	m_pit->out_handler<0>().set("custom", FUNC(specimx_sound_device::set_input_ch0));
+	m_pit->set_clk<1>(2000000);
+	m_pit->out_handler<1>().set("custom", FUNC(specimx_sound_device::set_input_ch1));
+	m_pit->set_clk<2>(2000000);
+	m_pit->out_handler<2>().set("custom", FUNC(specimx_sound_device::set_input_ch2));
 
-	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(special_state, specialist_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(special_state, specialist_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(special_state, specimx_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(special_state, specialist_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(special_state, specialist_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
+	m_ppi->in_pa_callback().set(FUNC(special_state::specialist_8255_porta_r));
+	m_ppi->out_pa_callback().set(FUNC(special_state::specialist_8255_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(special_state::specimx_8255_portb_r));
+	m_ppi->out_pb_callback().set(FUNC(special_state::specialist_8255_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(special_state::specialist_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(special_state::specialist_8255_portc_w));
 
-	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(special_state, fdc_drq))
+	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->drq_wr_callback().set(FUNC(special_state::fdc_drq));
 	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","special_flop")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("128K").set_default_value(0x00);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(special_state::erik)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(erik_mem)
-	MCFG_CPU_IO_MAP(erik_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(erik_mem)
+	MCFG_DEVICE_IO_MAP(erik_io_map)
 	MCFG_MACHINE_RESET_OVERRIDE(special_state, erik )
 
 	/* video hardware */
@@ -496,21 +487,18 @@ MACHINE_CONFIG_START(special_state::erik)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(384, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 256-1)
-	MCFG_VIDEO_START_OVERRIDE(special_state,erik)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_erik)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(special_state,erik)
+	PALETTE(config, m_palette, FUNC(special_state::erik_palette), 8);
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625)
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.0625);
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -518,48 +506,46 @@ MACHINE_CONFIG_START(special_state::erik)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 	MCFG_CASSETTE_INTERFACE("special_cass")
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(special_state, specialist_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(special_state, specialist_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(special_state, specialist_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(special_state, specialist_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(special_state, specialist_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(special_state, specialist_8255_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set(FUNC(special_state::specialist_8255_porta_r));
+	m_ppi->out_pa_callback().set(FUNC(special_state::specialist_8255_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(special_state::specialist_8255_portb_r));
+	m_ppi->out_pb_callback().set(FUNC(special_state::specialist_8255_portb_w));
+	m_ppi->in_pc_callback().set(FUNC(special_state::specialist_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(special_state::specialist_8255_portc_w));
 
-	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(special_state, fdc_drq))
+	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->drq_wr_callback().set(FUNC(special_state::fdc_drq));
 	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", special_state::specimx_floppy_formats)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("192K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("192K").set_default_value(0x00);
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( special )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "2nd", "2nd rev.")
-	ROMX_LOAD( "monitor2_1.rom", 0xc000, 0x0800, CRC(52abde77) SHA1(66ba2ef9eac14a5c0df510224ea25fd5745399cd), ROM_BIOS(1))
-	ROMX_LOAD( "monitor2_2.rom", 0xc800, 0x0800, CRC(c425f719) SHA1(1c322591b4e5c8b01b81362c6801aa6fd9fc1492), ROM_BIOS(1))
-	ROMX_LOAD( "monitor2_3.rom", 0xd000, 0x0800, CRC(d804aeba) SHA1(1585f354719c25e1f59c7cb8b3a3f5d309a7e8fb), ROM_BIOS(1))
+	ROMX_LOAD( "monitor2_1.rom", 0xc000, 0x0800, CRC(52abde77) SHA1(66ba2ef9eac14a5c0df510224ea25fd5745399cd), ROM_BIOS(0))
+	ROMX_LOAD( "monitor2_2.rom", 0xc800, 0x0800, CRC(c425f719) SHA1(1c322591b4e5c8b01b81362c6801aa6fd9fc1492), ROM_BIOS(0))
+	ROMX_LOAD( "monitor2_3.rom", 0xd000, 0x0800, CRC(d804aeba) SHA1(1585f354719c25e1f59c7cb8b3a3f5d309a7e8fb), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "2rom", "2nd rev. rom disk")
-	ROMX_LOAD( "monitor2_1.rom",  0xc000, 0x0800, CRC(52abde77) SHA1(66ba2ef9eac14a5c0df510224ea25fd5745399cd), ROM_BIOS(2))
-	ROMX_LOAD( "m2_rom-disk.rom", 0xc800, 0x0800, CRC(7bd3d476) SHA1(232341755ae794f8aab4f6181c8d499a66016af2), ROM_BIOS(2))
-	ROMX_LOAD( "monitor2_3.rom",  0xd000, 0x0800, CRC(d804aeba) SHA1(1585f354719c25e1f59c7cb8b3a3f5d309a7e8fb), ROM_BIOS(2))
+	ROMX_LOAD( "monitor2_1.rom",  0xc000, 0x0800, CRC(52abde77) SHA1(66ba2ef9eac14a5c0df510224ea25fd5745399cd), ROM_BIOS(1))
+	ROMX_LOAD( "m2_rom-disk.rom", 0xc800, 0x0800, CRC(7bd3d476) SHA1(232341755ae794f8aab4f6181c8d499a66016af2), ROM_BIOS(1))
+	ROMX_LOAD( "monitor2_3.rom",  0xd000, 0x0800, CRC(d804aeba) SHA1(1585f354719c25e1f59c7cb8b3a3f5d309a7e8fb), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "1b", "1st rev. + BASIC")
-	ROMX_LOAD( "root.rom", 0xc000, 0x0800, CRC(62de741d) SHA1(6c6a29d4340b0b1230c708f9c04ff2ed1c012a76), ROM_BIOS(3))
-	ROMX_LOAD( "pzu2.rom", 0xc800, 0x0800, CRC(49937e13) SHA1(872ae5a7c3496d4404cdd577caa2236424016c66), ROM_BIOS(3))
-	ROMX_LOAD( "pzu3.rom", 0xd000, 0x0800, CRC(dc817a08) SHA1(8101fe924386f38c10ef929e6dea5a83fcf34600), ROM_BIOS(3))
-	ROMX_LOAD( "pzu4.rom", 0xd800, 0x0800, CRC(6793ba23) SHA1(3a27b5dbc6561ea7af5fb30513dc83ec64f1d94c), ROM_BIOS(3))
-	ROMX_LOAD( "pzu5.rom", 0xe000, 0x0800, CRC(13a1a0dc) SHA1(3a0818cb8f36c2c5a9b9916669538ad1702a7710), ROM_BIOS(3))
+	ROMX_LOAD( "root.rom", 0xc000, 0x0800, CRC(62de741d) SHA1(6c6a29d4340b0b1230c708f9c04ff2ed1c012a76), ROM_BIOS(2))
+	ROMX_LOAD( "pzu2.rom", 0xc800, 0x0800, CRC(49937e13) SHA1(872ae5a7c3496d4404cdd577caa2236424016c66), ROM_BIOS(2))
+	ROMX_LOAD( "pzu3.rom", 0xd000, 0x0800, CRC(dc817a08) SHA1(8101fe924386f38c10ef929e6dea5a83fcf34600), ROM_BIOS(2))
+	ROMX_LOAD( "pzu4.rom", 0xd800, 0x0800, CRC(6793ba23) SHA1(3a27b5dbc6561ea7af5fb30513dc83ec64f1d94c), ROM_BIOS(2))
+	ROMX_LOAD( "pzu5.rom", 0xe000, 0x0800, CRC(13a1a0dc) SHA1(3a0818cb8f36c2c5a9b9916669538ad1702a7710), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "1st", "1st rev.")
-	ROMX_LOAD( "special1.rom", 0xc000, 0x1000, CRC(217414bd) SHA1(345cd1410fbca8f75421d12d1419f27f81cd35d6), ROM_BIOS(4))
+	ROMX_LOAD( "special1.rom", 0xc000, 0x1000, CRC(217414bd) SHA1(345cd1410fbca8f75421d12d1419f27f81cd35d6), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "2col", "2nd rev. color")
-	ROMX_LOAD( "col_mon2.rom",   0xc000, 0x0800, CRC(8cebb1b5) SHA1(0c912a25220de8c5135e16c443e4796e6bb6f805), ROM_BIOS(5))
-	ROMX_LOAD( "monitor2_2.rom", 0xc800, 0x0800, CRC(c425f719) SHA1(1c322591b4e5c8b01b81362c6801aa6fd9fc1492), ROM_BIOS(5))
-	ROMX_LOAD( "monitor2_3.rom", 0xd000, 0x0800, CRC(d804aeba) SHA1(1585f354719c25e1f59c7cb8b3a3f5d309a7e8fb), ROM_BIOS(5))
+	ROMX_LOAD( "col_mon2.rom",   0xc000, 0x0800, CRC(8cebb1b5) SHA1(0c912a25220de8c5135e16c443e4796e6bb6f805), ROM_BIOS(4))
+	ROMX_LOAD( "monitor2_2.rom", 0xc800, 0x0800, CRC(c425f719) SHA1(1c322591b4e5c8b01b81362c6801aa6fd9fc1492), ROM_BIOS(4))
+	ROMX_LOAD( "monitor2_3.rom", 0xd000, 0x0800, CRC(d804aeba) SHA1(1585f354719c25e1f59c7cb8b3a3f5d309a7e8fb), ROM_BIOS(4))
 ROM_END
 
 ROM_START( specialm )
@@ -578,19 +564,19 @@ ROM_END
 ROM_START( lik )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "1st", "1st rev.")
-	ROMX_LOAD( "lik.rom",   0xc000, 0x3000, CRC(705bb3a0) SHA1(f90b009ec9d3303bbda228714dd24de057e744b6), ROM_BIOS(1))
+	ROMX_LOAD( "lik.rom",   0xc000, 0x3000, CRC(705bb3a0) SHA1(f90b009ec9d3303bbda228714dd24de057e744b6), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "2nd", "2nd rev.")
-	ROMX_LOAD( "lik2.rom",  0xc000, 0x3000, CRC(71820e43) SHA1(a85b4fc33b1ea96a1b8fe0c791f1aab8e967bb44), ROM_BIOS(2))
+	ROMX_LOAD( "lik2.rom",  0xc000, 0x3000, CRC(71820e43) SHA1(a85b4fc33b1ea96a1b8fe0c791f1aab8e967bb44), ROM_BIOS(1))
 ROM_END
 
 ROM_START( specimx )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "fos", "ROM FOS")
-	ROMX_LOAD( "specimx.rom", 0x10000, 0xb800,  CRC(db68f9b1) SHA1(c79888449f8a605267ec3e10dcc8e6e6f43b3a95), ROM_BIOS(1))
+	ROMX_LOAD( "specimx.rom", 0x10000, 0xb800,  CRC(db68f9b1) SHA1(c79888449f8a605267ec3e10dcc8e6e6f43b3a95), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "nc", "NC")
-	ROMX_LOAD( "ncrdy.rom",   0x10000, 0x10000, CRC(5d04c522) SHA1(d7daa7fe14cd8e0c6f87fd6453ec3e94ea2c259f) ,ROM_BIOS(2))
+	ROMX_LOAD( "ncrdy.rom",   0x10000, 0x10000, CRC(5d04c522) SHA1(d7daa7fe14cd8e0c6f87fd6453ec3e94ea2c259f) ,ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "ramfos", "RAMFOS")
-	ROMX_LOAD( "ramfos.rom",  0x10000, 0x3000, CRC(83e19df4) SHA1(20e5e53eb45729a24c1c7c63e114dbd14e3c4184) ,ROM_BIOS(3))
+	ROMX_LOAD( "ramfos.rom",  0x10000, 0x3000, CRC(83e19df4) SHA1(20e5e53eb45729a24c1c7c63e114dbd14e3c4184) ,ROM_BIOS(2))
 ROM_END
 
 ROM_START( erik )
@@ -606,11 +592,11 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME        PARENT    COMPAT   MACHINE    INPUT     CLASS             INIT       COMPANY      FULLNAME                    FLAGS
-COMP( 1985, special,    0,        0,       special,   special,  special_state,    special,   "<unknown>", "Specialist",               0 )
-COMP( 1985, specialm,   special,  0,       specialm,  special,  special_state,    special,   "<unknown>", "Specialist M",             0 )
-COMP( 1985, pioner,     special,  0,       special,   special,  special_state,    special,   "<unknown>", "Pioner",                   MACHINE_NOT_WORKING )
-COMP( 1985, specialp,   special,  0,       specialp,  specialp, special_state,    special,   "<unknown>", "Specialist + hires graph", MACHINE_NOT_WORKING )
-COMP( 1985, lik,        special,  0,       special,   lik,      special_state,    special,   "<unknown>", "Lik",                      0 )
-COMP( 1985, specimx,    special,  0,       specimx,   specimx,  special_state,    0,         "<unknown>", "Specialist MX",            0 )
-COMP( 1994, erik,       special,  0,       erik,      special,  special_state,    erik,      "<unknown>", "Erik",                     0 )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT          COMPANY      FULLNAME                    FLAGS
+COMP( 1985, special,  0,       0,      special,  special,  special_state, init_special, "<unknown>", "Specialist",               0 )
+COMP( 1985, specialm, special, 0,      specialm, special,  special_state, init_special, "<unknown>", "Specialist M",             0 )
+COMP( 1985, pioner,   special, 0,      special,  special,  special_state, init_special, "<unknown>", "Pioner",                   MACHINE_NOT_WORKING )
+COMP( 1985, specialp, special, 0,      specialp, specialp, special_state, init_special, "<unknown>", "Specialist + hires graph", MACHINE_NOT_WORKING )
+COMP( 1985, lik,      special, 0,      special,  lik,      special_state, init_special, "<unknown>", "Lik",                      0 )
+COMP( 1985, specimx,  special, 0,      specimx,  specimx,  special_state, empty_init,   "<unknown>", "Specialist MX",            0 )
+COMP( 1994, erik,     special, 0,      erik,     special,  special_state, init_erik,    "<unknown>", "Erik",                     0 )

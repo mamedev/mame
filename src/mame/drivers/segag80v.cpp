@@ -139,7 +139,6 @@
 #include "machine/segag80.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "speaker.h"
 
@@ -165,7 +164,7 @@ INPUT_CHANGED_MEMBER(segag80v_state::service_switch)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -393,13 +392,13 @@ void segag80v_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).rom();     /* CPU board ROM */
 	map(0x0800, 0xbfff).rom();     /* PROM board ROM area */
-	map(0xc800, 0xcfff).ram().w(this, FUNC(segag80v_state::mainram_w)).share("mainram");
-	map(0xe000, 0xefff).ram().w(this, FUNC(segag80v_state::vectorram_w)).share("vectorram");
+	map(0xc800, 0xcfff).ram().w(FUNC(segag80v_state::mainram_w)).share("mainram");
+	map(0xe000, 0xefff).ram().w(FUNC(segag80v_state::vectorram_w)).share("vectorram");
 }
 
 void segag80v_state::opcodes_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(segag80v_state::g80v_opcode_r));
+	map(0x0000, 0xffff).r(FUNC(segag80v_state::g80v_opcode_r));
 }
 
 
@@ -408,12 +407,12 @@ void segag80v_state::main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0xbc, 0xbc); /* AM_READ ??? */
-	map(0xbd, 0xbe).w(this, FUNC(segag80v_state::multiply_w));
-	map(0xbe, 0xbe).r(this, FUNC(segag80v_state::multiply_r));
-	map(0xbf, 0xbf).w(this, FUNC(segag80v_state::unknown_w));
+	map(0xbd, 0xbe).w(FUNC(segag80v_state::multiply_w));
+	map(0xbe, 0xbe).r(FUNC(segag80v_state::multiply_r));
+	map(0xbf, 0xbf).w(FUNC(segag80v_state::unknown_w));
 
-	map(0xf9, 0xf9).mirror(0x04).w(this, FUNC(segag80v_state::coin_count_w));
-	map(0xf8, 0xfb).r(this, FUNC(segag80v_state::mangled_ports_r));
+	map(0xf9, 0xf9).mirror(0x04).w(FUNC(segag80v_state::coin_count_w));
+	map(0xf8, 0xfb).r(FUNC(segag80v_state::mangled_ports_r));
 	map(0xfc, 0xfc).portr("FC");
 }
 
@@ -893,90 +892,86 @@ static const char *const zektor_sample_names[] =
  *
  *************************************/
 
-MACHINE_CONFIG_START(segag80v_state::g80v_base)
-
+void segag80v_state::g80v_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_OPCODES_MAP(opcodes_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segag80v_state,  irq0_line_hold)
-
+	Z80(config, m_maincpu, VIDEO_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segag80v_state::main_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segag80v_state::opcodes_map);
+	m_maincpu->set_addrmap(AS_IO, &segag80v_state::main_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(segag80v_state::irq0_line_hold));
 
 	/* video hardware */
+	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
+	m_screen->set_refresh_hz(40);
+	m_screen->set_size(400, 300);
+	m_screen->set_visarea(512, 1536, 640-32, 1408+32);
+	m_screen->set_screen_update(FUNC(segag80v_state::screen_update_segag80v));
 
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(40)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(512, 1536, 640-32, 1408+32)
-	MCFG_SCREEN_UPDATE_DRIVER(segag80v_state, screen_update_segag80v)
-
-	MCFG_VECTOR_ADD("vector")
+	VECTOR(config, m_vector);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-MACHINE_CONFIG_END
+	SPEAKER(config, "speaker").front_center();
+}
 
-
-MACHINE_CONFIG_START(segag80v_state::elim2)
+void segag80v_state::elim2(machine_config &config)
+{
 	g80v_base(config);
 
 	/* custom sound board */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(8)
-	MCFG_SAMPLES_NAMES(elim_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(8);
+	m_samples->set_samples_names(elim_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(segag80v_state::spacfury)
+void segag80v_state::spacfury(machine_config &config)
+{
 	g80v_base(config);
 
 	/* custom sound board */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(8)
-	MCFG_SAMPLES_NAMES(spacfury_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(8);
+	m_samples->set_samples_names(spacfury_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.1);
 
 	/* speech board */
 	sega_speech_board(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(segag80v_state::zektor)
+void segag80v_state::zektor(machine_config &config)
+{
 	g80v_base(config);
 
 	/* custom sound board */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(8)
-	MCFG_SAMPLES_NAMES(zektor_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(8);
+	m_samples->set_samples_names(zektor_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.1);
 
-	MCFG_SOUND_ADD("aysnd", AY8912, VIDEO_CLOCK/4/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
+	AY8912(config, m_aysnd, VIDEO_CLOCK/4/2).add_route(ALL_OUTPUTS, "speaker", 0.33);
 
 	/* speech board */
 	sega_speech_board(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(segag80v_state::tacscan)
+void segag80v_state::tacscan(machine_config &config)
+{
 	g80v_base(config);
 
 	/* universal sound board */
-	MCFG_SEGAUSB_ADD("usbsnd")
-MACHINE_CONFIG_END
+	SEGAUSB(config, m_usb, 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
-MACHINE_CONFIG_START(segag80v_state::startrek)
-	g80v_base(config);
+void segag80v_state::startrek(machine_config &config)
+{
+	tacscan(config);
 
 	/* speech board */
 	sega_speech_board(config);
-
-	/* universal sound board */
-	MCFG_SEGAUSB_ADD("usbsnd")
-MACHINE_CONFIG_END
+}
 
 
 
@@ -1115,7 +1110,7 @@ ROM_START( spacfury ) /* Revision C */
 	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808c.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
 
-	ROM_REGION( 0x4000, "speech", 0 )
+	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
 	ROM_LOAD( "970c.speech-u6",  0x0000, 0x1000, CRC(979d8535) SHA1(1ed097e563319ca6d2b7df9875ce7ee921eae468) )
 	ROM_LOAD( "971c.speech-u5",  0x1000, 0x1000, CRC(022dbd32) SHA1(4e0504b5ccc28094078912673c49571cf83804ab) )
 	ROM_LOAD( "972c.speech-u4",  0x2000, 0x1000, CRC(fad9346d) SHA1(784e5ab0fb00235cfd733c502baf23960923504f) )
@@ -1142,7 +1137,7 @@ ROM_START( spacfurya ) /* Revision A */
 	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808a.speech-u7",  0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, "speech", 0 )
+	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
 	ROM_LOAD( "970.speech-u6",   0x0000, 0x1000, CRC(f3b47b36) SHA1(6ae0b627349664140a7f70799645b368e452d69c) )
 	ROM_LOAD( "971.speech-u5",   0x1000, 0x1000, CRC(e72bbe88) SHA1(efadf8aa448c289cf4d0cf1831255b9ac60820f2) )
 	ROM_LOAD( "972.speech-u4",   0x2000, 0x1000, CRC(8b3da539) SHA1(3a0c4af96a2116fc668a340534582776b2018663) )
@@ -1169,7 +1164,7 @@ ROM_START( spacfuryb ) /* Revision B */
 	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808a.speech-u7",  0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, "speech", 0 )
+	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
 	ROM_LOAD( "970.speech-u6",   0x0000, 0x1000, CRC(f3b47b36) SHA1(6ae0b627349664140a7f70799645b368e452d69c) )
 	ROM_LOAD( "971.speech-u5",   0x1000, 0x1000, CRC(e72bbe88) SHA1(efadf8aa448c289cf4d0cf1831255b9ac60820f2) )
 	ROM_LOAD( "972.speech-u4",   0x2000, 0x1000, CRC(8b3da539) SHA1(3a0c4af96a2116fc668a340534582776b2018663) )
@@ -1209,7 +1204,7 @@ ROM_START( zektor )
 	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "1607.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
 
-	ROM_REGION( 0x4000, "speech", 0 )
+	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
 	ROM_LOAD( "1608.speech-u6",  0x0000, 0x1000, CRC(637e2b13) SHA1(8a470f9a8a722f7ced340c4d32b4cf6f05b3e848) )
 	ROM_LOAD( "1609.speech-u5",  0x1000, 0x1000, CRC(675ee8e5) SHA1(e314482028b8925ad02e833a1d22224533d0a683) )
 	ROM_LOAD( "1610.speech-u4",  0x2000, 0x1000, CRC(2915c7bd) SHA1(3ed98747b5237aa1b3bab6866292370dc2c7655a) )
@@ -1282,7 +1277,7 @@ ROM_START( startrek )
 	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "1670.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
 
-	ROM_REGION( 0x4000, "speech", 0 )
+	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
 	ROM_LOAD( "1871.speech-u6",  0x0000, 0x1000, CRC(03713920) SHA1(25a0158cab9983248e91133f96d1849c9e9bcbd2) )
 	ROM_LOAD( "1872.speech-u5",  0x1000, 0x1000, CRC(ebb5c3a9) SHA1(533b6f0499b311f561cf7aba14a7f48ca7c47321) )
 
@@ -1300,7 +1295,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segag80v_state,elim2)
+void segag80v_state::init_elim2()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1313,7 +1308,7 @@ DRIVER_INIT_MEMBER(segag80v_state,elim2)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,elim4)
+void segag80v_state::init_elim4()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1330,7 +1325,7 @@ DRIVER_INIT_MEMBER(segag80v_state,elim4)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,spacfury)
+void segag80v_state::init_spacfury()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1345,10 +1340,9 @@ DRIVER_INIT_MEMBER(segag80v_state,spacfury)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,zektor)
+void segag80v_state::init_zektor()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
-	ay8912_device *ay8912 = machine().device<ay8912_device>("aysnd");
 
 	/* configure security */
 	m_decrypt = segag80_security(82);
@@ -1356,7 +1350,7 @@ DRIVER_INIT_MEMBER(segag80v_state,zektor)
 	/* configure sound */
 	iospace.install_write_handler(0x38, 0x38, write8_delegate(FUNC(speech_sound_device::data_w), (speech_sound_device*)m_speech));
 	iospace.install_write_handler(0x3b, 0x3b, write8_delegate(FUNC(speech_sound_device::control_w), (speech_sound_device*)m_speech));
-	iospace.install_write_handler(0x3c, 0x3d, write8_delegate(FUNC(ay8912_device::address_data_w), ay8912));
+	iospace.install_write_handler(0x3c, 0x3d, write8_delegate(FUNC(ay8912_device::address_data_w), (ay8912_device*)m_aysnd));
 	iospace.install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::zektor1_sh_w),this));
 	iospace.install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::zektor2_sh_w),this));
 
@@ -1366,7 +1360,7 @@ DRIVER_INIT_MEMBER(segag80v_state,zektor)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,tacscan)
+void segag80v_state::init_tacscan()
 {
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
@@ -1385,7 +1379,7 @@ DRIVER_INIT_MEMBER(segag80v_state,tacscan)
 }
 
 
-DRIVER_INIT_MEMBER(segag80v_state,startrek)
+void segag80v_state::init_startrek()
 {
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
@@ -1414,15 +1408,15 @@ DRIVER_INIT_MEMBER(segag80v_state,startrek)
  *
  *************************************/
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE           INIT,     MONITOR,                     COMPANY,   FULLNAME,FLAGS
-GAME( 1981, elim2,     0,        elim2,    elim2,    segag80v_state, elim2,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, set 1)",     MACHINE_IMPERFECT_SOUND )
-GAME( 1981, elim2a,    elim2,    elim2,    elim2,    segag80v_state, elim2,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, set 2)",     MACHINE_IMPERFECT_SOUND )
-GAME( 1981, elim2c,    elim2,    elim2,    elim2c,   segag80v_state, elim2,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, cocktail)",  MACHINE_IMPERFECT_SOUND )
-GAME( 1981, elim4,     elim2,    elim2,    elim4,    segag80v_state, elim4,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (4 Players)",            MACHINE_IMPERFECT_SOUND )
-GAME( 1981, elim4p,    elim2,    elim2,    elim4,    segag80v_state, elim4,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (4 Players, prototype)", MACHINE_IMPERFECT_SOUND )
-GAME( 1981, spacfury,  0,        spacfury, spacfury, segag80v_state, spacfury, ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision C)",           MACHINE_IMPERFECT_SOUND )
-GAME( 1981, spacfurya, spacfury, spacfury, spacfury, segag80v_state, spacfury, ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision A)",           MACHINE_IMPERFECT_SOUND )
-GAME( 1981, spacfuryb, spacfury, spacfury, spacfury, segag80v_state, spacfury, ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision B)",           MACHINE_IMPERFECT_SOUND )
-GAME( 1982, zektor,    0,        zektor,   zektor,   segag80v_state, zektor,   ORIENTATION_FLIP_Y,          "Sega",    "Zektor (revision B)",               MACHINE_IMPERFECT_SOUND )
-GAME( 1982, tacscan,   0,        tacscan,  tacscan,  segag80v_state, tacscan,  ORIENTATION_FLIP_X ^ ROT270, "Sega",    "Tac/Scan",                          MACHINE_IMPERFECT_SOUND )
-GAME( 1982, startrek,  0,        startrek, startrek, segag80v_state, startrek, ORIENTATION_FLIP_Y,          "Sega",    "Star Trek",                         MACHINE_IMPERFECT_SOUND )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE           INIT,          MONITOR,                     COMPANY,   FULLNAME,FLAGS
+GAME( 1981, elim2,     0,        elim2,    elim2,    segag80v_state, init_elim2,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, set 1)",     MACHINE_IMPERFECT_SOUND )
+GAME( 1981, elim2a,    elim2,    elim2,    elim2,    segag80v_state, init_elim2,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, set 2)",     MACHINE_IMPERFECT_SOUND )
+GAME( 1981, elim2c,    elim2,    elim2,    elim2c,   segag80v_state, init_elim2,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, cocktail)",  MACHINE_IMPERFECT_SOUND )
+GAME( 1981, elim4,     elim2,    elim2,    elim4,    segag80v_state, init_elim4,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (4 Players)",            MACHINE_IMPERFECT_SOUND )
+GAME( 1981, elim4p,    elim2,    elim2,    elim4,    segag80v_state, init_elim4,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (4 Players, prototype)", MACHINE_IMPERFECT_SOUND )
+GAME( 1981, spacfury,  0,        spacfury, spacfury, segag80v_state, init_spacfury, ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision C)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1981, spacfurya, spacfury, spacfury, spacfury, segag80v_state, init_spacfury, ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision A)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1981, spacfuryb, spacfury, spacfury, spacfury, segag80v_state, init_spacfury, ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision B)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1982, zektor,    0,        zektor,   zektor,   segag80v_state, init_zektor,   ORIENTATION_FLIP_Y,          "Sega",    "Zektor (revision B)",               MACHINE_IMPERFECT_SOUND )
+GAME( 1982, tacscan,   0,        tacscan,  tacscan,  segag80v_state, init_tacscan,  ORIENTATION_FLIP_X ^ ROT270, "Sega",    "Tac/Scan",                          MACHINE_IMPERFECT_SOUND )
+GAME( 1982, startrek,  0,        startrek, startrek, segag80v_state, init_startrek, ORIENTATION_FLIP_Y,          "Sega",    "Star Trek",                         MACHINE_IMPERFECT_SOUND )

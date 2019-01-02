@@ -144,9 +144,9 @@ void cbuster_state::twocrude_map(address_map &map)
 	map(0x0b4000, 0x0b4001).nopw();
 	map(0x0b5000, 0x0b500f).w("tilegen1", FUNC(deco16ic_device::pf_control_w));
 	map(0x0b6000, 0x0b600f).w("tilegen2", FUNC(deco16ic_device::pf_control_w));
-	map(0x0b8000, 0x0b8fff).ram().w(this, FUNC(cbuster_state::cbuster_palette_w)).share("palette");
-	map(0x0b9000, 0x0b9fff).ram().w(this, FUNC(cbuster_state::cbuster_palette_ext_w)).share("palette_ext");
-	map(0x0bc000, 0x0bc00f).rw(this, FUNC(cbuster_state::twocrude_control_r), FUNC(cbuster_state::twocrude_control_w));
+	map(0x0b8000, 0x0b8fff).ram().w(FUNC(cbuster_state::palette_w)).share("palette");
+	map(0x0b9000, 0x0b9fff).ram().w(FUNC(cbuster_state::palette_ext_w)).share("palette_ext");
+	map(0x0bc000, 0x0bc00f).rw(FUNC(cbuster_state::twocrude_control_r), FUNC(cbuster_state::twocrude_control_w));
 }
 
 
@@ -161,8 +161,6 @@ void cbuster_state::sound_map(address_map &map)
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
 }
 
 /******************************************************************************/
@@ -248,8 +246,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 24,16,8,0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*4) },
 	8*32
 };
 
@@ -259,10 +257,8 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,1),
 	4,
 	{ 24, 16, 8, 0 },
-	{ 64*8+0, 64*8+1, 64*8+2, 64*8+3, 64*8+4, 64*8+5, 64*8+6, 64*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP8(16*8*4,1), STEP8(0,1) },
+	{ STEP16(0,8*4) },
 	128*8
 };
 
@@ -272,14 +268,12 @@ static const gfx_layout spritelayout =
 	(4096*2)+2048,  /* Main bank + 4 extra roms */
 	4,
 	{ 0xa0000*8+8, 0xa0000*8, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
-static GFXDECODE_START( cbuster )
+static GFXDECODE_START( gfx_cbuster )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 128 )   /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,       0, 128 )  /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,       0, 128 )  /* Tiles 16x16 */
@@ -290,7 +284,7 @@ GFXDECODE_END
 
 DECO16IC_BANK_CB_MEMBER(cbuster_state::bank_callback)
 {
-	return ((bank >> 4) & 0x7) * 0x1000;
+	return (bank & 0x70) << 8;
 }
 
 void cbuster_state::machine_start()
@@ -308,12 +302,13 @@ void cbuster_state::machine_reset()
 MACHINE_CONFIG_START(cbuster_state::twocrude)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* Custom chip 59 @ 12MHz Verified */
-	MCFG_CPU_PROGRAM_MAP(twocrude_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cbuster_state,  irq4_line_assert)/* VBL */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* Custom chip 59 @ 12MHz Verified */
+	MCFG_DEVICE_PROGRAM_MAP(twocrude_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cbuster_state,  irq4_line_assert)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(24'000'000)/4) /* Custom chip 45, 6MHz Verified */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, XTAL(24'000'000)/4); /* Custom chip 45, 6MHz Verified */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cbuster_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -322,66 +317,65 @@ MACHINE_CONFIG_START(cbuster_state::twocrude)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cbuster_state, screen_update_twocrude)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cbuster)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XBGR)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cbuster)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x20)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(cbuster_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(cbuster_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[0], 0);
+	m_deco_tilegen[0]->set_split(0);
+	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[0]->set_pf2_col_bank(0x20);
+	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(cbuster_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(cbuster_state::bank_callback), this);
+	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
+	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x30)
-	MCFG_DECO16IC_PF2_COL_BANK(0x40)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(cbuster_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(cbuster_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(2)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[1], 0);
+	m_deco_tilegen[1]->set_split(0);
+	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf1_col_bank(0x30);
+	m_deco_tilegen[1]->set_pf2_col_bank(0x40);
+	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cbuster_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cbuster_state::bank_callback), this);
+	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
+	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(3)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(3);
+	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	// YM2203_PITCH_HACK - Pitch is too low at 1.3425MHz (see also stfight.cpp)
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000)/24 * 3) /* 1.3425MHz Verified */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/24 * 3) /* 1.3425MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_YM2151_ADD("ym2", XTAL(32'220'000)/9) /* 3.58MHz Verified */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	ym2151_device &ym2(YM2151(config, "ym2", XTAL(32'220'000)/9)); /* 3.58MHz Verified */
+	ym2.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.45);
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(32'220'000)/32, PIN7_HIGH) /* 1.0068MHz Verified */
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH) /* 1.0068MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(32'220'000)/16, PIN7_HIGH) /* 2.01375MHz Verified */
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH) /* 2.01375MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -587,14 +581,12 @@ ROM_END
 
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(cbuster_state,twocrude)
+void cbuster_state::init_twocrude()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
-	uint8_t *PTR;
-	int i, j;
 
 	/* Main cpu decrypt */
-	for (i = 0x00000; i < 0x80000; i += 2)
+	for (int i = 0x00000; i < 0x80000; i += 2)
 	{
 		int h = i + NATIVE_ENDIAN_VALUE_LE_BE(1,0), l = i + NATIVE_ENDIAN_VALUE_LE_BE(0,1);
 
@@ -607,10 +599,10 @@ DRIVER_INIT_MEMBER(cbuster_state,twocrude)
 
 	/* Rearrange the 'extra' sprite bank to be in the same format as main sprites */
 	RAM = memregion("gfx3")->base() + 0x080000;
-	PTR = memregion("gfx3")->base() + 0x140000;
-	for (i = 0; i < 0x20000; i += 64)
+	uint8_t *PTR = memregion("gfx3")->base() + 0x140000;
+	for (int i = 0; i < 0x20000; i += 64)
 	{
-		for (j = 0; j < 16; j += 1)
+		for (int j = 0; j < 16; j += 1)
 		{ /* Copy 16 lines down */
 			RAM[i +       0 + j * 2] = PTR[i / 2 +       0 + j]; /* Pixels 0-7 for each plane */
 			RAM[i +       1 + j * 2] = PTR[i / 2 + 0x10000 + j];
@@ -618,7 +610,7 @@ DRIVER_INIT_MEMBER(cbuster_state,twocrude)
 			RAM[i + 0xa0001 + j * 2] = PTR[i / 2 + 0x30000 + j];
 		}
 
-		for (j = 0; j < 16; j += 1)
+		for (int j = 0; j < 16; j += 1)
 		{ /* Copy 16 lines down */
 			RAM[i +    0x20 + j * 2] = PTR[i / 2 +    0x10 + j]; /* Pixels 8-15 for each plane */
 			RAM[i +    0x21 + j * 2] = PTR[i / 2 + 0x10010 + j];
@@ -630,8 +622,8 @@ DRIVER_INIT_MEMBER(cbuster_state,twocrude)
 
 /******************************************************************************/
 
-GAME( 1990, cbuster,  0,       twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FX version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, cbusterw, cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East Corporation", "Crude Buster (World FU version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, cbusterj, cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East Corporation", "Crude Buster (Japan FR revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, twocrude, cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East USA", "Two Crude (US FT revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, twocrudea,cbuster, twocrude, twocrude, cbuster_state, twocrude, ROT0, "Data East USA", "Two Crude (US FT version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, cbuster,   0,       twocrude, twocrude, cbuster_state, init_twocrude, ROT0, "Data East Corporation", "Crude Buster (World FX version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, cbusterw,  cbuster, twocrude, twocrude, cbuster_state, init_twocrude, ROT0, "Data East Corporation", "Crude Buster (World FU version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, cbusterj,  cbuster, twocrude, twocrude, cbuster_state, init_twocrude, ROT0, "Data East Corporation", "Crude Buster (Japan FR revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, twocrude,  cbuster, twocrude, twocrude, cbuster_state, init_twocrude, ROT0, "Data East USA", "Two Crude (US FT revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, twocrudea, cbuster, twocrude, twocrude, cbuster_state, init_twocrude, ROT0, "Data East USA", "Two Crude (US FT version)", MACHINE_SUPPORTS_SAVE )

@@ -165,7 +165,7 @@ Measurements -
 
 #include "emu.h"
 #include "includes/badlands.h"
-
+#include "emupal.h"
 
 
 /*************************************
@@ -362,18 +362,18 @@ WRITE8_MEMBER(badlands_state::audio_io_w)
 void badlands_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0xfc0000, 0xfc1fff).r(this, FUNC(badlands_state::sound_busy_r)).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_reset_w));
+	map(0xfc0000, 0xfc1fff).r(FUNC(badlands_state::sound_busy_r)).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_reset_w));
 	map(0xfd0000, 0xfd1fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0xfe0000, 0xfe1fff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0xfe2000, 0xfe3fff).w(this, FUNC(badlands_state::video_int_ack_w));
+	map(0xfe2000, 0xfe3fff).w(FUNC(badlands_state::video_int_ack_w));
 	map(0xfe4000, 0xfe5fff).portr("FE4000");
 	map(0xfe6000, 0xfe6001).portr("FE6000");
 	map(0xfe6002, 0xfe6003).portr("FE6002");
-	map(0xfe6004, 0xfe6005).r(this, FUNC(badlands_state::pedal_0_r));
-	map(0xfe6006, 0xfe6007).r(this, FUNC(badlands_state::pedal_1_r));
+	map(0xfe6004, 0xfe6005).r(FUNC(badlands_state::pedal_0_r));
+	map(0xfe6006, 0xfe6007).r(FUNC(badlands_state::pedal_1_r));
 	map(0xfe8000, 0xfe9fff).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w)).umask16(0xff00);
 	map(0xfea000, 0xfebfff).r(m_soundcomm, FUNC(atari_sound_comm_device::main_response_r)).umask16(0xff00);
-	map(0xfec000, 0xfedfff).w(this, FUNC(badlands_state::badlands_pf_bank_w));
+	map(0xfec000, 0xfedfff).w(FUNC(badlands_state::badlands_pf_bank_w));
 	map(0xfee000, 0xfeffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0xffc000, 0xffc3ff).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
 	map(0xffe000, 0xffefff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
@@ -393,7 +393,7 @@ void badlands_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x2800, 0x2bff).rw(this, FUNC(badlands_state::audio_io_r), FUNC(badlands_state::audio_io_w));
+	map(0x2800, 0x2bff).rw(FUNC(badlands_state::audio_io_r), FUNC(badlands_state::audio_io_w));
 	map(0x3000, 0x3fff).bankr("soundbank");
 	map(0x4000, 0xffff).rom();
 }
@@ -427,7 +427,7 @@ static const gfx_layout badlands_molayout =
 	64*8
 };
 
-static GFXDECODE_START( badlands )
+static GFXDECODE_START( gfx_badlands )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout,           0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, badlands_molayout,  128, 8 )
 GFXDECODE_END
@@ -443,31 +443,31 @@ GFXDECODE_END
 MACHINE_CONFIG_START(badlands_state::badlands)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", badlands_state,  vblank_int)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", badlands_state,  vblank_int)
 
-	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", badlands_state, sound_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
 	MCFG_MACHINE_RESET_OVERRIDE(badlands_state,badlands)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", badlands)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_badlands)
+	palette_device &palette(PALETTE(config, "palette"));
+	palette.set_format(palette_device::IRGB_1555, 256);
+	palette.set_membits(8);
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, badlands_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", badlands_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, badlands_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -480,12 +480,11 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	ATARI_SOUND_COMM(config, "soundcomm", "audiocpu")
+		.int_callback().set_inputline("maincpu", M68K_IRQ_2);
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
-	MCFG_SOUND_ROUTE(0, "mono", 0.30)
-	MCFG_SOUND_ROUTE(1, "mono", 0.30)
+	YM2151(config, "ymsnd", ATARI_CLOCK_14MHz/4).add_route(0, "mono", 0.30).add_route(1, "mono", 0.30);
 MACHINE_CONFIG_END
 
 
@@ -536,7 +535,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(badlands_state,badlands)
+void badlands_state::init_badlands()
 {
 	/* initialize the audio system */
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x01000);
@@ -550,4 +549,4 @@ DRIVER_INIT_MEMBER(badlands_state,badlands)
  *
  *************************************/
 
-GAME( 1989, badlands, 0, badlands, badlands, badlands_state, badlands, ROT0, "Atari Games", "Bad Lands", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, badlands, 0, badlands, badlands, badlands_state, init_badlands, ROT0, "Atari Games", "Bad Lands", MACHINE_SUPPORTS_SAVE )

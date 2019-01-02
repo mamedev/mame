@@ -5,9 +5,14 @@
     Psikyo Games
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_PSIKYO_H
+#define MAME_INCLUDES_PSIKYO_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include <algorithm>
@@ -38,6 +43,24 @@ public:
 		std::fill(std::begin(m_old_linescroll), std::end(m_old_linescroll), 0);
 	}
 
+	void sngkace(machine_config &config);
+	void s1945jn(machine_config &config);
+	void gunbird(machine_config &config);
+	void s1945(machine_config &config);
+	void s1945bl(machine_config &config);
+
+	void init_s1945a();
+	void init_s1945j();
+	void init_sngkace();
+	void init_s1945();
+	void init_s1945bl();
+	void init_tengai();
+	void init_gunbird();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(z80_nmi_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_shared_ptr_array<uint32_t, 2> m_vram;
@@ -81,15 +104,7 @@ public:
 	DECLARE_WRITE32_MEMBER(s1945bl_oki_w);
 	template<int Shift> DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	template<int Layer> DECLARE_WRITE32_MEMBER(vram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(z80_nmi_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
-	DECLARE_DRIVER_INIT(s1945a);
-	DECLARE_DRIVER_INIT(s1945j);
-	DECLARE_DRIVER_INIT(sngkace);
-	DECLARE_DRIVER_INIT(s1945);
-	DECLARE_DRIVER_INIT(s1945bl);
-	DECLARE_DRIVER_INIT(tengai);
-	DECLARE_DRIVER_INIT(gunbird);
+
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -112,11 +127,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void sngkace(machine_config &config);
-	void s1945jn(machine_config &config);
-	void gunbird(machine_config &config);
-	void s1945(machine_config &config);
-	void s1945bl(machine_config &config);
+
 	void gunbird_map(address_map &map);
 	void gunbird_sound_io_map(address_map &map);
 	void gunbird_sound_map(address_map &map);
@@ -130,3 +141,5 @@ public:
 	void sngkace_sound_io_map(address_map &map);
 	void sngkace_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_PSIKYO_H

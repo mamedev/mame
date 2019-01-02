@@ -34,12 +34,13 @@ protected:
 	void machine_start() override;
 };
 
-MACHINE_CONFIG_START(ps2_state::at_softlists)
+void ps2_state::at_softlists(machine_config &config)
+{
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
-	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
-	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
+	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+}
 
 void ps2_state::ps2_16_map(address_map &map)
 {
@@ -85,58 +86,60 @@ void ps2_state::machine_start()
 	}
 }
 
-MACHINE_CONFIG_START(ps2_state::ps2m30286)
+void ps2_state::ps2m30286(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, 10000000)
-	MCFG_CPU_PROGRAM_MAP(ps2_16_map)
-	MCFG_CPU_IO_MAP(ps2_16_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
-	MCFG_80286_SHUTDOWN(DEVWRITELINE("mb", at_mb_device, shutdown))
+	i80286_cpu_device &maincpu(I80286(config, m_maincpu, 10000000));
+	maincpu.set_addrmap(AS_PROGRAM, &ps2_state::ps2_16_map);
+	maincpu.set_addrmap(AS_IO, &ps2_state::ps2_16_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
+	maincpu.shutdown_callback().set("mb", FUNC(at_mb_device::shutdown));
 
-	MCFG_DEVICE_ADD("mb", AT_MB, 0)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	AT_MB(config, m_mb, 0);
+
+	config.m_minimum_quantum = attotime::from_hz(60);
+
 	at_softlists(config);
 
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "vga", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, "fdc", false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa3", pc_isa16_cards, "ide", false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa4", pc_isa16_cards, "comat", false)
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
+	// FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "vga", true);
+	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, "fdc", false);
+	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, "ide", false);
+	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, "comat", false);
+	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("2M,4M,8M,15M");
+}
 
-MACHINE_CONFIG_START(ps2_state::ps2386)
-	MCFG_CPU_ADD("maincpu", I386, 12000000)
-	MCFG_CPU_PROGRAM_MAP(ps2_32_map)
-	MCFG_CPU_IO_MAP(ps2_32_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+void ps2_state::ps2386(machine_config &config)
+{
+	I386(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ps2_state::ps2_32_map);
+	m_maincpu->set_addrmap(AS_IO, &ps2_state::ps2_32_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("mb", AT_MB, 0)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	AT_MB(config, m_mb, 0);
+
+	config.m_minimum_quantum = attotime::from_hz(60);
 	at_softlists(config);
 
 	// on board devices
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "fdcsmc", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board2", pc_isa16_cards, "comat", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board3", pc_isa16_cards, "ide", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board4", pc_isa16_cards, "lpt", true)
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
+	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "ide", true);
+	ISA16_SLOT(config, "board4", 0, "mb:isabus", pc_isa16_cards, "lpt", true);
 	// ISA cards
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "svga_et4k", false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa3", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa4", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa5", pc_isa16_cards, nullptr, false)
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
+	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
+	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M,16M,32M,64M,128M,256M")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("2M,4M,8M,15M,16M,32M,64M,128M,256M");
+}
 
 ROM_START( i8530286 )
 	ROM_REGION(0x20000,"bios", 0)
@@ -264,11 +267,11 @@ ROM_START( i8580111 )
 	ROM_LOAD16_BYTE( "15f6639.bin", 0x00001, 0x10000, CRC(82cf0f7d) SHA1(13bb39225757b89749af70e881af0228673dbe0c))
 ROM_END
 
-COMP ( 1990, i8530h31, ibm5170, 0,       ps2m30286, 0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8530-H31 (Model 30/286)", MACHINE_NOT_WORKING )
-COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, 0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 Model 30-286", MACHINE_NOT_WORKING )
-COMP ( 198?, i8535043, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8535-043 (Model 35)", MACHINE_NOT_WORKING )
-COMP ( 198?, i8550021, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8550-021 (Model 50)", MACHINE_NOT_WORKING )
-COMP ( 198?, i8550061, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8550-061 (Model 50Z)", MACHINE_NOT_WORKING )
-COMP ( 1989, i8555081, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8550-081 (Model 55SX)", MACHINE_NOT_WORKING )
-COMP ( 198?, i8580071, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8580-071 (Model 80)", MACHINE_NOT_WORKING )
-COMP ( 198?, i8580111, ibm5170, 0,       ps2386,    0, ps2_state, 0,  "International Business Machines",  "IBM PS/2 8580-111 (Model 80)", MACHINE_NOT_WORKING )
+COMP( 1990, i8530h31, ibm5170, 0, ps2m30286, 0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8530-H31 (Model 30/286)", MACHINE_NOT_WORKING )
+COMP( 1988, i8530286, ibm5170, 0, ps2m30286, 0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 Model 30-286", MACHINE_NOT_WORKING )
+COMP( 198?, i8535043, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8535-043 (Model 35)", MACHINE_NOT_WORKING )
+COMP( 198?, i8550021, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8550-021 (Model 50)", MACHINE_NOT_WORKING )
+COMP( 198?, i8550061, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8550-061 (Model 50Z)", MACHINE_NOT_WORKING )
+COMP( 1989, i8555081, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8550-081 (Model 55SX)", MACHINE_NOT_WORKING )
+COMP( 198?, i8580071, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8580-071 (Model 80)", MACHINE_NOT_WORKING )
+COMP( 198?, i8580111, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8580-111 (Model 80)", MACHINE_NOT_WORKING )

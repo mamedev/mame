@@ -230,9 +230,9 @@ void glasgow_state::glasgow_mem(address_map &map)
 {
 	map.global_mask(0x1ffff);
 	map(0x000000, 0x00ffff).rom();
-	map(0x010000, 0x010000).w(this, FUNC(glasgow_state::glasgow_lcd_w));
-	map(0x010002, 0x010002).rw(this, FUNC(glasgow_state::glasgow_keys_r), FUNC(glasgow_state::glasgow_keys_w));
-	map(0x010004, 0x010004).w(this, FUNC(glasgow_state::glasgow_lcd_flag_w));
+	map(0x010000, 0x010000).w(FUNC(glasgow_state::glasgow_lcd_w));
+	map(0x010002, 0x010002).rw(FUNC(glasgow_state::glasgow_keys_r), FUNC(glasgow_state::glasgow_keys_w));
+	map(0x010004, 0x010004).w(FUNC(glasgow_state::glasgow_lcd_flag_w));
 	map(0x010006, 0x010006).rw("board", FUNC(mephisto_board_device::input_r), FUNC(mephisto_board_device::led_w));
 	map(0x010008, 0x010008).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x01c000, 0x01ffff).ram(); // 16KB
@@ -242,12 +242,12 @@ void amsterd_state::amsterd_mem(address_map &map)
 {
 	// ADDRESS_MAP_GLOBAL_MASK(0x7FFFF)
 	map(0x000000, 0x00ffff).rom();
-	map(0x800002, 0x800002).w(this, FUNC(amsterd_state::write_lcd));
-	map(0x800008, 0x800008).w(this, FUNC(amsterd_state::write_lcd_flag));
-	map(0x800004, 0x800004).w(this, FUNC(amsterd_state::write_beeper));
-	map(0x800010, 0x800010).w(this, FUNC(amsterd_state::write_board));
+	map(0x800002, 0x800002).w(FUNC(amsterd_state::write_lcd));
+	map(0x800008, 0x800008).w(FUNC(amsterd_state::write_lcd_flag));
+	map(0x800004, 0x800004).w(FUNC(amsterd_state::write_beeper));
+	map(0x800010, 0x800010).w(FUNC(amsterd_state::write_board));
 	map(0x800020, 0x800020).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x800040, 0x800040).r(this, FUNC(amsterd_state::read_newkeys));
+	map(0x800040, 0x800040).r(FUNC(amsterd_state::read_newkeys));
 	map(0x800088, 0x800088).w("board", FUNC(mephisto_board_device::led_w));
 	map(0xffc000, 0xffffff).ram(); // 16KB
 }
@@ -257,12 +257,12 @@ void amsterd_state::dallas32_mem(address_map &map)
 	// ADDRESS_MAP_GLOBAL_MASK(0x1FFFF)
 	map(0x000000, 0x00ffff).rom();
 	map(0x010000, 0x01ffff).ram(); // 64KB
-	map(0x800002, 0x800002).w(this, FUNC(amsterd_state::write_lcd32));
-	map(0x800004, 0x800004).w(this, FUNC(amsterd_state::write_beeper));
-	map(0x800008, 0x800008).w(this, FUNC(amsterd_state::write_lcd_flag));
-	map(0x800010, 0x800010).w(this, FUNC(amsterd_state::write_board));
+	map(0x800002, 0x800002).w(FUNC(amsterd_state::write_lcd32));
+	map(0x800004, 0x800004).w(FUNC(amsterd_state::write_beeper));
+	map(0x800008, 0x800008).w(FUNC(amsterd_state::write_lcd_flag));
+	map(0x800010, 0x800010).w(FUNC(amsterd_state::write_board));
 	map(0x800020, 0x800020).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x800040, 0x800040).r(this, FUNC(amsterd_state::read_newkeys));
+	map(0x800040, 0x800040).r(FUNC(amsterd_state::read_newkeys));
 	map(0x800088, 0x800088).w("board", FUNC(mephisto_board_device::led_w));
 }
 
@@ -313,16 +313,16 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(glasgow_state::glasgow)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(glasgow_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(glasgow_mem)
 
-	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
+	MEPHISTO_SENSORS_BOARD(config, m_board, 0);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_glasgow)
+	config.set_default_layout(layout_glasgow);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 44)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 44)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", glasgow_state, update_nmi, attotime::from_hz(50))
@@ -332,16 +332,16 @@ MACHINE_CONFIG_START(amsterd_state::amsterd)
 	glasgow(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(amsterd_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(amsterd_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amsterd_state::dallas32)
 	glasgow(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M68020, 14_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(dallas32_mem)
+	MCFG_DEVICE_REPLACE("maincpu", M68020, 14_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(dallas32_mem)
 
 	MCFG_DEVICE_REMOVE("nmi_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", amsterd_state, update_nmi32, attotime::from_hz(50))
@@ -404,11 +404,11 @@ ROM_END
   Game drivers
 ***************************************************************************/
 
-/*     YEAR, NAME,     PARENT,   COMPAT, MACHINE,     INPUT,          CLASS,         INIT, COMPANY,                      FULLNAME,                 FLAGS */
-CONS(  1984, glasgow,  0,        0,      glasgow,     old_keyboard,   glasgow_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto III S Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS(  1985, amsterd,  0,        0,      amsterd,     new_keyboard,   amsterd_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Amsterdam",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS(  1986, dallas,   glasgow,  0,      glasgow,     old_keyboard,   glasgow_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Dallas",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS(  1986, dallas16, amsterd,  0,      amsterd,     new_keyboard,   amsterd_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Dallas 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS(  1986, dallas32, amsterd,  0,      dallas32,    new_keyboard,   amsterd_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Dallas 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS(  1987, roma,     amsterd,  0,      amsterd,     new_keyboard,   amsterd_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Roma",          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS(  1987, roma32,   amsterd,  0,      dallas32,    new_keyboard,   amsterd_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Roma 32 Bit",   MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*     YEAR, NAME,     PARENT   COMPAT  MACHINE   INPUT         CLASS          INIT        COMPANY                      FULLNAME                  FLAGS */
+CONS(  1984, glasgow,  0,       0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener & Glaser Muenchen", "Mephisto III S Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS(  1985, amsterd,  0,       0,      amsterd,  new_keyboard, amsterd_state, empty_init, "Hegener & Glaser Muenchen", "Mephisto Amsterdam",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS(  1986, dallas,   glasgow, 0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener & Glaser Muenchen", "Mephisto Dallas",        MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS(  1986, dallas16, amsterd, 0,      amsterd,  new_keyboard, amsterd_state, empty_init, "Hegener & Glaser Muenchen", "Mephisto Dallas 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS(  1986, dallas32, amsterd, 0,      dallas32, new_keyboard, amsterd_state, empty_init, "Hegener & Glaser Muenchen", "Mephisto Dallas 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS(  1987, roma,     amsterd, 0,      amsterd,  new_keyboard, amsterd_state, empty_init, "Hegener & Glaser Muenchen", "Mephisto Roma",          MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS(  1987, roma32,   amsterd, 0,      dallas32, new_keyboard, amsterd_state, empty_init, "Hegener & Glaser Muenchen", "Mephisto Roma 32 Bit",   MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

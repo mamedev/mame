@@ -84,6 +84,7 @@ PROM  : Type MB7051
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -91,8 +92,8 @@ PROM  : Type MB7051
 class shougi_state : public driver_device
 {
 public:
-	shougi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	shougi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_alpha_8201(*this, "alpha_8201"),
@@ -101,11 +102,11 @@ public:
 
 	void shougi(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(semaphore_r);
 
-	DECLARE_PALETTE_INIT(shougi);
+	void shougi_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
@@ -115,7 +116,6 @@ protected:
 	void readport_sub(address_map &map);
 	void sub_map(address_map &map);
 
-private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -162,7 +162,7 @@ void shougi_state::machine_start()
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(shougi_state, shougi)
+void shougi_state::shougi_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_b[2]  = { 470, 220 };
@@ -176,24 +176,24 @@ PALETTE_INIT_MEMBER(shougi_state, shougi)
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0,bit1,bit2;
 
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = combine_3_weights(weights_r, bit0, bit1, bit2);
+		int const r = combine_3_weights(weights_r, bit0, bit1, bit2);
 
 		/* green component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = combine_3_weights(weights_g, bit0, bit1, bit2);
+		int const g = combine_3_weights(weights_g, bit0, bit1, bit2);
 
 		/* blue component */
 		bit0 = (color_prom[i] >> 6) & 0x01;
 		bit1 = (color_prom[i] >> 7) & 0x01;
-		b = combine_2_weights(weights_b, bit0, bit1);
+		int const b = combine_2_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
@@ -283,7 +283,7 @@ void shougi_state::sub_map(address_map &map)
 void shougi_state::readport_sub(address_map &map)
 {
 	map.global_mask(0x00ff);
-	map(0x00, 0x00).r(this, FUNC(shougi_state::semaphore_r));
+	map(0x00, 0x00).r(FUNC(shougi_state::semaphore_r));
 }
 
 
@@ -373,28 +373,27 @@ INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
 MACHINE_CONFIG_START(shougi_state::shougi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", shougi_state, vblank_nmi)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shougi_state, vblank_nmi)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(10'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_IO_MAP(readport_sub)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(10'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_IO_MAP(readport_sub)
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(10'000'000)/4/8)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // 0: sharedram = sub, 1: sharedram = main (TODO!)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(shougi_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // ?
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("alpha_8201", alpha_8201_device, mcu_start_w)) // start/halt ALPHA-8201
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("alpha_8201", alpha_8201_device, bus_dir_w)) MCFG_DEVCB_INVERT // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // nothing? connected to +5v via resistor
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set_nop(); // 0: sharedram = sub, 1: sharedram = main (TODO!)
+	mainlatch.q_out_cb<1>().set(FUNC(shougi_state::nmi_enable_w));
+	mainlatch.q_out_cb<2>().set_nop(); // ?
+	mainlatch.q_out_cb<3>().set("alpha_8201", FUNC(alpha_8201_device::mcu_start_w)); // start/halt ALPHA-8201
+	mainlatch.q_out_cb<4>().set("alpha_8201", FUNC(alpha_8201_device::bus_dir_w)).invert(); // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
+	mainlatch.q_out_cb<7>().set_nop(); // nothing? connected to +5v via resistor
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10) // assuming it's the same as champbas
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 0x10); // assuming it's the same as champbas
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -405,14 +404,12 @@ MACHINE_CONFIG_START(shougi_state::shougi)
 	MCFG_SCREEN_UPDATE_DRIVER(shougi_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(shougi_state, shougi)
+	PALETTE(config, "palette", FUNC(shougi_state::shougi_palette), 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(10'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "aysnd", XTAL(10'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 
@@ -469,6 +466,6 @@ ROM_START( shougi2 )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT  MONITOR  COMPANY                              FULLNAME          FLAGS */
-GAME( 1982, shougi,  0,      shougi,  shougi,  shougi_state, 0,    ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi",         MACHINE_SUPPORTS_SAVE )
-GAME( 1982, shougi2, 0,      shougi,  shougi2, shougi_state, 0,    ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi Part II", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT        MONITOR  COMPANY                              FULLNAME          FLAGS */
+GAME( 1982, shougi,  0,      shougi,  shougi,  shougi_state, empty_init, ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, shougi2, 0,      shougi,  shougi2, shougi_state, empty_init, ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi Part II", MACHINE_SUPPORTS_SAVE )

@@ -87,8 +87,8 @@ void comx_pl80_device::comxpl80_mem(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(comx_pl80_device::device_add_mconfig)
-	MCFG_CPU_ADD(CX005_TAG, M6805, 4000000) // CX005: some kind of MC6805/MC68HC05 clone
-	MCFG_CPU_PROGRAM_MAP(comxpl80_mem)
+	MCFG_DEVICE_ADD(CX005_TAG, M6805, 4000000) // CX005: some kind of MC6805/MC68HC05 clone
+	MCFG_DEVICE_PROGRAM_MAP(comxpl80_mem)
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 

@@ -62,6 +62,7 @@ JALCF1   BIN     1,048,576  02-07-99  1:11a JALCF1.BIN
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "video/ms1_tmap.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -71,8 +72,8 @@ JALCF1   BIN     1,048,576  02-07-99  1:11a JALCF1.BIN
 class acommand_state : public driver_device
 {
 public:
-	acommand_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	acommand_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_oki1(*this, "oki1"),
@@ -84,6 +85,9 @@ public:
 		m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void acommand(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
 	DECLARE_WRITE16_MEMBER(output_7seg0_w);
 	DECLARE_WRITE16_MEMBER(output_7seg1_w);
@@ -100,13 +104,10 @@ public:
 	uint32_t screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(acommand_scanline);
 
-
-	void acommand(machine_config &config);
 	void acommand_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki1;
@@ -331,7 +332,7 @@ void acommand_state::acommand_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x082000, 0x082005).w(m_bgtmap, FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x082100, 0x082105).w(m_txtmap, FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x082208, 0x082209).w(this, FUNC(acommand_state::ac_unk2_w));
+	map(0x082208, 0x082209).w(FUNC(acommand_state::ac_unk2_w));
 	map(0x0a0000, 0x0a3fff).ram().w(m_bgtmap, FUNC(megasys1_tilemap_device::write)).share("bgtmap");
 	map(0x0b0000, 0x0b3fff).ram().w(m_txtmap, FUNC(megasys1_tilemap_device::write)).share("txtmap");
 	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -339,17 +340,17 @@ void acommand_state::acommand_map(address_map &map)
 	map(0x0f8000, 0x0f8fff).ram().share("spriteram");
 	map(0x0f9000, 0x0fffff).ram();
 
-	map(0x100001, 0x100001).w(this, FUNC(acommand_state::oki_bank_w));
-	map(0x100008, 0x100009).portr("IN0").w(this, FUNC(acommand_state::output_lamps_w));
+	map(0x100001, 0x100001).w(FUNC(acommand_state::oki_bank_w));
+	map(0x100008, 0x100009).portr("IN0").w(FUNC(acommand_state::output_lamps_w));
 	map(0x100014, 0x100017).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x100018, 0x10001b).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 
-	map(0x100040, 0x100041).rw(this, FUNC(acommand_state::ext_devices_0_r), FUNC(acommand_state::ext_devices_0_w));
-	map(0x100044, 0x100045).rw(this, FUNC(acommand_state::ext_devices_1_r), FUNC(acommand_state::ext_devices_1_w));
-	map(0x100048, 0x100049).w(this, FUNC(acommand_state::ext_devices_2_w));
+	map(0x100040, 0x100041).rw(FUNC(acommand_state::ext_devices_0_r), FUNC(acommand_state::ext_devices_0_w));
+	map(0x100044, 0x100045).rw(FUNC(acommand_state::ext_devices_1_r), FUNC(acommand_state::ext_devices_1_w));
+	map(0x100048, 0x100049).w(FUNC(acommand_state::ext_devices_2_w));
 
-	map(0x100050, 0x100051).w(this, FUNC(acommand_state::output_7seg0_w));
-	map(0x100054, 0x100055).w(this, FUNC(acommand_state::output_7seg1_w));
+	map(0x100050, 0x100051).w(FUNC(acommand_state::output_7seg0_w));
+	map(0x100054, 0x100055).w(FUNC(acommand_state::output_7seg1_w));
 	map(0x10005c, 0x10005d).portr("DSW");
 }
 
@@ -452,7 +453,7 @@ static const gfx_layout tilelayout =
 	32*32
 };
 
-static GFXDECODE_START( acommand )
+static GFXDECODE_START( gfx_acommand )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x1800, 256 )
 GFXDECODE_END
 
@@ -470,8 +471,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(acommand_state::acommand_scanline)
 MACHINE_CONFIG_START(acommand_state::acommand)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,12000000)
-	MCFG_CPU_PROGRAM_MAP(acommand_map)
+	MCFG_DEVICE_ADD("maincpu",M68000,12000000)
+	MCFG_DEVICE_PROGRAM_MAP(acommand_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", acommand_state, acommand_scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -481,23 +482,23 @@ MACHINE_CONFIG_START(acommand_state::acommand)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(acommand_state, screen_update_acommand)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", acommand)
-	MCFG_PALETTE_ADD("palette", 0x4000)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_acommand);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x4000);
 
-	MCFG_MEGASYS1_TILEMAP_ADD("bgtmap", "palette", 0x0f00)
-	MCFG_MEGASYS1_TILEMAP_ADD("txtmap", "palette", 0x2700)
+	MEGASYS1_TILEMAP(config, m_bgtmap, m_palette, 0x0f00);
+	MEGASYS1_TILEMAP(config, m_txtmap, m_palette, 0x2700);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki1", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -540,4 +541,4 @@ ROM_START( acommand )
 	ROM_LOAD( "jalmr17.bin",   0x080000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) )
 ROM_END
 
-GAMEL( 1994, acommand,  0,      acommand,  acommand, acommand_state,  0, ROT0, "Jaleco", "Alien Command" , MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_acommand )
+GAMEL( 1994, acommand, 0, acommand, acommand, acommand_state, empty_init, ROT0, "Jaleco", "Alien Command" , MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_acommand )

@@ -22,24 +22,26 @@ FLOPPY_FORMATS_MEMBER( sv801_device::floppy_formats )
 	FLOPPY_SVI_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( svi_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void svi_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sv801_device::device_add_mconfig)
-	MCFG_FD1793_ADD("fdc", XTAL(8'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(sv801_device, intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(sv801_device, drq_w))
+void sv801_device::device_add_mconfig(machine_config &config)
+{
+	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(sv801_device::intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(sv801_device::drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", svi_floppies, "dd", sv801_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", svi_floppies, "dd", sv801_device::floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, svi_floppies, "dd", sv801_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, svi_floppies, "dd", sv801_device::floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "svi318_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "disk_list").set_original("svi318_flop");
+}
 
 
 //**************************************************************************
@@ -114,10 +116,10 @@ READ8_MEMBER( sv801_device::iorq_r )
 {
 	switch (offset)
 	{
-	case 0x30: return m_fdc->status_r(space, 0);
-	case 0x31: return m_fdc->track_r(space, 0);
-	case 0x32: return m_fdc->sector_r(space, 0);
-	case 0x33: return m_fdc->data_r(space, 0);
+	case 0x30: return m_fdc->status_r();
+	case 0x31: return m_fdc->track_r();
+	case 0x32: return m_fdc->sector_r();
+	case 0x33: return m_fdc->data_r();
 	case 0x34: return (m_drq << 6) | (m_irq << 7);
 	}
 
@@ -128,10 +130,10 @@ WRITE8_MEMBER( sv801_device::iorq_w )
 {
 	switch (offset)
 	{
-	case 0x30: m_fdc->cmd_w(space, 0, data); break;
-	case 0x31: m_fdc->track_w(space, 0, data); break;
-	case 0x32: m_fdc->sector_w(space, 0, data); break;
-	case 0x33: m_fdc->data_w(space, 0, data); break;
+	case 0x30: m_fdc->cmd_w(data); break;
+	case 0x31: m_fdc->track_w(data); break;
+	case 0x32: m_fdc->sector_w(data); break;
+	case 0x33: m_fdc->data_w(data); break;
 	case 0x34: motor_w(space, 0, data); break;
 	case 0x38:
 		m_fdc->dden_w(BIT(data, 0));

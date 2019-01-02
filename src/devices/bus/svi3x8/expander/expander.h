@@ -49,25 +49,25 @@
 	MCFG_DEVICE_ADD(_tag, SVI_EXPANDER, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(svi_expander_modules, nullptr, false)
 #define MCFG_SVI_EXPANDER_INT_HANDLER(_devcb) \
-	devcb = &downcast<svi_expander_device &>(*device).set_int_handler(DEVCB_##_devcb);
+	downcast<svi_expander_device &>(*device).set_int_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_EXPANDER_ROMDIS_HANDLER(_devcb) \
-	devcb = &downcast<svi_expander_device &>(*device).set_romdis_handler(DEVCB_##_devcb);
+	downcast<svi_expander_device &>(*device).set_romdis_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_EXPANDER_RAMDIS_HANDLER(_devcb) \
-	devcb = &downcast<svi_expander_device &>(*device).set_ramdis_handler(DEVCB_##_devcb);
+	downcast<svi_expander_device &>(*device).set_ramdis_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_EXPANDER_CTRL1_HANDLER(_devcb) \
-	devcb = &downcast<svi_expander_device &>(*device).set_ctrl1_handler(DEVCB_##_devcb);
+	downcast<svi_expander_device &>(*device).set_ctrl1_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_EXPANDER_CTRL2_HANDLER(_devcb) \
-	devcb = &downcast<svi_expander_device &>(*device).set_ctrl2_handler(DEVCB_##_devcb);
+	downcast<svi_expander_device &>(*device).set_ctrl2_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_EXPANDER_EXCSR_HANDLER(_devcb) \
-	devcb = &downcast<svi_expander_device &>(*device).set_excsr_handler(DEVCB_##_devcb);
+	downcast<svi_expander_device &>(*device).set_excsr_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_EXPANDER_EXCSW_HANDLER(_devcb) \
-	devcb = &downcast<svi_expander_device &>(*device).set_excsw_handler(DEVCB_##_devcb);
+	downcast<svi_expander_device &>(*device).set_excsw_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -158,7 +158,7 @@ protected:
 };
 
 // device type definition
-extern const device_type SVI_EXPANDER;
+DECLARE_DEVICE_TYPE(SVI_EXPANDER, svi_expander_device)
 
 // include here so drivers don't need to
 #include "modules.h"

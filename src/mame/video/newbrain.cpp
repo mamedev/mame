@@ -180,7 +180,7 @@ static const gfx_layout newbrain_charlayout =
 	8                   /* every char takes 16 x 1 bytes */
 };
 
-static GFXDECODE_START( newbrain )
+static GFXDECODE_START( gfx_newbrain )
 	GFXDECODE_ENTRY( "chargen", 0x0000, newbrain_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -193,7 +193,7 @@ MACHINE_CONFIG_START(newbrain_state::newbrain_video)
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", newbrain)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_newbrain)
 MACHINE_CONFIG_END

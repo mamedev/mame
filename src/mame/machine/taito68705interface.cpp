@@ -189,12 +189,13 @@ taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, devi
 {
 }
 
-MACHINE_CONFIG_START(taito68705_mcu_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
-	MCFG_M68705_PORTC_R_CB(READ8(taito68705_mcu_device, mcu_portc_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(taito68705_mcu_device, mcu_pa_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(taito68705_mcu_device, mcu_portb_w))
-MACHINE_CONFIG_END
+void taito68705_mcu_device::device_add_mconfig(machine_config &config)
+{
+	M68705P5(config, m_mcu, DERIVED_CLOCK(1, 1));
+	m_mcu->porta_w().set(FUNC(taito68705_mcu_device::mcu_pa_w));
+	m_mcu->portb_w().set(FUNC(taito68705_mcu_device::mcu_portb_w));
+	m_mcu->portc_r().set(FUNC(taito68705_mcu_device::mcu_portc_r));
+}
 
 void taito68705_mcu_device::device_start()
 {
@@ -321,13 +322,14 @@ arkanoid_68705p3_device::arkanoid_68705p3_device(
 {
 }
 
-MACHINE_CONFIG_START(arkanoid_68705p3_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", M68705P3, DERIVED_CLOCK(1, 1))
-	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_68705p3_device, mcu_pb_r))
-	MCFG_M68705_PORTC_R_CB(READ8(arkanoid_68705p3_device, mcu_pc_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(arkanoid_68705p3_device, mcu_pa_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(arkanoid_68705p3_device, mcu_pc_w))
-MACHINE_CONFIG_END
+void arkanoid_68705p3_device::device_add_mconfig(machine_config &config)
+{
+	M68705P3(config, m_mcu, DERIVED_CLOCK(1, 1));
+	m_mcu->portb_r().set(FUNC(arkanoid_68705p3_device::mcu_pb_r));
+	m_mcu->portc_r().set(FUNC(arkanoid_68705p3_device::mcu_pc_r));
+	m_mcu->porta_w().set(FUNC(arkanoid_68705p3_device::mcu_pa_w));
+	m_mcu->portc_w().set(FUNC(arkanoid_68705p3_device::mcu_pc_w));
+}
 
 
 arkanoid_68705p5_device::arkanoid_68705p5_device(
@@ -339,10 +341,11 @@ arkanoid_68705p5_device::arkanoid_68705p5_device(
 {
 }
 
-MACHINE_CONFIG_START(arkanoid_68705p5_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", M68705P5, DERIVED_CLOCK(1, 1))
-	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_68705p5_device, mcu_pb_r))
-	MCFG_M68705_PORTC_R_CB(READ8(arkanoid_68705p5_device, mcu_pc_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(arkanoid_68705p5_device, mcu_pa_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(arkanoid_68705p5_device, mcu_pc_w))
-MACHINE_CONFIG_END
+void arkanoid_68705p5_device::device_add_mconfig(machine_config &config)
+{
+	M68705P5(config, m_mcu, DERIVED_CLOCK(1, 1));
+	m_mcu->portb_r().set(FUNC(arkanoid_68705p5_device::mcu_pb_r));
+	m_mcu->portc_r().set(FUNC(arkanoid_68705p5_device::mcu_pc_r));
+	m_mcu->porta_w().set(FUNC(arkanoid_68705p5_device::mcu_pa_w));
+	m_mcu->portc_w().set(FUNC(arkanoid_68705p5_device::mcu_pc_w));
+}

@@ -124,13 +124,14 @@ uint32_t sms_control_port_device::pixel_r()
 //  SLOT_INTERFACE( sms_control_port_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( sms_control_port_devices )
-	SLOT_INTERFACE("joypad", SMS_JOYPAD)
-	SLOT_INTERFACE("lphaser", SMS_LIGHT_PHASER)
-	SLOT_INTERFACE("paddle", SMS_PADDLE)
-	SLOT_INTERFACE("sportspad", SMS_SPORTS_PAD)
-	SLOT_INTERFACE("sportspadjp", SMS_SPORTS_PAD_JP)
-	SLOT_INTERFACE("rapidfire", SMS_RAPID_FIRE)
-	SLOT_INTERFACE("multitap", SMS_MULTITAP)
-	SLOT_INTERFACE("graphic", SMS_GRAPHIC)
-SLOT_INTERFACE_END
+void sms_control_port_devices(device_slot_interface &device)
+{
+	device.option_add("joypad", SMS_JOYPAD);
+	device.option_add("lphaser", SMS_LIGHT_PHASER);
+	device.option_add("paddle", SMS_PADDLE);
+	device.option_add("sportspad", SMS_SPORTS_PAD);
+	device.option_add("sportspadjp", SMS_SPORTS_PAD_JP);
+	device.option_add("rapidfire", SMS_RAPID_FIRE);
+	device.option_add("multitap", SMS_MULTITAP);
+	device.option_add("graphic", SMS_GRAPHIC);
+}

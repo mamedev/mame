@@ -23,6 +23,7 @@ Sanma - 3nin-uchi Mahjong is another ANES game confirmed running on the same har
 */
 
 #include "emu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "cpu/z80/z80.h"
@@ -36,18 +37,19 @@ public:
 	{
 	}
 
+	void anes(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(vram_offset_w);
 	DECLARE_WRITE8_MEMBER(blit_trigger_w);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void anes(machine_config &config);
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 
-private:
 	uint8_t m_vram_offset[3];
 };
 
@@ -89,9 +91,9 @@ void anes_state::io_map(address_map &map)
 
 	map(0x07, 0x07).nopw(); // mux write
 	map(0x08, 0x09).w("ym", FUNC(ym2413_device::write));
-	map(0x0a, 0x0a).w(this, FUNC(anes_state::blit_trigger_w));
+	map(0x0a, 0x0a).w(FUNC(anes_state::blit_trigger_w));
 //  AM_RANGE(0x0b, 0x0b) AM_WRITE(blit_mode_w)
-	map(0x0c, 0x0e).w(this, FUNC(anes_state::vram_offset_w));
+	map(0x0c, 0x0e).w(FUNC(anes_state::vram_offset_w));
 	map(0x11, 0x11).portr("DSW1");
 	map(0x12, 0x12).portr("DSW2");
 	map(0x13, 0x13).portr("DSW3");
@@ -156,10 +158,10 @@ void anes_state::machine_start()
 
 MACHINE_CONFIG_START(anes_state::anes)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 2) // Z0840008PSC
-	MCFG_CPU_PROGRAM_MAP(prg_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", anes_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 2) // Z0840008PSC
+	MCFG_DEVICE_PROGRAM_MAP(prg_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", anes_state, irq0_line_hold)
 
 	// all wrong
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -173,8 +175,8 @@ MACHINE_CONFIG_START(anes_state::anes)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ym", YM2413, XTAL(3'579'545))
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ym", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -189,4 +191,4 @@ ROM_START( tonpuu )
 ROM_END
 
 
-GAME( 200?, tonpuu,  0, anes, anes, anes_state, 0, ROT0, "ANES", "Ton Puu Mahjong [BET] (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 200?, tonpuu, 0, anes, anes, anes_state, empty_init, ROT0, "ANES", "Ton Puu Mahjong [BET] (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

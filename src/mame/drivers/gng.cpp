@@ -41,16 +41,6 @@ WRITE8_MEMBER(gng_state::gng_bankswitch_w)
 		membank("bank1")->set_entry((data & 0x03));
 }
 
-WRITE_LINE_MEMBER(gng_state::coin_counter_1_w)
-{
-	machine().bookkeeping().coin_counter_w(0, state);
-}
-
-WRITE_LINE_MEMBER(gng_state::coin_counter_2_w)
-{
-	machine().bookkeeping().coin_counter_w(1, state);
-}
-
 WRITE_LINE_MEMBER(gng_state::ym_reset_w)
 {
 	if (!state)
@@ -69,8 +59,8 @@ void gng_state::gng_map(address_map &map)
 {
 	map(0x0000, 0x1dff).ram();
 	map(0x1e00, 0x1fff).ram().share("spriteram");
-	map(0x2000, 0x27ff).ram().w(this, FUNC(gng_state::gng_fgvideoram_w)).share("fgvideoram");
-	map(0x2800, 0x2fff).ram().w(this, FUNC(gng_state::gng_bgvideoram_w)).share("bgvideoram");
+	map(0x2000, 0x27ff).ram().w(FUNC(gng_state::gng_fgvideoram_w)).share("fgvideoram");
+	map(0x2800, 0x2fff).ram().w(FUNC(gng_state::gng_bgvideoram_w)).share("bgvideoram");
 	map(0x3000, 0x3000).portr("SYSTEM");
 	map(0x3001, 0x3001).portr("P1");
 	map(0x3002, 0x3002).portr("P2");
@@ -79,11 +69,11 @@ void gng_state::gng_map(address_map &map)
 	map(0x3800, 0x38ff).w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x3900, 0x39ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x3a00, 0x3a00).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x3b08, 0x3b09).w(this, FUNC(gng_state::gng_bgscrollx_w));
-	map(0x3b0a, 0x3b0b).w(this, FUNC(gng_state::gng_bgscrolly_w));
+	map(0x3b08, 0x3b09).w(FUNC(gng_state::gng_bgscrollx_w));
+	map(0x3b0a, 0x3b0b).w(FUNC(gng_state::gng_bgscrolly_w));
 	map(0x3c00, 0x3c00).noprw(); /* watchdog? */
 	map(0x3d00, 0x3d07).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0x3e00, 0x3e00).w(this, FUNC(gng_state::gng_bankswitch_w));
+	map(0x3e00, 0x3e00).w(FUNC(gng_state::gng_bankswitch_w));
 	map(0x4000, 0x5fff).bankr("bank1");
 	map(0x6000, 0xffff).rom();
 }
@@ -92,8 +82,8 @@ void gng_state::diamond_map(address_map &map)
 {
 	map(0x0000, 0x1dff).ram();
 	map(0x1e00, 0x1fff).ram().share("spriteram");
-	map(0x2000, 0x27ff).ram().w(this, FUNC(gng_state::gng_fgvideoram_w)).share("fgvideoram");
-	map(0x2800, 0x2fff).ram().w(this, FUNC(gng_state::gng_bgvideoram_w)).share("bgvideoram");
+	map(0x2000, 0x27ff).ram().w(FUNC(gng_state::gng_fgvideoram_w)).share("fgvideoram");
+	map(0x2800, 0x2fff).ram().w(FUNC(gng_state::gng_bgvideoram_w)).share("bgvideoram");
 	map(0x3000, 0x33ff).noprw(); // faulty POST?
 	map(0x3000, 0x3000).portr("SYSTEM");
 	map(0x3001, 0x3001).portr("P1");
@@ -103,15 +93,15 @@ void gng_state::diamond_map(address_map &map)
 	map(0x3800, 0x38ff).w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x3900, 0x39ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x3a00, 0x3a00).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x3b08, 0x3b09).w(this, FUNC(gng_state::gng_bgscrollx_w));
-	map(0x3b0a, 0x3b0b).w(this, FUNC(gng_state::gng_bgscrolly_w));
+	map(0x3b08, 0x3b09).w(FUNC(gng_state::gng_bgscrollx_w));
+	map(0x3b0a, 0x3b0b).w(FUNC(gng_state::gng_bgscrolly_w));
 	map(0x3c00, 0x3c00).noprw(); /* watchdog? */
 	map(0x3d00, 0x3d00).nopw(); // ? (writes $01 and $0F)
 	map(0x3d01, 0x3d01).nopw(); // ?
-	map(0x3e00, 0x3e00).w(this, FUNC(gng_state::gng_bankswitch_w));
+	map(0x3e00, 0x3e00).w(FUNC(gng_state::gng_bankswitch_w));
 	map(0x4000, 0x5fff).bankr("bank1");
 	map(0x6000, 0xffff).rom();
-	map(0x6000, 0x6000).r(this, FUNC(gng_state::diamond_hack_r));
+	map(0x6000, 0x6000).r(FUNC(gng_state::diamond_hack_r));
 	map(0x6048, 0x6048).nopw(); // ?
 }
 
@@ -343,7 +333,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( gng )
+static GFXDECODE_START( gfx_gng )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0x80, 16 ) /* colors 0x80-0xbf */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  0x00,  8 ) /* colors 0x00-0x3f */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x40, 4 ) /* colors 0x40-0x7f */
@@ -391,23 +381,23 @@ void gng_state::machine_reset()
 MACHINE_CONFIG_START(gng_state::gng)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(12'000'000)/2)        /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(gng_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gng_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(12'000'000)/2)        /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(gng_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gng_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4)     /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(gng_state, irq0_line_hold, 4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/4)     /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(gng_state, irq0_line_hold, 4*60)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 9B on A board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gng_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(gng_state, ym_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gng_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gng_state, coin_counter_2_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 9B on A board
+	mainlatch.q_out_cb<0>().set(FUNC(gng_state::flipscreen_w));
+	mainlatch.q_out_cb<1>().set_inputline("audiocpu", INPUT_LINE_RESET).invert();
+	mainlatch.q_out_cb<1>().append(FUNC(gng_state::ym_reset_w));
+	mainlatch.q_out_cb<2>().set([this] (int state) { machine().bookkeeping().coin_counter_w(0, state); });
+	mainlatch.q_out_cb<3>().set([this] (int state) { machine().bookkeeping().coin_counter_w(1, state); });
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.59)    /* verified on pcb */
@@ -415,26 +405,25 @@ MACHINE_CONFIG_START(gng_state::gng)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gng_state, screen_update_gng)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gng)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gng)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8)     /* verified on pcb */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8)     /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 	MCFG_SOUND_ROUTE(2, "mono", 0.40)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(12'000'000)/8)     /* verified on pcb */
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(12'000'000)/8)     /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 	MCFG_SOUND_ROUTE(2, "mono", 0.40)
@@ -443,8 +432,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gng_state::diamond)
 	gng(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(diamond_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(diamond_map)
 
 	MCFG_DEVICE_REMOVE("mainlatch")
 MACHINE_CONFIG_END
@@ -832,14 +821,14 @@ ROM_END
 
 
 
-GAME( 1985, gng,       0,   gng,     gng,      gng_state, 0, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gnga,      gng, gng,     gng,      gng_state, 0, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngbl,     gng, gng,     gng,      gng_state, 0, ROT0, "bootleg",  "Ghosts'n Goblins (bootleg with Cross)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngprot,   gng, gng,     gng,      gng_state, 0, ROT0, "Capcom",   "Ghosts'n Goblins (prototype)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngblita,  gng, gng,     gng,      gng_state, 0, ROT0, "bootleg",  "Ghosts'n Goblins (Italian bootleg, harder)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngc,      gng, gng,     gng,      gng_state, 0, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 3)",            MACHINE_SUPPORTS_SAVE ) // rev c?
-GAME( 1985, gngt,      gng, gng,     gng,      gng_state, 0, ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimur,  gng, gng,     makaimur, gng_state, 0, ROT0, "Capcom",   "Makai-Mura (Japan)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurc, gng, gng,     makaimur, gng_state, 0, ROT0, "Capcom",   "Makai-Mura (Japan Revision C)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurg, gng, gng,     makaimur, gng_state, 0, ROT0, "Capcom",   "Makai-Mura (Japan Revision G)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1989, diamond,   0,   diamond, diamond,  gng_state, 0, ROT0, "KH Video", "Diamond Run",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gng,       0,   gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gnga,      gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngbl,     gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (bootleg with Cross)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngprot,   gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (prototype)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngblita,  gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (Italian bootleg, harder)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngc,      gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 3)",            MACHINE_SUPPORTS_SAVE ) // rev c?
+GAME( 1985, gngt,      gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimur,  gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makai-Mura (Japan)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurc, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makai-Mura (Japan Revision C)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurg, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makai-Mura (Japan Revision G)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, diamond,   0,   diamond, diamond,  gng_state, empty_init, ROT0, "KH Video", "Diamond Run",                                MACHINE_SUPPORTS_SAVE )

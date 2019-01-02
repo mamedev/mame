@@ -19,6 +19,17 @@ Dip locations added from dip listing at crazykong.com
 #include "screen.h"
 #include "speaker.h"
 
+#define MASTER_CLOCK (20_MHz_XTAL)
+#define PIXEL_CLOCK  (MASTER_CLOCK/4) // guess
+#define CPU_CLOCK    (8_MHz_XTAL)
+
+/* also a guess, need to extract PAL equations to get further answers */
+#define HTOTAL       (320)
+#define HBEND        (8)
+#define HBSTART      (248)
+#define VTOTAL       (262)
+#define VBEND        (16)
+#define VBSTART      (240)
 
 READ8_MEMBER(citycon_state::citycon_in_r)
 {
@@ -35,14 +46,14 @@ READ8_MEMBER(citycon_state::citycon_irq_ack_r)
 void citycon_state::citycon_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1fff).ram().w(this, FUNC(citycon_state::citycon_videoram_w)).share("videoram");
-	map(0x2000, 0x20ff).ram().w(this, FUNC(citycon_state::citycon_linecolor_w)).share("linecolor").mirror(0x0700);
+	map(0x1000, 0x1fff).ram().w(FUNC(citycon_state::citycon_videoram_w)).share("videoram");
+	map(0x2000, 0x20ff).ram().w(FUNC(citycon_state::citycon_linecolor_w)).share("linecolor").mirror(0x0700);
 	map(0x2800, 0x28ff).ram().share("spriteram").mirror(0x0700); //0x2900-0x2fff cleared at post but unused
-	map(0x3000, 0x3000).r(this, FUNC(citycon_state::citycon_in_r)).w(this, FUNC(citycon_state::citycon_background_w));   /* player 1 & 2 inputs multiplexed */
+	map(0x3000, 0x3000).r(FUNC(citycon_state::citycon_in_r)).w(FUNC(citycon_state::citycon_background_w));   /* player 1 & 2 inputs multiplexed */
 	map(0x3001, 0x3001).portr("DSW1").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x3002, 0x3002).portr("DSW2").w("soundlatch2", FUNC(generic_latch_8_device::write));
 	map(0x3004, 0x3005).nopr().writeonly().share("scroll");
-	map(0x3007, 0x3007).r(this, FUNC(citycon_state::citycon_irq_ack_r));
+	map(0x3007, 0x3007).r(FUNC(citycon_state::citycon_irq_ack_r));
 	map(0x3800, 0x3cff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x4000, 0xffff).rom();
 }
@@ -157,7 +168,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( citycon )
+static GFXDECODE_START( gfx_citycon )
 //  GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 512, 32 ) /* colors 512-639 */
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 640, 32 ) /* colors 512-639 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout, 0, 16 ) /* colors 0-255 */
@@ -190,43 +201,38 @@ void citycon_state::machine_reset()
 MACHINE_CONFIG_START(citycon_state::citycon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(8'000'000)) // HD68B09P
-	MCFG_CPU_PROGRAM_MAP(citycon_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", MC6809, CPU_CLOCK) // HD68B09P
+	MCFG_DEVICE_PROGRAM_MAP(citycon_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL(20'000'000) / 32) // schematics allow for either a 6809 or 6809E; HD68A09EP found on one actual PCB
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_hold) //actually unused, probably it was during development
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK / 32) // schematics allow for either a 6809 or 6809E; HD68A09EP found on one actual PCB
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", citycon_state,  irq0_line_hold) // actually unused, probably it was during development
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(citycon_state, screen_update_citycon)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", citycon)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 640+1024)   /* 640 real palette + 1024 virtual palette */
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_citycon)
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RGBx_444, 640+1024);   // 640 real palette + 1024 virtual palette
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(20'000'000) / 16) // schematics consistently specify AY-3-8910, though YM2149 found on one actual PCB
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, "aysnd", MASTER_CLOCK / 16).add_route(ALL_OUTPUTS, "mono", 0.40); // schematics consistently specify AY-3-8910, though YM2149 found on one actual PCB
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(20'000'000) / 16)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch2", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-	MCFG_SOUND_ROUTE(2, "mono", 0.40)
-	MCFG_SOUND_ROUTE(3, "mono", 0.20)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 16));
+	ymsnd.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
+	ymsnd.port_b_read_callback().set("soundlatch2", FUNC(generic_latch_8_device::read));
+	ymsnd.add_route(0, "mono", 0.40);
+	ymsnd.add_route(1, "mono", 0.40);
+	ymsnd.add_route(2, "mono", 0.40);
+	ymsnd.add_route(3, "mono", 0.20);
 MACHINE_CONFIG_END
 
 
@@ -289,6 +295,20 @@ ROM_START( citycona )
 	ROM_LOAD( "c2",           0x0000, 0x8000, CRC(f2da4f23) SHA1(5ea1a51c3ac283796f7eafb6719d88356767340d) )    /* background maps */
 	ROM_LOAD( "c3",           0x8000, 0x4000, CRC(7ef3ac1b) SHA1(8a0497c4e4733f9c50d576f632210b82497a5e1c) )
 	ROM_LOAD( "c5",           0xc000, 0x2000, CRC(c03d8b1b) SHA1(641c1eba334d36ea64b9293a20320b31c7c88858) )    /* color codes for the background */
+
+	/* stuff below isn't used but loaded because it was on the board .. */
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "citycon_82s123n.n5",  0x0000, 0x0020, CRC(5ae142a3) SHA1(ba25c9bcbc4936a6b7f402addab50b75dbe519ce) )
+	ROM_LOAD( "citycon_82s123n.r4",  0x0100, 0x0020, CRC(29221e13) SHA1(232fd02811f157197c7ce44716dc495ed49a80cc) )
+	ROM_LOAD( "citycon_82s129.l6",   0x0200, 0x0100, CRC(91a7b6e3) SHA1(6135b264a69978d17aa8636d24eb1eba41d16c89) )
+
+		// Same PROM content on J10 and L6 sockets
+	//ROM_LOAD( "citycon_82s129.j10", 0x0300, 0x0100, CRC(91a7b6e3) SHA1(6135b264a69978d17aa8636d24eb1eba41d16c89) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "citycon_pal16l8a.h7", 0x0000, 0x0104, CRC(24a0f5d4) SHA1(69007ccbe1966b1a1d4378fe06e102598c3cdb09) )
+	ROM_LOAD( "citycon_pal16l8a.l5", 0x0200, 0x0104, CRC(dd0cf771) SHA1(4483da095ce7633d8e0c90f181a54ace19a6e87d) )
+	ROM_LOAD( "citycon_pal16l8a.u7", 0x0400, 0x0104, CRC(08d4ff84) SHA1(10a2b985e0866661c4f0ce4297f728f07540e9b6) )
 ROM_END
 
 ROM_START( cruisin )
@@ -320,10 +340,9 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(citycon_state,citycon)
+void citycon_state::init_citycon()
 {
 	uint8_t *rom = memregion("gfx1")->base();
-	int i;
 
 	/*
 	  City Connection controls the text color code for each _scanline_, not
@@ -331,14 +350,12 @@ DRIVER_INIT_MEMBER(citycon_state,citycon)
 	  I convert the 2bpp char data into 5bpp, and create a virtual palette so
 	  characters can still be drawn in one pass.
 	  */
-	for (i = 0x0fff; i >= 0; i--)
+	for (int i = 0x0fff; i >= 0; i--)
 	{
-		int mask;
-
 		rom[3 * i] = rom[i];
 		rom[3 * i + 1] = 0;
 		rom[3 * i + 2] = 0;
-		mask = rom[i] | (rom[i] << 4) | (rom[i] >> 4);
+		int mask = rom[i] | (rom[i] << 4) | (rom[i] >> 4);
 		if (i & 0x01) rom[3 * i + 1] |= mask & 0xf0;
 		if (i & 0x02) rom[3 * i + 1] |= mask & 0x0f;
 		if (i & 0x04) rom[3 * i + 2] |= mask & 0xf0;
@@ -347,6 +364,6 @@ DRIVER_INIT_MEMBER(citycon_state,citycon)
 
 
 
-GAME( 1985, citycon,  0,       citycon, citycon, citycon_state, citycon, ROT0, "Jaleco", "City Connection (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, citycona, citycon, citycon, citycon, citycon_state, citycon, ROT0, "Jaleco", "City Connection (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cruisin,  citycon, citycon, citycon, citycon_state, citycon, ROT0, "Jaleco (Kitkorp license)", "Cruisin", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, citycon,  0,       citycon, citycon, citycon_state, init_citycon, ROT0, "Jaleco", "City Connection (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, citycona, citycon, citycon, citycon, citycon_state, init_citycon, ROT0, "Jaleco", "City Connection (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cruisin,  citycon, citycon, citycon, citycon_state, init_citycon, ROT0, "Jaleco (Kitkorp license)", "Cruisin", MACHINE_SUPPORTS_SAVE )

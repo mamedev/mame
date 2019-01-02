@@ -1,19 +1,30 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Ernesto Corvi
+#ifndef MAME_INCLUDES_IQBLOCK_H
+#define MAME_INCLUDES_IQBLOCK_H
+
+#pragma once
 
 #include "machine/timer.h"
 
 class iqblock_state : public driver_device
 {
 public:
-	iqblock_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	iqblock_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_rambase(*this, "rambase"),
 		m_bgvideoram(*this, "bgvideoram"),
-		m_fgvideoram(*this, "fgvideoram") { }
+		m_fgvideoram(*this, "fgvideoram")
+	{ }
 
+	void iqblock(machine_config &config);
+
+	void init_grndtour();
+	void init_iqblock();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -36,15 +47,14 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 
-	DECLARE_DRIVER_INIT(grndtour);
-	DECLARE_DRIVER_INIT(iqblock);
 	virtual void video_start() override;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void iqblock(machine_config &config);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
 };
+
+#endif // MAME_INCLUDES_IQBLOCK_H

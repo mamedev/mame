@@ -84,6 +84,7 @@ dmv_k801_device::dmv_k801_device(const machine_config &mconfig, device_type type
 	: device_t(mconfig, type, tag, owner, clock),
 	device_dmvslot_interface( mconfig, *this ),
 	m_epci(*this, "epci"),
+	m_rs232(*this, "rs232"),
 	m_dsw(*this, "DSW"), m_bus(nullptr)
 {
 }
@@ -142,41 +143,39 @@ void dmv_k801_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(dmv_k801_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("epci", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_MC2661_RXRDY_HANDLER(WRITELINE(dmv_k801_device, epci_irq_w))
-	MCFG_MC2661_TXRDY_HANDLER(WRITELINE(dmv_k801_device, epci_irq_w))
+void dmv_k801_device::device_add_mconfig(machine_config &config)
+{
+	MC2661(config, m_epci, XTAL(5'068'800));
+	m_epci->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_epci->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_epci->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_epci->rxrdy_handler().set(FUNC(dmv_k801_device::epci_irq_w));
+	m_epci->txrdy_handler().set(FUNC(dmv_k801_device::epci_irq_w));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "printer")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("epci", mc2661_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("epci", mc2661_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("epci", mc2661_device, dsr_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("epci", mc2661_device, cts_w))
-MACHINE_CONFIG_END
+	RS232_PORT(config, m_rs232, default_rs232_devices, "printer");
+	m_rs232->rxd_handler().set(m_epci, FUNC(mc2661_device::rx_w));
+	m_rs232->dcd_handler().set(m_epci, FUNC(mc2661_device::dcd_w));
+	m_rs232->dsr_handler().set(m_epci, FUNC(mc2661_device::dsr_w));
+	m_rs232->cts_handler().set(m_epci, FUNC(mc2661_device::cts_w));
+}
 
-MACHINE_CONFIG_START(dmv_k211_device::device_add_mconfig)
+void dmv_k211_device::device_add_mconfig(machine_config &config)
+{
 	dmv_k801_device::device_add_mconfig(config);
+	m_rs232->set_default_option("null_modem");
+}
 
-	MCFG_DEVICE_MODIFY("rs232")
-	MCFG_SLOT_DEFAULT_OPTION("null_modem")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(dmv_k212_device::device_add_mconfig)
+void dmv_k212_device::device_add_mconfig(machine_config &config)
+{
 	dmv_k801_device::device_add_mconfig(config);
+	m_rs232->set_default_option("printer");
+}
 
-	MCFG_DEVICE_MODIFY("rs232")
-	MCFG_SLOT_DEFAULT_OPTION("printer")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(dmv_k213_device::device_add_mconfig)
+void dmv_k213_device::device_add_mconfig(machine_config &config)
+{
 	dmv_k801_device::device_add_mconfig(config);
-
-	MCFG_DEVICE_MODIFY("rs232")
-	MCFG_SLOT_DEFAULT_OPTION(nullptr)
-MACHINE_CONFIG_END
+	m_rs232->set_default_option(nullptr);
+}
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -213,9 +212,9 @@ void dmv_k801_device::io_read(address_space &space, int ifsel, offs_t offset, ui
 	if ((dsw >> 1) == ifsel && BIT(offset, 3) == BIT(dsw, 0))
 	{
 		if (offset & 0x04)
-			m_epci->write(space, offset & 0x03, data);
+			m_epci->write(offset & 0x03, data);
 		else
-			data = m_epci->read(space, offset & 0x03);
+			data = m_epci->read(offset & 0x03);
 	}
 }
 
@@ -225,9 +224,9 @@ void dmv_k801_device::io_write(address_space &space, int ifsel, offs_t offset, u
 	if ((dsw >> 1) == ifsel && BIT(offset, 3) == BIT(dsw, 0))
 	{
 		if (offset & 0x04)
-			m_epci->write(space, offset & 0x03, data);
+			m_epci->write(offset & 0x03, data);
 		else
-			data = m_epci->read(space, offset & 0x03);
+			data = m_epci->read(offset & 0x03);
 	}
 }
 
@@ -237,9 +236,9 @@ void dmv_k211_device::io_read(address_space &space, int ifsel, offs_t offset, ui
 	if ((BIT(jumpers, 0) && ifsel == 0) || (BIT(jumpers, 1) && ifsel == 1))
 	{
 		if (offset & 0x04)
-			m_epci->write(space, offset & 0x03, data);
+			m_epci->write(offset & 0x03, data);
 		else
-			data = m_epci->read(space, offset & 0x03);
+			data = m_epci->read(offset & 0x03);
 	}
 }
 
@@ -249,8 +248,8 @@ void dmv_k211_device::io_write(address_space &space, int ifsel, offs_t offset, u
 	if ((BIT(jumpers, 0) && ifsel == 0) || (BIT(jumpers, 1) && ifsel == 1))
 	{
 		if (offset & 0x04)
-			m_epci->write(space, offset & 0x03, data);
+			m_epci->write(offset & 0x03, data);
 		else
-			data = m_epci->read(space, offset & 0x03);
+			data = m_epci->read(offset & 0x03);
 	}
 }

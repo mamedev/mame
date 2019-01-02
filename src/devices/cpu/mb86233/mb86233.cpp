@@ -89,7 +89,7 @@ std::unique_ptr<util::disasm_interface> mb86233_device::create_disassembler()
 void mb86233_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct  = m_program->direct<-2>();
+	m_cache  = m_program->cache<2, -2, ENDIANNESS_LITTLE>();
 
 	m_data     = &space(AS_DATA);
 	m_io       = &space(AS_IO);
@@ -722,7 +722,7 @@ void mb86233_device::execute_run()
 	while(m_icount > 0) {
 		m_ppc = m_pc;
 		debugger_instruction_hook(m_ppc);
-		u32 opcode = m_direct->read_dword(m_pc++);
+		u32 opcode = m_cache->read_dword(m_pc++);
 
 		switch((opcode >> 26) & 0x3f) {
 		case 0x00: {

@@ -60,7 +60,7 @@ Known Issues:
 
 
 
-int twin16_state::spriteram_process_enable(  )
+int twin16_state::spriteram_process_enable()
 {
 	return (m_CPUA_register & 0x40) == 0;
 }
@@ -164,13 +164,13 @@ void twin16_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(twin16_state::upd_reset_w));
+	map(0x9000, 0x9000).w(FUNC(twin16_state::upd_reset_w));
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xd000, 0xd000).w(m_upd7759, FUNC(upd7759_device::port_w));
-	map(0xe000, 0xe000).w(this, FUNC(twin16_state::upd_start_w));
-	map(0xf000, 0xf000).r(this, FUNC(twin16_state::upd_busy_r)); // miaj writes 0 to it
+	map(0xe000, 0xe000).w(FUNC(twin16_state::upd_start_w));
+	map(0xf000, 0xf000).r(FUNC(twin16_state::upd_busy_r)); // miaj writes 0 to it
 	}
 
 void twin16_state::main_map(address_map &map)
@@ -181,7 +181,7 @@ void twin16_state::main_map(address_map &map)
 	map(0x060000, 0x063fff).ram();
 	map(0x080000, 0x080fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
 	map(0x081000, 0x081fff).nopw();
-	map(0x0a0000, 0x0a0001).portr("SYSTEM").w(this, FUNC(twin16_state::CPUA_register_w));
+	map(0x0a0000, 0x0a0001).portr("SYSTEM").w(FUNC(twin16_state::CPUA_register_w));
 	map(0x0a0002, 0x0a0003).portr("P1");
 	map(0x0a0004, 0x0a0005).portr("P2");
 	map(0x0a0006, 0x0a0007).portr("P3");
@@ -189,12 +189,12 @@ void twin16_state::main_map(address_map &map)
 	map(0x0a0010, 0x0a0011).portr("DSW2").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x0a0012, 0x0a0013).portr("DSW1");
 	map(0x0a0018, 0x0a0019).portr("DSW3");
-	map(0x0c0000, 0x0c000f).w(this, FUNC(twin16_state::video_register_w));
-	map(0x0c000e, 0x0c000f).r(this, FUNC(twin16_state::sprite_status_r));
-	map(0x100000, 0x103fff).ram().w(this, FUNC(twin16_state::fixram_w)).share("fixram");
+	map(0x0c0000, 0x0c000f).w(FUNC(twin16_state::video_register_w));
+	map(0x0c000e, 0x0c000f).r(FUNC(twin16_state::sprite_status_r));
+	map(0x100000, 0x103fff).ram().w(FUNC(twin16_state::fixram_w)).share("fixram");
 //  AM_RANGE(0x104000, 0x105fff) AM_NOP             // miaj
-	map(0x120000, 0x121fff).ram().w(this, FUNC(twin16_state::videoram0_w)).share("videoram.0");
-	map(0x122000, 0x123fff).ram().w(this, FUNC(twin16_state::videoram1_w)).share("videoram.1");
+	map(0x120000, 0x121fff).ram().w(FUNC(twin16_state::videoram0_w)).share("videoram.0");
+	map(0x122000, 0x123fff).ram().w(FUNC(twin16_state::videoram1_w)).share("videoram.1");
 	map(0x140000, 0x143fff).ram().share("spriteram");
 }
 
@@ -205,11 +205,11 @@ void twin16_state::sub_map(address_map &map)
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
 	map(0x060000, 0x063fff).ram();
 	map(0x080000, 0x09ffff).rom().region("data", 0);
-	map(0x0a0000, 0x0a0001).w(this, FUNC(twin16_state::CPUB_register_w));
+	map(0x0a0000, 0x0a0001).w(FUNC(twin16_state::CPUB_register_w));
 	map(0x400000, 0x403fff).ram().share("spriteram");
-	map(0x480000, 0x481fff).ram().w(this, FUNC(twin16_state::videoram0_w)).share("videoram.0");
-	map(0x482000, 0x483fff).ram().w(this, FUNC(twin16_state::videoram1_w)).share("videoram.1");
-	map(0x500000, 0x53ffff).ram().w(this, FUNC(twin16_state::zipram_w)).share("zipram");
+	map(0x480000, 0x481fff).ram().w(FUNC(twin16_state::videoram0_w)).share("videoram.0");
+	map(0x482000, 0x483fff).ram().w(FUNC(twin16_state::videoram1_w)).share("videoram.1");
+	map(0x500000, 0x53ffff).ram().w(FUNC(twin16_state::zipram_w)).share("zipram");
 	map(0x600000, 0x6fffff).rom().region("gfxrom", 0);
 	map(0x700000, 0x77ffff).bankr("gfxrombank");
 	map(0x780000, 0x79ffff).ram().share("sprite_gfx_ram");
@@ -221,19 +221,19 @@ void fround_state::fround_map(address_map &map)
 	map(0x040000, 0x043fff).ram().share("comram");
 	map(0x060000, 0x063fff).ram();
 	map(0x080000, 0x080fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x0a0000, 0x0a0001).portr("SYSTEM").w(this, FUNC(fround_state::fround_CPU_register_w));
+	map(0x0a0000, 0x0a0001).portr("SYSTEM").w(FUNC(fround_state::fround_CPU_register_w));
 	map(0x0a0002, 0x0a0003).portr("P1");
 	map(0x0a0004, 0x0a0005).portr("P2");
 	map(0x0a0009, 0x0a0009).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0a0010, 0x0a0011).portr("DSW2").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x0a0012, 0x0a0013).portr("DSW1");
 	map(0x0a0018, 0x0a0019).portr("DSW3");
-	map(0x0c0000, 0x0c000f).w(this, FUNC(fround_state::video_register_w));
-	map(0x0c000e, 0x0c000f).r(this, FUNC(fround_state::sprite_status_r));
-	map(0x0e0000, 0x0e0001).w(this, FUNC(fround_state::gfx_bank_w));
-	map(0x100000, 0x103fff).ram().w(this, FUNC(fround_state::fixram_w)).share("fixram");
-	map(0x120000, 0x121fff).ram().w(this, FUNC(fround_state::videoram0_w)).share("videoram.0");
-	map(0x122000, 0x123fff).ram().w(this, FUNC(fround_state::videoram1_w)).share("videoram.1");
+	map(0x0c0000, 0x0c000f).w(FUNC(fround_state::video_register_w));
+	map(0x0c000e, 0x0c000f).r(FUNC(fround_state::sprite_status_r));
+	map(0x0e0000, 0x0e0001).w(FUNC(fround_state::gfx_bank_w));
+	map(0x100000, 0x103fff).ram().w(FUNC(fround_state::fixram_w)).share("fixram");
+	map(0x120000, 0x121fff).ram().w(FUNC(fround_state::videoram0_w)).share("videoram.0");
+	map(0x122000, 0x123fff).ram().w(FUNC(fround_state::videoram1_w)).share("videoram.1");
 	map(0x140000, 0x143fff).ram().share("spriteram");
 	map(0x500000, 0x5fffff).rom().region("tiles", 0);
 	map(0x600000, 0x6fffff).rom().region("gfxrom", 0);
@@ -616,12 +616,12 @@ static const gfx_layout tile_layout =
 
 /* Graphics Decode Info */
 
-static GFXDECODE_START( twin16 )
+static GFXDECODE_START( gfx_twin16 )
 	GFXDECODE_ENTRY( "fixed", 0, tile_layout,   0, 16 )
 	GFXDECODE_RAM(  "zipram", 0, tile_layout, 512, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( fround )
+static GFXDECODE_START( gfx_fround )
 	GFXDECODE_ENTRY( "fixed", 0, tile_layout,   0, 16 )
 	GFXDECODE_ENTRY( "tiles", 0, tile_layout, 512, 16 )
 GFXDECODE_END
@@ -649,124 +649,123 @@ void twin16_state::machine_start()
 	save_item(NAME(m_CPUB_register));
 }
 
-MACHINE_CONFIG_START(twin16_state::twin16)
+void twin16_state::twin16(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'432'000)/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, XTAL(18'432'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &twin16_state::main_map);
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(18'432'000)/2)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	M68000(config, m_subcpu, XTAL(18'432'000)/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &twin16_state::sub_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &twin16_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8)
-	MCFG_SCREEN_UPDATE_DRIVER(twin16_state, screen_update_twin16)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(twin16_state, screen_vblank_twin16))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8);
+	m_screen->set_screen_update(FUNC(twin16_state::screen_update_twin16));
+	m_screen->screen_vblank().set(FUNC(twin16_state::screen_vblank_twin16));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twin16)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_twin16);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+	m_palette->set_membits(8);
+	m_palette->enable_shadows();
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(twin16_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.12) // estimated with gradius2 OST
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.12)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.12)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.12)
+	K007232(config, m_k007232, XTAL(3'579'545));
+	m_k007232->port_write().set(FUNC(twin16_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.12); // estimated with gradius2 OST
+	m_k007232->add_route(0, "rspeaker", 0.12);
+	m_k007232->add_route(1, "lspeaker", 0.12);
+	m_k007232->add_route(1, "rspeaker", 0.12);
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.20);
+	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.20);
+}
 
-MACHINE_CONFIG_START(twin16_state::devilw)
+void twin16_state::devilw(machine_config &config)
+{
 	twin16(config);
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) // watchdog reset otherwise
-MACHINE_CONFIG_END
+	config.m_minimum_quantum = attotime::from_hz(60000); // watchdog reset otherwise
+}
 
-MACHINE_CONFIG_START(fround_state::fround)
+void fround_state::fround(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'432'000)/2)
-	MCFG_CPU_PROGRAM_MAP(fround_map)
+	M68000(config, m_maincpu, XTAL(18'432'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fround_state::fround_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fround_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8)
-	MCFG_SCREEN_UPDATE_DRIVER(twin16_state, screen_update_twin16)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(twin16_state, screen_vblank_twin16))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(18'432'000)/2, 576, 0, 40*8, 264, 2*8, 30*8);
+	m_screen->set_screen_update(FUNC(twin16_state::screen_update_twin16));
+	m_screen->screen_vblank().set(FUNC(twin16_state::screen_vblank_twin16));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fround)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fround);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_MEMBITS(8)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+	m_palette->set_membits(8);
+	m_palette->enable_shadows();
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(twin16_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.12)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.12)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.12)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.12)
+	K007232(config, m_k007232, XTAL(3'579'545));
+	m_k007232->port_write().set(FUNC(twin16_state::volume_callback));
+	m_k007232->add_route(0, "lspeaker", 0.12);
+	m_k007232->add_route(0, "rspeaker", 0.12);
+	m_k007232->add_route(1, "lspeaker", 0.12);
+	m_k007232->add_route(1, "rspeaker", 0.12);
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.20);
+	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.20);
+}
 
-MACHINE_CONFIG_START(twin16_state::miaj)
+void twin16_state::miaj(machine_config &config)
+{
 	twin16(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
-MACHINE_CONFIG_END
+	m_screen->set_raw(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8);
+}
 
-MACHINE_CONFIG_START(cuebrickj_state::cuebrickj)
+void cuebrickj_state::cuebrickj(machine_config &config)
+{
 	twin16(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	m_screen->set_raw(XTAL(18'432'000)/2, 576, 1*8, 39*8, 264, 2*8, 30*8);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 /* ROMs */
 
@@ -1232,14 +1231,14 @@ ROM_END
 
 /* Driver Initialization */
 
-DRIVER_INIT_MEMBER(twin16_state,twin16)
+void twin16_state::init_twin16()
 {
 	m_is_fround = false;
 	m_gfxrombank->configure_entries(0, 2, memregion("gfxrom")->base() + 0x100000, 0x80000);
 	m_gfxrombank->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(fround_state,fround)
+void fround_state::init_fround()
 {
 	m_is_fround = true;
 }
@@ -1249,9 +1248,9 @@ WRITE8_MEMBER(cuebrickj_state::nvram_bank_w)
 	membank("nvrambank")->set_entry(data);
 }
 
-DRIVER_INIT_MEMBER(cuebrickj_state,cuebrickj)
+void cuebrickj_state::init_cuebrickj()
 {
-	DRIVER_INIT_CALL(twin16);
+	init_twin16();
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -1260,7 +1259,7 @@ DRIVER_INIT_MEMBER(cuebrickj_state,cuebrickj)
 
 	membank("nvrambank")->configure_entries(0, 0x20, m_nvram, 0x400);
 
-	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
+	subdevice<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 
 	save_item(NAME(m_nvram));
 }
@@ -1268,18 +1267,18 @@ DRIVER_INIT_MEMBER(cuebrickj_state,cuebrickj)
 /* Game Drivers */
 
 //    YEAR, NAME,      PARENT,   MACHINE,   INPUT,     STATE,           INIT,      MONITOR,COMPANY,  FULLNAME,FLAGS
-GAME( 1987, devilw,    0,        devilw,    devilw,    twin16_state,    twin16,    ROT0,   "Konami", "Devil World", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, majuu,     devilw,   devilw,    devilw,    twin16_state,    twin16,    ROT0,   "Konami", "Majuu no Ohkoku", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, darkadv,   devilw,   devilw,    darkadv,   twin16_state,    twin16,    ROT0,   "Konami", "Dark Adventure", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vulcan,    0,        twin16,    vulcan,    twin16_state,    twin16,    ROT0,   "Konami", "Vulcan Venture (New)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vulcana,   vulcan,   twin16,    vulcan,    twin16_state,    twin16,    ROT0,   "Konami", "Vulcan Venture (Old)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vulcanb,   vulcan,   twin16,    vulcan,    twin16_state,    twin16,    ROT0,   "Konami", "Vulcan Venture (Oldest)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gradius2,  vulcan,   twin16,    gradius2,  twin16_state,    twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gradius2a, vulcan,   twin16,    vulcan,    twin16_state,    twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gradius2b, vulcan,   twin16,    vulcan,    twin16_state,    twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan Older Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, devilw,    0,        devilw,    devilw,    twin16_state,    init_twin16,    ROT0,   "Konami", "Devil World", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, majuu,     devilw,   devilw,    devilw,    twin16_state,    init_twin16,    ROT0,   "Konami", "Majuu no Ohkoku", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, darkadv,   devilw,   devilw,    darkadv,   twin16_state,    init_twin16,    ROT0,   "Konami", "Dark Adventure", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vulcan,    0,        twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (New)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vulcana,   vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (Old)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vulcanb,   vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Vulcan Venture (Oldest)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gradius2,  vulcan,   twin16,    gradius2,  twin16_state,    init_twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gradius2a, vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gradius2b, vulcan,   twin16,    vulcan,    twin16_state,    init_twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan Older Ver.)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, fround,    0,        fround,    fround,    fround_state,    fround,    ROT0,   "Konami", "The Final Round (version M)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, froundl,   fround,   fround,    fround,    fround_state,    fround,    ROT0,   "Konami", "The Final Round (version L)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hpuncher,  fround,   twin16,    fround,    twin16_state,    twin16,    ROT0,   "Konami", "Hard Puncher (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, miaj,      mia,      miaj,      miaj,      twin16_state,    twin16,    ROT0,   "Konami", "M.I.A. - Missing in Action (version R) (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cuebrickj, cuebrick, cuebrickj, cuebrickj, cuebrickj_state, cuebrickj, ROT0,   "Konami", "Cue Brick (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, fround,    0,        fround,    fround,    fround_state,    init_fround,    ROT0,   "Konami", "The Final Round (version M)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, froundl,   fround,   fround,    fround,    fround_state,    init_fround,    ROT0,   "Konami", "The Final Round (version L)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hpuncher,  fround,   twin16,    fround,    twin16_state,    init_twin16,    ROT0,   "Konami", "Hard Puncher (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, miaj,      mia,      miaj,      miaj,      twin16_state,    init_twin16,    ROT0,   "Konami", "M.I.A. - Missing in Action (version R) (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cuebrickj, cuebrick, cuebrickj, cuebrickj, cuebrickj_state, init_cuebrickj, ROT0,   "Konami", "Cue Brick (Japan)", MACHINE_SUPPORTS_SAVE )

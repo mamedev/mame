@@ -17,55 +17,55 @@ void mcf5206e_peripheral_device::coldfire_regs_map(address_map &map)
 {
 
 
-	map(0x014, 0x017).rw(this, FUNC(mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_r), FUNC(mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_w));
+	map(0x014, 0x017).rw(FUNC(mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_r), FUNC(mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_w));
 
-	map(0x01c, 0x01f).rw(this, FUNC(mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_r), FUNC(mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_w));
-	map(0x020, 0x023).rw(this, FUNC(mcf5206e_peripheral_device::ICR13_r), FUNC(mcf5206e_peripheral_device::ICR13_w));
+	map(0x01c, 0x01f).rw(FUNC(mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_r), FUNC(mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_w));
+	map(0x020, 0x023).rw(FUNC(mcf5206e_peripheral_device::ICR13_r), FUNC(mcf5206e_peripheral_device::ICR13_w));
 
-	map(0x034, 0x037).rw(this, FUNC(mcf5206e_peripheral_device::IMR_r), FUNC(mcf5206e_peripheral_device::IMR_w));
+	map(0x034, 0x037).rw(FUNC(mcf5206e_peripheral_device::IMR_r), FUNC(mcf5206e_peripheral_device::IMR_w));
 
 	/* Chip Select registers */
-	map(0x064, 0x067).rw(this, FUNC(mcf5206e_peripheral_device::CSAR0_r), FUNC(mcf5206e_peripheral_device::CSAR0_w));
-	map(0x068, 0x06b).rw(this, FUNC(mcf5206e_peripheral_device::CSMR0_r), FUNC(mcf5206e_peripheral_device::CSMR0_w));
-	map(0x06c, 0x06f).rw(this, FUNC(mcf5206e_peripheral_device::CSCR0_r), FUNC(mcf5206e_peripheral_device::CSCR0_w));
-	map(0x070, 0x073).rw(this, FUNC(mcf5206e_peripheral_device::CSAR1_r), FUNC(mcf5206e_peripheral_device::CSAR1_w));
-	map(0x074, 0x077).rw(this, FUNC(mcf5206e_peripheral_device::CSMR1_r), FUNC(mcf5206e_peripheral_device::CSMR1_w));
-	map(0x078, 0x07b).rw(this, FUNC(mcf5206e_peripheral_device::CSCR1_r), FUNC(mcf5206e_peripheral_device::CSCR1_w));
-	map(0x07c, 0x07f).rw(this, FUNC(mcf5206e_peripheral_device::CSAR2_r), FUNC(mcf5206e_peripheral_device::CSAR2_w));
-	map(0x080, 0x083).rw(this, FUNC(mcf5206e_peripheral_device::CSMR2_r), FUNC(mcf5206e_peripheral_device::CSMR2_w));
-	map(0x084, 0x087).rw(this, FUNC(mcf5206e_peripheral_device::CSCR2_r), FUNC(mcf5206e_peripheral_device::CSCR2_w));
-	map(0x088, 0x08b).rw(this, FUNC(mcf5206e_peripheral_device::CSAR3_r), FUNC(mcf5206e_peripheral_device::CSAR3_w));
-	map(0x08c, 0x08f).rw(this, FUNC(mcf5206e_peripheral_device::CSMR3_r), FUNC(mcf5206e_peripheral_device::CSMR3_w));
-	map(0x090, 0x093).rw(this, FUNC(mcf5206e_peripheral_device::CSCR3_r), FUNC(mcf5206e_peripheral_device::CSCR3_w));
-	map(0x094, 0x097).rw(this, FUNC(mcf5206e_peripheral_device::CSAR4_r), FUNC(mcf5206e_peripheral_device::CSAR4_w));
-	map(0x098, 0x09b).rw(this, FUNC(mcf5206e_peripheral_device::CSMR4_r), FUNC(mcf5206e_peripheral_device::CSMR4_w));
-	map(0x09c, 0x09f).rw(this, FUNC(mcf5206e_peripheral_device::CSCR4_r), FUNC(mcf5206e_peripheral_device::CSCR4_w));
-	map(0x0a0, 0x0a3).rw(this, FUNC(mcf5206e_peripheral_device::CSAR5_r), FUNC(mcf5206e_peripheral_device::CSAR5_w));
-	map(0x0a4, 0x0a7).rw(this, FUNC(mcf5206e_peripheral_device::CSMR5_r), FUNC(mcf5206e_peripheral_device::CSMR5_w));
-	map(0x0a8, 0x0ab).rw(this, FUNC(mcf5206e_peripheral_device::CSCR5_r), FUNC(mcf5206e_peripheral_device::CSCR5_w));
-	map(0x0ac, 0x0af).rw(this, FUNC(mcf5206e_peripheral_device::CSAR6_r), FUNC(mcf5206e_peripheral_device::CSAR6_w));
-	map(0x0b0, 0x0b3).rw(this, FUNC(mcf5206e_peripheral_device::CSMR6_r), FUNC(mcf5206e_peripheral_device::CSMR6_w));
-	map(0x0b4, 0x0b7).rw(this, FUNC(mcf5206e_peripheral_device::CSCR6_r), FUNC(mcf5206e_peripheral_device::CSCR6_w));
-	map(0x0b8, 0x0bb).rw(this, FUNC(mcf5206e_peripheral_device::CSAR7_r), FUNC(mcf5206e_peripheral_device::CSAR7_w));
-	map(0x0bc, 0x0bf).rw(this, FUNC(mcf5206e_peripheral_device::CSMR7_r), FUNC(mcf5206e_peripheral_device::CSMR7_w));
-	map(0x0c0, 0x0c3).rw(this, FUNC(mcf5206e_peripheral_device::CSCR7_r), FUNC(mcf5206e_peripheral_device::CSCR7_w));
+	map(0x064, 0x067).rw(FUNC(mcf5206e_peripheral_device::CSAR0_r), FUNC(mcf5206e_peripheral_device::CSAR0_w));
+	map(0x068, 0x06b).rw(FUNC(mcf5206e_peripheral_device::CSMR0_r), FUNC(mcf5206e_peripheral_device::CSMR0_w));
+	map(0x06c, 0x06f).rw(FUNC(mcf5206e_peripheral_device::CSCR0_r), FUNC(mcf5206e_peripheral_device::CSCR0_w));
+	map(0x070, 0x073).rw(FUNC(mcf5206e_peripheral_device::CSAR1_r), FUNC(mcf5206e_peripheral_device::CSAR1_w));
+	map(0x074, 0x077).rw(FUNC(mcf5206e_peripheral_device::CSMR1_r), FUNC(mcf5206e_peripheral_device::CSMR1_w));
+	map(0x078, 0x07b).rw(FUNC(mcf5206e_peripheral_device::CSCR1_r), FUNC(mcf5206e_peripheral_device::CSCR1_w));
+	map(0x07c, 0x07f).rw(FUNC(mcf5206e_peripheral_device::CSAR2_r), FUNC(mcf5206e_peripheral_device::CSAR2_w));
+	map(0x080, 0x083).rw(FUNC(mcf5206e_peripheral_device::CSMR2_r), FUNC(mcf5206e_peripheral_device::CSMR2_w));
+	map(0x084, 0x087).rw(FUNC(mcf5206e_peripheral_device::CSCR2_r), FUNC(mcf5206e_peripheral_device::CSCR2_w));
+	map(0x088, 0x08b).rw(FUNC(mcf5206e_peripheral_device::CSAR3_r), FUNC(mcf5206e_peripheral_device::CSAR3_w));
+	map(0x08c, 0x08f).rw(FUNC(mcf5206e_peripheral_device::CSMR3_r), FUNC(mcf5206e_peripheral_device::CSMR3_w));
+	map(0x090, 0x093).rw(FUNC(mcf5206e_peripheral_device::CSCR3_r), FUNC(mcf5206e_peripheral_device::CSCR3_w));
+	map(0x094, 0x097).rw(FUNC(mcf5206e_peripheral_device::CSAR4_r), FUNC(mcf5206e_peripheral_device::CSAR4_w));
+	map(0x098, 0x09b).rw(FUNC(mcf5206e_peripheral_device::CSMR4_r), FUNC(mcf5206e_peripheral_device::CSMR4_w));
+	map(0x09c, 0x09f).rw(FUNC(mcf5206e_peripheral_device::CSCR4_r), FUNC(mcf5206e_peripheral_device::CSCR4_w));
+	map(0x0a0, 0x0a3).rw(FUNC(mcf5206e_peripheral_device::CSAR5_r), FUNC(mcf5206e_peripheral_device::CSAR5_w));
+	map(0x0a4, 0x0a7).rw(FUNC(mcf5206e_peripheral_device::CSMR5_r), FUNC(mcf5206e_peripheral_device::CSMR5_w));
+	map(0x0a8, 0x0ab).rw(FUNC(mcf5206e_peripheral_device::CSCR5_r), FUNC(mcf5206e_peripheral_device::CSCR5_w));
+	map(0x0ac, 0x0af).rw(FUNC(mcf5206e_peripheral_device::CSAR6_r), FUNC(mcf5206e_peripheral_device::CSAR6_w));
+	map(0x0b0, 0x0b3).rw(FUNC(mcf5206e_peripheral_device::CSMR6_r), FUNC(mcf5206e_peripheral_device::CSMR6_w));
+	map(0x0b4, 0x0b7).rw(FUNC(mcf5206e_peripheral_device::CSCR6_r), FUNC(mcf5206e_peripheral_device::CSCR6_w));
+	map(0x0b8, 0x0bb).rw(FUNC(mcf5206e_peripheral_device::CSAR7_r), FUNC(mcf5206e_peripheral_device::CSAR7_w));
+	map(0x0bc, 0x0bf).rw(FUNC(mcf5206e_peripheral_device::CSMR7_r), FUNC(mcf5206e_peripheral_device::CSMR7_w));
+	map(0x0c0, 0x0c3).rw(FUNC(mcf5206e_peripheral_device::CSCR7_r), FUNC(mcf5206e_peripheral_device::CSCR7_w));
 
-	map(0x0c4, 0x0c7).rw(this, FUNC(mcf5206e_peripheral_device::DMCR_r), FUNC(mcf5206e_peripheral_device::DMCR_w));
-	map(0x0c8, 0x0cb).rw(this, FUNC(mcf5206e_peripheral_device::PAR_r), FUNC(mcf5206e_peripheral_device::PAR_w));
+	map(0x0c4, 0x0c7).rw(FUNC(mcf5206e_peripheral_device::DMCR_r), FUNC(mcf5206e_peripheral_device::DMCR_w));
+	map(0x0c8, 0x0cb).rw(FUNC(mcf5206e_peripheral_device::PAR_r), FUNC(mcf5206e_peripheral_device::PAR_w));
 
-	map(0x100, 0x103).rw(this, FUNC(mcf5206e_peripheral_device::TMR1_r), FUNC(mcf5206e_peripheral_device::TMR1_w));
-	map(0x104, 0x107).rw(this, FUNC(mcf5206e_peripheral_device::TRR1_r), FUNC(mcf5206e_peripheral_device::TRR1_w));
-	map(0x10c, 0x10f).rw(this, FUNC(mcf5206e_peripheral_device::TCN1_r), FUNC(mcf5206e_peripheral_device::TCN1_w));
-	map(0x110, 0x113).rw(this, FUNC(mcf5206e_peripheral_device::TER1_r), FUNC(mcf5206e_peripheral_device::TER1_w));
+	map(0x100, 0x103).rw(FUNC(mcf5206e_peripheral_device::TMR1_r), FUNC(mcf5206e_peripheral_device::TMR1_w));
+	map(0x104, 0x107).rw(FUNC(mcf5206e_peripheral_device::TRR1_r), FUNC(mcf5206e_peripheral_device::TRR1_w));
+	map(0x10c, 0x10f).rw(FUNC(mcf5206e_peripheral_device::TCN1_r), FUNC(mcf5206e_peripheral_device::TCN1_w));
+	map(0x110, 0x113).rw(FUNC(mcf5206e_peripheral_device::TER1_r), FUNC(mcf5206e_peripheral_device::TER1_w));
 
 
-	map(0x1c4, 0x1c7).rw(this, FUNC(mcf5206e_peripheral_device::PPDDR_r), FUNC(mcf5206e_peripheral_device::PPDDR_w));
-	map(0x1c8, 0x1cb).rw(this, FUNC(mcf5206e_peripheral_device::PPDAT_r), FUNC(mcf5206e_peripheral_device::PPDAT_w));
+	map(0x1c4, 0x1c7).rw(FUNC(mcf5206e_peripheral_device::PPDDR_r), FUNC(mcf5206e_peripheral_device::PPDDR_w));
+	map(0x1c8, 0x1cb).rw(FUNC(mcf5206e_peripheral_device::PPDAT_r), FUNC(mcf5206e_peripheral_device::PPDAT_w));
 
-	map(0x1e4, 0x1e7).rw(this, FUNC(mcf5206e_peripheral_device::MFDR_r), FUNC(mcf5206e_peripheral_device::MFDR_w));
-	map(0x1e8, 0x1eb).rw(this, FUNC(mcf5206e_peripheral_device::MBCR_r), FUNC(mcf5206e_peripheral_device::MBCR_w));
-	map(0x1ec, 0x1ef).rw(this, FUNC(mcf5206e_peripheral_device::MBSR_r), FUNC(mcf5206e_peripheral_device::MBSR_w));
-	map(0x1f0, 0x1f3).rw(this, FUNC(mcf5206e_peripheral_device::MBDR_r), FUNC(mcf5206e_peripheral_device::MBDR_w));
+	map(0x1e4, 0x1e7).rw(FUNC(mcf5206e_peripheral_device::MFDR_r), FUNC(mcf5206e_peripheral_device::MFDR_w));
+	map(0x1e8, 0x1eb).rw(FUNC(mcf5206e_peripheral_device::MBCR_r), FUNC(mcf5206e_peripheral_device::MBCR_w));
+	map(0x1ec, 0x1ef).rw(FUNC(mcf5206e_peripheral_device::MBSR_r), FUNC(mcf5206e_peripheral_device::MBSR_w));
+	map(0x1f0, 0x1f3).rw(FUNC(mcf5206e_peripheral_device::MBDR_r), FUNC(mcf5206e_peripheral_device::MBDR_w));
 }
 
 

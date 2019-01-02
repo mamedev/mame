@@ -17,7 +17,7 @@
 #include "machine/64h156.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
-#include "machine/latch.h"
+#include "machine/output_latch.h"
 
 
 
@@ -65,6 +65,8 @@ protected:
 	void c1541dd_mem(address_map &map);
 	void c1541pd_mem(address_map &map);
 
+	required_device<m6502_device> m_maincpu;
+
 private:
 	enum
 	{
@@ -88,11 +90,11 @@ private:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
 	required_ioport m_address;
+	output_finder<2> m_leds;
 
 	// IEC bus
 	int m_data_out;                         // serial data out
@@ -225,7 +227,7 @@ protected:
 
 // ======================> c1541_dolphin_dos_device
 
-class c1541_dolphin_dos_device :  public c1541_device_base
+class c1541_dolphin_dos_device : public c1541_device_base
 {
 public:
 	// construction/destruction

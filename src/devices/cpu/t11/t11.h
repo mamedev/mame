@@ -28,12 +28,6 @@ enum
 #define T11_TRAP        0x01C   /* TRAP instruction vector */
 
 
-#define MCFG_T11_INITIAL_MODE(_mode) \
-	downcast<t11_device &>(*device).set_initial_mode(_mode);
-
-#define MCFG_T11_RESET(_devcb) \
-	devcb = &downcast<t11_device &>(*device).set_out_reset_func(DEVCB_##_devcb);
-
 class t11_device :  public cpu_device
 {
 public:
@@ -42,7 +36,7 @@ public:
 
 	// configuration helpers
 	void set_initial_mode(const uint16_t mode) { c_initial_mode = mode; }
-	template <class Object> devcb_base &set_out_reset_func(Object &&cb) { return m_out_reset_func.set_callback(std::forward<Object>(cb)); }
+	auto out_reset() { return m_out_reset_func.bind(); }
 
 protected:
 	t11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -57,7 +51,7 @@ protected:
 	virtual uint32_t execute_input_lines() const override { return 4; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual uint32_t execute_default_irq_vector() const override { return -1; };
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return -1; }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -80,7 +74,7 @@ protected:
 	uint8_t               m_irq_state;
 	int                 m_icount;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *m_cache;
 	devcb_write_line   m_out_reset_func;
 
 	inline int ROPCODE();

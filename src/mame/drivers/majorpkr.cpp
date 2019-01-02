@@ -457,6 +457,7 @@
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -472,14 +473,45 @@
 class majorpkr_state : public driver_device
 {
 public:
-	majorpkr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	majorpkr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette_bank(*this, "palette_bank"),
 		m_vram_bank(*this, "vram_bank"),
 		m_rom_bank(*this, "rom_bank"),
 		m_fg_vram(*this, "fg_vram"),
-		m_bg_vram(*this, "bg_vram") { }
+		m_bg_vram(*this, "bg_vram"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
+
+	void majorpkr(machine_config &config);
+
+	void init_majorpkr();
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
+private:
+	DECLARE_WRITE8_MEMBER(rom_bank_w);
+	DECLARE_WRITE8_MEMBER(palette_bank_w);
+	DECLARE_WRITE8_MEMBER(vram_bank_w);
+	DECLARE_WRITE8_MEMBER(fg_vram_w);
+	DECLARE_WRITE8_MEMBER(bg_vram_w);
+	DECLARE_WRITE8_MEMBER(vidreg_w);
+	DECLARE_READ8_MEMBER(mux_port_r);
+	DECLARE_READ8_MEMBER(mux_port2_r);
+	DECLARE_WRITE8_MEMBER(mux_sel_w);
+	DECLARE_WRITE8_MEMBER(lamps_a_w);
+	DECLARE_WRITE8_MEMBER(lamps_b_w);
+	DECLARE_WRITE8_MEMBER(pulses_w);
+	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	TILE_GET_INFO_MEMBER(fg_get_tile_info);
+	uint32_t screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void map(address_map &map);
+	void palettebanks(address_map &map);
+	void portmap(address_map &map);
+	void vrambanks(address_map &map);
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<address_map_bank_device> m_palette_bank;
@@ -493,29 +525,7 @@ public:
 
 	int m_mux_data;
 	int m_flip_state;
-
-	DECLARE_WRITE8_MEMBER(rom_bank_w);
-	DECLARE_WRITE8_MEMBER(palette_bank_w);
-	DECLARE_WRITE8_MEMBER(vram_bank_w);
-	DECLARE_WRITE8_MEMBER(fg_vram_w);
-	DECLARE_WRITE8_MEMBER(bg_vram_w);
-	DECLARE_WRITE8_MEMBER(vidreg_w);
-	DECLARE_READ8_MEMBER(mux_port_r);
-	DECLARE_READ8_MEMBER(mux_port2_r);
-	DECLARE_WRITE8_MEMBER(mux_sel_w);
-	DECLARE_WRITE8_MEMBER(lamps_a_w);
-	DECLARE_WRITE8_MEMBER(lamps_b_w);
-	DECLARE_WRITE8_MEMBER(pulses_w);
-	DECLARE_DRIVER_INIT(majorpkr);
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	TILE_GET_INFO_MEMBER(fg_get_tile_info);
-	virtual void video_start() override;
-	uint32_t screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void majorpkr(machine_config &config);
-	void map(address_map &map);
-	void palettebanks(address_map &map);
-	void portmap(address_map &map);
-	void vrambanks(address_map &map);
+	output_finder<13> m_lamps;
 };
 
 
@@ -678,13 +688,13 @@ WRITE8_MEMBER(majorpkr_state::lamps_a_w)
     -x-- ----   Small lamp.
     x--- ----   Unknown.
 */
-	output().set_lamp_value(0, (data) & 1);       // Lamp 0: Hold 1.
-	output().set_lamp_value(1, (data >> 1) & 1);  // Lamp 1: Hold 2.
-	output().set_lamp_value(2, (data >> 2) & 1);  // Lamp 2: Hold 3.
-	output().set_lamp_value(3, (data >> 3) & 1);  // Lamp 3: Hold 4.
-	output().set_lamp_value(4, (data >> 4) & 1);  // Lamp 4: Hold 5.
-	output().set_lamp_value(5, (data >> 5) & 1);  // Lamp 5: Big or Small (need identification).
-	output().set_lamp_value(6, (data >> 6) & 1);  // Lamp 6: Big or Small (need identification).
+	m_lamps[0] = BIT(data, 0);       // Lamp 0: Hold 1.
+	m_lamps[1] = BIT(data, 1);  // Lamp 1: Hold 2.
+	m_lamps[2] = BIT(data, 2);  // Lamp 2: Hold 3.
+	m_lamps[3] = BIT(data, 3);  // Lamp 3: Hold 4.
+	m_lamps[4] = BIT(data, 4);  // Lamp 4: Hold 5.
+	m_lamps[5] = BIT(data, 5);  // Lamp 5: Big or Small (need identification).
+	m_lamps[6] = BIT(data, 6);  // Lamp 6: Big or Small (need identification).
 
 	if (data & 0x80)
 		logerror("Lamps A: Write to 13h: %02x\n", data);
@@ -704,12 +714,12 @@ WRITE8_MEMBER(majorpkr_state::lamps_b_w)
     --x- ----   Fever lamp.
     xx-- ----   Unknown.
 */
-	output().set_lamp_value(7, (data) & 1);        // Lamp 7: Bet.
-	output().set_lamp_value(8, (data >> 1) & 1);   // Lamp 8: Draw.
-	output().set_lamp_value(9, (data >> 2) & 1);   // Lamp 9: Cancel.
-	output().set_lamp_value(10, (data >> 3) & 1);  // Lamp 10: Take.
-	output().set_lamp_value(11, (data >> 4) & 1);  // Lamp 11: D-UP.
-	output().set_lamp_value(12, (data >> 5) & 1);  // Lamp 12: Fever.
+	m_lamps[7] = BIT(data, 0);        // Lamp 7: Bet.
+	m_lamps[8] = BIT(data, 1);   // Lamp 8: Draw.
+	m_lamps[9] = BIT(data, 2);   // Lamp 9: Cancel.
+	m_lamps[10] = BIT(data, 3);  // Lamp 10: Take.
+	m_lamps[11] = BIT(data, 4);  // Lamp 11: D-UP.
+	m_lamps[12] = BIT(data, 5);  // Lamp 12: Fever.
 
 	if (data & 0xc0)
 		logerror("Lamps B: Write to 14h: %02x\n", data);
@@ -758,8 +768,8 @@ void majorpkr_state::palettebanks(address_map &map)
 
 void majorpkr_state::vrambanks(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(this, FUNC(majorpkr_state::fg_vram_w)).share("fg_vram");
-	map(0x0800, 0x0fff).ram().w(this, FUNC(majorpkr_state::bg_vram_w)).share("bg_vram");
+	map(0x0000, 0x07ff).ram().w(FUNC(majorpkr_state::fg_vram_w)).share("fg_vram");
+	map(0x0800, 0x0fff).ram().w(FUNC(majorpkr_state::bg_vram_w)).share("bg_vram");
 	map(0x1000, 0x1fff).ram(); // spare vram? cleared during boot along with fg and bg
 }
 
@@ -787,20 +797,20 @@ void majorpkr_state::vrambanks(address_map &map)
 void majorpkr_state::portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(majorpkr_state::rom_bank_w));
-	map(0x01, 0x01).w(this, FUNC(majorpkr_state::palette_bank_w));
-	map(0x02, 0x02).w(this, FUNC(majorpkr_state::vram_bank_w));
+	map(0x00, 0x00).w(FUNC(majorpkr_state::rom_bank_w));
+	map(0x01, 0x01).w(FUNC(majorpkr_state::palette_bank_w));
+	map(0x02, 0x02).w(FUNC(majorpkr_state::vram_bank_w));
 
-	map(0x10, 0x10).r(this, FUNC(majorpkr_state::mux_port2_r));   // muxed set of controls.
-	map(0x10, 0x10).w(this, FUNC(majorpkr_state::pulses_w));     // kind of watchdog on bit4... mech counters on bits 0-1-2-3.
+	map(0x10, 0x10).r(FUNC(majorpkr_state::mux_port2_r));   // muxed set of controls.
+	map(0x10, 0x10).w(FUNC(majorpkr_state::pulses_w));     // kind of watchdog on bit4... mech counters on bits 0-1-2-3.
 	map(0x11, 0x11).portr("IN1");
-	map(0x11, 0x11).w(this, FUNC(majorpkr_state::mux_sel_w));    // multiplexer selector.
+	map(0x11, 0x11).w(FUNC(majorpkr_state::mux_sel_w));    // multiplexer selector.
 	map(0x12, 0x12).portr("IN2");
-	map(0x12, 0x12).w(this, FUNC(majorpkr_state::vidreg_w));     // video registers: normal or up down screen.
-	map(0x13, 0x13).r(this, FUNC(majorpkr_state::mux_port_r));    // all 4 DIP switches banks multiplexed.
-	map(0x13, 0x13).w(this, FUNC(majorpkr_state::lamps_a_w));    // lamps a out.
+	map(0x12, 0x12).w(FUNC(majorpkr_state::vidreg_w));     // video registers: normal or up down screen.
+	map(0x13, 0x13).r(FUNC(majorpkr_state::mux_port_r));    // all 4 DIP switches banks multiplexed.
+	map(0x13, 0x13).w(FUNC(majorpkr_state::lamps_a_w));    // lamps a out.
 	map(0x14, 0x14).portr("TEST");   // "freeze" switch.
-	map(0x14, 0x14).w(this, FUNC(majorpkr_state::lamps_b_w));    // lamps b out.
+	map(0x14, 0x14).w(FUNC(majorpkr_state::lamps_b_w));    // lamps b out.
 
 	map(0x30, 0x30).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x31, 0x31).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -984,7 +994,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( majorpkr )
+static GFXDECODE_START( gfx_majorpkr )
 	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout, 8*256, 8 )
 	GFXDECODE_ENTRY( "fg_gfx", 0, tilelayout, 0, 8 )
 GFXDECODE_END
@@ -996,26 +1006,15 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(majorpkr_state::majorpkr)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)  // 6 MHz.
-	MCFG_CPU_PROGRAM_MAP(map)
-	MCFG_CPU_IO_MAP(portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", majorpkr_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)  // 6 MHz.
+	MCFG_DEVICE_PROGRAM_MAP(map)
+	MCFG_DEVICE_IO_MAP(portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", majorpkr_state, irq0_line_hold)
 
-	MCFG_DEVICE_ADD("palette_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(palettebanks)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
+	ADDRESS_MAP_BANK(config, "palette_bank").set_map(&majorpkr_state::palettebanks).set_options(ENDIANNESS_LITTLE, 8, 13, 0x800);
+	ADDRESS_MAP_BANK(config, "vram_bank").set_map(&majorpkr_state::vrambanks).set_options(ENDIANNESS_LITTLE, 8, 13, 0x800);
 
-	MCFG_DEVICE_ADD("vram_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vrambanks)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1023,19 +1022,19 @@ MACHINE_CONFIG_START(majorpkr_state::majorpkr)
 	MCFG_SCREEN_UPDATE_DRIVER(majorpkr_state, screen_update_majorpkr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", majorpkr)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_majorpkr);
 
-	MCFG_PALETTE_ADD("palette", 0x100 * 16)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 0x100 * 16);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)  // verified.
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_VISAREA_ADJUST(0, -16, 0, 0)
-	MCFG_MC6845_CHAR_WIDTH(16)
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));  // verified.
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_visarea_adjust(0, -16, 0, 0);
+	crtc.set_char_width(16);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH)  // clock frequency & pin 7 verified.
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH)  // clock frequency & pin 7 verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1181,9 +1180,9 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(majorpkr_state, majorpkr)
+void majorpkr_state::init_majorpkr()
 {
-	uint8_t * ROM = (uint8_t *)memregion("maincpu")->base();
+	uint8_t *ROM = (uint8_t *)memregion("maincpu")->base();
 	m_rom_bank->configure_entries(0, 4, &ROM[0xe000], 0x800);
 }
 
@@ -1192,9 +1191,9 @@ DRIVER_INIT_MEMBER(majorpkr_state, majorpkr)
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY                             FULLNAME                                         FLAGS  LAYOUT */
-GAMEL( 1994, majorpkr,  0,        majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System",                       "Major Poker (set 1, v2.0)",                      0,     layout_majorpkr )
-GAMEL( 1994, majorpkra, majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 2, Micro Manufacturing intro)", 0,     layout_majorpkr )
-GAMEL( 1994, majorpkrb, majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 3, Micro Manufacturing intro)", 0,     layout_majorpkr )
-GAMEL( 1994, majorpkrc, majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 4, Micro Manufacturing intro)", 0,     layout_majorpkr )
-GAMEL( 1994, luckypkr,  majorpkr, majorpkr, majorpkr, majorpkr_state, majorpkr, ROT0, "bootleg",                          "Lucky Poker (bootleg/hack of Major Poker)",      0,     layout_majorpkr )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT           ROT   COMPANY                             FULLNAME                                          FLAGS  LAYOUT */
+GAMEL( 1994, majorpkr,  0,        majorpkr, majorpkr, majorpkr_state, init_majorpkr, ROT0, "PAL System",                       "Major Poker (set 1, v2.0)",                      0,     layout_majorpkr )
+GAMEL( 1994, majorpkra, majorpkr, majorpkr, majorpkr, majorpkr_state, init_majorpkr, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 2, Micro Manufacturing intro)", 0,     layout_majorpkr )
+GAMEL( 1994, majorpkrb, majorpkr, majorpkr, majorpkr, majorpkr_state, init_majorpkr, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 3, Micro Manufacturing intro)", 0,     layout_majorpkr )
+GAMEL( 1994, majorpkrc, majorpkr, majorpkr, majorpkr, majorpkr_state, init_majorpkr, ROT0, "PAL System / Micro Manufacturing", "Major Poker (set 4, Micro Manufacturing intro)", 0,     layout_majorpkr )
+GAMEL( 1994, luckypkr,  majorpkr, majorpkr, majorpkr, majorpkr_state, init_majorpkr, ROT0, "bootleg",                          "Lucky Poker (bootleg/hack of Major Poker)",      0,     layout_majorpkr )

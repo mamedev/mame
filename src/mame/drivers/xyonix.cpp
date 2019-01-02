@@ -24,6 +24,7 @@ TODO:
 
 #include "emu.h"
 #include "includes/xyonix.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "screen.h"
@@ -166,18 +167,18 @@ void xyonix_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xffff).ram().w(this, FUNC(xyonix_state::vidram_w)).share("vidram");
+	map(0xe000, 0xffff).ram().w(FUNC(xyonix_state::vidram_w)).share("vidram");
 }
 
 void xyonix_state::port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x20, 0x20).nopr().w("sn1", FUNC(sn76496_device::write));   /* SN76496 ready signal */
-	map(0x21, 0x21).nopr().w("sn2", FUNC(sn76496_device::write));
-	map(0x40, 0x40).w(this, FUNC(xyonix_state::nmiack_w));
-	map(0x50, 0x50).w(this, FUNC(xyonix_state::irqack_w));
+	map(0x20, 0x20).nopr().w("sn1", FUNC(sn76496_device::command_w));   /* SN76496 ready signal */
+	map(0x21, 0x21).nopr().w("sn2", FUNC(sn76496_device::command_w));
+	map(0x40, 0x40).w(FUNC(xyonix_state::nmiack_w));
+	map(0x50, 0x50).w(FUNC(xyonix_state::irqack_w));
 	map(0x60, 0x61).nopw();        /* mc6845 */
-	map(0xe0, 0xe0).rw(this, FUNC(xyonix_state::io_r), FUNC(xyonix_state::io_w));
+	map(0xe0, 0xe0).rw(FUNC(xyonix_state::io_r), FUNC(xyonix_state::io_w));
 }
 
 /* Inputs Ports **************************************************************/
@@ -238,7 +239,7 @@ static const gfx_layout charlayout =
 	4*16
 };
 
-static GFXDECODE_START( xyonix )
+static GFXDECODE_START( gfx_xyonix )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -248,10 +249,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(xyonix_state::xyonix)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,16000000 / 4)        /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(xyonix_state, irq0_line_assert, 4*60)  /* ?? controls music tempo */
+	MCFG_DEVICE_ADD("maincpu", Z80,16000000 / 4)        /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(port_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(xyonix_state, irq0_line_assert, 4*60)  /* ?? controls music tempo */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -261,20 +262,16 @@ MACHINE_CONFIG_START(xyonix_state::xyonix)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*4-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(xyonix_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(xyonix_state, nmiclk_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xyonix_state, nmiclk_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xyonix)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(xyonix_state, xyonix)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_xyonix);
+	PALETTE(config, "palette", FUNC(xyonix_state::xyonix_palette), 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76496, 16000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_SOUND_ADD("sn2", SN76496, 16000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76496(config, "sn1", 16000000/4).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76496(config, "sn2", 16000000/4).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 /* ROM Loading ***************************************************************/
@@ -296,4 +293,4 @@ ROM_END
 
 /* GAME drivers **************************************************************/
 
-GAME( 1989, xyonix, 0, xyonix, xyonix, xyonix_state, 0, ROT0, "Philko", "Xyonix", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, xyonix, 0, xyonix, xyonix, xyonix_state, empty_init, ROT0, "Philko", "Xyonix", MACHINE_SUPPORTS_SAVE )

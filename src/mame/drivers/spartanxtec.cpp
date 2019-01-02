@@ -25,6 +25,7 @@ probably an original bug?
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -47,13 +48,13 @@ public:
 
 	void spartanxtec(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(spartanxtec);
+	void spartanxtec_palette(palette_device &palette) const;
 
 	DECLARE_WRITE8_MEMBER(kungfum_tileram_w);
 	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
@@ -65,7 +66,6 @@ protected:
 	void spartanxtec_sound_io(address_map &map);
 	void spartanxtec_sound_map(address_map &map);
 
-private:
 	required_shared_ptr<uint8_t> m_m62_tileram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scroll_lo;
@@ -194,14 +194,14 @@ void spartanxtec_state::spartanxtec_map(address_map &map)
 	map(0x8102, 0x8102).portr("SYSTEM");
 	map(0x8103, 0x8103).portr("P1");
 
-	map(0x8200, 0x8200).w(this, FUNC(spartanxtec_state::irq_ack));
+	map(0x8200, 0x8200).w(FUNC(spartanxtec_state::irq_ack));
 
-	map(0xA801, 0xA801).w(this, FUNC(spartanxtec_state::a801_w));
+	map(0xA801, 0xA801).w(FUNC(spartanxtec_state::a801_w));
 
 	map(0xa900, 0xa903).ram().share("scroll_lo");
 	map(0xa980, 0xa983).ram().share("scroll_hi");
 
-	map(0xd000, 0xdfff).ram().w(this, FUNC(spartanxtec_state::kungfum_tileram_w)).share("m62_tileram");
+	map(0xd000, 0xdfff).ram().w(FUNC(spartanxtec_state::kungfum_tileram_w)).share("m62_tileram");
 
 	map(0xe000, 0xefff).ram();
 
@@ -227,7 +227,7 @@ void spartanxtec_state::spartanxtec_sound_map(address_map &map)
 void spartanxtec_state::spartanxtec_sound_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0x0000).w(this, FUNC(spartanxtec_state::sound_irq_ack));
+	map(0x0000, 0x0000).w(FUNC(spartanxtec_state::sound_irq_ack));
 
 	map(0x0012, 0x0013).w("ay3", FUNC(ay8912_device::address_data_w));
 	map(0x0012, 0x0012).r("ay3", FUNC(ay8912_device::data_r));
@@ -328,7 +328,7 @@ static const gfx_layout tiles16x16_layout =
 };
 
 
-static GFXDECODE_START( news )
+static GFXDECODE_START( gfx_news )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x100, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0, 32 )
 GFXDECODE_END
@@ -343,19 +343,17 @@ void spartanxtec_state::machine_reset()
 {
 }
 
-PALETTE_INIT_MEMBER(spartanxtec_state, spartanxtec)
+void spartanxtec_state::spartanxtec_palette(palette_device &palette) const
 {
-	// todo, proper weights for this bootleg PCB
-	const uint8_t *color_prom = memregion("cprom")->base();
+	// TODO proper weights for this bootleg PCB
+	uint8_t const *const color_prom = memregion("cprom")->base();
 	for (int i = 0; i < 0x200; i++)
 	{
-		int r, g, b;
+		int const b = pal4bit(color_prom[i + 0x000] & 0x0f);
+		int const g = pal4bit(color_prom[i + 0x200] & 0x0f);
+		int const r = pal4bit(color_prom[i + 0x400] & 0x0f);
 
-		b = (color_prom[i+0x000]&0x0f)<<4;
-		g = (color_prom[i+0x200]&0x0f)<<4;
-		r = (color_prom[i+0x400]&0x0f)<<4;
-
-		palette.set_pen_color(i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -364,15 +362,15 @@ PALETTE_INIT_MEMBER(spartanxtec_state, spartanxtec)
 MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(spartanxtec_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(spartanxtec_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)
-	MCFG_CPU_PROGRAM_MAP(spartanxtec_sound_map)
-	MCFG_CPU_IO_MAP(spartanxtec_sound_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(spartanxtec_state, irq0_line_assert, 1000) // controls speed of music
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)
+	MCFG_DEVICE_PROGRAM_MAP(spartanxtec_sound_map)
+	MCFG_DEVICE_IO_MAP(spartanxtec_sound_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(spartanxtec_state, irq0_line_assert, 1000) // controls speed of music
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
 
 	/* video hardware */
 	// todo, proper screen timings for this bootleg PCB - as visible area is less it's probably ~60hz, not 55
@@ -382,25 +380,23 @@ MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(spartanxtec_state, screen_update_spartanxtec)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(spartanxtec_state,spartanxtec)
+	PALETTE(config, m_palette, FUNC(spartanxtec_state::spartanxtec_palette), 0x200);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", news)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_news)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_SOUND_ADD("ay1", AY8912, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay2", AY8912, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay3", AY8912, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, "ay1", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	AY8912(config, "ay2", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	AY8912(config, "ay3", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 MACHINE_CONFIG_END
 
@@ -449,4 +445,4 @@ ROM_END
 
 
 
-GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, spartanxtec_state,  0, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )
+GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, spartanxtec_state, empty_init, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )

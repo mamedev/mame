@@ -56,6 +56,7 @@ void sprint8_state::machine_start()
 	save_item(NAME(m_collision_reset));
 	save_item(NAME(m_collision_index));
 	save_item(NAME(m_dial));
+	save_item(NAME(m_team));
 }
 
 void sprint8_state::machine_reset()
@@ -112,16 +113,16 @@ WRITE_LINE_MEMBER(sprint8_state::team_w)
 void sprint8_state::sprint8_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram();
-	map(0x1800, 0x1bff).ram().w(this, FUNC(sprint8_state::video_ram_w)).share("video_ram");
-	map(0x1c00, 0x1c00).r(this, FUNC(sprint8_state::collision_r));
-	map(0x1c01, 0x1c08).r(this, FUNC(sprint8_state::input_r));
+	map(0x1800, 0x1bff).ram().w(FUNC(sprint8_state::video_ram_w)).share("video_ram");
+	map(0x1c00, 0x1c00).r(FUNC(sprint8_state::collision_r));
+	map(0x1c01, 0x1c08).r(FUNC(sprint8_state::input_r));
 	map(0x1c09, 0x1c09).portr("IN0");
 	map(0x1c0a, 0x1c0a).portr("IN1");
 	map(0x1c0f, 0x1c0f).portr("VBLANK");
 	map(0x1c00, 0x1c0f).writeonly().share("pos_h_ram");
 	map(0x1c10, 0x1c1f).writeonly().share("pos_v_ram");
 	map(0x1c20, 0x1c2f).writeonly().share("pos_d_ram");
-	map(0x1c30, 0x1c37).w(this, FUNC(sprint8_state::lockout_w));
+	map(0x1c30, 0x1c37).w(FUNC(sprint8_state::lockout_w));
 	map(0x1d00, 0x1d07).w("latch", FUNC(f9334_device::write_d0));
 	map(0x1e00, 0x1e07).w("motor", FUNC(f9334_device::write_d0));
 	map(0x1f00, 0x1f00).nopw(); /* probably a watchdog, disabled in service mode */
@@ -448,7 +449,7 @@ static const gfx_layout car_layout =
 };
 
 
-static GFXDECODE_START( sprint8 )
+static GFXDECODE_START( gfx_sprint8 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_1, 0, 18 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_2, 0, 18 )
 	GFXDECODE_ENTRY( "gfx2", 0, car_layout, 0, 16 )
@@ -458,8 +459,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sprint8_state::sprint8)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 11055000 / 11) /* ? */
-	MCFG_CPU_PROGRAM_MAP(sprint8_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 11055000 / 11) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(sprint8_map)
 
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("input_timer", sprint8_state, input_callback, attotime::from_hz(60))
@@ -470,13 +471,11 @@ MACHINE_CONFIG_START(sprint8_state::sprint8)
 	MCFG_SCREEN_SIZE(512, 261)
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 231)
 	MCFG_SCREEN_UPDATE_DRIVER(sprint8_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sprint8_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint8_state, screen_vblank))
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprint8)
-	MCFG_PALETTE_ADD("palette", 36)
-	MCFG_PALETTE_INDIRECT_ENTRIES(18)
-	MCFG_PALETTE_INIT_OWNER(sprint8_state, sprint8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sprint8)
+	PALETTE(config, m_palette, FUNC(sprint8_state::sprint8_palette), 36, 18);
 
 	sprint8_audio(config);
 MACHINE_CONFIG_END
@@ -515,5 +514,5 @@ ROM_START( sprint8a )
 ROM_END
 
 
-GAME( 1977, sprint8,  0,       sprint8, sprint8,  sprint8_state, 0, ROT0, "Atari", "Sprint 8",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1977, sprint8a, sprint8, sprint8, sprint8p, sprint8_state, 0, ROT0, "Atari", "Sprint 8 (play tag & chase)", MACHINE_SUPPORTS_SAVE )
+GAME( 1977, sprint8,  0,       sprint8, sprint8,  sprint8_state, empty_init, ROT0, "Atari", "Sprint 8",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1977, sprint8a, sprint8, sprint8, sprint8p, sprint8_state, empty_init, ROT0, "Atari", "Sprint 8 (play tag & chase)", MACHINE_SUPPORTS_SAVE )

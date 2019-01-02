@@ -36,12 +36,15 @@ public:
 	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) override;
 	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask) override;
 
+	DECLARE_WRITE_LINE_MEMBER(smi_act_w);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	void i82439tx_configure_memory(uint8_t val, offs_t begin, offs_t end);
+	void update_smram_mappings();
 
 private:
 	const char *m_cpu_tag;
@@ -52,9 +55,25 @@ private:
 
 	uint32_t m_regs[8*256];
 	uint32_t m_bios_ram[0x40000 / 4];
+
+	// system management ram setup
+	struct {
+		int tseg_en;
+		int tseg_sz;
+		int e_smerr;
+		int h_smrame;
+		int c_base_seg;
+		int g_smrame;
+		int d_lck;
+		int d_cls;
+		int d_open;
+		int smiact_n;
+		int tseg_size;
+		int mapping;
+	} m_smram;
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(I82439TX, i82439tx_device)
+DECLARE_DEVICE_TYPE(I82439TX_LEGACY, i82439tx_device)
 
 #endif // MAME_BUS_LPCI_I82439TX_H

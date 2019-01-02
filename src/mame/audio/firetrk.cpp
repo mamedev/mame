@@ -17,50 +17,50 @@ WRITE8_MEMBER(firetrk_state::firetrk_skid_reset_w)
 	m_skid[1] = 0;
 
 	// also SUPERBUG_SKID_EN
-	m_discrete->write(space, FIRETRUCK_SKID_EN, 1);
+	m_discrete->write(FIRETRUCK_SKID_EN, 1);
 }
 
 
 WRITE8_MEMBER(firetrk_state::montecar_skid_reset_w)
 {
-	m_discrete->write(space, MONTECAR_SKID_EN, 1);
+	m_discrete->write(MONTECAR_SKID_EN, 1);
 }
 
 
 WRITE8_MEMBER(firetrk_state::firetrk_crash_snd_w)
 {
 	// also SUPERBUG_CRASH_DATA and MONTECAR_CRASH_DATA
-	m_discrete->write(space, FIRETRUCK_CRASH_DATA, data >> 4);
+	m_discrete->write(FIRETRUCK_CRASH_DATA, data >> 4);
 }
 
 
 WRITE8_MEMBER(firetrk_state::firetrk_skid_snd_w)
 {
 	// also SUPERBUG_SKID_EN and MONTECAR_SKID_EN
-	m_discrete->write(space, FIRETRUCK_SKID_EN, 0);
+	m_discrete->write(FIRETRUCK_SKID_EN, 0);
 }
 
 
 WRITE8_MEMBER(firetrk_state::firetrk_motor_snd_w)
 {
 	// also MONTECAR_DRONE_MOTOR_DATA
-	m_discrete->write(space, FIRETRUCK_SIREN_DATA, data >> 4);
+	m_discrete->write(FIRETRUCK_SIREN_DATA, data >> 4);
 
 	// also MONTECAR_MOTOR_DATA
-	m_discrete->write(space, FIRETRUCK_MOTOR_DATA, data & 0x0f);
+	m_discrete->write(FIRETRUCK_MOTOR_DATA, data & 0x0f);
 }
 
 
 WRITE8_MEMBER(firetrk_state::superbug_motor_snd_w)
 {
-	m_discrete->write(space, SUPERBUG_SPEED_DATA, data & 0x0f);
+	m_discrete->write(SUPERBUG_SPEED_DATA, data & 0x0f);
 }
 
 
 WRITE8_MEMBER(firetrk_state::firetrk_xtndply_w)
 {
 	// also SUPERBUG_ASR_EN (extended play)
-	m_discrete->write(space, FIRETRUCK_XTNDPLY_EN, data);
+	m_discrete->write(FIRETRUCK_XTNDPLY_EN, data);
 }
 
 
@@ -180,7 +180,7 @@ static const discrete_mixer_desc firetrk_mixer =
 #define FIRETRUCK_BELLSND       NODE_17
 #define FIRETRUCK_XTNDPLYSND    NODE_18
 
-DISCRETE_SOUND_START(firetrk)
+DISCRETE_SOUND_START(firetrk_discrete)
 	/************************************************/
 	/* Input register mapping for firetruck         */
 	/************************************************/
@@ -387,7 +387,7 @@ static const discrete_mixer_desc superbug_mixer =
 #define SUPERBUG_SCREECHSND     NODE_13
 #define SUPERBUG_ASRSND         NODE_14
 
-DISCRETE_SOUND_START(superbug)
+DISCRETE_SOUND_START(superbug_discrete)
 	/************************************************/
 	/* Input register mapping for superbug          */
 	/************************************************/
@@ -568,7 +568,7 @@ static const discrete_mixer_desc montecar_mixer =
 #define MONTECAR_BANGSND            NODE_13
 #define MONTECAR_SCREECHSND         NODE_14
 
-DISCRETE_SOUND_START(montecar)
+DISCRETE_SOUND_START(montecar_discrete)
 	/************************************************/
 	/* Input register mapping for montecar          */
 	/************************************************/

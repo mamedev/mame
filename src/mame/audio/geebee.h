@@ -38,6 +38,6 @@ private:
 	int m_vcount;
 };
 
-DECLARE_DEVICE_TYPE(GEEBEE, geebee_sound_device)
+DECLARE_DEVICE_TYPE(GEEBEE_SOUND, geebee_sound_device)
 
 #endif // MAME_AUDIO_GEEBEE_H

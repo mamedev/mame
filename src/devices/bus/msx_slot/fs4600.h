@@ -14,7 +14,7 @@ DECLARE_DEVICE_TYPE(MSX_SLOT_FS4600, msx_slot_fs4600_device)
 
 #define MCFG_MSX_SLOT_FS4600_ADD(_tag, _startpage, _numpages, _region, _offset) \
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_FS4600, _startpage, _numpages) \
-	downcast<msx_slot_fs4600_device &>(*device).set_rom_start("^" _region, _offset);
+	downcast<msx_slot_fs4600_device &>(*device).set_rom_start(_region, _offset);
 
 class msx_slot_fs4600_device : public device_t, public msx_internal_slot_interface
 {

@@ -418,12 +418,13 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -438,7 +439,7 @@ class avt_state : public driver_device
 public:
 	avt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this,"maincpu")
+		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
 		, m_pio0(*this, "pio0")
 		, m_pio1(*this, "pio1")
@@ -446,8 +447,15 @@ public:
 		, m_colorram(*this, "colorram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		{ }
+	{ }
 
+	void avtnfl(machine_config &config);
+	void avt(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(avt_6845_address_w);
 	DECLARE_WRITE8_MEMBER(avt_6845_data_w);
 	DECLARE_READ8_MEMBER( avt_6845_data_r );
@@ -456,18 +464,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(avtnfl_w);
 	DECLARE_WRITE_LINE_MEMBER(avtbingo_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_PALETTE_INIT(avt);
+	void avt_palette(palette_device &palette) const;
 	uint32_t screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void avtnfl(machine_config &config);
-	void avt(machine_config &config);
 	void avt_map(address_map &map);
 	void avt_portmap(address_map &map);
-private:
+
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
-	virtual void video_start() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<z80pio_device> m_pio0;
 	required_device<z80pio_device> m_pio1;
@@ -560,50 +565,43 @@ uint32_t avt_state::screen_update_avt(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-PALETTE_INIT_MEMBER(avt_state, avt)
+void avt_state::avt_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-/*  prom bits
-    7654 3210
-    ---- ---x   Intensity?.
-    ---- --x-   Red component.
-    ---- -x--   Green component.
-    ---- x---   Blue component.
-    xxxx ----   Unused.
-*/
-	int j;
+	/*  prom bits
+		7654 3210
+		---- ---x   Intensity?.
+		---- --x-   Red component.
+		---- -x--   Green component.
+		---- x---   Blue component.
+		xxxx ----   Unused.
+	*/
 
 	/* 0000BGRI */
-	if (color_prom == nullptr) return;
+	const uint8_t *color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
 
-	for (j = 0; j < palette.entries(); j++)
+	for (int j = 0; j < palette.entries(); j++)
 	{
-		int bit1, bit2, bit3, r, g, b, inten, intenmin, intenmax, i;
+		constexpr int intenmin = 0xe0;
+		constexpr int intenmax = 0xff;
 
-		intenmin = 0xe0;
-		intenmax = 0xff;
+		int const i = ((j & 0x7) << 4) | ((j & 0x78) >> 3);
 
-		i = ((j & 0x7) << 4) | ((j & 0x78) >> 3);
+		// intensity component
+//      int const inten = BIT(~color_prom[i], 0);
+		int const inten = BIT(color_prom[i], 0);
 
+		// red component
+		int const r = BIT(color_prom[i], 1) * (inten ? intenmax : intenmin);
 
-		/* intensity component */
-//      inten = 1 - (color_prom[i] & 0x01);
-		inten = (color_prom[i] & 0x01);
+		// green component
+		int const g = BIT(color_prom[i], 2) * (inten ? intenmax : intenmin);
 
-		/* red component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		r = (bit1 * intenmin) + (inten * (bit1 * (intenmax - intenmin)));
+		// blue component
+		int const b = BIT(color_prom[i], 3) * (inten ? intenmax : intenmin);
 
-		/* green component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		g = (bit2 * intenmin) + (inten * (bit2 * (intenmax - intenmin)));
-
-		/* blue component */
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		b = (bit3 * intenmin) + (inten * (bit3 * (intenmax - intenmin)));
-
-
-		/* hack to switch cyan->magenta for highlighted background */
+		// hack to switch cyan->magenta for highlighted background
 		if (j == 0x40)
 			palette.set_pen_color(j, rgb_t(g, r, b)); // Why this one has R-G swapped?...
 		else
@@ -651,8 +649,8 @@ void avt_state::avt_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x7fff).ram();
 	map(0x8000, 0x9fff).ram(); // AM_SHARE("nvram")
-	map(0xa000, 0xa7ff).ram().w(this, FUNC(avt_state::avt_videoram_w)).share("videoram");
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(avt_state::avt_colorram_w)).share("colorram");
+	map(0xa000, 0xa7ff).ram().w(FUNC(avt_state::avt_videoram_w)).share("videoram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(avt_state::avt_colorram_w)).share("colorram");
 }
 
 void avt_state::avt_portmap(address_map &map)
@@ -663,8 +661,8 @@ void avt_state::avt_portmap(address_map &map)
 	map(0x0c, 0x0f).rw("ctc0", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x21, 0x21).w("aysnd", FUNC(ay8910_device::data_w));     /* AY8910 data */
 	map(0x23, 0x23).w("aysnd", FUNC(ay8910_device::address_w));      /* AY8910 control */
-	map(0x28, 0x28).w(this, FUNC(avt_state::avt_6845_address_w));
-	map(0x29, 0x29).rw(this, FUNC(avt_state::avt_6845_data_r), FUNC(avt_state::avt_6845_data_w));
+	map(0x28, 0x28).w(FUNC(avt_state::avt_6845_address_w));
+	map(0x29, 0x29).rw(FUNC(avt_state::avt_6845_data_r), FUNC(avt_state::avt_6845_data_w));
 }
 
 /* I/O byte R/W
@@ -935,7 +933,7 @@ static const gfx_layout tilelayout =
 *           Graphics Decode Information           *
 **************************************************/
 
-static GFXDECODE_START( avt )
+static GFXDECODE_START( gfx_avt )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
 GFXDECODE_END
 
@@ -960,10 +958,10 @@ WRITE_LINE_MEMBER( avt_state::avtbingo_w )
 
 MACHINE_CONFIG_START(avt_state::avt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(avt_map)
-	MCFG_CPU_IO_MAP(avt_portmap)
+	Z80(config, m_maincpu, CPU_CLOCK); /* guess */
+	m_maincpu->set_daisy_config(daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &avt_state::avt_map);
+	m_maincpu->set_addrmap(AS_IO, &avt_state::avt_portmap);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -972,38 +970,37 @@ MACHINE_CONFIG_START(avt_state::avt)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)  /* 240x224 (through CRTC) */
 	MCFG_SCREEN_UPDATE_DRIVER(avt_state, screen_update_avt)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", avt)
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 8*16)
-	MCFG_PALETTE_INIT_OWNER(avt_state, avt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_avt);
+	PALETTE(config, m_palette, FUNC(avt_state::avt_palette), 8*16);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("ctc0", z80ctc_device, trg3))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(avt_state, avtbingo_w))
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK)); // guess
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set("ctc0", FUNC(z80ctc_device::trg3));
+	crtc.out_vsync_callback().append(FUNC(avt_state::avtbingo_w));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, CPU_CLOCK/2)    /* 1.25 MHz.?? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, "aysnd", CPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 1.00);    /* 1.25 MHz.?? */
 
 	// device never addressed by cpu
-	MCFG_DEVICE_ADD("ctc0", Z80CTC, CPU_CLOCK) // U27
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc0", z80ctc_device, trg1))
+	z80ctc_device& ctc(Z80CTC(config, "ctc0", CPU_CLOCK)); // U27
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set("ctc0", FUNC(z80ctc_device::trg1));
 	// ZC1 not connected
 	// TRG2 to TP18; ZC2 to TP9; TRG3 to VSYNC; TRG0 to cpu_clock/4
 
-	MCFG_DEVICE_ADD("pio0", Z80PIO, CPU_CLOCK) // U23
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PB_CB(IOPORT("IN0"))
+	Z80PIO(config, m_pio0, CPU_CLOCK); // U23
+	m_pio0->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio0->in_pb_callback().set_ioport("IN0");
 	// PORT A appears to be lamp drivers
 	// PORT B d0-d5 = muxed inputs; d6 = SW2 pushbutton; d7 = ?
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, CPU_CLOCK) // U22
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_pio1, CPU_CLOCK); // U22
+	m_pio1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// PORT A d0-d7 = TP13,TP12,TP11,TP10,TP8,TP7,TP5,TP3
 	// PORT B d0-d7 = "Player2", DCOM, CCOM, BCOM, ACOM, LOCKOUT/TP6, TP4, 50/60HZ (held high, jumper on JP13 grounds it)
 	// DCOM,CCOM,BCOM,ACOM appear to be muxes
@@ -1015,15 +1012,17 @@ WRITE_LINE_MEMBER( avt_state::avtnfl_w )
 	m_pio1->port_b_write((m_pio1->port_b_read() & 0xbf) | (state ? 0x40 : 0));
 }
 
-MACHINE_CONFIG_START(avt_state::avtnfl)
+void avt_state::avtnfl(machine_config &config)
+{
 	avt(config);
-	MCFG_DEVICE_REMOVE("crtc")
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("ctc0", z80ctc_device, trg3))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(avt_state, avtnfl_w))
-MACHINE_CONFIG_END
+
+	mc6845_device &crtc(MC6845(config.replace(), "crtc", CRTC_CLOCK)); // guess
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set("ctc0", FUNC(z80ctc_device::trg3));
+	crtc.out_vsync_callback().append(FUNC(avt_state::avtnfl_w));
+}
 
 /*********************************************
 *                  Rom Load                  *
@@ -1095,8 +1094,8 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE       INIT  ROT   COMPANY                      FULLNAME             FLAGS */
-GAME( 1985, avtsym14, 0,        avt,      symbols,  avt_state,  0,    ROT0, "Advanced Video Technology", "Symbols (ver 1.4)", MACHINE_NOT_WORKING )
-GAME( 1985, avtsym25, avtsym14, avt,      symbols,  avt_state,  0,    ROT0, "Advanced Video Technology", "Symbols (ver 2.5)", MACHINE_NOT_WORKING )
-GAME( 1985, avtbingo, 0,        avt,      avtbingo, avt_state,  0,    ROT0, "Advanced Video Technology", "Arrow Bingo",       MACHINE_NOT_WORKING )
-GAME( 1989, avtnfl,   0,        avtnfl,   symbols,  avt_state,  0,    ROT0, "Advanced Video Technology", "NFL (ver 109)",     MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE       INIT        ROT   COMPANY                      FULLNAME             FLAGS */
+GAME( 1985, avtsym14, 0,        avt,      symbols,  avt_state,  empty_init, ROT0, "Advanced Video Technology", "Symbols (ver 1.4)", MACHINE_NOT_WORKING )
+GAME( 1985, avtsym25, avtsym14, avt,      symbols,  avt_state,  empty_init, ROT0, "Advanced Video Technology", "Symbols (ver 2.5)", MACHINE_NOT_WORKING )
+GAME( 1985, avtbingo, 0,        avt,      avtbingo, avt_state,  empty_init, ROT0, "Advanced Video Technology", "Arrow Bingo",       MACHINE_NOT_WORKING )
+GAME( 1989, avtnfl,   0,        avtnfl,   symbols,  avt_state,  empty_init, ROT0, "Advanced Video Technology", "NFL (ver 109)",     MACHINE_NOT_WORKING )

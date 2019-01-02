@@ -8,7 +8,6 @@
 #include "bus/msx_cart/cartridge.h"
 #include "machine/wd_fdc.h"
 #include "machine/upd765.h"
-#include "imagedev/flopdrv.h"
 #include "imagedev/floppy.h"
 
 
@@ -58,6 +57,7 @@ protected:
 
 	void post_load();
 
+	output_finder<> m_led;
 	uint8_t m_side_control;
 	uint8_t m_control;
 
@@ -81,6 +81,7 @@ protected:
 
 	void post_load();
 
+	output_finder<> m_led;
 	uint8_t m_control;
 
 	void set_control(uint8_t data);

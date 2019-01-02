@@ -51,6 +51,7 @@ TODO:
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
 //#include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -62,20 +63,30 @@ class molecula_state : public driver_device
 {
 public:
 	molecula_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_filecpu(*this, "filecpu")
+		: driver_device(mconfig, type, tag)
+		, m_filecpu(*this, "filecpu")
 	{ }
 
+	void molecula(machine_config &config);
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	// devices
 	required_device<cpu_device> m_filecpu;
-
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t *m_file_rom;
 	uint8_t *m_app_rom;
 	std::unique_ptr<uint8_t[]> m_file_ram;
 	std::unique_ptr<uint8_t[]> m_app_ram;
+
+	// screen updates
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	DECLARE_READ8_MEMBER(file_r);
 	DECLARE_WRITE8_MEMBER(file_w);
 
@@ -91,19 +102,12 @@ public:
 	uint8_t app_ram_enable;
 	uint8_t file_ram_enable;
 
-	DECLARE_PALETTE_INIT(molecula);
+	void molecula_palette(palette_device &palette) const;
 
-	void molecula(machine_config &config);
 	void molecula_app_io(address_map &map);
 	void molecula_app_map(address_map &map);
 	void molecula_file_io(address_map &map);
 	void molecula_file_map(address_map &map);
-protected:
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void video_start() override;
 };
 
 void molecula_state::video_start()
@@ -177,26 +181,26 @@ WRITE8_MEMBER( molecula_state::sio_w)
 
 void molecula_state::molecula_file_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(molecula_state::file_r), FUNC(molecula_state::file_w));
+	map(0x0000, 0xffff).rw(FUNC(molecula_state::file_r), FUNC(molecula_state::file_w));
 }
 
 void molecula_state::molecula_file_io(address_map &map)
 {
 	map.global_mask(0xff);
 //  AM_RANGE(0x40, 0x43) AM_READWRITE(sio_r,sio_w)
-	map(0x72, 0x73).w(this, FUNC(molecula_state::file_output_w)); // unknown
+	map(0x72, 0x73).w(FUNC(molecula_state::file_output_w)); // unknown
 }
 
 void molecula_state::molecula_app_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(molecula_state::app_r), FUNC(molecula_state::app_w));
+	map(0x0000, 0xffff).rw(FUNC(molecula_state::app_r), FUNC(molecula_state::app_w));
 }
 
 void molecula_state::molecula_app_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x10).w(this, FUNC(molecula_state::app_output_w));
-	map(0x60, 0x63).rw(this, FUNC(molecula_state::sio_r), FUNC(molecula_state::sio_w));
+	map(0x10, 0x10).w(FUNC(molecula_state::app_output_w));
+	map(0x60, 0x63).rw(FUNC(molecula_state::sio_r), FUNC(molecula_state::sio_w));
 }
 
 static INPUT_PORTS_START( molecula )
@@ -268,7 +272,7 @@ static const gfx_layout charlayout =
 };
 #endif
 
-static GFXDECODE_START( molecula )
+static GFXDECODE_START( gfx_molecula )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -289,25 +293,25 @@ void molecula_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(molecula_state, molecula)
+void molecula_state::molecula_palette(palette_device &palette) const
 {
 }
 
 MACHINE_CONFIG_START(molecula_state::molecula)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("filecpu",Z80,Z80_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(molecula_file_map)
-	MCFG_CPU_IO_MAP(molecula_file_io)
+	MCFG_DEVICE_ADD("filecpu",Z80,Z80_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(molecula_file_map)
+	MCFG_DEVICE_IO_MAP(molecula_file_io)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_CPU_ADD("appcpu",Z80,Z80_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(molecula_app_map)
-	MCFG_CPU_IO_MAP(molecula_app_io)
+	MCFG_DEVICE_ADD("appcpu",Z80,Z80_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(molecula_app_map)
+	MCFG_DEVICE_IO_MAP(molecula_app_io)
 
-//  MCFG_CPU_ADD("sub",I8086,I86_CLOCK/2)
-//  MCFG_CPU_PROGRAM_MAP(molecula_map)
-//  MCFG_CPU_IO_MAP(molecula_io)
+//  MCFG_DEVICE_ADD("sub",I8086,I86_CLOCK/2)
+//  MCFG_DEVICE_PROGRAM_MAP(molecula_map)
+//  MCFG_DEVICE_IO_MAP(molecula_io)
 //  MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
@@ -319,15 +323,13 @@ MACHINE_CONFIG_START(molecula_state::molecula)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", molecula)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_molecula)
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(molecula_state, molecula)
+	PALETTE(config, "palette", FUNC(molecula_state::molecula_palette), 8);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	SPEAKER(config, "mono").front_center();
+//  AY8910(config, "aysnd", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 
@@ -364,4 +366,4 @@ ROM_START( molecula )
 	ROM_LOAD( "wait_16r4.jed", 0x000000, 0x00caef, CRC(3aacfeb4) SHA1(1af1a8046e5a8a0337c85b55adceaef6e45702b7) )
 ROM_END
 
-COMP( 1982, molecula,  0,   0,   molecula,  molecula, molecula_state,  0,  "MOLECULAR",      "MOLECULAR Computer", MACHINE_IS_SKELETON )
+COMP( 1982, molecula, 0, 0, molecula, molecula, molecula_state, empty_init, "MOLECULAR", "MOLECULAR Computer", MACHINE_IS_SKELETON )

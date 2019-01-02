@@ -439,9 +439,9 @@ public:
 
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
 
-	DECLARE_DRIVER_INIT(snspell);
-	DECLARE_DRIVER_INIT(tntell);
-	DECLARE_DRIVER_INIT(lantutor);
+	void init_snspell();
+	void init_tntell();
+	void init_lantutor();
 
 	// machine configs
 	void tms5110_route(machine_config &config);
@@ -459,7 +459,7 @@ public:
 	void lantutor(machine_config &config);
 	void k28m2(machine_config &config);
 
-protected:
+private:
 	virtual void power_off() override;
 	void prepare_display();
 	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
@@ -488,7 +488,6 @@ protected:
 
 	virtual void machine_start() override;
 
-private:
 	// devices
 	required_device<tms5110_device> m_tms5100;
 	required_device<tms6100_device> m_tms6100;
@@ -551,19 +550,19 @@ DEVICE_IMAGE_LOAD_MEMBER(tispeak_state, tispeak_cartridge)
 }
 
 
-DRIVER_INIT_MEMBER(tispeak_state, snspell)
+void tispeak_state::init_snspell()
 {
 	m_cart_max_size = 0x4000;
 	m_cart_base = memregion("tms6100")->base() + 0x8000;
 }
 
-DRIVER_INIT_MEMBER(tispeak_state, tntell)
+void tispeak_state::init_tntell()
 {
 	m_cart_max_size = 0x4000;
 	m_cart_base = memregion("tms6100")->base() + 0x4000;
 }
 
-DRIVER_INIT_MEMBER(tispeak_state, lantutor)
+void tispeak_state::init_lantutor()
 {
 	m_cart_max_size = 0x10000;
 	m_cart_base = memregion("tms6100")->base();
@@ -1269,219 +1268,218 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(tispeak_state::tms5110_route)
-
+void tispeak_state::tms5110_route(machine_config &config)
+{
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("tms5100")
-	MCFG_TMS5110_M0_CB(DEVWRITELINE("tms6100", tms6100_device, m0_w))
-	MCFG_TMS5110_M1_CB(DEVWRITELINE("tms6100", tms6100_device, m1_w))
-	MCFG_TMS5110_ADDR_CB(DEVWRITE8("tms6100", tms6100_device, add_w))
-	MCFG_TMS5110_DATA_CB(DEVREADLINE("tms6100", tms6100_device, data_line_r))
-	MCFG_TMS5110_ROMCLK_CB(DEVWRITELINE("tms6100", tms6100_device, clk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	m_tms5100->m0().set(m_tms6100, FUNC(tms6100_device::m0_w));
+	m_tms5100->m1().set(m_tms6100, FUNC(tms6100_device::m1_w));
+	m_tms5100->addr().set(m_tms6100, FUNC(tms6100_device::add_w));
+	m_tms5100->data().set(m_tms6100, FUNC(tms6100_device::data_line_r));
+	m_tms5100->romclk().set(m_tms6100, FUNC(tms6100_device::clk_w));
+	m_tms5100->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
-MACHINE_CONFIG_START(tispeak_state::snmath)
-
+void tispeak_state::snmath(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0270, MASTER_CLOCK/2)
-	MCFG_TMS1XXX_READ_K_CB(READ8(tispeak_state, snspell_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snmath_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, snspell_write_r))
+	tms0270_cpu_device &tms(TMS0270(config, m_maincpu, MASTER_CLOCK/2));
+	tms.k().set(FUNC(tispeak_state::snspell_read_k));
+	tms.o().set(FUNC(tispeak_state::snmath_write_o));
+	tms.r().set(FUNC(tispeak_state::snspell_write_r));
 
-	MCFG_TMS0270_READ_CTL_CB(DEVREAD8("tms5100", tms5110_device, ctl_r))
-	MCFG_TMS0270_WRITE_CTL_CB(DEVWRITE8("tms5100", tms5110_device, ctl_w))
-	MCFG_TMS0270_WRITE_PDC_CB(DEVWRITELINE("tms5100", tms5110_device, pdc_w))
+	tms.read_ctl().set("tms5100", FUNC(tms5110_device::ctl_r));
+	tms.write_ctl().set("tms5100", FUNC(tms5110_device::ctl_w));
+	tms.write_pdc().set("tms5100", FUNC(tms5110_device::pdc_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_snmath)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_snmath);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
+	TMS6100(config, m_tms6100, MASTER_CLOCK/4);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5100", CD2801, MASTER_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	CD2801(config, m_tms5100, MASTER_CLOCK);
 	tms5110_route(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(tispeak_state::sns_cd2801)
+void tispeak_state::sns_cd2801(machine_config &config)
+{
 	snmath(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspell_write_o))
+	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
 
-	MCFG_DEFAULT_LAYOUT(layout_snspell)
+	config.set_default_layout(layout_snspell);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "snspell")
-	MCFG_GENERIC_EXTENSIONS("vsm")
-	MCFG_GENERIC_LOAD(tispeak_state, tispeak_cartridge)
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm");
+	m_cart->set_device_load(device_image_load_delegate(&tispeak_state::device_image_load_tispeak_cartridge, this));
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "snspell")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("snspell");
+}
 
-MACHINE_CONFIG_START(tispeak_state::snspellit)
+void tispeak_state::snspellit(machine_config &config)
+{
 	sns_cd2801(config);
 
 	/* basic machine hardware */
-	MCFG_DEFAULT_LAYOUT(layout_snmath)
-MACHINE_CONFIG_END
+	config.set_default_layout(layout_snmath);
+}
 
-MACHINE_CONFIG_START(tispeak_state::sns_tmc0281)
+void tispeak_state::sns_tmc0281(machine_config &config)
+{
 	sns_cd2801(config);
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("tms5100", TMC0281, MASTER_CLOCK)
+	TMC0281(config.replace(), m_tms5100, MASTER_CLOCK);
 	tms5110_route(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tispeak_state::snspellsp)
+void tispeak_state::snspellsp(machine_config &config)
+{
 	sns_tmc0281(config);
 
 	/* basic machine hardware */
-	MCFG_DEFAULT_LAYOUT(layout_snspellsp)
-MACHINE_CONFIG_END
+	config.set_default_layout(layout_snspellsp);
+}
 
-MACHINE_CONFIG_START(tispeak_state::sns_tmc0281d)
+void tispeak_state::sns_tmc0281d(machine_config &config)
+{
 	sns_cd2801(config);
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("tms5100", TMC0281D, MASTER_CLOCK)
+	TMC0281D(config.replace(), m_tms5100, MASTER_CLOCK);
 	tms5110_route(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(tispeak_state::snread)
+void tispeak_state::snread(machine_config &config)
+{
 	snmath(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspell_write_o))
+	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
 
-	MCFG_DEFAULT_LAYOUT(layout_snread)
+	config.set_default_layout(layout_snread);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "snread")
-	MCFG_GENERIC_EXTENSIONS("vsm")
-	MCFG_GENERIC_LOAD(tispeak_state, tispeak_cartridge)
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snread", "vsm");
+	m_cart->set_device_load(device_image_load_delegate(&tispeak_state::device_image_load_tispeak_cartridge, this));
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "snread")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("snread");
+}
 
 
-MACHINE_CONFIG_START(tispeak_state::lantutor)
+void tispeak_state::lantutor(machine_config &config)
+{
 	snmath(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspell_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, lantutor_write_r))
+	m_maincpu->o().set(FUNC(tispeak_state::snspell_write_o));
+	m_maincpu->r().set(FUNC(tispeak_state::lantutor_write_r));
 
-	MCFG_DEFAULT_LAYOUT(layout_snread)
+	config.set_default_layout(layout_snread);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "lantutor")
-	MCFG_GENERIC_MANDATORY
-	MCFG_GENERIC_EXTENSIONS("vsm,bin")
-	MCFG_GENERIC_LOAD(tispeak_state, tispeak_cartridge)
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "lantutor", "vsm,bin");
+	m_cart->set_must_be_loaded(true);
+	m_cart->set_device_load(device_image_load_delegate(&tispeak_state::device_image_load_tispeak_cartridge, this));
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "lantutor")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("lantutor");
+}
 
 
-MACHINE_CONFIG_START(tispeak_state::snspellc)
-
+void tispeak_state::snspellc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, MASTER_CLOCK/2)
-	MCFG_TMS1XXX_READ_K_CB(READ8(tispeak_state, snspellc_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspellc_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, snspellc_write_r))
+	TMS1100(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->k().set(FUNC(tispeak_state::snspellc_read_k));
+	m_maincpu->o().set(FUNC(tispeak_state::snspellc_write_o));
+	m_maincpu->r().set(FUNC(tispeak_state::snspellc_write_r));
 
 	/* no visual feedback! */
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
+	TMS6100(config, m_tms6100, MASTER_CLOCK/4);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5100", TMC0281D, MASTER_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	TMC0281D(config, m_tms5100, MASTER_CLOCK);
 	tms5110_route(config);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "snspell")
-	MCFG_GENERIC_EXTENSIONS("vsm")
-	MCFG_GENERIC_LOAD(tispeak_state, tispeak_cartridge)
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "snspell", "vsm");
+	m_cart->set_device_load(device_image_load_delegate(&tispeak_state::device_image_load_tispeak_cartridge, this));
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "snspell")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("snspell");
+}
 
-MACHINE_CONFIG_START(tispeak_state::snspellcuk)
+void tispeak_state::snspellcuk(machine_config &config)
+{
 	snspellc(config);
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("tms5100", CD2801, MASTER_CLOCK) // CD2801A!
+	CD2801(config.replace(), m_tms5100, MASTER_CLOCK); // CD2801A!
 	tms5110_route(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(tispeak_state::vocaid)
-
+void tispeak_state::vocaid(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, MASTER_CLOCK/2)
-	MCFG_TMS1XXX_READ_K_CB(READ8(tispeak_state, tntell_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, snspellc_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, snspellc_write_r))
+	TMS1100(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->k().set(FUNC(tispeak_state::tntell_read_k));
+	m_maincpu->o().set(FUNC(tispeak_state::snspellc_write_o));
+	m_maincpu->r().set(FUNC(tispeak_state::snspellc_write_r));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ol_timer", tispeak_state, tntell_get_overlay, attotime::from_msec(50))
-	MCFG_DEFAULT_LAYOUT(layout_tntell)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	TIMER(config, "ol_timer").configure_periodic(FUNC(tispeak_state::tntell_get_overlay), attotime::from_msec(50));
+	config.set_default_layout(layout_tntell);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
+	TMS6100(config, m_tms6100, MASTER_CLOCK/4);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5100", CD2802, MASTER_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	CD2802(config, m_tms5100, MASTER_CLOCK);
 	tms5110_route(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tispeak_state::tntell)
+void tispeak_state::tntell(machine_config &config)
+{
 	vocaid(config);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "tntell")
-	MCFG_GENERIC_EXTENSIONS("vsm")
-	MCFG_GENERIC_LOAD(tispeak_state, tispeak_cartridge)
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "tntell", "vsm");
+	m_cart->set_device_load(device_image_load_delegate(&tispeak_state::device_image_load_tispeak_cartridge, this));
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "tntell")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("tntell");
+}
 
 
-MACHINE_CONFIG_START(tispeak_state::k28m2)
-
+void tispeak_state::k28m2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1400, MASTER_CLOCK/2)
-	MCFG_TMS1XXX_READ_K_CB(READ8(tispeak_state, k28_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tispeak_state, k28_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tispeak_state, k28_write_r))
+	TMS1400(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->k().set(FUNC(tispeak_state::k28_read_k));
+	m_maincpu->o().set(FUNC(tispeak_state::k28_write_o));
+	m_maincpu->r().set(FUNC(tispeak_state::k28_write_r));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_k28m2)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_k28m2);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("tms6100", TMS6100, MASTER_CLOCK/4)
+	TMS6100(config, m_tms6100, MASTER_CLOCK/4);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5100", TMS5110A, MASTER_CLOCK)
+	SPEAKER(config, "mono").front_center();
+	TMS5110A(config, m_tms5100, MASTER_CLOCK);
 	tms5110_route(config);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "k28m2")
-	MCFG_GENERIC_EXTENSIONS("vsm")
-	MCFG_GENERIC_LOAD(tispeak_state, tispeak_cartridge)
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "k28m2", "vsm");
+	m_cart->set_device_load(device_image_load_delegate(&tispeak_state::device_image_load_tispeak_cartridge, this));
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "k28m2")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("k28m2");
+}
 
 
 
@@ -1856,35 +1854,35 @@ ROM_END
 
 
 
-//    YEAR  NAME        PARENT   CMP MACHINE       INPUT       STATE          INIT      COMPANY, FULLNAME, FLAGS
-COMP( 1979, snspell,    0,        0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1978, snspellp,   snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1980, snspellub,  snspell,  0, sns_tmc0281d, snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1978, snspellua,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1978, snspelluk,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1981, snspelluka, snspell,  0, sns_cd2801,   snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1979, snspelljp,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1981, snspellsp,  snspell,  0, snspellsp,    snspellsp,  tispeak_state, snspell,  "Texas Instruments", "Speak & Spell (Spanish, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1980, snspellfr,  snspell,  0, sns_cd2801,   snspellfr,  tispeak_state, snspell,  "Texas Instruments", "La Dictee Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1982, snspellit,  snspell,  0, snspellit,    snspellit,  tispeak_state, snspell,  "Texas Instruments", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME        PARENT   CMP MACHINE       INPUT       CLASS          INIT           COMPANY              FULLNAME                            FLAGS
+COMP( 1979, snspell,    0,        0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1979 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1978, snspellp,   snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1980, snspellub,  snspell,  0, sns_tmc0281d, snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1978, snspellua,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1978, snspelluk,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (UK, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1981, snspelluka, snspell,  0, sns_cd2801,   snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (UK, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1979, snspelljp,  snspell,  0, sns_tmc0281,  snspell,    tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1981, snspellsp,  snspell,  0, snspellsp,    snspellsp,  tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell (Spanish, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1980, snspellfr,  snspell,  0, sns_cd2801,   snspellfr,  tispeak_state, init_snspell,  "Texas Instruments", "La Dictee Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1982, snspellit,  snspell,  0, snspellit,    snspellit,  tispeak_state, init_snspell,  "Texas Instruments", "Grillo Parlante (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-COMP( 1981, snspellc,   0,        0, snspellc,     snspellc,   tispeak_state, snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1982, snspellca,  snspellc, 0, snspellc,     snspellc,   tispeak_state, snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1982, snspellcuk, snspellc, 0, snspellcuk,   snspellcuk, tispeak_state, snspell,  "Texas Instruments", "Speak & Write (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1981, snspellc,   0,        0, snspellc,     snspellc,   tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1981 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1982, snspellca,  snspellc, 0, snspellc,     snspellc,   tispeak_state, init_snspell,  "Texas Instruments", "Speak & Spell Compact (US, 1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1982, snspellcuk, snspellc, 0, snspellcuk,   snspellcuk, tispeak_state, init_snspell,  "Texas Instruments", "Speak & Write (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-COMP( 1980, snmath,     0,        0, snmath,       snmath,     tispeak_state, 0,        "Texas Instruments", "Speak & Math (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1986, snmatha,    snmath,   0, snmath,       snmath,     tispeak_state, 0,        "Texas Instruments", "Speak & Math (US, 1986 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1980, snmathp,    snmath,   0, snmath,       snmath,     tispeak_state, 0,        "Texas Instruments", "Speak & Math (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IS_INCOMPLETE )
+COMP( 1980, snmath,     0,        0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1980 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1986, snmatha,    snmath,   0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, 1986 version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1980, snmathp,    snmath,   0, snmath,       snmath,     tispeak_state, empty_init,    "Texas Instruments", "Speak & Math (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IS_INCOMPLETE )
 
-COMP( 1980, snread,     0,        0, snread,       snread,     tispeak_state, snspell,  "Texas Instruments", "Speak & Read (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1980, snread,     0,        0, snread,       snread,     tispeak_state, init_snspell,  "Texas Instruments", "Speak & Read (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-COMP( 1979, lantutor,   0,        0, lantutor,     lantutor,   tispeak_state, lantutor, "Texas Instruments", "Language Tutor (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+COMP( 1979, lantutor,   0,        0, lantutor,     lantutor,   tispeak_state, init_lantutor, "Texas Instruments", "Language Tutor (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-COMP( 1981, tntell,     0,        0, tntell,       tntell,     tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
-COMP( 1980, tntellp,    tntell,   0, tntell,       tntell,     tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-COMP( 1981, tntelluk,   tntell,   0, tntell,       tntell,     tispeak_state, tntell,   "Texas Instruments", "Touch & Tell (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
-COMP( 1981, tntellfr,   tntell,   0, tntell,       tntell,     tispeak_state, tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
+COMP( 1981, tntell,     0,        0, tntell,       tntell,     tispeak_state, init_tntell,   "Texas Instruments", "Touch & Tell (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
+COMP( 1980, tntellp,    tntell,   0, tntell,       tntell,     tispeak_state, init_tntell,   "Texas Instruments", "Touch & Tell (US, patent)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+COMP( 1981, tntelluk,   tntell,   0, tntell,       tntell,     tispeak_state, init_tntell,   "Texas Instruments", "Touch & Tell (UK)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
+COMP( 1981, tntellfr,   tntell,   0, tntell,       tntell,     tispeak_state, init_tntell,   "Texas Instruments", "Le Livre Magique (France)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK | MACHINE_REQUIRES_ARTWORK )
 
-COMP( 1982, vocaid,     0,        0, vocaid,       tntell,     tispeak_state, 0,        "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+COMP( 1982, vocaid,     0,        0, vocaid,       tntell,     tispeak_state, empty_init,    "Texas Instruments", "Vocaid", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
 
-COMP( 1985, k28m2,      0,        0, k28m2,        k28m2,      tispeak_state, snspell,  "Tiger Electronics", "K28: Talking Learning Computer (model 7-232)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+COMP( 1985, k28m2,      0,        0, k28m2,        k28m2,      tispeak_state, init_snspell,  "Tiger Electronics", "K28: Talking Learning Computer (model 7-232)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

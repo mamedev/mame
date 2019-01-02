@@ -28,7 +28,7 @@ public:
 
 	void stellafr(machine_config &config);
 
-protected:
+private:
 	IRQ_CALLBACK_MEMBER(irq_ack);
 	DECLARE_WRITE8_MEMBER(write_8000c1);
 	DECLARE_READ8_MEMBER(read_800101);
@@ -38,7 +38,6 @@ protected:
 
 	void stellafr_map(address_map &map);
 
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
@@ -76,8 +75,8 @@ WRITE8_MEMBER(stellafr_state::ay8910_portb_w)
 void stellafr_state::stellafr_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
-	map(0x8000c1, 0x8000c1).w(this, FUNC(stellafr_state::write_8000c1));
-	map(0x800101, 0x800101).rw(this, FUNC(stellafr_state::read_800101), FUNC(stellafr_state::write_800101));
+	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::write_8000c1));
+	map(0x800101, 0x800101).rw(FUNC(stellafr_state::read_800101), FUNC(stellafr_state::write_800101));
 	map(0x800141, 0x800141).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
@@ -92,19 +91,19 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(stellafr_state::stellafr)
-	MCFG_CPU_ADD("maincpu", M68000, 10000000 ) //?
-	MCFG_CPU_PROGRAM_MAP(stellafr_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(stellafr_state, irq_ack)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000 ) //?
+	MCFG_DEVICE_PROGRAM_MAP(stellafr_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(stellafr_state, irq_ack)
 
 	MCFG_DEVICE_ADD("duart", MC68681, 3686400)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_2)) // ?
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(stellafr_state, duart_output_w))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, stellafr_state, duart_output_w))
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(stellafr_state, ay8910_portb_w))
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1000000));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	aysnd.port_a_read_callback().set_ioport("INPUTS");
+	aysnd.port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
 MACHINE_CONFIG_END
 
 
@@ -122,5 +121,5 @@ ROM_START( st_vulkn )
 ROM_END
 
 
-GAME(199?,  st_ohla,   0,  stellafr,  stellafr, stellafr_state,  0,  ROT0,  "Stella",    "Oh La La (Stella)",    MACHINE_IS_SKELETON_MECHANICAL )
-GAME(199?,  st_vulkn,  0,  stellafr,  stellafr, stellafr_state,  0,  ROT0,  "Stella",    "Vulkan (Stella)",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME(199?,  st_ohla,   0,  stellafr,  stellafr, stellafr_state, empty_init, ROT0, "Stella", "Oh La La (Stella)",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME(199?,  st_vulkn,  0,  stellafr,  stellafr, stellafr_state, empty_init, ROT0, "Stella", "Vulkan (Stella)",      MACHINE_IS_SKELETON_MECHANICAL )

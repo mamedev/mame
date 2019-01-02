@@ -102,6 +102,7 @@
 ***************************************************************************/
 
 class vic3_device : public device_t,
+					public device_palette_interface,
 					public device_video_interface
 {
 public:
@@ -131,7 +132,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+
+	// device_palette_interface override
+	virtual uint32_t palette_entries() const override { return 0x100; }
 
 private:
 	static constexpr unsigned SPRITE_BASE_X_SIZE = 24;
@@ -229,41 +232,39 @@ private:
 	uint8_t m_palette_green[0x100];
 	uint8_t m_palette_blue[0x100];
 	int m_palette_dirty;
-
-	required_device<palette_device> m_palette;
 };
 
 DECLARE_DEVICE_TYPE(VIC3, vic3_device)
 
 
 #define MCFG_VIC3_CPU(tag) \
-	downcast<vic3_device &>(*device).set_cpu_tag(("^" tag));
+	downcast<vic3_device &>(*device).set_cpu_tag(tag);
 
 #define MCFG_VIC3_TYPE(type) \
 	downcast<vic3_device &>(*device).set_vic3_type((vic3_device::vic3_type::type));
 
 #define MCFG_VIC3_DMA_READ_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_dma_read_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_dma_read_callback((DEVCB_##cb));
 
 #define MCFG_VIC3_DMA_READ_COLOR_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_dma_read_color_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_dma_read_color_callback((DEVCB_##cb));
 
 #define MCFG_VIC3_INTERRUPT_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_interrupt_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_interrupt_callback((DEVCB_##cb));
 
 #define MCFG_VIC3_PORT_CHANGED_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_port_changed_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_port_changed_callback((DEVCB_##cb));
 
 #define MCFG_VIC3_LIGHTPEN_BUTTON_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_lightpen_button_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_lightpen_button_callback((DEVCB_##cb));
 
 #define MCFG_VIC3_LIGHTPEN_X_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_lightpen_x_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_lightpen_x_callback((DEVCB_##cb));
 
 #define MCFG_VIC3_LIGHTPEN_Y_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_lightpen_y_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_lightpen_y_callback((DEVCB_##cb));
 
 #define MCFG_VIC3_C64_MEM_R_CB(cb) \
-	devcb = &downcast<vic3_device &>(*device).set_c64_mem_r_callback((DEVCB_##cb));
+	downcast<vic3_device &>(*device).set_c64_mem_r_callback((DEVCB_##cb));
 
 #endif // MAME_VIDEO_VIC4567_H

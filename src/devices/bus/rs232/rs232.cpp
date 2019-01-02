@@ -168,14 +168,15 @@ device_rs232_port_interface::~device_rs232_port_interface()
 #include "terminal.h"
 #include "ie15.h"
 
-SLOT_INTERFACE_START( default_rs232_devices )
-	SLOT_INTERFACE("keyboard", SERIAL_KEYBOARD)
-	SLOT_INTERFACE("loopback", RS232_LOOPBACK)
-	SLOT_INTERFACE("dec_loopback", DEC_RS232_LOOPBACK)
-	SLOT_INTERFACE("null_modem", NULL_MODEM)
-	SLOT_INTERFACE("printer", SERIAL_PRINTER)
-	SLOT_INTERFACE("terminal", SERIAL_TERMINAL)
-	SLOT_INTERFACE("pty", PSEUDO_TERMINAL)
-	SLOT_INTERFACE("sunkbd", SUN_KBD_ADAPTOR)
-	SLOT_INTERFACE("ie15", SERIAL_TERMINAL_IE15)
-SLOT_INTERFACE_END
+void default_rs232_devices(device_slot_interface &device)
+{
+	device.option_add("keyboard", SERIAL_KEYBOARD);
+	device.option_add("loopback", RS232_LOOPBACK);
+	device.option_add("dec_loopback", DEC_RS232_LOOPBACK);
+	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("printer", SERIAL_PRINTER);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("pty", PSEUDO_TERMINAL);
+	device.option_add("sunkbd", SUN_KBD_ADAPTOR);
+	device.option_add("ie15", SERIAL_TERMINAL_IE15);
+}

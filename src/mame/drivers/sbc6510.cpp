@@ -56,6 +56,7 @@ ToDo:
 #include "machine/mos6526.h"
 #include "machine/terminal.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -70,6 +71,9 @@ public:
 		, m_keyboard(*this, "X%u", 0)
 	{ }
 
+	void sbc6510(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(a2_r);
 	DECLARE_WRITE8_MEMBER(a2_w);
 	DECLARE_READ8_MEMBER(psg_a_r);
@@ -77,12 +81,11 @@ public:
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ8_MEMBER(key_r);
 
-	void sbc6510(machine_config &config);
 	void sbc6510_mem(address_map &map);
 	void sbc6510_video_data(address_map &map);
 	void sbc6510_video_io(address_map &map);
 	void sbc6510_video_mem(address_map &map);
-private:
+
 	uint8_t m_key_row;
 	uint8_t m_2;
 	virtual void machine_start() override;
@@ -98,7 +101,7 @@ void sbc6510_state::sbc6510_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0001).ram();
-	map(0x0002, 0x0002).rw(this, FUNC(sbc6510_state::a2_r), FUNC(sbc6510_state::a2_w));
+	map(0x0002, 0x0002).rw(FUNC(sbc6510_state::a2_r), FUNC(sbc6510_state::a2_w));
 	map(0x0003, 0xdfff).ram();
 	map(0xe000, 0xe00f).mirror(0x1f0).rw("cia6526", FUNC(mos6526_device::read), FUNC(mos6526_device::write));
 	map(0xe800, 0xe800).mirror(0x1ff).w("ay8910", FUNC(ay8910_device::address_w));
@@ -268,43 +271,44 @@ static const gfx_layout charset_8x16 =
 };
 
 
-static GFXDECODE_START( sbc6510 )
+static GFXDECODE_START( gfx_sbc6510 )
 	GFXDECODE_ENTRY( "videocpu", 0x1500, charset_8x16, 0, 128 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(sbc6510_state::sbc6510)
+void sbc6510_state::sbc6510(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6510, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(sbc6510_mem)
+	M6510(config, m_maincpu, XTAL(1'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sbc6510_state::sbc6510_mem);
 
-	MCFG_CPU_ADD("videocpu",ATMEGA88, XTAL(16'000'000))
+	ATMEGA88(config, m_videocpu, XTAL(16'000'000));
 //  MCFG_DEVICE_DISABLE() // trips SLEEP opcode, needs to be emulated
-	MCFG_CPU_PROGRAM_MAP(sbc6510_video_mem)
-	MCFG_CPU_DATA_MAP(sbc6510_video_data)
-	MCFG_CPU_IO_MAP(sbc6510_video_io)
-	MCFG_CPU_AVR8_EEPROM("eeprom")
+	m_videocpu->set_addrmap(AS_PROGRAM, &sbc6510_state::sbc6510_video_mem);
+	m_videocpu->set_addrmap(AS_DATA, &sbc6510_state::sbc6510_video_data);
+	m_videocpu->set_addrmap(AS_IO, &sbc6510_state::sbc6510_video_io);
+	m_videocpu->set_eeprom_tag("eeprom");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette") // for F4 displayer only
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbc6510)
+	PALETTE(config, "palette", palette_device::MONOCHROME); // for F4 displayer only
+	GFXDECODE(config, "gfxdecode", "palette", gfx_sbc6510);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	GENERIC_TERMINAL(config, m_terminal, 0);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(1'000'000))
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(1'000'000)));
 	// Ports A and B connect to the IDE socket
-	MCFG_AY8910_PORT_A_READ_CB(READ8(sbc6510_state, psg_a_r))        // port A read
-	MCFG_AY8910_PORT_B_READ_CB(READ8(sbc6510_state, psg_b_r))        // port B read
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ay8910.port_a_read_callback().set(FUNC(sbc6510_state::psg_a_r));
+	ay8910.port_b_read_callback().set(FUNC(sbc6510_state::psg_b_r));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("cia6526", MOS6526, XTAL(1'000'000))
-	MCFG_MOS6526_TOD(50)
-	MCFG_MOS6526_IRQ_CALLBACK(INPUTLINE("maincpu", M6510_IRQ_LINE))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(sbc6510_state, key_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(sbc6510_state, key_r))
-MACHINE_CONFIG_END
+	mos6526_device &cia(MOS6526(config, "cia6526", XTAL(1'000'000)));
+	cia.set_tod_clock(50);
+	cia.irq_wr_callback().set_inputline("maincpu", M6510_IRQ_LINE);
+	cia.pa_wr_callback().set(FUNC(sbc6510_state::key_w));
+	cia.pb_rd_callback().set(FUNC(sbc6510_state::key_r));
+}
 
 /* ROM definition */
 ROM_START( sbc6510 )
@@ -319,5 +323,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT  COMPANY            FULLNAME   FLAGS */
-COMP( 2009, sbc6510,  0,      0,       sbc6510,   sbc6510, sbc6510_state, 0,    "Josip Perusanec", "SBC6510", MACHINE_NOT_WORKING )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY            FULLNAME   FLAGS */
+COMP( 2009, sbc6510, 0,      0,      sbc6510, sbc6510, sbc6510_state, empty_init, "Josip Perusanec", "SBC6510", MACHINE_NOT_WORKING )

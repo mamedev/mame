@@ -56,46 +56,6 @@
 
 #pragma once
 
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_AY3600_MATRIX_X0(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x0_cb(DEVCB_##_cb);
-#define MCFG_AY3600_MATRIX_X1(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x1_cb(DEVCB_##_cb);
-#define MCFG_AY3600_MATRIX_X2(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x2_cb(DEVCB_##_cb);
-#define MCFG_AY3600_MATRIX_X3(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x3_cb(DEVCB_##_cb);
-#define MCFG_AY3600_MATRIX_X4(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x4_cb(DEVCB_##_cb);
-#define MCFG_AY3600_MATRIX_X5(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x5_cb(DEVCB_##_cb);
-#define MCFG_AY3600_MATRIX_X6(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x6_cb(DEVCB_##_cb);
-#define MCFG_AY3600_MATRIX_X7(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x7_cb(DEVCB_##_cb);
-#define MCFG_AY3600_MATRIX_X8(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_x8_cb(DEVCB_##_cb);
-#define MCFG_AY3600_SHIFT_CB(_cb)   \
-	devcb = &downcast<ay3600_device &>(*device).set_shift_cb(DEVCB_##_cb);
-#define MCFG_AY3600_CONTROL_CB(_cb) \
-	devcb = &downcast<ay3600_device &>(*device).set_control_cb(DEVCB_##_cb);
-#define MCFG_AY3600_DATA_READY_CB(_cb)  \
-	devcb = &downcast<ay3600_device &>(*device).set_data_ready_cb(DEVCB_##_cb);
-#define MCFG_AY3600_AKO_CB(_cb) \
-	devcb = &downcast<ay3600_device &>(*device).set_ako_cb(DEVCB_##_cb);
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> ay3600_device
-
 class ay3600_device : public device_t
 {
 public:
@@ -105,19 +65,19 @@ public:
 	// public interface
 	uint16_t b_r();
 
-	template <class Object> devcb_base &set_x0_cb(Object &&rd) { return m_read_x0.set_callback(std::forward<Object>(rd)); }
-	template <class Object> devcb_base &set_x1_cb(Object &&rd) { return m_read_x1.set_callback(std::forward<Object>(rd)); }
-	template <class Object> devcb_base &set_x2_cb(Object &&rd) { return m_read_x2.set_callback(std::forward<Object>(rd)); }
-	template <class Object> devcb_base &set_x3_cb(Object &&rd) { return m_read_x3.set_callback(std::forward<Object>(rd)); }
-	template <class Object> devcb_base &set_x4_cb(Object &&rd) { return m_read_x4.set_callback(std::forward<Object>(rd)); }
-	template <class Object> devcb_base &set_x5_cb(Object &&rd) { return m_read_x5.set_callback(std::forward<Object>(rd)); }
-	template <class Object> devcb_base &set_x6_cb(Object &&rd) { return m_read_x6.set_callback(std::forward<Object>(rd)); }
-	template <class Object> devcb_base &set_x7_cb(Object &&rd) { return m_read_x7.set_callback(std::forward<Object>(rd)); }
-	template <class Object> devcb_base &set_x8_cb(Object &&rd) { return m_read_x8.set_callback(std::forward<Object>(rd)); }
-	template <class Object> devcb_base &set_shift_cb(Object &&rd) { return m_read_shift.set_callback(std::forward<Object>(rd)); }
-	template <class Object> devcb_base &set_control_cb(Object &&rd) { return m_read_control.set_callback(std::forward<Object>(rd)); }
-	template <class Object> devcb_base &set_data_ready_cb(Object &&wr) { return m_write_data_ready.set_callback(std::forward<Object>(wr)); }
-	template <class Object> devcb_base &set_ako_cb(Object &&wr) { return m_write_ako.set_callback(std::forward<Object>(wr)); }
+	auto x0() { return m_read_x0.bind(); }
+	auto x1() { return m_read_x1.bind(); }
+	auto x2() { return m_read_x2.bind(); }
+	auto x3() { return m_read_x3.bind(); }
+	auto x4() { return m_read_x4.bind(); }
+	auto x5() { return m_read_x5.bind(); }
+	auto x6() { return m_read_x6.bind(); }
+	auto x7() { return m_read_x7.bind(); }
+	auto x8() { return m_read_x8.bind(); }
+	auto shift() { return m_read_shift.bind(); }
+	auto control() { return m_read_control.bind(); }
+	auto data_ready() { return m_write_data_ready.bind(); }
+	auto ako() { return m_write_ako.bind(); }
 
 protected:
 	// device-level overrides

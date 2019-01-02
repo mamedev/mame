@@ -50,7 +50,7 @@ void tc0280grd_device::device_start()
 
 	m_ram = make_unique_clear<uint16_t[]>(TC0280GRD_RAM_SIZE / 2);
 
-	save_pointer(NAME(m_ram.get()), TC0280GRD_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram), TC0280GRD_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
 }
 

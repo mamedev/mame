@@ -228,6 +228,10 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 {
 }
 
+hyperstone_device::~hyperstone_device()
+{
+}
+
 
 //-------------------------------------------------
 //  e116t_device - constructor
@@ -414,19 +418,6 @@ uint32_t hyperstone_device::get_emu_code_addr(uint8_t num) /* num is OP */
 #if E132XS_LOG_INTERPRETER_REGS
 void hyperstone_device::dump_registers()
 {
-	static uint64_t total_ops = 0;
-	//static uint64_t total_11094 = 0;
-	total_ops++;
-	if (total_ops < 0ULL)
-	{
-		//if (m_core->global_regs[0] == 0x11094)
-		//{
-		//  total_11094++;
-		//}
-		return;
-	} else if (total_ops == 0ULL) {
-		//printf("Total non-log hits of 0x11094: %d\n", (uint32_t)total_11094);
-	}
 	uint8_t packed[4];
 	packed[0] = (uint8_t)m_core->intblock;
 	packed[1] = (uint8_t)(m_core->icount >> 16);
@@ -706,21 +697,21 @@ uint32_t hyperstone_device::decode_immediate_s()
 		case 1:
 		{
 			m_instruction_length = (3<<19);
-			uint32_t extra_u = (READ_OP(PC) << 16) | READ_OP(PC + 2);
+			uint32_t extra_u = (m_pr16(PC) << 16) | m_pr16(PC + 2);
 			PC += 4;
 			return extra_u;
 		}
 		case 2:
 		{
 			m_instruction_length = (2<<19);
-			uint32_t extra_u = READ_OP(PC);
+			uint32_t extra_u = m_pr16(PC);
 			PC += 2;
 			return extra_u;
 		}
 		case 3:
 		{
 			m_instruction_length = (2<<19);
-			uint32_t extra_u = 0xffff0000 | READ_OP(PC);
+			uint32_t extra_u = 0xffff0000 | m_pr16(PC);
 			PC += 2;
 			return extra_u;
 		}
@@ -731,14 +722,13 @@ uint32_t hyperstone_device::decode_immediate_s()
 
 uint32_t hyperstone_device::decode_const()
 {
-	const uint16_t imm_1 = READ_OP(PC);
+	const uint16_t imm_1 = m_pr16(PC);
 
 	PC += 2;
-	m_instruction_length = (2<<19);
 
 	if (imm_1 & 0x8000)
 	{
-		const uint16_t imm_2 = READ_OP(PC);
+		const uint16_t imm_2 = m_pr16(PC);
 
 		PC += 2;
 		m_instruction_length = (3<<19);
@@ -752,6 +742,8 @@ uint32_t hyperstone_device::decode_const()
 	}
 	else
 	{
+		m_instruction_length = (2<<19);
+
 		uint32_t imm = imm_1 & 0x3fff;
 
 		if (imm_1 & 0x4000)
@@ -764,7 +756,7 @@ int32_t hyperstone_device::decode_pcrel()
 {
 	if (OP & 0x80)
 	{
-		uint16_t next = READ_OP(PC);
+		uint16_t next = m_pr16(PC);
 
 		PC += 2;
 		m_instruction_length = (2<<19);
@@ -1095,6 +1087,8 @@ void hyperstone_device::device_start()
 
 void hyperstone_device::init(int scale_mask)
 {
+	m_instruction_length_valid = false;
+
 	m_core = (internal_hyperstone_state *)m_cache.alloc_near(sizeof(internal_hyperstone_state));
 	memset(m_core, 0, sizeof(internal_hyperstone_state));
 
@@ -1119,7 +1113,31 @@ void hyperstone_device::init(int scale_mask)
 	m_instruction_length = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	if (m_program->data_width() == 16)
+	{
+		auto cache = m_program->cache<1, 0, ENDIANNESS_BIG>();
+		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address); };
+		m_prptr = [cache](offs_t address) -> const void * { return cache->read_ptr(address); };
+	}
+	else
+	{
+		auto cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
+		m_pr16 = [cache](offs_t address) -> u16 { return cache->read_word(address); };
+		if (ENDIANNESS_NATIVE != ENDIANNESS_BIG)
+			m_prptr = [cache](offs_t address) -> const void * {
+				const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~3));
+				if(!(address & 2))
+					ptr++;
+				return ptr;
+			};
+		else
+			m_prptr = [cache](offs_t address) -> const void * {
+				const u16 *ptr = static_cast<u16 *>(cache->read_ptr(address & ~3));
+				if(address & 2)
+					ptr++;
+				return ptr;
+			};
+	}
 	m_io = &space(AS_IO);
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyperstone_device::timer_callback), this));
@@ -1305,94 +1323,76 @@ void hyperstone_device::init(int scale_mask)
 void e116t_device::device_start()
 {
 	init(0);
-	m_core->opcodexor = 0;
 }
 
 void e116xt_device::device_start()
 {
 	init(3);
-	m_core->opcodexor = 0;
 }
 
 void e116xs_device::device_start()
 {
 	init(7);
-	m_core->opcodexor = 0;
 }
 
 void e116xsr_device::device_start()
 {
 	init(7);
-	m_core->opcodexor = 0;
 }
 
 void gms30c2116_device::device_start()
 {
 	init(0);
-	m_core->opcodexor = 0;
 }
 
 void gms30c2216_device::device_start()
 {
 	init(0);
-	m_core->opcodexor = 0;
 }
 
 void e132n_device::device_start()
 {
 	init(0);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void e132t_device::device_start()
 {
 	init(0);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void e132xn_device::device_start()
 {
 	init(3);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void e132xt_device::device_start()
 {
 	init(3);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void e132xs_device::device_start()
 {
 	init(7);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void e132xsr_device::device_start()
 {
 	init(7);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void gms30c2132_device::device_start()
 {
 	init(0);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void gms30c2232_device::device_start()
 {
 	init(0);
-	m_core->opcodexor = WORD_XOR_BE(0);
 }
 
 void hyperstone_device::device_reset()
 {
 	//TODO: Add different reset initializations for BCR, MCR, FCR, TPR
-
-	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
-	m_io = &space(AS_IO);
 
 	m_core->tr_clocks_per_tick = 2;
 
@@ -1620,6 +1620,51 @@ void hyperstone_device::hyperstone_do()
 	fatalerror("Executed hyperstone_do instruction. PC = %08X\n", PC-4);
 }
 
+uint32_t hyperstone_device::imm_length(uint16_t op)
+{
+	switch (op & 0x0f)
+	{
+		case 0:
+		default:
+			return 1;
+		case 1:
+			return 3;
+		case 2:
+		case 3:
+			return 2;
+	}
+}
+
+int32_t hyperstone_device::get_instruction_length(uint16_t op)
+{
+	switch (op >> 8)
+	{
+	case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
+	case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
+	case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
+	case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
+	case 0xee: case 0xef:
+		m_instruction_length = ((m_pr16(PC+2) & 0x8000) ? 3 : 2) << ILC_SHIFT;
+		break;
+	case 0x61: case 0x63: case 0x65: case 0x67: case 0x69: case 0x6b: case 0x6d: case 0x6f:
+	case 0x71: case 0x73: case 0x75: case 0x77: case 0x79: case 0x7b: case 0x7d: case 0x7f:
+		m_instruction_length = imm_length(op) << ILC_SHIFT;
+		break;
+	case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
+	case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc:
+		m_instruction_length = ((op & 0x80) ? 2 : 1) << ILC_SHIFT;
+		break;
+	case 0xce:
+		m_instruction_length = 2 << ILC_SHIFT;
+		break;
+	default:
+		m_instruction_length = 1 << ILC_SHIFT;
+		break;
+	}
+	m_instruction_length_valid = true;
+	return m_instruction_length;
+}
+
 //-------------------------------------------------
 //  execute_run - execute a timeslice's worth of
 //  opcodes
@@ -1636,6 +1681,9 @@ void hyperstone_device::execute_run()
 	if (m_core->intblock < 0)
 		m_core->intblock = 0;
 
+	if (!m_instruction_length_valid)
+		SET_ILC(get_instruction_length(m_pr16(PC)));
+
 	if (m_core->timer_int_pending)
 		check_interrupts<IS_TIMER>();
 	else
@@ -1649,10 +1697,10 @@ void hyperstone_device::execute_run()
 
 		debugger_instruction_hook(PC);
 
-		OP = READ_OP(PC);
+		OP = m_pr16(PC);
 		PC += 2;
 
-		m_instruction_length = (1<<19);
+		m_instruction_length = 1 << ILC_SHIFT;
 
 #if E132XS_COUNT_INSTRUCTIONS
 		m_op_counts[m_op >> 8]++;

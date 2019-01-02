@@ -146,7 +146,7 @@ void qs1000_device::qs1000_prg_map(address_map &map)
 void qs1000_device::qs1000_io_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram();
-	map(0x0200, 0x0211).w(this, FUNC(qs1000_device::wave_w));
+	map(0x0200, 0x0211).w(FUNC(qs1000_device::wave_w));
 }
 
 
@@ -195,18 +195,20 @@ const tiny_rom_entry *qs1000_device::device_rom_region() const
 //-------------------------------------------------
 //  device_add_mconfig - add machine configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START(qs1000_device::device_add_mconfig)
-	MCFG_CPU_ADD("cpu", I8052, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(qs1000_prg_map)
-	MCFG_CPU_IO_MAP(qs1000_io_map)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(qs1000_device, p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(qs1000_device, p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(qs1000_device, p2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(qs1000_device, p2_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(qs1000_device, p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(qs1000_device, p3_w))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(qs1000_device, data_to_i8052))
-MACHINE_CONFIG_END
+
+void qs1000_device::device_add_mconfig(machine_config &config)
+{
+	I8052(config, m_cpu, DERIVED_CLOCK(1, 1));
+	m_cpu->set_addrmap(AS_PROGRAM, &qs1000_device::qs1000_prg_map);
+	m_cpu->set_addrmap(AS_IO, &qs1000_device::qs1000_io_map);
+	m_cpu->port_in_cb<1>().set(FUNC(qs1000_device::p1_r));
+	m_cpu->port_out_cb<1>().set(FUNC(qs1000_device::p1_w));
+	m_cpu->port_in_cb<2>().set(FUNC(qs1000_device::p2_r));
+	m_cpu->port_out_cb<2>().set(FUNC(qs1000_device::p2_w));
+	m_cpu->port_in_cb<3>().set(FUNC(qs1000_device::p3_r));
+	m_cpu->port_out_cb<3>().set(FUNC(qs1000_device::p3_w));
+	m_cpu->serial_rx_cb().set(FUNC(qs1000_device::data_to_i8052));
+}
 
 
 //-------------------------------------------------

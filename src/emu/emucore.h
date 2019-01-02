@@ -159,6 +159,7 @@ enum endianness_t
 	ENDIANNESS_BIG
 };
 
+extern const char *const endianness_names[2];
 
 // declare native endianness to be one or the other
 #ifdef LSB_FIRST
@@ -220,24 +221,20 @@ inline TYPE &operator|=(TYPE &a, TYPE b) { return a = a | b; }
 
 
 // standard assertion macros
-#undef assert
 #undef assert_always
 
 #if defined(MAME_DEBUG_FAST)
-#define assert(x)               do { } while (0)
 #define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #elif defined(MAME_DEBUG)
-#define assert(x)               do { if (!(x)) throw emu_fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
 #define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #else
-#define assert(x)               do { } while (0)
 #define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
 #endif
 
 
 // macros to convert radians to degrees and degrees to radians
-#define RADIAN_TO_DEGREE(x)   ((180.0 / M_PI) * (x))
-#define DEGREE_TO_RADIAN(x)   ((M_PI / 180.0) * (x))
+template <typename T> constexpr auto RADIAN_TO_DEGREE(T const &x) { return (180.0 / M_PI) * x; }
+template <typename T> constexpr auto DEGREE_TO_RADIAN(T const &x) { return (M_PI / 180.0) * x; }
 
 
 // endian-based value: first value is if 'endian' is little-endian, second is if 'endian' is big-endian

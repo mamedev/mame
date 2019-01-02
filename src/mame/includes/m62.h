@@ -1,13 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:smf, David Haywood
+#ifndef MAME_INCLUDES_M62_H
+#define MAME_INCLUDES_M62_H
+
+#pragma once
 
 #include "audio/irem.h"
+#include "emupal.h"
 
 class m62_state : public driver_device
 {
 public:
-	m62_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m62_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_m62_tileram(*this, "m62_tileram"),
 		m_m62_textram(*this, "m62_textram"),
@@ -26,6 +31,28 @@ public:
 		m_audio(*this, "irem_audio")
 	{ }
 
+	void ldrun2(machine_config &config);
+	void lotlot(machine_config &config);
+	void ldrun3(machine_config &config);
+	void battroad(machine_config &config);
+	void horizon(machine_config &config);
+	void ldrun4(machine_config &config);
+	void spelunk2(machine_config &config);
+	void youjyudn(machine_config &config);
+	void kungfum(machine_config &config);
+	void spelunkr(machine_config &config);
+	void ldrun(machine_config &config);
+	void kidniki(machine_config &config);
+
+	void init_youjyudn();
+	void init_spelunkr();
+	void init_ldrun2();
+	void init_ldrun4();
+	void init_spelunk2();
+	void init_kidniki();
+	void init_battroad();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
 
@@ -75,13 +102,6 @@ public:
 	DECLARE_WRITE8_MEMBER(spelunkr_palbank_w);
 	DECLARE_WRITE8_MEMBER(spelunk2_gfxport_w);
 	DECLARE_WRITE8_MEMBER(horizon_scrollram_w);
-	DECLARE_DRIVER_INIT(youjyudn);
-	DECLARE_DRIVER_INIT(spelunkr);
-	DECLARE_DRIVER_INIT(ldrun2);
-	DECLARE_DRIVER_INIT(ldrun4);
-	DECLARE_DRIVER_INIT(spelunk2);
-	DECLARE_DRIVER_INIT(kidniki);
-	DECLARE_DRIVER_INIT(battroad);
 	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_ldrun_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_ldrun2_bg_tile_info);
@@ -103,10 +123,10 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(m62_spr);
-	DECLARE_PALETTE_INIT(m62_chr);
-	DECLARE_PALETTE_INIT(m62_lotlot_fg);
-	DECLARE_PALETTE_INIT(m62_battroad_fg);
+	void m62_spr(palette_device &palette) const;
+	void m62_chr(palette_device &palette) const;
+	void m62_lotlot_fg(palette_device &palette) const;
+	void m62_battroad_fg(palette_device &palette) const;
 	DECLARE_VIDEO_START(kungfum);
 	DECLARE_VIDEO_START(battroad);
 	DECLARE_VIDEO_START(ldrun2);
@@ -115,7 +135,7 @@ public:
 	DECLARE_VIDEO_START(kidniki);
 	DECLARE_VIDEO_START(spelunkr);
 	DECLARE_VIDEO_START(spelunk2);
-	DECLARE_PALETTE_INIT(spelunk2);
+	void spelunk2_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(youjyudn);
 	DECLARE_VIDEO_START(horizon);
 	uint32_t screen_update_ldrun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -130,10 +150,10 @@ public:
 	uint32_t screen_update_youjyudn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_horizon(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void m62_amplify_contrast(bool include_fg);
-	void register_savestate(  );
-	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colormask, int prioritymask, int priority );
-	void m62_start( tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 );
-	void m62_textlayer( tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 );
+	void register_savestate();
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int colormask, int prioritymask, int priority);
+	void m62_start(tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2);
+	void m62_textlayer(tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2);
 	required_device<cpu_device> m_maincpu;
 	optional_device<gfxdecode_device> m_fg_decode;
 	required_device<gfxdecode_device> m_spr_decode;
@@ -142,18 +162,7 @@ public:
 	required_device<palette_device> m_spr_palette;
 	required_device<palette_device> m_chr_palette;
 	required_device<irem_audio_device> m_audio;
-	void ldrun2(machine_config &config);
-	void lotlot(machine_config &config);
-	void ldrun3(machine_config &config);
-	void battroad(machine_config &config);
-	void horizon(machine_config &config);
-	void ldrun4(machine_config &config);
-	void spelunk2(machine_config &config);
-	void youjyudn(machine_config &config);
-	void kungfum(machine_config &config);
-	void spelunkr(machine_config &config);
-	void ldrun(machine_config &config);
-	void kidniki(machine_config &config);
+
 	void battroad_io_map(address_map &map);
 	void battroad_map(address_map &map);
 	void horizon_map(address_map &map);
@@ -174,3 +183,5 @@ public:
 	void youjyudn_io_map(address_map &map);
 	void youjyudn_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_M62_H

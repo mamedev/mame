@@ -184,18 +184,14 @@ MAIN BOARD:
 #include "includes/trackfld.h"
 #include "includes/konamipt.h"
 #include "audio/hyprolyb.h"
-#include "audio/trackfld.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/74259.h"
 #include "machine/konami1.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -216,11 +212,9 @@ WRITE_LINE_MEMBER(trackfld_state::coin_counter_2_w)
 
 WRITE8_MEMBER(trackfld_state::questions_bank_w)
 {
-	int i;
-
-	for(i=0;i<8;i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if((data & 1 << i) == 0) // check first bit active low, change ROM bank according to the correlated bit
+		if (!BIT(data, i)) // check first bit active low, change ROM bank according to the correlated bit
 		{
 			membank("bank1")->set_entry(i);
 			return;
@@ -238,7 +232,7 @@ WRITE_LINE_MEMBER(trackfld_state::irq_mask_w)
 void trackfld_state::main_map(address_map &map)
 {
 	map(0x1000, 0x1000).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));       /* AFE */
-	map(0x1080, 0x1087).mirror(0x0078).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x1080, 0x1087).mirror(0x0078).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x1100, 0x1100).mirror(0x007f).w("soundlatch", FUNC(generic_latch_8_device::write));  /* 32 */
 	map(0x1200, 0x1200).mirror(0x007f).portr("DSW2");
 	map(0x1280, 0x1280).mirror(0x007c).portr("SYSTEM");
@@ -246,15 +240,15 @@ void trackfld_state::main_map(address_map &map)
 	map(0x1282, 0x1282).mirror(0x007c).portr("IN1");
 	map(0x1283, 0x1283).mirror(0x007c).portr("DSW1");
 	/* not used according to schems: AM_RANGE(0x1300, 0x1300) AM_MIRROR(0x007f) AM_READ_PORT("DSW3") */
-	map(0x1800, 0x183f).ram().share("spriteram2");
-	map(0x1840, 0x185f).ram().share("scroll");
+	map(0x1800, 0x183f).ram().share(m_spriteram2);
+	map(0x1840, 0x185f).ram().share(m_scroll);
 	map(0x1860, 0x1bff).ram();
-	map(0x1c00, 0x1c3f).ram().share("spriteram");
-	map(0x1c40, 0x1c5f).ram().share("scroll2");
+	map(0x1c00, 0x1c3f).ram().share(m_spriteram);
+	map(0x1c40, 0x1c5f).ram().share(m_scroll2);
 	map(0x1c60, 0x1fff).ram();
 	map(0x2800, 0x2fff).ram().share("nvram");
-	map(0x3000, 0x37ff).ram().w(this, FUNC(trackfld_state::trackfld_videoram_w)).share("videoram");
-	map(0x3800, 0x3fff).ram().w(this, FUNC(trackfld_state::trackfld_colorram_w)).share("colorram");
+	map(0x3000, 0x37ff).ram().w(FUNC(trackfld_state::trackfld_videoram_w)).share(m_videoram);
+	map(0x3800, 0x3fff).ram().w(FUNC(trackfld_state::trackfld_colorram_w)).share(m_colorram);
 	map(0x6000, 0xffff).rom();
 }
 
@@ -283,12 +277,12 @@ WRITE8_MEMBER(trackfld_state::trackfld_VLM5030_control_w)
 
 void trackfld_state::yieartf_map(address_map &map)
 {
-	map(0x0000, 0x0000).r(this, FUNC(trackfld_state::trackfld_speech_r)).w(this, FUNC(trackfld_state::konami_SN76496_latch_w));
-	map(0x0001, 0x0001).w(this, FUNC(trackfld_state::konami_SN76496_w));
-	map(0x0002, 0x0002).w(this, FUNC(trackfld_state::trackfld_VLM5030_control_w));
+	map(0x0000, 0x0000).r(FUNC(trackfld_state::trackfld_speech_r)).w(FUNC(trackfld_state::konami_SN76496_latch_w));
+	map(0x0001, 0x0001).w(FUNC(trackfld_state::konami_SN76496_w));
+	map(0x0002, 0x0002).w(FUNC(trackfld_state::trackfld_VLM5030_control_w));
 	map(0x0003, 0x0003).w(m_vlm, FUNC(vlm5030_device::data_w));
 	map(0x1000, 0x1000).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));       /* AFE */
-	map(0x1080, 0x1087).mirror(0x0078).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x1080, 0x1087).mirror(0x0078).w(m_mainlatch, FUNC(ls259_device::write_d0));
 //  AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)     /* 32 */
 	map(0x1200, 0x1200).mirror(0x007f).portr("DSW2");
 	map(0x1280, 0x1280).mirror(0x007c).portr("SYSTEM");
@@ -296,15 +290,15 @@ void trackfld_state::yieartf_map(address_map &map)
 	map(0x1282, 0x1282).mirror(0x007c).portr("IN1");
 	map(0x1283, 0x1283).mirror(0x007c).portr("DSW1");
 	map(0x1300, 0x1300).mirror(0x007f).portr("DSW3");
-	map(0x1800, 0x183f).ram().share("spriteram2");
-	map(0x1840, 0x185f).ram().share("scroll");
+	map(0x1800, 0x183f).ram().share(m_spriteram2);
+	map(0x1840, 0x185f).ram().share(m_scroll);
 	map(0x1860, 0x1bff).ram();
-	map(0x1c00, 0x1c3f).ram().share("spriteram");
-	map(0x1c40, 0x1c5f).ram().share("scroll2");
+	map(0x1c00, 0x1c3f).ram().share(m_spriteram);
+	map(0x1c40, 0x1c5f).ram().share(m_scroll2);
 	map(0x1c60, 0x1fff).ram();
 	map(0x2800, 0x2fff).ram().share("nvram");
-	map(0x3000, 0x37ff).ram().w(this, FUNC(trackfld_state::trackfld_videoram_w)).share("videoram");
-	map(0x3800, 0x3fff).ram().w(this, FUNC(trackfld_state::trackfld_colorram_w)).share("colorram");
+	map(0x3000, 0x37ff).ram().w(FUNC(trackfld_state::trackfld_videoram_w)).share(m_videoram);
+	map(0x3800, 0x3fff).ram().w(FUNC(trackfld_state::trackfld_colorram_w)).share(m_colorram);
 	map(0x6000, 0xffff).rom();
 }
 
@@ -313,23 +307,23 @@ void trackfld_state::reaktor_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	/* all usual addresses +0x8000 */
 	map(0x9000, 0x9000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x9080, 0x9087).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x9080, 0x9087).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x9100, 0x9100).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x9200, 0x9200).portr("DSW2");
 	map(0x9280, 0x9280).portr("SYSTEM");
 	map(0x9281, 0x9281).portr("IN0");
 	map(0x9282, 0x9282).portr("IN1");
 	map(0x9283, 0x9283).portr("DSW1");
-	map(0x9800, 0x983f).ram().share("spriteram2");
-	map(0x9840, 0x985f).ram().share("scroll");
+	map(0x9800, 0x983f).ram().share(m_spriteram2);
+	map(0x9840, 0x985f).ram().share(m_scroll);
 	map(0x9860, 0x9bff).ram();
-	map(0x9c00, 0x9c3f).ram().share("spriteram");
-	map(0x9c40, 0x9c5f).ram().share("scroll2");
+	map(0x9c00, 0x9c3f).ram().share(m_spriteram);
+	map(0x9c40, 0x9c5f).ram().share(m_scroll2);
 	map(0x9c60, 0x9fff).ram();
 	map(0xa800, 0xabff).ram();
 	map(0xac00, 0xafff).ram().share("nvram");
-	map(0xb000, 0xb7ff).ram().w(this, FUNC(trackfld_state::trackfld_videoram_w)).share("videoram");
-	map(0xb800, 0xbfff).ram().w(this, FUNC(trackfld_state::trackfld_colorram_w)).share("colorram");
+	map(0xb000, 0xb7ff).ram().w(FUNC(trackfld_state::trackfld_videoram_w)).share(m_videoram);
+	map(0xb800, 0xbfff).ram().w(FUNC(trackfld_state::trackfld_colorram_w)).share(m_colorram);
 }
 
 /* Reaktor reads / writes some I/O ports, no idea what they're connected to, if anything */
@@ -345,24 +339,24 @@ void trackfld_state::reaktor_io_map(address_map &map)
 void trackfld_state::mastkin_map(address_map &map)
 {
 	map(0x1000, 0x1000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x10b0, 0x10b7).nopr().w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x10b0, 0x10b7).nopr().w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x1100, 0x1100).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x1200, 0x1200).portr("DSW2");
 	map(0x1280, 0x1280).portr("SYSTEM");
 	map(0x1281, 0x1281).portr("IN0");
 //  AM_RANGE(0x1282, 0x1282) AM_READ_PORT("IN1") /* unused */
 	map(0x1283, 0x1283).portr("DSW1");
-	map(0x1800, 0x183f).ram().share("spriteram2");
-	map(0x1840, 0x185f).ram().share("scroll");
+	map(0x1800, 0x183f).ram().share(m_spriteram2);
+	map(0x1840, 0x185f).ram().share(m_scroll);
 	map(0x1860, 0x1bff).ram();
-	map(0x1c00, 0x1c3f).ram().share("spriteram");
-	map(0x1c40, 0x1c5f).ram().share("scroll2");
+	map(0x1c00, 0x1c3f).ram().share(m_spriteram);
+	map(0x1c40, 0x1c5f).ram().share(m_scroll2);
 	map(0x1c60, 0x1fff).ram();
 	map(0x2000, 0x27ff).ram(); // initialized at POST
 	map(0x2800, 0x2bff).ram();
 	map(0x2c00, 0x2fff).ram().share("nvram");
-	map(0x3000, 0x37ff).ram().w(this, FUNC(trackfld_state::trackfld_videoram_w)).share("videoram");
-	map(0x3800, 0x3fff).ram().w(this, FUNC(trackfld_state::trackfld_colorram_w)).share("colorram");
+	map(0x3000, 0x37ff).ram().w(FUNC(trackfld_state::trackfld_videoram_w)).share(m_videoram);
+	map(0x3800, 0x3fff).ram().w(FUNC(trackfld_state::trackfld_colorram_w)).share(m_colorram);
 	map(0x6000, 0xffff).rom();
 }
 
@@ -370,24 +364,24 @@ void trackfld_state::wizzquiz_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram();
 	map(0x1000, 0x1000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
-	map(0x1080, 0x1087).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x1080, 0x1087).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x1100, 0x1100).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x1200, 0x1200).portr("DSW2");
 	map(0x1280, 0x1280).portr("SYSTEM");
 	map(0x1281, 0x1281).portr("IN0");
 	map(0x1282, 0x1282).portr("IN1");
 	map(0x1283, 0x1283).portr("DSW1");
-	map(0x1800, 0x183f).ram().share("spriteram2");
-	map(0x1840, 0x185f).ram().share("scroll");
+	map(0x1800, 0x183f).ram().share(m_spriteram2);
+	map(0x1840, 0x185f).ram().share(m_scroll);
 	map(0x1860, 0x1bff).ram();
-	map(0x1c00, 0x1c3f).ram().share("spriteram");
-	map(0x1c40, 0x1c5f).ram().share("scroll2");
+	map(0x1c00, 0x1c3f).ram().share(m_spriteram);
+	map(0x1c40, 0x1c5f).ram().share(m_scroll2);
 	map(0x1c60, 0x1fff).ram();
 	map(0x2800, 0x2bff).ram();
 	map(0x2c00, 0x2fff).ram().share("nvram");
-	map(0x3000, 0x37ff).ram().w(this, FUNC(trackfld_state::trackfld_videoram_w)).share("videoram");
-	map(0x3800, 0x3fff).ram().w(this, FUNC(trackfld_state::trackfld_colorram_w)).share("colorram");
-	map(0xc000, 0xc000).w(this, FUNC(trackfld_state::questions_bank_w));
+	map(0x3000, 0x37ff).ram().w(FUNC(trackfld_state::trackfld_videoram_w)).share(m_videoram);
+	map(0x3800, 0x3fff).ram().w(FUNC(trackfld_state::trackfld_colorram_w)).share(m_colorram);
+	map(0xc000, 0xc000).w(FUNC(trackfld_state::questions_bank_w));
 	map(0x6000, 0xdfff).bankr("bank1");
 	map(0xe000, 0xffff).rom();
 }
@@ -404,13 +398,13 @@ void trackfld_state::sound_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).mirror(0x1c00).ram();
 	map(0x6000, 0x6000).mirror(0x1fff).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x8000, 0x8000).mirror(0x1fff).r("trackfld_audio", FUNC(trackfld_audio_device::trackfld_sh_timer_r));
-	map(0xa000, 0xa000).mirror(0x1fff).w(this, FUNC(trackfld_state::konami_SN76496_latch_w));
-	map(0xc000, 0xc000).mirror(0x1fff).r(this, FUNC(trackfld_state::trackfld_SN76496_r)).w(this, FUNC(trackfld_state::konami_SN76496_w));
-	map(0xe000, 0xe000).mirror(0x1ff8).w("dac", FUNC(dac_byte_interface::write));
+	map(0x8000, 0x8000).mirror(0x1fff).r(m_soundbrd, FUNC(trackfld_audio_device::trackfld_sh_timer_r));
+	map(0xa000, 0xa000).mirror(0x1fff).w(FUNC(trackfld_state::konami_SN76496_latch_w));
+	map(0xc000, 0xc000).mirror(0x1fff).r(FUNC(trackfld_state::trackfld_SN76496_r)).w(FUNC(trackfld_state::konami_SN76496_w));
+	map(0xe000, 0xe000).mirror(0x1ff8).w(m_dac, FUNC(dac_byte_interface::data_w));
 	map(0xe001, 0xe001).mirror(0x1ff8).noprw();           /* watch dog ?; reaktor reads here */
-	map(0xe002, 0xe002).mirror(0x1ff8).r("trackfld_audio", FUNC(trackfld_audio_device::trackfld_speech_r));
-	map(0xe003, 0xe003).mirror(0x1c78).select(0x0380).w("trackfld_audio", FUNC(trackfld_audio_device::trackfld_sound_w));
+	map(0xe002, 0xe002).mirror(0x1ff8).r(m_soundbrd, FUNC(trackfld_audio_device::trackfld_speech_r));
+	map(0xe003, 0xe003).mirror(0x1c78).select(0x0380).w(m_soundbrd, FUNC(trackfld_audio_device::trackfld_sound_w));
 	map(0xe004, 0xe004).mirror(0x1ff8).w(m_vlm, FUNC(vlm5030_device::data_w));
 }
 
@@ -419,10 +413,10 @@ void trackfld_state::hyprolyb_sound_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).mirror(0x1c00).ram();
 	map(0x6000, 0x6000).mirror(0x1fff).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x8000, 0x8000).mirror(0x1fff).r("trackfld_audio", FUNC(trackfld_audio_device::trackfld_sh_timer_r));
-	map(0xa000, 0xa000).mirror(0x1fff).w(this, FUNC(trackfld_state::konami_SN76496_latch_w));
-	map(0xc000, 0xc000).mirror(0x1fff).r(this, FUNC(trackfld_state::trackfld_SN76496_r)).w(this, FUNC(trackfld_state::konami_SN76496_w));
-	map(0xe000, 0xe000).mirror(0x1ff8).w("dac", FUNC(dac_byte_interface::write));
+	map(0x8000, 0x8000).mirror(0x1fff).r(m_soundbrd, FUNC(trackfld_audio_device::trackfld_sh_timer_r));
+	map(0xa000, 0xa000).mirror(0x1fff).w(FUNC(trackfld_state::konami_SN76496_latch_w));
+	map(0xc000, 0xc000).mirror(0x1fff).r(FUNC(trackfld_state::trackfld_SN76496_r)).w(FUNC(trackfld_state::konami_SN76496_w));
+	map(0xe000, 0xe000).mirror(0x1ff8).w(m_dac, FUNC(dac_byte_interface::data_w));
 	map(0xe001, 0xe001).mirror(0x1ff8).noprw();           /* watch dog ?; reaktor reads here */
 	map(0xe002, 0xe002).mirror(0x1ff8).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::busy_r));
 	map(0xe003, 0xe003).mirror(0x1ff8).nopw();
@@ -862,7 +856,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( trackfld )
+static GFXDECODE_START( gfx_trackfld )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
 GFXDECODE_END
@@ -904,68 +898,66 @@ WRITE_LINE_MEMBER(trackfld_state::vblank_nmi)
 MACHINE_CONFIG_START(trackfld_state::trackfld)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK/6/2)    /* a guess for now */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD(m_maincpu, KONAMI1, MASTER_CLOCK/6/2)    /* a guess for now */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, SOUND_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 1D
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(trackfld_state, flipscreen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("trackfld_audio", trackfld_audio_device, sh_irqtrigger_w)) // 26 = SOUND ON
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // 25 = MUT?
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(trackfld_state, coin_counter_1_w)) // 24 = OUT1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(trackfld_state, coin_counter_2_w)) // 23 = OUT2
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // CN3.2
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // CN3.4
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(trackfld_state, irq_mask_w)) // INT
+	LS259(config, m_mainlatch); // 1D
+	m_mainlatch->q_out_cb<0>().set(FUNC(trackfld_state::flipscreen_w)); // FLIP
+	m_mainlatch->q_out_cb<1>().set("trackfld_audio", FUNC(trackfld_audio_device::sh_irqtrigger_w)); // 26 = SOUND ON
+	m_mainlatch->q_out_cb<2>().set_nop(); // 25 = MUT?
+	m_mainlatch->q_out_cb<3>().set(FUNC(trackfld_state::coin_counter_1_w)); // 24 = OUT1
+	m_mainlatch->q_out_cb<4>().set(FUNC(trackfld_state::coin_counter_2_w)); // 23 = OUT2
+	m_mainlatch->q_out_cb<5>().set_nop(); // CN3.2
+	m_mainlatch->q_out_cb<6>().set_nop(); // CN3.4
+	m_mainlatch->q_out_cb<7>().set(FUNC(trackfld_state::irq_mask_w)); // INT
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trackfld_state, screen_update_trackfld)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(trackfld_state, vblank_irq))
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, trackfld_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trackfld)
-	MCFG_PALETTE_ADD("palette", 16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(trackfld_state,trackfld)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_trackfld);
+	PALETTE(config, m_palette, FUNC(trackfld_state::trackfld_palette), 16*16+16*16, 32);
 	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
+	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, m_audiocpu, m_vlm)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
+	MCFG_DEVICE_ADD(m_dac, DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("snsnd", SN76496, SOUND_CLOCK/8)
+	MCFG_DEVICE_ADD(m_sn, SN76496, SOUND_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
+	MCFG_DEVICE_ADD(m_vlm, VLM5030, VLM_CLOCK)
 	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trackfld_state::trackfldu)
 	trackfld(config);
-	MCFG_CPU_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* exact M6809 model unknown */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* exact M6809 model unknown */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 MACHINE_CONFIG_END
 
@@ -978,62 +970,60 @@ INTERRUPT_GEN_MEMBER(trackfld_state::yieartf_timer_irq)
 MACHINE_CONFIG_START(trackfld_state::yieartf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
-	MCFG_CPU_PROGRAM_MAP(yieartf_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(trackfld_state, yieartf_timer_irq, 480)
+	MCFG_DEVICE_ADD(m_maincpu, MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
+	MCFG_DEVICE_PROGRAM_MAP(yieartf_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(trackfld_state, yieartf_timer_irq, 480)
 
 //  z80 isn't used
-//  MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
-//  MCFG_CPU_PROGRAM_MAP(sound_map)
+//  MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/4)
+//  MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(trackfld_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("trackfld_audio", trackfld_audio_device, sh_irqtrigger_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(trackfld_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(trackfld_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(trackfld_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(trackfld_state, irq_mask_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1D
+	mainlatch.q_out_cb<0>().set(FUNC(trackfld_state::flipscreen_w));
+	mainlatch.q_out_cb<1>().set("trackfld_audio", FUNC(trackfld_audio_device::sh_irqtrigger_w));
+	mainlatch.q_out_cb<2>().set(FUNC(trackfld_state::nmi_mask_w));
+	mainlatch.q_out_cb<3>().set(FUNC(trackfld_state::coin_counter_1_w));
+	mainlatch.q_out_cb<4>().set(FUNC(trackfld_state::coin_counter_2_w));
+	mainlatch.q_out_cb<5>().set_nop();
+	mainlatch.q_out_cb<6>().set_nop();
+	mainlatch.q_out_cb<7>().set(FUNC(trackfld_state::irq_mask_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trackfld_state, screen_update_trackfld)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(trackfld_state, vblank_irq))
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, trackfld_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trackfld)
-	MCFG_PALETTE_ADD("palette", 16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(trackfld_state,trackfld)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_trackfld);
+	PALETTE(config, m_palette, FUNC(trackfld_state::trackfld_palette), 16*16+16*16, 32);
 	MCFG_VIDEO_START_OVERRIDE(trackfld_state,trackfld)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
+	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, finder_base::DUMMY_TAG, m_vlm)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
+	MCFG_DEVICE_ADD(m_dac, DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/6/2)
+	MCFG_DEVICE_ADD(m_sn, SN76496, MASTER_CLOCK/6/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
+	MCFG_DEVICE_ADD(m_vlm, VLM5030, VLM_CLOCK)
 	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -1066,23 +1056,22 @@ void trackfld_state::hyprolyb_adpcm_map(address_map &map)
 MACHINE_CONFIG_START(trackfld_state::hyprolyb)
 	trackfld(config);
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(hyprolyb_sound_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, address_map_constructor(&std::remove_pointer_t<decltype(this)>::hyprolyb_sound_map, tag(), this));
 
 	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("vlm")
-	MCFG_CPU_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
-	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
+	MCFG_DEVICE_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
+	MCFG_DEVICE_PROGRAM_MAP(hyprolyb_adpcm_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_SOUND_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
+	MCFG_DEVICE_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(DEVWRITELINE("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback)) /* VCK function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback)) /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
@@ -1098,12 +1087,11 @@ MACHINE_CONFIG_START(trackfld_state::mastkin)
 	trackfld(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
-	MCFG_CPU_PROGRAM_MAP(mastkin_map)
+	MCFG_DEVICE_REPLACE(m_maincpu, MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
+	MCFG_DEVICE_PROGRAM_MAP(mastkin_map)
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // actually not used
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // actually not used
+	m_mainlatch->q_out_cb<3>().set_nop(); // actually not used
+	m_mainlatch->q_out_cb<4>().set_nop(); // actually not used
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trackfld_state::wizzquiz)
@@ -1111,23 +1099,21 @@ MACHINE_CONFIG_START(trackfld_state::wizzquiz)
 
 	/* basic machine hardware */
 	// right cpu?
-	MCFG_CPU_REPLACE("maincpu",M6800,2048000)       /* 1.400 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(wizzquiz_map)
+	MCFG_DEVICE_REPLACE(m_maincpu, M6800, 2048000)       /* 1.400 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(wizzquiz_map)
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(trackfld_state, vblank_nmi))
+	m_screen->set_screen_vblank(DEVCB_WRITELINE(*this, trackfld_state, vblank_nmi));
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(trackfld_state, nmi_mask_w))
+	m_mainlatch->q_out_cb<7>().set(FUNC(trackfld_state::nmi_mask_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trackfld_state::reaktor)
 	trackfld(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu",Z80,MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(reaktor_map)
-	MCFG_CPU_IO_MAP(reaktor_io_map)
+	MCFG_DEVICE_REPLACE(m_maincpu, Z80, MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(reaktor_map)
+	MCFG_DEVICE_IO_MAP(reaktor_io_map)
 MACHINE_CONFIG_END
 
 
@@ -1647,26 +1633,25 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(trackfld_state,trackfld)
+void trackfld_state::init_trackfld()
 {
 }
 
-DRIVER_INIT_MEMBER(trackfld_state, trackfldnz)
+void trackfld_state::init_trackfldnz()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	int i;
 
 	/* decrypt program rom */
-	for (i = 0x6000; i < 0x10000; i++)
+	for (int i = 0x6000; i < 0x10000; i++)
 		ROM[i] = bitswap<8>(ROM[i], 6, 7, 5, 4, 3, 2, 1, 0);
 }
 
-DRIVER_INIT_MEMBER(trackfld_state,atlantol)
+void trackfld_state::init_atlantol()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint8_t *rom = memregion("maincpu")->base();
 
-	machine().device<konami1_device>("maincpu")->set_encryption_boundary(0x6000);
+	downcast<konami1_device &>(*m_maincpu).set_encryption_boundary(0x6000);
 
 	space.install_write_handler(0x0800, 0x0800, write8_delegate(FUNC(trackfld_state::atlantol_gfxbank_w),this));
 	space.nop_write(0x1000, 0x1000);
@@ -1682,19 +1667,18 @@ DRIVER_INIT_MEMBER(trackfld_state,atlantol)
 	membank("bank13")->set_base(&rom[0x4000]);
 }
 
-DRIVER_INIT_MEMBER(trackfld_state,mastkin)
+void trackfld_state::init_mastkin()
 {
 	uint8_t *prom = memregion("proms")->base();
-	int i;
 
 	/* build a fake palette so the screen won't be all black */
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
 		prom[i] = i * 4;
 	}
 
 	/* build a fake lookup table since we don't have the color PROMs */
-	for (i = 0; i < 0x0200; i++)
+	for (int i = 0; i < 0x0200; i++)
 	{
 		if ((i & 0x0f) == 0)
 			prom[i + 0x20] = 0;
@@ -1704,40 +1688,39 @@ DRIVER_INIT_MEMBER(trackfld_state,mastkin)
 	m_palette->update();
 }
 
-DRIVER_INIT_MEMBER(trackfld_state,wizzquiz)
+void trackfld_state::init_wizzquiz()
 {
 	uint8_t *ROM = memregion("maincpu")->base() + 0xe000;
-	int i;
 
 	/* decrypt program rom */
-	for (i = 0; i < 0x2000; i++)
+	for (int i = 0; i < 0x2000; i++)
 		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	ROM = memregion("user1")->base();
 
 	/* decrypt questions roms */
-	for (i = 0; i < 0x40000; i++)
+	for (int i = 0; i < 0x40000; i++)
 		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	membank("bank1")->configure_entries(0, 8, ROM, 0x8000);
 }
 
 
-GAME( 1983, trackfld,   0,        trackfld,  trackfld, trackfld_state, trackfld,   ROT0,  "Konami",                               "Track & Field",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1983, trackfldc,  trackfld, trackfld,  trackfld, trackfld_state, trackfld,   ROT0,  "Konami (Centuri license)",             "Track & Field (Centuri)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1983, trackfldu,  trackfld, trackfldu, trackfld, trackfld_state, trackfld,   ROT0,  "Konami (Centuri license)",             "Track & Field (Centuri, unencrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hyprolym,   trackfld, trackfld,  trackfld, trackfld_state, trackfld,   ROT0,  "Konami",                               "Hyper Olympic",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hyprolymb,  trackfld, hyprolyb,  trackfld, trackfld_state, trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hyprolymba, trackfld, hyprolyb,  trackfld, trackfld_state, trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hipoly,     trackfld, hyprolyb,  trackfld, trackfld_state, trackfld,   ROT0,  "bootleg",                              "Hipoly (bootleg of Hyper Olympic)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, atlantol,   trackfld, atlantol,  atlantol, trackfld_state, atlantol,   ROT0,  "bootleg",                              "Atlant Olimpic",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1982, trackfldnz, trackfld, trackfld,  trackfld, trackfld_state, trackfldnz, ROT0,  "bootleg? (Goldberg Enterprizes Inc.)", "Track & Field (NZ bootleg?)",          MACHINE_SUPPORTS_SAVE) // bootleg of the Centuri version
+GAME( 1983, trackfld,   0,        trackfld,  trackfld, trackfld_state, init_trackfld,   ROT0,  "Konami",                               "Track & Field",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, trackfldc,  trackfld, trackfld,  trackfld, trackfld_state, init_trackfld,   ROT0,  "Konami (Centuri license)",             "Track & Field (Centuri)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1983, trackfldu,  trackfld, trackfldu, trackfld, trackfld_state, init_trackfld,   ROT0,  "Konami (Centuri license)",             "Track & Field (Centuri, unencrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hyprolym,   trackfld, trackfld,  trackfld, trackfld_state, init_trackfld,   ROT0,  "Konami",                               "Hyper Olympic",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hyprolymb,  trackfld, hyprolyb,  trackfld, trackfld_state, init_trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hyprolymba, trackfld, hyprolyb,  trackfld, trackfld_state, init_trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hipoly,     trackfld, hyprolyb,  trackfld, trackfld_state, init_trackfld,   ROT0,  "bootleg",                              "Hipoly (bootleg of Hyper Olympic)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, atlantol,   trackfld, atlantol,  atlantol, trackfld_state, init_atlantol,   ROT0,  "bootleg",                              "Atlant Olimpic",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, trackfldnz, trackfld, trackfld,  trackfld, trackfld_state, init_trackfldnz, ROT0,  "bootleg? (Goldberg Enterprizes Inc.)", "Track & Field (NZ bootleg?)",          MACHINE_SUPPORTS_SAVE) // bootleg of the Centuri version
 
-GAME( 1988, mastkin,    0,        mastkin,   mastkin,  trackfld_state, mastkin,    ROT0,  "Du Tech",                              "The Masters of Kin", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mastkin,    0,        mastkin,   mastkin,  trackfld_state, init_mastkin,    ROT0,  "Du Tech",                              "The Masters of Kin", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, wizzquiz,   0,        wizzquiz,  wizzquiz, trackfld_state, wizzquiz,   ROT0,  "Zilec-Zenitone (Konami license)",      "Wizz Quiz (Konami version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, wizzquiza,  wizzquiz, wizzquiz,  wizzquiz, trackfld_state, wizzquiz,   ROT0,  "Zilec-Zenitone",                       "Wizz Quiz (version 4)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wizzquiz,   0,        wizzquiz,  wizzquiz, trackfld_state, init_wizzquiz,   ROT0,  "Zilec-Zenitone (Konami license)",      "Wizz Quiz (Konami version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wizzquiza,  wizzquiz, wizzquiz,  wizzquiz, trackfld_state, init_wizzquiz,   ROT0,  "Zilec-Zenitone",                       "Wizz Quiz (version 4)",      MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, reaktor,    0,        reaktor,   reaktor,  trackfld_state, 0,          ROT90, "Zilec",                                "Reaktor (Track & Field conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, reaktor,    0,        reaktor,   reaktor,  trackfld_state, empty_init,      ROT90, "Zilec",                                "Reaktor (Track & Field conversion)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, yieartf,    yiear,    yieartf,   yieartf,  trackfld_state, 0,          ROT0,  "Konami",                               "Yie Ar Kung-Fu (GX361 conversion)", MACHINE_SUPPORTS_SAVE ) // the conversion looks of bootleg quality, but the code is clearly a very different revision to either original hardware set...
+GAME( 1985, yieartf,    yiear,    yieartf,   yieartf,  trackfld_state, empty_init,      ROT0,  "Konami",                               "Yie Ar Kung-Fu (GX361 conversion)", MACHINE_SUPPORTS_SAVE ) // the conversion looks of bootleg quality, but the code is clearly a very different revision to either original hardware set...

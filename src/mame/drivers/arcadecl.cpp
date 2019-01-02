@@ -75,6 +75,7 @@
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/atarimo.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -97,7 +98,7 @@ void sparkz_state::scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
-		scanline_int_gen(*m_maincpu);
+		scanline_int_write_line(1);
 }
 
 
@@ -162,11 +163,11 @@ void sparkz_state::main_map(address_map &map)
 	map(0x640022, 0x640023).portr("TRACKY2");
 	map(0x640024, 0x640025).portr("TRACKX1");
 	map(0x640026, 0x640027).portr("TRACKY1");
-	map(0x640040, 0x64004f).w(this, FUNC(sparkz_state::latch_w));
+	map(0x640040, 0x64004f).w(FUNC(sparkz_state::latch_w));
 	map(0x640060, 0x64006f).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x641000, 0x641fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x642000, 0x642000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x646000, 0x646fff).w(this, FUNC(sparkz_state::scanline_int_ack_w));
+	map(0x646000, 0x646fff).w(FUNC(sparkz_state::scanline_int_ack_w));
 	map(0x647000, 0x647fff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 }
 
@@ -307,7 +308,7 @@ static const gfx_layout molayout =
 };
 
 
-static GFXDECODE_START( arcadecl )
+static GFXDECODE_START( gfx_arcadecl )
 	GFXDECODE_ENTRY( "gfx1", 0, molayout,  256, 16 )
 GFXDECODE_END
 
@@ -322,19 +323,18 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sparkz_state::sparkz)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arcadecl)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arcadecl)
+	palette_device &palette(PALETTE(config, "palette"));
+	palette.set_format(palette_device::IRGB_1555, 512);
+	palette.set_membits(8);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -343,21 +343,22 @@ MACHINE_CONFIG_START(sparkz_state::sparkz)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(sparkz_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sparkz_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sparkz_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/4/3, PIN7_LOW)
+	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK/4/3, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(arcadecl_state::arcadecl)
+void arcadecl_state::arcadecl(machine_config &config)
+{
 	sparkz(config);
 
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", arcadecl_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
-MACHINE_CONFIG_END
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, arcadecl_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
+}
 
 
 
@@ -399,5 +400,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1992, arcadecl, 0, arcadecl, arcadecl, arcadecl_state, 0, ROT0, "Atari Games", "Arcade Classics (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sparkz,   0, sparkz,   sparkz,   sparkz_state,   0, ROT0, "Atari Games", "Sparkz (prototype)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1992, arcadecl, 0, arcadecl, arcadecl, arcadecl_state, empty_init, ROT0, "Atari Games", "Arcade Classics (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sparkz,   0, sparkz,   sparkz,   sparkz_state,   empty_init, ROT0, "Atari Games", "Sparkz (prototype)",          MACHINE_SUPPORTS_SAVE )

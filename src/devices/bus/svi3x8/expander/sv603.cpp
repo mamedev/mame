@@ -38,8 +38,8 @@ const tiny_rom_entry *sv603_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sv603_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("snd", SN76489A, XTAL(10'738'635) / 3)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("snd", SN76489A, XTAL(10'738'635) / 3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// cartridge slot
@@ -139,5 +139,5 @@ WRITE8_MEMBER( sv603_device::iorq_w )
 		m_expander->excs_w(space, offset, data);
 
 	if (offset >= 0xe0 && offset <= 0xff)
-		m_snd->write(space, 0, data);
+		m_snd->write(data);
 }

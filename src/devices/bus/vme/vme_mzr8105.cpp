@@ -38,8 +38,8 @@ DEFINE_DEVICE_TYPE(VME_MZR8105, vme_mzr8105_card_device, "mzr8105", "Mizar 8105 
 
 MACHINE_CONFIG_START(vme_mzr8105_card_device::device_add_mconfig)
 {
-	MCFG_CPU_ADD ("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP (mzr8105_mem)
+	MCFG_DEVICE_ADD ("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP (mzr8105_mem)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_BUS_OWNER_SPACES()
 	MCFG_VME_SLOT_ADD ("vme", 1, mzr8105_vme_cards, "mzr8300")

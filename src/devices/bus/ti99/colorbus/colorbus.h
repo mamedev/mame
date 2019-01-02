@@ -43,6 +43,16 @@ protected:
 class ti99_colorbus_device : public device_t, public device_slot_interface
 {
 public:
+	template <typename U>
+	ti99_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+		: ti99_colorbus_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
 	ti99_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	line_state left_button();  // left button is not connected to the V9938 but to a TMS9901 pin
 	void poll();
@@ -59,12 +69,8 @@ private:
 
 } } } // end namespace bus::ti99::colorbus
 
-SLOT_INTERFACE_EXTERN(ti99_colorbus_port);
-
-#define MCFG_COLORBUS_MOUSE_ADD( _tag )  \
-	MCFG_DEVICE_ADD(_tag, TI99_COLORBUS, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ti99_colorbus_port, "busmouse", false)
-
 DECLARE_DEVICE_TYPE_NS(TI99_COLORBUS, bus::ti99::colorbus, ti99_colorbus_device)
+
+void ti99_colorbus_options(device_slot_interface &device);
 
 #endif // MAME_BUS_TI99_COLORBUS_COLORBUS_H

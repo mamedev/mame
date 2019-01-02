@@ -78,7 +78,7 @@ READ8_MEMBER( namco_52xx_device::R1_r )
 
 WRITE8_MEMBER( namco_52xx_device::P_w )
 {
-	m_discrete->write(space, NAMCO_52XX_P_DATA(m_basenode), data & 0x0f);
+	m_discrete->write(NAMCO_52XX_P_DATA(m_basenode), data & 0x0f);
 }
 
 WRITE8_MEMBER( namco_52xx_device::R2_w )
@@ -176,17 +176,18 @@ void namco_52xx_device::device_start()
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(namco_52xx_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
-	MCFG_MB88XX_READ_K_CB(READ8(namco_52xx_device, K_r))
-	MCFG_MB88XX_WRITE_O_CB(WRITE8(namco_52xx_device, O_w))
-	MCFG_MB88XX_WRITE_P_CB(WRITE8(namco_52xx_device, P_w))
-	MCFG_MB88XX_READ_SI_CB(READLINE(namco_52xx_device, SI_r))
-	MCFG_MB88XX_READ_R0_CB(READ8(namco_52xx_device, R0_r))
-	MCFG_MB88XX_READ_R1_CB(READ8(namco_52xx_device, R1_r))
-	MCFG_MB88XX_WRITE_R2_CB(WRITE8(namco_52xx_device, R2_w))
-	MCFG_MB88XX_WRITE_R3_CB(WRITE8(namco_52xx_device, R3_w))
-MACHINE_CONFIG_END
+void namco_52xx_device::device_add_mconfig(machine_config &config)
+{
+	MB8843(config, m_cpu, DERIVED_CLOCK(1,1));     /* parent clock, internally divided by 6 */
+	m_cpu->read_k().set(FUNC(namco_52xx_device::K_r));
+	m_cpu->write_o().set(FUNC(namco_52xx_device::O_w));
+	m_cpu->write_p().set(FUNC(namco_52xx_device::P_w));
+	m_cpu->read_si().set(FUNC(namco_52xx_device::SI_r));
+	m_cpu->read_r<0>().set(FUNC(namco_52xx_device::R0_r));
+	m_cpu->read_r<1>().set(FUNC(namco_52xx_device::R1_r));
+	m_cpu->write_r<2>().set(FUNC(namco_52xx_device::R2_w));
+	m_cpu->write_r<3>().set(FUNC(namco_52xx_device::R3_w));
+}
 
 //-------------------------------------------------
 //  device_rom_region - return a pointer to the

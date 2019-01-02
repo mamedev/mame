@@ -319,17 +319,19 @@ public:
 		, m_convcpu(*this, "convcpu")       // conversational 80286-8
 	{ }
 
+	void fanucs15(machine_config &config);
+
+private:
 	required_device<m68020_device> m_maincpu;
 	required_device<m68000_device> m_pmccpu;
 	required_device<m68000_device> m_gfxcpu;
 	required_device<i80286_cpu_device> m_convcpu;
 
-	void fanucs15(machine_config &config);
 	void convcpu_mem(address_map &map);
 	void gfxcpu_mem(address_map &map);
 	void maincpu_mem(address_map &map);
 	void pmccpu_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 };
 
@@ -370,20 +372,20 @@ void fanucs15_state::machine_reset()
 
 MACHINE_CONFIG_START(fanucs15_state::fanucs15)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68020, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(maincpu_mem)
+	MCFG_DEVICE_ADD("maincpu", M68020, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_mem)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_CPU_ADD("pmccpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(pmccpu_mem)
+	MCFG_DEVICE_ADD("pmccpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pmccpu_mem)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_CPU_ADD("gfxcpu", M68000, XTAL(10'000'000))      // wants bit 15 of 70500 to be set
-	MCFG_CPU_PROGRAM_MAP(gfxcpu_mem)
+	MCFG_DEVICE_ADD("gfxcpu", M68000, XTAL(10'000'000))      // wants bit 15 of 70500 to be set
+	MCFG_DEVICE_PROGRAM_MAP(gfxcpu_mem)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_CPU_ADD("convcpu", I80286, XTAL(8'000'000))      // wants 70500 to return 0x8000 (same as what gfxcpu looks for, basically)
-	MCFG_CPU_PROGRAM_MAP(convcpu_mem)
+	MCFG_DEVICE_ADD("convcpu", I80286, XTAL(8'000'000))      // wants 70500 to return 0x8000 (same as what gfxcpu looks for, basically)
+	MCFG_DEVICE_PROGRAM_MAP(convcpu_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -428,5 +430,5 @@ ROM_START( fanucs15 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT     CLASS           INIT  COMPANY  FULLNAME     FLAGS
-COMP( 1990, fanucs15, 0,      0,      fanucs15,  fanucs15, fanucs15_state, 0,    "Fanuc", "System 15", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME     FLAGS
+COMP( 1990, fanucs15, 0,      0,      fanucs15, fanucs15, fanucs15_state, empty_init, "Fanuc", "System 15", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

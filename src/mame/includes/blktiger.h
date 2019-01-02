@@ -5,21 +5,28 @@
     Black Tiger
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_BLKTIGER_H
+#define MAME_INCLUDES_BLKTIGER_H
 
+#pragma once
+
+#include "cpu/mcs51/mcs51.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 
 class blktiger_state : public driver_device
 {
 public:
-	blktiger_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_spriteram(*this, "spriteram") ,
+	blktiger_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_spriteram(*this, "spriteram"),
 		m_txvideoram(*this, "txvideoram"),
 		m_mcu(*this, "mcu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_device<buffered_spriteram8_device> m_spriteram;
@@ -43,7 +50,7 @@ public:
 	uint8_t   m_i8751_latch;
 
 	/* devices */
-	optional_device<cpu_device> m_mcu;
+	optional_device<i8751_device> m_mcu;
 	required_device<cpu_device> m_audiocpu;
 	DECLARE_READ8_MEMBER(blktiger_from_mcu_r);
 	DECLARE_WRITE8_MEMBER(blktiger_to_mcu_w);
@@ -73,7 +80,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_DRIVER_INIT(blktigerb3);
+	void init_blktigerb3();
 	void blktiger(machine_config &config);
 	void blktigerbl(machine_config &config);
 	void blktiger_io_map(address_map &map);
@@ -81,3 +88,5 @@ public:
 	void blktiger_sound_map(address_map &map);
 	void blktigerbl_io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_BLKTIGER_H

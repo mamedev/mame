@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "romload.h"
 
 
 //**************************************************************************
@@ -98,10 +99,11 @@ constexpr char finder_base::DUMMY_TAG[];
 //  finder_base - constructor
 //-------------------------------------------------
 
-finder_base::finder_base(device_t &base, const char *tag)
+finder_base::finder_base(device_t &base, char const *tag)
 	: m_next(base.register_auto_finder(*this))
 	, m_base(base)
 	, m_tag(tag)
+	, m_resolved(false)
 {
 }
 
@@ -116,14 +118,26 @@ finder_base::~finder_base()
 
 
 //-------------------------------------------------
+//  set_tag - set tag
+//-------------------------------------------------
+
+void finder_base::set_tag(char const *tag)
+{
+	assert(!m_resolved);
+	m_base = m_base.get().mconfig().current_device();
+	m_tag = tag;
+}
+
+
+//-------------------------------------------------
 //  find_memregion - find memory region
 //-------------------------------------------------
 
 void *finder_base::find_memregion(u8 width, size_t &length, bool required) const
 {
 	// look up the region and return nullptr if not found
-	memory_region *const region = m_base.memregion(m_tag);
-	if (region == nullptr)
+	memory_region *const region(m_base.get().memregion(m_tag));
+	if (!region)
 	{
 		length = 0;
 		return nullptr;
@@ -162,10 +176,10 @@ bool finder_base::validate_memregion(size_t bytes, bool required) const
 {
 	// make sure we can resolve the full path to the region
 	size_t bytes_found = 0;
-	std::string region_fulltag = m_base.subtag(m_tag);
+	std::string const region_fulltag(m_base.get().subtag(m_tag));
 
 	// look for the region
-	for (device_t const &dev : device_iterator(m_base.mconfig().root_device()))
+	for (device_t const &dev : device_iterator(m_base.get().mconfig().root_device()))
 	{
 		for (romload::region const &region : romload::entries(dev.rom_region()).get_regions())
 		{
@@ -197,8 +211,8 @@ bool finder_base::validate_memregion(size_t bytes, bool required) const
 void *finder_base::find_memshare(u8 width, size_t &bytes, bool required) const
 {
 	// look up the share and return nullptr if not found
-	memory_share *share = m_base.memshare(m_tag);
-	if (share == nullptr)
+	memory_share *const share(m_base.get().memshare(m_tag));
+	if (!share)
 		return nullptr;
 
 	// check the width and warn if not correct
@@ -233,7 +247,7 @@ bool finder_base::report_missing(bool found, const char *objname, bool required)
 		return true;
 
 	// otherwise, report
-	std::string const region_fulltag = m_base.subtag(m_tag);
+	std::string const region_fulltag(m_base.get().subtag(m_tag));
 	if (required)
 		osd_printf_error("Required %s '%s' not found\n", objname, region_fulltag.c_str());
 	else

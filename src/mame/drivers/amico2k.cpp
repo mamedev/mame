@@ -43,8 +43,11 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_digits(*this, "digit%u", 0U)
-		{ }
+	{ }
 
+	void amico2k(machine_config &config);
+
+private:
 	void machine_start() override;
 
 	DECLARE_READ8_MEMBER( ppi_pa_r );
@@ -55,9 +58,8 @@ public:
 	// timers
 	emu_timer *m_led_refresh_timer;
 	TIMER_CALLBACK_MEMBER(led_refresh);
-	void amico2k(machine_config &config);
 	void amico2k_mem(address_map &map);
-private:
+
 	int m_ls145_p;
 	uint8_t m_segment;
 	required_device<cpu_device> m_maincpu;
@@ -215,17 +217,17 @@ void amico2k_state::machine_start()
 
 MACHINE_CONFIG_START(amico2k_state::amico2k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1000000) /* 1MHz */
-	MCFG_CPU_PROGRAM_MAP(amico2k_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000) /* 1MHz */
+	MCFG_DEVICE_PROGRAM_MAP(amico2k_mem)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_amico2k )
+	config.set_default_layout(layout_amico2k);
 
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(amico2k_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(amico2k_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(amico2k_state, ppi_pb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(amico2k_state, ppi_pb_w))
+	i8255_device &ppi(I8255(config, "i8255"));
+	ppi.in_pa_callback().set(FUNC(amico2k_state::ppi_pa_r));
+	ppi.out_pa_callback().set(FUNC(amico2k_state::ppi_pa_w));
+	ppi.in_pb_callback().set(FUNC(amico2k_state::ppi_pb_r));
+	ppi.out_pb_callback().set(FUNC(amico2k_state::ppi_pb_w));
 MACHINE_CONFIG_END
 
 
@@ -244,5 +246,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    STATE          INIT   COMPANY     FULLNAME      FLAGS
-COMP( 1978, amico2k,  0,      0,      amico2k, amico2k, amico2k_state, 0,     "A.S.E.L.", "Amico 2000", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME      FLAGS
+COMP( 1978, amico2k, 0,      0,      amico2k, amico2k, amico2k_state, empty_init, "A.S.E.L.", "Amico 2000", MACHINE_NO_SOUND_HW)

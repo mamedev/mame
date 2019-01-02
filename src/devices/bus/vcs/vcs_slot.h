@@ -12,6 +12,7 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
+#define A26SLOT_ROM_REGION_TAG ":cart:rom"
 
 /* PCB */
 enum
@@ -88,7 +89,16 @@ class vcs_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	vcs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	vcs_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: vcs_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	vcs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~vcs_cart_slot_device();
 
 	// image-level overrides
@@ -143,19 +153,6 @@ private:
 
 
 // device type definition
-extern const device_type VCS_CART_SLOT;
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define A26SLOT_ROM_REGION_TAG ":cart:rom"
-
-
-#define MCFG_VCS_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, VCS_CART_SLOT, 0)  \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
+DECLARE_DEVICE_TYPE(VCS_CART_SLOT, vcs_cart_slot_device)
 
 #endif // MAME_BUS_VCS_VCS_SLOT_H

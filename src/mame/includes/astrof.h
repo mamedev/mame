@@ -71,10 +71,10 @@ public:
 	DECLARE_WRITE8_MEMBER(tomahawk_audio_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(service_coin_inserted);
-	DECLARE_DRIVER_INIT(afire);
-	DECLARE_DRIVER_INIT(abattle);
-	DECLARE_DRIVER_INIT(sstarbtl);
-	DECLARE_DRIVER_INIT(acombat3);
+	void init_afire();
+	void init_abattle();
+	void init_sstarbtl();
+	void init_acombat3();
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(astrof);
 	DECLARE_MACHINE_START(abattle);

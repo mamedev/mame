@@ -288,7 +288,6 @@ Timings:
 #include "cpu/i8085/i8085.h"
 #include "sound/wave.h"
 
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -299,17 +298,17 @@ Timings:
 
 void lviv_state::io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(lviv_state::lviv_io_r), FUNC(lviv_state::lviv_io_w));
+	map(0x00, 0xff).rw(FUNC(lviv_state::io_r), FUNC(lviv_state::io_w));
 }
 
 /* memory w/r functions */
 
-void lviv_state::lviv_mem(address_map &map)
+void lviv_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x3fff).bankrw("bank1");
-	map(0x4000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xbfff).bankrw("bank3");
-	map(0xc000, 0xffff).bankrw("bank4");
+	map(0x0000, 0x3fff).bankrw(m_bank[0]);
+	map(0x4000, 0x7fff).bankrw(m_bank[1]);
+	map(0x8000, 0xbfff).bankrw(m_bank[2]);
+	map(0xc000, 0xffff).bankrw(m_bank[3]);
 }
 
 
@@ -408,7 +407,7 @@ static INPUT_PORTS_START (lviv)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_START("RESET") /* CPU */
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(PGDN)) PORT_CHANGED_MEMBER(DEVICE_SELF, lviv_state, lviv_reset, 0)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(PGDN)) PORT_CHANGED_MEMBER(DEVICE_SELF, lviv_state, reset_button, 0)
 	PORT_START("JOY") /* Joystick */
 		PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)
 		PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)
@@ -424,46 +423,43 @@ INPUT_PORTS_END
 /* machine definition */
 MACHINE_CONFIG_START(lviv_state::lviv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 2500000)
-	MCFG_CPU_PROGRAM_MAP(lviv_mem)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD(m_maincpu, I8080, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(lviv_state, lviv_ppi_0_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lviv_state, lviv_ppi_0_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(lviv_state, lviv_ppi_0_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lviv_state, lviv_ppi_0_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(lviv_state, lviv_ppi_0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lviv_state, lviv_ppi_0_portc_w))
+	I8255(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set(FUNC(lviv_state::ppi_0_porta_r));
+	m_ppi[0]->out_pa_callback().set(FUNC(lviv_state::ppi_0_porta_w));
+	m_ppi[0]->in_pb_callback().set(FUNC(lviv_state::ppi_0_portb_r));
+	m_ppi[0]->out_pb_callback().set(FUNC(lviv_state::ppi_0_portb_w));
+	m_ppi[0]->in_pc_callback().set(FUNC(lviv_state::ppi_0_portc_r));
+	m_ppi[0]->out_pc_callback().set(FUNC(lviv_state::ppi_0_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(lviv_state, lviv_ppi_1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lviv_state, lviv_ppi_1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(lviv_state, lviv_ppi_1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lviv_state, lviv_ppi_1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(lviv_state, lviv_ppi_1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lviv_state, lviv_ppi_1_portc_w))
+	I8255(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set(FUNC(lviv_state::ppi_1_porta_r));
+	m_ppi[1]->out_pa_callback().set(FUNC(lviv_state::ppi_1_porta_w));
+	m_ppi[1]->in_pb_callback().set(FUNC(lviv_state::ppi_1_portb_r));
+	m_ppi[1]->out_pb_callback().set(FUNC(lviv_state::ppi_1_portb_w));
+	m_ppi[1]->in_pc_callback().set(FUNC(lviv_state::ppi_1_portc_r));
+	m_ppi[1]->out_pc_callback().set(FUNC(lviv_state::ppi_1_portc_w));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(0)
 
 	/* video hardware */
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lviv_state, screen_update_lviv)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DRIVER(lviv_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", sizeof (lviv_palette) / 3)
-	MCFG_PALETTE_INIT_OWNER(lviv_state, lviv)
+	PALETTE(config, m_palette, FUNC(lviv_state::lviv_palette), ARRAY_LENGTH(s_palette));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", lviv_state, lviv, "sav", 0)
@@ -476,20 +472,19 @@ MACHINE_CONFIG_START(lviv_state::lviv)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","lviv")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 
 ROM_START(lviv)
 	ROM_REGION(0x14000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "lviv", "Lviv/L'vov" )
-	ROMX_LOAD("lviv.bin", 0x10000, 0x4000, CRC(44a347d9) SHA1(74e067493b2b7d9ab17333202009a1a4f5e460fd), ROM_BIOS(1))
+	ROMX_LOAD("lviv.bin", 0x10000, 0x4000, CRC(44a347d9) SHA1(74e067493b2b7d9ab17333202009a1a4f5e460fd), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "lviva", "Lviv/L'vov (alternate)" )
-	ROMX_LOAD("lviva.bin", 0x10000, 0x4000, CRC(551622f5) SHA1(b225f3542b029d767b7db9dce562e8a3f77f92a2), ROM_BIOS(2))
+	ROMX_LOAD("lviva.bin", 0x10000, 0x4000, CRC(551622f5) SHA1(b225f3542b029d767b7db9dce562e8a3f77f92a2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "lvivp", "Lviv/L'vov (prototype)" )
-	ROMX_LOAD("lvivp.bin", 0x10000, 0x4000, CRC(f171c282) SHA1(c7dc2bdb02400e6b5cdcc50040eb06f506a7ed84), ROM_BIOS(3))
+	ROMX_LOAD("lvivp.bin", 0x10000, 0x4000, CRC(f171c282) SHA1(c7dc2bdb02400e6b5cdcc50040eb06f506a7ed84), ROM_BIOS(2))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT    COMPANY         FULLNAME      FLAGS */
-COMP( 1989, lviv,   0,      0,      lviv,    lviv,  lviv_state, 0,      "V. I. Lenin",  "PK-01 Lviv", 0 )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY        FULLNAME      FLAGS */
+COMP( 1989, lviv, 0,      0,      lviv,    lviv,  lviv_state, empty_init, "V. I. Lenin", "PK-01 Lviv", 0 )

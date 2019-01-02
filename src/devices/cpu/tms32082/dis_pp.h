@@ -17,9 +17,9 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	static const char *REG_NAMES[128];
-	static const char *CONDITION_CODES[16];
-	static const char *TRANSFER_SIZE[4];
+	static char const *const REG_NAMES[128];
+	static char const *const CONDITION_CODES[16];
+	static char const *const TRANSFER_SIZE[4];
 
 
 	std::ostream *output;

@@ -1,22 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese,Carl
-
-#pragma once
-
 #ifndef MAME_INCLUDES_PC9801_H
 #define MAME_INCLUDES_PC9801_H
+
+#pragma once
 
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i286.h"
 #include "cpu/i86/i86.h"
 #include "cpu/nec/nec.h"
 
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/bankdev.h"
 #include "machine/buffer.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/latch.h"
+#include "machine/output_latch.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
@@ -47,6 +47,7 @@
 #include "machine/idehd.h"
 
 #include "debugger.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -84,6 +85,8 @@ public:
 		m_pit8253(*this, "pit8253"),
 		m_pic1(*this, "pic8259_master"),
 		m_pic2(*this, "pic8259_slave"),
+		m_ppi_sys(*this, "ppi8255_sys"),
+		m_ppi_prn(*this, "ppi8255_prn"),
 		m_fdc_2hd(*this, "upd765_2hd"),
 		m_fdc_2dd(*this, "upd765_2dd"),
 		m_rtc(*this, UPD1990A_TAG),
@@ -95,8 +98,7 @@ public:
 		m_sasi_data_out(*this, "sasi_data_out"),
 		m_sasi_data_in(*this, "sasi_data_in"),
 		m_sasi_ctrl_in(*this, "sasi_ctrl_in"),
-		m_ide1(*this, "ide1"),
-		m_ide2(*this, "ide2"),
+		m_ide(*this, "ide%u", 1U),
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"),
 		m_ext_gvram(*this, "ext_gvram"),
@@ -118,11 +120,11 @@ public:
 	void pc9821(machine_config &config);
 	void pc9801rs(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
-	DECLARE_DRIVER_INIT(pc9801_kanji);
+	void init_pc9801_kanji();
+	void init_pc9801vm_kanji();
 
 protected:
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	static void cdrom_headphones(device_t *device);
@@ -132,6 +134,8 @@ private:
 	required_device<pit8253_device> m_pit8253;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
+	required_device<i8255_device> m_ppi_sys;
+	required_device<i8255_device> m_ppi_prn;
 	required_device<upd765a_device> m_fdc_2hd;
 	optional_device<upd765a_device> m_fdc_2dd;
 	required_device<upd1990a_device> m_rtc;
@@ -143,8 +147,7 @@ private:
 	optional_device<output_latch_device> m_sasi_data_out;
 	optional_device<input_buffer_device> m_sasi_data_in;
 	optional_device<input_buffer_device> m_sasi_ctrl_in;
-	optional_device<ata_interface_device> m_ide1;
-	optional_device<ata_interface_device> m_ide2;
+	optional_device_array<ata_interface_device, 2> m_ide;
 	required_shared_ptr<uint16_t> m_video_ram_1;
 	required_shared_ptr<uint16_t> m_video_ram_2;
 	optional_shared_ptr<uint32_t> m_ext_gvram;
@@ -155,7 +158,6 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	DECLARE_WRITE_LINE_MEMBER( write_uart_clock );
 	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_WRITE8_MEMBER(dmapg4_w);
 	DECLARE_WRITE8_MEMBER(dmapg8_w);
@@ -197,8 +199,6 @@ private:
 	DECLARE_WRITE16_MEMBER(ide_cs0_w);
 	DECLARE_READ16_MEMBER(ide_cs1_r);
 	DECLARE_WRITE16_MEMBER(ide_cs1_w);
-	DECLARE_WRITE_LINE_MEMBER(ide1_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(ide2_irq_w);
 
 	DECLARE_WRITE8_MEMBER(sasi_data_w);
 	DECLARE_READ8_MEMBER(sasi_data_r);
@@ -278,8 +278,8 @@ private:
 	DECLARE_MACHINE_RESET(pc9801rs);
 	DECLARE_MACHINE_RESET(pc9821);
 
-	DECLARE_PALETTE_INIT(pc9801);
-	INTERRUPT_GEN_MEMBER(vrtc_irq);
+	void pc9801_palette(palette_device &palette) const;
+	DECLARE_WRITE_LINE_MEMBER(vrtc_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
@@ -332,7 +332,6 @@ private:
 	};
 
 	inline void set_dma_channel(int channel, int state);
-	emu_timer *m_vbirq;
 	uint8_t *m_char_rom;
 	uint8_t *m_kanji_rom;
 
@@ -369,7 +368,6 @@ private:
 	}m_mouse;
 
 	uint8_t m_ide_sel;
-	bool m_ide1_irq, m_ide2_irq;
 
 	/* PC9801RS specific, move to specific state */
 	uint8_t m_gate_a20; //A20 line
@@ -418,5 +416,4 @@ private:
 	uint16_t egc_shift(int plane, uint16_t val);
 };
 
-
-#endif
+#endif // MAME_INCLUDES_PC9801_H

@@ -112,6 +112,10 @@ public:
 		, m_via(*this, "via")
 		, m_overlay(1)
 	{ }
+
+	void lwriter(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER(bankedarea_r);
 	DECLARE_WRITE16_MEMBER(bankedarea_w);
 	DECLARE_WRITE8_MEMBER(led_out_w);
@@ -127,9 +131,8 @@ public:
 	//DECLARE_WRITE_LINE_MEMBER(scc_int);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
-	void lwriter(machine_config &config);
 	void maincpu_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<scc8530_device> m_scc;
 
@@ -204,12 +207,12 @@ as well as PA0 (ST1), PA2 (ST2) and PA3 (ADB /INT)
 void lwriter_state::maincpu_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x1fffff).rw(this, FUNC(lwriter_state::bankedarea_r), FUNC(lwriter_state::bankedarea_w));
+	map(0x000000, 0x1fffff).rw(FUNC(lwriter_state::bankedarea_r), FUNC(lwriter_state::bankedarea_w));
 	map(0x200000, 0x2fffff).rom().region("rom", 0); // 1MB ROM
 	//AM_RANGE(0x300000, 0x3fffff) // open bus?
 	map(0x400000, 0x5fffff).ram().region("dram", 0).mirror(0x200000); // 2MB DRAM
-	map(0x800000, 0x800000).w(this, FUNC(lwriter_state::led_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
-	map(0x800001, 0x800001).w(this, FUNC(lwriter_state::fifo_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
+	map(0x800000, 0x800000).w(FUNC(lwriter_state::led_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
+	map(0x800001, 0x800001).w(FUNC(lwriter_state::fifo_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
 	map(0xc00001, 0xc00001).w(m_scc, FUNC(scc8530_device::ca_w)).mirror(0x1ffff8);
 	map(0xc00005, 0xc00005).w(m_scc, FUNC(scc8530_device::da_w)).mirror(0x1ffff8);
 	map(0xa00000, 0xa00000).r(m_scc, FUNC(scc8530_device::ca_r)).mirror(0x1ffff8);
@@ -349,47 +352,50 @@ WRITE_LINE_MEMBER(lwriter_state::scc_int)
     m_via->write_ca1(state);
 }*/
 
-#define CPU_CLK (XTAL(22'321'000) / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
+#define CPU_CLK (22.321_MHz_XTAL / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
 #define RXC_CLK ((CPU_CLK.value() - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
 
-MACHINE_CONFIG_START(lwriter_state::lwriter)
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLK)
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_SCC8530_ADD("scc", CPU_CLK, RXC_CLK, 0, RXC_CLK, 0)
+void lwriter_state::lwriter(machine_config &config)
+{
+	M68000(config, m_maincpu, CPU_CLK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lwriter_state::maincpu_map);
+
+	SCC8530N(config, m_scc, CPU_CLK);
+	m_scc->configure_channels(RXC_CLK, 0, RXC_CLK, 0);
 	/* Port A */
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	m_scc->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	m_scc->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
 	/* Port B */
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+	m_scc->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	m_scc->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 	/* Interrupt */
-	MCFG_Z80SCC_OUT_INT_CB(DEVWRITELINE("via", via6522_device, write_ca1))
-	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE(lwriter_state, scc_int))
+	m_scc->out_int_callback().set("via", FUNC(via6522_device::write_ca1));
+	//m_scc->out_int_callback().set(FUNC(lwriter_state::scc_int));
 
-	MCFG_RS232_PORT_ADD ("rs232a", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc8530_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc8530_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
+	rs232a.rxd_handler().set("scc", FUNC(scc8530_device::rxa_w));
+	rs232a.cts_handler().set("scc", FUNC(scc8530_device::ctsa_w));
 
-	MCFG_RS232_PORT_ADD ("rs232b", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc8530_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc8530_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, "terminal"));
+	rs232b.rxd_handler().set("scc", FUNC(scc8530_device::rxb_w));
+	rs232b.cts_handler().set("scc", FUNC(scc8530_device::ctsb_w));
 
 #if TPI
-	MCFG_DEVICE_ADD("tpi", TPI6525, 0)
+	TPI6525(config, "tpi", 0);
 #else
-	MCFG_DEVICE_ADD("via", VIA6522, CPU_CLK/10) // 68000 E clock presumed
-	MCFG_VIA6522_READPA_HANDLER(READ8(lwriter_state, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(lwriter_state, via_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(lwriter_state, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(lwriter_state, via_pb_w))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(lwriter_state, via_cb1_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(lwriter_state, via_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(lwriter_state, via_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(lwriter_state, via_int_w))
+	VIA6522(config, m_via, CPU_CLK/10); // 68000 E clock presumed
+	m_via->readpa_handler().set(FUNC(lwriter_state::via_pa_r));
+	m_via->readpb_handler().set(FUNC(lwriter_state::via_pb_r));
+	m_via->writepa_handler().set(FUNC(lwriter_state::via_pa_w));
+	m_via->writepb_handler().set(FUNC(lwriter_state::via_pb_w));
+	m_via->cb1_handler().set(FUNC(lwriter_state::via_cb1_w));
+	m_via->ca2_handler().set(FUNC(lwriter_state::via_ca2_w));
+	m_via->cb2_handler().set(FUNC(lwriter_state::via_cb2_w));
+	m_via->irq_handler().set(FUNC(lwriter_state::via_int_w));
 #endif
-MACHINE_CONFIG_END
+}
 
 /* SCC init sequence
  * :scc B Reg 09 <- c0 - Master Interrupt Control - Device reset
@@ -438,5 +444,5 @@ ROM_START(lwriter)
 
 ROM_END
 
-/*    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      STATE          INIT  COMPANY            FULLNAME                    FLAGS */
-CONS( 1988, lwriter,    0,        0,      lwriter,   lwriter,   lwriter_state, 0,    "Apple Computer",  "Apple Laser Writer II NT", MACHINE_IS_SKELETON)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT        COMPANY            FULLNAME                    FLAGS */
+CONS( 1988, lwriter, 0,      0,      lwriter, lwriter, lwriter_state, empty_init, "Apple Computer",  "Apple Laser Writer II NT", MACHINE_IS_SKELETON)

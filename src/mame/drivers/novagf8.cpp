@@ -36,20 +36,21 @@ public:
 		: novagbase_state(mconfig, type, tag)
 	{ }
 
+	void delta1(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+private:
 	u8 m_io[2]; // F8 CPU I/O ports
-	F3853_INTERRUPT_REQ_CB(f3853_interrupt);
 
 	// Delta-1
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	DECLARE_WRITE8_MEMBER(delta1_io0_w);
 	DECLARE_WRITE8_MEMBER(delta1_io1_w);
 	DECLARE_READ8_MEMBER(delta1_io0_r);
 	DECLARE_READ8_MEMBER(delta1_io1_r);
 	void delta1_io(address_map &map);
 	void delta1_map(address_map &map);
-	void delta1(machine_config &config);
 
-protected:
 	virtual void machine_start() override;
 };
 
@@ -128,8 +129,8 @@ void novagf8_state::delta1_map(address_map &map)
 
 void novagf8_state::delta1_io(address_map &map)
 {
-	map(0x0, 0x0).rw(this, FUNC(novagf8_state::delta1_io0_r), FUNC(novagf8_state::delta1_io0_w));
-	map(0x1, 0x1).rw(this, FUNC(novagf8_state::delta1_io1_r), FUNC(novagf8_state::delta1_io1_w));
+	map(0x0, 0x0).rw(FUNC(novagf8_state::delta1_io0_r), FUNC(novagf8_state::delta1_io0_w));
+	map(0x1, 0x1).rw(FUNC(novagf8_state::delta1_io1_r), FUNC(novagf8_state::delta1_io1_w));
 	map(0xc, 0xf).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
@@ -184,24 +185,19 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-F3853_INTERRUPT_REQ_CB(novagf8_state::f3853_interrupt)
-{
-	m_maincpu->set_input_line_vector(F8_INPUT_LINE_INT_REQ, addr);
-	m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE);
-}
-
 MACHINE_CONFIG_START(novagf8_state::delta1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", F8, 2000000) // LC circuit, measured 2MHz
-	MCFG_CPU_PROGRAM_MAP(delta1_map)
-	MCFG_CPU_IO_MAP(delta1_io)
+	MCFG_DEVICE_ADD("maincpu", F8, 2000000) // LC circuit, measured 2MHz
+	MCFG_DEVICE_PROGRAM_MAP(delta1_map)
+	MCFG_DEVICE_IO_MAP(delta1_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("f3853", f3853_device, int_acknowledge)
 
-	MCFG_DEVICE_ADD("f3853", F3853, 2000000)
-	MCFG_F3853_EXT_INPUT_CB(novagf8_state, f3853_interrupt)
+	f3853_device &f3853(F3853(config, "f3853", 2000000));
+	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_delta1)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagf8_state, display_decay_tick, attotime::from_msec(1))
+	config.set_default_layout(layout_novag_delta1);
 MACHINE_CONFIG_END
 
 
@@ -221,5 +217,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT  CMP MACHINE  INPUT    STATE          INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1979, ccdelta1, 0,       0, delta1,  delta1,  novagf8_state, 0,    "Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS          INIT        COMPANY  FULLNAME                   FLAGS
+CONS( 1979, ccdelta1, 0,      0,      delta1,  delta1, novagf8_state, empty_init, "Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

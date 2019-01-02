@@ -72,7 +72,8 @@ X - change banks
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "imagedev/floppy.h"
+#include "machine/z80daisy.h"
 #include "machine/74259.h"
 #include "machine/clock.h"
 #include "machine/keyboard.h"
@@ -82,6 +83,7 @@ X - change banks
 #include "machine/z80sio.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -125,7 +127,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sio_wrdya_w);
 	DECLARE_WRITE_LINE_MEMBER(sio_wrdyb_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_DRIVER_INIT(bigbord2);
+	void init_bigbord2();
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
@@ -147,7 +149,7 @@ private:
 	address_space *m_mem;
 	address_space *m_io;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_ram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80ctc_device> m_ctc1;
@@ -339,12 +341,12 @@ void bigbord2_state::bigbord2_io(address_map &map)
 	map(0x80, 0x83).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)); // u16
 	map(0x84, 0x87).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // u37 has issues
 	map(0x88, 0x8b).rw(m_ctc2, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)); // u21
-	map(0x8c, 0x8f).rw(m_dma, FUNC(z80dma_device::read), FUNC(z80dma_device::write)); // u62
+	map(0x8c, 0x8f).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w)); // u62
 	map(0xc0, 0xc3).w("proglatch", FUNC(ls259_device::write_nibble_d3)); // u41 - eprom programming port
-	map(0xc4, 0xc7).r(this, FUNC(bigbord2_state::status_port_r)); // u11
+	map(0xc4, 0xc7).r(FUNC(bigbord2_state::status_port_r)); // u11
 	map(0xc8, 0xcb).w(m_syslatch1, FUNC(ls259_device::write_nibble_d3)); // u14
-	map(0xcc, 0xcf).w(this, FUNC(bigbord2_state::syslatch2_w));
-	map(0xd0, 0xd3).r(this, FUNC(bigbord2_state::kbd_r)); // u1
+	map(0xcc, 0xcf).w(FUNC(bigbord2_state::syslatch2_w));
+	map(0xd0, 0xd3).r(FUNC(bigbord2_state::kbd_r)); // u1
 	map(0xd4, 0xd7).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write)); // u10
 	//AM_RANGE(0xd8, 0xdb) AM_READWRITE(portd8_r, portd8_w) // various external data ports; DB = centronics printer
 	map(0xd9, 0xd9).w("outlatch1", FUNC(ls259_device::write_nibble_d3)); // u96
@@ -403,9 +405,10 @@ static const z80_daisy_config daisy_chain[] =
 
 /* WD1793 Interface */
 
-static SLOT_INTERFACE_START( bigbord2_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void bigbord2_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 
 /* Machine Initialization */
@@ -428,7 +431,7 @@ void bigbord2_state::machine_reset()
 	m_banka->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(bigbord2_state,bigbord2)
+void bigbord2_state::init_bigbord2()
 {
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 	m_io = &m_maincpu->space(AS_IO);
@@ -454,7 +457,7 @@ static const gfx_layout crt8002_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( crt8002 )
+static GFXDECODE_START( gfx_crt8002 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, crt8002_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -543,86 +546,86 @@ MC6845_UPDATE_ROW( bigbord2_state::crtc_update_row )
 
 /* Machine Drivers */
 
-#define MAIN_CLOCK XTAL(8'000'000) / 2
+#define MAIN_CLOCK 8_MHz_XTAL / 2
 
 MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(bigbord2_mem)
-	MCFG_CPU_IO_MAP(bigbord2_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bigbord2_state::bigbord2_mem);
+	m_maincpu->set_addrmap(AS_IO, &bigbord2_state::bigbord2_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'694'250), 700, 0, 560, 260, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crt8002)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crt8002)
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, MAIN_CLOCK)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bigbord2_state, clock_w))
+	CLOCK(config, "ctc_clock", MAIN_CLOCK).signal_handler().set(FUNC(bigbord2_state::clock_w));
 
 	/* devices */
-	MCFG_DEVICE_ADD("dma", Z80DMA, MAIN_CLOCK)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(bigbord2_state, busreq_w))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(bigbord2_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(bigbord2_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(bigbord2_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(bigbord2_state, io_write_byte))
+	Z80DMA(config, m_dma, MAIN_CLOCK);
+	m_dma->out_busreq_callback().set(FUNC(bigbord2_state::busreq_w));
+	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_dma->in_mreq_callback().set(FUNC(bigbord2_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(bigbord2_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(bigbord2_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(bigbord2_state::io_write_byte));
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, MAIN_CLOCK)
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_SYNCA_CB(DEVWRITELINE("ctc1", z80ctc_device, trg2))
-	MCFG_Z80SIO_OUT_WRDYA_CB(WRITELINE(bigbord2_state, sio_wrdya_w))
-	MCFG_Z80SIO_OUT_WRDYB_CB(WRITELINE(bigbord2_state, sio_wrdyb_w))
+	Z80SIO(config, m_sio, MAIN_CLOCK);
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_sio->out_synca_callback().set(m_ctc1, FUNC(z80ctc_device::trg2));
+	m_sio->out_wrdya_callback().set(FUNC(bigbord2_state::sio_wrdya_w));
+	m_sio->out_wrdyb_callback().set(FUNC(bigbord2_state::sio_wrdyb_w));
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, MAIN_CLOCK)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc1, MAIN_CLOCK);
+	m_ctc1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ctc2", Z80CTC, MAIN_CLOCK)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))    // to SIO Ch B
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(bigbord2_state, ctc_z1_w))  // to SIO Ch A
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc2", z80ctc_device, trg3))
+	Z80CTC(config, m_ctc2, MAIN_CLOCK);
+	m_ctc2->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc2->zc_callback<0>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));    // to SIO Ch B
+	m_ctc2->zc_callback<1>().set(FUNC(bigbord2_state::ctc_z1_w));  // to SIO Ch A
+	m_ctc2->zc_callback<2>().set(m_ctc2, FUNC(z80ctc_device::trg3));
 
-	MCFG_MB8877_ADD("fdc", XTAL(16'000'000) / 8) // 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
-	//MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", ??)) // info missing from schematic
+	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
+	//m_fdc->intrq_wr_callback().set_inputline(m_maincpu, ??); // info missing from schematic
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(16'000'000) / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(bigbord2_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("ctc1", z80ctc_device, trg3))
+	mc6845_device &crtc(MC6845(config, "crtc", 16_MHz_XTAL / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(bigbord2_state::crtc_update_row), this);
+	crtc.out_vsync_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
 
-	MCFG_DEVICE_ADD("proglatch", LS259, 0) // U41
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("outlatch1", ls259_device, clear_w)) // FCRST - also resets the 8877
+	ls259_device &proglatch(LS259(config, "proglatch")); // U41
+	proglatch.q_out_cb<6>().set("outlatch1", FUNC(ls259_device::clear_w)); // FCRST - also resets the 8877
 
-	MCFG_DEVICE_ADD("syslatch1", LS259, 0) // U14
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(MEMBANK("bankr")) // D_S
-	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("bankv"))
-	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("banka"))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(bigbord2_state, side_select_w)) // SIDSEL
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(bigbord2_state, smc1_w)) // SMC1
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(bigbord2_state, smc2_w)) // SMC2
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("fdc", mb8877_device, dden_w)) // DDEN
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(bigbord2_state, head_load_w)) // HLD
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(bigbord2_state, disk_motor_w)) // MOTOR
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("beeper", beep_device, set_state)) // BELL
+	LS259(config, m_syslatch1, 0); // U14
+	m_syslatch1->q_out_cb<0>().set_membank(m_bankr); // D_S
+	m_syslatch1->q_out_cb<0>().append_membank(m_bankv);
+	m_syslatch1->q_out_cb<0>().append_membank(m_banka);
+	m_syslatch1->q_out_cb<1>().set(FUNC(bigbord2_state::side_select_w)); // SIDSEL
+	m_syslatch1->q_out_cb<2>().set(FUNC(bigbord2_state::smc1_w)); // SMC1
+	m_syslatch1->q_out_cb<3>().set(FUNC(bigbord2_state::smc2_w)); // SMC2
+	m_syslatch1->q_out_cb<4>().set(m_fdc, FUNC(mb8877_device::dden_w)); // DDEN
+	m_syslatch1->q_out_cb<5>().set(FUNC(bigbord2_state::head_load_w)); // HLD
+	m_syslatch1->q_out_cb<6>().set(FUNC(bigbord2_state::disk_motor_w)); // MOTOR
+	m_syslatch1->q_out_cb<7>().set("beeper", FUNC(beep_device::set_state)); // BELL
 
 	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // U96
 
 	/* keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(bigbord2_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(bigbord2_state::kbd_put));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 950) // actual frequency is unknown
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 950) // actual frequency is unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -639,5 +642,5 @@ ROM_START( bigbord2 )
 ROM_END
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY                       FULLNAME        FLAGS
-COMP( 1982, bigbord2, 0,        0,      bigbord2, bigbord2, bigbord2_state, bigbord2, "Digital Research Computers", "Big Board II", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY                       FULLNAME        FLAGS
+COMP( 1982, bigbord2, 0,      0,      bigbord2, bigbord2, bigbord2_state, init_bigbord2, "Digital Research Computers", "Big Board II", MACHINE_NOT_WORKING )

@@ -256,7 +256,7 @@ const m6800_cpu_device::op_func m6801_cpu_device::hd63701_insn[0x100] = {
 
 void m6801_cpu_device::m6803_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw(this, FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
+	map(0x0000, 0x001f).rw(FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
 	map(0x0020, 0x007f).noprw();        /* unused */
 	map(0x0080, 0x00ff).ram();        /* 6803 internal RAM */
 }
@@ -276,7 +276,8 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, const char *ta
 
 m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles, address_map_constructor internal)
 	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, internal)
-	, m_io_config("io", ENDIANNESS_BIG, 8, 9, 0)
+	, m_in_port_func{{*this}, {*this}, {*this}, {*this}}
+	, m_out_port_func{{*this}, {*this}, {*this}, {*this}}
 	, m_out_sc2_func(*this)
 	, m_out_sertx_func(*this)
 {
@@ -310,13 +311,6 @@ hd6303r_cpu_device::hd6303r_cpu_device(const machine_config &mconfig, const char
 hd6303y_cpu_device::hd6303y_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hd6301_cpu_device(mconfig, HD6303Y, tag, owner, clock)
 {
-}
-
-device_memory_interface::space_config_vector m6801_cpu_device::memory_space_config() const
-{
-	auto r = m6800_cpu_device::memory_space_config();
-	r.emplace_back(std::make_pair(AS_IO, &m_io_config));
-	return r;
 }
 
 void m6801_cpu_device::m6800_check_irq2()
@@ -359,10 +353,10 @@ void m6801_cpu_device::check_timer_event()
 			TAKE_OCI;
 
 		// if output on P21 is enabled, let's do it
-		if (m_port2_ddr & 2)
+		if (m_port_ddr[1] & 2)
 		{
-			m_port2_data &= ~2;
-			m_port2_data |= (m_tcsr & TCSR_OLVL) << 1;
+			m_port_data[1] &= ~2;
+			m_port_data[1] |= (m_tcsr & TCSR_OLVL) << 1;
 			m_port2_written = 1;
 			write_port2();
 		}
@@ -443,7 +437,7 @@ void m6801_cpu_device::set_rmcr(uint8_t data)
 
 int m6801_cpu_device::m6800_rx()
 {
-	return (m_io->read_byte(M6801_PORT2) & M6801_PORT2_IO3) >> 3;
+	return (m_in_port_func[1]() & M6801_PORT2_IO3) >> 3;
 }
 
 void m6801_cpu_device::serial_transmit()
@@ -453,7 +447,7 @@ void m6801_cpu_device::serial_transmit()
 	if (m_trcsr & M6801_TRCSR_TE)
 	{
 		// force Port 2 bit 4 as output
-		m_port2_ddr |= M6801_PORT2_IO4;
+		m_port_ddr[1] |= M6801_PORT2_IO4;
 
 		switch (m_txstate)
 		{
@@ -656,9 +650,9 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 			if (!m_port3_latched && (m_p3csr & M6801_P3CSR_LE))
 			{
 				// latch input data to port 3
-				m_port3_data = (m_io->read_byte(M6801_PORT3) & (m_port3_ddr ^ 0xff)) | (m_port3_data & m_port3_ddr);
+				m_port_data[2] = (m_in_port_func[2]() & (m_port_ddr[2] ^ 0xff)) | (m_port_data[2] & m_port_ddr[2]);
 				m_port3_latched = 1;
-				LOGPORT("Latched Port 3 Data: %02x\n", m_port3_data);
+				LOGPORT("Latched Port 3 Data: %02x\n", m_port_data[2]);
 
 				// set IS3 flag bit
 				m_p3csr |= M6801_P3CSR_IS3_FLAG;
@@ -696,32 +690,33 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 }
 
 
+void m6801_cpu_device::device_resolve_objects()
+{
+	for (auto &cb : m_in_port_func)
+		cb.resolve_safe(0xff);
+	for (auto &cb : m_out_port_func)
+		cb.resolve_safe();
+	m_out_sc2_func.resolve_safe();
+	m_out_sertx_func.resolve_safe();
+}
+
+
 void m6801_cpu_device::device_start()
 {
 	m6800_cpu_device::device_start();
 
-	m_io = &space(AS_IO);
-
-	m_out_sc2_func.resolve_safe();
-	m_out_sertx_func.resolve_safe();
 	m_sci_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m6801_cpu_device::sci_tick),this));
 
-	m_port4_ddr = 0;
-	m_port4_data = 0;
+	m_port_ddr[3] = 0;
+	m_port_data[3] = 0;
 	m_input_capture = 0;
 	m_rdr = 0;
 	m_tdr = 0;
 	m_rmcr = 0;
 	m_ram_ctrl = 0;
 
-	save_item(NAME(m_port1_ddr));
-	save_item(NAME(m_port2_ddr));
-	save_item(NAME(m_port3_ddr));
-	save_item(NAME(m_port4_ddr));
-	save_item(NAME(m_port1_data));
-	save_item(NAME(m_port2_data));
-	save_item(NAME(m_port3_data));
-	save_item(NAME(m_port4_data));
+	save_item(NAME(m_port_ddr));
+	save_item(NAME(m_port_data));
 	save_item(NAME(m_p3csr));
 	save_item(NAME(m_tcsr));
 	save_item(NAME(m_pending_tcsr));
@@ -767,10 +762,10 @@ void m6801_cpu_device::device_reset()
 	m_irq_state[M6801_TIN_LINE] = 0;
 	m_sc1_state = 0;
 
-	m_port1_ddr = 0x00;
-	m_port2_ddr = 0x00;
-	m_port3_ddr = 0x00;
-	m_port1_data = 0;
+	m_port_ddr[0] = 0x00;
+	m_port_ddr[1] = 0x00;
+	m_port_ddr[2] = 0x00;
+	m_port_data[0] = 0;
 	m_p3csr = 0x00;
 	m_p3csr_is3_flag_read = 0;
 	m_port2_written = 0;
@@ -805,12 +800,12 @@ void m6801_cpu_device::write_port2()
 {
 	if (!m_port2_written) return;
 
-	uint8_t data = m_port2_data;
-	uint8_t ddr = m_port2_ddr & 0x1f;
+	uint8_t data = m_port_data[1];
+	uint8_t ddr = m_port_ddr[1] & 0x1f;
 
 	if ((ddr != 0x1f) && ddr)
 	{
-		data = (m_port2_data & ddr) | (ddr ^ 0xff);
+		data = (m_port_data[1] & ddr) | (ddr ^ 0xff);
 	}
 
 	if (m_trcsr & M6801_TRCSR_TE)
@@ -820,7 +815,7 @@ void m6801_cpu_device::write_port2()
 
 	data &= 0x1f;
 
-	m_io->write_byte(M6801_PORT2, data);
+	m_out_port_func[1](data);
 }
 
 /*
@@ -845,27 +840,27 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 	switch (offset)
 	{
 	case IO_P1DDR:
-		data = m_port1_ddr;
+		data = m_port_ddr[0];
 		break;
 
 	case IO_P2DDR:
-		data = m_port2_ddr;
+		data = m_port_ddr[1];
 		break;
 
 	case IO_P1DATA:
-		if(m_port1_ddr == 0xff)
-			data = m_port1_data;
+		if(m_port_ddr[0] == 0xff)
+			data = m_port_data[0];
 		else
-			data = (m_io->read_byte(M6801_PORT1) & (m_port1_ddr ^ 0xff))
-				| (m_port1_data & m_port1_ddr);
+			data = (m_in_port_func[0]() & (m_port_ddr[0] ^ 0xff))
+				| (m_port_data[0] & m_port_ddr[0]);
 		break;
 
 	case IO_P2DATA:
-		if(m_port2_ddr == 0xff)
-			data = m_port2_data;
+		if(m_port_ddr[1] == 0xff)
+			data = m_port_data[1];
 		else
-			data = (m_io->read_byte(M6801_PORT2) & (m_port2_ddr ^ 0xff))
-				| (m_port2_data & m_port2_ddr);
+			data = (m_in_port_func[1]() & (m_port_ddr[1] ^ 0xff))
+				| (m_port_data[1] & m_port_ddr[1]);
 		break;
 
 	case IO_P3DDR:
@@ -873,7 +868,7 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		break;
 
 	case IO_P4DDR:
-		data = m_port4_ddr;
+		data = m_port_ddr[3];
 		break;
 
 	case IO_P3DATA:
@@ -892,11 +887,11 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 			}
 		}
 
-		if ((m_p3csr & M6801_P3CSR_LE) || (m_port3_ddr == 0xff))
-			data = m_port3_data;
+		if ((m_p3csr & M6801_P3CSR_LE) || (m_port_ddr[2] == 0xff))
+			data = m_port_data[2];
 		else
-			data = (m_io->read_byte(M6801_PORT3) & (m_port3_ddr ^ 0xff))
-				| (m_port3_data & m_port3_ddr);
+			data = (m_in_port_func[2]() & (m_port_ddr[2] ^ 0xff))
+				| (m_port_data[2] & m_port_ddr[2]);
 
 		if (!machine().side_effects_disabled())
 		{
@@ -910,11 +905,11 @@ READ8_MEMBER( m6801_cpu_device::m6801_io_r )
 		break;
 
 	case IO_P4DATA:
-		if(m_port4_ddr == 0xff)
-			data = m_port4_data;
+		if(m_port_ddr[3] == 0xff)
+			data = m_port_data[3];
 		else
-			data = (m_io->read_byte(M6801_PORT4) & (m_port4_ddr ^ 0xff))
-				| (m_port4_data & m_port4_ddr);
+			data = (m_in_port_func[3]() & (m_port_ddr[3] ^ 0xff))
+				| (m_port_data[3] & m_port_ddr[3]);
 		break;
 
 	case IO_TCSR:
@@ -1055,22 +1050,19 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 	case IO_P1DDR:
 		LOGPORT("Port 1 Data Direction Register: %02x\n", data);
 
-		if (m_port1_ddr != data)
+		if (m_port_ddr[0] != data)
 		{
-			m_port1_ddr = data;
-			if(m_port1_ddr == 0xff)
-				m_io->write_byte(M6801_PORT1,m_port1_data);
-			else
-				m_io->write_byte(M6801_PORT1,(m_port1_data & m_port1_ddr) | (m_port1_ddr ^ 0xff));
+			m_port_ddr[0] = data;
+			m_out_port_func[0]((m_port_data[0] & m_port_ddr[0]) | (m_port_ddr[0] ^ 0xff));
 		}
 		break;
 
 	case IO_P2DDR:
 		LOGPORT("Port 2 Data Direction Register: %02x\n", data);
 
-		if (m_port2_ddr != data)
+		if (m_port_ddr[1] != data)
 		{
-			m_port2_ddr = data;
+			m_port_ddr[1] = data;
 			write_port2();
 		}
 		break;
@@ -1078,17 +1070,14 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 	case IO_P1DATA:
 		LOGPORT("Port 1 Data Register: %02x\n", data);
 
-		m_port1_data = data;
-		if(m_port1_ddr == 0xff)
-			m_io->write_byte(M6801_PORT1,m_port1_data);
-		else
-			m_io->write_byte(M6801_PORT1,(m_port1_data & m_port1_ddr) | (m_port1_ddr ^ 0xff));
+		m_port_data[0] = data;
+		m_out_port_func[0]((m_port_data[0] & m_port_ddr[0]) | (m_port_ddr[0] ^ 0xff));
 		break;
 
 	case IO_P2DATA:
 		LOGPORT("Port 2 Data Register: %02x\n", data);
 
-		m_port2_data = data;
+		m_port_data[1] = data;
 		m_port2_written = 1;
 		write_port2();
 		break;
@@ -1096,26 +1085,20 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 	case IO_P3DDR:
 		LOGPORT("Port 3 Data Direction Register: %02x\n", data);
 
-		if (m_port3_ddr != data)
+		if (m_port_ddr[2] != data)
 		{
-			m_port3_ddr = data;
-			if(m_port3_ddr == 0xff)
-				m_io->write_byte(M6801_PORT3,m_port3_data);
-			else
-				m_io->write_byte(M6801_PORT3,(m_port3_data & m_port3_ddr) | (m_port3_ddr ^ 0xff));
+			m_port_ddr[2] = data;
+			m_out_port_func[2]((m_port_data[2] & m_port_ddr[2]) | (m_port_ddr[2] ^ 0xff));
 		}
 		break;
 
 	case IO_P4DDR:
 		LOGPORT("Port 4 Data Direction Register: %02x\n", data);
 
-		if (m_port4_ddr != data)
+		if (m_port_ddr[3] != data)
 		{
-			m_port4_ddr = data;
-			if(m_port4_ddr == 0xff)
-				m_io->write_byte(M6801_PORT4,m_port4_data);
-			else
-				m_io->write_byte(M6801_PORT4,(m_port4_data & m_port4_ddr) | (m_port4_ddr ^ 0xff));
+			m_port_ddr[3] = data;
+			m_out_port_func[3]((m_port_data[3] & m_port_ddr[3]) | (m_port_ddr[3] ^ 0xff));
 		}
 		break;
 
@@ -1134,11 +1117,8 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 			set_os3(ASSERT_LINE);
 		}
 
-		m_port3_data = data;
-		if(m_port3_ddr == 0xff)
-			m_io->write_byte(M6801_PORT3,m_port3_data);
-		else
-			m_io->write_byte(M6801_PORT3,(m_port3_data & m_port3_ddr) | (m_port3_ddr ^ 0xff));
+		m_port_data[2] = data;
+		m_out_port_func[2]((m_port_data[2] & m_port_ddr[2]) | (m_port_ddr[2] ^ 0xff));
 
 		if (m_p3csr & M6801_P3CSR_OSS)
 		{
@@ -1149,11 +1129,8 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 	case IO_P4DATA:
 		LOGPORT("Port 4 Data Register: %02x\n", data);
 
-		m_port4_data = data;
-		if(m_port4_ddr == 0xff)
-			m_io->write_byte(M6801_PORT4,m_port4_data);
-		else
-			m_io->write_byte(M6801_PORT4,(m_port4_data & m_port4_ddr) | (m_port4_ddr ^ 0xff));
+		m_port_data[3] = data;
+		m_out_port_func[3]((m_port_data[3] & m_port_ddr[3]) | (m_port_ddr[3] ^ 0xff));
 		break;
 
 	case IO_TCSR:

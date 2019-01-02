@@ -49,24 +49,6 @@ WRITE8_MEMBER( abc800_state::hrc_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  translate_trom_offset -
-//-------------------------------------------------
-
-offs_t abc800c_state::translate_trom_offset(offs_t offset)
-{
-	int row = offset / 40;
-	int col = offset % 40;
-
-	offset = ((row & 0x07) * 0x80) + col;
-
-	if (row & 0x08) offset += 0x28;
-	if (row & 0x10) offset += 0x50;
-
-	return offset;
-}
-
-
-//-------------------------------------------------
 //  hr_update - high resolution screen update
 //-------------------------------------------------
 
@@ -113,14 +95,6 @@ void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 }
 
 
-void abc800_state::video_start()
-{
-	// register for state saving
-	save_item(NAME(m_hrs));
-	save_item(NAME(m_fgctl));
-}
-
-
 //-------------------------------------------------
 //  SCREEN_UPDATE( abc800c )
 //-------------------------------------------------
@@ -149,7 +123,15 @@ uint32_t abc800c_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 READ8_MEMBER( abc800c_state::char_ram_r )
 {
-	return m_char_ram[translate_trom_offset(offset)];
+	int row = offset / 40;
+	int col = offset % 40;
+
+	offset = ((row & 0x07) * 0x80) + col;
+
+	if (row & 0x08) offset += 0x28;
+	if (row & 0x10) offset += 0x50;
+
+	return m_char_ram[offset];
 }
 
 
@@ -157,16 +139,16 @@ READ8_MEMBER( abc800c_state::char_ram_r )
 //  PALETTE_INIT( abc800c )
 //-------------------------------------------------
 
-PALETTE_INIT_MEMBER( abc800c_state, abc800c )
+void abc800c_state::abc800c_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // black
+	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
-	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // green
+	palette.set_pen_color(2, rgb_t::green());
 	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0x00)); // yellow
 	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0xff)); // blue
 	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0xff)); // magenta
 	palette.set_pen_color(6, rgb_t(0x00, 0xff, 0xff)); // cyan
-	palette.set_pen_color(7, rgb_t(0xff, 0xff, 0xff)); // white
+	palette.set_pen_color(7, rgb_t::white());
 }
 
 
@@ -182,11 +164,10 @@ MACHINE_CONFIG_START(abc800c_state::abc800c_video)
 	MCFG_SCREEN_SIZE(480, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 480-1)
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(abc800c_state, abc800c)
+	PALETTE(config, m_palette, FUNC(abc800c_state::abc800c_palette), 8);
 
 	MCFG_DEVICE_ADD(SAA5052_TAG, SAA5052, XTAL(12'000'000)/2)
-	MCFG_SAA5050_D_CALLBACK(READ8(abc800c_state, char_ram_r))
+	MCFG_SAA5050_D_CALLBACK(READ8(*this, abc800c_state, char_ram_r))
 	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
 MACHINE_CONFIG_END
 
@@ -296,15 +277,16 @@ uint32_t abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(abc800m_state::abc800m_video)
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)
-	MCFG_MC6845_UPDATE_ROW_CB(abc800m_state, abc800m_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE(Z80DART_TAG, z80dart_device, rib_w))
+	mc6845_device &mc6845(MC6845(config, MC6845_TAG, ABC800_CCLK));
+	mc6845.set_screen(SCREEN_TAG);
+	mc6845.set_show_border_area(true);
+	mc6845.set_char_width(ABC800_CHAR_WIDTH);
+	mc6845.set_update_row_callback(FUNC(abc800m_state::abc800m_update_row), this);
+	mc6845.out_vsync_callback().set(m_dart, FUNC(z80dart_device::rib_w)).invert();
 
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t(0xff, 0xff, 0x00))
 	MCFG_SCREEN_UPDATE_DRIVER(abc800m_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xf0)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 MACHINE_CONFIG_END

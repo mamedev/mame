@@ -37,6 +37,7 @@
 
 void harddriv_state::device_start()
 {
+	m_lamps.resolve();
 	//atarigen_state::machine_start();
 
 	/* predetermine memory regions */
@@ -415,11 +416,11 @@ WRITE16_MEMBER( harddriv_state::hd68k_nwr_w )
 			break;
 		case 2: /* LC1 */
 			// used for seat locking on harddriv
-			machine().output().set_led_value(1, data);
+			m_lamps[0] = data;
 			break;
 		case 3: /* LC2 */
 			// used for "abort" button lamp
-			machine().output().set_led_value(2, data);
+			m_lamps[1] = data;
 			break;
 		case 4: /* ZP1 */
 			m_m68k_zp1 = data;
@@ -1217,7 +1218,7 @@ WRITE16_MEMBER( harddriv_state::hdds3_sdsp_control_w )
 			{
 				uint32_t page = (data >> 6) & 7;
 				m_ds3sdsp->load_boot_data(m_ds3sdsp_region->base() + (0x2000 * page), m_ds3sdsp_pgm_memory);
-				m_ds3sdsp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+				m_ds3sdsp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 				data &= ~0x200;
 			}
 

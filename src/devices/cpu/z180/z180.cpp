@@ -364,7 +364,7 @@ bool z180_device::get_tend1()
 
 #define Z180_CNTR_RESET         0x07
 #define Z180_CNTR_RMASK         0xff
-#define Z180_CNTR_WMASK         0x7f
+#define Z180_CNTR_WMASK         0x4f        /* Original: 0x7f - Modified: 0x4f - Inhibits setting up TI & RI flags due to the lack of CSIO implementation */
 
 /* 0b CSI/O transmit/receive register */
 #define Z180_TRDR_RESET         0x00
@@ -857,7 +857,6 @@ uint8_t z180_device::z180_readcontrol(offs_t port)
 
 	case Z180_CNTR:
 		data = IO_CNTR & Z180_CNTR_RMASK;
-		data &= ~0x10; // Super Famicom Box sets the TE bit then wants it to be toggled after 8 bits transmitted
 		LOG("Z180 CNTR   rd $%02x ($%02x)\n", data, m_io[port & 0x3f]);
 		break;
 
@@ -2016,9 +2015,9 @@ void z180_device::device_start()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_oprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_odirect = m_oprogram->direct<0>();
+	m_ocache = m_oprogram->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_iospace = &space(AS_IO);
 
 	/* set up the state table */
@@ -2442,6 +2441,7 @@ again:
 				if (!m_HALT)
 				{
 					m_R++;
+					IO_FRC++;   /* Added FRC counting, not implemented yet */
 					m_extra_cycles = 0;
 					curcycles = exec_op(ROP());
 					curcycles += m_extra_cycles;
@@ -2500,6 +2500,7 @@ again:
 			if (!m_HALT)
 			{
 				m_R++;
+				IO_FRC++;   /* Added FRC counting, not implemented yet */
 				m_extra_cycles = 0;
 				curcycles = exec_op(ROP());
 				curcycles += m_extra_cycles;

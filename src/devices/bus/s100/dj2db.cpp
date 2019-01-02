@@ -69,9 +69,10 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fr_w )
 	// S1602 RRC/TRC
 }
 
-static SLOT_INTERFACE_START( s100_dj2db_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void s100_dj2db_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 WRITE_LINE_MEMBER( s100_dj2db_device::fdc_intrq_w )
 {
@@ -101,19 +102,20 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(s100_dj2db_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(BR1941_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(s100_dj2db_device, fr_w))
+void s100_dj2db_device::device_add_mconfig(machine_config &config)
+{
+	COM8116(config, m_dbrg, 5.0688_MHz_XTAL);
+	m_dbrg->fr_handler().set(FUNC(s100_dj2db_device::fr_w));
 
-	MCFG_MB8866_ADD(MB8866_TAG, XTAL(10'000'000)/5)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(s100_dj2db_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(s100_dj2db_device, fdc_drq_w))
+	MB8866(config, m_fdc, 10_MHz_XTAL / 5);
+	m_fdc->intrq_wr_callback().set(FUNC(s100_dj2db_device::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(s100_dj2db_device::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":0", s100_dj2db_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":1", s100_dj2db_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":2", s100_dj2db_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":3", s100_dj2db_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, s100_dj2db_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, s100_dj2db_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy2, s100_dj2db_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy3, s100_dj2db_floppies, nullptr, floppy_image_device::default_floppy_formats);
+}
 
 
 //-------------------------------------------------
@@ -303,7 +305,7 @@ uint8_t s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
 {
 	uint8_t data = 0;
 
-//  if (!(m_board_enbl & m_phantom)) return 0;
+//  if (!(m_board_enbl & m_phantom)) return 0xff;
 
 	if ((offset >= 0xf800) && (offset < 0xfbf8))
 	{
@@ -358,7 +360,7 @@ uint8_t s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
 	{
 		m_bus->rdy_w(ASSERT_LINE);
 
-		data = m_fdc->gen_r(offset & 0x03);
+		data = m_fdc->read(offset & 0x03);
 	}
 	else if ((offset >= 0xfc00) && (offset < 0x10000))
 	{
@@ -366,7 +368,7 @@ uint8_t s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
 	}
 	else
 	{
-		return 0;
+		return 0xff;
 	}
 
 	// LS241 inverts data
@@ -458,7 +460,7 @@ void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, uint8_t
 	}
 	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
 	{
-		m_fdc->gen_w(offset & 0x03, data);
+		m_fdc->write(offset & 0x03, data);
 	}
 	else if ((offset >= 0xfc00) && (offset < 0x10000))
 	{
@@ -473,7 +475,7 @@ void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, uint8_t
 
 uint8_t s100_dj2db_device::s100_sinp_r(address_space &space, offs_t offset)
 {
-	return 0;
+	return 0xff;
 }
 
 

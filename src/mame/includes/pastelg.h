@@ -1,6 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
+#ifndef MAME_INCLUDES_PASTELG_H
+#define MAME_INCLUDES_PASTELG_H
+
+#pragma once
+
 #include "machine/nb1413m3.h"
+#include "emupal.h"
 #include "screen.h"
 
 class pastelg_state : public driver_device
@@ -11,12 +17,13 @@ public:
 		TIMER_BLITTER
 	};
 
-	pastelg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	pastelg_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_nb1413m3(*this, "nb1413m3"),
 		m_screen(*this, "screen"),
-		m_clut(*this, "clut") { }
+		m_clut(*this, "clut")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
@@ -56,7 +63,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	DECLARE_PALETTE_INIT(pastelg);
+	void pastelg_palette(palette_device &palette) const;
 	uint32_t screen_update_pastelg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int pastelg_blitter_src_addr_r();
 	void pastelg_vramflip();
@@ -70,3 +77,5 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_PASTELG_H

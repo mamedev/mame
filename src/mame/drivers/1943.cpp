@@ -111,17 +111,17 @@ void _1943_state::c1943_map(address_map &map)
 	map(0xc002, 0xc002).portr("P2");
 	map(0xc003, 0xc003).portr("DSWA");
 	map(0xc004, 0xc004).portr("DSWB");
-	map(0xc007, 0xc007).r(this, FUNC(_1943_state::c1943_protection_r));
+	map(0xc007, 0xc007).r(FUNC(_1943_state::c1943_protection_r));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(this, FUNC(_1943_state::c1943_c804_w)); // ROM bank switch, screen flip
+	map(0xc804, 0xc804).w(FUNC(_1943_state::c1943_c804_w)); // ROM bank switch, screen flip
 	map(0xc806, 0xc806).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xc807, 0xc807).w(this, FUNC(_1943_state::c1943_protection_w));
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(_1943_state::c1943_videoram_w)).share("videoram");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(_1943_state::c1943_colorram_w)).share("colorram");
+	map(0xc807, 0xc807).w(FUNC(_1943_state::c1943_protection_w));
+	map(0xd000, 0xd3ff).ram().w(FUNC(_1943_state::c1943_videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).ram().w(FUNC(_1943_state::c1943_colorram_w)).share("colorram");
 	map(0xd800, 0xd801).ram().share("scrollx");
 	map(0xd802, 0xd802).ram().share("scrolly");
 	map(0xd803, 0xd804).ram().share("bgscrollx");
-	map(0xd806, 0xd806).w(this, FUNC(_1943_state::c1943_d806_w)); // sprites, bg1, bg2 enable
+	map(0xd806, 0xd806).w(FUNC(_1943_state::c1943_d806_w)); // sprites, bg1, bg2 enable
 	map(0xd808, 0xd808).nopw(); // ???
 	map(0xd868, 0xd868).nopw(); // ???
 	map(0xd888, 0xd888).nopw(); // ???
@@ -287,7 +287,7 @@ static const gfx_layout spritelayout =
 
 /* Graphics Decode Info */
 
-static GFXDECODE_START( 1943 )
+static GFXDECODE_START( gfx_1943 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,                  0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,               32*4, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, bgtilelayout,       32*4+16*16, 16 )
@@ -314,15 +314,15 @@ void _1943_state::machine_reset()
 MACHINE_CONFIG_START(_1943_state::_1943)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(c1943_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _1943_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(c1943_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _1943_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/8) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(_1943_state, irq0_line_hold, 4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(_1943_state, irq0_line_hold, 4*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -331,25 +331,23 @@ MACHINE_CONFIG_START(_1943_state::_1943)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_1943_state, screen_update_1943)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1943)
-	MCFG_PALETTE_ADD("palette", 32*4+16*16+16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(_1943_state, 1943)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_1943)
+	PALETTE(config, m_palette, FUNC(_1943_state::_1943_palette), 32*4+16*16+16*16+16*16, 256);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(24'000'000)/16) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(24'000'000)/16) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -935,27 +933,27 @@ ROM_START( 1943bj )
 	ROM_LOAD( "bm6.4b",    0x0b00, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )    /* video timing (not used) */
 ROM_END
 
-DRIVER_INIT_MEMBER(_1943_state,1943)
+void _1943_state::init_1943()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(_1943_state,1943b)
+void _1943_state::init_1943b()
 {
-	DRIVER_INIT_CALL(1943);
+	init_1943();
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc007, 0xc007, read8_delegate(FUNC(_1943_state::_1943b_c007_r),this));
 }
 
 /* Game Drivers */
-GAME( 1987, 1943,     0,     _1943,   1943, _1943_state,  1943, ROT270,  "Capcom",  "1943: The Battle of Midway (Euro)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943u,    1943,  _1943,   1943, _1943_state,  1943, ROT270,  "Capcom",  "1943: The Battle of Midway (US, Rev C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943ua,   1943,  _1943,   1943, _1943_state,  1943, ROT270,  "Capcom",  "1943: The Battle of Midway (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943j,    1943,  _1943,   1943, _1943_state,  1943, ROT270,  "Capcom",  "1943: Midway Kaisen (Japan, Rev B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943ja,   1943,  _1943,   1943, _1943_state,  1943, ROT270,  "Capcom",  "1943: Midway Kaisen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943jah,  1943,  _1943,   1943, _1943_state,  1943, ROT270,  "Capcom",  "1943: Midway Kaisen (Japan, no protection hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943b,    1943,  _1943,   1943, _1943_state,  1943b,ROT270,  "bootleg", "1943: Battle of Midway (bootleg, hack of Japan set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943bj,   1943,  _1943,   1943, _1943_state,  1943b,ROT270,  "bootleg", "1943: Midway Kaisen (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943kai,  0,     _1943,   1943, _1943_state,  1943, ROT270,  "Capcom",  "1943 Kai: Midway Kaisen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943mii,  0,     _1943,   1943, _1943_state,  1943, ROT270,  "Capcom",  "1943: The Battle of Midway Mark II (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943,    0,    _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943: The Battle of Midway (Euro)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943u,   1943, _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943: The Battle of Midway (US, Rev C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943ua,  1943, _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943: The Battle of Midway (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943j,   1943, _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943: Midway Kaisen (Japan, Rev B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943ja,  1943, _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943: Midway Kaisen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943jah, 1943, _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943: Midway Kaisen (Japan, no protection hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943b,   1943, _1943, 1943, _1943_state, init_1943b, ROT270, "bootleg", "1943: Battle of Midway (bootleg, hack of Japan set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943bj,  1943, _1943, 1943, _1943_state, init_1943b, ROT270, "bootleg", "1943: Midway Kaisen (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943kai, 0,    _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943 Kai: Midway Kaisen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943mii, 0,    _1943, 1943, _1943_state, init_1943,  ROT270, "Capcom",  "1943: The Battle of Midway Mark II (US)", MACHINE_SUPPORTS_SAVE )

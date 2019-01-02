@@ -101,7 +101,7 @@ void abc77_device::abc77_map(address_map &map)
 
 void abc77_device::abc77_io(address_map &map)
 {
-	map(0x00, 0x00).mirror(0xff).w(this, FUNC(abc77_device::j3_w));
+	map(0x00, 0x00).mirror(0xff).w(FUNC(abc77_device::j3_w));
 	map(0x00, 0x00).mirror(0xff).portr("DSW");
 }
 
@@ -118,7 +118,7 @@ static const discrete_555_desc abc77_ne556_a =
 };
 
 
-static DISCRETE_SOUND_START( abc77 )
+static DISCRETE_SOUND_START( abc77_discrete )
 	DISCRETE_INPUT_LOGIC(NODE_01)
 	DISCRETE_555_ASTABLE(NODE_02, NODE_01, (int) RES_K(2.7), (int) RES_K(15), (int) CAP_N(22), &abc77_ne556_a)
 	DISCRETE_OUTPUT(NODE_02, 5000)
@@ -131,22 +131,20 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(abc77_device::device_add_mconfig)
 	// keyboard cpu
-	MCFG_CPU_ADD(I8035_TAG, I8035, XTAL(4'608'000))
-	MCFG_CPU_PROGRAM_MAP(abc77_map)
-	MCFG_CPU_IO_MAP(abc77_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(abc77_device, p1_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(abc77_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(abc77_device, t1_r))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(abc77_device, prog_w))
+	I8035(config, m_maincpu, XTAL(4'608'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc77_device::abc77_map);
+	m_maincpu->set_addrmap(AS_IO, &abc77_device::abc77_io);
+	m_maincpu->p1_in_cb().set(FUNC(abc77_device::p1_r));
+	m_maincpu->p2_out_cb().set(FUNC(abc77_device::p2_w));
+	m_maincpu->t1_in_cb().set(FUNC(abc77_device::t1_r));
+	m_maincpu->prog_out_cb().set(FUNC(abc77_device::prog_w));
 
 	// watchdog
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(XTAL(4'608'000)/3/5/4096))
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_hz(XTAL(4'608'000)/3/5/4096));
 
 	// discrete sound
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
-	MCFG_DISCRETE_INTF(abc77)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, abc77_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -566,7 +564,7 @@ WRITE8_MEMBER( abc77_device::p2_w )
 	}
 
 	// beep
-	m_discrete->write(space, NODE_01, BIT(data, 4));
+	m_discrete->write(NODE_01, BIT(data, 4));
 
 	// transmit data
 	serial_output(BIT(data, 5));

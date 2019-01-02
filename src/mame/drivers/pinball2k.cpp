@@ -25,6 +25,7 @@
 #include "machine/pckeybrd.h"
 #include "machine/pcshare.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -40,14 +41,22 @@ public:
 		m_vram(*this, "vram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
+		m_ramdac(*this, "ramdac"),
 		m_palette(*this, "palette") { }
 
+	void mediagx(machine_config &config);
+
+	void init_mediagx();
+	void init_pinball2k();
+
+private:
 	required_shared_ptr<uint32_t> m_main_ram;
 	required_shared_ptr<uint32_t> m_cga_ram;
 	required_shared_ptr<uint32_t> m_bios_ram;
 	required_shared_ptr<uint32_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
+	required_device<ramdac_device> m_ramdac;
 	required_device<palette_device> m_palette;
 	uint8_t m_pal[768];
 
@@ -65,9 +74,9 @@ public:
 	uint8_t m_mediagx_config_regs[256];
 
 	//uint8_t m_controls_data;
-	uint8_t m_parallel_pointer;
-	uint8_t m_parallel_latched;
-	uint32_t m_parport;
+	//uint8_t m_parallel_pointer;
+	//uint8_t m_parallel_latched;
+	//uint32_t m_parport;
 	//int m_control_num;
 	//int m_control_num2;
 	//int m_control_read;
@@ -88,7 +97,7 @@ public:
 	DECLARE_WRITE32_MEMBER(port400_w);
 	DECLARE_READ32_MEMBER(port800_r);
 	DECLARE_WRITE32_MEMBER(port800_w);
-	DECLARE_DRIVER_INIT(pinball2k);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -96,8 +105,6 @@ public:
 	void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void init_mediagx();
-	void mediagx(machine_config &config);
 	void mediagx_io(address_map &map);
 	void mediagx_map(address_map &map);
 	void ramdac_map(address_map &map);
@@ -342,8 +349,6 @@ WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
 //  printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
 	{
-		ramdac_device *ramdac = machine().device<ramdac_device>("ramdac");
-
 		if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00e00000) == 0x00400000)
 		{
 			// guess: crtc params?
@@ -352,7 +357,7 @@ WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00000000)
 		{
 			m_pal_index = data;
-			ramdac->index_w( space, 0, data );
+			m_ramdac->index_w( space, 0, data );
 		}
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00100000)
 		{
@@ -362,7 +367,7 @@ WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
 			{
 				m_pal_index = 0;
 			}
-			ramdac->pal_w( space, 0, data );
+			m_ramdac->pal_w( space, 0, data );
 		}
 	}
 	else
@@ -482,9 +487,9 @@ void pinball2k_state::mediagx_map(address_map &map)
 	map(0x000b0000, 0x000b7fff).ram().share("cga_ram");
 	map(0x000c0000, 0x000fffff).ram().share("bios_ram");
 	map(0x00100000, 0x00ffffff).ram();
-	map(0x40008000, 0x400080ff).rw(this, FUNC(pinball2k_state::biu_ctrl_r), FUNC(pinball2k_state::biu_ctrl_w));
-	map(0x40008300, 0x400083ff).rw(this, FUNC(pinball2k_state::disp_ctrl_r), FUNC(pinball2k_state::disp_ctrl_w));
-	map(0x40008400, 0x400084ff).rw(this, FUNC(pinball2k_state::memory_ctrl_r), FUNC(pinball2k_state::memory_ctrl_w));
+	map(0x40008000, 0x400080ff).rw(FUNC(pinball2k_state::biu_ctrl_r), FUNC(pinball2k_state::biu_ctrl_w));
+	map(0x40008300, 0x400083ff).rw(FUNC(pinball2k_state::disp_ctrl_r), FUNC(pinball2k_state::disp_ctrl_w));
+	map(0x40008400, 0x400084ff).rw(FUNC(pinball2k_state::memory_ctrl_r), FUNC(pinball2k_state::memory_ctrl_w));
 	map(0x40800000, 0x40bfffff).ram().share("vram");
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
@@ -492,11 +497,11 @@ void pinball2k_state::mediagx_map(address_map &map)
 void pinball2k_state::mediagx_io(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x0022, 0x0023).rw(this, FUNC(pinball2k_state::io20_r), FUNC(pinball2k_state::io20_w));
+	map(0x0022, 0x0023).rw(FUNC(pinball2k_state::io20_r), FUNC(pinball2k_state::io20_w));
 	map(0x00e8, 0x00eb).noprw();     // I/O delay port
-	map(0x0378, 0x037b).rw(this, FUNC(pinball2k_state::parallel_port_r), FUNC(pinball2k_state::parallel_port_w));
-	map(0x0400, 0x0403).rw(this, FUNC(pinball2k_state::port400_r), FUNC(pinball2k_state::port400_w));
-	map(0x0800, 0x0803).rw(this, FUNC(pinball2k_state::port800_r), FUNC(pinball2k_state::port800_w));
+	map(0x0378, 0x037b).rw(FUNC(pinball2k_state::parallel_port_r), FUNC(pinball2k_state::parallel_port_w));
+	map(0x0400, 0x0403).rw(FUNC(pinball2k_state::port400_r), FUNC(pinball2k_state::port400_w));
+	map(0x0800, 0x0803).rw(FUNC(pinball2k_state::port800_r), FUNC(pinball2k_state::port800_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 }
 
@@ -516,12 +521,12 @@ static const gfx_layout CGA_charlayout =
 	8*8                     /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( CGA )
-/* Support up to four CGA fonts */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, CGA_charlayout, 0, 256 )   /* Font 0 */
-	GFXDECODE_ENTRY( "gfx1", 0x0800, CGA_charlayout, 0, 256 )   /* Font 1 */
-	GFXDECODE_ENTRY( "gfx1", 0x1000, CGA_charlayout, 0, 256 )   /* Font 2 */
-	GFXDECODE_ENTRY( "gfx1", 0x1800, CGA_charlayout, 0, 256 )   /* Font 3*/
+static GFXDECODE_START( gfx_cga )
+	// Support up to four CGA fonts
+	GFXDECODE_ENTRY( "gfx1", 0x0000, CGA_charlayout, 0, 256 )   // Font 0
+	GFXDECODE_ENTRY( "gfx1", 0x0800, CGA_charlayout, 0, 256 )   // Font 1
+	GFXDECODE_ENTRY( "gfx1", 0x1000, CGA_charlayout, 0, 256 )   // Font 2
+	GFXDECODE_ENTRY( "gfx1", 0x1800, CGA_charlayout, 0, 256 )   // Font 3
 GFXDECODE_END
 
 static INPUT_PORTS_START(mediagx)
@@ -600,20 +605,21 @@ void pinball2k_state::ramdac_map(address_map &map)
 MACHINE_CONFIG_START(pinball2k_state::mediagx)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MEDIAGX, 166000000)
-	MCFG_CPU_PROGRAM_MAP(mediagx_map)
-	MCFG_CPU_IO_MAP(mediagx_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", MEDIAGX, 166000000)
+	MCFG_DEVICE_PROGRAM_MAP(mediagx_map)
+	MCFG_DEVICE_IO_MAP(mediagx_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, pinball2k_state, cx5510_pci_r, cx5510_pci_w)
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	RAMDAC(config, m_ramdac, 0, m_palette);
+	m_ramdac->set_addrmap(0, &pinball2k_state::ramdac_map);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -622,11 +628,12 @@ MACHINE_CONFIG_START(pinball2k_state::mediagx)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(pinball2k_state, screen_update_mediagx)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", CGA)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cga)
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 MACHINE_CONFIG_END
 
 
@@ -635,7 +642,7 @@ void pinball2k_state::init_mediagx()
 	m_frame_width = m_frame_height = 1;
 }
 
-DRIVER_INIT_MEMBER(pinball2k_state, pinball2k)
+void pinball2k_state::init_pinball2k()
 {
 	init_mediagx();
 }
@@ -702,6 +709,6 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1999, swe1pb,   0       , mediagx, mediagx, pinball2k_state, pinball2k, ROT0,   "Midway",  "Pinball 2000: Star Wars Episode 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
-GAME( 1999, rfmpb,    0       , mediagx, mediagx, pinball2k_state, pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
-GAME( 1999, rfmpbr2,  rfmpb   , mediagx, mediagx, pinball2k_state, pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
+GAME( 1999, swe1pb,   0       , mediagx, mediagx, pinball2k_state, init_pinball2k, ROT0,   "Midway",  "Pinball 2000: Star Wars Episode 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
+GAME( 1999, rfmpb,    0       , mediagx, mediagx, pinball2k_state, init_pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )
+GAME( 1999, rfmpbr2,  rfmpb   , mediagx, mediagx, pinball2k_state, init_pinball2k, ROT0,   "Midway",  "Pinball 2000: Revenge From Mars (rev. 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL )

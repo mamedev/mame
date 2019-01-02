@@ -137,7 +137,7 @@ VIDEO_START_MEMBER(ladyfrog_state,ladyfrog_common)
 	m_bg_tilemap->set_scroll_cols(32);
 	m_bg_tilemap->set_scrolldy(15, 15);
 
-	save_pointer(NAME(m_spriteram.get()), 160);
+	save_pointer(NAME(m_spriteram), 160);
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_paletteram_ext));
 }

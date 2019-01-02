@@ -50,9 +50,9 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(bgt_state::bgt)
-	MCFG_CPU_ADD("maincpu", V30, 12000000 ) // ? unknown CPU.. definitely x86 based tho
-	MCFG_CPU_PROGRAM_MAP(bgt_map)
-	MCFG_CPU_IO_MAP(bgt_io)
+	MCFG_DEVICE_ADD("maincpu", V30, 12000000 ) // ? unknown CPU.. definitely x86 based tho
+	MCFG_DEVICE_PROGRAM_MAP(bgt_map)
+	MCFG_DEVICE_IO_MAP(bgt_io)
 MACHINE_CONFIG_END
 
 ROM_START( bg_ddb )
@@ -95,7 +95,7 @@ ROM_START( bg_maxa )
 ROM_END
 
 
-GAME( 199?, bg_ddb,    0,       bgt,  bgt, bgt_state,  0,  ROT0,  "BGT",    "Ding Dong Bells (BGT)",          MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, bg_barmy,  0,       bgt,  bgt, bgt_state,  0,  ROT0,  "BGT",    "Barmy Army (BGT)",               MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, bg_max,    0,       bgt,  bgt, bgt_state,  0,  ROT0,  "BGT",    "Max A Million (BGT) (set 1)",    MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, bg_maxa,   bg_max,  bgt,  bgt, bgt_state,  0,  ROT0,  "BGT",    "Max A Million (BGT) (set 2)",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, bg_ddb,   0,      bgt, bgt, bgt_state, empty_init, ROT0, "BGT", "Ding Dong Bells (BGT)",       MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, bg_barmy, 0,      bgt, bgt, bgt_state, empty_init, ROT0, "BGT", "Barmy Army (BGT)",            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, bg_max,   0,      bgt, bgt, bgt_state, empty_init, ROT0, "BGT", "Max A Million (BGT) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, bg_maxa,  bg_max, bgt, bgt, bgt_state, empty_init, ROT0, "BGT", "Max A Million (BGT) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )

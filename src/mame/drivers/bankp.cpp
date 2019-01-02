@@ -128,21 +128,21 @@ void bankp_state::bankp_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xefff).ram();
-	map(0xf000, 0xf3ff).ram().w(this, FUNC(bankp_state::videoram_w)).share("videoram");
-	map(0xf400, 0xf7ff).ram().w(this, FUNC(bankp_state::colorram_w)).share("colorram");
-	map(0xf800, 0xfbff).ram().w(this, FUNC(bankp_state::videoram2_w)).share("videoram2");
-	map(0xfc00, 0xffff).ram().w(this, FUNC(bankp_state::colorram2_w)).share("colorram2");
+	map(0xf000, 0xf3ff).ram().w(FUNC(bankp_state::videoram_w)).share("videoram");
+	map(0xf400, 0xf7ff).ram().w(FUNC(bankp_state::colorram_w)).share("colorram");
+	map(0xf800, 0xfbff).ram().w(FUNC(bankp_state::videoram2_w)).share("videoram2");
+	map(0xfc00, 0xffff).ram().w(FUNC(bankp_state::colorram2_w)).share("colorram2");
 }
 
 void bankp_state::bankp_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w("sn1", FUNC(sn76489_device::write));
-	map(0x01, 0x01).portr("IN1").w("sn2", FUNC(sn76489_device::write));
-	map(0x02, 0x02).portr("IN2").w("sn3", FUNC(sn76489_device::write));
+	map(0x00, 0x00).portr("IN0").w("sn1", FUNC(sn76489_device::command_w));
+	map(0x01, 0x01).portr("IN1").w("sn2", FUNC(sn76489_device::command_w));
+	map(0x02, 0x02).portr("IN2").w("sn3", FUNC(sn76489_device::command_w));
 	map(0x04, 0x04).portr("DSW1");
-	map(0x05, 0x05).w(this, FUNC(bankp_state::scroll_w));
-	map(0x07, 0x07).w(this, FUNC(bankp_state::out_w));
+	map(0x05, 0x05).w(FUNC(bankp_state::scroll_w));
+	map(0x07, 0x07).w(FUNC(bankp_state::out_w));
 }
 
 
@@ -269,7 +269,7 @@ static const gfx_layout charlayout2 =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( bankp )
+static GFXDECODE_START( gfx_bankp )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,  32*4, 16 )
 GFXDECODE_END
@@ -290,39 +290,37 @@ void bankp_state::machine_reset()
 INTERRUPT_GEN_MEMBER(bankp_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(bankp_state::bankp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(bankp_map)
-	MCFG_CPU_IO_MAP(bankp_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bankp_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(bankp_map)
+	MCFG_DEVICE_IO_MAP(bankp_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bankp_state,  vblank_irq)
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(bankp_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bankp)
-	MCFG_PALETTE_ADD("palette", 32*4+16*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(bankp_state, bankp)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bankp);
+	PALETTE(config, m_palette, FUNC(bankp_state::bankp_palette), 32*4+16*8, 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76489, MASTER_CLOCK/6)
+	MCFG_DEVICE_ADD("sn1", SN76489, MASTER_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76489, MASTER_CLOCK/6)
+	MCFG_DEVICE_ADD("sn2", SN76489, MASTER_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn3", SN76489, MASTER_CLOCK/6)
+	MCFG_DEVICE_ADD("sn3", SN76489, MASTER_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -400,5 +398,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, bankp, 0, bankp, bankp, bankp_state, 0, ROT0,   "Sanritsu / Sega", "Bank Panic",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, combh, 0, bankp, combh, bankp_state, 0, ROT270, "Sanritsu / Sega", "Combat Hawk", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bankp, 0, bankp, bankp, bankp_state, empty_init, ROT0,   "Sanritsu / Sega", "Bank Panic",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, combh, 0, bankp, combh, bankp_state, empty_init, ROT270, "Sanritsu / Sega", "Combat Hawk", MACHINE_SUPPORTS_SAVE )

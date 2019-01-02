@@ -20,64 +20,101 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "video/poly.h"
+#include "emupal.h"
 #include "screen.h"
 
-
-struct atarisy4_polydata
-{
-	uint16_t color;
-	uint16_t *screen_ram;
-};
-
-class atarisy4_state;
-
-class atarisy4_renderer : public poly_manager<float, atarisy4_polydata, 2, 8192>
-{
-public:
-	atarisy4_renderer(atarisy4_state &state, screen_device &screen);
-	~atarisy4_renderer() {}
-
-	void draw_scanline(int32_t scanline, const extent_t &extent, const atarisy4_polydata &extradata, int threadid);
-	void draw_polygon(uint16_t color);
-
-	atarisy4_state &m_state;
-};
 
 class atarisy4_state : public driver_device
 {
 public:
-	atarisy4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	atarisy4_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dsp0(*this, "dsp0"),
-		m_dsp1(*this, "dsp1"),
+		m_dsp0_bank1(*this, "dsp0_bank1"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_m68k_ram(*this, "m68k_ram"),
 		m_screen_ram(*this, "screen_ram"),
-		m_dsp0_bank1(*this, "dsp0_bank1"),
-		m_dsp1_bank1(*this, "dsp1_bank1") { }
+		m_stick(*this, "STICK%c", 'X')
+	{
+	}
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_dsp0;
-	optional_device<cpu_device> m_dsp1;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
+	void atarisy4(machine_config &config);
 
-	required_shared_ptr<uint16_t> m_m68k_ram;
-	required_shared_ptr<uint16_t> m_screen_ram;
+	void init_laststar();
 
-	required_memory_bank m_dsp0_bank1;
-	optional_memory_bank m_dsp1_bank1;
+protected:
+	struct atarisy4_polydata
+	{
+		uint16_t color;
+		uint16_t *screen_ram;
+	};
 
-	std::unique_ptr<atarisy4_renderer> m_renderer;
+	class atarisy4_renderer : public poly_manager<float, atarisy4_polydata, 2, 8192>
+	{
+	public:
+		atarisy4_renderer(atarisy4_state &state, screen_device &screen);
+		~atarisy4_renderer() {}
 
-	uint8_t m_r_color_table[256];
-	uint8_t m_g_color_table[256];
-	uint8_t m_b_color_table[256];
-	uint16_t m_dsp_bank[2];
-	uint8_t m_csr[2];
-	std::unique_ptr<uint16_t[]> m_shared_ram[2];
+		void draw_scanline(int32_t scanline, const extent_t &extent, const atarisy4_polydata &extradata, int threadid);
+		void draw_polygon(uint16_t color);
+
+	protected:
+		atarisy4_state &m_state;
+	};
+
+	struct gpu
+	{
+		uint32_t xy_to_screen_addr(uint32_t x, uint32_t y) const;
+
+		/* Memory-mapped registers */
+		uint16_t gr[8];   /* Command parameters */
+
+		uint16_t bcrw;    /* Screen buffer W control */
+		uint16_t bcrx;    /* Screen buffer X control */
+		uint16_t bcry;    /* Screen buffer Y control */
+		uint16_t bcrz;    /* Screen buffer Z control */
+		uint16_t psrw;
+		uint16_t psrx;
+		uint16_t psry;
+		uint16_t psrz;
+
+		uint16_t dpr;
+		uint16_t ctr;
+		uint16_t lfr;
+		uint16_t ifr;
+		uint16_t ecr;     /* Execute command register */
+		uint16_t far;
+		uint16_t mcr;     /* Interrupt control */
+		uint16_t qlr;
+		uint16_t qar;
+
+		uint16_t dhr;     /* Scanline counter */
+		uint16_t dlr;
+
+		/* Others */
+		uint16_t idr;
+		uint16_t icd;
+
+		uint8_t  transpose;
+		uint8_t  vblank_wait;
+
+		/* Polygon points */
+		struct
+		{
+			int16_t x;
+			int16_t y;
+		} points[16];
+
+		uint16_t pt_idx;
+		bool   poly_open;
+
+		uint16_t clip_min_x;
+		uint16_t clip_max_x;
+		uint16_t clip_min_y;
+		uint16_t clip_max_y;
+	};
 
 	DECLARE_WRITE16_MEMBER(gpu_w);
 	DECLARE_READ16_MEMBER(gpu_r);
@@ -89,90 +126,85 @@ public:
 	DECLARE_WRITE16_MEMBER(dsp0_control_w);
 	DECLARE_READ_LINE_MEMBER(dsp0_bio_r);
 	DECLARE_WRITE16_MEMBER(dsp0_bank_w);
-	DECLARE_READ16_MEMBER(dsp1_status_r);
-	DECLARE_WRITE16_MEMBER(dsp1_control_w);
-	DECLARE_READ_LINE_MEMBER(dsp1_bio_r);
-	DECLARE_WRITE16_MEMBER(dsp1_bank_w);
 	DECLARE_READ16_MEMBER(analog_r);
-	DECLARE_DRIVER_INIT(airrace);
-	DECLARE_DRIVER_INIT(laststar);
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
-	DECLARE_MACHINE_RESET(airrace);
+
 	uint32_t screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	INTERRUPT_GEN_MEMBER(vblank_int);
+
 	void image_mem_to_screen( bool clip);
 	void execute_gpu_command();
 	inline uint8_t hex_to_ascii(uint8_t in);
 	void load_ldafile(address_space &space, const uint8_t *file);
 	void load_hexfile(address_space &space, const uint8_t *file);
-	void airrace(machine_config &config);
-	void atarisy4(machine_config &config);
-	void dsp0_io_map(address_map &map);
-	void dsp0_map(address_map &map);
-	void dsp1_io_map(address_map &map);
-	void dsp1_map(address_map &map);
+
 	void main_map(address_map &map);
+	void dsp0_map(address_map &map);
+	void dsp0_io_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<tms32010_device> m_dsp0;
+
+	required_memory_bank m_dsp0_bank1;
+
+	uint16_t m_dsp_bank[2];
+	uint8_t m_csr[2];
+	std::unique_ptr<uint16_t[]> m_shared_ram[2];
+
+private:
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+
+	required_shared_ptr<uint16_t> m_m68k_ram;
+	required_shared_ptr<uint16_t> m_screen_ram;
+
+	required_ioport_array<2> m_stick;
+
+	std::unique_ptr<atarisy4_renderer> m_renderer;
+
+	gpu m_gpu;
+
+	uint8_t m_r_color_table[256];
+	uint8_t m_g_color_table[256];
+	uint8_t m_b_color_table[256];
 };
 
 
-
-/*************************************
- *
- *  State
- *
- *************************************/
-
-struct gpu_
+class airrace_state : public atarisy4_state
 {
-	/* Memory-mapped registers */
-	uint16_t gr[8];   /* Command parameters */
-
-	uint16_t bcrw;    /* Screen buffer W control */
-	uint16_t bcrx;    /* Screen buffer X control */
-	uint16_t bcry;    /* Screen buffer Y control */
-	uint16_t bcrz;    /* Screen buffer Z control */
-	uint16_t psrw;
-	uint16_t psrx;
-	uint16_t psry;
-	uint16_t psrz;
-
-	uint16_t dpr;
-	uint16_t ctr;
-	uint16_t lfr;
-	uint16_t ifr;
-	uint16_t ecr;     /* Execute command register */
-	uint16_t far;
-	uint16_t mcr;     /* Interrupt control */
-	uint16_t qlr;
-	uint16_t qar;
-
-	uint16_t dhr;     /* Scanline counter */
-	uint16_t dlr;
-
-	/* Others */
-	uint16_t idr;
-	uint16_t icd;
-
-	uint8_t  transpose;
-	uint8_t  vblank_wait;
-
-	/* Polygon points */
-	struct
+public:
+	airrace_state(const machine_config &mconfig, device_type type, const char *tag) :
+		atarisy4_state(mconfig, type, tag),
+		m_dsp1(*this, "dsp1"),
+		m_dsp1_bank1(*this, "dsp1_bank1")
 	{
-		int16_t x;
-		int16_t y;
-	} points[16];
+	}
 
-	uint16_t pt_idx;
-	bool   poly_open;
+	void init_airrace();
 
-	uint16_t clip_min_x;
-	uint16_t clip_max_x;
-	uint16_t clip_min_y;
-	uint16_t clip_max_y;
-} gpu;
+	void airrace(machine_config &config);
+
+protected:
+	DECLARE_READ16_MEMBER(dsp1_status_r);
+	DECLARE_WRITE16_MEMBER(dsp1_control_w);
+	DECLARE_READ_LINE_MEMBER(dsp1_bio_r);
+	DECLARE_WRITE16_MEMBER(dsp1_bank_w);
+
+	virtual void machine_reset() override;
+
+	void airrace_map(address_map &map);
+	void dsp1_map(address_map &map);
+	void dsp1_io_map(address_map &map);
+
+private:
+	required_device<tms32010_device> m_dsp1;
+	required_memory_bank m_dsp1_bank1;
+};
+
 
 
 /*************************************
@@ -181,9 +213,9 @@ struct gpu_
  *
  *************************************/
 
-atarisy4_renderer::atarisy4_renderer(atarisy4_state &state, screen_device &screen)
-	: poly_manager<float, atarisy4_polydata, 2, 8192>(screen, FLAG_NO_WORK_QUEUE),
-		m_state(state)
+atarisy4_state::atarisy4_renderer::atarisy4_renderer(atarisy4_state &state, screen_device &screen) :
+	poly_manager<float, atarisy4_polydata, 2, 8192>(screen, FLAG_NO_WORK_QUEUE),
+	m_state(state)
 {
 }
 
@@ -194,7 +226,7 @@ void atarisy4_state::video_start()
 
 void atarisy4_state::video_reset()
 {
-	gpu.vblank_wait = 0;
+	m_gpu.vblank_wait = 0;
 }
 
 uint32_t atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -202,24 +234,24 @@ uint32_t atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rg
 	int y;
 	uint32_t offset = 0;
 
-	if (gpu.bcrw & 0x80)
+	if (m_gpu.bcrw & 0x80)
 	{
 		offset = 0;
 	}
-	else if (gpu.bcrx & 0x80)
+	else if (m_gpu.bcrx & 0x80)
 	{
 		offset = 0x10 << 5;
 	}
 
-	//uint32_t offset = gpu.dpr << 5;
+	//uint32_t offset = m_gpu.dpr << 5;
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
 		uint16_t *src = &m_screen_ram[(offset + (4096 * y)) / 2];
-		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
+		uint32_t *dest = &bitmap.pix32(y, cliprect.left());
 		int x;
 
-		for (x = cliprect.min_x; x < cliprect.max_x; x += 2)
+		for (x = cliprect.left(); x < cliprect.right(); x += 2)
 		{
 			uint16_t data = *src++;
 
@@ -230,16 +262,16 @@ uint32_t atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-static inline uint32_t xy_to_screen_addr(uint32_t x, uint32_t y)
+inline uint32_t atarisy4_state::gpu::xy_to_screen_addr(uint32_t x, uint32_t y) const
 {
-//  uint32_t offset = ((gpu.mcr >> 4) & 3) << 9;
+//  uint32_t offset = ((mcr >> 4) & 3) << 9;
 	uint32_t offset = 0;
 
-	if (~gpu.bcrw & 0x80)
+	if (~bcrw & 0x80)
 	{
 		offset = 0;
 	}
-	else if (~gpu.bcrx & 0x80)
+	else if (~bcrx & 0x80)
 	{
 		offset = 0x10 << 5;
 	}
@@ -249,8 +281,8 @@ static inline uint32_t xy_to_screen_addr(uint32_t x, uint32_t y)
 
 void atarisy4_state::image_mem_to_screen(bool clip)
 {
-	int16_t y = gpu.gr[1] - 0x200;
-	uint16_t h = gpu.gr[3];
+	int16_t y = m_gpu.gr[1] - 0x200;
+	uint16_t h = m_gpu.gr[3];
 
 	if (h & 0x8000)
 		h = -h;
@@ -258,8 +290,8 @@ void atarisy4_state::image_mem_to_screen(bool clip)
 	/* Not 100% sure of this */
 	while (h--)
 	{
-		uint16_t w = gpu.gr[2];
-		int16_t x = gpu.gr[0] - 0x400;
+		uint16_t w = m_gpu.gr[2];
+		int16_t x = m_gpu.gr[0] - 0x400;
 
 		if (w & 0x8000)
 			w = -w;
@@ -270,14 +302,14 @@ void atarisy4_state::image_mem_to_screen(bool clip)
 			{
 				if (x >= 0 && x <= 511)
 				{
-					uint16_t pix = m_screen_ram[xy_to_screen_addr(x,y) >> 1];
+					uint16_t pix = m_screen_ram[m_gpu.xy_to_screen_addr(x,y) >> 1];
 
 					if (x & 1)
-						pix = (pix & (0x00ff)) | gpu.idr << 8;
+						pix = (pix & (0x00ff)) | m_gpu.idr << 8;
 					else
-						pix = (pix & (0xff00)) | gpu.idr;
+						pix = (pix & (0xff00)) | m_gpu.idr;
 
-					m_screen_ram[xy_to_screen_addr(x,y) >> 1] = pix;
+					m_screen_ram[m_gpu.xy_to_screen_addr(x,y) >> 1] = pix;
 				}
 				++x;
 			}
@@ -286,14 +318,14 @@ void atarisy4_state::image_mem_to_screen(bool clip)
 	}
 }
 
-void atarisy4_renderer::draw_scanline(int32_t scanline, const extent_t &extent, const atarisy4_polydata &extradata, int threadid)
+void atarisy4_state::atarisy4_renderer::draw_scanline(int32_t scanline, const extent_t &extent, const atarisy4_polydata &extradata, int threadid)
 {
 	uint16_t color = extradata.color;
 	int x;
 
 	for (x = extent.startx; x < extent.stopx; ++x)
 	{
-		uint32_t addr = xy_to_screen_addr(x, scanline);
+		uint32_t addr = m_state.m_gpu.xy_to_screen_addr(x, scanline);
 		uint16_t pix = extradata.screen_ram[addr >> 1];
 
 		if (x & 1)
@@ -305,7 +337,7 @@ void atarisy4_renderer::draw_scanline(int32_t scanline, const extent_t &extent, 
 	}
 }
 
-void atarisy4_renderer::draw_polygon(uint16_t color)
+void atarisy4_state::atarisy4_renderer::draw_polygon(uint16_t color)
 {
 	rectangle clip;
 	vertex_t v1, v2, v3;
@@ -317,17 +349,17 @@ void atarisy4_renderer::draw_polygon(uint16_t color)
 	extradata.color = color;
 	extradata.screen_ram = m_state.m_screen_ram;
 
-	v1.x = gpu.points[0].x;
-	v1.y = gpu.points[0].y;
+	v1.x = m_state.m_gpu.points[0].x;
+	v1.y = m_state.m_gpu.points[0].y;
 
-	v2.x = gpu.points[1].x;
-	v2.y = gpu.points[1].y;
+	v2.x = m_state.m_gpu.points[1].x;
+	v2.y = m_state.m_gpu.points[1].y;
 
 	/* Draw a triangle fan */
-	for (int i = 2; i <= gpu.pt_idx; ++i)
+	for (int i = 2; i <= m_state.m_gpu.pt_idx; ++i)
 	{
-		v3.x = gpu.points[i].x;
-		v3.y = gpu.points[i].y;
+		v3.x = m_state.m_gpu.points[i].x;
+		v3.y = m_state.m_gpu.points[i].y;
 
 		render_triangle(clip, rd_scan, 1, v1, v2, v3);
 		v2 = v3;
@@ -364,40 +396,40 @@ void atarisy4_renderer::draw_polygon(uint16_t color)
 */
 void atarisy4_state::execute_gpu_command()
 {
-	switch (gpu.ecr)
+	switch (m_gpu.ecr)
 	{
 		case 0x04:
 		{
-			gpu.transpose = 0;
+			m_gpu.transpose = 0;
 			break;
 		}
 		case 0x05:
 		{
-			gpu.transpose = 1;
+			m_gpu.transpose = 1;
 			break;
 		}
 		case 0x06:
 		{
-			gpu.idr = gpu.gr[0];
+			m_gpu.idr = m_gpu.gr[0];
 			break;
 		}
 		case 0x07:
 		{
-			gpu.icd = gpu.gr[0];
+			m_gpu.icd = m_gpu.gr[0];
 			break;
 		}
 		case 0x09:
 		{
-			gpu.clip_max_x = gpu.gr[0];
-			gpu.clip_min_x = gpu.gr[1];
-			gpu.clip_max_y = gpu.gr[2];
-			gpu.clip_min_y = gpu.gr[3];
+			m_gpu.clip_max_x = m_gpu.gr[0];
+			m_gpu.clip_min_x = m_gpu.gr[1];
+			m_gpu.clip_max_y = m_gpu.gr[2];
+			m_gpu.clip_min_y = m_gpu.gr[3];
 			break;
 		}
 		case 0x0b:
 		{
 			// Wait for VBLANK and swap buffers?
-			gpu.vblank_wait = 1;
+			m_gpu.vblank_wait = 1;
 			break;
 		}
 		case 0x16:
@@ -411,19 +443,19 @@ void atarisy4_state::execute_gpu_command()
 			    GR4 : Channels to set (R: 0x10, G: 0x20, B: 0x40)
 			*/
 			int i;
-			int offset = xy_to_screen_addr(gpu.gr[0] - 0x400, gpu.gr[1] - 0x200);
-			int table_offs = gpu.gr[2];
+			int offset = m_gpu.xy_to_screen_addr(m_gpu.gr[0] - 0x400, m_gpu.gr[1] - 0x200);
+			int table_offs = m_gpu.gr[2];
 
-			for (i = 0; i < gpu.gr[3]; ++i)
+			for (i = 0; i < m_gpu.gr[3]; ++i)
 			{
 				uint16_t val = m_screen_ram[offset >> 1];
 				val >>= (~offset & 1) << 3;
 
-				if (gpu.gr[4] & 0x10)
+				if (m_gpu.gr[4] & 0x10)
 					m_r_color_table[table_offs] = val;
-				if (gpu.gr[4] & 0x20)
+				if (m_gpu.gr[4] & 0x20)
 					m_g_color_table[table_offs] = val;
-				if (gpu.gr[4] & 0x40)
+				if (m_gpu.gr[4] & 0x40)
 					m_b_color_table[table_offs] = val;
 
 				/* Update */
@@ -447,42 +479,42 @@ void atarisy4_state::execute_gpu_command()
 		}
 		case 0x28:
 		{
-			gpu.points[0].x = gpu.gr[0] - 0x400;
-			gpu.points[0].y = gpu.gr[1] - 0x200;
-			gpu.pt_idx = 0;
+			m_gpu.points[0].x = m_gpu.gr[0] - 0x400;
+			m_gpu.points[0].y = m_gpu.gr[1] - 0x200;
+			m_gpu.pt_idx = 0;
 			break;
 		}
 		case 0x29:
 		{
-			gpu.points[0].x = gpu.points[gpu.pt_idx].x + gpu.gr[0];
-			gpu.points[0].y = gpu.points[gpu.pt_idx].y + gpu.gr[1];
-			gpu.pt_idx = 0;
+			m_gpu.points[0].x = m_gpu.points[m_gpu.pt_idx].x + m_gpu.gr[0];
+			m_gpu.points[0].y = m_gpu.points[m_gpu.pt_idx].y + m_gpu.gr[1];
+			m_gpu.pt_idx = 0;
 			break;
 		}
 		case 0x2a:
 		{
-			++gpu.pt_idx;
-			gpu.points[gpu.pt_idx].x = gpu.gr[0] - 0x400;
-			gpu.points[gpu.pt_idx].y = gpu.gr[1] - 0x200;
+			++m_gpu.pt_idx;
+			m_gpu.points[m_gpu.pt_idx].x = m_gpu.gr[0] - 0x400;
+			m_gpu.points[m_gpu.pt_idx].y = m_gpu.gr[1] - 0x200;
 			break;
 		}
 		case 0x2b:
 		{
-			uint16_t x = gpu.points[gpu.pt_idx].x + gpu.gr[0];
-			uint16_t y = gpu.points[gpu.pt_idx].y + gpu.gr[1];
-			++gpu.pt_idx;
-			gpu.points[gpu.pt_idx].x = x;
-			gpu.points[gpu.pt_idx].y = y;
+			uint16_t x = m_gpu.points[m_gpu.pt_idx].x + m_gpu.gr[0];
+			uint16_t y = m_gpu.points[m_gpu.pt_idx].y + m_gpu.gr[1];
+			++m_gpu.pt_idx;
+			m_gpu.points[m_gpu.pt_idx].x = x;
+			m_gpu.points[m_gpu.pt_idx].y = y;
 			break;
 		}
 		case 0x2c:
 		{
-			m_renderer->draw_polygon(gpu.gr[2]);
+			m_renderer->draw_polygon(m_gpu.gr[2]);
 			m_renderer->wait();
 			break;
 		}
 		default:
-			logerror("GPU COMMAND: %x\n", gpu.ecr);
+			logerror("GPU COMMAND: %x\n", m_gpu.ecr);
 	}
 }
 
@@ -490,37 +522,37 @@ WRITE16_MEMBER(atarisy4_state::gpu_w)
 {
 	switch (offset)
 	{
-		case 0x00:  gpu.gr[0] = data;   break;
-		case 0x01:  gpu.gr[1] = data;   break;
-		case 0x02:  gpu.gr[2] = data;   break;
-		case 0x03:  gpu.gr[3] = data;   break;
-		case 0x04:  gpu.gr[4] = data;   break;
-		case 0x05:  gpu.gr[5] = data;   break;
-		case 0x06:  gpu.gr[6] = data;   break;
-		case 0x07:  gpu.gr[7] = data;   break;
+		case 0x00:  m_gpu.gr[0] = data;   break;
+		case 0x01:  m_gpu.gr[1] = data;   break;
+		case 0x02:  m_gpu.gr[2] = data;   break;
+		case 0x03:  m_gpu.gr[3] = data;   break;
+		case 0x04:  m_gpu.gr[4] = data;   break;
+		case 0x05:  m_gpu.gr[5] = data;   break;
+		case 0x06:  m_gpu.gr[6] = data;   break;
+		case 0x07:  m_gpu.gr[7] = data;   break;
 
-		case 0x08:  gpu.bcrw = data;    break;
-		case 0x09:  gpu.bcrx = data;    break;
-		case 0x0a:  gpu.bcry = data;    break;
-		case 0x0b:  gpu.bcrz = data;    break;
-		case 0x0c:  gpu.psrw = data;    break;
-		case 0x0d:  gpu.psrx = data;    break;
-		case 0x0e:  gpu.psry = data;    break;
-		case 0x0f:  gpu.psrz = data;    break;
+		case 0x08:  m_gpu.bcrw = data;    break;
+		case 0x09:  m_gpu.bcrx = data;    break;
+		case 0x0a:  m_gpu.bcry = data;    break;
+		case 0x0b:  m_gpu.bcrz = data;    break;
+		case 0x0c:  m_gpu.psrw = data;    break;
+		case 0x0d:  m_gpu.psrx = data;    break;
+		case 0x0e:  m_gpu.psry = data;    break;
+		case 0x0f:  m_gpu.psrz = data;    break;
 
-		case 0x14:  gpu.dpr = data;     break;
-		case 0x15:  gpu.ctr = data;     break;
-		case 0x16:  gpu.ifr = data;     break;
+		case 0x14:  m_gpu.dpr = data;     break;
+		case 0x15:  m_gpu.ctr = data;     break;
+		case 0x16:  m_gpu.ifr = data;     break;
 		case 0x17:
 		{
-			gpu.ecr = data;
+			m_gpu.ecr = data;
 			execute_gpu_command();
 			break;
 		}
-		case 0x1a:  gpu.far = data;     break;
+		case 0x1a:  m_gpu.far = data;     break;
 		case 0x20:
 		{
-			gpu.mcr = data;
+			m_gpu.mcr = data;
 
 			if (~data & 0x08)
 				m_maincpu->set_input_line(6, CLEAR_LINE);
@@ -528,8 +560,8 @@ WRITE16_MEMBER(atarisy4_state::gpu_w)
 			break;
 		}
 
-		case 0x21:  gpu.qlr = data;     break;
-		case 0x22:  gpu.qar = data;     break;
+		case 0x21:  m_gpu.qlr = data;     break;
+		case 0x22:  m_gpu.qar = data;     break;
 	}
 }
 
@@ -539,12 +571,12 @@ READ16_MEMBER(atarisy4_state::gpu_r)
 
 	switch (offset)
 	{
-		case 0x08:  res = gpu.bcrw;     break;
-		case 0x09:  res = gpu.bcrx;     break;
-		case 0x0a:  res = gpu.bcry;     break;
-		case 0x0b:  res = gpu.bcrz;     break;
+		case 0x08:  res = m_gpu.bcrw;     break;
+		case 0x09:  res = m_gpu.bcrx;     break;
+		case 0x0a:  res = m_gpu.bcry;     break;
+		case 0x0b:  res = m_gpu.bcrz;     break;
 
-		case 0x20:  res = gpu.mcr;      break;
+		case 0x20:  res = m_gpu.mcr;      break;
 
 		case 0x400: res = 5;            break; // TODO!
 		case 0x420: res = 5;            break;
@@ -557,7 +589,7 @@ READ16_MEMBER(atarisy4_state::gpu_r)
 
 INTERRUPT_GEN_MEMBER(atarisy4_state::vblank_int)
 {
-	if (gpu.mcr & 0x08)
+	if (m_gpu.mcr & 0x08)
 		m_maincpu->set_input_line(6, ASSERT_LINE);
 }
 
@@ -630,12 +662,12 @@ WRITE16_MEMBER(atarisy4_state::dsp0_bank_w)
 	m_dsp_bank[0] = data;
 }
 
-READ16_MEMBER(atarisy4_state::dsp1_status_r)
+READ16_MEMBER(airrace_state::dsp1_status_r)
 {
 	return m_csr[1];
 }
 
-WRITE16_MEMBER(atarisy4_state::dsp1_control_w)
+WRITE16_MEMBER(airrace_state::dsp1_control_w)
 {
 	m_dsp1->set_input_line(INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
 	m_dsp1->set_input_line(0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
@@ -643,12 +675,12 @@ WRITE16_MEMBER(atarisy4_state::dsp1_control_w)
 	m_csr[1] = data;
 }
 
-READ_LINE_MEMBER(atarisy4_state::dsp1_bio_r)
+READ_LINE_MEMBER(airrace_state::dsp1_bio_r)
 {
 	return BIT(m_csr[1], 2);
 }
 
-WRITE16_MEMBER(atarisy4_state::dsp1_bank_w)
+WRITE16_MEMBER(airrace_state::dsp1_bank_w)
 {
 	if (data & 0x4000)
 	{
@@ -676,14 +708,20 @@ void atarisy4_state::main_map(address_map &map)
 	map(0x000000, 0x00ffff).ram().share("m68k_ram");
 	map(0x010000, 0x01ffff).ram();
 	map(0x580000, 0x580001).portr("JOYSTICK");
-	map(0x588000, 0x588001).r(this, FUNC(atarisy4_state::analog_r));
+	map(0x588000, 0x588001).r(FUNC(atarisy4_state::analog_r));
 	map(0x598000, 0x598001).noprw(); /* Sound board */
-	map(0x7c0000, 0x7c4fff).rw(this, FUNC(atarisy4_state::m68k_shared_1_r), FUNC(atarisy4_state::m68k_shared_1_w));
-	map(0x7c6000, 0x7c6001).rw(this, FUNC(atarisy4_state::dsp1_status_r), FUNC(atarisy4_state::dsp1_control_w));
-	map(0x7f0000, 0x7f4fff).rw(this, FUNC(atarisy4_state::m68k_shared_0_r), FUNC(atarisy4_state::m68k_shared_0_w));
-	map(0x7f6000, 0x7f6001).rw(this, FUNC(atarisy4_state::dsp0_status_r), FUNC(atarisy4_state::dsp0_control_w));
+	map(0x7c0000, 0x7c4fff).rw(FUNC(atarisy4_state::m68k_shared_1_r), FUNC(atarisy4_state::m68k_shared_1_w));
+	map(0x7f0000, 0x7f4fff).rw(FUNC(atarisy4_state::m68k_shared_0_r), FUNC(atarisy4_state::m68k_shared_0_w));
+	map(0x7f6000, 0x7f6001).rw(FUNC(atarisy4_state::dsp0_status_r), FUNC(atarisy4_state::dsp0_control_w));
 	map(0xa00400, 0xbfffff).ram().share("screen_ram");
-	map(0xff8000, 0xff8fff).rw(this, FUNC(atarisy4_state::gpu_r), FUNC(atarisy4_state::gpu_w));
+	map(0xff8000, 0xff8fff).rw(FUNC(atarisy4_state::gpu_r), FUNC(atarisy4_state::gpu_w));
+}
+
+void airrace_state::airrace_map(address_map &map)
+{
+	main_map(map);
+
+	map(0x7c6000, 0x7c6001).rw(FUNC(airrace_state::dsp1_status_r), FUNC(airrace_state::dsp1_control_w));
 }
 
 
@@ -702,7 +740,7 @@ void atarisy4_state::dsp0_map(address_map &map)
 
 void atarisy4_state::dsp0_io_map(address_map &map)
 {
-	map(0x00, 0x01).w(this, FUNC(atarisy4_state::dsp0_bank_w));
+	map(0x00, 0x01).w(FUNC(atarisy4_state::dsp0_bank_w));
 }
 
 
@@ -712,16 +750,16 @@ void atarisy4_state::dsp0_io_map(address_map &map)
  *
  *************************************/
 
-void atarisy4_state::dsp1_map(address_map &map)
+void airrace_state::dsp1_map(address_map &map)
 {
 	map.global_mask(0xfff);
 	map(0x0000, 0x07ff).bankrw("dsp1_bank0");
 	map(0x0800, 0x0fff).bankrw("dsp1_bank1");
 }
 
-void atarisy4_state::dsp1_io_map(address_map &map)
+void airrace_state::dsp1_io_map(address_map &map)
 {
-	map(0x00, 0x01).w(this, FUNC(atarisy4_state::dsp1_bank_w));
+	map(0x00, 0x01).w(FUNC(airrace_state::dsp1_bank_w));
 }
 
 
@@ -733,7 +771,7 @@ void atarisy4_state::dsp1_io_map(address_map &map)
 
 READ16_MEMBER(atarisy4_state::analog_r)
 {
-	return (ioport("STICKX")->read() << 8) | ioport("STICKY")->read();
+	return (m_stick[0]->read() << 8) | m_stick[1]->read();
 }
 
 static INPUT_PORTS_START( atarisy4 )
@@ -769,35 +807,36 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(atarisy4_state::atarisy4)
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", atarisy4_state,  vblank_int)
+void atarisy4_state::atarisy4(machine_config &config)
+{
+	M68000(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarisy4_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(atarisy4_state::vblank_int));
 
-	MCFG_CPU_ADD("dsp0", TMS32010, 16000000)
-	MCFG_CPU_PROGRAM_MAP(dsp0_map)
-	MCFG_CPU_IO_MAP(dsp0_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(atarisy4_state, dsp0_bio_r))
+	TMS32010(config, m_dsp0, 16000000);
+	m_dsp0->set_addrmap(AS_PROGRAM, &atarisy4_state::dsp0_map);
+	m_dsp0->set_addrmap(AS_IO, &atarisy4_state::dsp0_io_map);
+	m_dsp0->bio().set(FUNC(atarisy4_state::dsp0_bio_r));
 
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(32000000/2, 660, 0, 512, 404, 0, 384);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_screen_update(FUNC(atarisy4_state::screen_update_atarisy4));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(32000000/2, 660, 0, 512, 404, 0, 384)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_UPDATE_DRIVER(atarisy4_state, screen_update_atarisy4)
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, m_palette).set_entries(256);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(atarisy4_state::airrace)
+void airrace_state::airrace(machine_config &config)
+{
 	atarisy4(config);
 
-	MCFG_CPU_ADD("dsp1", TMS32010, 16000000)
-	MCFG_CPU_PROGRAM_MAP(dsp1_map)
-	MCFG_CPU_IO_MAP(dsp1_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(atarisy4_state, dsp1_bio_r))
+	m_maincpu->set_addrmap(AS_PROGRAM, &airrace_state::airrace_map);
 
-	MCFG_MACHINE_RESET_OVERRIDE(atarisy4_state,airrace)
-MACHINE_CONFIG_END
+	TMS32010(config, m_dsp1, 16000000);
+	m_dsp1->set_addrmap(AS_PROGRAM, &airrace_state::dsp1_map);
+	m_dsp1->set_addrmap(AS_IO, &airrace_state::dsp1_io_map);
+	m_dsp1->bio().set(FUNC(airrace_state::dsp1_bio_r));
+}
 
 
 /*************************************
@@ -1011,7 +1050,7 @@ next_line:
 	}
 }
 
-DRIVER_INIT_MEMBER(atarisy4_state,laststar)
+void atarisy4_state::init_laststar()
 {
 	address_space &main = m_maincpu->space(AS_PROGRAM);
 
@@ -1028,7 +1067,7 @@ DRIVER_INIT_MEMBER(atarisy4_state,laststar)
 	load_ldafile(m_dsp0->space(AS_PROGRAM), memregion("dsp")->base());
 }
 
-DRIVER_INIT_MEMBER(atarisy4_state,airrace)
+void airrace_state::init_airrace()
 {
 	/* Allocate two sets of 32kB shared RAM */
 	m_shared_ram[0] = make_unique_clear<uint16_t[]>(0x4000);
@@ -1053,9 +1092,10 @@ void atarisy4_state::machine_reset()
 	m_dsp0->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-MACHINE_RESET_MEMBER(atarisy4_state,airrace)
+void airrace_state::machine_reset()
 {
-	m_dsp0->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	atarisy4_state::machine_reset();
+
 	m_dsp1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
@@ -1066,5 +1106,5 @@ MACHINE_RESET_MEMBER(atarisy4_state,airrace)
  *
  *************************************/
 
-GAME( 1984, laststar, 0, atarisy4, atarisy4, atarisy4_state, laststar, ROT0, "Atari Games", "The Last Starfighter (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND_HW )
-GAME( 1985, airrace,  0, airrace,  atarisy4, atarisy4_state, airrace,  ROT0, "Atari Games", "Air Race (prototype)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND_HW )
+GAME( 1984, laststar, 0, atarisy4, atarisy4, atarisy4_state, init_laststar, ROT0, "Atari Games", "The Last Starfighter (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND_HW )
+GAME( 1985, airrace,  0, airrace,  atarisy4, airrace_state,  init_airrace,  ROT0, "Atari Games", "Air Race (prototype)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND_HW )

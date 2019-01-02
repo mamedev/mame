@@ -32,6 +32,14 @@
 #include <utility>
 #include <vector>
 
+// Generate a N-bit mask at compile time.  N better be constant.
+// Works even for signed types
+
+template<typename T> constexpr T make_bitmask(unsigned int N)
+{
+	return T((N < (8 * sizeof(T)) ? (std::make_unsigned_t<T>(1) << N) : std::make_unsigned_t<T>(0)) - 1);
+}
+
 
 // ======================> simple_list
 
@@ -877,6 +885,17 @@ public:
 	bool full() const { return !m_empty && (m_head == m_tail); }
 	bool empty() const { return m_empty; }
 
+	// number of currently enqueued elements
+	std::size_t queue_length() const
+	{
+		if (m_empty)
+			return 0;
+
+		auto const distance = std::distance(m_head, m_tail);
+
+		return (distance > 0) ? distance : (N + distance);
+	}
+
 	void enqueue(T const &v)
 	{
 		if (WriteWrap || m_empty || (m_head != m_tail))
@@ -980,6 +999,26 @@ template <typename T>
 constexpr std::enable_if_t<std::is_signed<T>::value, T> iabs(T v) noexcept
 {
 	return (v < T(0)) ? -v : v;
+}
+
+
+// returns greatest common divisor of a and b using the Euclidean algorithm
+template <typename M, typename N>
+constexpr std::common_type_t<M, N> euclid_gcd(M a, N b)
+{
+	return b ? euclid_gcd(b, a % b) : a;
+}
+
+// reduce a fraction
+template <typename M, typename N>
+inline void reduce_fraction(M &num, N &den)
+{
+	auto const div(euclid_gcd(num, den));
+	if (div)
+	{
+		num /= div;
+		den /= div;
+	}
 }
 
 }; // namespace util

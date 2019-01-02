@@ -103,17 +103,17 @@ void blockout_state::main_map(address_map &map)
 	map(0x100004, 0x100005).portr("SYSTEM");
 	map(0x100006, 0x100007).portr("DSW1");
 	map(0x100008, 0x100009).portr("DSW2");
-	map(0x100010, 0x100011).w(this, FUNC(blockout_state::blockout_irq6_ack_w));
-	map(0x100012, 0x100013).w(this, FUNC(blockout_state::blockout_irq5_ack_w));
+	map(0x100010, 0x100011).w(FUNC(blockout_state::blockout_irq6_ack_w));
+	map(0x100012, 0x100013).w(FUNC(blockout_state::blockout_irq5_ack_w));
 	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
-	map(0x180000, 0x1bffff).ram().w(this, FUNC(blockout_state::blockout_videoram_w)).share("videoram");
+	map(0x180000, 0x1bffff).ram().w(FUNC(blockout_state::blockout_videoram_w)).share("videoram");
 	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
 	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
 	map(0x200000, 0x207fff).ram().share("frontvideoram");
 	map(0x208000, 0x21ffff).ram(); /* ??? */
-	map(0x280002, 0x280003).w(this, FUNC(blockout_state::blockout_frontcolor_w));
-	map(0x280200, 0x2805ff).ram().w(this, FUNC(blockout_state::blockout_paletteram_w)).share("paletteram");
+	map(0x280002, 0x280003).w(FUNC(blockout_state::blockout_frontcolor_w));
+	map(0x280200, 0x2805ff).ram().w(FUNC(blockout_state::blockout_paletteram_w)).share("paletteram");
 }
 
 void blockout_state::agress_map(address_map &map)
@@ -124,17 +124,17 @@ void blockout_state::agress_map(address_map &map)
 	map(0x100004, 0x100005).portr("SYSTEM");
 	map(0x100006, 0x100007).portr("DSW1");
 	map(0x100008, 0x100009).portr("DSW2");
-	map(0x100010, 0x100011).w(this, FUNC(blockout_state::blockout_irq6_ack_w));
-	map(0x100012, 0x100013).w(this, FUNC(blockout_state::blockout_irq5_ack_w));
+	map(0x100010, 0x100011).w(FUNC(blockout_state::blockout_irq6_ack_w));
+	map(0x100012, 0x100013).w(FUNC(blockout_state::blockout_irq5_ack_w));
 	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
-	map(0x180000, 0x1bffff).ram().w(this, FUNC(blockout_state::blockout_videoram_w)).share("videoram");
+	map(0x180000, 0x1bffff).ram().w(FUNC(blockout_state::blockout_videoram_w)).share("videoram");
 	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
 	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
 	map(0x200000, 0x207fff).ram().share("frontvideoram");
 	map(0x208000, 0x21ffff).ram(); /* ??? */
-	map(0x280002, 0x280003).w(this, FUNC(blockout_state::blockout_frontcolor_w));
-	map(0x280200, 0x2805ff).ram().w(this, FUNC(blockout_state::blockout_paletteram_w)).share("paletteram");
+	map(0x280002, 0x280003).w(FUNC(blockout_state::blockout_frontcolor_w));
+	map(0x280200, 0x2805ff).ram().w(FUNC(blockout_state::blockout_paletteram_w)).share("paletteram");
 }
 
 void blockout_state::audio_map(address_map &map)
@@ -307,12 +307,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(blockout_state::blockout_scanline)
 MACHINE_CONFIG_START(blockout_state::blockout)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MAIN_CLOCK)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", blockout_state, blockout_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, AUDIO_CLOCK)  /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, AUDIO_CLOCK)  /* 3.579545 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 
 	/* video hardware */
@@ -326,25 +326,26 @@ MACHINE_CONFIG_START(blockout_state::blockout)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_YM2151_ADD("ymsnd", AUDIO_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(blockout_state,irq_handler))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", AUDIO_CLOCK));
+	ymsnd.irq_handler().set(FUNC(blockout_state::irq_handler));
+	ymsnd.add_route(0, "lspeaker", 0.60);
+	ymsnd.add_route(1, "rspeaker", 0.60);
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(blockout_state::agress)
 	blockout(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(agress_map)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(agress_map)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -436,7 +437,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(blockout_state,agress)
+void blockout_state::init_agress()
 {
 	/*
 	 * agress checks at F3A that this is mirrored, blockout glitches if you mirror to it
@@ -456,8 +457,8 @@ DRIVER_INIT_MEMBER(blockout_state,agress)
 	rom[0x82/2] = 0x2700;
 }
 
-GAME( 1989, blockout, 0,        blockout, blockout,  blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, blockout2,blockout, blockout, blockout,  blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, blockoutj,blockout, blockout, blockoutj, blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, agress,   0,        agress,   agress,    blockout_state, agress, ROT0, "Palco",   "Agress - Missile Daisenryaku (Japan)",           MACHINE_SUPPORTS_SAVE )
-GAME( 2003, agressb,  agress,   agress,   agress,    blockout_state, agress, ROT0, "bootleg", "Agress - Missile Daisenryaku (English bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockout,  0,        blockout, blockout,  blockout_state, empty_init,  ROT0, "Technos Japan / California Dreams", "Block Out (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockout2, blockout, blockout, blockout,  blockout_state, empty_init,  ROT0, "Technos Japan / California Dreams", "Block Out (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockoutj, blockout, blockout, blockoutj, blockout_state, empty_init,  ROT0, "Technos Japan / California Dreams", "Block Out (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, agress,    0,        agress,   agress,    blockout_state, init_agress, ROT0, "Palco",   "Agress - Missile Daisenryaku (Japan)",           MACHINE_SUPPORTS_SAVE )
+GAME( 2003, agressb,   agress,   agress,   agress,    blockout_state, init_agress, ROT0, "bootleg", "Agress - Missile Daisenryaku (English bootleg)", MACHINE_SUPPORTS_SAVE )

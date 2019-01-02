@@ -42,6 +42,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
@@ -75,6 +76,9 @@ public:
 		, m_floppy(nullptr)
 	{ }
 
+	void proteus(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -93,12 +97,10 @@ public:
 	DECLARE_WRITE8_MEMBER(enable_z80_w);
 	DECLARE_WRITE8_MEMBER(enable_6809_w);
 
-	void proteus(machine_config &config);
 	void proteus_6809_mem(address_map &map);
 	void proteus_z80_mem(address_map &map);
 	void proteus_z80_io(address_map &map);
 
-protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_z80;
 	required_device<mc6854_device> m_adlc;
@@ -208,12 +210,12 @@ WRITE_LINE_MEMBER(proteus_state::motor_w)
 
 READ8_MEMBER(proteus_state::fdc_inv_r)
 {
-	return m_fdc->gen_r(offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(proteus_state::fdc_inv_w)
 {
-	m_fdc->gen_w(offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 
@@ -241,11 +243,11 @@ void proteus_state::proteus_6809_mem(address_map &map)
 	map(0xe004, 0xe005).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Terminal
 	map(0xe008, 0xe009).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Printer
 	map(0xe00c, 0xe00d).rw(m_acia[2], FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Modem
-	map(0xe014, 0xe014).rw(this, FUNC(proteus_state::drive_register_r), FUNC(proteus_state::drive_register_w));
-	map(0xe018, 0xe01b).rw(this, FUNC(proteus_state::fdc_inv_r), FUNC(proteus_state::fdc_inv_w)); // Floppy control
+	map(0xe014, 0xe014).rw(FUNC(proteus_state::drive_register_r), FUNC(proteus_state::drive_register_w));
+	map(0xe018, 0xe01b).rw(FUNC(proteus_state::fdc_inv_r), FUNC(proteus_state::fdc_inv_w)); // Floppy control
 	map(0xe020, 0xe027).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));       // Timer
-	map(0xe030, 0xe036).rw(this, FUNC(proteus_state::network_r), FUNC(proteus_state::network_w)); // Poly network
-	map(0xe060, 0xe060).w(this, FUNC(proteus_state::enable_z80_w));
+	map(0xe030, 0xe036).rw(FUNC(proteus_state::network_r), FUNC(proteus_state::network_w)); // Poly network
+	map(0xe060, 0xe060).w(FUNC(proteus_state::enable_z80_w));
 	map(0xf000, 0xffff).rom().region("bios", 0);
 }
 
@@ -262,11 +264,11 @@ void proteus_state::proteus_z80_io(address_map &map)
 	map(0x04, 0x05).mirror(0xff00).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Terminal
 	map(0x08, 0x09).mirror(0xff00).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Printer
 	map(0x0c, 0x0d).mirror(0xff00).rw(m_acia[2], FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Modem
-	map(0x14, 0x14).mirror(0xff00).rw(this, FUNC(proteus_state::drive_register_r), FUNC(proteus_state::drive_register_w));
-	map(0x18, 0x1b).mirror(0xff00).rw(this, FUNC(proteus_state::fdc_inv_r), FUNC(proteus_state::fdc_inv_w)); // Floppy control
+	map(0x14, 0x14).mirror(0xff00).rw(FUNC(proteus_state::drive_register_r), FUNC(proteus_state::drive_register_w));
+	map(0x18, 0x1b).mirror(0xff00).rw(FUNC(proteus_state::fdc_inv_r), FUNC(proteus_state::fdc_inv_w)); // Floppy control
 	map(0x20, 0x27).mirror(0xff00).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));       // Timer
-	map(0x30, 0x36).mirror(0xff00).rw(this, FUNC(proteus_state::network_r), FUNC(proteus_state::network_w)); // Poly network
-	map(0x50, 0x50).mirror(0xff00).w(this, FUNC(proteus_state::enable_6809_w));
+	map(0x30, 0x36).mirror(0xff00).rw(FUNC(proteus_state::network_r), FUNC(proteus_state::network_w)); // Poly network
+	map(0x50, 0x50).mirror(0xff00).w(FUNC(proteus_state::enable_6809_w));
 }
 
 
@@ -313,28 +315,29 @@ FLOPPY_FORMATS_MEMBER(proteus_state::floppy_formats)
 	FLOPPY_POLY_CPM_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START(proteus_floppies)
-	SLOT_INTERFACE("8dssd", FLOPPY_8_DSSD) // Shugart SA-860
-SLOT_INTERFACE_END
+static void proteus_floppies(device_slot_interface &device)
+{
+	device.option_add("8dssd", FLOPPY_8_DSSD); // Shugart SA-860
+}
 
 
 MACHINE_CONFIG_START(proteus_state::proteus)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, 4_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(proteus_6809_mem)
+	MCFG_DEVICE_ADD("maincpu", MC6809, 4_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(proteus_6809_mem)
 
-	MCFG_CPU_ADD("z80", Z80, 4_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(proteus_z80_mem)
-	MCFG_CPU_IO_MAP(proteus_z80_io)
+	MCFG_DEVICE_ADD("z80", Z80, 4_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(proteus_z80_mem)
+	MCFG_DEVICE_IO_MAP(proteus_z80_io)
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("z80", INPUT_LINE_IRQ0))
+	INPUT_MERGER_ANY_HIGH(config, m_irqs);
+	m_irqs->output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	m_irqs->output_handler().append_inputline(m_z80, INPUT_LINE_IRQ0);
 
 	/* fdc */
-	MCFG_FD1771_ADD("fdc", 4_MHz_XTAL / 2)
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(proteus_state, motor_w))
-	MCFG_WD_FDC_FORCE_READY
+	FD1771(config, m_fdc, 4_MHz_XTAL / 2);
+	m_fdc->hld_wr_callback().set(FUNC(proteus_state::motor_w));
+	m_fdc->set_force_ready(true);
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", proteus_floppies, "8dssd", proteus_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -342,73 +345,72 @@ MACHINE_CONFIG_START(proteus_state::proteus)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	/* network */
-	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_IRQ_CB(DEVWRITELINE("irqs", input_merger_device, in_w<0>))
+	MC6854(config, m_adlc);
+	m_adlc->out_irq_cb().set("irqs", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 4_MHz_XTAL / 2)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O2_CB(WRITELINE(proteus_state, ptm_o2_callback))
-	MCFG_PTM6840_O3_CB(WRITELINE(proteus_state, ptm_o3_callback))
-	MCFG_PTM6840_IRQ_CB(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
+	PTM6840(config, m_ptm, 4_MHz_XTAL / 2);
+	m_ptm->set_external_clocks(0, 0, 0);
+	m_ptm->o2_callback().set(FUNC(proteus_state::ptm_o2_callback));
+	m_ptm->o3_callback().set(FUNC(proteus_state::ptm_o3_callback));
+	m_ptm->irq_callback().set("irqs", FUNC(input_merger_device::in_w<1>));
 
 	/* parallel port */
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	//MCFG_PIA_READPB_HANDLER(READ8(proteus_state, pia_pb_r))
-	//MCFG_PIA_WRITEPA_HANDLER(WRITE8(proteus_state, pia_pa_w))
-	//MCFG_PIA_WRITEPB_HANDLER(WRITE8(proteus_state, pia_pb_w))
-	//MCFG_PIA_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<2>))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<3>))
+	PIA6821(config, m_pia, 0);
+	//m_pia->readpb_handler().set(FUNC(proteus_state::pia_pb_r));
+	//m_pia->writepa_handler().set(FUNC(proteus_state::pia_pa_w));
+	//m_pia->writepb_handler().set(FUNC(proteus_state::pia_pb_w));
+	//m_pia->ca2_handler().set(CENTRONICS_TAG, FUNC(centronics_device::write_strobe));
+	m_pia->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<2>));
+	m_pia->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<3>));
 
-	MCFG_CENTRONICS_ADD("parallel", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("pia", pia6821_device, ca1_w))
+	MCFG_DEVICE_ADD("parallel", CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("pia", pia6821_device, ca1_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "parallel")
 
 	/* terminal port */
-	MCFG_DEVICE_ADD("acia0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("terminal", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("terminal", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<4>))
+	ACIA6850(config, m_acia[0], 0);
+	m_acia[0]->txd_handler().set("terminal", FUNC(rs232_port_device::write_txd));
+	m_acia[0]->rts_handler().set("terminal", FUNC(rs232_port_device::write_rts));
+	m_acia[0]->irq_handler().set("irqs", FUNC(input_merger_device::in_w<4>));
 
-	MCFG_RS232_PORT_ADD("terminal", default_rs232_devices, "terminal") // TODO: ADM-31 terminal required
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_cts))
+	rs232_port_device &terminal(RS232_PORT(config, "terminal", default_rs232_devices, "terminal")); // TODO: ADM-31 terminal required
+	terminal.rxd_handler().set(m_acia[0], FUNC(acia6850_device::write_rxd));
+	terminal.cts_handler().set(m_acia[0], FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD("acia0_clock", CLOCK, 4_MHz_XTAL / 2 / 13) // TODO: this is set using jumpers
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia0", acia6850_device, write_rxc))
+	clock_device &acia0_clock(CLOCK(config, "acia0_clock", 4_MHz_XTAL / 2 / 13)); // TODO: this is set using jumpers
+	acia0_clock.signal_handler().set(m_acia[0], FUNC(acia6850_device::write_txc));
+	acia0_clock.signal_handler().append(m_acia[0], FUNC(acia6850_device::write_rxc));
 
 	/* printer port */
-	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("printer", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("printer", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<5>))
+	ACIA6850(config, m_acia[1], 0);
+	m_acia[1]->txd_handler().set("printer", FUNC(rs232_port_device::write_txd));
+	m_acia[1]->rts_handler().set("printer", FUNC(rs232_port_device::write_rts));
+	m_acia[1]->irq_handler().set("irqs", FUNC(input_merger_device::in_w<5>));
 
-	MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_cts))
+	rs232_port_device &printer(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	printer.rxd_handler().set(m_acia[1], FUNC(acia6850_device::write_rxd));
+	printer.cts_handler().set(m_acia[1], FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD("acia1_clock", CLOCK, 4_MHz_XTAL / 2 / 13) // TODO: this is set using jumpers J2
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_rxc))
+	clock_device &acia1_clock(CLOCK(config, "acia1_clock", 4_MHz_XTAL / 2 / 13)); // TODO: this is set using jumpers J2
+	acia1_clock.signal_handler().set(m_acia[1], FUNC(acia6850_device::write_txc));
+	acia1_clock.signal_handler().append(m_acia[1], FUNC(acia6850_device::write_rxc));
 
 	/* modem port */
-	MCFG_DEVICE_ADD("acia2", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("modem", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("modem", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<6>))
+	ACIA6850(config, m_acia[2], 0);
+	m_acia[2]->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
+	m_acia[2]->rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
+	m_acia[2]->irq_handler().set("irqs", FUNC(input_merger_device::in_w<6>));
 
-	MCFG_RS232_PORT_ADD("modem", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_cts))
+	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	modem.rxd_handler().set(m_acia[2], FUNC(acia6850_device::write_rxd));
+	modem.cts_handler().set(m_acia[2], FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD("acia2_clock", CLOCK, 4_MHz_XTAL / 2 / 13) // TODO: this is set using jumpers J1
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia2", acia6850_device, write_rxc))
+	clock_device &acia2_clock(CLOCK(config, "acia2_clock", 4_MHz_XTAL / 2 / 13)); // TODO: this is set using jumpers J1
+	acia2_clock.signal_handler().set(m_acia[2], FUNC(acia6850_device::write_txc));
+	acia2_clock.signal_handler().append(m_acia[2], FUNC(acia6850_device::write_rxc));
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "poly_flop")
@@ -420,11 +422,11 @@ ROM_START(proteus)
 	ROM_REGION(0x1000, "bios", 0)
 	ROM_DEFAULT_BIOS("82")
 	ROM_SYSTEM_BIOS(0, "82", "030982")
-	ROMX_LOAD("proteusv30.u28", 0x0000, 0x1000, CRC(ad02dc36) SHA1(f73aff8b3d85448f603a2fe807e3a7e02550db27), ROM_BIOS(1))
+	ROMX_LOAD("proteusv30.u28", 0x0000, 0x1000, CRC(ad02dc36) SHA1(f73aff8b3d85448f603a2fe807e3a7e02550db27), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "86", "300986")
-	ROMX_LOAD("300986.u28", 0x0000, 0x1000, CRC(f607d396) SHA1(0b9d9d3178b5587e60da56885b9e8a83f7d5dd26), ROM_BIOS(2))
+	ROMX_LOAD("300986.u28", 0x0000, 0x1000, CRC(f607d396) SHA1(0b9d9d3178b5587e60da56885b9e8a83f7d5dd26), ROM_BIOS(1))
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT  COMPANY     FULLNAME                     FLAGS */
-COMP( 1982, proteus, 0,      0,       proteus, proteus, proteus_state, 0,    "Polycorp", "Poly Proteus (Standalone)", MACHINE_NOT_WORKING )
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME                     FLAGS */
+COMP( 1982, proteus, 0,      0,       proteus, proteus, proteus_state, empty_init, "Polycorp", "Poly Proteus (Standalone)", MACHINE_NOT_WORKING )

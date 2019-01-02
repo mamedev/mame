@@ -55,13 +55,13 @@ namco_audio_device::namco_audio_device(const machine_config &mconfig, device_typ
 	, m_soundregs(nullptr)
 	, m_wavedata(nullptr)
 	, m_wave_size(0)
-	, m_sound_enable(0)
+	, m_sound_enable(false)
 	, m_stream(nullptr)
 	, m_namco_clock(0)
 	, m_sample_rate(0)
 	, m_f_fracbits(0)
 	, m_voices(0)
-	, m_stereo(0)
+	, m_stereo(false)
 {
 }
 
@@ -104,7 +104,7 @@ void namco_audio_device::device_start()
 		m_stream = machine().sound().stream_alloc(*this, 0, 1, 192000);
 
 	/* start with sound enabled, many games don't have a sound enable register */
-	m_sound_enable = 1;
+	m_sound_enable = true;
 
 	/* register with the save state system */
 	save_pointer(NAME(m_soundregs), 0x400);
@@ -245,6 +245,12 @@ uint32_t namco_audio_device::namco_update_one(stream_sample_t *buffer, int lengt
 }
 
 
+WRITE_LINE_MEMBER(namco_audio_device::sound_enable_w)
+{
+	m_sound_enable = state;
+}
+
+
 /********************************************************************************/
 
 /* pacman register map
@@ -262,11 +268,6 @@ uint32_t namco_audio_device::namco_update_one(stream_sample_t *buffer, int lengt
     0x1b-0x1e:  ch 2    frequency
     0x1f:       ch 2    volume
 */
-
-WRITE_LINE_MEMBER(namco_device::pacman_sound_enable_w)
-{
-	m_sound_enable = state;
-}
 
 WRITE8_MEMBER( namco_device::pacman_sound_w )
 {
@@ -410,11 +411,6 @@ it select the 54XX/52XX outputs on those channels
     0x3f        ch 7
 */
 
-void namco_device::polepos_sound_enable(int enable)
-{
-	m_sound_enable = enable;
-}
-
 READ8_MEMBER( namco_device::polepos_sound_r )
 {
 	return m_soundregs[offset];
@@ -490,11 +486,6 @@ WRITE8_MEMBER( namco_device::polepos_sound_w )
     0x3c-0x3d   ch 7    frequency
     0x3e        ch 7    waveform select & frequency
 */
-
-WRITE_LINE_MEMBER(namco_15xx_device::mappy_sound_enable)
-{
-	m_sound_enable = state;
-}
 
 WRITE8_MEMBER(namco_15xx_device::namco_15xx_w)
 {
@@ -675,7 +666,7 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, stream_sample
 		memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
 		/* if no sound, we're done */
-		if (m_sound_enable == 0)
+		if (!m_sound_enable)
 			return;
 
 		/* loop over each voice and add its contribution */
@@ -782,9 +773,8 @@ void namco_audio_device::sound_stream_update(sound_stream &stream, stream_sample
 		memset(buffer, 0, samples * sizeof(*buffer));
 
 		/* if no sound, we're done */
-
-		if (m_sound_enable == 0)
-		return;
+		if (!m_sound_enable)
+			return;
 
 		/* loop over each voice and add its contribution */
 		for (voice = m_channel_list; voice < m_last_channel; voice++)

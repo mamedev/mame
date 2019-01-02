@@ -36,19 +36,21 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		{ }
 
+	void nsm(machine_config &config);
+
+private:
+
 	DECLARE_READ8_MEMBER(ff_r);
 	DECLARE_WRITE8_MEMBER(cru_w);
 	DECLARE_WRITE8_MEMBER(oe_w);
-	void nsm(machine_config &config);
 	void nsm_io_map(address_map &map);
 	void nsm_map(address_map &map);
 
-private:
 	uint8_t m_cru_data[9];
 	uint8_t m_cru_count;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<tms9995_device> m_maincpu;
 	output_finder<60> m_digits;
 };
 
@@ -63,18 +65,18 @@ void nsm_state::nsm_map(address_map &map)
 void nsm_state::nsm_io_map(address_map &map)
 {
 	// 00-71 selected by IC600 (74LS151)
-	map(0x0000, 0x0001).r(this, FUNC(nsm_state::ff_r)); // 5v supply
+	map(0x0000, 0x0001).r(FUNC(nsm_state::ff_r)); // 5v supply
 	map(0x0010, 0x0011).nopr(); // antenna
 	map(0x0020, 0x0021).nopr(); // reset circuit
-	map(0x0030, 0x0031).r(this, FUNC(nsm_state::ff_r)); // service plug
-	map(0x0040, 0x0041).r(this, FUNC(nsm_state::ff_r)); // service plug
-	map(0x0050, 0x0051).r(this, FUNC(nsm_state::ff_r)); // test of internal battery
-	map(0x0060, 0x0061).r(this, FUNC(nsm_state::ff_r)); // sum of analog outputs of ay2
+	map(0x0030, 0x0031).r(FUNC(nsm_state::ff_r)); // service plug
+	map(0x0040, 0x0041).r(FUNC(nsm_state::ff_r)); // service plug
+	map(0x0050, 0x0051).r(FUNC(nsm_state::ff_r)); // test of internal battery
+	map(0x0060, 0x0061).r(FUNC(nsm_state::ff_r)); // sum of analog outputs of ay2
 	//AM_RANGE(0x0070, 0x0071) AM_READNOP // serial data in
 	map(0x0f70, 0x0f7d).nopw();
 	map(0x0fe4, 0x0fff).nopr();
-	map(0x7fb0, 0x7fbf).w(this, FUNC(nsm_state::cru_w));
-	map(0x7fd0, 0x7fd1).w(this, FUNC(nsm_state::oe_w));
+	map(0x7fb0, 0x7fbf).w(FUNC(nsm_state::cru_w));
+	map(0x7fd0, 0x7fd1).w(FUNC(nsm_state::oe_w));
 }
 
 static INPUT_PORTS_START( nsm )
@@ -120,25 +122,26 @@ WRITE8_MEMBER( nsm_state::cru_w )
 void nsm_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
-	cpu->ready_line(ASSERT_LINE);
-	cpu->reset_line(ASSERT_LINE);
+	m_maincpu->ready_line(ASSERT_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(nsm_state::nsm)
+void nsm_state::nsm(machine_config &config)
+{
 	// CPU TMS9995, standard variant; no line connection
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 11052000, nsm_map, nsm_io_map)
+	TMS9995(config, m_maincpu, 11052000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nsm_state::nsm_map);
+	m_maincpu->set_addrmap(AS_IO, &nsm_state::nsm_io_map);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_nsm)
+	config.set_default_layout(layout_nsm);
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ay1", AY8912, 11052000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_SOUND_ADD("ay2", AY8912, 11052000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_CONFIG_END
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	AY8912(config, "ay1", 11052000/8).add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	AY8912(config, "ay2", 11052000/8).add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+}
 
 /*-------------------------------------------------------------------
 / Cosmic Flash (1985)
@@ -162,4 +165,4 @@ ROM_END
 / The Games (1985)
 /-------------------------------------------------------------------*/
 
-GAME(1985,  firebird,  0,  nsm,  nsm, nsm_state, 0,  ROT0, "NSM", "Hot Fire Birds", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME(1985,  firebird,  0,  nsm,  nsm, nsm_state, empty_init, ROT0, "NSM", "Hot Fire Birds", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)

@@ -7,10 +7,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/astrocde.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/astrocde.h"
 #include "video/resnet.h"
+
+#include <cmath>
+
 
 /*************************************
  *
@@ -20,12 +24,25 @@
 
 void astrocde_state::machine_start()
 {
-	save_item(NAME(m_port_1_last));
-	save_item(NAME(m_port_2_last));
 	save_item(NAME(m_ram_write_enable));
 	save_item(NAME(m_input_select));
+}
+
+void seawolf2_state::machine_start()
+{
+	astrocde_state::machine_start();
+
+	save_item(NAME(m_port_1_last));
+	save_item(NAME(m_port_2_last));
 
 	m_port_1_last = m_port_2_last = 0xff;
+}
+
+void tenpindx_state::machine_start()
+{
+	astrocde_state::machine_start();
+
+	m_lamps.resolve();
 }
 
 
@@ -62,7 +79,7 @@ inline int astrocde_state::mame_vpos_to_astrocade_vpos(int scanline)
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(astrocde_state, astrocde)
+void astrocde_state::astrocade_palette(palette_device &palette) const
 {
 	/*
 	    The Astrocade has a 256 color palette: 32 colors with 8 luminance
@@ -75,81 +92,71 @@ PALETTE_INIT_MEMBER(astrocde_state, astrocde)
 	    that has a 4-bit resolution.
 	*/
 
-	int color, luma;
-
-	/* loop over color values */
-	for (color = 0; color < 32; color++)
+	// loop over color values
+	for (int color = 0; color < 32; color++)
 	{
-		float ry = 0.75 * sin((color / 32.0) * (2.0 * M_PI));
-		float by = 1.15 * cos((color / 32.0) * (2.0 * M_PI));
+		// color 0 maps to ry = by = 0
+		double const angle = (color / 32.0) * (2.0 * M_PI);
+		float const ry = color ? (0.75 * std::sin(angle)) : 0;
+		float const by = color ? (1.15 * std::cos(angle)) : 0;
 
-		/* color 0 maps to ry = by = 0 */
-		if (color == 0)
-			ry = by = 0;
-
-		/* iterate over luminence values */
-		for (luma = 0; luma < 16; luma++)
+		// iterate over luminence values
+		for (int luma = 0; luma < 16; luma++)
 		{
-			float y = luma / 15.0;
-			int r, g, b;
+			float const y = luma / 15.0;
 
-			/* transform to RGB */
-			r = (ry + y) * 255;
-			g = ((y - 0.299f * (ry + y) - 0.114f * (by + y)) / 0.587f) * 255;
-			b = (by + y) * 255;
+			// transform to RGB
+			int r = (ry + y) * 255;
+			int g = ((y - 0.299f * (ry + y) - 0.114f * (by + y)) / 0.587f) * 255;
+			int b = (by + y) * 255;
 
-			/* clamp and store */
-			r = std::max(r, 0);
-			r = std::min(r, 255);
-			g = std::max(g, 0);
-			g = std::min(g, 255);
-			b = std::max(b, 0);
-			b = std::min(b, 255);
+			// clamp and store
+			r = (std::min)((std::max)(r, 0), 255);
+			g = (std::min)((std::max)(g, 0), 255);
+			b = (std::min)((std::max)(b, 0), 255);
 			palette.set_pen_color(color * 16 + luma, rgb_t(r, g, b));
 		}
 	}
 }
 
 
-PALETTE_INIT_MEMBER(astrocde_state,profpac)
+void astrocde_state::profpac_palette(palette_device &palette) const
 {
-	/* Professor Pac-Man uses a more standard 12-bit RGB palette layout */
-	static const int resistances[4] = { 6200, 3000, 1500, 750 };
-	double weights[4];
-	int i;
+	// Professor Pac-Man uses a more standard 12-bit RGB palette layout
+	static constexpr int resistances[4] = { 6200, 3000, 1500, 750 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double weights[4];
 	compute_resistor_weights(0, 255, -1.0,
 			4, resistances, weights, 1500, 0,
 			4, resistances, weights, 1500, 0,
 			4, resistances, weights, 1500, 0);
 
-	/* initialize the palette with these colors */
-	for (i = 0; i < 4096; i++)
+	// initialize the palette with these colors
+	for (int i = 0; i < 4096; i++)
 	{
 		int bit0, bit1, bit2, bit3;
-		int r, g, b;
 
-		/* blue component */
-		bit0 = (i >> 0) & 0x01;
-		bit1 = (i >> 1) & 0x01;
-		bit2 = (i >> 2) & 0x01;
-		bit3 = (i >> 3) & 0x01;
-		b = combine_4_weights(weights, bit0, bit1, bit2, bit3);
+		// blue component
+		bit0 = BIT(i, 0);
+		bit1 = BIT(i, 1);
+		bit2 = BIT(i, 2);
+		bit3 = BIT(i, 3);
+		int const b = combine_4_weights(weights, bit0, bit1, bit2, bit3);
 
-		/* green component */
-		bit0 = (i >> 4) & 0x01;
-		bit1 = (i >> 5) & 0x01;
-		bit2 = (i >> 6) & 0x01;
-		bit3 = (i >> 7) & 0x01;
-		g = combine_4_weights(weights, bit0, bit1, bit2, bit3);
+		// green component
+		bit0 = BIT(i, 4);
+		bit1 = BIT(i, 5);
+		bit2 = BIT(i, 6);
+		bit3 = BIT(i, 7);
+		int const g = combine_4_weights(weights, bit0, bit1, bit2, bit3);
 
-		/* red component */
-		bit0 = (i >> 8) & 0x01;
-		bit1 = (i >> 9) & 0x01;
-		bit2 = (i >> 10) & 0x01;
-		bit3 = (i >> 11) & 0x01;
-		r = combine_4_weights(weights, bit0, bit1, bit2, bit3);
+		// red component
+		bit0 = BIT(i, 8);
+		bit1 = BIT(i, 9);
+		bit2 = BIT(i, 10);
+		bit3 = BIT(i, 11);
+		int const r = combine_4_weights(weights, bit0, bit1, bit2, bit3);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -193,7 +200,7 @@ VIDEO_START_MEMBER(astrocde_state,profpac)
 	init_savestate();
 
 	/* register our specific save state data */
-	save_pointer(NAME(m_profpac_videoram.get()), 0x4000 * 4);
+	save_pointer(NAME(m_profpac_videoram), 0x4000 * 4);
 	save_item(NAME(m_profpac_palette));
 	save_item(NAME(m_profpac_colormap));
 	save_item(NAME(m_profpac_intercept));
@@ -469,151 +476,100 @@ TIMER_CALLBACK_MEMBER(astrocde_state::scanline_callback)
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::astrocade_data_chip_register_r)
+READ8_MEMBER(astrocde_state::video_register_r)
 {
 	uint8_t result = 0xff;
 
 	/* these are the core registers */
 	switch (offset & 0xff)
 	{
-		case 0x08:  /* intercept feedback */
-			result = m_funcgen_intercept;
-			m_funcgen_intercept = 0;
-			break;
+	case 0x08:  /* intercept feedback */
+		result = m_funcgen_intercept;
+		m_funcgen_intercept = 0;
+		break;
 
-		case 0x0e:  /* vertical feedback (from lightpen interrupt) */
-			result = m_vertical_feedback;
-			break;
+	case 0x0e:  /* vertical feedback (from lightpen interrupt) */
+		result = m_vertical_feedback;
+		break;
 
-		case 0x0f:  /* horizontal feedback (from lightpen interrupt) */
-			result = m_horizontal_feedback;
-			break;
-
-		case 0x10:  /* player 1 handle */
-			result = m_p1handle.read_safe(0xff);
-			break;
-
-		case 0x11:  /* player 2 handle */
-			result = m_p2handle.read_safe(0xff);
-			break;
-
-		case 0x12:  /* player 3 handle */
-			result = m_p3handle.read_safe(0xff);
-			break;
-
-		case 0x13:  /* player 4 handle */
-			result = m_p4handle.read_safe(0xff);
-			break;
-
-		case 0x14:  /* keypad column 0 */
-			result = m_keypad0.read_safe(0xff);
-			break;
-
-		case 0x15:  /* keypad column 1 */
-			result = m_keypad1.read_safe(0xff);
-			break;
-
-		case 0x16:  /* keypad column 2 */
-			result = m_keypad2.read_safe(0xff);
-			break;
-
-		case 0x17:  /* keypad column 3 */
-			result = m_keypad3.read_safe(0xff);
-			break;
-
-		case 0x1c:  /* player 1 knob */
-			result = m_p1_knob.read_safe(0xff);
-			break;
-
-		case 0x1d:  /* player 2 knob */
-			result = m_p2_knob.read_safe(0xff);
-			break;
-
-		case 0x1e:  /* player 3 knob */
-			result = m_p3_knob.read_safe(0xff);
-			break;
-
-		case 0x1f:  /* player 4 knob */
-			result = m_p4_knob.read_safe(0xff);
-			break;
+	case 0x0f:  /* horizontal feedback (from lightpen interrupt) */
+		result = m_horizontal_feedback;
+		break;
 	}
 
 	return result;
 }
 
 
-WRITE8_MEMBER(astrocde_state::astrocade_data_chip_register_w)
+WRITE8_MEMBER(astrocde_state::video_register_w)
 {
 	/* these are the core registers */
 	switch (offset & 0xff)
 	{
-		case 0x00:  /* color table is in registers 0-7 */
-		case 0x01:
-		case 0x02:
-		case 0x03:
-		case 0x04:
-		case 0x05:
-		case 0x06:
-		case 0x07:
-			m_colors[offset & 7] = data;
-			break;
+	case 0x00:  /* color table is in registers 0-7 */
+	case 0x01:
+	case 0x02:
+	case 0x03:
+	case 0x04:
+	case 0x05:
+	case 0x06:
+	case 0x07:
+		m_colors[offset & 7] = data;
+		break;
 
-		case 0x08:  /* mode register */
-			m_video_mode = data & 1;
-			break;
+	case 0x08:  /* mode register */
+		m_video_mode = data & 1;
+		break;
 
-		case 0x09:  /* color split pixel */
-			m_colorsplit = 2 * (data & 0x3f);
-			m_bgdata = ((data & 0xc0) >> 6) * 0x55;
-			break;
+	case 0x09:  /* color split pixel */
+		m_colorsplit = 2 * (data & 0x3f);
+		m_bgdata = ((data & 0xc0) >> 6) * 0x55;
+		break;
 
-		case 0x0a:  /* vertical blank register */
-			m_vblank = data;
-			break;
+	case 0x0a:  /* vertical blank register */
+		m_vblank = data;
+		break;
 
-		case 0x0b:  /* color block transfer */
-			m_colors[(offset >> 8) & 7] = data;
-			break;
+	case 0x0b:  /* color block transfer */
+		m_colors[(offset >> 8) & 7] = data;
+		break;
 
-		case 0x0c:  /* function generator */
-			m_funcgen_control = data;
-			m_funcgen_expand_count = 0;     /* reset flip-flop for expand mode on write to this register */
-			m_funcgen_rotate_count = 0;     /* reset counter for rotate mode on write to this register */
-			m_funcgen_shift_prev_data = 0;  /* reset shift buffer on write to this register */
-			break;
+	case 0x0c:  /* function generator */
+		m_funcgen_control = data;
+		m_funcgen_expand_count = 0;     /* reset flip-flop for expand mode on write to this register */
+		m_funcgen_rotate_count = 0;     /* reset counter for rotate mode on write to this register */
+		m_funcgen_shift_prev_data = 0;  /* reset shift buffer on write to this register */
+		break;
 
-		case 0x0d:  /* interrupt feedback */
-			m_interrupt_vector = data;
-			m_maincpu->set_input_line(0, CLEAR_LINE);
-			break;
+	case 0x0d:  /* interrupt feedback */
+		m_interrupt_vector = data;
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+		break;
 
-		case 0x0e:  /* interrupt enable and mode */
-			m_interrupt_enabl = data;
-			m_maincpu->set_input_line(0, CLEAR_LINE);
-			break;
+	case 0x0e:  /* interrupt enable and mode */
+		m_interrupt_enabl = data;
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+		break;
 
-		case 0x0f:  /* interrupt line */
-			m_interrupt_scanline = data;
-			m_maincpu->set_input_line(0, CLEAR_LINE);
-			break;
+	case 0x0f:  /* interrupt line */
+		m_interrupt_scanline = data;
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+		break;
 
-		case 0x10:  /* master oscillator register */
-		case 0x11:  /* tone A frequency register */
-		case 0x12:  /* tone B frequency register */
-		case 0x13:  /* tone C frequency register */
-		case 0x14:  /* vibrato register */
-		case 0x15:  /* tone C volume, noise modulation and MUX register */
-		case 0x16:  /* tone A volume and tone B volume register */
-		case 0x17:  /* noise volume register */
-		case 0x18:  /* sound block transfer */
-			if (m_video_config & AC_SOUND_PRESENT)
-				m_astrocade_sound1->astrocade_sound_w(space, offset, data);
-			break;
-
-		case 0x19:  /* expand register */
-			m_funcgen_expand_color[0] = data & 0x03;
-			m_funcgen_expand_color[1] = (data >> 2) & 0x03;
-			break;
+#ifdef UNUSED_OLD_CODE
+	case 0x10:  /* master oscillator register */
+	case 0x11:  /* tone A frequency register */
+	case 0x12:  /* tone B frequency register */
+	case 0x13:  /* tone C frequency register */
+	case 0x14:  /* vibrato register */
+	case 0x15:  /* tone C volume, noise modulation and MUX register */
+	case 0x16:  /* tone A volume and tone B volume register */
+	case 0x17:  /* noise volume register */
+	case 0x18:  /* sound block transfer */
+		if (m_video_config & AC_SOUND_PRESENT)
+			m_astrocade_sound1->write(space, offset, data);
+		break;
+#endif
 	}
 }
 
@@ -710,6 +666,13 @@ WRITE8_MEMBER(astrocde_state::astrocade_funcgen_w)
 
 	/* write the result */
 	space.write_byte(0x4000 + offset, data);
+}
+
+
+WRITE8_MEMBER(astrocde_state::expand_register_w)
+{
+	m_funcgen_expand_color[0] = data & 0x03;
+	m_funcgen_expand_color[1] = (data >> 2) & 0x03;
 }
 
 

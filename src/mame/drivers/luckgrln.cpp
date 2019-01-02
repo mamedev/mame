@@ -8,12 +8,8 @@
  The program rom extracted from the Z180 also refers to this as Lucky 74..
 
  TODO:
- - inputs / port mapping
  - sound (what's the sound chip?)
- - reel scroll / reel enable / reel colours
  - are the colours correct even on the text layer? they look odd in places, and there are unused bits
- - dunno where / how is the service mode bit is connected (I've accessed it once, but dunno how I've did it)
- - graphics in 7smash are quite off (encrypted ROM?)
 
  Lucky Girl
  Wing 1991
@@ -83,6 +79,7 @@
 #include "cpu/z180/z180.h"
 #include "machine/msm6242.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -94,56 +91,42 @@ class luckgrln_state : public driver_device
 public:
 	luckgrln_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_reel1_ram(*this, "reel1_ram"),
-		m_reel1_attr(*this, "reel1_attr"),
-		m_reel1_scroll(*this, "reel1_scroll"),
-		m_reel2_ram(*this, "reel2_ram"),
-		m_reel2_attr(*this, "reel2_attr"),
-		m_reel2_scroll(*this, "reel2_scroll"),
-		m_reel3_ram(*this, "reel3_ram"),
-		m_reel3_attr(*this, "reel3_attr"),
-		m_reel3_scroll(*this, "reel3_scroll"),
-		m_reel4_ram(*this, "reel4_ram"),
-		m_reel4_attr(*this, "reel4_attr"),
-		m_reel4_scroll(*this, "reel4_scroll"),
-		m_luck_vram1(*this, "luck_vram1"),
-		m_luck_vram2(*this, "luck_vram2"),
-		m_luck_vram3(*this, "luck_vram3"),
+		m_reel_ram(*this, "reel_ram.%u", 0U),
+		m_reel_attr(*this, "reel_attr.%u", 0U),
+		m_reel_scroll(*this, "reel_scroll.%u", 0U),
+		m_luck_vram(*this, "luck_vram.%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_lamps(*this, "lamp%u", 0U) { }
+
+	void init_luckgrln();
+
+	void _7smash(machine_config &config);
+	void luckgrln(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	required_shared_ptr_array<uint8_t, 4> m_reel_ram;
+	required_shared_ptr_array<uint8_t, 4> m_reel_attr;
+	required_shared_ptr_array<uint8_t, 4> m_reel_scroll;
+	required_shared_ptr_array<uint8_t, 3> m_luck_vram;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	output_finder<12> m_lamps;
 
 	uint8_t m_nmi_enable;
-	tilemap_t *m_reel1_tilemap;
-	tilemap_t *m_reel2_tilemap;
-	tilemap_t *m_reel3_tilemap;
-	tilemap_t *m_reel4_tilemap;
-	required_shared_ptr<uint8_t> m_reel1_ram;
-	required_shared_ptr<uint8_t> m_reel1_attr;
-	required_shared_ptr<uint8_t> m_reel1_scroll;
-	required_shared_ptr<uint8_t> m_reel2_ram;
-	required_shared_ptr<uint8_t> m_reel2_attr;
-	required_shared_ptr<uint8_t> m_reel2_scroll;
-	required_shared_ptr<uint8_t> m_reel3_ram;
-	required_shared_ptr<uint8_t> m_reel3_attr;
-	required_shared_ptr<uint8_t> m_reel3_scroll;
-	required_shared_ptr<uint8_t> m_reel4_ram;
-	required_shared_ptr<uint8_t> m_reel4_attr;
-	required_shared_ptr<uint8_t> m_reel4_scroll;
-	required_shared_ptr<uint8_t> m_luck_vram1;
-	required_shared_ptr<uint8_t> m_luck_vram2;
-	required_shared_ptr<uint8_t> m_luck_vram3;
-
+	tilemap_t *m_reel_tilemap[4];
 	int m_palette_count;
 	uint8_t m_palette_ram[0x10000];
-	DECLARE_WRITE8_MEMBER(luckgrln_reel1_ram_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel1_attr_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel2_ram_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel2_attr_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel3_ram_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel3_attr_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel4_ram_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel4_attr_w);
+
+	template<uint8_t Reel> DECLARE_WRITE8_MEMBER(reel_ram_w);
+	template<uint8_t Reel> DECLARE_WRITE8_MEMBER(reel_attr_w);
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_WRITE8_MEMBER(palette_offset_low_w);
 	DECLARE_WRITE8_MEMBER(palette_offset_high_w);
@@ -152,19 +135,10 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_b_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
 	DECLARE_READ8_MEMBER(test_r);
-	DECLARE_DRIVER_INIT(luckgrln);
-	TILE_GET_INFO_MEMBER(get_luckgrln_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_luckgrln_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_luckgrln_reel3_tile_info);
-	TILE_GET_INFO_MEMBER(get_luckgrln_reel4_tile_info);
-	virtual void video_start() override;
-	uint32_t screen_update_luckgrln(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(luckgrln_irq);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	void _7smash(machine_config &config);
-	void luckgrln(machine_config &config);
+	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(irq);
+
 	void _7smash_io(address_map &map);
 	void _7smash_map(address_map &map);
 	void common_portmap(address_map &map);
@@ -173,24 +147,32 @@ public:
 };
 
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel1_ram_w)
+void luckgrln_state::machine_start()
 {
-	m_reel1_ram[offset] = data;
-	m_reel1_tilemap->mark_tile_dirty(offset);
+	m_lamps.resolve();
+
+	save_item(NAME(m_nmi_enable));
 }
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel1_attr_w)
+template<uint8_t Reel>
+WRITE8_MEMBER(luckgrln_state::reel_ram_w)
 {
-	m_reel1_attr[offset] = data;
-	m_reel1_tilemap->mark_tile_dirty(offset);
+	m_reel_ram[Reel][offset] = data;
+	m_reel_tilemap[Reel]->mark_tile_dirty(offset);
 }
 
-
-
-TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel1_tile_info)
+template<uint8_t Reel>
+WRITE8_MEMBER(luckgrln_state::reel_attr_w)
 {
-	int code = m_reel1_ram[tile_index];
-	int attr = m_reel1_attr[tile_index];
+	m_reel_attr[Reel][offset] = data;
+	m_reel_tilemap[Reel]->mark_tile_dirty(offset);
+}
+
+template<uint8_t Reel>
+TILE_GET_INFO_MEMBER(luckgrln_state::get_reel_tile_info)
+{
+	int code = m_reel_ram[Reel][tile_index];
+	int attr = m_reel_attr[Reel][tile_index];
 	int col = (attr & 0x1f);
 
 	code |= (attr & 0xe0)<<3;
@@ -202,128 +184,43 @@ TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel1_tile_info)
 			0);
 }
 
-
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel2_ram_w)
-{
-	m_reel2_ram[offset] = data;
-	m_reel2_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel2_attr_w)
-{
-	m_reel2_attr[offset] = data;
-	m_reel2_tilemap->mark_tile_dirty(offset);
-}
-
-
-TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel2_tile_info)
-{
-	int code = m_reel2_ram[tile_index];
-	int attr = m_reel2_attr[tile_index];
-	int col = (attr & 0x1f);
-
-	code |= (attr & 0xe0)<<3;
-
-
-	SET_TILE_INFO_MEMBER(1,
-			code,
-			col,
-			0);
-}
-
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel3_ram_w)
-{
-	m_reel3_ram[offset] = data;
-	m_reel3_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel3_attr_w)
-{
-	m_reel3_attr[offset] = data;
-	m_reel3_tilemap->mark_tile_dirty(offset);
-}
-
-
-TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel3_tile_info)
-{
-	int code = m_reel3_ram[tile_index];
-	int attr = m_reel3_attr[tile_index];
-	int col = (attr & 0x1f);
-
-	code |= (attr & 0xe0)<<3;
-
-	SET_TILE_INFO_MEMBER(1,
-			code,
-			col,
-			0);
-}
-
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel4_ram_w)
-{
-	m_reel4_ram[offset] = data;
-	m_reel4_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel4_attr_w)
-{
-	m_reel4_attr[offset] = data;
-	m_reel4_tilemap->mark_tile_dirty(offset);
-}
-
-
-TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel4_tile_info)
-{
-	int code = m_reel4_ram[tile_index];
-	int attr = m_reel4_attr[tile_index];
-	int col = (attr & 0x1f);
-
-	code |= (attr & 0xe0)<<3;
-
-	SET_TILE_INFO_MEMBER(1,
-			code,
-			col,
-			0);
-}
 
 void luckgrln_state::video_start()
 {
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel3_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_luckgrln_reel4_tile_info),this),TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_reel_tile_info<0>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_reel_tile_info<1>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_reel_tile_info<2>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_reel_tile_info<3>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
-	m_reel1_tilemap->set_scroll_cols(64);
-	m_reel2_tilemap->set_scroll_cols(64);
-	m_reel3_tilemap->set_scroll_cols(64);
-	m_reel4_tilemap->set_scroll_cols(64);
+	for (uint8_t i = 0; i < 4; i++)
+	{
+		m_reel_tilemap[i]->set_scroll_cols(64);
+		m_reel_tilemap[i]->set_transparent_pen(0);
+	}
 
-	m_reel1_tilemap->set_transparent_pen(0 );
-	m_reel2_tilemap->set_transparent_pen(0 );
-	m_reel3_tilemap->set_transparent_pen(0 );
-	m_reel4_tilemap->set_transparent_pen(0 );
+	save_item(NAME(m_palette_count));
+	save_item(NAME(m_palette_ram));
 }
 
-uint32_t luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t luckgrln_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y,x;
 	int count = 0;
 	const rectangle &visarea = screen.visible_area();
-	int i;
 
 	rectangle clip = visarea;
 
 	bitmap.fill(0, cliprect);
 
-	for (i= 0;i < 64;i++)
+	for (int i = 0; i < 64; i++)
 	{
-		m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
-		m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
-		m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
-		m_reel4_tilemap->set_scrolly(i, m_reel4_scroll[i]);
+		m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+		m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+		m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
+		m_reel_tilemap[3]->set_scrolly(i, m_reel_scroll[3][i]);
 	}
 
 
-	for (y=0;y<32;y++)
+	for (int y = 0; y < 32; y++)
 	{
 		clip.min_y = y*8;
 		clip.max_y = y*8+8;
@@ -331,11 +228,11 @@ uint32_t luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_in
 		if (clip.min_y<visarea.min_y) clip.min_y = visarea.min_y;
 		if (clip.max_y>visarea.max_y) clip.max_y = visarea.max_y;
 
-		for (x=0;x<64;x++)
+		for (int x = 0; x < 64; x++)
 		{
-			uint16_t tile = (m_luck_vram1[count] & 0xff);
-			uint16_t tile_high = (m_luck_vram2[count]);
-			uint16_t tileattr = (m_luck_vram3[count]);
+			uint16_t tile = (m_luck_vram[0][count] & 0xff);
+			uint16_t tile_high = (m_luck_vram[1][count]);
+			uint16_t tileattr = (m_luck_vram[2][count]);
 			uint8_t col = 0;
 			uint8_t region = 0;
 			uint8_t bgenable;
@@ -347,8 +244,8 @@ uint32_t luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_in
 			if (clip.max_x>visarea.max_x) clip.max_x = visarea.max_x;
 
 			/*
-			  m_luck_vram1  tttt tttt   (t = low tile bits)
-			  m_luck_vram2  tttt ppp?   (t = high tile bits) (p = pal select)?
+			  m_luck_vram[0]  tttt tttt   (t = low tile bits)
+			  m_luck_vram[1]  tttt ppp?   (t = high tile bits) (p = pal select)?
 
 
 			 */
@@ -371,10 +268,10 @@ uint32_t luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_in
 #if 0 // treat bit as fg enable
 			if (tileattr&0x04)
 			{
-				if (bgenable==0) m_reel1_tilemap->draw(screen, bitmap, clip, 0, 0);
-				if (bgenable==1) m_reel2_tilemap->draw(screen, bitmap, clip, 0, 0);
-				if (bgenable==2) m_reel3_tilemap->draw(screen, bitmap, clip, 0, 0);
-				if (bgenable==3) m_reel4_tilemap->draw(screen, bitmap, clip, 0, 0);
+				if (bgenable==0) m_reel_tilemap[0]->draw(screen, bitmap, clip, 0, 0);
+				if (bgenable==1) m_reel_tilemap[1]->draw(screen, bitmap, clip, 0, 0);
+				if (bgenable==2) m_reel_tilemap[2]->draw(screen, bitmap, clip, 0, 0);
+				if (bgenable==3) m_reel_tilemap[3]->draw(screen, bitmap, clip, 0, 0);
 			}
 
 			if (tileattr&0x08) m_gfxdecode->gfx(region)->transpen(bitmap,clip,tile,col,0,0,x*8,y*8, 0);
@@ -384,10 +281,10 @@ uint32_t luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_in
 
 			if (tileattr&0x04)
 			{
-				if (bgenable==0) m_reel1_tilemap->draw(screen, bitmap, clip, 0, 0);
-				if (bgenable==1) m_reel2_tilemap->draw(screen, bitmap, clip, 0, 0);
-				if (bgenable==2) m_reel3_tilemap->draw(screen, bitmap, clip, 0, 0);
-				if (bgenable==3) m_reel4_tilemap->draw(screen, bitmap, clip, 0, 0);
+				if (bgenable==0) m_reel_tilemap[0]->draw(screen, bitmap, clip, 0, 0);
+				if (bgenable==1) m_reel_tilemap[1]->draw(screen, bitmap, clip, 0, 0);
+				if (bgenable==2) m_reel_tilemap[2]->draw(screen, bitmap, clip, 0, 0);
+				if (bgenable==3) m_reel_tilemap[3]->draw(screen, bitmap, clip, 0, 0);
 			}
 
 			if ((tileattr&0x08)) m_gfxdecode->gfx(region)->transpen(bitmap,clip,tile,col,0,0,x*8,y*8, 0);
@@ -405,30 +302,30 @@ void luckgrln_state::mainmap(address_map &map)
 	map(0x10000, 0x1ffff).rom().region("rom_data", 0x10000);
 	map(0x20000, 0x2ffff).rom().region("rom_data", 0x00000);
 
-	map(0x0c000, 0x0c1ff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel1_ram_w)).share("reel1_ram"); // only written to half way
-	map(0x0c800, 0x0c9ff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel1_attr_w)).share("reel1_attr");
-	map(0x0d000, 0x0d03f).ram().share("reel1_scroll").mirror(0x000c0);
+	map(0x0c000, 0x0c1ff).ram().w(FUNC(luckgrln_state::reel_ram_w<0>)).share("reel_ram.0"); // only written to half way
+	map(0x0c800, 0x0c9ff).ram().w(FUNC(luckgrln_state::reel_attr_w<0>)).share("reel_attr.0");
+	map(0x0d000, 0x0d03f).ram().share("reel_scroll.0").mirror(0x000c0);
 
-	map(0x0c200, 0x0c3ff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel2_ram_w)).share("reel2_ram");
-	map(0x0ca00, 0x0cbff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel2_attr_w)).share("reel2_attr");
-	map(0x0d200, 0x0d23f).ram().share("reel2_scroll").mirror(0x000c0);
+	map(0x0c200, 0x0c3ff).ram().w(FUNC(luckgrln_state::reel_ram_w<1>)).share("reel_ram.1");
+	map(0x0ca00, 0x0cbff).ram().w(FUNC(luckgrln_state::reel_attr_w<1>)).share("reel_attr.1");
+	map(0x0d200, 0x0d23f).ram().share("reel_scroll.1").mirror(0x000c0);
 
-	map(0x0c400, 0x0c5ff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel3_ram_w)).share("reel3_ram");
-	map(0x0cc00, 0x0cdff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel3_attr_w)).share("reel3_attr");
-	map(0x0d400, 0x0d43f).ram().share("reel3_scroll").mirror(0x000c0);
+	map(0x0c400, 0x0c5ff).ram().w(FUNC(luckgrln_state::reel_ram_w<2>)).share("reel_ram.2");
+	map(0x0cc00, 0x0cdff).ram().w(FUNC(luckgrln_state::reel_attr_w<2>)).share("reel_attr.2");
+	map(0x0d400, 0x0d43f).ram().share("reel_scroll.2").mirror(0x000c0);
 
-	map(0x0c600, 0x0c7ff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel4_ram_w)).share("reel4_ram");
-	map(0x0ce00, 0x0cfff).ram().w(this, FUNC(luckgrln_state::luckgrln_reel4_attr_w)).share("reel4_attr");
-	map(0x0d600, 0x0d63f).ram().share("reel4_scroll");
+	map(0x0c600, 0x0c7ff).ram().w(FUNC(luckgrln_state::reel_ram_w<3>)).share("reel_ram.3");
+	map(0x0ce00, 0x0cfff).ram().w(FUNC(luckgrln_state::reel_attr_w<3>)).share("reel_attr.3");
+	map(0x0d600, 0x0d63f).ram().share("reel_scroll.3");
 
 //  AM_RANGE(0x0d200, 0x0d2ff) AM_RAM
 
 
 	map(0x0d800, 0x0dfff).ram(); // nvram
 
-	map(0x0e000, 0x0e7ff).ram().share("luck_vram1");
-	map(0x0e800, 0x0efff).ram().share("luck_vram2");
-	map(0x0f000, 0x0f7ff).ram().share("luck_vram3");
+	map(0x0e000, 0x0e7ff).ram().share("luck_vram.0");
+	map(0x0e800, 0x0efff).ram().share("luck_vram.1");
+	map(0x0f000, 0x0f7ff).ram().share("luck_vram.2");
 
 
 	map(0x0f800, 0x0ffff).ram();
@@ -472,15 +369,12 @@ WRITE8_MEMBER(luckgrln_state::palette_w)
 
 
 	{
-		int r,g,b;
-		int offs;
-		uint16_t dat;
-		offs = m_palette_count&~0x1;
-		dat = m_palette_ram[offs] | m_palette_ram[offs+1]<<8;
+		int offs = m_palette_count&~0x1;
+		uint16_t dat = m_palette_ram[offs] | m_palette_ram[offs+1]<<8;
 
-		r = (dat >> 0) & 0x1f;
-		g = (dat >> 5) & 0x1f;
-		b = (dat >> 10) & 0x1f;
+		int r = (dat >> 0) & 0x1f;
+		int g = (dat >> 5) & 0x1f;
+		int b = (dat >> 10) & 0x1f;
 
 		m_palette->set_pen_color(offs/2, pal5bit(r), pal5bit(g), pal5bit(b));
 
@@ -490,7 +384,7 @@ WRITE8_MEMBER(luckgrln_state::palette_w)
 
 }
 
-/* Analizing the lamps, the game should has a 12-buttons control layout */
+/* Analyzing the lamps, the game should have a 12-buttons control layout */
 WRITE8_MEMBER(luckgrln_state::lamps_a_w)
 {
 /*  LAMPS A:
@@ -506,14 +400,9 @@ WRITE8_MEMBER(luckgrln_state::lamps_a_w)
     x--- ----  TAKE
 
 */
-	output().set_lamp_value(0, (data >> 0) & 1);      /* HOLD1 */
-	output().set_lamp_value(1, (data >> 1) & 1);      /* HOLD2 */
-	output().set_lamp_value(2, (data >> 2) & 1);      /* HOLD3 */
-	output().set_lamp_value(3, (data >> 3) & 1);      /* HOLD4 */
-	output().set_lamp_value(4, (data >> 4) & 1);      /* HOLD5 */
-	output().set_lamp_value(5, (data >> 5) & 1);      /* START */
-	output().set_lamp_value(6, (data >> 6) & 1);      /* BET */
-	output().set_lamp_value(7, (data >> 7) & 1);      /* TAKE */
+
+	for (int i = 0; i < 8; i++)
+		m_lamps[i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(luckgrln_state::lamps_b_w)
@@ -529,10 +418,8 @@ WRITE8_MEMBER(luckgrln_state::lamps_b_w)
     xx-- ----  unused
 
 */
-	output().set_lamp_value(8, (data >> 0) & 1);      /* D-UP */
-	output().set_lamp_value(9, (data >> 1) & 1);      /* HIGH */
-	output().set_lamp_value(10, (data >> 2) & 1);     /* LOW */
-	output().set_lamp_value(11, (data >> 3) & 1);     /* CANCEL */
+	for (int i = 0; i < 4; i++)
+		m_lamps[i + 8] = BIT(data, i);
 }
 
 WRITE8_MEMBER(luckgrln_state::counters_w)
@@ -559,19 +446,19 @@ void luckgrln_state::common_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x0000, 0x003f).ram(); // Z180 internal regs
-	map(0x0060, 0x0060).w(this, FUNC(luckgrln_state::output_w));
+	map(0x0060, 0x0060).w(FUNC(luckgrln_state::output_w));
 
-	map(0x00a0, 0x00a0).w(this, FUNC(luckgrln_state::palette_offset_low_w));
-	map(0x00a1, 0x00a1).w(this, FUNC(luckgrln_state::palette_offset_high_w));
-	map(0x00a2, 0x00a2).w(this, FUNC(luckgrln_state::palette_w));
+	map(0x00a0, 0x00a0).w(FUNC(luckgrln_state::palette_offset_low_w));
+	map(0x00a1, 0x00a1).w(FUNC(luckgrln_state::palette_offset_high_w));
+	map(0x00a2, 0x00a2).w(FUNC(luckgrln_state::palette_w));
 
 	map(0x00b0, 0x00b0).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x00b1, 0x00b1).w("crtc", FUNC(mc6845_device::register_w));
 
 	map(0x00b8, 0x00b8).portr("IN0");
-	map(0x00b9, 0x00b9).portr("IN1").w(this, FUNC(luckgrln_state::counters_w));
-	map(0x00ba, 0x00ba).portr("IN2").w(this, FUNC(luckgrln_state::lamps_a_w));
-	map(0x00bb, 0x00bb).portr("IN3").w(this, FUNC(luckgrln_state::lamps_b_w));
+	map(0x00b9, 0x00b9).portr("IN1").w(FUNC(luckgrln_state::counters_w));
+	map(0x00ba, 0x00ba).portr("IN2").w(FUNC(luckgrln_state::lamps_a_w));
+	map(0x00bb, 0x00bb).portr("IN3").w(FUNC(luckgrln_state::lamps_b_w));
 	map(0x00bc, 0x00bc).portr("DSW1");
 
 	map(0x00c0, 0x00c3).nopw();
@@ -623,7 +510,7 @@ READ8_MEMBER(luckgrln_state::test_r)
 void luckgrln_state::_7smash_io(address_map &map)
 {
 	common_portmap(map);
-	map(0x66, 0x66).r(this, FUNC(luckgrln_state::test_r));
+	map(0x66, 0x66).r(FUNC(luckgrln_state::test_r));
 }
 
 static INPUT_PORTS_START( luckgrln )
@@ -963,26 +850,27 @@ static const gfx_layout tiles8x32_layout =
 	32*8
 };
 
-static GFXDECODE_START( luckgrln )
+static GFXDECODE_START( gfx_luckgrln )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0x400, 64 )
 	GFXDECODE_ENTRY( "reels", 0, tiles8x32_layout, 0, 64 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(luckgrln_state::luckgrln_irq)
+INTERRUPT_GEN_MEMBER(luckgrln_state::irq)
 {
 	if(m_nmi_enable)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(luckgrln_state::luckgrln)
-	MCFG_CPU_ADD("maincpu", Z180,8000000)
-	MCFG_CPU_PROGRAM_MAP(mainmap)
-	MCFG_CPU_IO_MAP(luckgrln_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", luckgrln_state,  luckgrln_irq)
+	MCFG_DEVICE_ADD(m_maincpu, Z180,8000000)
+	MCFG_DEVICE_PROGRAM_MAP(mainmap)
+	MCFG_DEVICE_IO_MAP(luckgrln_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", luckgrln_state, irq)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 6000000/4) /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	h46505_device &crtc(H46505(config, "crtc", 6000000/4)); /* unknown clock, hand tuned to get ~60 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, 0)
 
@@ -991,35 +879,33 @@ MACHINE_CONFIG_START(luckgrln_state::luckgrln)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(luckgrln_state, screen_update_luckgrln)
+	MCFG_SCREEN_UPDATE_DRIVER(luckgrln_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", luckgrln)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_luckgrln)
 	MCFG_PALETTE_ADD("palette", 0x8000)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(luckgrln_state::_7smash)
 	luckgrln(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(_7smash_map)
-	MCFG_CPU_IO_MAP(_7smash_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(_7smash_map)
+	MCFG_DEVICE_IO_MAP(_7smash_io)
 
 	MCFG_DEVICE_REMOVE("rtc")
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(luckgrln_state,luckgrln)
+void luckgrln_state::init_luckgrln()
 {
-	int i;
-	uint8_t x,v;
-	uint8_t* rom = memregion("rom_data")->base();
+	uint8_t *rom = memregion("rom_data")->base();
 
-	for (i=0;i<0x20000;i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
-		x = rom[i];
-		v = 0xfe + (i & 0xf)*0x3b + ((i >> 4) & 0xf)*0x9c + ((i >> 8) & 0xf)*0xe1 + ((i >> 12) & 0x7)*0x10;
+		uint8_t x = rom[i];
+		uint8_t v = 0xfe + (i & 0xf)*0x3b + ((i >> 4) & 0xf)*0x9c + ((i >> 8) & 0xf)*0xe1 + ((i >> 12) & 0x7)*0x10;
 		v += ((((i >> 4) & 0xf) + ((i >> 2) & 3)) >> 2) * 0x50;
 		x ^= ~v;
 		x = (x << (i & 7)) | (x >> (8-(i & 7)));
@@ -1028,10 +914,9 @@ DRIVER_INIT_MEMBER(luckgrln_state,luckgrln)
 
 	#if 0
 	{
-		FILE *fp;
 		char filename[256];
 		sprintf(filename,"decrypted_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
+		FILE *fp = fopen(filename, "w+b");
 		if (fp)
 		{
 			fwrite(rom, 0x20000, 1, fp);
@@ -1087,6 +972,6 @@ ROM_END
 *                Game Drivers                *
 **********************************************/
 
-//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY           FULL NAME                                 FLAGS             LAYOUT
-GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", MACHINE_NO_SOUND, layout_luckgrln )
-GAMEL( 1993, 7smash,   0,      _7smash,  _7smash,  luckgrln_state, 0,        ROT0, "Sovic",          "7 Smash",                                MACHINE_NO_SOUND, layout_7smash )
+//     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT           ROT   COMPANY           FULL NAME                                 FLAGS                                     LAYOUT
+GAMEL( 1991, luckgrln, 0,      luckgrln, luckgrln, luckgrln_state, init_luckgrln, ROT0, "Wing Co., Ltd.", "Lucky Girl (newer Z180 based hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_luckgrln )
+GAMEL( 1993, 7smash,   0,      _7smash,  _7smash,  luckgrln_state, empty_init,    ROT0, "Sovic",          "7 Smash",                                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_7smash )

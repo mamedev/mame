@@ -46,6 +46,7 @@ TODO:
 #include "sound/wave.h"
 #include "video/mc6847.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 #include "formats/fc100_cas.h"
@@ -67,6 +68,11 @@ public:
 		, m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
+	void fc100(machine_config &config);
+
+	void init_fc100();
+
+private:
 	DECLARE_READ8_MEMBER(mc6847_videoram_r);
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_WRITE8_MEMBER(port31_w);
@@ -75,7 +81,6 @@ public:
 	DECLARE_WRITE8_MEMBER(port60_w);
 	DECLARE_WRITE8_MEMBER(port70_w);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	DECLARE_DRIVER_INIT(fc100);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
@@ -84,10 +89,9 @@ public:
 	{
 		return m_p_chargen[(ch * 16 + line) & 0xfff];
 	}
-	void fc100(machine_config &config);
 	void fc100_io(address_map &map);
 	void fc100_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -132,19 +136,19 @@ void fc100_state::fc100_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x0F).r(this, FUNC(fc100_state::port00_r));
+	map(0x00, 0x0F).r(FUNC(fc100_state::port00_r));
 	// AM_RANGE(0x10, 0x10) AM_WRITE(port10_w)  // vdg, unknown effects
 	map(0x21, 0x21).w("psg", FUNC(ay8910_device::data_w));
 	map(0x22, 0x22).r("psg", FUNC(ay8910_device::data_r));
 	map(0x23, 0x23).w("psg", FUNC(ay8910_device::address_w));
-	map(0x31, 0x31).w(this, FUNC(fc100_state::port31_w));
-	map(0x33, 0x33).w(this, FUNC(fc100_state::port33_w));
-	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x31, 0x31).w(FUNC(fc100_state::port31_w));
+	map(0x33, 0x33).w(FUNC(fc100_state::port33_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x42, 0x42).nopw(); // bit 0 could be printer select
-	map(0x43, 0x43).w(this, FUNC(fc100_state::port43_w));
-	map(0x44, 0x44).r("cent_status_in", FUNC(input_buffer_device::read));
-	map(0x60, 0x61).w(this, FUNC(fc100_state::port60_w));
-	map(0x70, 0x71).w(this, FUNC(fc100_state::port70_w));
+	map(0x43, 0x43).w(FUNC(fc100_state::port43_w));
+	map(0x44, 0x44).r("cent_status_in", FUNC(input_buffer_device::bus_r));
+	map(0x60, 0x61).w(FUNC(fc100_state::port60_w));
+	map(0x70, 0x71).w(FUNC(fc100_state::port70_w));
 	map(0xb0, 0xb0).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xb8, 0xb8).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 }
@@ -393,7 +397,7 @@ static const gfx_layout u53_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( fc100 )
+static GFXDECODE_START( gfx_fc100 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, u53_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -501,7 +505,7 @@ WRITE8_MEMBER( fc100_state::port70_w )
 	m_banksw_unlocked = (bool)offset;
 }
 
-DRIVER_INIT_MEMBER( fc100_state, fc100 )
+void fc100_state::init_fc100()
 {
 	uint8_t *ram = memregion("ram")->base();
 	uint8_t *cgen = memregion("chargen")->base()+0x800;
@@ -513,42 +517,41 @@ DRIVER_INIT_MEMBER( fc100_state, fc100 )
 
 MACHINE_CONFIG_START(fc100_state::fc100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(7'159'090)/2)
-	MCFG_CPU_PROGRAM_MAP(fc100_mem)
-	MCFG_CPU_IO_MAP(fc100_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(7'159'090)/2)
+	MCFG_DEVICE_PROGRAM_MAP(fc100_mem)
+	MCFG_DEVICE_IO_MAP(fc100_io)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("vdg", M5C6847P1, XTAL(7'159'090)/3)  // Clock not verified
-	MCFG_MC6847_INPUT_CALLBACK(READ8(fc100_state, mc6847_videoram_r))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, fc100_state, mc6847_videoram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(fc100_state, get_char_rom)
 	MCFG_MC6847_FIXED_MODE(m5c6847p1_device::MODE_INTEXT)
 	// other lines not connected
 
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "vdg")
-	MCFG_GFXDECODE_ADD("gfxdecode", "f4palette", fc100)
-	MCFG_PALETTE_ADD_MONOCHROME("f4palette")
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "f4palette", gfx_fc100)
+	PALETTE(config, "f4palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-	MCFG_SOUND_ADD("psg", AY8910, XTAL(7'159'090)/3/2)  /* AY-3-8910 - clock not verified */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("JOY1"))
-	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(fc100_state, ay_port_a_w))
-	//MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(fc100_state, ay_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	ay8910_device &psg(AY8910(config, "psg", XTAL(7'159'090)/3/2));  /* AY-3-8910 - clock not verified */
+	psg.port_a_read_callback().set_ioport("JOY0");
+	psg.port_b_read_callback().set_ioport("JOY1");
+	//psg.port_a_write_callback().set(FUNC(fc100_state::ay_port_a_w));
+	//psg.port_b_write_callback().set(FUNC(fc100_state::ay_port_b_w));
+	psg.add_route(ALL_OUTPUTS, "mono", 1.50);
 
 	/* Devices */
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(fc100_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(fc100_state, txdata_callback))
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, XTAL(4'915'200)/16/16) // gives 19200
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set(FUNC(fc100_state::txdata_callback));
+	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL(4'915'200)/16/16)); // gives 19200
+	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", fc100_state, timer_c, attotime::from_hz(4800)) // cass write
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(40000)) // cass read
@@ -556,9 +559,9 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fc100_cart")
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit4))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit5))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 MACHINE_CONFIG_END
@@ -578,5 +581,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT   CLASS        INIT    COMPANY     FULLNAME  FLAGS
-CONS( 1982, fc100,  0,      0,       fc100,   fc100,  fc100_state, fc100,  "Goldstar", "FC-100", MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
+CONS( 1982, fc100, 0,      0,      fc100,   fc100, fc100_state, init_fc100, "Goldstar", "FC-100", MACHINE_NOT_WORKING )

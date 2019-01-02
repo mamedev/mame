@@ -79,12 +79,12 @@ void wangpc_wdc_device::wangpc_wdc_mem(address_map &map)
 void wangpc_wdc_device::wangpc_wdc_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).r(this, FUNC(wangpc_wdc_device::port_r));
-	map(0x03, 0x03).w(this, FUNC(wangpc_wdc_device::status_w));
-	map(0x10, 0x10).rw(this, FUNC(wangpc_wdc_device::ctc_ch0_r), FUNC(wangpc_wdc_device::ctc_ch0_w));
-	map(0x14, 0x14).rw(this, FUNC(wangpc_wdc_device::ctc_ch1_r), FUNC(wangpc_wdc_device::ctc_ch1_w));
-	map(0x18, 0x18).rw(this, FUNC(wangpc_wdc_device::ctc_ch2_r), FUNC(wangpc_wdc_device::ctc_ch2_w));
-	map(0x1c, 0x1c).rw(this, FUNC(wangpc_wdc_device::ctc_ch3_r), FUNC(wangpc_wdc_device::ctc_ch3_w));
+	map(0x01, 0x01).r(FUNC(wangpc_wdc_device::port_r));
+	map(0x03, 0x03).w(FUNC(wangpc_wdc_device::status_w));
+	map(0x10, 0x10).rw(FUNC(wangpc_wdc_device::ctc_ch0_r), FUNC(wangpc_wdc_device::ctc_ch0_w));
+	map(0x14, 0x14).rw(FUNC(wangpc_wdc_device::ctc_ch1_r), FUNC(wangpc_wdc_device::ctc_ch1_w));
+	map(0x18, 0x18).rw(FUNC(wangpc_wdc_device::ctc_ch2_r), FUNC(wangpc_wdc_device::ctc_ch2_w));
+	map(0x1c, 0x1c).rw(FUNC(wangpc_wdc_device::ctc_ch3_r), FUNC(wangpc_wdc_device::ctc_ch3_w));
 }
 
 
@@ -92,17 +92,18 @@ void wangpc_wdc_device::wangpc_wdc_io(address_map &map)
 //  MACHINE_CONFIG_START( wangpc_wdc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(wangpc_wdc_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, 2000000) // XTAL(10'000'000) / ?
-	//MCFG_Z80_DAISY_CHAIN(wangpc_wdc_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(wangpc_wdc_mem)
-	MCFG_CPU_IO_MAP(wangpc_wdc_io)
+void wangpc_wdc_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_maincpu, 2000000); // XTAL(10'000'000) / ?
+	//m_maincpu->set_daisy_config(wangpc_wdc_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wangpc_wdc_device::wangpc_wdc_mem);
+	m_maincpu->set_addrmap(AS_IO, &wangpc_wdc_device::wangpc_wdc_io);
 
-	MCFG_DEVICE_ADD(MK3882_TAG, Z80CTC, 2000000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc, 2000000);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("harddisk0", SCSIHD, 0)
-MACHINE_CONFIG_END
+	SCSIHD(config, "harddisk0", 0);
+}
 
 
 

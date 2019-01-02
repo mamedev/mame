@@ -5,19 +5,24 @@
     Taito Triple Screen Games
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_NINJAW_H
+#define MAME_INCLUDES_NINJAW_H
+
+#pragma once
 
 #include "audio/taitosnd.h"
 #include "machine/taitoio.h"
 #include "sound/flt_vol.h"
 #include "video/tc0100scn.h"
 #include "video/tc0110pcr.h"
+#include "emupal.h"
 
 
 class ninjaw_state : public driver_device
 {
 public:
-	ninjaw_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ninjaw_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_tc0140syt(*this, "tc0140syt"),
@@ -28,8 +33,13 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
-		m_z80bank(*this, "z80bank") { }
+		m_z80bank(*this, "z80bank")
+	{ }
 
+	void darius2(machine_config &config);
+	void ninjaw(machine_config &config);
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -69,11 +79,11 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs );
 	void parse_control(  );
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip);
-	void darius2(machine_config &config);
-	void ninjaw(machine_config &config);
 	void darius2_master_map(address_map &map);
 	void darius2_slave_map(address_map &map);
 	void ninjaw_master_map(address_map &map);
 	void ninjaw_slave_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_NINJAW_H

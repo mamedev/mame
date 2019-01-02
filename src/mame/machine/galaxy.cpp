@@ -148,7 +148,7 @@ SNAPSHOT_LOAD_MEMBER( galaxy_state, galaxy )
   Driver Initialization
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(galaxy_state,galaxy)
+void galaxy_state::init_galaxy()
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
@@ -189,9 +189,9 @@ MACHINE_RESET_MEMBER(galaxy_state,galaxy)
 	m_interrupts_enabled = true;
 }
 
-DRIVER_INIT_MEMBER(galaxy_state,galaxyp)
+void galaxy_state::init_galaxyp()
 {
-	DRIVER_INIT_CALL(galaxy);
+	init_galaxy();
 }
 
 MACHINE_RESET_MEMBER(galaxy_state,galaxyp)

@@ -73,11 +73,11 @@ void battlnts_state::battlnts_map(address_map &map)
 	map(0x2e02, 0x2e02).portr("P1");
 	map(0x2e03, 0x2e03).portr("DSW3");               /* coinsw, testsw, startsw */
 	map(0x2e04, 0x2e04).portr("DSW2");
-	map(0x2e08, 0x2e08).w(this, FUNC(battlnts_state::battlnts_bankswitch_w));    /* bankswitch control */
-	map(0x2e0c, 0x2e0c).w(this, FUNC(battlnts_state::battlnts_spritebank_w));    /* sprite bank select */
+	map(0x2e08, 0x2e08).w(FUNC(battlnts_state::battlnts_bankswitch_w));    /* bankswitch control */
+	map(0x2e0c, 0x2e0c).w(FUNC(battlnts_state::battlnts_spritebank_w));    /* sprite bank select */
 	map(0x2e10, 0x2e10).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x2e14, 0x2e14).w("soundlatch", FUNC(generic_latch_8_device::write)); /* sound code # */
-	map(0x2e18, 0x2e18).w(this, FUNC(battlnts_state::battlnts_sh_irqtrigger_w)); /* cause interrupt on audio CPU */
+	map(0x2e18, 0x2e18).w(FUNC(battlnts_state::battlnts_sh_irqtrigger_w)); /* cause interrupt on audio CPU */
 	map(0x4000, 0x7fff).bankr("rombank");              /* banked ROM */
 	map(0x8000, 0xffff).rom();                             /* ROM 777e02.bin */
 }
@@ -205,7 +205,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( battlnts )
+static GFXDECODE_START( gfx_battlnts )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 ) /* colors  0-15 */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 4*16, 1 ) /* colors 64-79 */
 GFXDECODE_END
@@ -234,13 +234,13 @@ void battlnts_state::machine_reset()
 MACHINE_CONFIG_START(battlnts_state::battlnts)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, XTAL(24'000'000) / 2 /* 3000000*4? */)
-	MCFG_CPU_PROGRAM_MAP(battlnts_map)
+	MCFG_DEVICE_ADD("maincpu", HD6309, XTAL(24'000'000) / 2 /* 3000000*4? */)
+	MCFG_DEVICE_PROGRAM_MAP(battlnts_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000) / 6 /* 3579545? */)
-	MCFG_CPU_PROGRAM_MAP(battlnts_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000) / 6 /* 3579545? */)
+	MCFG_DEVICE_PROGRAM_MAP(battlnts_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -250,31 +250,30 @@ MACHINE_CONFIG_START(battlnts_state::battlnts)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(battlnts_state, screen_update_battlnts)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(battlnts_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, battlnts_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", battlnts)
-	MCFG_PALETTE_ADD("palette", 128)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_battlnts);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 128);
 
-	MCFG_K007342_ADD("k007342")
-	MCFG_K007342_GFXNUM(0)
-	MCFG_K007342_CALLBACK_OWNER(battlnts_state, battlnts_tile_callback)
-	MCFG_K007342_GFXDECODE("gfxdecode")
+	K007342(config, m_k007342, 0);
+	m_k007342->set_gfxnum(0);
+	m_k007342->set_tile_callback(FUNC(battlnts_state::battlnts_tile_callback), this);
+	m_k007342->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_K007420_ADD("k007420")
-	MCFG_K007420_BANK_LIMIT(0x3ff)
-	MCFG_K007420_CALLBACK_OWNER(battlnts_state, battlnts_sprite_callback)
-	MCFG_K007420_PALETTE("palette")
+	K007420(config, m_k007420, 0);
+	m_k007420->set_bank_limit(0x3ff);
+	m_k007420->set_sprite_callback(FUNC(battlnts_state::battlnts_sprite_callback), this);
+	m_k007420->set_palette_tag("palette");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ym1", YM3812, XTAL(24'000'000) / 8)
+	MCFG_DEVICE_ADD("ym1", YM3812, XTAL(24'000'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym2", YM3812, XTAL(24'000'000) / 8)
+	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(24'000'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -383,9 +382,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, battlnts,  0,        battlnts, battlnts, battlnts_state, 0, ROT90, "Konami", "Battlantis (program code G)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, battlntsa, battlnts, battlnts, battlnts, battlnts_state, 0, ROT90, "Konami", "Battlantis (program code F)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, battlntsj, battlnts, battlnts, battlnts, battlnts_state, 0, ROT90, "Konami", "Battlantis (Japan, program code E)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rackemup,  0,        battlnts, rackemup, battlnts_state, 0, ROT90, "Konami", "Rack 'em Up (program code L)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, thehustl,  rackemup, battlnts, thehustl, battlnts_state, 0, ROT90, "Konami", "The Hustler (Japan, program code M)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, thehustlj, rackemup, battlnts, thehustl, battlnts_state, 0, ROT90, "Konami", "The Hustler (Japan, program code J)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, battlnts,  0,        battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (program code G)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, battlntsa, battlnts, battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (program code F)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, battlntsj, battlnts, battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (Japan, program code E)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rackemup,  0,        battlnts, rackemup, battlnts_state, empty_init, ROT90, "Konami", "Rack 'em Up (program code L)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, thehustl,  rackemup, battlnts, thehustl, battlnts_state, empty_init, ROT90, "Konami", "The Hustler (Japan, program code M)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, thehustlj, rackemup, battlnts, thehustl, battlnts_state, empty_init, ROT90, "Konami", "The Hustler (Japan, program code J)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

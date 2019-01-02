@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "includes/avalnche.h"
-#include "machine/74259.h"
 #include "sound/discrete.h"
 #include "speaker.h"
 
@@ -27,7 +26,7 @@
 
 WRITE8_MEMBER(avalnche_state::avalnche_noise_amplitude_w)
 {
-	m_discrete->write(space, AVALNCHE_SOUNDLVL_DATA, data & 0x3f);
+	m_discrete->write(AVALNCHE_SOUNDLVL_DATA, data & 0x3f);
 }
 
 
@@ -55,7 +54,7 @@ static const discrete_lfsr_desc avalnche_lfsr={
 #define AVALNCHE_AUD2_SND           NODE_12
 #define AVALNCHE_SOUNDLVL_AUD0_SND  NODE_13
 
-static DISCRETE_SOUND_START(avalnche)
+static DISCRETE_SOUND_START(avalnche_discrete)
 	/************************************************/
 	/* avalnche  Effects Relataive Gain Table       */
 	/*                                              */
@@ -104,26 +103,23 @@ DISCRETE_SOUND_END
 
 
 MACHINE_CONFIG_START(avalnche_state::avalnche_sound)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(avalnche)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, avalnche_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_MODIFY("latch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_ATTRACT_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_AUD0_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_AUD1_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<AVALNCHE_AUD2_EN>))
+	m_latch->q_out_cb<1>().set("discrete", FUNC(discrete_device::write_line<AVALNCHE_ATTRACT_EN>));
+	m_latch->q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<AVALNCHE_AUD0_EN>));
+	m_latch->q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<AVALNCHE_AUD1_EN>));
+	m_latch->q_out_cb<6>().set("discrete", FUNC(discrete_device::write_line<AVALNCHE_AUD2_EN>));
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(avalnche_state::acatch_sound) // just a stub here...
-	MCFG_DEVICE_MODIFY("latch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // It is attract_enable just like avalnche, but not hooked up yet.
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(avalnche_state, catch_aud0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(avalnche_state, catch_aud1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(avalnche_state, catch_aud2_w))
+	m_latch->q_out_cb<1>().set_nop(); // It is attract_enable just like avalnche, but not hooked up yet.
+	m_latch->q_out_cb<4>().set(FUNC(avalnche_state::catch_aud0_w));
+	m_latch->q_out_cb<5>().set(FUNC(avalnche_state::catch_aud1_w));
+	m_latch->q_out_cb<6>().set(FUNC(avalnche_state::catch_aud2_w));
 MACHINE_CONFIG_END
 
 

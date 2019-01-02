@@ -87,7 +87,7 @@ protected:
 DECLARE_DEVICE_TYPE(SMS_EXPANSION_SLOT, sms_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( sms_expansion_devices );
+void sms_expansion_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_SMS_EXP_SMSEXP_H

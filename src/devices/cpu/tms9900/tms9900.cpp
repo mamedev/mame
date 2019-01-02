@@ -114,6 +114,8 @@
 
 #define NOPRG -1
 
+constexpr int tms99xx_device::AS_SETOFFSET;
+
 /* tms9900 ST register bits. */
 enum
 {
@@ -179,6 +181,7 @@ enum
 tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, const char *tag, int data_width, int prg_addr_bits, int cru_addr_bits, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, data_width, prg_addr_bits),
+		m_setoffset_config("setoffset", ENDIANNESS_BIG, data_width, prg_addr_bits),
 		m_io_config("cru", ENDIANNESS_BIG, 8, cru_addr_bits),
 		m_prgspace(nullptr),
 		m_cru(nullptr),
@@ -223,6 +226,7 @@ void tms99xx_device::device_start()
 	// TODO: Restore state save feature
 	resolve_lines();
 	m_prgspace = &space(AS_PROGRAM);
+	m_sospace = has_space(AS_SETOFFSET) ? &space(AS_SETOFFSET) : nullptr;
 	m_cru = &space(AS_IO);
 
 	// set our instruction counter
@@ -324,7 +328,7 @@ void tms99xx_device::device_reset()
 	m_irq_state = false;
 }
 
-const char* tms99xx_device::s_statename[20] =
+char const *const tms99xx_device::s_statename[20] =
 {
 	"PC", "WP", "ST", "IR",
 	"R0", "R1", "R2", "R3",
@@ -401,7 +405,7 @@ void tms99xx_device::state_export(const device_state_entry &entry)
 */
 void tms99xx_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
-	static const char *statestr = "LAECOPX-----IIII";
+	static char const statestr[] = "LAECOPX-----IIII";
 	char flags[17];
 	for (auto &flag : flags) flag = 0x00;
 	uint16_t val = 0x8000;
@@ -437,10 +441,17 @@ void tms99xx_device::write_workspace_register_debug(int reg, uint16_t data)
 
 device_memory_interface::space_config_vector tms99xx_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO,      &m_io_config)
-	};
+	if (has_configured_map(AS_SETOFFSET))
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM,   &m_program_config),
+			std::make_pair(AS_SETOFFSET, &m_setoffset_config),
+			std::make_pair(AS_IO,        &m_io_config)
+		};
+	else
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM,   &m_program_config),
+			std::make_pair(AS_IO,        &m_io_config)
+		};
 }
 
 /**************************************************************************
@@ -1523,7 +1534,8 @@ void tms99xx_device::mem_read()
 	if (m_mem_phase==1)
 	{
 		if (!m_dbin_line.isnull()) m_dbin_line(ASSERT_LINE);
-		m_prgspace->set_address(m_address & m_prgaddr_mask & 0xfffe);
+		if (m_sospace)
+			m_sospace->read_byte(m_address & m_prgaddr_mask & 0xfffe);
 		m_check_ready = true;
 		m_mem_phase = 2;
 		m_pass = 2;
@@ -1550,7 +1562,8 @@ void tms99xx_device::mem_write()
 		if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
 		// When writing, the data bus is asserted immediately after the address bus
 		if (TRACE_ADDRESSBUS) logerror("set address (w) %04x\n", m_address);
-		m_prgspace->set_address(m_address & m_prgaddr_mask & 0xfffe);
+		if (m_sospace)
+			m_sospace->read_byte(m_address & m_prgaddr_mask & 0xfffe);
 		if (TRACE_MEM) logerror("mem w %04x <- %04x\n",  m_address, m_current_value);
 		m_prgspace->write_word(m_address & m_prgaddr_mask & 0xfffe, m_current_value);
 		m_check_ready = true;

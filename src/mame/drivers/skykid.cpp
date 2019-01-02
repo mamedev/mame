@@ -62,8 +62,8 @@ READ8_MEMBER(skykid_state::inputport_r)
 
 WRITE8_MEMBER(skykid_state::skykid_led_w)
 {
-	output().set_led_value(0,data & 0x08);
-	output().set_led_value(1,data & 0x10);
+	m_leds[0] = BIT(data, 3);
+	m_leds[1] = BIT(data, 4);
 }
 
 WRITE8_MEMBER(skykid_state::skykid_subreset_w)
@@ -95,6 +95,8 @@ WRITE8_MEMBER(skykid_state::skykid_irq_2_ctrl_w)
 
 void skykid_state::machine_start()
 {
+	m_leds.resolve();
+
 	/* configure the banks */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
 
@@ -106,18 +108,18 @@ void skykid_state::machine_start()
 void skykid_state::skykid_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankr("bank1");                /* banked ROM */
-	map(0x2000, 0x2fff).rw(this, FUNC(skykid_state::skykid_videoram_r), FUNC(skykid_state::skykid_videoram_w)).share("videoram");/* Video RAM (background) */
-	map(0x4000, 0x47ff).rw(this, FUNC(skykid_state::skykid_textram_r), FUNC(skykid_state::skykid_textram_w)).share("textram");    /* video RAM (text layer) */
+	map(0x2000, 0x2fff).rw(FUNC(skykid_state::skykid_videoram_r), FUNC(skykid_state::skykid_videoram_w)).share("videoram");/* Video RAM (background) */
+	map(0x4000, 0x47ff).rw(FUNC(skykid_state::skykid_textram_r), FUNC(skykid_state::skykid_textram_w)).share("textram");    /* video RAM (text layer) */
 	map(0x4800, 0x5fff).ram().share("spriteram");   /* RAM + Sprite RAM */
-	map(0x6000, 0x60ff).w(this, FUNC(skykid_state::skykid_scroll_y_w));        /* Y scroll register map */
-	map(0x6200, 0x63ff).w(this, FUNC(skykid_state::skykid_scroll_x_w));        /* X scroll register map */
+	map(0x6000, 0x60ff).w(FUNC(skykid_state::skykid_scroll_y_w));        /* Y scroll register map */
+	map(0x6200, 0x63ff).w(FUNC(skykid_state::skykid_scroll_x_w));        /* X scroll register map */
 	map(0x6800, 0x6bff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); /* PSG device, shared RAM */
-	map(0x7000, 0x7fff).w(this, FUNC(skykid_state::skykid_irq_1_ctrl_w));      /* IRQ control */
+	map(0x7000, 0x7fff).w(FUNC(skykid_state::skykid_irq_1_ctrl_w));      /* IRQ control */
 	map(0x7800, 0x7fff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0x8000, 0xffff).rom();                 /* ROM */
-	map(0x8000, 0x8fff).w(this, FUNC(skykid_state::skykid_subreset_w));        /* MCU control */
-	map(0x9000, 0x9fff).w(this, FUNC(skykid_state::skykid_bankswitch_w));      /* Bankswitch control */
-	map(0xa000, 0xa001).w(this, FUNC(skykid_state::skykid_flipscreen_priority_w)); /* flip screen & priority */
+	map(0x8000, 0x8fff).w(FUNC(skykid_state::skykid_subreset_w));        /* MCU control */
+	map(0x9000, 0x9fff).w(FUNC(skykid_state::skykid_bankswitch_w));      /* Bankswitch control */
+	map(0xa000, 0xa001).w(FUNC(skykid_state::skykid_flipscreen_priority_w)); /* flip screen & priority */
 }
 
 void skykid_state::mcu_map(address_map &map)
@@ -126,24 +128,10 @@ void skykid_state::mcu_map(address_map &map)
 	map(0x0080, 0x00ff).ram();
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); /* PSG device, shared RAM */
 	map(0x2000, 0x3fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));     /* watchdog? */
-	map(0x4000, 0x7fff).w(this, FUNC(skykid_state::skykid_irq_2_ctrl_w));
+	map(0x4000, 0x7fff).w(FUNC(skykid_state::skykid_irq_2_ctrl_w));
 	map(0x8000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xf000, 0xffff).rom();
-}
-
-
-READ8_MEMBER(skykid_state::readFF)
-{
-	return 0xff;
-}
-
-void skykid_state::mcu_port_map(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).r(this, FUNC(skykid_state::inputport_r));         /* input ports read */
-	map(M6801_PORT1, M6801_PORT1).w(this, FUNC(skykid_state::inputport_select_w)); /* input port select */
-	map(M6801_PORT2, M6801_PORT2).r(this, FUNC(skykid_state::readFF));  /* leds won't work otherwise */
-	map(M6801_PORT2, M6801_PORT2).w(this, FUNC(skykid_state::skykid_led_w));           /* lamps */
 }
 
 
@@ -416,7 +404,7 @@ static const gfx_layout sprite_layout =
 	64*8
 };
 
-static GFXDECODE_START( skykid )
+static GFXDECODE_START( gfx_skykid )
 	GFXDECODE_ENTRY( "gfx1", 0, text_layout,   0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   64*4, 128 )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 64*4+128*4, 64 )
@@ -433,42 +421,43 @@ WRITE_LINE_MEMBER(skykid_state::vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(skykid_state::skykid)
-
+void skykid_state::skykid(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(49'152'000)/32)
-	MCFG_CPU_PROGRAM_MAP(skykid_map)
+	MC6809E(config, m_maincpu, XTAL(49'152'000)/32);
+	m_maincpu->set_addrmap(AS_PROGRAM, &skykid_state::skykid_map);
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8) /* or compatible 6808 with extra instructions */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
-	MCFG_CPU_IO_MAP(mcu_port_map)
+	HD63701(config, m_mcu, XTAL(49'152'000)/8); /* or compatible 6808 with extra instructions */
+	m_mcu->set_addrmap(AS_PROGRAM, &skykid_state::mcu_map);
+	m_mcu->in_p1_cb().set(FUNC(skykid_state::inputport_r));         /* input ports read */
+	m_mcu->out_p1_cb().set(FUNC(skykid_state::inputport_select_w)); /* input port select */
+	m_mcu->in_p2_cb().set_constant(0xff);                           /* leds won't work otherwise */
+	m_mcu->out_p2_cb().set(FUNC(skykid_state::skykid_led_w));       /* lamps */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synch */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* we need heavy synch */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.606060)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(skykid_state, screen_update_skykid)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(skykid_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60.606060);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(36*8, 28*8);
+	screen.set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(skykid_state::screen_update_skykid));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(skykid_state::vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skykid)
-	MCFG_PALETTE_ADD("palette", 64*4+128*4+64*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(skykid_state, skykid)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skykid);
+	PALETTE(config, m_palette, FUNC(skykid_state::skykid_palette), 64*4 + 128*4 + 64*8, 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
-	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	NAMCO_CUS30(config, m_cus30, 49152000/2048);
+	m_cus30->set_voices(8);
+	m_cus30->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( skykid ) // a PCB was found with ROM 4 and 6 labeled sk1, but hashes match the sk2 listed here and in other sets, while they differ from the sk1 ROMs in set skykidd?
@@ -623,14 +612,11 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(skykid_state,skykid)
+void skykid_state::init_skykid()
 {
-	uint8_t *rom;
-	int i;
-
 	/* unpack the third sprite ROM */
-	rom = memregion("gfx3")->base() + 0x4000;
-	for (i = 0;i < 0x2000;i++)
+	uint8_t *rom = memregion("gfx3")->base() + 0x4000;
+	for (int i = 0;i < 0x2000;i++)
 	{
 		rom[i + 0x4000] = rom[i];       // sprite set #1, plane 3
 		rom[i + 0x6000] = rom[i] >> 4;  // sprite set #2, plane 3
@@ -639,11 +625,11 @@ DRIVER_INIT_MEMBER(skykid_state,skykid)
 	}
 }
 
-GAME( 1984, drgnbstr, 0,      skykid, drgnbstr, skykid_state, skykid,  ROT0,   "Namco", "Dragon Buster", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, skykid,   0,      skykid, skykid, skykid_state,   skykid,  ROT180, "Namco", "Sky Kid (new version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
-GAME( 1985, skykido,  skykid, skykid, skykid, skykid_state,   skykid,  ROT180, "Namco", "Sky Kid (old version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
-GAME( 1985, skykidd,  skykid, skykid, skykid, skykid_state,   skykid,  ROT180, "Namco", "Sky Kid (CUS60 version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS60 aka 60a1 */
+GAME( 1984, drgnbstr, 0,      skykid, drgnbstr, skykid_state, init_skykid, ROT0,   "Namco", "Dragon Buster", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, skykid,   0,      skykid, skykid,   skykid_state, init_skykid, ROT180, "Namco", "Sky Kid (new version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
+GAME( 1985, skykido,  skykid, skykid, skykid,   skykid_state, init_skykid, ROT180, "Namco", "Sky Kid (old version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
+GAME( 1985, skykidd,  skykid, skykid, skykid,   skykid_state, init_skykid, ROT180, "Namco", "Sky Kid (CUS60 version)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS60 aka 60a1 */
 
 // no license text is displayed but the PCB was licensed by Namco for production by Sipem (formerly Sidam) with Namco supplying the Custom chips (MCU etc.)
 // the level select is handled in a much more user-friendly way in this set and the dip for it is inverted (although this is displayed incorrectly in the test mode)
-GAME( 1985, skykids,  skykid, skykid, skykids, skykid_state,  skykid,  ROT180, "Namco (Sipem license)", "Sky Kid (Sipem)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
+GAME( 1985, skykids,  skykid, skykid, skykids,  skykid_state, init_skykid, ROT180, "Namco (Sipem license)", "Sky Kid (Sipem)", MACHINE_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */

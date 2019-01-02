@@ -32,7 +32,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(einstein_userport_cards, nullptr, false)
 
 #define MCFG_EINSTEIN_USERPORT_BSTB_HANDLER(_devcb) \
-	devcb = &downcast<einstein_userport_device &>(*device).set_bstb_handler(DEVCB_##_devcb);
+	downcast<einstein_userport_device &>(*device).set_bstb_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -90,6 +90,6 @@ protected:
 DECLARE_DEVICE_TYPE(EINSTEIN_USERPORT, einstein_userport_device)
 
 // supported devices
-SLOT_INTERFACE_EXTERN(einstein_userport_cards);
+void einstein_userport_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_EINSTEIN_USERPORT_USERPORT_H

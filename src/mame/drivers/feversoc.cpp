@@ -73,6 +73,7 @@ U0564 LH28F800SU OBJ4-1
 #include "machine/rtc4543.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -80,8 +81,8 @@ U0564 LH28F800SU OBJ4-1
 class feversoc_state : public driver_device
 {
 public:
-	feversoc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	feversoc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mainram1(*this, "workram1"),
 		m_mainram2(*this, "workram2"),
 		m_nvram(*this, "nvram"),
@@ -94,9 +95,10 @@ public:
 		m_rtc(*this, "rtc"),
 		m_hopper(*this, "hopper"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
-	DECLARE_DRIVER_INIT(feversoc);
+	void init_feversoc();
 	void feversoc(machine_config &config);
 
 private:
@@ -202,10 +204,10 @@ void feversoc_state::feversoc_map(address_map &map)
 	map(0x02030000, 0x0203ffff).ram().share("nvram");
 	map(0x02034000, 0x0203dfff).ram().share("workram2"); //work ram
 	map(0x0203e000, 0x0203ffff).ram().share("spriteram");
-	map(0x06000000, 0x06000001).w(this, FUNC(feversoc_state::output_w));
-	map(0x06000002, 0x06000003).w(this, FUNC(feversoc_state::output2_w));
-	map(0x06000006, 0x06000007).w(this, FUNC(feversoc_state::feversoc_irq_ack));
-	map(0x06000008, 0x0600000b).r(this, FUNC(feversoc_state::in_r));
+	map(0x06000000, 0x06000001).w(FUNC(feversoc_state::output_w));
+	map(0x06000002, 0x06000003).w(FUNC(feversoc_state::output2_w));
+	map(0x06000006, 0x06000007).w(FUNC(feversoc_state::feversoc_irq_ack));
+	map(0x06000008, 0x0600000b).r(FUNC(feversoc_state::in_r));
 	map(0x0600000d, 0x0600000d).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	//AM_RANGE(0x06010000, 0x0601007f) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write) AM_RAM
 	map(0x06010060, 0x06010063).nopw(); // sprite buffering
@@ -228,7 +230,7 @@ static const gfx_layout spi_spritelayout =
 };
 
 
-static GFXDECODE_START( feversoc )
+static GFXDECODE_START( gfx_feversoc )
 	GFXDECODE_ENTRY( "gfx1", 0, spi_spritelayout,   0, 0x40 )
 GFXDECODE_END
 
@@ -287,8 +289,8 @@ void feversoc_state::machine_start()
 MACHINE_CONFIG_START(feversoc_state::feversoc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",SH2,MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(feversoc_map)
+	MCFG_DEVICE_ADD("maincpu",SH2,MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(feversoc_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -297,24 +299,22 @@ MACHINE_CONFIG_START(feversoc_state::feversoc)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1) //dynamic resolution?
 	MCFG_SCREEN_UPDATE_DRIVER(feversoc_state, screen_update_feversoc)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(feversoc_state, feversoc_irq))
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, feversoc_state, feversoc_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", feversoc)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_feversoc);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+	EEPROM_93C56_16BIT(config, "eeprom");
 
-	MCFG_JRC6355E_ADD("rtc", XTAL(32'768))
+	JRC6355E(config, m_rtc, XTAL(32'768));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(60), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 MACHINE_CONFIG_END
@@ -341,7 +341,7 @@ ROM_START( feversoc )
 	ROM_LOAD( "pcm.u0743", 0x00000, 0x80000, CRC(20b0c0e3) SHA1(dcf2f620a8fe695688057dbaf5c431a32a832440) )
 ROM_END
 
-DRIVER_INIT_MEMBER(feversoc_state,feversoc)
+void feversoc_state::init_feversoc()
 {
 	uint32_t *rom = (uint32_t *)memregion("maincpu")->base();
 
@@ -355,4 +355,4 @@ DRIVER_INIT_MEMBER(feversoc_state,feversoc)
 	m_maincpu->sh2drc_add_fastram(0x0203e000, 0x0203ffff, 0, &m_spriteram[0]);
 }
 
-GAME( 2004, feversoc,  0,       feversoc,  feversoc, feversoc_state,  feversoc, ROT0, "Seibu Kaihatsu", "Fever Soccer", 0 )
+GAME( 2004, feversoc, 0, feversoc, feversoc, feversoc_state, init_feversoc, ROT0, "Seibu Kaihatsu", "Fever Soccer", 0 )

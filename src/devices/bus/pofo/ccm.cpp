@@ -104,7 +104,8 @@ std::string portfolio_memory_card_slot_device::get_default_card_software(get_def
 #include "ram.h"
 #include "rom.h"
 
-SLOT_INTERFACE_START( portfolio_memory_cards )
-	SLOT_INTERFACE("ram", PORTFOLIO_RAM_CARD)
-	SLOT_INTERFACE("rom", PORTFOLIO_ROM_CARD)
-SLOT_INTERFACE_END
+void portfolio_memory_cards(device_slot_interface &device)
+{
+	device.option_add("ram", PORTFOLIO_RAM_CARD);
+	device.option_add("rom", PORTFOLIO_ROM_CARD);
+}

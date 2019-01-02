@@ -39,30 +39,35 @@ public:
 	ec184x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-
-	DECLARE_MACHINE_RESET(ec1841);
-	DECLARE_DRIVER_INIT(ec1841);
-
-	struct
-	{
-		uint8_t enable[4];
-		int boards;
-	} m_memory;
-
-	DECLARE_READ8_MEMBER(memboard_r);
-	DECLARE_WRITE8_MEMBER(memboard_w);
 	void ec1841(machine_config &config);
 	void ec1847(machine_config &config);
 	void ec1840(machine_config &config);
+
+	void init_ec1841();
+
+private:
+	DECLARE_MACHINE_RESET(ec1841);
+	DECLARE_READ8_MEMBER(memboard_r);
+	DECLARE_WRITE8_MEMBER(memboard_w);
+
 	void ec1840_io(address_map &map);
 	void ec1840_map(address_map &map);
 	void ec1841_io(address_map &map);
 	void ec1841_map(address_map &map);
 	void ec1847_io(address_map &map);
 	void ec1847_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+
+	struct
+	{
+		uint8_t enable[4];
+		int boards;
+	} m_memory;
 };
 
 /*
@@ -101,10 +106,7 @@ READ8_MEMBER(ec184x_state::memboard_r)
 WRITE8_MEMBER(ec184x_state::memboard_w)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	ram_device *m_ram = machine().device<ram_device>(RAM_TAG);
-	uint8_t current;
-
-	current = m_memory.enable[offset];
+	uint8_t current = m_memory.enable[offset];
 
 	DBG_LOG(1, "ec1841_memboard", ("W (%d of %d) <- %02X (%02X)\n", offset + 1, m_memory.boards, data, current));
 
@@ -150,10 +152,9 @@ WRITE8_MEMBER(ec184x_state::memboard_w)
 	m_memory.enable[offset] = data;
 }
 
-DRIVER_INIT_MEMBER(ec184x_state, ec1841)
+void ec184x_state::init_ec1841()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	ram_device *m_ram = machine().device<ram_device>(RAM_TAG);
 
 	m_memory.boards = m_ram->size() / EC1841_MEMBOARD_SIZE;
 	if (m_memory.boards > 4) m_memory.boards = 4;
@@ -211,7 +212,7 @@ void ec184x_state::ec1841_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m("mb", FUNC(ec1841_mb_device::map));
-	map(0x02b0, 0x02b3).rw(this, FUNC(ec184x_state::memboard_r), FUNC(ec184x_state::memboard_w));
+	map(0x02b0, 0x02b3).rw(FUNC(ec184x_state::memboard_r), FUNC(ec184x_state::memboard_w));
 }
 
 void ec184x_state::ec1847_io(address_map &map)
@@ -224,74 +225,73 @@ void ec184x_state::ec1847_io(address_map &map)
 
 // XXX verify everything
 MACHINE_CONFIG_START(ec184x_state::ec1840)
-	MCFG_CPU_ADD("maincpu", I8088, 4096000)
-	MCFG_CPU_PROGRAM_MAP(ec1840_map)
-	MCFG_CPU_IO_MAP(ec1840_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, 4096000)
+	MCFG_DEVICE_PROGRAM_MAP(ec1840_map)
+	MCFG_DEVICE_IO_MAP(ec1840_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_IBM5150_MOTHERBOARD_ADD("mb","maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", ec184x_isa8_cards, "ec1840.0002", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", ec184x_isa8_cards, "ec1841.0003", false)   // actually ec1840.0003 -- w/o mouse port
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", ec184x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", ec184x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", ec184x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", ec184x_isa8_cards, nullptr, false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1840.0002", false)
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1840.0003", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","ec1841")
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, m_ram).set_default_size("512K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ec184x_state::ec1841)
-	MCFG_CPU_ADD("maincpu", I8086, 4096000)
-	MCFG_CPU_PROGRAM_MAP(ec1841_map)
-	MCFG_CPU_IO_MAP(ec1841_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(12'288'000) / 3)
+	MCFG_DEVICE_PROGRAM_MAP(ec1841_map)
+	MCFG_DEVICE_IO_MAP(ec1841_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_MACHINE_RESET_OVERRIDE(ec184x_state, ec1841)
 
 	MCFG_EC1841_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", ec184x_isa8_cards, "ec1841.0002", false)   // cga
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", ec184x_isa8_cards, "ec1841.0003", false)   // fdc + mouse port
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", ec184x_isa8_cards, "hdc", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", ec184x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", ec184x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", ec184x_isa8_cards, nullptr, false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1841.0002", false)   // cga
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1841.0003", false)   // fdc (IRQ6) + mouse port (IRQ2..5)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "ec1841.0004", false)   // lpt (IRQ7||5) [+ serial (IRQx)]
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, "hdc", false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", ec184x_isa8_cards, nullptr, false)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","ec1841")
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,1024K,1576K,2048K")
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("512K,1024K,1576K,2048K");
 MACHINE_CONFIG_END
 
 // XXX verify everything
 MACHINE_CONFIG_START(ec184x_state::ec1847)
-	MCFG_CPU_ADD("maincpu", I8088, 4772720)
-	MCFG_CPU_PROGRAM_MAP(ec1847_map)
-	MCFG_CPU_IO_MAP(ec1847_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, 4772720)
+	MCFG_DEVICE_PROGRAM_MAP(ec1847_map)
+	MCFG_DEVICE_IO_MAP(ec1847_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "hercules", false)  // cga, ega and vga(?) are options too
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, nullptr, false)    // native variant (wd1010 + z80) not emulated
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, nullptr, false)    // native serial (2x8251) not emulated
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "hercules", false)  // cga, ega and vga(?) are options too
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)    // native variant (wd1010 + z80) not emulated
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)    // native serial (2x8251) not emulated
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
+	RAM(config, m_ram).set_default_size("640K");
 MACHINE_CONFIG_END
 
 ROM_START( ec1840 )
@@ -299,16 +299,16 @@ ROM_START( ec1840 )
 	ROM_DEFAULT_BIOS("v4")
 	// supports MDA only
 	ROM_SYSTEM_BIOS(0, "v1", "EC-1840.01")
-	ROMX_LOAD( "000-01.bin", 0xe000, 0x0800, CRC(c3ab1fad) SHA1(8168bdee30698f4f9aa7bbb6dfabe62dd723cec5), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "001-01.bin", 0xf000, 0x0800, CRC(601d1155) SHA1(9684d33b92743749704587a48e679ef7a3b20f9c), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "002-01.bin", 0xe001, 0x0800, CRC(ce4dddb7) SHA1(f9b1da60c848e68ff1c154d695a36a0833de4804), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "003-01.bin", 0xf001, 0x0800, CRC(14b40431) SHA1(ce7fffa41897405ee64fd4e86015e774f8bd108a), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("000-01.bin", 0xe000, 0x0800, CRC(c3ab1fad) SHA1(8168bdee30698f4f9aa7bbb6dfabe62dd723cec5), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("001-01.bin", 0xf000, 0x0800, CRC(601d1155) SHA1(9684d33b92743749704587a48e679ef7a3b20f9c), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("002-01.bin", 0xe001, 0x0800, CRC(ce4dddb7) SHA1(f9b1da60c848e68ff1c154d695a36a0833de4804), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("003-01.bin", 0xf001, 0x0800, CRC(14b40431) SHA1(ce7fffa41897405ee64fd4e86015e774f8bd108a), ROM_SKIP(1) | ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "v4", "EC-1840.04")
-	ROMX_LOAD( "000-04-971b.bin", 0xe000, 0x0800, CRC(06aeaee8) SHA1(9f954e4c48156d573a8e0109e7ca652be9e6036a), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "001-04-92b7.bin", 0xf000, 0x0800, CRC(3fae650a) SHA1(c98b777fdeceadd72d6eb9465b3501b9ead55a08), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "002-04-9e17.bin", 0xe001, 0x0800, CRC(d59712df) SHA1(02ea1b3ae9662f5c64c58920a32ca9db0f6fbd12), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "003-04-3ccb.bin", 0xf001, 0x0800, CRC(7fc362c7) SHA1(538e13639ad2b4c30bd72582e323181e63513306), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("000-04-971b.bin", 0xe000, 0x0800, CRC(06aeaee8) SHA1(9f954e4c48156d573a8e0109e7ca652be9e6036a), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("001-04-92b7.bin", 0xf000, 0x0800, CRC(3fae650a) SHA1(c98b777fdeceadd72d6eb9465b3501b9ead55a08), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("002-04-9e17.bin", 0xe001, 0x0800, CRC(d59712df) SHA1(02ea1b3ae9662f5c64c58920a32ca9db0f6fbd12), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("003-04-3ccb.bin", 0xf001, 0x0800, CRC(7fc362c7) SHA1(538e13639ad2b4c30bd72582e323181e63513306), ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
 ROM_END
@@ -317,61 +317,61 @@ ROM_START( ec1841 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
 	ROM_DEFAULT_BIOS("v2")
 	ROM_SYSTEM_BIOS(0, "v1", "EC-1841.01")
-	ROMX_LOAD( "012-01-3107.bin", 0xc000, 0x0800, CRC(77957396) SHA1(785f1dceb6e2b4618f5c5f0af15eb74a8c951448), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "013-01-203f.bin", 0xc001, 0x0800, CRC(768bd3d5) SHA1(2e948f2ad262de306d889b7964c3f1aad45ff5bc), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "014-01-fa40.bin", 0xd000, 0x0800, CRC(47722b58) SHA1(a6339ee8af516f834826b7828a5cf79cb650480c), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "015-01-bf1d.bin", 0xd001, 0x0800, CRC(b585b5ea) SHA1(d0ebed586eb13031477c2e071c50416682f80489), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "016-01-65f7.bin", 0xe000, 0x0800, CRC(28a07db4) SHA1(17fbcd60dacd1d3f8d8355db429f97e4d1d1ac88), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "017-01-5be1.bin", 0xe001, 0x0800, CRC(928bda26) SHA1(ee889184067e2680b29a8ef1c3a76cf5afd4c78d), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "018-01-7090.bin", 0xf000, 0x0800, CRC(75ca7d7e) SHA1(6356426820c5326a7893a437d54b02f250ef8609), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "019-01-0492.bin", 0xf001, 0x0800, CRC(8a9d593e) SHA1(f3936d2cb4e6d130dd732973f126c3aa20612463), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("012-01-3107.bin", 0xc000, 0x0800, CRC(77957396) SHA1(785f1dceb6e2b4618f5c5f0af15eb74a8c951448), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("013-01-203f.bin", 0xc001, 0x0800, CRC(768bd3d5) SHA1(2e948f2ad262de306d889b7964c3f1aad45ff5bc), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("014-01-fa40.bin", 0xd000, 0x0800, CRC(47722b58) SHA1(a6339ee8af516f834826b7828a5cf79cb650480c), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("015-01-bf1d.bin", 0xd001, 0x0800, CRC(b585b5ea) SHA1(d0ebed586eb13031477c2e071c50416682f80489), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("016-01-65f7.bin", 0xe000, 0x0800, CRC(28a07db4) SHA1(17fbcd60dacd1d3f8d8355db429f97e4d1d1ac88), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("017-01-5be1.bin", 0xe001, 0x0800, CRC(928bda26) SHA1(ee889184067e2680b29a8ef1c3a76cf5afd4c78d), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("018-01-7090.bin", 0xf000, 0x0800, CRC(75ca7d7e) SHA1(6356426820c5326a7893a437d54b02f250ef8609), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("019-01-0492.bin", 0xf001, 0x0800, CRC(8a9d593e) SHA1(f3936d2cb4e6d130dd732973f126c3aa20612463), ROM_SKIP(1) | ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "v2", "EC-1841.02")
-	ROMX_LOAD( "012-02-37f6.bin", 0xc000, 0x0800, CRC(8f5c6a20) SHA1(874b62f9cee8d3b974f33732f94eff10fc002c44), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "013-02-2552.bin", 0xc001, 0x0800, CRC(e3c10128) SHA1(d6ed743ebe9c130925c9f17aad1a45db9194c967), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "014-02-0fbe.bin", 0xd000, 0x0800, CRC(f8517e5e) SHA1(8034cd6ff5778365dc9daa494524f1753a74f1ed), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "015-02-d736.bin", 0xd001, 0x0800, CRC(8538c52a) SHA1(ee981ce90870b6546a18f2a2e64d71b0038ce0dd), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "016-02-5b2c.bin", 0xe000, 0x0800, CRC(3d1d1e67) SHA1(c527e29796537787c0f6c329f3c203f6131ca77f), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "017-02-4b9d.bin", 0xe001, 0x0800, CRC(1b985264) SHA1(5ddcb9c13564be208c5068c105444a87159c67ee), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "018-02-7090.bin", 0xf000, 0x0800, CRC(75ca7d7e) SHA1(6356426820c5326a7893a437d54b02f250ef8609), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "019-02-0493.bin", 0xf001, 0x0800, CRC(61aae23d) SHA1(7b3aa24a63ee31b194297eb1e61c3827edfcb95a), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("012-02-37f6.bin", 0xc000, 0x0800, CRC(8f5c6a20) SHA1(874b62f9cee8d3b974f33732f94eff10fc002c44), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("013-02-2552.bin", 0xc001, 0x0800, CRC(e3c10128) SHA1(d6ed743ebe9c130925c9f17aad1a45db9194c967), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("014-02-0fbe.bin", 0xd000, 0x0800, CRC(f8517e5e) SHA1(8034cd6ff5778365dc9daa494524f1753a74f1ed), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("015-02-d736.bin", 0xd001, 0x0800, CRC(8538c52a) SHA1(ee981ce90870b6546a18f2a2e64d71b0038ce0dd), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("016-02-5b2c.bin", 0xe000, 0x0800, CRC(3d1d1e67) SHA1(c527e29796537787c0f6c329f3c203f6131ca77f), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("017-02-4b9d.bin", 0xe001, 0x0800, CRC(1b985264) SHA1(5ddcb9c13564be208c5068c105444a87159c67ee), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("018-02-7090.bin", 0xf000, 0x0800, CRC(75ca7d7e) SHA1(6356426820c5326a7893a437d54b02f250ef8609), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("019-02-0493.bin", 0xf001, 0x0800, CRC(61aae23d) SHA1(7b3aa24a63ee31b194297eb1e61c3827edfcb95a), ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(2, "v3", "EC-1841.03")
-	ROMX_LOAD( "012-03-37e7.bin", 0xc000, 0x0800, CRC(49992bd5) SHA1(119121e1b4af1c44b9b8c2edabe7dc1d3019c4a6), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD( "013-03-2554.bin", 0xc001, 0x0800, CRC(834bd7d7) SHA1(e37514fc4cb8a5cbe68e7564e0e07d5116c4021a), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD( "014-03-0fbe.bin", 0xd000, 0x0800, CRC(f8517e5e) SHA1(8034cd6ff5778365dc9daa494524f1753a74f1ed), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD( "015-03-d736.bin", 0xd001, 0x0800, CRC(8538c52a) SHA1(ee981ce90870b6546a18f2a2e64d71b0038ce0dd), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD( "016-03-5b2c.bin", 0xe000, 0x0800, CRC(3d1d1e67) SHA1(c527e29796537787c0f6c329f3c203f6131ca77f), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD( "017-03-4b9d.bin", 0xe001, 0x0800, CRC(1b985264) SHA1(5ddcb9c13564be208c5068c105444a87159c67ee), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD( "018-03-7090.bin", 0xf000, 0x0800, CRC(75ca7d7e) SHA1(6356426820c5326a7893a437d54b02f250ef8609), ROM_SKIP(1) | ROM_BIOS(3))
-	ROMX_LOAD( "019-03-0493.bin", 0xf001, 0x0800, CRC(61aae23d) SHA1(7b3aa24a63ee31b194297eb1e61c3827edfcb95a), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("012-03-37e7.bin", 0xc000, 0x0800, CRC(49992bd5) SHA1(119121e1b4af1c44b9b8c2edabe7dc1d3019c4a6), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("013-03-2554.bin", 0xc001, 0x0800, CRC(834bd7d7) SHA1(e37514fc4cb8a5cbe68e7564e0e07d5116c4021a), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("014-03-0fbe.bin", 0xd000, 0x0800, CRC(f8517e5e) SHA1(8034cd6ff5778365dc9daa494524f1753a74f1ed), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("015-03-d736.bin", 0xd001, 0x0800, CRC(8538c52a) SHA1(ee981ce90870b6546a18f2a2e64d71b0038ce0dd), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("016-03-5b2c.bin", 0xe000, 0x0800, CRC(3d1d1e67) SHA1(c527e29796537787c0f6c329f3c203f6131ca77f), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("017-03-4b9d.bin", 0xe001, 0x0800, CRC(1b985264) SHA1(5ddcb9c13564be208c5068c105444a87159c67ee), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("018-03-7090.bin", 0xf000, 0x0800, CRC(75ca7d7e) SHA1(6356426820c5326a7893a437d54b02f250ef8609), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("019-03-0493.bin", 0xf001, 0x0800, CRC(61aae23d) SHA1(7b3aa24a63ee31b194297eb1e61c3827edfcb95a), ROM_SKIP(1) | ROM_BIOS(2))
 ROM_END
 
 ROM_START( ec1845 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
-	ROMX_LOAD( "184500.bin", 0xc000, 0x0800, CRC(7c472ef7) SHA1(3af53f27b49bbc731bf51f9300fbada23a1bfcfc), ROM_SKIP(1))
-	ROMX_LOAD( "184501.bin", 0xc001, 0x0800, CRC(db240dc6) SHA1(d7bb022213d09bbf2a8107fe4f1cd27b23939e18), ROM_SKIP(1))
-	ROMX_LOAD( "184502.bin", 0xd000, 0x0800, CRC(149e7e29) SHA1(7f2a297588fef1bc750c57e6ae0d5acf3d27c486), ROM_SKIP(1))
-	ROMX_LOAD( "184503.bin", 0xd001, 0x0800, CRC(e28cbd74) SHA1(cf1fba4e67c8e1dd8cdda547118e84b704029b03), ROM_SKIP(1))
-	ROMX_LOAD( "184504.bin", 0xe000, 0x0800, CRC(55fa7a1d) SHA1(58f7abab08b9d2f0a1c1636e11bb72af2694c95f), ROM_SKIP(1))
-	ROMX_LOAD( "184505.bin", 0xe001, 0x0800, CRC(c807e3f5) SHA1(08117e449f0d04f96041cff8d34893f500f3760d), ROM_SKIP(1))
-	ROMX_LOAD( "184506.bin", 0xf000, 0x0800, CRC(24f5c27c) SHA1(7822dd7f715ef00ccf6d8408be8bbfe01c2eba20), ROM_SKIP(1))
-	ROMX_LOAD( "184507.bin", 0xf001, 0x0800, CRC(75122203) SHA1(7b0fbdf1315230633e39574ac7360163bc7361e1), ROM_SKIP(1))
+	ROMX_LOAD("184500.bin", 0xc000, 0x0800, CRC(7c472ef7) SHA1(3af53f27b49bbc731bf51f9300fbada23a1bfcfc), ROM_SKIP(1))
+	ROMX_LOAD("184501.bin", 0xc001, 0x0800, CRC(db240dc6) SHA1(d7bb022213d09bbf2a8107fe4f1cd27b23939e18), ROM_SKIP(1))
+	ROMX_LOAD("184502.bin", 0xd000, 0x0800, CRC(149e7e29) SHA1(7f2a297588fef1bc750c57e6ae0d5acf3d27c486), ROM_SKIP(1))
+	ROMX_LOAD("184503.bin", 0xd001, 0x0800, CRC(e28cbd74) SHA1(cf1fba4e67c8e1dd8cdda547118e84b704029b03), ROM_SKIP(1))
+	ROMX_LOAD("184504.bin", 0xe000, 0x0800, CRC(55fa7a1d) SHA1(58f7abab08b9d2f0a1c1636e11bb72af2694c95f), ROM_SKIP(1))
+	ROMX_LOAD("184505.bin", 0xe001, 0x0800, CRC(c807e3f5) SHA1(08117e449f0d04f96041cff8d34893f500f3760d), ROM_SKIP(1))
+	ROMX_LOAD("184506.bin", 0xf000, 0x0800, CRC(24f5c27c) SHA1(7822dd7f715ef00ccf6d8408be8bbfe01c2eba20), ROM_SKIP(1))
+	ROMX_LOAD("184507.bin", 0xf001, 0x0800, CRC(75122203) SHA1(7b0fbdf1315230633e39574ac7360163bc7361e1), ROM_SKIP(1))
 ROM_END
 
 ROM_START( ec1847 )
 	ROM_REGION16_LE(0x20000,"bios", 0)
 	ROM_SYSTEM_BIOS(0, "vxxx", "EC-1847.0x")
-	ROMX_LOAD( "308_d47_2764.bin", 0x08000, 0x2000, CRC(f06924f2) SHA1(83a5dedf1c06f875c598f087bbc087524bc9bfa3), ROM_BIOS(1))
-	ROMX_LOAD( "188m_d47_2764.bin", 0x14000, 0x2000, CRC(bc8742c7) SHA1(3af09d14e891e976b7a9a2a6e1af63f0eabe5426), ROM_BIOS(1))
-	ROMX_LOAD( "188m_d48_2764.bin", 0x1e000, 0x2000, CRC(7d290e95) SHA1(e73e6c8e19477fce5de3f95b89693dc6ad6781ab), ROM_BIOS(1))
+	ROMX_LOAD("308_d47_2764.bin", 0x08000, 0x2000, CRC(f06924f2) SHA1(83a5dedf1c06f875c598f087bbc087524bc9bfa3), ROM_BIOS(0))
+	ROMX_LOAD("188m_d47_2764.bin", 0x14000, 0x2000, CRC(bc8742c7) SHA1(3af09d14e891e976b7a9a2a6e1af63f0eabe5426), ROM_BIOS(0))
+	ROMX_LOAD("188m_d48_2764.bin", 0x1e000, 0x2000, CRC(7d290e95) SHA1(e73e6c8e19477fce5de3f95b89693dc6ad6781ab), ROM_BIOS(0))
 
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
-	ROM_LOAD( "317_d28_2732.bin", 0x00000, 0x1000, CRC(8939599b) SHA1(53d02460cf93596882a96758ef4bac5fa1ce55b2)) // monochrome font
+	ROM_LOAD("317_d28_2732.bin", 0x00000, 0x1000, CRC(8939599b) SHA1(53d02460cf93596882a96758ef4bac5fa1ce55b2)) // monochrome font
 ROM_END
 
-//     YEAR  ROM NAME  PARENT   COMPAT  MACHINE  INPUT  STATE         INIT    COMPANY       FULLNAME   FLAGS
-COMP ( 1987, ec1840,   ibm5150, 0,      ec1840,  0,     ec184x_state, 0,      "<unknown>",  "EC-1840", MACHINE_NOT_WORKING )
-COMP ( 1987, ec1841,   ibm5150, 0,      ec1841,  0,     ec184x_state, ec1841, "<unknown>",  "EC-1841", 0 )
-COMP ( 1989, ec1845,   ibm5150, 0,      ec1841,  0,     ec184x_state, ec1841, "<unknown>",  "EC-1845", MACHINE_NOT_WORKING )
-COMP ( 1990, ec1847,   ibm5150, 0,      ec1847,  0,     ec184x_state, 0,      "<unknown>",  "EC-1847", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT  STATE         INIT         COMPANY      FULLNAME   FLAGS
+COMP( 1987, ec1840, ibm5150, 0,      ec1840,  0,     ec184x_state, empty_init,  "<unknown>", "EC-1840", MACHINE_NOT_WORKING )
+COMP( 1987, ec1841, ibm5150, 0,      ec1841,  0,     ec184x_state, init_ec1841, "<unknown>", "EC-1841", 0 )
+COMP( 1989, ec1845, ibm5150, 0,      ec1841,  0,     ec184x_state, init_ec1841, "<unknown>", "EC-1845", MACHINE_NOT_WORKING )
+COMP( 1990, ec1847, ibm5150, 0,      ec1847,  0,     ec184x_state, empty_init,  "<unknown>", "EC-1847", MACHINE_NOT_WORKING )

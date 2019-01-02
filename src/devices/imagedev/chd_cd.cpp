@@ -12,6 +12,7 @@
 #include "chd_cd.h"
 
 #include "cdrom.h"
+#include "romload.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(CDROM, cdrom_image_device, "cdrom_image", "CD-ROM Image")

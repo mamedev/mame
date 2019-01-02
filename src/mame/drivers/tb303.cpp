@@ -27,6 +27,9 @@ public:
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
+	void tb303(machine_config &config);
+
+private:
 	u8 m_ram[0xc00];
 	u16 m_ram_address;
 	bool m_ram_ce;
@@ -45,7 +48,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clear) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 
 	virtual void machine_start() override;
-	void tb303(machine_config &config);
 };
 
 // TP2 to MCU CLK: LC circuit(TI S74230), stable sine wave, 2.2us interval
@@ -250,24 +252,24 @@ void tb303_state::machine_start()
 MACHINE_CONFIG_START(tb303_state::tb303)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D650, TP2_HZ)
-	MCFG_UCOM4_READ_A_CB(READ8(tb303_state, input_r))
-	MCFG_UCOM4_READ_B_CB(READ8(tb303_state, input_r))
-	MCFG_UCOM4_READ_C_CB(READ8(tb303_state, ram_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(tb303_state, ram_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(tb303_state, ram_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(tb303_state, ram_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(tb303_state, ram_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(tb303_state, switch_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(tb303_state, switch_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(tb303_state, strobe_w))
+	NEC_D650(config, m_maincpu, TP2_HZ);
+	m_maincpu->read_a().set(FUNC(tb303_state::input_r));
+	m_maincpu->read_b().set(FUNC(tb303_state::input_r));
+	m_maincpu->read_c().set(FUNC(tb303_state::ram_r));
+	m_maincpu->write_c().set(FUNC(tb303_state::ram_w));
+	m_maincpu->write_d().set(FUNC(tb303_state::ram_w));
+	m_maincpu->write_e().set(FUNC(tb303_state::ram_w));
+	m_maincpu->write_f().set(FUNC(tb303_state::ram_w));
+	m_maincpu->write_g().set(FUNC(tb303_state::switch_w));
+	m_maincpu->write_h().set(FUNC(tb303_state::switch_w));
+	m_maincpu->write_i().set(FUNC(tb303_state::strobe_w));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp3_clock", tb303_state, tp3_clock, TP3_PERIOD)
 	MCFG_TIMER_START_DELAY(TP3_PERIOD - TP3_LOW)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp3_clear", tb303_state, tp3_clear, TP3_PERIOD)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_tb303)
+	config.set_default_layout(layout_tb303);
 
 	/* sound hardware */
 	// discrete...
@@ -287,4 +289,4 @@ ROM_START( tb303 )
 ROM_END
 
 
-CONS( 1982, tb303, 0, 0, tb303, tb303, tb303_state, 0, "Roland", "TB-303 Bass Line", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tb303, 0, 0, tb303, tb303, tb303_state, empty_init, "Roland", "TB-303 Bass Line", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

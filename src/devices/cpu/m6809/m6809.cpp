@@ -159,8 +159,8 @@ void m6809_base_device::device_start()
 	m_mintf->m_program  = &space(AS_PROGRAM);
 	m_mintf->m_sprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_mintf->m_program;
 
-	m_mintf->m_direct  = m_mintf->m_program->direct<0>();
-	m_mintf->m_sdirect = m_mintf->m_sprogram->direct<0>();
+	m_mintf->m_cache  = m_mintf->m_program->cache<0, 0, ENDIANNESS_BIG>();
+	m_mintf->m_scache = m_mintf->m_sprogram->cache<0, 0, ENDIANNESS_BIG>();
 
 	m_lic_func.resolve_safe();
 
@@ -586,12 +586,12 @@ uint8_t m6809_base_device::mi_default::read(uint16_t adr)
 
 uint8_t m6809_base_device::mi_default::read_opcode(uint16_t adr)
 {
-	return m_sdirect->read_byte(adr);
+	return m_scache->read_byte(adr);
 }
 
 uint8_t m6809_base_device::mi_default::read_opcode_arg(uint16_t adr)
 {
-	return m_direct->read_byte(adr);
+	return m_cache->read_byte(adr);
 }
 
 

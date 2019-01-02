@@ -21,7 +21,7 @@
     0000 0011               bell off
     0000 1010               enable keyclick (5ms duration 480us period on make)
     0000 1011               disable keyclick
-    0000 1110  ---k lscn    LED (1 = on, k = kana, l = caps lock, s = scroll lock, c = compose, n = num lock)
+    0000 1110  ---k lscn    LED (1 = on: k = kana, l = caps lock, s = scroll lock, c = compose, n = num lock)
     0000 1111               layout request (keyboard responds with layout response)
 
     message from keyboad to host:
@@ -101,7 +101,7 @@
     control on home row, caps lock at bottom left corner of main area
 
 
-    Type 5 International layout:
+    Type 5 International (ISO) layout:
 
       76      1d      05  06  08  0a    0c  0e  10  11    12  07  09  0b    16  17  15    2d  02  04  30
 
@@ -114,7 +114,7 @@
     double-height return key, 58 (US backslash) moved to home row, 7c added on left of bottom row
 
 
-    Type 5 Japanese layout:
+    Type 5 Japanese (JIS) layout:
 
       76      1d      05  06  08  0a    0c  0e  10  11    12  07  09  0b    16  17  15    2d  02  04  30
 
@@ -127,8 +127,8 @@
     double-height return key
     yen/pipe replaces backtick/tilde at top left corner of main area
     linefeed scancode repurposed for backslash/underscore
-    kana replaces alt graph (with LED window)
-    extra kakutei, henkan and nihongo on-off keys
+    kana (かな) replaces alt graph (with LED window)
+    extra kakutei (確定), henkan (変換) and nihongo on-off (日本語 On-Off) keys
 */
 
 
@@ -148,6 +148,7 @@ DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_JP_HLE_KEYBOARD, bus::sunkbd, hle_type5_jp_devic
 namespace bus { namespace sunkbd {
 
 namespace {
+
 /***************************************************************************
     INPUT PORT DEFINITIONS
 ***************************************************************************/
@@ -633,7 +634,7 @@ INPUT_PORTS_START( hle_type4_device )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Scroll Lock")  PORT_CODE(KEYCODE_SCRLOCK)    PORT_CHAR(UCHAR_MAMEKEY(SCRLOCK))
 
 	PORT_MODIFY("ROW2")
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("KP =")         PORT_CODE(KEYCODE_INSERT)     PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("KP =")         PORT_CODE(KEYCODE_INSERT)     PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD))
 
 	PORT_MODIFY("ROW6")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Line Feed")                                  PORT_CHAR(10)
@@ -753,6 +754,7 @@ hle_device_base::hle_device_base(
 	, m_dips(*this, "DIP")
 	, m_click_timer(nullptr)
 	, m_beeper(*this, "beeper")
+	, m_leds(*this, "led%u", 0U)
 	, m_make_count(0U)
 	, m_rx_state(RX_IDLE)
 	, m_keyclick(0U)
@@ -788,8 +790,8 @@ WRITE_LINE_MEMBER( hle_device_base::input_txd )
 --------------------------------------------------*/
 
 MACHINE_CONFIG_START(hle_device_base::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("bell")
-	MCFG_SOUND_ADD("beeper", BEEP, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND))
+	SPEAKER(config, "bell").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 1.0)
 MACHINE_CONFIG_END
 
@@ -802,6 +804,7 @@ MACHINE_CONFIG_END
 
 void hle_device_base::device_start()
 {
+	m_leds.resolve();
 	m_click_timer = timer_alloc(CLICK_TIMER_ID);
 
 	save_item(NAME(m_make_count));
@@ -836,11 +839,11 @@ void hle_device_base::device_reset()
 	output_rxd(1);
 
 	// start with keyboard LEDs off
-	machine().output().set_led_value(LED_NUM, 0);
-	machine().output().set_led_value(LED_COMPOSE, 0);
-	machine().output().set_led_value(LED_SCROLL, 0);
-	machine().output().set_led_value(LED_CAPS, 0);
-	machine().output().set_led_value(LED_KANA, 0);
+	m_leds[LED_NUM] = 0;
+	m_leds[LED_COMPOSE] = 0;
+	m_leds[LED_SCROLL] = 0;
+	m_leds[LED_CAPS] = 0;
+	m_leds[LED_KANA] = 0;
 
 	// no beep
 	m_click_timer->reset();
@@ -939,13 +942,13 @@ void hle_device_base::key_break(uint8_t row, uint8_t column)
 	assert(!fifo_full());
 	assert(m_make_count);
 
-	// send the break code, and the idle code if no other keysa are down
+	// send the break code, and the idle code if no other keys are down
 	transmit_byte(0x80U | (row << 4) | column);
 	if (!--m_make_count)
 		transmit_byte(0x7fU);
 
-	// check our counting
-	assert(are_all_keys_up() == !bool(m_make_count));
+	// this blows up if a key is pressed just as the last key is released
+	//assert(are_all_keys_up() == !bool(m_make_count));
 }
 
 
@@ -972,11 +975,11 @@ void hle_device_base::received_byte(uint8_t byte)
 	switch (m_rx_state)
 	{
 	case RX_LED:
-		machine().output().set_led_value(LED_NUM, BIT(byte, 0));
-		machine().output().set_led_value(LED_COMPOSE, BIT(byte, 1));
-		machine().output().set_led_value(LED_SCROLL, BIT(byte, 2));
-		machine().output().set_led_value(LED_CAPS, BIT(byte, 3));
-		machine().output().set_led_value(LED_KANA, BIT(byte, 4));
+		m_leds[LED_NUM] = BIT(byte, 0);
+		m_leds[LED_COMPOSE] = BIT(byte, 1);
+		m_leds[LED_SCROLL] = BIT(byte, 2);
+		m_leds[LED_CAPS] = BIT(byte, 3);
+		m_leds[LED_KANA] = BIT(byte, 4);
 		m_rx_state = RX_IDLE;
 		break;
 

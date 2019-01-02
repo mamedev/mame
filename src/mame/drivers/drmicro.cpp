@@ -31,7 +31,7 @@ Quite similar to Appoooh
 INTERRUPT_GEN_MEMBER(drmicro_state::drmicro_interrupt)
 {
 	if (m_nmi_enable)
-			device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(drmicro_state::nmi_enable_w)
@@ -55,7 +55,7 @@ WRITE_LINE_MEMBER(drmicro_state::pcm_w)
 		if (~m_pcm_adr & 1)
 			data >>= 4;
 
-		m_msm->data_w(data & 0x0f);
+		m_msm->write_data(data & 0x0f);
 		m_msm->reset_w(0);
 
 		m_pcm_adr = (m_pcm_adr + 1) & 0x7fff;
@@ -80,18 +80,18 @@ void drmicro_state::drmicro_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xefff).ram().w(this, FUNC(drmicro_state::drmicro_videoram_w));
+	map(0xe000, 0xefff).ram().w(FUNC(drmicro_state::drmicro_videoram_w));
 	map(0xf000, 0xffff).ram();
 }
 
 void drmicro_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76496_device::write));
-	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76496_device::write));
-	map(0x02, 0x02).w("sn3", FUNC(sn76496_device::write));
-	map(0x03, 0x03).portr("DSW1").w(this, FUNC(drmicro_state::pcm_set_w));
-	map(0x04, 0x04).portr("DSW2").w(this, FUNC(drmicro_state::nmi_enable_w));
+	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76496_device::command_w));
+	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76496_device::command_w));
+	map(0x02, 0x02).w("sn3", FUNC(sn76496_device::command_w));
+	map(0x03, 0x03).portr("DSW1").w(FUNC(drmicro_state::pcm_set_w));
+	map(0x04, 0x04).portr("DSW2").w(FUNC(drmicro_state::nmi_enable_w));
 	map(0x05, 0x05).noprw(); // unused? / watchdog?
 }
 
@@ -211,7 +211,7 @@ static const gfx_layout charlayout8 =
 	8*8*1
 };
 
-static GFXDECODE_START( drmicro )
+static GFXDECODE_START( gfx_drmicro )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout4,     0, 64 ) /* tiles */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout8,   256, 32 ) /* tiles */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout4,   0, 64 ) /* sprites */
@@ -243,10 +243,10 @@ void drmicro_state::machine_reset()
 MACHINE_CONFIG_START(drmicro_state::drmicro)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MCLK/6) /* 3.072MHz? */
-	MCFG_CPU_PROGRAM_MAP(drmicro_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", drmicro_state,  drmicro_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80,MCLK/6) /* 3.072MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(drmicro_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drmicro_state,  drmicro_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -258,27 +258,25 @@ MACHINE_CONFIG_START(drmicro_state::drmicro)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(drmicro_state, screen_update_drmicro)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", drmicro)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(drmicro_state, drmicro)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_drmicro);
+	PALETTE(config, m_palette, FUNC(drmicro_state::drmicro_palette), 512, 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76496, MCLK/4)
+	MCFG_DEVICE_ADD("sn1", SN76496, MCLK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76496, MCLK/4)
+	MCFG_DEVICE_ADD("sn2", SN76496, MCLK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn3", SN76496, MCLK/4)
+	MCFG_DEVICE_ADD("sn3", SN76496, MCLK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(drmicro_state, pcm_w))          /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, drmicro_state, pcm_w))          /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
@@ -324,4 +322,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, drmicro, 0, drmicro, drmicro, drmicro_state, 0, ROT270, "Sanritsu", "Dr. Micro", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, drmicro, 0, drmicro, drmicro, drmicro_state, empty_init, ROT270, "Sanritsu", "Dr. Micro", MACHINE_SUPPORTS_SAVE )

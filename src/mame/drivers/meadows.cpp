@@ -334,13 +334,13 @@ void meadows_state::meadows_main_map(address_map &map)
 	map(0x0000, 0x0bff).rom();
 	map(0x0c00, 0x0c00).portr("INPUTS");
 	map(0x0c01, 0x0c01).portr("STICK");
-	map(0x0c02, 0x0c02).r(this, FUNC(meadows_state::hsync_chain_r));
+	map(0x0c02, 0x0c02).r(FUNC(meadows_state::hsync_chain_r));
 	map(0x0c03, 0x0c03).portr("DSW");
-	map(0x0c00, 0x0c03).w(this, FUNC(meadows_state::meadows_audio_w));
-	map(0x0d00, 0x0d0f).w(this, FUNC(meadows_state::meadows_spriteram_w)).share("spriteram");
+	map(0x0c00, 0x0c03).w(FUNC(meadows_state::meadows_audio_w));
+	map(0x0d00, 0x0d0f).w(FUNC(meadows_state::meadows_spriteram_w)).share("spriteram");
 	map(0x0e00, 0x0eff).ram();
 	map(0x1000, 0x1bff).rom();
-	map(0x1c00, 0x1fff).ram().w(this, FUNC(meadows_state::meadows_videoram_w)).share("videoram");
+	map(0x1c00, 0x1fff).ram().w(FUNC(meadows_state::meadows_videoram_w)).share("videoram");
 }
 
 void meadows_state::bowl3d_main_map(address_map &map)
@@ -348,26 +348,26 @@ void meadows_state::bowl3d_main_map(address_map &map)
 	map(0x0000, 0x0bff).rom();
 	map(0x0c00, 0x0c00).portr("INPUTS1");
 	map(0x0c01, 0x0c01).portr("INPUTS2");
-	map(0x0c02, 0x0c02).r(this, FUNC(meadows_state::hsync_chain_r));
+	map(0x0c02, 0x0c02).r(FUNC(meadows_state::hsync_chain_r));
 	map(0x0c03, 0x0c03).portr("DSW");
-	map(0x0c00, 0x0c03).w(this, FUNC(meadows_state::meadows_audio_w));
-	map(0x0d00, 0x0d0f).w(this, FUNC(meadows_state::meadows_spriteram_w)).share("spriteram");
+	map(0x0c00, 0x0c03).w(FUNC(meadows_state::meadows_audio_w));
+	map(0x0d00, 0x0d0f).w(FUNC(meadows_state::meadows_spriteram_w)).share("spriteram");
 	map(0x0e00, 0x0eff).ram();
 	map(0x1000, 0x1bff).rom();
-	map(0x1c00, 0x1fff).ram().w(this, FUNC(meadows_state::meadows_videoram_w)).share("videoram");
+	map(0x1c00, 0x1fff).ram().w(FUNC(meadows_state::meadows_videoram_w)).share("videoram");
 }
 
 void meadows_state::minferno_main_map(address_map &map)
 {
 	map(0x0000, 0x0bff).rom();
-	map(0x1c00, 0x1eff).ram().w(this, FUNC(meadows_state::meadows_videoram_w)).share("videoram");
+	map(0x1c00, 0x1eff).ram().w(FUNC(meadows_state::meadows_videoram_w)).share("videoram");
 	map(0x1f00, 0x1f00).portr("JOY1");
 	map(0x1f01, 0x1f01).portr("JOY2");
 	map(0x1f02, 0x1f02).portr("BUTTONS");
 	map(0x1f03, 0x1f03).portr("DSW1");
-	map(0x1f00, 0x1f03).w(this, FUNC(meadows_state::meadows_audio_w));
-	map(0x1f04, 0x1f04).r(this, FUNC(meadows_state::vsync_chain_hi_r));
-	map(0x1f05, 0x1f05).r(this, FUNC(meadows_state::vsync_chain_lo_r));
+	map(0x1f00, 0x1f03).w(FUNC(meadows_state::meadows_audio_w));
+	map(0x1f04, 0x1f04).r(FUNC(meadows_state::vsync_chain_hi_r));
+	map(0x1f05, 0x1f05).r(FUNC(meadows_state::vsync_chain_lo_r));
 }
 
 
@@ -387,7 +387,7 @@ void meadows_state::minferno_data_map(address_map &map)
 void meadows_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x0bff).rom();
-	map(0x0c00, 0x0c03).rw(this, FUNC(meadows_state::audio_hardware_r), FUNC(meadows_state::audio_hardware_w));
+	map(0x0c00, 0x0c03).rw(FUNC(meadows_state::audio_hardware_r), FUNC(meadows_state::audio_hardware_w));
 	map(0x0e00, 0x0eff).ram();
 }
 
@@ -582,7 +582,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( meadows )
+static GFXDECODE_START( gfx_meadows )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 1 )     /* character generator */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 1 )        /* sprite prom 1 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0, 1 )        /* sprite prom 2 */
@@ -591,7 +591,7 @@ static GFXDECODE_START( meadows )
 GFXDECODE_END
 
 
-static GFXDECODE_START( minferno )
+static GFXDECODE_START( gfx_minferno )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 4 )
 GFXDECODE_END
 
@@ -621,109 +621,109 @@ static const char *const bowl3d_sample_names[] =
  *
  *************************************/
 
-MACHINE_CONFIG_START(meadows_state::meadows)
-
+void meadows_state::meadows(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
-	MCFG_CPU_PROGRAM_MAP(meadows_main_map)
+	S2650(config, m_maincpu, MASTER_CLOCK/8);  /* 5MHz / 8 = 625 kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &meadows_state::meadows_main_map);
 
-	MCFG_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8)     /* 5MHz / 8 = 625 kHz */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(meadows_state, audio_interrupt,  (double)5000000/131072)
+	S2650(config, m_audiocpu, MASTER_CLOCK/8); /* 5MHz / 8 = 625 kHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &meadows_state::audio_map);
+	m_audiocpu->set_periodic_int(FUNC(meadows_state::audio_interrupt), attotime::from_hz((double)5000000/131072));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 30*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(meadows_state, screen_update_meadows)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(meadows_state, meadows_vblank_irq)) // one interrupt per frame!?
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(32*8, 30*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(meadows_state::screen_update_meadows));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(meadows_state::meadows_vblank_irq)); // one interrupt per frame!?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", meadows)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_meadows);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	SPEAKER(config, "speaker").front_center();
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(2)
-	MCFG_SAMPLES_START_CB(meadows_state, meadows_sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(2);
+	m_samples->set_samples_start_callback(FUNC(meadows_state::meadows_sh_start));
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(meadows_state::minferno)
-
+void meadows_state::minferno(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24)     /* 5MHz / 8 / 3 = 208.33 kHz */
-	MCFG_CPU_PROGRAM_MAP(minferno_main_map)
-	MCFG_CPU_DATA_MAP(minferno_data_map)
+	S2650(config, m_maincpu, MASTER_CLOCK/24); /* 5MHz / 8 / 3 = 208.33 kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &meadows_state::minferno_main_map);
+	m_maincpu->set_addrmap(AS_DATA, &meadows_state::minferno_data_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 24*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(meadows_state, screen_update_meadows)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(meadows_state, minferno_vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 24*8-1);
+	m_screen->set_screen_update(FUNC(meadows_state::screen_update_meadows));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(meadows_state::minferno_vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", minferno)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_minferno);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* audio hardware */
 	// TODO
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(meadows_state::bowl3d)
-
+void meadows_state::bowl3d(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
-	MCFG_CPU_PROGRAM_MAP(bowl3d_main_map)
+	S2650(config, m_maincpu, MASTER_CLOCK/8);  /* 5MHz / 8 = 625 kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &meadows_state::bowl3d_main_map);
 
-	MCFG_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8)     /* 5MHz / 8 = 625 kHz */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(meadows_state, audio_interrupt,  (double)5000000/131072)
+	S2650(config, m_audiocpu, MASTER_CLOCK/8); /* 5MHz / 8 = 625 kHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &meadows_state::audio_map);
+	m_audiocpu->set_periodic_int(FUNC(meadows_state::audio_interrupt), attotime::from_hz((double)5000000/131072));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 30*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(meadows_state, screen_update_meadows)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(meadows_state, meadows_vblank_irq)) // one interrupt per frame!?
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(32*8, 30*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(meadows_state::screen_update_meadows));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(meadows_state::meadows_vblank_irq)); // one interrupt per frame!?
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", meadows)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_meadows);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	SPEAKER(config, "speaker").front_center();
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(2)
-	MCFG_SAMPLES_START_CB(meadows_state, meadows_sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(2);
+	m_samples->set_samples_start_callback(FUNC(meadows_state::meadows_sh_start));
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_SOUND_ADD("samples2", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(bowl3d_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
-
-
+	samples_device &samples2(SAMPLES(config, "samples2"));
+	samples2.set_channels(1);
+	samples2.set_samples_names(bowl3d_sample_names);
+	samples2.add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 /*************************************
  *
@@ -844,7 +844,7 @@ ROM_END
  *************************************/
 
 /* A fake for the missing ball sprites #3 and #4 */
-DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
+void meadows_state::init_gypsyjug()
 {
 	static const uint8_t ball[16*2] =
 	{
@@ -853,7 +853,6 @@ DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
 		0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
 		0x01,0x80, 0x03,0xc0, 0x03,0xc0, 0x01,0x80
 	};
-	int i;
 	uint8_t *gfx2 = memregion("gfx2")->base();
 	uint8_t *gfx3 = memregion("gfx3")->base();
 	uint8_t *gfx4 = memregion("gfx4")->base();
@@ -863,7 +862,7 @@ DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
 
 	memcpy(gfx3,gfx2,len3);
 
-	for (i = 0; i < len4; i += 16*2)
+	for (int i = 0; i < len4; i += 16*2)
 	{
 		memcpy(gfx4 + i, ball, sizeof(ball));
 		memcpy(gfx5 + i, ball, sizeof(ball));
@@ -872,16 +871,13 @@ DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
 
 
 /* A fake for inverting the data bus */
-DRIVER_INIT_MEMBER(meadows_state,minferno)
+void meadows_state::init_minferno()
 {
-	int i, length;
-	uint8_t *mem;
-
 	/* create an inverted copy of the graphics data */
-	mem = memregion("gfx1")->base();
-	length = memregion("gfx1")->bytes();
-	for (i = 0; i < length/2; i++)
-		mem[i] = ~mem[i + length/2];
+	uint8_t *mem = memregion("gfx1")->base();
+	int length = memregion("gfx1")->bytes();
+	for (int i = 0; i < length / 2; i++)
+		mem[i] = ~mem[i + length / 2];
 }
 
 
@@ -892,7 +888,7 @@ DRIVER_INIT_MEMBER(meadows_state,minferno)
  *
  *************************************/
 
-GAMEL( 1978, deadeye,  0, meadows,  meadows,  meadows_state, 0,        ROT0,  "Meadows Games, Inc.", "Dead Eye",          0, layout_deadeye )
-GAME ( 1978, bowl3d,   0, bowl3d,   bowl3d,   meadows_state, 0,        ROT90, "Meadows Games, Inc.", "3-D Bowling",       MACHINE_NO_SOUND )
-GAMEL( 1978, gypsyjug, 0, meadows,  meadows,  meadows_state, gypsyjug, ROT0,  "Meadows Games, Inc.", "Gypsy Juggler",     MACHINE_IMPERFECT_GRAPHICS, layout_gypsyjug )
-GAMEL( 1978, minferno, 0, minferno, minferno, meadows_state, minferno, ROT0,  "Meadows Games, Inc.", "Inferno (Meadows)", MACHINE_NO_SOUND, layout_minferno )
+GAMEL( 1978, deadeye,  0, meadows,  meadows,  meadows_state, empty_init,    ROT0,  "Meadows Games, Inc.", "Dead Eye",          0, layout_deadeye )
+GAME(  1978, bowl3d,   0, bowl3d,   bowl3d,   meadows_state, empty_init,    ROT90, "Meadows Games, Inc.", "3-D Bowling",       MACHINE_NO_SOUND )
+GAMEL( 1978, gypsyjug, 0, meadows,  meadows,  meadows_state, init_gypsyjug, ROT0,  "Meadows Games, Inc.", "Gypsy Juggler",     MACHINE_IMPERFECT_GRAPHICS, layout_gypsyjug )
+GAMEL( 1978, minferno, 0, minferno, minferno, meadows_state, init_minferno, ROT0,  "Meadows Games, Inc.", "Inferno (Meadows)", MACHINE_NO_SOUND, layout_minferno )

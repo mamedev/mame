@@ -17,41 +17,34 @@
   Convert the color PROMs into a more useable format.
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(tankbatt_state, tankbatt)
+void tankbatt_state::tankbatt_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	#define RES_1   0xc0 /* this is a guess */
-	#define RES_2   0x3f /* this is a guess */
+	constexpr int RES_1 = 0xc0; // this is a guess
+	constexpr int RES_2 = 0x3f; // this is a guess
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
 	{
-		int bit0, bit1, bit2, bit3;
-		int r, g, b;
+		int const bit0 = BIT(color_prom[i], 0); // intensity
+		int const bit1 = BIT(color_prom[i], 1); // red
+		int const bit2 = BIT(color_prom[i], 2); // green
+		int const bit3 = BIT(color_prom[i], 3); // blue
 
-		bit0 = (color_prom[i] >> 0) & 0x01; /* intensity */
-		bit1 = (color_prom[i] >> 1) & 0x01; /* red */
-		bit2 = (color_prom[i] >> 2) & 0x01; /* green */
-		bit3 = (color_prom[i] >> 3) & 0x01; /* blue */
+		// red component
+		int const r = bit1 * (RES_1 + (RES_2 * bit0));
 
-		/* red component */
-		r = RES_1 * bit1;
-		if (bit1) r += RES_2 * bit0;
+		// green component
+		int const g = bit2 * (RES_1 + (RES_2 * bit0));
 
-		/* green component */
-		g = RES_1 * bit2;
-		if (bit2) g += RES_2 * bit0;
-
-		/* blue component */
-		b = RES_1 * bit3;
-		if (bit3) b += RES_2 * bit0;
+		// blue component
+		int const b = bit3 * (RES_1 + (RES_2 * bit0));
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	for (i = 0; i < 0x200; i += 2)
+	for (int i = 0; i < 0x200; i += 2)
 	{
 		palette.set_pen_indirect(i + 0, 0);
 		palette.set_pen_indirect(i + 1, i >> 1);

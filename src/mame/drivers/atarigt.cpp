@@ -65,7 +65,7 @@
 
 /*************************************
  *
- *  Initialization
+ *  Interrupt handling
  *
  *************************************/
 
@@ -75,6 +75,18 @@ void atarigt_state::update_interrupts()
 	m_maincpu->set_input_line(6, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
+
+INTERRUPT_GEN_MEMBER(atarigt_state::scanline_int_gen)
+{
+	scanline_int_write_line(1);
+}
+
+
+/*************************************
+ *
+ *  Initialization
+ *
+ *************************************/
 
 MACHINE_RESET_MEMBER(atarigt_state,atarigt)
 {
@@ -103,7 +115,7 @@ WRITE8_MEMBER(atarigt_state::cage_irq_callback)
 
 READ32_MEMBER(atarigt_state::special_port2_r)
 {
-	int temp = ioport("SERVICE")->read();
+	int temp = m_service_io->read();
 	temp ^= 0x0001;     /* /A2DRDY always high for now */
 	return (temp << 16) | temp;
 }
@@ -111,7 +123,7 @@ READ32_MEMBER(atarigt_state::special_port2_r)
 
 READ32_MEMBER(atarigt_state::special_port3_r)
 {
-	int temp = ioport("COIN")->read();
+	int temp = m_coin_io->read();
 	if (m_video_int_state) temp ^= 0x0001;
 	if (m_scanline_int_state) temp ^= 0x0002;
 	return (temp << 16) | temp;
@@ -121,7 +133,7 @@ READ32_MEMBER(atarigt_state::special_port3_r)
 inline void atarigt_state::compute_fake_pots(int *pots)
 {
 #if (HACK_TMEK_CONTROLS)
-	int fake = ioport("FAKE")->read();
+	int fake = m_fake_io->read();
 
 	pots[0] = pots[1] = pots[2] = pots[3] = 0x80;
 
@@ -412,12 +424,12 @@ void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, u
 	primrage_update_mode(offset);
 
 	/* check for certain read sequences */
-	if (m_protmode == 1 && offset >= 0xdc7800 && offset < 0xdc7800 + sizeof(m_protdata) * 2)
-		m_protdata[(offset - 0xdc7800) / 2] = data;
+	if (m_protmode == 1 && offset >= 0xdc7800 && offset < 0xdc7800 + (0x800 * 2))
+		m_protdata[(offset - 0xdc7800) >> 1] = data;
 
 	if (m_protmode == 2)
 	{
-		int temp = (offset - 0xdc7800) / 2;
+		int temp = (offset - 0xdc7800) >> 1;
 		if (LOG_PROTECTION) logerror("prot:mode 2 param = %04X\n", temp);
 		m_protresult = temp * 0x6915 + 0x6915;
 	}
@@ -600,24 +612,24 @@ WRITE32_MEMBER(atarigt_state::colorram_protection_w)
 void atarigt_state::main_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0xc00000, 0xc00003).rw(this, FUNC(atarigt_state::sound_data_r), FUNC(atarigt_state::sound_data_w));
-	map(0xd00010, 0xd0001f).r(this, FUNC(atarigt_state::analog_port_r)).umask32(0xff00ff00);
+	map(0xc00000, 0xc00003).rw(FUNC(atarigt_state::sound_data_r), FUNC(atarigt_state::sound_data_w));
+	map(0xd00010, 0xd0001f).r(FUNC(atarigt_state::analog_port_r)).umask32(0xff00ff00);
 	map(0xd20000, 0xd20fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0xd40000, 0xd4ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
 	map(0xd70000, 0xd7ffff).ram();
 	map(0xd72000, 0xd75fff).w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
 	map(0xd76000, 0xd76fff).w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
 	map(0xd78000, 0xd78fff).ram().share("rle");
-	map(0xd7a200, 0xd7a203).w(this, FUNC(atarigt_state::mo_command_w)).share("mo_command");
-	map(0xd80000, 0xdfffff).rw(this, FUNC(atarigt_state::colorram_protection_r), FUNC(atarigt_state::colorram_protection_w)).share("colorram");
-	map(0xe04000, 0xe04003).w(this, FUNC(atarigt_state::led_w));
-	map(0xe08000, 0xe08003).w(this, FUNC(atarigt_state::latch_w));
-	map(0xe0a000, 0xe0a003).w(this, FUNC(atarigt_state::scanline_int_ack_w));
-	map(0xe0c000, 0xe0c003).w(this, FUNC(atarigt_state::video_int_ack_w));
+	map(0xd7a200, 0xd7a203).w(FUNC(atarigt_state::mo_command_w)).share("mo_command");
+	map(0xd80000, 0xdfffff).rw(FUNC(atarigt_state::colorram_protection_r), FUNC(atarigt_state::colorram_protection_w)).share("colorram");
+	map(0xe04000, 0xe04003).w(FUNC(atarigt_state::led_w));
+	map(0xe08000, 0xe08003).w(FUNC(atarigt_state::latch_w));
+	map(0xe0a000, 0xe0a003).w(FUNC(atarigt_state::scanline_int_ack_w));
+	map(0xe0c000, 0xe0c003).w(FUNC(atarigt_state::video_int_ack_w));
 	map(0xe0e000, 0xe0e003).nopw();//watchdog_reset_w },
 	map(0xe80000, 0xe80003).portr("P1_P2");
-	map(0xe82000, 0xe82003).r(this, FUNC(atarigt_state::special_port2_r));
-	map(0xe82004, 0xe82007).r(this, FUNC(atarigt_state::special_port3_r));
+	map(0xe82000, 0xe82003).r(FUNC(atarigt_state::special_port2_r));
+	map(0xe82004, 0xe82007).r(FUNC(atarigt_state::special_port3_r));
 	map(0xf80000, 0xffffff).ram();
 }
 
@@ -730,7 +742,7 @@ static const gfx_layout pflayout =
 	5,
 	{ 0, 0, 1, 2, 3 },
 	{ RGN_FRAC(1,3)+0, RGN_FRAC(1,3)+4, 0, 4, RGN_FRAC(1,3)+8, RGN_FRAC(1,3)+12, 8, 12 },
-	{ 0*8, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8 },
+	{ STEP8(0,16) },
 	16*8
 };
 
@@ -742,7 +754,7 @@ static const gfx_layout pftoplayout =
 	6,
 	{ RGN_FRAC(2,3)+0, RGN_FRAC(2,3)+4, 0, 0, 0, 0 },
 	{ 3, 2, 1, 0, 11, 10, 9, 8 },
-	{ 0*8, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8 },
+	{ STEP8(0,16) },
 	16*8
 };
 
@@ -752,14 +764,14 @@ static const gfx_layout anlayout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
 	32*8
 };
 
 
-static GFXDECODE_START( atarigt )
+static GFXDECODE_START( gfx_atarigt )
 	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 0x000, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, anlayout, 0x000, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x000, 64 )
@@ -794,24 +806,17 @@ static const atari_rle_objects_config modesc =
 MACHINE_CONFIG_START(atarigt_state::atarigt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_50MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(atarigt_state, scanline_int_gen, 250)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, ATARI_CLOCK_50MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(atarigt_state, scanline_int_gen, 250)
 
 	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16) // should be 447 kHz according to schematics, but that fails the self-test
-	MCFG_ADC0808_IN2_CB(IOPORT("AN4"))
-	MCFG_ADC0808_IN3_CB(IOPORT("AN1"))
-	MCFG_ADC0808_IN6_CB(IOPORT("AN2"))
-	MCFG_ADC0808_IN7_CB(IOPORT("AN3"))
-
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarigt)
-	MCFG_PALETTE_ADD("palette", 32768)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigt)
+	MCFG_PALETTE_ADD("palette", MRAM_ENTRIES)
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigt_state, get_playfield_tile_info, 8,8, atarigt_playfield_scan, 128,64)
 	MCFG_TILEMAP_ADD_STANDARD("alpha", "gfxdecode", 2, atarigt_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64, 32)
@@ -822,39 +827,44 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	/* the board uses a pair of GALs to determine H and V parameters */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarigt_state, screen_update_atarigt)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarigt_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarigt_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(atarigt_state,atarigt)
 
-	MCFG_ATARIRLE_ADD("rle", modesc)
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc);
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(atarigt_state::tmek)
-	atarigt(config);
 	/* sound hardware */
-	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
-	MCFG_ATARI_CAGE_SPEEDUP(0x4fad)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))
+	ATARI_CAGE(config, m_cage, 0);
+	m_cage->irq_handler().set(FUNC(atarigt_state::cage_irq_callback));
+
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(atarigt_state::primrage)
+void atarigt_state::tmek(machine_config &config)
+{
 	atarigt(config);
-	/* sound hardware */
-	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
-	MCFG_ATARI_CAGE_SPEEDUP(0x42f2)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))
-	MCFG_DEVICE_REMOVE("adc")
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(atarigt_state::primrage20)
+	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16); // should be 447 kHz according to schematics, but that fails the self-test
+	m_adc->in_callback<2>().set_ioport("AN4");
+	m_adc->in_callback<3>().set_ioport("AN1");
+	m_adc->in_callback<6>().set_ioport("AN2");
+	m_adc->in_callback<7>().set_ioport("AN3");
+
+	m_cage->set_speedup(0x4fad);
+}
+
+void atarigt_state::primrage(machine_config &config)
+{
 	atarigt(config);
-	/* sound hardware */
-	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
-	MCFG_ATARI_CAGE_SPEEDUP(0x48a4)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))
-	MCFG_DEVICE_REMOVE("adc")
-MACHINE_CONFIG_END
+
+	m_cage->set_speedup(0x42f2);
+}
+
+void atarigt_state::primrage20(machine_config &config)
+{
+	atarigt(config);
+
+	m_cage->set_speedup(0x48a4);
+}
 
 /*************************************
  *
@@ -869,7 +879,7 @@ ROM_START( tmek )
 	ROM_LOAD32_BYTE( "0042d", 0x00002, 0x20000, CRC(ef9feda4) SHA1(9fb6e91d4c22e28ced61d0d1f28f5e43191c8762) )
 	ROM_LOAD32_BYTE( "0041d", 0x00003, 0x20000, CRC(179da056) SHA1(5f7ddf44aab55beaf2c377b0c93279acb6273255) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "0078c", 0x000000, 0x080000, CRC(ff5b979a) SHA1(deb8ee454b6b7c7bddb2ba0c808869e45b19e55f) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -924,7 +934,7 @@ ROM_START( tmek51p )
 	ROM_LOAD32_BYTE( "prog2", 0x00002, 0x20000, CRC(bdcf5942) SHA1(21c54694bfe1e5663e67a54afed2a0f37b0f00de) )
 	ROM_LOAD32_BYTE( "prog3", 0x00003, 0x20000, CRC(7b59022a) SHA1(7395063ff0ecda0453dc7d981ca0b90b8411b715) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "0078c", 0x000000, 0x080000, CRC(ff5b979a) SHA1(deb8ee454b6b7c7bddb2ba0c808869e45b19e55f) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -979,7 +989,7 @@ ROM_START( tmek45 )
 	ROM_LOAD32_BYTE( "0042c", 0x00002, 0x20000, CRC(ba8745be) SHA1(139a3132ea2c69e37e63868402fcf10852953e9b) )
 	ROM_LOAD32_BYTE( "0041c", 0x00003, 0x20000, CRC(0285bc17) SHA1(346d9fcbea4b22986be04971074531bc0c014c79) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "0078b", 0x000000, 0x080000, CRC(a952771c) SHA1(49982ea864a99c07f45886ada7e2c9427a75f775) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -1034,7 +1044,7 @@ ROM_START( tmek44 )
 	ROM_LOAD32_BYTE( "0042b", 0x00002, 0x20000, CRC(ce68a9b3) SHA1(47b7a0ac8cce3d40f3f7559ec1b137dfdeaf1d83) )
 	ROM_LOAD32_BYTE( "0041b", 0x00003, 0x20000, CRC(b71ec759) SHA1(d4bed4bbab2c3bd278da4cd0f53580d7f66d8152) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "0078a", 0x000000, 0x080000, CRC(314d736f) SHA1(b23946fde6ea47d6a6e3430a9df4b06d453a94c8) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -1089,7 +1099,7 @@ ROM_START( tmek20 )
 	ROM_LOAD32_BYTE( "pgm2", 0x00002, 0x20000, CRC(ce9a77d4) SHA1(025143b59d85180286086940b05c8e5ea0b4a7fe) )
 	ROM_LOAD32_BYTE( "pgm3", 0x00003, 0x20000, CRC(28b0e210) SHA1(7567671beecc7d30e9d4b61cf7d3448bb1dbb072) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "0078", 0x000000, 0x080000, BAD_DUMP CRC(314d736f) SHA1(b23946fde6ea47d6a6e3430a9df4b06d453a94c8) ) // not dumped from this pcb, rom taken from another set instead
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -1144,7 +1154,7 @@ ROM_START( primrage )
 	ROM_LOAD32_BYTE( "136102-1042b.27l", 0x000002, 0x80000, CRC(750e8095) SHA1(4660637136b1a25169d8c43646c8b87081763987) )
 	ROM_LOAD32_BYTE( "136102-1041b.25l", 0x000003, 0x80000, CRC(6a90d283) SHA1(7c18c97cb5e5cdd26a52cd6bc099fbce87055311) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "136102-1078a.11a", 0x000000, 0x080000, CRC(0656435f) SHA1(f8e498171e754eb8703dad6b2351509bbb27e06b) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -1230,7 +1240,7 @@ ROM_START( primrage20 )
 	ROM_LOAD32_BYTE( "136102-0042b.27l", 0x000002, 0x80000, CRC(cd6062b9) SHA1(2973fb561ab68cd48ec132b6720c04d10bedfd19) )
 	ROM_LOAD32_BYTE( "136102-0041b.25l", 0x000003, 0x80000, CRC(3008f6f0) SHA1(45aac457b4584ee3bd3561e3b2e34e49aa61fbc5) )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "136102-0078a.11a", 0x000000, 0x080000, CRC(91df8d8f) SHA1(6d361f88de604b8f11dd9bfe85ff18bcd322862d) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -1306,9 +1316,9 @@ WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 	m_playfield_tilemap->write32(space, offset, data, mem_mask);
 }
 
-DRIVER_INIT_MEMBER(atarigt_state,tmek)
+void atarigt_state::init_tmek()
 {
-	m_is_primrage = 0;
+	m_is_primrage = false;
 
 	/* setup protection */
 	m_protection_r = &atarigt_state::tmek_protection_r;
@@ -1319,13 +1329,16 @@ DRIVER_INIT_MEMBER(atarigt_state,tmek)
 }
 
 
-DRIVER_INIT_MEMBER(atarigt_state,primrage)
+void atarigt_state::init_primrage()
 {
-	m_is_primrage = 1;
+	m_is_primrage = true;
 
 	/* install protection */
 	m_protection_r = &atarigt_state::primrage_protection_r;
 	m_protection_w = &atarigt_state::primrage_protection_w;
+
+	m_protdata = make_unique_clear<uint8_t[]>(0x800);
+	save_pointer(NAME(m_protdata), 0x800);
 }
 
 /*************************************
@@ -1334,10 +1347,10 @@ DRIVER_INIT_MEMBER(atarigt_state,primrage)
  *
  *************************************/
 
-GAME( 1994, tmek,       0,        tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek51p,    tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek45,     tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek44,     tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek20,     tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", 0 )
-GAME( 1994, primrage,   0,        primrage,  primrage, atarigt_state, primrage, ROT0, "Atari Games", "Primal Rage (version 2.3)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, primrage20, primrage, primrage20,primrage, atarigt_state, primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek,       0,        tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek51p,    tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek45,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek44,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek20,     tmek,     tmek,       tmek,     atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", 0 )
+GAME( 1994, primrage,   0,        primrage,   primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, primrage20, primrage, primrage20, primrage, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION )

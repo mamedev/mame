@@ -31,15 +31,16 @@ public:
 			m_subcpu(*this, "subcpu")
 	{ }
 
+	void m74(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void m74(machine_config &config);
 	void c68_map(address_map &map);
 	void sub_map(address_map &map);
-protected:
 
 	// devices
 	required_device<m37450_device> m_maincpu;
@@ -81,11 +82,11 @@ static INPUT_PORTS_START( m74 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(m74_state::m74)
-	MCFG_CPU_ADD("maincpu", M37450, XTAL(8'000'000)) /* C68 @ 8.0MHz - main CPU */
-	MCFG_CPU_PROGRAM_MAP(c68_map)
+	MCFG_DEVICE_ADD("maincpu", M37450, XTAL(8'000'000)) /* C68 @ 8.0MHz - main CPU */
+	MCFG_DEVICE_PROGRAM_MAP(c68_map)
 
-	MCFG_CPU_ADD("subcpu", TMPZ84C011, XTAL(12'000'000) / 3)  /* Z84C011 @ 4 MHz - sub CPU */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("subcpu", TMPZ84C011, XTAL(12'000'000) / 3)  /* Z84C011 @ 4 MHz - sub CPU */
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -94,8 +95,8 @@ MACHINE_CONFIG_START(m74_state::m74)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -113,4 +114,4 @@ ROM_START(shootaw2)
 	ROM_LOAD( "unknown_label.5e", 0x000000, 0x040000, CRC(fa75e91e) SHA1(d06ca906135a3f23c1f0dadff75f940ea7ca0e4a) )
 ROM_END
 
-GAME( 1996,  shootaw2,  0,  m74,  m74, m74_state,  0,  ROT0,  "Namco",    "Shoot Away II", MACHINE_NOT_WORKING )
+GAME( 1996,  shootaw2,  0,  m74,  m74, m74_state, empty_init, ROT0, "Namco", "Shoot Away II", MACHINE_NOT_WORKING )

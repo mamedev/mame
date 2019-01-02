@@ -252,12 +252,12 @@ void naughtyb_state::naughtyb_map(address_map &map)
 	map(0x4000, 0x7fff).ram();
 	map(0x8000, 0x87ff).ram().share("videoram");
 	map(0x8800, 0x8fff).ram().share("videoram2");
-	map(0x9000, 0x97ff).w(this, FUNC(naughtyb_state::naughtyb_videoreg_w));
+	map(0x9000, 0x97ff).w(FUNC(naughtyb_state::naughtyb_videoreg_w));
 	map(0x9800, 0x9fff).ram().share("scrollreg");
 	map(0xa000, 0xa7ff).w(m_naughtyb_custom, FUNC(naughtyb_sound_device::control_a_w));
 	map(0xa800, 0xafff).w(m_naughtyb_custom, FUNC(naughtyb_sound_device::control_b_w));
-	map(0xb000, 0xb7ff).r(this, FUNC(naughtyb_state::in0_port_r));    // IN0
-	map(0xb800, 0xbfff).r(this, FUNC(naughtyb_state::dsw0_port_r));   // DSW0
+	map(0xb000, 0xb7ff).r(FUNC(naughtyb_state::in0_port_r));    // IN0
+	map(0xb800, 0xbfff).r(FUNC(naughtyb_state::dsw0_port_r));   // DSW0
 }
 
 void naughtyb_state::popflame_map(address_map &map)
@@ -266,12 +266,12 @@ void naughtyb_state::popflame_map(address_map &map)
 	map(0x4000, 0x7fff).ram();
 	map(0x8000, 0x87ff).ram().share("videoram");
 	map(0x8800, 0x8fff).ram().share("videoram2");
-	map(0x9000, 0x97ff).w(this, FUNC(naughtyb_state::popflame_videoreg_w));
+	map(0x9000, 0x97ff).w(FUNC(naughtyb_state::popflame_videoreg_w));
 	map(0x9800, 0x9fff).ram().share("scrollreg");
 	map(0xa000, 0xa7ff).w(m_popflame_custom, FUNC(popflame_sound_device::control_a_w));
 	map(0xa800, 0xafff).w(m_popflame_custom, FUNC(popflame_sound_device::control_b_w));
-	map(0xb000, 0xb7ff).r(this, FUNC(naughtyb_state::in0_port_r));    // IN0
-	map(0xb800, 0xbfff).r(this, FUNC(naughtyb_state::dsw0_port_r));   // DSW0
+	map(0xb000, 0xb7ff).r(FUNC(naughtyb_state::in0_port_r));    // IN0
+	map(0xb800, 0xbfff).r(FUNC(naughtyb_state::dsw0_port_r));   // DSW0
 }
 
 
@@ -402,83 +402,62 @@ static const gfx_layout charlayout =
 
 
 
-static GFXDECODE_START( naughtyb )
+static GFXDECODE_START( gfx_naughtyb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 32*4, 32 )
 GFXDECODE_END
 
-
-MACHINE_CONFIG_START(naughtyb_state::naughtyb)
-
+void naughtyb_state::naughtyb_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
-	MCFG_CPU_PROGRAM_MAP(naughtyb_map)
+	Z80(config, m_maincpu, CLOCK_XTAL / 4); /* 12 MHz clock, divided by 4. CPU is a Z80A */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(naughtyb_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(36*8, 28*8);
+	m_screen->set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(naughtyb_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", naughtyb)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(naughtyb_state, naughtyb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_naughtyb);
+	PALETTE(config, m_palette, FUNC(naughtyb_state::naughtyb_palette), 256);
 
 	/* sound hardware */
 	/* uses the TMS3615NS for sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_TMS36XX_ADD("tms", 350)
-	MCFG_TMS36XX_TYPE(TMS3615)
-	MCFG_TMS36XX_DECAY_TIMES(0.15, 0.20, 0, 0, 0, 0)
+	tms36xx_device &tms(TMS36XX(config, "tms", 350));
+	tms.set_subtype(tms36xx_device::subtype::TMS3615);
+	tms.set_decays(0.15, 0.20, 0, 0, 0, 0);
 	// NOTE: it's unknown if the TMS3615 mixes more than one voice internally.
 	// A wav taken from Pop Flamer sounds like there are at least no 'odd'
 	// harmonics (5 1/3' and 2 2/3')
-	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+	tms.add_route(0, "mono", 0.60);
+}
 
-	MCFG_SOUND_ADD("naughtyb_custom", NAUGHTYB, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-MACHINE_CONFIG_END
+void naughtyb_state::naughtyb(machine_config &config)
+{
+	naughtyb_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &naughtyb_state::naughtyb_map);
+
+	NAUGHTYB_SOUND(config, m_naughtyb_custom);
+	m_naughtyb_custom->add_route(0, "mono", 0.40);
+}
 
 
 /* Exactly the same but for certain address writes */
-MACHINE_CONFIG_START(naughtyb_state::popflame)
+void naughtyb_state::popflame(machine_config &config)
+{
+	naughtyb_base(config);
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
-	MCFG_CPU_PROGRAM_MAP(popflame_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &naughtyb_state::popflame_map);
 
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(naughtyb_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", naughtyb)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(naughtyb_state, naughtyb)
-
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_TMS36XX_ADD("tms", 350)
-	MCFG_TMS36XX_TYPE(TMS3615)
-	MCFG_TMS36XX_DECAY_TIMES(0.15, 0.20, 0, 0, 0, 0)
-	// NOTE: it's unknown if the TMS3615 mixes more than one voice internally.
-	// A wav taken from Pop Flamer sounds like there are at least no 'odd'
-	// harmonics (5 1/3' and 2 2/3')
-	MCFG_SOUND_ROUTE(0, "mono", 0.60)
-
-	MCFG_SOUND_ADD("popflame_custom", POPFLAME, 0)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-MACHINE_CONFIG_END
+	POPFLAME_SOUND(config, m_popflame_custom);
+	m_popflame_custom->add_route(0, "mono", 1.0);
+}
 
 
 
@@ -542,6 +521,34 @@ ROM_START( naughtyba )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "6301-1.63", 0x0000, 0x0100, CRC(98ad89a1) SHA1(ddee7dcb003b66fbc7d6d6e90d499ed090c59227) ) /* palette low bits */
 	ROM_LOAD( "6301-1.64", 0x0100, 0x0100, CRC(909107d4) SHA1(138ace7845424bc3ca86b0889be634943c8c2d19) ) /* palette high bits */
+ROM_END
+
+ROM_START( naughtybb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",       0x0000, 0x0800, CRC(31d27637) SHA1(c9940dae8f715109faab56067e5dfc03b91271e2) )
+	ROM_LOAD( "2.bin",       0x0800, 0x0800, CRC(a24674b4) SHA1(2d93981c2f0dea190745cbc3926b012cfd561ec3) )
+	ROM_LOAD( "3.bin",       0x1000, 0x0800, CRC(004d0ba7) SHA1(5c182fa6f65f7caa3459fcc5cdc3b7faa8b34769) )
+	ROM_LOAD( "4.bin",       0x1800, 0x0800, CRC(3c7bcac6) SHA1(ef291cd5b2f8a64999dc015e16d3ea479fefaf8f) )
+	ROM_LOAD( "5.bin",       0x2000, 0x0800, CRC(e282f1b8) SHA1(9eb7b2fed75cd23f3c90e445021f23648503c96f) )
+	ROM_LOAD( "6.bin",       0x2800, 0x0800, CRC(61178ff2) SHA1(2a7fb894e7fc5ec170d00d24300f1e23307f9687) )
+	ROM_LOAD( "7.bin",       0x3000, 0x0800, CRC(ba4079f0) SHA1(4e7afa8becc1ef3125933eaf558c331b73076b17) )
+	ROM_LOAD( "8.bin",       0x3800, 0x0800, CRC(17c3b6fb) SHA1(c01c8ae27f5b9be90778f7c459c5ba0dddf443ba) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "105.bin",     0x0000, 0x0800, CRC(d692f9c7) SHA1(3573c518868690b140340d19f88c670026a6696d) )
+	ROM_LOAD( "106.bin",     0x0800, 0x0800, CRC(d3ba8b27) SHA1(0ff14b8b983ab75870fb19b64327070ccd0888d6) )
+	ROM_LOAD( "103.bin",     0x1000, 0x0800, CRC(c1669cd5) SHA1(9b4370ed54424e3615fa2e4d07cadae37ab8cd10) )
+	ROM_LOAD( "104.bin",     0x1800, 0x0800, CRC(eef2c8e5) SHA1(5077c4052342958ee26c25047704c62eed44eb89) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "101.bin",     0x0000, 0x0800, CRC(75ec9710) SHA1(b41606930eff79ccf5bfcad01362251d7bab114a) )
+	ROM_LOAD( "102.bin",     0x0800, 0x0800, CRC(0802d460) SHA1(d44c31e162a3a19572fec886e6ebc3b8fb4614ea) )
+	ROM_LOAD( "99.bin",      0x1000, 0x0800, CRC(8c8db764) SHA1(2641a1b8bc30896293ebd9396e304ce5eb7eb705) )
+	ROM_LOAD( "100.bin",     0x1800, 0x0800, CRC(c97c97b9) SHA1(5da7fb378e85b6c9d5ab6e75544f1e64fae9997a) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "am27s1.2", 0x0000, 0x0100, CRC(98ad89a1) SHA1(ddee7dcb003b66fbc7d6d6e90d499ed090c59227) ) /* palette low bits */
+	ROM_LOAD( "am27s1.1", 0x0100, 0x0100, CRC(909107d4) SHA1(138ace7845424bc3ca86b0889be634943c8c2d19) ) /* palette high bits */
 ROM_END
 
 ROM_START( naughtybc )
@@ -647,7 +654,7 @@ All eproms are 2716
 
 Note
 
-This romset comes from a bootleg pcb.It's a Naughty Boy conversion.
+This romset comes from a bootleg pcb. It's a Naughty Boy conversion.
 */
 
 ROM_START( popflamen )
@@ -829,7 +836,7 @@ ROM_START( trvgns )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(naughtyb_state,popflame)
+void naughtyb_state::init_popflame()
 {
 	/* install a handler to catch protection checks */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9000, 0x9000, read8_delegate(FUNC(naughtyb_state::popflame_protection_r),this));
@@ -864,7 +871,7 @@ WRITE8_MEMBER(naughtyb_state::trvmstr_questions_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(naughtyb_state,trvmstr)
+void naughtyb_state::init_trvmstr()
 {
 	/* install questions' handlers  */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xc002, read8_delegate(FUNC(naughtyb_state::trvmstr_questions_r),this), write8_delegate(FUNC(naughtyb_state::trvmstr_questions_w),this));
@@ -873,15 +880,16 @@ DRIVER_INIT_MEMBER(naughtyb_state,trvmstr)
 }
 
 
-GAME( 1982, naughtyb, 0,        naughtyb, naughtyb, naughtyb_state, 0,        ROT90, "Jaleco", "Naughty Boy", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, naughtyba,naughtyb, naughtyb, naughtyb, naughtyb_state, 0,        ROT90, "bootleg", "Naughty Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, naughtybc,naughtyb, naughtyb, naughtyb, naughtyb_state, 0,        ROT90, "Jaleco (Cinematronics license)", "Naughty Boy (Cinematronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popflame, 0,        popflame, naughtyb, naughtyb_state, popflame, ROT90, "Jaleco", "Pop Flamer (protected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popflamea,popflame, popflame, naughtyb, naughtyb_state, 0,        ROT90, "Jaleco", "Pop Flamer (not protected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popflameb,popflame, popflame, naughtyb, naughtyb_state, 0,        ROT90, "Jaleco", "Pop Flamer (hack?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, popflamen,popflame, naughtyb, naughtyb, naughtyb_state, 0,        ROT90, "Jaleco", "Pop Flamer (bootleg on Naughty Boy PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvmstr,  0,        naughtyb, trvmstr,  naughtyb_state, trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvmstra, trvmstr,  naughtyb, trvmstr,  naughtyb_state, trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvmstrb, trvmstr,  naughtyb, trvmstr,  naughtyb_state, trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvmstrc, trvmstr,  naughtyb, trvmstr,  naughtyb_state, trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvgns,   trvmstr,  naughtyb, trvmstr,  naughtyb_state, trvmstr,  ROT90, "bootleg", "Trivia Genius", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, naughtyb,  0,        naughtyb, naughtyb, naughtyb_state, empty_init,    ROT90, "Jaleco", "Naughty Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, naughtyba, naughtyb, naughtyb, naughtyb, naughtyb_state, empty_init,    ROT90, "bootleg", "Naughty Boy (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, naughtybb, naughtyb, naughtyb, naughtyb, naughtyb_state, empty_init,    ROT90, "bootleg", "Naughty Boy (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, naughtybc, naughtyb, naughtyb, naughtyb, naughtyb_state, empty_init,    ROT90, "Jaleco (Cinematronics license)", "Naughty Boy (Cinematronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popflame,  0,        popflame, naughtyb, naughtyb_state, init_popflame, ROT90, "Jaleco", "Pop Flamer (protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popflamea, popflame, popflame, naughtyb, naughtyb_state, empty_init,    ROT90, "Jaleco", "Pop Flamer (not protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popflameb, popflame, popflame, naughtyb, naughtyb_state, empty_init,    ROT90, "Jaleco", "Pop Flamer (hack?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popflamen, popflame, naughtyb, naughtyb, naughtyb_state, empty_init,    ROT90, "Jaleco", "Pop Flamer (bootleg on Naughty Boy PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmstr,   0,        naughtyb, trvmstr,  naughtyb_state, init_trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmstra,  trvmstr,  naughtyb, trvmstr,  naughtyb_state, init_trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmstrb,  trvmstr,  naughtyb, trvmstr,  naughtyb_state, init_trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmstrc,  trvmstr,  naughtyb, trvmstr,  naughtyb_state, init_trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvgns,    trvmstr,  naughtyb, trvmstr,  naughtyb_state, init_trvmstr,  ROT90, "bootleg", "Trivia Genius", MACHINE_SUPPORTS_SAVE )

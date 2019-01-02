@@ -15,12 +15,12 @@ class acd_state : public driver_device
 public:
 	acd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//      , m_maincpu(*this, "maincpu")
+		//      , m_maincpu(*this, "maincpu")
 	{ }
 
-void acd(machine_config &config);
+	void acd(machine_config &config);
 private:
-//  required_device<cpu_device> m_maincpu;
+	//  required_device<cpu_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( acd )
@@ -42,4 +42,4 @@ ROM_START( acd )
 	ROM_LOAD( "d9_cpu_b14_rev_1.2.bin", 0x000000, 0x000200, CRC(5572ff8b) SHA1(9e8158c338b2798f7fb1d9c4fa6dd99592d2fae3) )
 ROM_END
 
-COMP( 198?, acd, 0, 0, acd, acd, acd_state, 0, "Advanced Computer Design", "unknown ACD computer", MACHINE_IS_SKELETON )
+COMP( 198?, acd, 0, 0, acd, acd, acd_state, empty_init, "Advanced Computer Design", "unknown ACD computer", MACHINE_IS_SKELETON )

@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(I8156, i8156_device, "i8156", "Intel 8156 RAM, I/O & Timer")
 
 #define LOG_PORT (1U << 0)
 #define LOG_TIMER (1U << 1)
-#define VERBOSE (LOG_PORT | LOG_TIMER)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 enum
@@ -102,18 +102,6 @@ enum
 #define TIMER_MODE_MASK             0xc0
 #define TIMER_MODE_AUTO_RELOAD      0x40
 #define TIMER_MODE_TC_PULSE         0x80
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// default address map
-void i8155_device::i8155(address_map &map)
-{
-	map(0x00, 0xff).ram();
-}
 
 
 
@@ -272,7 +260,6 @@ i8155_device::i8155_device(const machine_config &mconfig, const char *tag, devic
 
 i8155_device::i8155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
-		device_memory_interface(mconfig, *this),
 		m_in_pa_cb(*this),
 		m_in_pb_cb(*this),
 		m_in_pc_cb(*this),
@@ -286,8 +273,7 @@ i8155_device::i8155_device(const machine_config &mconfig, device_type type, cons
 		m_count_loaded(0),
 		m_counter(0),
 		m_count_extra(false),
-		m_to(0),
-		m_space_config("ram", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(), address_map_constructor(FUNC(i8155_device::i8155), this))
+		m_to(0)
 {
 }
 
@@ -317,6 +303,9 @@ void i8155_device::device_start()
 	m_out_pc_cb.resolve_safe();
 	m_out_to_cb.resolve_safe();
 
+	// allocate RAM
+	m_ram = make_unique_clear<uint8_t[]>(256);
+
 	// allocate timers
 	m_timer = timer_alloc();
 
@@ -326,6 +315,7 @@ void i8155_device::device_start()
 	save_item(NAME(m_command));
 	save_item(NAME(m_status));
 	save_item(NAME(m_output));
+	save_pointer(NAME(m_ram), 256);
 	save_item(NAME(m_count_length));
 	save_item(NAME(m_count_loaded));
 	save_item(NAME(m_count_extra));
@@ -409,19 +399,6 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			timer_reload_count();
 		}
 	}
-}
-
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-device_memory_interface::space_config_vector i8155_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
-	};
 }
 
 
@@ -574,7 +551,7 @@ WRITE8_MEMBER( i8155_device::io_w )
 
 READ8_MEMBER( i8155_device::memory_r )
 {
-	return this->space().read_byte(offset);
+	return m_ram[offset & 0xff];
 }
 
 
@@ -584,7 +561,7 @@ READ8_MEMBER( i8155_device::memory_r )
 
 WRITE8_MEMBER( i8155_device::memory_w )
 {
-	this->space().write_byte(offset, data);
+	m_ram[offset & 0xff] = data;
 }
 
 

@@ -108,12 +108,13 @@ namespace
 //**************************************************************************
 
 MACHINE_CONFIG_START(coco_orch90_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // ls374.ic5 + r7 (8x20k) + r9 (8x10k)
-	MCFG_SOUND_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // ls374.ic4 + r6 (8x20k) + r8 (8x10k)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // ls374.ic5 + r7 (8x20k) + r9 (8x10k)
+	MCFG_DEVICE_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // ls374.ic4 + r6 (8x20k) + r8 (8x10k)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -121,4 +122,4 @@ MACHINE_CONFIG_END
 //  DEVICE DECLARATION
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(COCO_ORCH90, coco_orch90_device, "coco_orch90", "CoCo Orch-90 PAK")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_ORCH90, device_cococart_interface, coco_orch90_device, "coco_orch90", "CoCo Orch-90 PAK")

@@ -86,7 +86,7 @@ READ8_MEMBER(blueprnt_state::grasspin_sh_dipsw_r)
 WRITE8_MEMBER(blueprnt_state::blueprnt_sound_command_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE8_MEMBER(blueprnt_state::blueprnt_coin_counter_w)
@@ -105,21 +105,21 @@ void blueprnt_state::blueprnt_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); // service mode checks for 8 chips = 64K
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x93ff).ram().w(this, FUNC(blueprnt_state::blueprnt_videoram_w)).mirror(0x400).share("videoram");
+	map(0x9000, 0x93ff).ram().w(FUNC(blueprnt_state::blueprnt_videoram_w)).mirror(0x400).share("videoram");
 	map(0xa000, 0xa0ff).ram().share("scrollram");
 	map(0xb000, 0xb0ff).ram().share("spriteram");
-	map(0xc000, 0xc000).portr("P1").w(this, FUNC(blueprnt_state::blueprnt_coin_counter_w));
+	map(0xc000, 0xc000).portr("P1").w(FUNC(blueprnt_state::blueprnt_coin_counter_w));
 	map(0xc001, 0xc001).portr("P2");
-	map(0xc003, 0xc003).r(this, FUNC(blueprnt_state::blueprnt_sh_dipsw_r));
-	map(0xd000, 0xd000).w(this, FUNC(blueprnt_state::blueprnt_sound_command_w));
-	map(0xe000, 0xe000).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(this, FUNC(blueprnt_state::blueprnt_flipscreen_w));
-	map(0xf000, 0xf3ff).ram().w(this, FUNC(blueprnt_state::blueprnt_colorram_w)).mirror(0x400).share("colorram");
+	map(0xc003, 0xc003).r(FUNC(blueprnt_state::blueprnt_sh_dipsw_r));
+	map(0xd000, 0xd000).w(FUNC(blueprnt_state::blueprnt_sound_command_w));
+	map(0xe000, 0xe000).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(blueprnt_state::blueprnt_flipscreen_w));
+	map(0xf000, 0xf3ff).ram().w(FUNC(blueprnt_state::blueprnt_colorram_w)).mirror(0x400).share("colorram");
 }
 
 void blueprnt_state::grasspin_map(address_map &map)
 {
 	blueprnt_map(map);
-	map(0xc003, 0xc003).r(this, FUNC(blueprnt_state::grasspin_sh_dipsw_r));
+	map(0xc003, 0xc003).r(FUNC(blueprnt_state::grasspin_sh_dipsw_r));
 }
 
 
@@ -322,7 +322,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( blueprnt )
+static GFXDECODE_START( gfx_blueprnt )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar,     0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     128*4,   1 )
 GFXDECODE_END
@@ -349,19 +349,19 @@ void blueprnt_state::machine_reset()
 MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 7000000/2) // 3.5 MHz
-	MCFG_CPU_PROGRAM_MAP(blueprnt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blueprnt_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 7000000/2) // 3.5 MHz
+	MCFG_DEVICE_PROGRAM_MAP(blueprnt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blueprnt_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 10000000/2/2/2)   // 1.25 MHz (2H)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(blueprnt_state, irq0_line_hold,  4*60) // IRQs connected to 32V
+	MCFG_DEVICE_ADD("audiocpu", Z80, 10000000/2/2/2)   // 1.25 MHz (2H)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(blueprnt_state, irq0_line_hold,  4*60) // IRQs connected to 32V
 									// NMIs are caused by the main CPU
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -371,34 +371,33 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_VIDEO_START_OVERRIDE(blueprnt_state, blueprnt)
 	MCFG_SCREEN_UPDATE_DRIVER(blueprnt_state, screen_update_blueprnt)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blueprnt)
-	MCFG_PALETTE_ADD("palette", 128*4+8)
-	MCFG_PALETTE_INIT_OWNER(blueprnt_state, blueprnt)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_blueprnt)
+	PALETTE(config, m_palette, FUNC(blueprnt_state::blueprnt_palette), 128*4+8);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ay1", AY8910, 10000000/2/2/2)
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(blueprnt_state, dipsw_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", 10000000/2/2/2));
+	ay1.port_b_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	ay1.port_a_write_callback().set(FUNC(blueprnt_state::dipsw_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_SOUND_ADD("ay2", AY8910, 10000000/2/2/2/2)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DILSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DILSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", 10000000/2/2/2/2));
+	ay2.port_a_read_callback().set_ioport("DILSW1");
+	ay2.port_b_read_callback().set_ioport("DILSW2");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(blueprnt_state::grasspin)
 	blueprnt(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(grasspin_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(grasspin_map)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -503,7 +502,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, blueprnt,  0,        blueprnt, blueprnt, blueprnt_state, 0, ROT270, "Zilec Electronics / Bally Midway", "Blue Print (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, blueprntj, blueprnt, blueprnt, blueprnt, blueprnt_state, 0, ROT270, "Zilec Electronics / Jaleco",       "Blue Print (Jaleco)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, saturnzi,  0,        blueprnt, saturn,   blueprnt_state, 0, ROT270, "Zilec Electronics / Jaleco",       "Saturn", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, grasspin,  0,        grasspin, grasspin, blueprnt_state, 0, ROT270, "Zilec Electronics / Jaleco",       "Grasspin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // a few issues with dip reading + video hw, but nothing major
+GAME( 1982, blueprnt,  0,        blueprnt, blueprnt, blueprnt_state, empty_init, ROT270, "Zilec Electronics / Bally Midway", "Blue Print (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, blueprntj, blueprnt, blueprnt, blueprnt, blueprnt_state, empty_init, ROT270, "Zilec Electronics / Jaleco",       "Blue Print (Jaleco)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, saturnzi,  0,        blueprnt, saturn,   blueprnt_state, empty_init, ROT270, "Zilec Electronics / Jaleco",       "Saturn", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, grasspin,  0,        grasspin, grasspin, blueprnt_state, empty_init, ROT270, "Zilec Electronics / Jaleco",       "Grasspin", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // a few issues with dip reading + video hw, but nothing major

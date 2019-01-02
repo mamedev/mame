@@ -45,7 +45,7 @@
 
 #define PPC    m_ppc.w.h
 
-#define FETCH() m_direct->read_word(rPC++)
+#define FETCH() m_cache->read_word(rPC++)
 #define PROGRAM_WORD(a) m_program->read_word(a)
 #define GET_PPC_OFFS() PPC
 
@@ -522,7 +522,7 @@ void ssp1601_device::device_start()
 
 	m_gr[0].w.h = 0xffff; // constant reg
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-1>();
+	m_cache = m_program->cache<1, -1, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	state_add( SSP_R0,     "REG0",   m_gr[0].w.h).formatstr("%04X");

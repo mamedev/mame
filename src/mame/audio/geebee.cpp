@@ -13,10 +13,10 @@
 #include "audio/geebee.h"
 
 
-DEFINE_DEVICE_TYPE(GEEBEE, geebee_sound_device, "geebee_sound", "Gee Bee Custom Sound")
+DEFINE_DEVICE_TYPE(GEEBEE_SOUND, geebee_sound_device, "geebee_sound", "Gee Bee Custom Sound")
 
 geebee_sound_device::geebee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GEEBEE, tag, owner, clock),
+	: device_t(mconfig, GEEBEE_SOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_decay(nullptr),
 		m_channel(nullptr),
@@ -42,7 +42,7 @@ void geebee_sound_device::device_start()
 		m_decay[0x7fff - i] = (int16_t) (0x7fff/exp(1.0*i/4096));
 
 	/* 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz */
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, 18432000 / 3 / 2 / 384);
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 3 / 2 / 384);
 	m_vcount = 0;
 
 	m_volume_timer = timer_alloc(TIMER_VOLUME_DECAY);

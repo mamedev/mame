@@ -35,6 +35,7 @@
 #include "sound/k053260.h"
 #include "sound/ym2151.h"
 #include "video/k053250.h"
+#include "emupal.h"
 #include "speaker.h"
 
 #include "overdriv.lh"
@@ -108,7 +109,7 @@ WRITE16_MEMBER(overdriv_state::cpuA_ctrl_w)
 
 		/* bit 1 is clear during service mode - function unknown */
 
-		output().set_led_value(0, data & 0x08);
+		m_led = BIT(data, 3);
 		machine().bookkeeping().coin_counter_w(0, data & 0x10);
 		machine().bookkeeping().coin_counter_w(1, data & 0x20);
 
@@ -172,16 +173,16 @@ void overdriv_state::overdriv_master_map(address_map &map)
 	map(0x1d0000, 0x1d001f).w(m_k053251, FUNC(k053251_device::msb_w));
 	map(0x1d8000, 0x1d8003).rw("k053260_1", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x1e0000, 0x1e0003).rw("k053260_2", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x1e8000, 0x1e8001).w(this, FUNC(overdriv_state::overdriv_soundirq_w));
-	map(0x1f0000, 0x1f0001).w(this, FUNC(overdriv_state::cpuA_ctrl_w));  /* halt cpu B, coin counter, start lamp, other? */
-	map(0x1f8000, 0x1f8001).w(this, FUNC(overdriv_state::eeprom_w));
+	map(0x1e8000, 0x1e8001).w(FUNC(overdriv_state::overdriv_soundirq_w));
+	map(0x1f0000, 0x1f0001).w(FUNC(overdriv_state::cpuA_ctrl_w));  /* halt cpu B, coin counter, start lamp, other? */
+	map(0x1f8000, 0x1f8001).w(FUNC(overdriv_state::eeprom_w));
 	map(0x200000, 0x203fff).ram().share("share1");
 	map(0x210000, 0x210fff).rw(m_k051316_1, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
 	map(0x218000, 0x218fff).rw(m_k051316_2, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
 	map(0x220000, 0x220fff).r(m_k051316_1, FUNC(k051316_device::rom_r)).umask16(0xff00);
 	map(0x228000, 0x228fff).r(m_k051316_2, FUNC(k051316_device::rom_r)).umask16(0xff00);
-	map(0x230000, 0x230001).w(this, FUNC(overdriv_state::slave_irq4_assert_w));
-	map(0x238000, 0x238001).w(this, FUNC(overdriv_state::slave_irq5_assert_w));
+	map(0x230000, 0x230001).w(FUNC(overdriv_state::slave_irq4_assert_w));
+	map(0x238000, 0x238001).w(FUNC(overdriv_state::slave_irq5_assert_w));
 }
 
 #ifdef UNUSED_FUNCTION
@@ -231,9 +232,9 @@ void overdriv_state::overdriv_slave_map(address_map &map)
 	map(0x108000, 0x10800f).rw("k053250_2", FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
 	map(0x118000, 0x118fff).rw(m_k053246, FUNC(k053247_device::k053247_word_r), FUNC(k053247_device::k053247_word_w)); // data gets copied to sprite chip with DMA..
 	map(0x120000, 0x120001).r(m_k053246, FUNC(k053247_device::k053246_word_r));
-	map(0x128000, 0x128001).rw(this, FUNC(overdriv_state::cpuB_ctrl_r), FUNC(overdriv_state::cpuB_ctrl_w)); /* enable K053247 ROM reading, plus something else */
+	map(0x128000, 0x128001).rw(FUNC(overdriv_state::cpuB_ctrl_r), FUNC(overdriv_state::cpuB_ctrl_w)); /* enable K053247 ROM reading, plus something else */
 	map(0x130000, 0x130007).rw(m_k053246, FUNC(k053247_device::k053246_r), FUNC(k053247_device::k053246_w));
-	map(0x130004, 0x130005).w(this, FUNC(overdriv_state::objdma_w));
+	map(0x130004, 0x130005).w(FUNC(overdriv_state::objdma_w));
 	//AM_RANGE(0x140000, 0x140001) used in later stages, set after writes at 0x208000-0x20bfff range
 	map(0x200000, 0x203fff).ram().share("share1");
 	map(0x208000, 0x20bfff).ram(); // sprite indirect table?
@@ -248,7 +249,7 @@ WRITE8_MEMBER(overdriv_state::sound_ack_w)
 
 void overdriv_state::overdriv_sound_map(address_map &map)
 {
-	map(0x0000, 0x0000).w(this, FUNC(overdriv_state::sound_ack_w));
+	map(0x0000, 0x0000).w(FUNC(overdriv_state::sound_ack_w));
 	// 0x012 read during explosions
 	// 0x180
 	map(0x0200, 0x0201).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
@@ -300,6 +301,7 @@ INPUT_PORTS_END
 
 void overdriv_state::machine_start()
 {
+	m_led.resolve();
 	m_objdma_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(overdriv_state::objdma_end_cb), this));
 
 	save_item(NAME(m_cpuB_ctrl));
@@ -323,79 +325,76 @@ void overdriv_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(overdriv_state::overdriv)
-
+void overdriv_state::overdriv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)  /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(overdriv_master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", overdriv_state, overdriv_cpuA_scanline, "screen", 0, 1)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2); /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &overdriv_state::overdriv_master_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(overdriv_state::overdriv_cpuA_scanline), "screen", 0, 1);
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(24'000'000)/2)  /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(overdriv_slave_map)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", overdriv_state,  cpuB_interrupt)
+	M68000(config, m_subcpu, XTAL(24'000'000)/2);  /* 12 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &overdriv_state::overdriv_slave_map);
+	//m_subcpu->set_vblank_int("screen", FUNC(overdriv_state::cpuB_interrupt));
 	/* IRQ 5 and 6 are generated by the main CPU. */
 	/* IRQ 5 is used only in test mode, to request the checksums of the gfx ROMs. */
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL(3'579'545))     /* 1.789 MHz?? This might be the right speed, but ROM testing */
-	MCFG_CPU_PROGRAM_MAP(overdriv_sound_map)    /* takes a little too much (the counter wraps from 0000 to 9999). */
-												/* This might just mean that the video refresh rate is less than */
-												/* 60 fps, that's how I fixed it for now. */
+	MC6809E(config, m_audiocpu, XTAL(3'579'545));                             /* 1.789 MHz?? This might be the right speed, but ROM testing */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &overdriv_state::overdriv_sound_map); /* takes a little too much (the counter wraps from 0000 to 9999). */
+																			  /* This might just mean that the video refresh rate is less than */
+																			  /* 60 fps, that's how I fixed it for now. */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	config.m_minimum_quantum = attotime::from_hz(12000);
 
-	MCFG_EEPROM_SERIAL_ER5911_16BIT_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DATA(overdriv_default_eeprom, 128)
+	EEPROM_ER5911_16BIT(config, "eeprom").default_data(overdriv_default_eeprom, 128);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4,384,0,305,264,0,224)
-	MCFG_SCREEN_UPDATE_DRIVER(overdriv_state, screen_update_overdriv)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(24'000'000)/4,384,0,305,264,0,224);
+	screen.set_screen_update(FUNC(overdriv_state::screen_update_overdriv));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(overdriv_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx1", NORMAL_PLANE_ORDER, 77, 22)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(overdriv_state::sprite_callback), this);
+	m_k053246->set_config("gfx1", NORMAL_PLANE_ORDER, 77, 22);
+	m_k053246->set_palette("palette");
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(14, -1)
-	MCFG_K051316_WRAP(1)
-	MCFG_K051316_CB(overdriv_state, zoom_callback_1)
+	K051316(config, m_k051316_1, 0);
+	m_k051316_1->set_palette("palette");
+	m_k051316_1->set_offsets(14, -1);
+	m_k051316_1->set_wrap(1);
+	m_k051316_1->set_zoom_callback(FUNC(overdriv_state::zoom_callback_1), this);
 
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(15, 1)
-	MCFG_K051316_CB(overdriv_state, zoom_callback_2)
+	K051316(config, m_k051316_2, 0);
+	m_k051316_2->set_palette("palette");
+	m_k051316_2->set_offsets(15, 1);
+	m_k051316_2->set_zoom_callback(FUNC(overdriv_state::zoom_callback_2), this);
 
-	MCFG_K053251_ADD("k053251")
-	MCFG_K053250_ADD("k053250_1", "palette", "screen", 0, 0)
-	MCFG_K053250_ADD("k053250_2", "palette", "screen", 0, 0)
+	K053251(config, m_k053251, 0);
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(24'000'000)/4)
-	MCFG_K053252_OFFSETS(13*8, 2*8)
+	K053250(config, "k053250_1", 0, "palette", m_screen, 0, 0);
+	K053250(config, "k053250_2", 0, "palette", m_screen, 0, 0);
+
+	K053252(config, m_k053252, XTAL(24'000'000)/4);
+	m_k053252->set_offsets(13*8, 2*8);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.5).add_route(1, "rspeaker", 0.5);
 
-	MCFG_K053260_ADD("k053260_1", XTAL(3'579'545))
-	MCFG_DEVICE_ADDRESS_MAP(0, overdriv_k053260_map)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
+	k053260_device &k053260_1(K053260(config, "k053260_1", XTAL(3'579'545)));
+	k053260_1.set_addrmap(0, &overdriv_state::overdriv_k053260_map);
+	k053260_1.add_route(0, "lspeaker", 0.35);
+	k053260_1.add_route(1, "rspeaker", 0.35);
 
-	MCFG_K053260_ADD("k053260_2", XTAL(3'579'545))
-	MCFG_DEVICE_ADDRESS_MAP(0, overdriv_k053260_map)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
-MACHINE_CONFIG_END
+	k053260_device &k053260_2(K053260(config, "k053260_2", XTAL(3'579'545)));
+	k053260_2.set_addrmap(0, &overdriv_state::overdriv_k053260_map);
+	k053260_2.add_route(0, "lspeaker", 0.35);
+	k053260_2.add_route(1, "rspeaker", 0.35);
+}
 
 
 
@@ -519,6 +518,6 @@ ROM_START( overdrivb )
 	ROM_LOAD( "789e02.f1", 0x100000, 0x100000, CRC(bdd3b5c6) SHA1(412332d64052c0a3714f4002c944b0e7d32980a4) )
 ROM_END
 
-GAMEL( 1990, overdriv,         0, overdriv, overdriv, overdriv_state, 0, ROT90, "Konami", "Over Drive (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // US version
-GAMEL( 1990, overdriva, overdriv, overdriv, overdriv, overdriv_state, 0, ROT90, "Konami", "Over Drive (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?
-GAMEL( 1990, overdrivb, overdriv, overdriv, overdriv, overdriv_state, 0, ROT90, "Konami", "Over Drive (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?
+GAMEL( 1990, overdriv,         0, overdriv, overdriv, overdriv_state, empty_init, ROT90, "Konami", "Over Drive (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // US version
+GAMEL( 1990, overdriva, overdriv, overdriv, overdriv, overdriv_state, empty_init, ROT90, "Konami", "Over Drive (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?
+GAMEL( 1990, overdrivb, overdriv, overdriv, overdriv, overdriv_state, empty_init, ROT90, "Konami", "Over Drive (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?

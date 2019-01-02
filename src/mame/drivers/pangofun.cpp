@@ -107,9 +107,12 @@ public:
 	pangofun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag) { }
 
-	DECLARE_DRIVER_INIT(pangofun);
-	virtual void machine_start() override;
 	void pangofun(machine_config &config);
+
+	void init_pangofun();
+
+private:
+	virtual void machine_start() override;
 	void pcat_io(address_map &map);
 	void pcat_map(address_map &map);
 };
@@ -178,10 +181,10 @@ void pangofun_state::machine_start()
 
 MACHINE_CONFIG_START(pangofun_state::pangofun)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486, 25000000 )    /* I486 ?? Mhz (25 according to POST) */
-	MCFG_CPU_PROGRAM_MAP(pcat_map)
-	MCFG_CPU_IO_MAP(pcat_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I486, 25000000 )    /* I486 ?? Mhz (25 according to POST) */
+	MCFG_DEVICE_PROGRAM_MAP(pcat_map)
+	MCFG_DEVICE_IO_MAP(pcat_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	/* video hardware */
 	pcvideo_vga(config);
@@ -224,8 +227,8 @@ ROM_START(pangofun)
 					/*bank8.u19 , NOT POPULATED */
 ROM_END
 
-DRIVER_INIT_MEMBER(pangofun_state,pangofun)
+void pangofun_state::init_pangofun()
 {
 }
 
-GAME( 1995, pangofun,  0,   pangofun, pangofun, pangofun_state, pangofun, ROT0, "InfoCube", "Pango Fun (Italy)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1995, pangofun,  0,   pangofun, pangofun, pangofun_state, init_pangofun, ROT0, "InfoCube", "Pango Fun (Italy)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

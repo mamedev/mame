@@ -83,41 +83,41 @@ READ8_MEMBER(decocass_state::mirrorcolorram_r)
 void decocass_state::decocass_map(address_map &map)
 {
 	map(0x0000, 0x5fff).ram().share("rambase");
-	map(0x6000, 0xbfff).ram().w(this, FUNC(decocass_state::decocass_charram_w)).share("charram"); /* still RMS3 RAM */
-	map(0xc000, 0xc3ff).ram().w(this, FUNC(decocass_state::decocass_fgvideoram_w)).share("fgvideoram");  /* DSP3 RAM */
-	map(0xc400, 0xc7ff).ram().w(this, FUNC(decocass_state::decocass_colorram_w)).share("colorram");
-	map(0xc800, 0xcbff).rw(this, FUNC(decocass_state::mirrorvideoram_r), FUNC(decocass_state::mirrorvideoram_w));
-	map(0xcc00, 0xcfff).rw(this, FUNC(decocass_state::mirrorcolorram_r), FUNC(decocass_state::mirrorcolorram_w));
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(decocass_state::decocass_tileram_w)).share("tileram");
-	map(0xd800, 0xdbff).ram().w(this, FUNC(decocass_state::decocass_objectram_w)).share("objectram");
-	map(0xe000, 0xe0ff).ram().w(this, FUNC(decocass_state::decocass_paletteram_w)).share("paletteram");
-	map(0xe300, 0xe300).portr("DSW1").w(this, FUNC(decocass_state::decocass_watchdog_count_w));
-	map(0xe301, 0xe301).portr("DSW2").w(this, FUNC(decocass_state::decocass_watchdog_flip_w));
-	map(0xe302, 0xe302).w(this, FUNC(decocass_state::decocass_color_missiles_w));
-	map(0xe400, 0xe400).w(this, FUNC(decocass_state::decocass_reset_w));
+	map(0x6000, 0xbfff).ram().w(FUNC(decocass_state::decocass_charram_w)).share("charram"); /* still RMS3 RAM */
+	map(0xc000, 0xc3ff).ram().w(FUNC(decocass_state::decocass_fgvideoram_w)).share("fgvideoram");  /* DSP3 RAM */
+	map(0xc400, 0xc7ff).ram().w(FUNC(decocass_state::decocass_colorram_w)).share("colorram");
+	map(0xc800, 0xcbff).rw(FUNC(decocass_state::mirrorvideoram_r), FUNC(decocass_state::mirrorvideoram_w));
+	map(0xcc00, 0xcfff).rw(FUNC(decocass_state::mirrorcolorram_r), FUNC(decocass_state::mirrorcolorram_w));
+	map(0xd000, 0xd7ff).ram().w(FUNC(decocass_state::decocass_tileram_w)).share("tileram");
+	map(0xd800, 0xdbff).ram().w(FUNC(decocass_state::decocass_objectram_w)).share("objectram");
+	map(0xe000, 0xe0ff).ram().w(FUNC(decocass_state::decocass_paletteram_w)).share("paletteram");
+	map(0xe300, 0xe300).portr("DSW1").w(FUNC(decocass_state::decocass_watchdog_count_w));
+	map(0xe301, 0xe301).portr("DSW2").w(FUNC(decocass_state::decocass_watchdog_flip_w));
+	map(0xe302, 0xe302).w(FUNC(decocass_state::decocass_color_missiles_w));
+	map(0xe400, 0xe400).w(FUNC(decocass_state::decocass_reset_w));
 
 /* BIO-3 board */
-	map(0xe402, 0xe402).w(this, FUNC(decocass_state::decocass_mode_set_w));      /* scroll mode regs + various enable regs */
-	map(0xe403, 0xe403).w(this, FUNC(decocass_state::decocass_back_h_shift_w));  /* back (both)  tilemap x scroll */
-	map(0xe404, 0xe404).w(this, FUNC(decocass_state::decocass_back_vl_shift_w)); /* back (left)  (top@rot0) tilemap y scroll */
-	map(0xe405, 0xe405).w(this, FUNC(decocass_state::decocass_back_vr_shift_w)); /* back (right) (bot@rot0) tilemap y scroll */
-	map(0xe406, 0xe406).w(this, FUNC(decocass_state::decocass_part_h_shift_w)); /* headlight */
-	map(0xe407, 0xe407).w(this, FUNC(decocass_state::decocass_part_v_shift_w)); /* headlight */
+	map(0xe402, 0xe402).w(FUNC(decocass_state::decocass_mode_set_w));      /* scroll mode regs + various enable regs */
+	map(0xe403, 0xe403).w(FUNC(decocass_state::decocass_back_h_shift_w));  /* back (both)  tilemap x scroll */
+	map(0xe404, 0xe404).w(FUNC(decocass_state::decocass_back_vl_shift_w)); /* back (left)  (top@rot0) tilemap y scroll */
+	map(0xe405, 0xe405).w(FUNC(decocass_state::decocass_back_vr_shift_w)); /* back (right) (bot@rot0) tilemap y scroll */
+	map(0xe406, 0xe406).w(FUNC(decocass_state::decocass_part_h_shift_w)); /* headlight */
+	map(0xe407, 0xe407).w(FUNC(decocass_state::decocass_part_v_shift_w)); /* headlight */
 
-	map(0xe410, 0xe410).w(this, FUNC(decocass_state::decocass_color_center_bot_w));
-	map(0xe411, 0xe411).w(this, FUNC(decocass_state::decocass_center_h_shift_space_w));
-	map(0xe412, 0xe412).w(this, FUNC(decocass_state::decocass_center_v_shift_w));
-	map(0xe413, 0xe413).w(this, FUNC(decocass_state::decocass_coin_counter_w));
-	map(0xe414, 0xe414).rw(this, FUNC(decocass_state::decocass_sound_command_main_r), FUNC(decocass_state::decocass_sound_command_w));
-	map(0xe415, 0xe416).w(this, FUNC(decocass_state::decocass_quadrature_decoder_reset_w));
-	map(0xe417, 0xe417).w(this, FUNC(decocass_state::decocass_nmi_reset_w));
-	map(0xe420, 0xe42f).w(this, FUNC(decocass_state::decocass_adc_w));
+	map(0xe410, 0xe410).w(FUNC(decocass_state::decocass_color_center_bot_w));
+	map(0xe411, 0xe411).w(FUNC(decocass_state::decocass_center_h_shift_space_w));
+	map(0xe412, 0xe412).w(FUNC(decocass_state::decocass_center_v_shift_w));
+	map(0xe413, 0xe413).w(FUNC(decocass_state::decocass_coin_counter_w));
+	map(0xe414, 0xe414).rw(FUNC(decocass_state::decocass_sound_command_main_r), FUNC(decocass_state::decocass_sound_command_w));
+	map(0xe415, 0xe416).w(FUNC(decocass_state::decocass_quadrature_decoder_reset_w));
+	map(0xe417, 0xe417).w(FUNC(decocass_state::decocass_nmi_reset_w));
+	map(0xe420, 0xe42f).w(FUNC(decocass_state::decocass_adc_w));
 
-	map(0xe500, 0xe5ff).rw(this, FUNC(decocass_state::decocass_e5xx_r), FUNC(decocass_state::decocass_e5xx_w)); /* read data from 8041/status */
+	map(0xe500, 0xe5ff).rw(FUNC(decocass_state::decocass_e5xx_r), FUNC(decocass_state::decocass_e5xx_w)); /* read data from 8041/status */
 
-	map(0xe600, 0xe6ff).r(this, FUNC(decocass_state::decocass_input_r));      /* inputs */
-	map(0xe700, 0xe700).r(this, FUNC(decocass_state::decocass_sound_data_r)); /* read sound CPU data */
-	map(0xe701, 0xe701).r(this, FUNC(decocass_state::decocass_sound_ack_r));  /* read sound CPU ack status */
+	map(0xe600, 0xe6ff).r(FUNC(decocass_state::decocass_input_r));      /* inputs */
+	map(0xe700, 0xe700).r(FUNC(decocass_state::decocass_sound_data_r)); /* read sound CPU data */
+	map(0xe701, 0xe701).r(FUNC(decocass_state::decocass_sound_ack_r));  /* read sound CPU ack status */
 
 	map(0xf000, 0xffff).rom();
 }
@@ -125,14 +125,14 @@ void decocass_state::decocass_map(address_map &map)
 void decocass_state::decocass_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x17ff).rw(this, FUNC(decocass_state::decocass_sound_nmi_enable_r), FUNC(decocass_state::decocass_sound_nmi_enable_w));
-	map(0x1800, 0x1fff).rw(this, FUNC(decocass_state::decocass_sound_data_ack_reset_r), FUNC(decocass_state::decocass_sound_data_ack_reset_w));
+	map(0x1000, 0x17ff).rw(FUNC(decocass_state::decocass_sound_nmi_enable_r), FUNC(decocass_state::decocass_sound_nmi_enable_w));
+	map(0x1800, 0x1fff).rw(FUNC(decocass_state::decocass_sound_data_ack_reset_r), FUNC(decocass_state::decocass_sound_data_ack_reset_w));
 	map(0x2000, 0x2fff).w("ay1", FUNC(ay8910_device::data_w));
 	map(0x4000, 0x4fff).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x6000, 0x6fff).w("ay2", FUNC(ay8910_device::data_w));
 	map(0x8000, 0x8fff).w("ay2", FUNC(ay8910_device::address_w));
-	map(0xa000, 0xafff).r(this, FUNC(decocass_state::decocass_sound_command_r));
-	map(0xc000, 0xcfff).w(this, FUNC(decocass_state::decocass_sound_data_w));
+	map(0xa000, 0xafff).r(FUNC(decocass_state::decocass_sound_command_r));
+	map(0xc000, 0xcfff).w(FUNC(decocass_state::decocass_sound_data_w));
 	map(0xf800, 0xffff).rom();
 }
 
@@ -932,22 +932,20 @@ static const gfx_layout objlayout =
 	objlayout_yoffset
 };
 
-static GFXDECODE_START( decocass )
+static GFXDECODE_START( gfx_decocass )
 	GFXDECODE_ENTRY( nullptr, 0x6000, charlayout,       0, 4 )  /* char set #1 */
 	GFXDECODE_ENTRY( nullptr, 0x6000, spritelayout,     0, 4 )  /* sprites */
 	GFXDECODE_ENTRY( nullptr, 0xd000, tilelayout,       0, 8 )  /* background tiles */
 	GFXDECODE_ENTRY( nullptr, 0xd800, objlayout,        0, 64 )  /* object */
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(decocass_state, decocass)
+void decocass_state::decocass_palette(palette_device &palette) const
 {
-	int i;
-
 	// set up 32 colors 1:1 pens and flipped colors for background tiles (D7 of color_center_bot)
-	for (i = 0; i < 32; i++)
+	for (int i = 0; i < 32; i++)
 	{
 		palette.set_pen_indirect(i, i);
-		palette.set_pen_indirect(32+i, bitswap<8>(i, 7, 6, 5, 4, 3, 1, 2, 0));
+		palette.set_pen_indirect(32 + i, bitswap<8>(i, 7, 6, 5, 4, 3, 1, 2, 0));
 	}
 }
 
@@ -955,47 +953,43 @@ PALETTE_INIT_MEMBER(decocass_state, decocass)
 MACHINE_CONFIG_START(decocass_state::decocass)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO_222, HCLK4) /* the earlier revision board doesn't have the 222 but must have the same thing implemented in logic for the M6502 */
-	MCFG_CPU_PROGRAM_MAP(decocass_map)
+	MCFG_DEVICE_ADD("maincpu", DECO_222, HCLK4) /* the earlier revision board doesn't have the 222 but must have the same thing implemented in logic for the M6502 */
+	MCFG_DEVICE_PROGRAM_MAP(decocass_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
-	MCFG_CPU_PROGRAM_MAP(decocass_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, HCLK1/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(decocass_sound_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audionmi", decocass_state, decocass_audio_nmi_gen, "screen", 0, 8)
 
-	MCFG_CPU_ADD("mcu", I8041, HCLK)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(decocass_state, i8041_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(decocass_state, i8041_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(decocass_state, i8041_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(decocass_state, i8041_p2_w))
+	I8041(config, m_mcu, HCLK);
+	m_mcu->p1_in_cb().set(FUNC(decocass_state::i8041_p1_r));
+	m_mcu->p1_out_cb().set(FUNC(decocass_state::i8041_p1_w));
+	m_mcu->p2_in_cb().set(FUNC(decocass_state::i8041_p2_r));
+	m_mcu->p2_out_cb().set(FUNC(decocass_state::i8041_p2_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(4200))              /* interleave CPUs */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
-	MCFG_DECOCASS_TAPE_ADD("cassette")
+	DECOCASS_TAPE(config, m_cassette, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 0*8, 256, 272, 1*8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(decocass_state, screen_update_decocass)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", decocass)
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(decocass_state, decocass)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_decocass)
+	PALETTE(config, m_palette, FUNC(decocass_state::decocass_palette), 64, 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_SOUND_ADD("ay1", AY8910, HCLK2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, "ay1", HCLK2).add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_SOUND_ADD("ay2", AY8910, HCLK2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, "ay2", HCLK2).add_route(ALL_OUTPUTS, "mono", 0.40);
 MACHINE_CONFIG_END
 
 
@@ -1243,7 +1237,7 @@ MACHINE_CONFIG_END
 
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 
 /************ Version A bios roms *************/
@@ -2025,7 +2019,7 @@ ROM_START( decomult )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(decocass_state,decocass)
+void decocass_state::init_decocass()
 {
 	/* Call the state save setup code in machine/decocass.c */
 	decocass_machine_state_save_init();
@@ -2033,10 +2027,10 @@ DRIVER_INIT_MEMBER(decocass_state,decocass)
 	decocass_video_state_save_init();
 }
 
-DRIVER_INIT_MEMBER(decocass_state,decocrom)
+void decocass_state::init_decocrom()
 {
 	/* standard init */
-	DRIVER_INIT_CALL(decocass);
+	init_decocass();
 
 	/* convert charram to a banked ROM */
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x6000, 0xafff, "bank1");
@@ -2074,85 +2068,85 @@ WRITE8_MEMBER(decocass_state::cdsteljn_mux_w )
 		printf("%02x\n",data);
 }
 
-DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
+void decocass_state::init_cdsteljn()
 {
 	/* standard init */
-	DRIVER_INIT_CALL(decocass);
+	init_decocass();
 
 	/* install custom mahjong panel */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe413, 0xe413, write8_delegate(FUNC(decocass_state::cdsteljn_mux_w), this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe600, 0xe6ff, read8_delegate(FUNC(decocass_state::cdsteljn_input_r), this));
 }
 
-/* -- */ GAME( 1981, decocass,  0,        decocass, decocass, decocass_state,       decocass, ROT270, "Data East Corporation", "DECO Cassette System", MACHINE_IS_BIOS_ROOT )
-/* -- */ GAME( 1981, ctsttape,  decocass, ctsttape, decocass, decocass_type1_state, decocass, ROT270, "Data East Corporation", "Test Tape (DECO Cassette) (US)", 0 )
-/* 01 */ GAME( 1980, chwy,      decocass, chwy,     chwy,     decocass_type1_state, decocass, ROT270, "Data East Corporation", "Highway Chase (DECO Cassette) (US)", 0 )
+/* -- */ GAME( 1981, decocass,  0,        decocass, decocass, decocass_state,        init_decocass, ROT270, "Data East Corporation", "DECO Cassette System", MACHINE_IS_BIOS_ROOT )
+/* -- */ GAME( 1981, ctsttape,  decocass, ctsttape, decocass, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Test Tape (DECO Cassette) (US)", 0 )
+/* 01 */ GAME( 1980, chwy,      decocass, chwy,     chwy,     decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Highway Chase (DECO Cassette) (US)", 0 )
 /* 02 */ // 1980.12 Sengoku Ninjatai
-/* 03 */ GAME( 1981, cmanhat,   decocass, cmanhat,  cmanhat,  decocass_type1_state, decocass, ROT270, "Data East Corporation", "Manhattan (DECO Cassette) (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-/* 04 */ GAME( 1981, cterrani,  decocass, cterrani, cterrani, decocass_type1_state, decocass, ROT270, "Data East Corporation", "Terranean (DECO Cassette) (US)", 0 )
+/* 03 */ GAME( 1981, cmanhat,   decocass, cmanhat,  cmanhat,  decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Manhattan (DECO Cassette) (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+/* 04 */ GAME( 1981, cterrani,  decocass, cterrani, cterrani, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Terranean (DECO Cassette) (US)", 0 )
 /* 05 */ // 1981.?? Missile Sprinter
 /* 06 */ // 1980.12 Nebula
-/* 07 */ GAME( 1981, castfant,  decocass, castfant, castfant, decocass_type1_state, decocass, ROT270, "Data East Corporation", "Astro Fantasia (DECO Cassette) (US)", 0 )
+/* 07 */ GAME( 1981, castfant,  decocass, castfant, castfant, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Astro Fantasia (DECO Cassette) (US)", 0 )
 /* 08 */ // 1981.03 The Tower
-/* 09 */ GAME( 1981, csuperas,  decocass, csuperas, csuperas, decocass_type1_state, decocass, ROT270, "Data East Corporation", "Super Astro Fighter (DECO Cassette) (US)", 0 )
-/* 10 */ GAME( 1981, cocean1a,  decocass, cocean1a, cocean1a, decocass_type1_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.1,Japan)", 0 ) /* no lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
-/*    */ GAME( 1981, cocean6b,  cocean1a, cocean1a, cocean1a, decocass_type1_state, decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.6,US)", 0 ) /* lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
-/* 11 */ GAME( 1981, clocknch,  decocass, clocknch, clocknch, decocass_type1_state, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette) (US)", 0 )
-/*    */ GAME( 1981, clocknchj, clocknch, clocknchj,clocknchj,decocass_type1_state, decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette) (Japan)", 0 )
-/* 12 */ GAME( 1981, cfboy0a1,  decocass, cfboy0a1, cfboy0a1, decocass_type1_state, decocass, ROT270, "Data East Corporation", "Flash Boy (vertical) (DECO Cassette MD) (No.12/Ver.0/Set.1,Japan)", 0 )
-/* 13 */ GAME( 1981, cprogolf,  decocass, cprogolf, cprogolf, decocass_type1_state, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette) (US)", 0 )
-/*    */ GAME( 1981, cprogolfj, cprogolf, cprogolfj,cprogolf, decocass_type1_state, decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette) (Japan)", 0 )
-/* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, cdsteljn, decocass_type1_state, cdsteljn, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette) (Japan)", 0 )
-/* 15 */ GAME( 1981, cluckypo,  decocass, cluckypo, cluckypo, decocass_type1_state, decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette) (US)", 0 )
-/* 16 */ GAME( 1981, ctisland,  decocass, ctisland, ctisland, decocass_type1_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (US) (set 1)", 0 )
-/*    */ GAME( 1981, ctisland2, ctisland, ctisland, ctisland, decocass_type1_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (US) (set 2)", 0 ) /* newer? has instructions in attract */
-/*    */ GAME( 1981, ctisland3, ctisland, ctisland3,ctisland, decocass_type1_state, decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (Region D)", 0 ) /* region code 'D' unknown region */
+/* 09 */ GAME( 1981, csuperas,  decocass, csuperas, csuperas, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Super Astro Fighter (DECO Cassette) (US)", 0 )
+/* 10 */ GAME( 1981, cocean1a,  decocass, cocean1a, cocean1a, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.1,Japan)", 0 ) /* no lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
+/*    */ GAME( 1981, cocean6b,  cocean1a, cocean1a, cocean1a, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Ocean to Ocean (Medal) (DECO Cassette MD) (No.10/Ver.6,US)", 0 ) /* lever, 1P/2P buttons used to switch player, cocktail mode not emulated */
+/* 11 */ GAME( 1981, clocknch,  decocass, clocknch, clocknch, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1981, clocknchj, clocknch, clocknchj,clocknchj,decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Lock'n'Chase (DECO Cassette) (Japan)", 0 )
+/* 12 */ GAME( 1981, cfboy0a1,  decocass, cfboy0a1, cfboy0a1, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Flash Boy (vertical) (DECO Cassette MD) (No.12/Ver.0/Set.1,Japan)", 0 )
+/* 13 */ GAME( 1981, cprogolf,  decocass, cprogolf, cprogolf, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1981, cprogolfj, cprogolf, cprogolfj,cprogolf, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Tournament Pro Golf (DECO Cassette) (Japan)", 0 )
+/* 14 */ GAME( 1981, cdsteljn,  decocass, cdsteljn, cdsteljn, decocass_type1_state,  init_cdsteljn, ROT270, "Data East Corporation", "DS Telejan (DECO Cassette) (Japan)", 0 )
+/* 15 */ GAME( 1981, cluckypo,  decocass, cluckypo, cluckypo, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "Lucky Poker (DECO Cassette) (US)", 0 )
+/* 16 */ GAME( 1981, ctisland,  decocass, ctisland, ctisland, decocass_type1_state,  init_decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (US) (set 1)", 0 )
+/*    */ GAME( 1981, ctisland2, ctisland, ctisland, ctisland, decocass_type1_state,  init_decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (US) (set 2)", 0 ) /* newer? has instructions in attract */
+/*    */ GAME( 1981, ctisland3, ctisland, ctisland3,ctisland, decocass_type1_state,  init_decocrom, ROT270, "Data East Corporation", "Treasure Island (DECO Cassette) (Region D)", 0 ) /* region code 'D' unknown region */
 /* 17 */ // 1981.10 Bobbitto
-/* 18 */ GAME( 1982, cexplore,  decocass, cexplore, cexplore, decocass_type1_state, decocrom, ROT270, "Data East Corporation", "Explorer (DECO Cassette) (US)", 0 )
-/* 19 */ GAME( 1982, cdiscon1,  decocass, decocass, cdiscon1, decocass_type2_state, decocass, ROT270, "Data East Corporation", "Disco No.1 (DECO Cassette) (US)", 0 )
-/*    */ GAME( 1982, csweetht,  cdiscon1, decocass, csweetht, decocass_type2_state, decocass, ROT270, "Data East Corporation", "Sweet Heart (DECO Cassette) (US)", 0 )
-/* 20 */ GAME( 1982, ctornado,  decocass, decocass, ctornado, decocass_type2_state, decocass, ROT270, "Data East Corporation", "Tornado (DECO Cassette) (US)", 0 )
-/* 21 */ GAME( 1982, cmissnx,   decocass, decocass, cmissnx,  decocass_type2_state, decocass, ROT270, "Data East Corporation", "Mission-X (DECO Cassette) (US)", 0 )
-/* 22 */ GAME( 1982, cptennis,  decocass, decocass, cptennis, decocass_type2_state, decocass, ROT270, "Data East Corporation", "Pro Tennis (DECO Cassette) (US)", 0 )
-/*    */ GAME( 1982, cptennisj, cptennis, decocass, cptennis, decocass_type2_state, decocass, ROT270, "Data East Corporation", "Pro Tennis (DECO Cassette) (Japan)", 0 )
-/* 23 */ GAME( 1982, cprogolf18,cprogolf, cprogolfj,cprogolf, decocass_type1_state, decocass, ROT270, "Data East Corporation", "18 Challenge Pro Golf (DECO Cassette) (Japan)", 0 ) // 1982.?? 18 Hole Pro Golf
+/* 18 */ GAME( 1982, cexplore,  decocass, cexplore, cexplore, decocass_type1_state,  init_decocrom, ROT270, "Data East Corporation", "Explorer (DECO Cassette) (US)", 0 )
+/* 19 */ GAME( 1982, cdiscon1,  decocass, decocass, cdiscon1, decocass_type2_state,  init_decocass, ROT270, "Data East Corporation", "Disco No.1 (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1982, csweetht,  cdiscon1, decocass, csweetht, decocass_type2_state,  init_decocass, ROT270, "Data East Corporation", "Sweet Heart (DECO Cassette) (US)", 0 )
+/* 20 */ GAME( 1982, ctornado,  decocass, decocass, ctornado, decocass_type2_state,  init_decocass, ROT270, "Data East Corporation", "Tornado (DECO Cassette) (US)", 0 )
+/* 21 */ GAME( 1982, cmissnx,   decocass, decocass, cmissnx,  decocass_type2_state,  init_decocass, ROT270, "Data East Corporation", "Mission-X (DECO Cassette) (US)", 0 )
+/* 22 */ GAME( 1982, cptennis,  decocass, decocass, cptennis, decocass_type2_state,  init_decocass, ROT270, "Data East Corporation", "Pro Tennis (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1982, cptennisj, cptennis, decocass, cptennis, decocass_type2_state,  init_decocass, ROT270, "Data East Corporation", "Pro Tennis (DECO Cassette) (Japan)", 0 )
+/* 23 */ GAME( 1982, cprogolf18,cprogolf, cprogolfj,cprogolf, decocass_type1_state,  init_decocass, ROT270, "Data East Corporation", "18 Challenge Pro Golf (DECO Cassette) (Japan)", 0 ) // 1982.?? 18 Hole Pro Golf
 /* 24 */ // 1982.07 Tsumego Kaisyou
-/* 25 */ GAME( 1982, cadanglr,  decocass, cfishing, cfishing, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Angler Dangler (DECO Cassette) (US)", 0 )
-/* 25 */ GAME( 1982, cfishing,  cadanglr, cfishing, cfishing, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Fishing (DECO Cassette) (Japan)", 0 )
-/* 26 */ GAME( 1983, cbtime,    decocass, cbtime,   cbtime,   decocass_type3_state, decocass, ROT270, "Data East Corporation", "Burger Time (DECO Cassette) (US)", 0 )
-/*    */ GAME( 1982, chamburger,cbtime,   cbtime,   cbtime,   decocass_type3_state, decocass, ROT270, "Data East Corporation", "Hamburger (DECO Cassette) (Japan)", 0 )
-/* 27 */ GAME( 1982, cburnrub,  decocass, cburnrub, cburnrub, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (US) (set 1)", 0 ) /* large stylized red title (newer release?) */
-/*    */ GAME( 1982, cburnrub2, cburnrub, cburnrub, cburnrub, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (US) (set 2)", 0 ) /* large monochrome title (original release?) */
-/*    */ GAME( 1982, cburnrubj, cburnrub, cburnrub, cburnrub, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (Japan)", 0 ) /* large monochrome title (original release?) */
-/*    */ GAME( 1982, cbnj,      cburnrub, cburnrub, cburnrub, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Bump 'n' Jump (DECO Cassette) (US)", 0 ) /* name was changed from Burnin' Rubber to Bump 'n' Jump (newest release?) */
-/* 28 */ GAME( 1983, cgraplop,  decocass, cgraplop, cgraplop, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Cluster Buster (DECO Cassette) (US)", 0 )
-/*    */ GAME( 1983, cgraplopj, cgraplop, cgraplop, cgraplop, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Graplop (DECO Cassette) (Japan)", 0 )
-/*    */ GAME( 1983, cgraplop2, cgraplop, cgraplop2,cgraplop, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Graplop (DECO Cassette) (US) (Prototype?)", 0 ) /* button 1 does nothing, infinite shield despite the attract mode claiming otherwise, no title screen (was marked Cluster Buster in a previous MAME release?), repetitive level design, most likely a proto unless the encryption is still an issue (unlikely) */
-/* 29 */ GAME( 1983, clapapa,   decocass, clapapa,  clapapa,  decocass_type3_state, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' / La-Pa-Pa (DECO Cassette) (US)" , 0) /* Displays 'La-Pa-Pa during attract */
-/*    */ GAME( 1983, clapapa2,  clapapa,  clapapa,  clapapa,  decocass_type3_state, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (DECO Cassette) (US)" , 0) /* Displays 'Rootin' Tootin' during attract */
-/* 30 */ GAME( 1983, cskater,   decocass, cskater,  cskater,  decocass_type3_state, decocass, ROT270, "Data East Corporation", "Skater (DECO Cassette) (Japan)", 0 )
-/* 31 */ GAME( 1983, cprobowl,  decocass, cprobowl, cprobowl, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Pro Bowling (DECO Cassette) (US)", 0 )
-/* 32 */ GAME( 1983, cnightst,  decocass, cnightst, cnightst, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette) (US) (set 1)", 0 )
-/*    */ GAME( 1983, cnightst2, cnightst, cnightst, cnightst, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette) (US) (set 2)", 0 )
-/* 33 */ GAME( 1983, cpsoccer,  decocass, cpsoccer, cpsoccer, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette) (US)", 0 )
-/*    */ GAME( 1983, cpsoccerj, cpsoccer, cpsoccer, cpsoccer, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette) (Japan)", 0 )
-/* 34 */ GAME( 1983, csdtenis,  decocass, csdtenis, csdtenis, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Super Doubles Tennis (DECO Cassette) (Japan)", 0 )
-/* 35 */ GAME( 1985, cflyball,  decocass, decocass, cflyball, decocass_nodong_state,decocass, ROT270, "Data East Corporation", "Flying Ball (DECO Cassette) (US)", 0 )
+/* 25 */ GAME( 1982, cadanglr,  decocass, cfishing, cfishing, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Angler Dangler (DECO Cassette) (US)", 0 )
+/* 25 */ GAME( 1982, cfishing,  cadanglr, cfishing, cfishing, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Fishing (DECO Cassette) (Japan)", 0 )
+/* 26 */ GAME( 1983, cbtime,    decocass, cbtime,   cbtime,   decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Burger Time (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1982, chamburger,cbtime,   cbtime,   cbtime,   decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Hamburger (DECO Cassette) (Japan)", 0 )
+/* 27 */ GAME( 1982, cburnrub,  decocass, cburnrub, cburnrub, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (US) (set 1)", 0 ) /* large stylized red title (newer release?) */
+/*    */ GAME( 1982, cburnrub2, cburnrub, cburnrub, cburnrub, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (US) (set 2)", 0 ) /* large monochrome title (original release?) */
+/*    */ GAME( 1982, cburnrubj, cburnrub, cburnrub, cburnrub, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette) (Japan)", 0 ) /* large monochrome title (original release?) */
+/*    */ GAME( 1982, cbnj,      cburnrub, cburnrub, cburnrub, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Bump 'n' Jump (DECO Cassette) (US)", 0 ) /* name was changed from Burnin' Rubber to Bump 'n' Jump (newest release?) */
+/* 28 */ GAME( 1983, cgraplop,  decocass, cgraplop, cgraplop, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Cluster Buster (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1983, cgraplopj, cgraplop, cgraplop, cgraplop, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Graplop (DECO Cassette) (Japan)", 0 )
+/*    */ GAME( 1983, cgraplop2, cgraplop, cgraplop2,cgraplop, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Graplop (DECO Cassette) (US) (Prototype?)", 0 ) /* button 1 does nothing, infinite shield despite the attract mode claiming otherwise, no title screen (was marked Cluster Buster in a previous MAME release?), repetitive level design, most likely a proto unless the encryption is still an issue (unlikely) */
+/* 29 */ GAME( 1983, clapapa,   decocass, clapapa,  clapapa,  decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Rootin' Tootin' / La-Pa-Pa (DECO Cassette) (US)" , 0) /* Displays 'La-Pa-Pa during attract */
+/*    */ GAME( 1983, clapapa2,  clapapa,  clapapa,  clapapa,  decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (DECO Cassette) (US)" , 0) /* Displays 'Rootin' Tootin' during attract */
+/* 30 */ GAME( 1983, cskater,   decocass, cskater,  cskater,  decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Skater (DECO Cassette) (Japan)", 0 )
+/* 31 */ GAME( 1983, cprobowl,  decocass, cprobowl, cprobowl, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Pro Bowling (DECO Cassette) (US)", 0 )
+/* 32 */ GAME( 1983, cnightst,  decocass, cnightst, cnightst, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette) (US) (set 1)", 0 )
+/*    */ GAME( 1983, cnightst2, cnightst, cnightst, cnightst, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Night Star (DECO Cassette) (US) (set 2)", 0 )
+/* 33 */ GAME( 1983, cpsoccer,  decocass, cpsoccer, cpsoccer, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette) (US)", 0 )
+/*    */ GAME( 1983, cpsoccerj, cpsoccer, cpsoccer, cpsoccer, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Pro Soccer (DECO Cassette) (Japan)", 0 )
+/* 34 */ GAME( 1983, csdtenis,  decocass, csdtenis, csdtenis, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Super Doubles Tennis (DECO Cassette) (Japan)", 0 )
+/* 35 */ GAME( 1985, cflyball,  decocass, decocass, cflyball, decocass_nodong_state, init_decocass, ROT270, "Data East Corporation", "Flying Ball (DECO Cassette) (US)", 0 )
 /* 36 */ // 1984.04 Genesis/Boomer Rang'r
-/* 37 */ GAME( 1983, czeroize,  decocass, czeroize, czeroize, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Zeroize (DECO Cassette) (US)", 0 )
-/* 38 */ GAME( 1984, cscrtry,   decocass, decocass, cscrtry,  decocass_type4_state, decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette) (US) (set 1)", 0 )
-/*    */ GAME( 1984, cscrtry2,  cscrtry,  decocass, cscrtry,  decocass_type4_state, decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette) (US) (set 2)", 0 )
-/* 39 */ GAME( 1984, cppicf,    decocass, cppicf,   cppicf,   decocass_type3_state, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette) (US) (set 1)", 0 )
-/*    */ GAME( 1984, cppicf2,   cppicf,   cppicf,   cppicf,   decocass_type3_state, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette) (US) (set 2)", 0 )
-/* 40 */ GAME( 1984, cfghtice,  decocass, cfghtice, cfghtice, decocass_type3_state, decocass, ROT270, "Data East Corporation", "Fighting Ice Hockey (DECO Cassette) (US)", 0 )
-/* 41 */ GAME( 1984, coozumou,  decocass, decocass, cscrtry,  decocass_type4_state, decocass, ROT270, "Data East Corporation", "Oozumou - The Grand Sumo (DECO Cassette) (Japan)", 0 )
+/* 37 */ GAME( 1983, czeroize,  decocass, czeroize, czeroize, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Zeroize (DECO Cassette) (US)", 0 )
+/* 38 */ GAME( 1984, cscrtry,   decocass, decocass, cscrtry,  decocass_type4_state,  init_decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette) (US) (set 1)", 0 )
+/*    */ GAME( 1984, cscrtry2,  cscrtry,  decocass, cscrtry,  decocass_type4_state,  init_decocass, ROT270, "Data East Corporation", "Scrum Try (DECO Cassette) (US) (set 2)", 0 )
+/* 39 */ GAME( 1984, cppicf,    decocass, cppicf,   cppicf,   decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette) (US) (set 1)", 0 )
+/*    */ GAME( 1984, cppicf2,   cppicf,   cppicf,   cppicf,   decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (DECO Cassette) (US) (set 2)", 0 )
+/* 40 */ GAME( 1984, cfghtice,  decocass, cfghtice, cfghtice, decocass_type3_state,  init_decocass, ROT270, "Data East Corporation", "Fighting Ice Hockey (DECO Cassette) (US)", 0 )
+/* 41 */ GAME( 1984, coozumou,  decocass, decocass, cscrtry,  decocass_type4_state,  init_decocass, ROT270, "Data East Corporation", "Oozumou - The Grand Sumo (DECO Cassette) (Japan)", 0 )
 /* 42 */ // 1984.08 Hellow Gateball // not a typo, this is official spelling
 /* 43 */ // 1984.08 Yellow Cab
-/* 44 */ GAME( 1985, cbdash,    decocass, decocass, cbdash,   decocass_type5_state, decocass, ROT270, "Data East Corporation", "Boulder Dash (DECO Cassette) (US)", 0 )
+/* 44 */ GAME( 1985, cbdash,    decocass, decocass, cbdash,   decocass_type5_state,  init_decocass, ROT270, "Data East Corporation", "Boulder Dash (DECO Cassette) (US)", 0 )
 
 /* UX7 */ // 1984.12 Tokyo MIE Clinic/Tokyo MIE Shinryoujo
 /* UX8 */ // 1985.01 Tokyo MIE Clinic/Tokyo MIE Shinryoujo Part 2
 /* UX9 */ // 1985.05 Geinoujin Shikaku Shiken
 
-/* xx */ GAME( 2008, decomult,  decocass, decocass, decocass, decocass_widel_state, decocass, ROT270, "bootleg (David Widel)", "Deco Cassette System Multigame (ROM based)", 0 )
+/* xx */ GAME( 2008, decomult,  decocass, decocass, decocass, decocass_widel_state,  init_decocass, ROT270, "bootleg (David Widel)", "Deco Cassette System Multigame (ROM based)", 0 )
 

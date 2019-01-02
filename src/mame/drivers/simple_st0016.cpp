@@ -92,12 +92,12 @@ WRITE8_MEMBER(st0016_state::st0016_rom_bank_w)
 void st0016_state::st0016_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xc0, 0xc0).portr("P1").w(this, FUNC(st0016_state::mux_select_w));
+	map(0xc0, 0xc0).portr("P1").w(FUNC(st0016_state::mux_select_w));
 	map(0xc1, 0xc1).portr("P2").nopw();
-	map(0xc2, 0xc2).r(this, FUNC(st0016_state::mux_r)).nopw();
+	map(0xc2, 0xc2).r(FUNC(st0016_state::mux_r)).nopw();
 	map(0xc3, 0xc3).portr("P2").nopw();
 	map(0xe0, 0xe0).nopw(); /* renju = $40, neratte = 0 */
-	map(0xe1, 0xe1).w(this, FUNC(st0016_state::st0016_rom_bank_w));
+	map(0xe1, 0xe1).w(FUNC(st0016_state::st0016_rom_bank_w));
 	map(0xe6, 0xe6).nopw(); /* banking ? ram bank ? shared rambank ? */
 	map(0xe7, 0xe7).nopw(); /* watchdog */
 }
@@ -146,20 +146,20 @@ void st0016_state::v810_mem(address_map &map)
 	map(0x00000000, 0x0001ffff).ram();
 	map(0x80000000, 0x8001ffff).ram();
 	map(0xc0000000, 0xc001ffff).ram();
-	map(0x40000000, 0x4000000f).r(this, FUNC(st0016_state::latch32_r)).w(this, FUNC(st0016_state::latch32_w));
+	map(0x40000000, 0x4000000f).r(FUNC(st0016_state::latch32_r)).w(FUNC(st0016_state::latch32_w));
 	map(0xfff80000, 0xffffffff).bankr("bank2");
 }
 
 void st0016_state::st0016_m2_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xc0, 0xc3).r(this, FUNC(st0016_state::latch8_r)).w(this, FUNC(st0016_state::latch8_w));
-	map(0xd0, 0xd0).portr("P1").w(this, FUNC(st0016_state::mux_select_w));
+	map(0xc0, 0xc3).r(FUNC(st0016_state::latch8_r)).w(FUNC(st0016_state::latch8_w));
+	map(0xd0, 0xd0).portr("P1").w(FUNC(st0016_state::mux_select_w));
 	map(0xd1, 0xd1).portr("P2").nopw();
-	map(0xd2, 0xd2).r(this, FUNC(st0016_state::mux_r)).nopw();
+	map(0xd2, 0xd2).r(FUNC(st0016_state::mux_r)).nopw();
 	map(0xd3, 0xd3).portr("P2").nopw();
 	map(0xe0, 0xe0).nopw();
-	map(0xe1, 0xe1).w(this, FUNC(st0016_state::st0016_rom_bank_w));
+	map(0xe1, 0xe1).w(FUNC(st0016_state::st0016_rom_bank_w));
 	map(0xe6, 0xe6).nopw(); /* banking ? ram bank ? shared rambank ? */
 	map(0xe7, 0xe7).nopw(); /* watchdog */
 }
@@ -449,7 +449,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(st0016_state::st0016_int)
 		m_maincpu->set_input_line(0,HOLD_LINE);
 	else if((scanline % 64) == 0)
 		if(m_maincpu->state_int(Z80_IFF1)) /* dirty hack ... */
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -469,9 +469,9 @@ uint32_t st0016_state::screen_update_st0016(screen_device &screen, bitmap_ind16 
 
 MACHINE_CONFIG_START(st0016_state::st0016)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(st0016_mem)
-	MCFG_CPU_IO_MAP(st0016_io)
+	MCFG_DEVICE_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)
+	MCFG_DEVICE_IO_MAP(st0016_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", st0016_state, st0016_int, "screen", 0, 1)
 
 	/* video hardware */
@@ -490,17 +490,17 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(st0016_state::mayjinsn)
 	st0016(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(st0016_m2_io)
-	MCFG_CPU_ADD("sub", V810, 10000000)//25 Mhz ?
-	MCFG_CPU_PROGRAM_MAP(v810_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(st0016_m2_io)
+	MCFG_DEVICE_ADD("sub", V810, 10000000)//25 Mhz ?
+	MCFG_DEVICE_PROGRAM_MAP(v810_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(st0016_state::renju)
 	st0016(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(renju_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(renju_mem)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -698,23 +698,23 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(st0016_state,renju)
+void st0016_state::init_renju()
 {
 	m_maincpu->set_st0016_game_flag(0);
 }
 
-DRIVER_INIT_MEMBER(st0016_state,nratechu)
+void st0016_state::init_nratechu()
 {
 	m_maincpu->set_st0016_game_flag(1);
 }
 
-DRIVER_INIT_MEMBER(st0016_state,mayjinsn)
+void st0016_state::init_mayjinsn()
 {
 	m_maincpu->set_st0016_game_flag(4 /*| 0x80*/);
 	membank("bank2")->set_base(memregion("user1")->base());
 }
 
-DRIVER_INIT_MEMBER(st0016_state,mayjisn2)
+void st0016_state::init_mayjisn2()
 {
 	m_maincpu->set_st0016_game_flag(4);
 	membank("bank2")->set_base(memregion("user1")->base());
@@ -727,13 +727,13 @@ DRIVER_INIT_MEMBER(st0016_state,mayjisn2)
  *
  *************************************/
 
-GAME( 1994, renju,      0,      renju,    renju,    st0016_state, renju,    ROT0, "Visco",            "Renju Kizoku",             MACHINE_NO_COCKTAIL)
-GAME( 1996, nratechu,   0,      st0016,   nratechu, st0016_state, nratechu, ROT0, "Seta",             "Neratte Chu",              MACHINE_NO_COCKTAIL)
-GAME( 1994, mayjisn2,   0,      mayjinsn, mayjisn2, st0016_state, mayjisn2, ROT0, "Seta",             "Mayjinsen 2",              MACHINE_NO_COCKTAIL)
-GAME( 1995, koikois,    0,      st0016,   koikois,  st0016_state, renju,    ROT0, "Visco",            "Koi Koi Shimasho",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL)
-GAME( 2001, gostop,     0,      st0016,   gostop,   st0016_state, renju,    ROT0, "Visco",            "Kankoku Hanafuda Go-Stop", MACHINE_NO_COCKTAIL)
+GAME( 1994, renju,      0,      renju,    renju,    st0016_state, init_renju,    ROT0, "Visco",            "Renju Kizoku",             MACHINE_NO_COCKTAIL)
+GAME( 1996, nratechu,   0,      st0016,   nratechu, st0016_state, init_nratechu, ROT0, "Seta",             "Neratte Chu",              MACHINE_NO_COCKTAIL)
+GAME( 1994, mayjisn2,   0,      mayjinsn, mayjisn2, st0016_state, init_mayjisn2, ROT0, "Seta",             "Mayjinsen 2",              MACHINE_NO_COCKTAIL)
+GAME( 1995, koikois,    0,      st0016,   koikois,  st0016_state, init_renju,    ROT0, "Visco",            "Koi Koi Shimasho",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL)
+GAME( 2001, gostop,     0,      st0016,   gostop,   st0016_state, init_renju,    ROT0, "Visco",            "Kankoku Hanafuda Go-Stop", MACHINE_NO_COCKTAIL)
 
 /* Not working */
-GAME( 1994, mayjinsn,   0,      mayjinsn, st0016,   st0016_state, mayjinsn, ROT0, "Seta",             "Mayjinsen",           MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING|MACHINE_NO_COCKTAIL)
-GAME( 1994, dcrown,     0,      st0016,   renju,    st0016_state, renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 1)", MACHINE_NOT_WORKING|MACHINE_NO_COCKTAIL) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
-GAME( 1994, dcrowna,    dcrown, st0016,   renju,    st0016_state, renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 2)", MACHINE_NOT_WORKING|MACHINE_NO_COCKTAIL) // the Insert Coin text has been translated to English and no (c) is uploaded
+GAME( 1994, mayjinsn,   0,      mayjinsn, st0016,   st0016_state, init_mayjinsn, ROT0, "Seta",             "Mayjinsen",           MACHINE_IMPERFECT_GRAPHICS|MACHINE_NOT_WORKING|MACHINE_NO_COCKTAIL)
+GAME( 1994, dcrown,     0,      st0016,   renju,    st0016_state, init_renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 1)", MACHINE_NOT_WORKING|MACHINE_NO_COCKTAIL) // (c) 1994 Nippon Data Kiki is uploaded near the Japanese Insert coin text
+GAME( 1994, dcrowna,    dcrown, st0016,   renju,    st0016_state, init_renju,    ROT0, "Nippon Data Kiki", "Dream Crown (Set 2)", MACHINE_NOT_WORKING|MACHINE_NO_COCKTAIL) // the Insert Coin text has been translated to English and no (c) is uploaded

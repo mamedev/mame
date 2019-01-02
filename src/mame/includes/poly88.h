@@ -5,9 +5,10 @@
  * includes/poly88.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_POLY88_H
 #define MAME_INCLUDES_POLY88_H
+
+#pragma once
 
 #include "machine/i8251.h"
 #include "imagedev/cassette.h"
@@ -23,8 +24,8 @@ public:
 		TIMER_CASSETTE
 	};
 
-	poly88_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	poly88_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_uart(*this, "uart"),
@@ -36,8 +37,15 @@ public:
 		m_line3(*this, "LINE3"),
 		m_line4(*this, "LINE4"),
 		m_line5(*this, "LINE5"),
-		m_line6(*this, "LINE6") { }
+		m_line6(*this, "LINE6")
+	{ }
 
+	void poly88(machine_config &config);
+	void poly8813(machine_config &config);
+
+	void init_poly88();
+
+private:
 	required_shared_ptr<uint8_t> m_video_ram;
 	uint8_t *m_FNT;
 	uint8_t m_intr;
@@ -51,7 +59,6 @@ public:
 	DECLARE_WRITE8_MEMBER(poly88_baud_rate_w);
 	DECLARE_READ8_MEMBER(poly88_keyboard_r);
 	DECLARE_WRITE8_MEMBER(poly88_intr_w);
-	DECLARE_DRIVER_INIT(poly88);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_poly88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -64,13 +71,11 @@ public:
 	IRQ_CALLBACK_MEMBER(poly88_irq_callback);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( poly88 );
 
-	void poly88(machine_config &config);
-	void poly8813(machine_config &config);
 	void poly8813_io(address_map &map);
 	void poly8813_mem(address_map &map);
 	void poly88_io(address_map &map);
 	void poly88_mem(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<cassette_image_device> m_cassette;

@@ -208,18 +208,18 @@ WRITE32_MEMBER( pci_bus_device::write )
 READ64_MEMBER(pci_bus_device::read_64be)
 {
 	uint64_t result = 0;
-	mem_mask = flipendian_int64(mem_mask);
+	mem_mask = swapendian_int64(mem_mask);
 	if (ACCESSING_BITS_0_31)
 		result |= (uint64_t)read(space, offset * 2 + 0, mem_mask >> 0) << 0;
 	if (ACCESSING_BITS_32_63)
 		result |= (uint64_t)read(space, offset * 2 + 1, mem_mask >> 32) << 32;
-	return flipendian_int64(result);
+	return swapendian_int64(result);
 }
 
 WRITE64_MEMBER(pci_bus_device::write_64be)
 {
-	data = flipendian_int64(data);
-	mem_mask = flipendian_int64(mem_mask);
+	data = swapendian_int64(data);
+	mem_mask = swapendian_int64(mem_mask);
 	if (ACCESSING_BITS_0_31)
 		write(space, offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if (ACCESSING_BITS_32_63)
@@ -233,6 +233,18 @@ void pci_bus_device::add_sibling(pci_bus_device *sibling, int busnum)
 	m_siblings_busnum[m_siblings_count] = busnum;
 	m_siblings_count++;
 }
+
+void pci_bus_device::remap(int space_id, offs_t start, offs_t end)
+{
+	for (int i = 0; i < ARRAY_LENGTH(m_devtag); i++)
+	{
+		if (m_device[i] != nullptr)
+			m_device[i]->remap(space_id, start, end);
+	}
+	for (int i = 0; i < m_siblings_count; i++)
+		m_siblings[i]->remap(space_id, start, end);
+}
+
 
 
 //-------------------------------------------------
@@ -263,8 +275,11 @@ void pci_bus_device::device_start()
 	{
 		sprintf(id, "%d", i);
 		pci_connector_device *conn = downcast<pci_connector_device *>(subdevice(id));
-		if (conn!=nullptr)
+		if (conn != nullptr)
+		{
 			m_device[i] = conn->get_device();
+			m_device[i]->set_pci_bus(this);
+		}
 		else
 			m_device[i] = nullptr;
 	}
@@ -298,7 +313,8 @@ void pci_bus_device::device_reset()
 //-------------------------------------------------
 
 pci_device_interface::pci_device_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_slot_card_interface(mconfig, device),
+	m_pci_bus(nullptr)
 {
 }
 

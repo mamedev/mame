@@ -26,31 +26,29 @@ DEFINE_DEVICE_TYPE(EINSTEIN_SPECULATOR, einstein_speculator_device, "einstein_sp
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(einstein_speculator_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("ic5a", TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_NO_DIODE)
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(47))
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_P(560))
-	MCFG_TTL74123_A_PIN_VALUE(1)
-	MCFG_TTL74123_B_PIN_VALUE(1)
-	MCFG_TTL74123_CLEAR_PIN_VALUE(0)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(einstein_speculator_device, ic5a_q_w))
+	TTL74123(config, m_ic5a, 0);
+	m_ic5a->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	m_ic5a->set_resistor_value(RES_K(47));
+	m_ic5a->set_capacitor_value(CAP_P(560));
+	m_ic5a->set_a_pin_value(1);
+	m_ic5a->set_b_pin_value(1);
+	m_ic5a->set_clear_pin_value(0);
+	m_ic5a->out_cb().set(FUNC(einstein_speculator_device::ic5a_q_w));
 
-	MCFG_DEVICE_ADD("ic5b", TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_NO_DIODE)
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(47))
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_P(560))
-	MCFG_TTL74123_A_PIN_VALUE(1)
-	MCFG_TTL74123_B_PIN_VALUE(1)
-	MCFG_TTL74123_CLEAR_PIN_VALUE(0)
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(einstein_speculator_device, ic5b_q_w))
+	TTL74123(config, m_ic5b, 0);
+	m_ic5b->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	m_ic5b->set_resistor_value(RES_K(47));
+	m_ic5b->set_capacitor_value(CAP_P(560));
+	m_ic5b->set_a_pin_value(1);
+	m_ic5b->set_b_pin_value(1);
+	m_ic5b->set_clear_pin_value(0);
+	m_ic5b->out_cb().set(FUNC(einstein_speculator_device::ic5b_q_w));
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_ADD(m_cassette)
 	MCFG_CASSETTE_FORMATS(tzx_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 	MCFG_CASSETTE_INTERFACE("spectrum_cass")
@@ -86,7 +84,7 @@ void einstein_speculator_device::device_start()
 	memset(m_ram.get(), 0xff, 0x800);
 
 	// register for save states
-	save_pointer(NAME(m_ram.get()), 0x800);
+	save_pointer(NAME(m_ram), 0x800);
 	save_item(NAME(m_nmisel));
 }
 

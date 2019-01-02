@@ -48,23 +48,22 @@ class forte2_state : public driver_device
 {
 public:
 	forte2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_DRIVER_INIT(pesadelo);
+	void init_pesadelo();
 	void pesadelo(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void io_mem(address_map &map);
 	void program_mem(address_map &map);
 
-	DECLARE_READ8_MEMBER(forte2_ay8910_read_input);
-	DECLARE_WRITE8_MEMBER(forte2_ay8910_set_input_mask);
+	DECLARE_READ8_MEMBER(ay8910_read_input);
+	DECLARE_WRITE8_MEMBER(ay8910_set_input_mask);
 
-private:
 	required_device<cpu_device> m_maincpu;
 
 	uint8_t m_input_mask;
@@ -82,8 +81,8 @@ void forte2_state::io_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x98, 0x98).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0x99, 0x99).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0x98, 0x98).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0x99, 0x99).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
 	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xa2, 0xa2).r("aysnd", FUNC(ay8910_device::data_r));
 //  AM_RANGE(0xa8, 0xa8) AM_RAM // Ports a8-ab are originally for communicating with the i8255 PPI on MSX.
@@ -103,12 +102,12 @@ static INPUT_PORTS_START( pesadelo )
 INPUT_PORTS_END
 
 
-READ8_MEMBER(forte2_state::forte2_ay8910_read_input)
+READ8_MEMBER(forte2_state::ay8910_read_input)
 {
 	return ioport("IN0")->read() | (m_input_mask & 0x3f);
 }
 
-WRITE8_MEMBER(forte2_state::forte2_ay8910_set_input_mask)
+WRITE8_MEMBER(forte2_state::ay8910_set_input_mask)
 {
 	/* PSG reg 15, writes 0 at coin insert, 0xff at boot and game over */
 	m_input_mask = data;
@@ -126,29 +125,29 @@ void forte2_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(forte2_state::pesadelo)
-
+void forte2_state::pesadelo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(program_mem)
-	MCFG_CPU_IO_MAP(io_mem)
+	Z80(config, m_maincpu, XTAL(3'579'545));
+	m_maincpu->set_addrmap(AS_PROGRAM, &forte2_state::program_mem);
+	m_maincpu->set_addrmap(AS_IO, &forte2_state::io_mem);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tms9928a", TMS9928A, XTAL(10'738'635)/2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
+	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(3'579'545)/2)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(forte2_state, forte2_ay8910_read_input))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(forte2_state, forte2_ay8910_set_input_mask))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(3'579'545)/2));
+	aysnd.port_a_read_callback().set(FUNC(forte2_state::ay8910_read_input));
+	aysnd.port_b_write_callback().set(FUNC(forte2_state::ay8910_set_input_mask));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-DRIVER_INIT_MEMBER(forte2_state,pesadelo)
+void forte2_state::init_pesadelo()
 {
 	uint8_t *mem = memregion("maincpu")->base();
 	int memsize = memregion("maincpu")->bytes();
@@ -160,8 +159,8 @@ DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 	}
 
 	// address line swap
-	std::vector<uint8_t> buf(memsize);
-	memcpy(&buf[0], mem, memsize);
+	std::vector<uint8_t> buf(&mem[0], &mem[memsize]);
+
 	for (int i = 0; i < memsize; i++)
 	{
 		mem[bitswap<16>(i,11,9,8,13,14,15,12,7,6,5,4,3,2,1,0,10)] = buf[i];
@@ -173,4 +172,4 @@ ROM_START( pesadelo )
 	ROM_LOAD( "epr2764.15", 0x00000, 0x10000, CRC(1ae2f724) SHA1(12880dd7ad82acf04861843fb9d4f0f926d18f6b) )
 ROM_END
 
-GAME( 1989, pesadelo, 0, pesadelo, pesadelo, forte2_state, pesadelo, ROT0, "bootleg (Forte II Games) / Konami", "Pesadelo (bootleg of Knightmare on MSX)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pesadelo, 0, pesadelo, pesadelo, forte2_state, init_pesadelo, ROT0, "bootleg (Forte II Games) / Konami", "Pesadelo (bootleg of Knightmare on MSX)", MACHINE_SUPPORTS_SAVE )

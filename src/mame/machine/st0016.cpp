@@ -4,6 +4,7 @@
 
 #include "emu.h"
 #include "st0016.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -11,10 +12,10 @@ DEFINE_DEVICE_TYPE(ST0016_CPU, st0016_cpu_device, "st0016_cpu", "ST0016")
 
 void st0016_cpu_device::st0016_cpu_internal_map(address_map &map)
 {
-	map(0xc000, 0xcfff).r(this, FUNC(st0016_cpu_device::st0016_sprite_ram_r)).w(this, FUNC(st0016_cpu_device::st0016_sprite_ram_w));
-	map(0xd000, 0xdfff).r(this, FUNC(st0016_cpu_device::st0016_sprite2_ram_r)).w(this, FUNC(st0016_cpu_device::st0016_sprite2_ram_w));
-	map(0xea00, 0xebff).r(this, FUNC(st0016_cpu_device::st0016_palette_ram_r)).w(this, FUNC(st0016_cpu_device::st0016_palette_ram_w));
-	map(0xec00, 0xec1f).r(this, FUNC(st0016_cpu_device::st0016_character_ram_r)).w(this, FUNC(st0016_cpu_device::st0016_character_ram_w));
+	map(0xc000, 0xcfff).r(FUNC(st0016_cpu_device::st0016_sprite_ram_r)).w(FUNC(st0016_cpu_device::st0016_sprite_ram_w));
+	map(0xd000, 0xdfff).r(FUNC(st0016_cpu_device::st0016_sprite2_ram_r)).w(FUNC(st0016_cpu_device::st0016_sprite2_ram_w));
+	map(0xea00, 0xebff).r(FUNC(st0016_cpu_device::st0016_palette_ram_r)).w(FUNC(st0016_cpu_device::st0016_palette_ram_w));
+	map(0xec00, 0xec1f).r(FUNC(st0016_cpu_device::st0016_character_ram_r)).w(FUNC(st0016_cpu_device::st0016_character_ram_w));
 	map(0xe900, 0xe9ff).rw("stsnd", FUNC(st0016_device::st0016_snd_r), FUNC(st0016_device::st0016_snd_w)); /* sound regs 8 x $20 bytes, see notes */
 }
 
@@ -22,11 +23,11 @@ void st0016_cpu_device::st0016_cpu_internal_map(address_map &map)
 void st0016_cpu_device::st0016_cpu_internal_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xbf).r(this, FUNC(st0016_cpu_device::st0016_vregs_r)).w(this, FUNC(st0016_cpu_device::st0016_vregs_w)); /* video/crt regs ? */
-	map(0xe2, 0xe2).w(this, FUNC(st0016_cpu_device::st0016_sprite_bank_w));
-	map(0xe3, 0xe4).w(this, FUNC(st0016_cpu_device::st0016_character_bank_w));
-	map(0xe5, 0xe5).w(this, FUNC(st0016_cpu_device::st0016_palette_bank_w));
-	map(0xf0, 0xf0).r(this, FUNC(st0016_cpu_device::st0016_dma_r));
+	map(0x00, 0xbf).r(FUNC(st0016_cpu_device::st0016_vregs_r)).w(FUNC(st0016_cpu_device::st0016_vregs_w)); /* video/crt regs ? */
+	map(0xe2, 0xe2).w(FUNC(st0016_cpu_device::st0016_sprite_bank_w));
+	map(0xe3, 0xe4).w(FUNC(st0016_cpu_device::st0016_character_bank_w));
+	map(0xe5, 0xe5).w(FUNC(st0016_cpu_device::st0016_palette_bank_w));
+	map(0xf0, 0xf0).r(FUNC(st0016_cpu_device::st0016_dma_r));
 }
 
 // note: a lot of bits are left uninitialized by the games, the default values are uncertain
@@ -118,17 +119,18 @@ READ8_MEMBER(st0016_cpu_device::soundram_read)
 }
 
 /* CPU interface */
-MACHINE_CONFIG_START(st0016_cpu_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+void st0016_cpu_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_PALETTE_ADD("palette", 16*16*4+1)
+	PALETTE(config, "palette").set_entries(16*16*4+1);
 
-	MCFG_DEVICE_ADD("stsnd", ST0016, 0)
-	MCFG_ST0016_SOUNDRAM_READ_CB(READ8(st0016_cpu_device, soundram_read))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-MACHINE_CONFIG_END
+	st0016_device &stsnd(ST0016(config, "stsnd", 0));
+	stsnd.ram_read().set(FUNC(st0016_cpu_device::soundram_read));
+	stsnd.add_route(0, "lspeaker", 1.0);
+	stsnd.add_route(1, "rspeaker", 1.0);
+}
 
 
 static const gfx_layout charlayout =
@@ -571,9 +573,9 @@ void st0016_cpu_device::st0016_save_init()
 	save_item(NAME(m_dma_offset));
 	//save_item(NAME(st0016_rom_bank));
 	save_item(NAME(st0016_vregs));
-	save_pointer(NAME(m_charram.get()), MAX_CHAR_BANK*CHAR_BANK_SIZE);
-	save_pointer(NAME(st0016_paletteram.get()), MAX_PAL_BANK*PAL_BANK_SIZE);
-	save_pointer(NAME(st0016_spriteram.get()), MAX_SPR_BANK*SPR_BANK_SIZE);
+	save_pointer(NAME(m_charram), MAX_CHAR_BANK*CHAR_BANK_SIZE);
+	save_pointer(NAME(st0016_paletteram), MAX_PAL_BANK*PAL_BANK_SIZE);
+	save_pointer(NAME(st0016_spriteram), MAX_SPR_BANK*SPR_BANK_SIZE);
 }
 
 

@@ -1,31 +1,33 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, ElSemi
 
-#include "namcos2.h"
 #include "machine/timer.h"
+#include "screen.h"
+#include "video/namco_c123tmap.h"
 #include "video/namco_c116.h"
+#include "video/namco_c169roz.h"
+#include "video/namco_c355spr.h"
+#include "emupal.h"
 
 #define NAMCOFL_HTOTAL      (288)   /* wrong */
 #define NAMCOFL_HBSTART (288)
 #define NAMCOFL_VTOTAL      (262)   /* needs to be checked */
 #define NAMCOFL_VBSTART (224)
 
-#define NAMCOFL_TILEMASKREGION      "tilemask"
-#define NAMCOFL_TILEGFXREGION       "tile"
-#define NAMCOFL_SPRITEGFXREGION "sprite"
-#define NAMCOFL_ROTMASKREGION       "rotmask"
-#define NAMCOFL_ROTGFXREGION        "rot"
+#define NAMCOFL_SPRITEGFX       0
 
-#define NAMCOFL_TILEGFX     0
-#define NAMCOFL_SPRITEGFX       1
-#define NAMCOFL_ROTGFX          2
-
-class namcofl_state : public namcos2_shared_state
+class namcofl_state : public driver_device
 {
 public:
-	namcofl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcos2_shared_state(mconfig, type, tag),
-		m_c116(*this,"c116"),
+	namcofl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_c116(*this, "c116"),
+		m_screen(*this, "screen"),
+		m_c123tmap(*this, "c123tmap"),
+		m_c169roz(*this, "c169roz"),
+		m_c355spr(*this, "c355spr"),
+		m_mcu(*this, "mcu"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_in2(*this, "IN2"),
@@ -35,7 +37,19 @@ public:
 		m_wheel(*this, "WHEEL"),
 		m_shareram(*this, "shareram", 32) { }
 
+	void namcofl(machine_config &config);
+
+	void init_speedrcr();
+	void init_finalapr();
+
+private:
+	required_device<cpu_device> m_maincpu;
 	required_device<namco_c116_device> m_c116;
+	required_device<screen_device> m_screen;
+	required_device<namco_c123tmap_device> m_c123tmap;
+	required_device<namco_c169roz_device> m_c169roz;
+	required_device<namco_c355spr_device> m_c355spr;
+	required_device<cpu_device> m_mcu;
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport m_in2;
@@ -69,8 +83,6 @@ public:
 	DECLARE_READ8_MEMBER(dac1_r);
 	DECLARE_READ8_MEMBER(dac0_r);
 	DECLARE_WRITE32_MEMBER(namcofl_spritebank_w);
-	DECLARE_DRIVER_INIT(speedrcr);
-	DECLARE_DRIVER_INIT(finalapr);
 	DECLARE_MACHINE_START(namcofl);
 	DECLARE_MACHINE_RESET(namcofl);
 	DECLARE_VIDEO_START(namcofl);
@@ -84,7 +96,7 @@ public:
 	void common_init();
 	int FLobjcode2tile(int code);
 	void TilemapCB(uint16_t code, int *tile, int *mask);
-	void namcofl(machine_config &config);
+	void RozCB(uint16_t code, int *tile, int *mask, int which);
 	void namcoc75_am(address_map &map);
 	void namcoc75_io(address_map &map);
 	void namcofl_mem(address_map &map);

@@ -623,21 +623,21 @@ void taitojc_state::taitojc_map(address_map &map)
 	map(0x00000000, 0x001fffff).rom().mirror(0x200000);
 	map(0x00400000, 0x01bfffff).rom().region("gfx1", 0);
 	map(0x04000000, 0x040f7fff).ram().share("vram");
-	map(0x040f8000, 0x040fbfff).rw(this, FUNC(taitojc_state::taitojc_tile_r), FUNC(taitojc_state::taitojc_tile_w));
-	map(0x040fc000, 0x040fefff).rw(this, FUNC(taitojc_state::taitojc_char_r), FUNC(taitojc_state::taitojc_char_w));
+	map(0x040f8000, 0x040fbfff).rw(FUNC(taitojc_state::taitojc_tile_r), FUNC(taitojc_state::taitojc_tile_w));
+	map(0x040fc000, 0x040fefff).rw(FUNC(taitojc_state::taitojc_char_r), FUNC(taitojc_state::taitojc_char_w));
 	map(0x040ff000, 0x040fffff).ram().share("objlist");
-	map(0x05800000, 0x0580003f).r(this, FUNC(taitojc_state::jc_pcbid_r));
-	map(0x05900000, 0x05900007).rw(this, FUNC(taitojc_state::mcu_comm_r), FUNC(taitojc_state::mcu_comm_w));
-	map(0x06400000, 0x0641ffff).rw(this, FUNC(taitojc_state::taitojc_palette_r), FUNC(taitojc_state::taitojc_palette_w)).share("palette_ram");
+	map(0x05800000, 0x0580003f).r(FUNC(taitojc_state::jc_pcbid_r));
+	map(0x05900000, 0x05900007).rw(FUNC(taitojc_state::mcu_comm_r), FUNC(taitojc_state::mcu_comm_w));
+	map(0x06400000, 0x0641ffff).rw(FUNC(taitojc_state::taitojc_palette_r), FUNC(taitojc_state::taitojc_palette_w)).share("palette_ram");
 	map(0x06600000, 0x0660001f).rw(m_tc0640fio, FUNC(tc0640fio_device::read), FUNC(tc0640fio_device::write)).umask32(0xff000000);
 	map(0x0660004c, 0x0660004f).portw("EEPROMOUT");
-	map(0x06800001, 0x06800001).w(this, FUNC(taitojc_state::jc_irq_unk_w));
+	map(0x06800001, 0x06800001).w(FUNC(taitojc_state::jc_irq_unk_w));
 	map(0x06a00000, 0x06a01fff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)).umask32(0xff000000);
-	map(0x06c00000, 0x06c0001f).rw(this, FUNC(taitojc_state::jc_lan_r), FUNC(taitojc_state::jc_lan_w)).umask32(0x00ff0000);
+	map(0x06c00000, 0x06c0001f).rw(FUNC(taitojc_state::jc_lan_r), FUNC(taitojc_state::jc_lan_w)).umask32(0x00ff0000);
 	map(0x08000000, 0x080fffff).ram().share("main_ram");
-	map(0x10000000, 0x10001fff).rw(this, FUNC(taitojc_state::dsp_shared_r), FUNC(taitojc_state::dsp_shared_w)).umask32(0xffff0000);
-	map(0x10001ff8, 0x10001ff9).r(this, FUNC(taitojc_state::dsp_to_main_7fe_r));
-	map(0x10001ffc, 0x10001ffd).w(this, FUNC(taitojc_state::main_to_dsp_7ff_w));
+	map(0x10000000, 0x10001fff).rw(FUNC(taitojc_state::dsp_shared_r), FUNC(taitojc_state::dsp_shared_w)).umask32(0xffff0000);
+	map(0x10001ff8, 0x10001ff9).r(FUNC(taitojc_state::dsp_to_main_7fe_r));
+	map(0x10001ffc, 0x10001ffd).w(FUNC(taitojc_state::main_to_dsp_7ff_w));
 }
 
 
@@ -672,8 +672,8 @@ WRITE8_MEMBER(taitojc_state::dendego_brakemeter_w)
 void taitojc_state::dendego_map(address_map &map)
 {
 	taitojc_map(map);
-	map(0x06e00001, 0x06e00001).w(this, FUNC(taitojc_state::dendego_speedmeter_w));
-	map(0x06e00005, 0x06e00005).w(this, FUNC(taitojc_state::dendego_brakemeter_w));
+	map(0x06e00001, 0x06e00001).w(FUNC(taitojc_state::dendego_speedmeter_w));
+	map(0x06e00005, 0x06e00005).w(FUNC(taitojc_state::dendego_brakemeter_w));
 	map(0x06e0000d, 0x06e0000d).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -754,10 +754,10 @@ void taitojc_state::hc11_pgm_map(address_map &map)
 void taitojc_state::hc11_io_map(address_map &map)
 {
 	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).nopr(); // ?
-	map(MC68HC11_IO_PORTG, MC68HC11_IO_PORTG).rw(this, FUNC(taitojc_state::hc11_comm_r), FUNC(taitojc_state::hc11_comm_w));
-	map(MC68HC11_IO_PORTH, MC68HC11_IO_PORTH).rw(this, FUNC(taitojc_state::hc11_output_r), FUNC(taitojc_state::hc11_output_w));
-	map(MC68HC11_IO_SPI2_DATA, MC68HC11_IO_SPI2_DATA).rw(this, FUNC(taitojc_state::hc11_data_r), FUNC(taitojc_state::hc11_data_w));
-	map(MC68HC11_IO_AD0, MC68HC11_IO_AD7).r(this, FUNC(taitojc_state::hc11_analog_r));
+	map(MC68HC11_IO_PORTG, MC68HC11_IO_PORTG).rw(FUNC(taitojc_state::hc11_comm_r), FUNC(taitojc_state::hc11_comm_w));
+	map(MC68HC11_IO_PORTH, MC68HC11_IO_PORTH).rw(FUNC(taitojc_state::hc11_output_r), FUNC(taitojc_state::hc11_output_w));
+	map(MC68HC11_IO_SPI2_DATA, MC68HC11_IO_SPI2_DATA).rw(FUNC(taitojc_state::hc11_data_r), FUNC(taitojc_state::hc11_data_w));
+	map(MC68HC11_IO_AD0, MC68HC11_IO_AD7).r(FUNC(taitojc_state::hc11_analog_r));
 }
 
 
@@ -862,16 +862,16 @@ void taitojc_state::tms_data_map(address_map &map)
 	map(0x6b20, 0x6b20).w(m_tc0780fpa, FUNC(tc0780fpa_device::poly_fifo_w));
 	map(0x6b22, 0x6b22).w(m_tc0780fpa, FUNC(tc0780fpa_device::tex_w));
 	map(0x6b23, 0x6b23).rw(m_tc0780fpa, FUNC(tc0780fpa_device::tex_addr_r), FUNC(tc0780fpa_device::tex_addr_w));
-	map(0x6c00, 0x6c01).rw(this, FUNC(taitojc_state::dsp_rom_r), FUNC(taitojc_state::dsp_rom_w));
-	map(0x7000, 0x7002).w(this, FUNC(taitojc_state::dsp_math_projection_w));
-	map(0x7010, 0x7012).w(this, FUNC(taitojc_state::dsp_math_intersection_w));
-	map(0x7013, 0x7015).w(this, FUNC(taitojc_state::dsp_math_viewport_w));
-	map(0x701b, 0x701b).r(this, FUNC(taitojc_state::dsp_math_intersection_r));
-	map(0x701d, 0x701d).r(this, FUNC(taitojc_state::dsp_math_projection_y_r));
-	map(0x701f, 0x701f).r(this, FUNC(taitojc_state::dsp_math_projection_x_r));
-	map(0x7022, 0x7022).r(this, FUNC(taitojc_state::dsp_math_unk_r));
+	map(0x6c00, 0x6c01).rw(FUNC(taitojc_state::dsp_rom_r), FUNC(taitojc_state::dsp_rom_w));
+	map(0x7000, 0x7002).w(FUNC(taitojc_state::dsp_math_projection_w));
+	map(0x7010, 0x7012).w(FUNC(taitojc_state::dsp_math_intersection_w));
+	map(0x7013, 0x7015).w(FUNC(taitojc_state::dsp_math_viewport_w));
+	map(0x701b, 0x701b).r(FUNC(taitojc_state::dsp_math_intersection_r));
+	map(0x701d, 0x701d).r(FUNC(taitojc_state::dsp_math_projection_y_r));
+	map(0x701f, 0x701f).r(FUNC(taitojc_state::dsp_math_projection_x_r));
+	map(0x7022, 0x7022).r(FUNC(taitojc_state::dsp_math_unk_r));
 	map(0x7800, 0x7fff).ram().share("dsp_shared");
-	map(0x7ffe, 0x7ffe).w(this, FUNC(taitojc_state::dsp_to_main_7fe_w));
+	map(0x7ffe, 0x7ffe).w(FUNC(taitojc_state::dsp_to_main_7fe_w));
 	map(0x8000, 0xffff).ram();
 }
 
@@ -1077,66 +1077,66 @@ void taitojc_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(taitojc_state::taitojc)
-
+void taitojc_state::taitojc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68040, XTAL(10'000'000)*2) // 20MHz, clock source = CY7C991
-	MCFG_CPU_PROGRAM_MAP(taitojc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitojc_state, taitojc_vblank)
+	M68040(config, m_maincpu, XTAL(10'000'000)*2); // 20MHz, clock source = CY7C991
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitojc_state::taitojc_map);
+	m_maincpu->set_vblank_int("screen", FUNC(taitojc_state::taitojc_vblank));
 
-	MCFG_CPU_ADD("sub", MC68HC11, XTAL(16'000'000)/2) // 8MHz, MC68HC11M0
-	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
-	MCFG_CPU_IO_MAP(hc11_io_map)
-	MCFG_MC68HC11_CONFIG( 1, 1280, 0x00 )
+	mc68hc11_cpu_device &sub(MC68HC11(config, "sub", XTAL(16'000'000)/2)); // 8MHz, MC68HC11M0
+	sub.set_addrmap(AS_PROGRAM, &taitojc_state::hc11_pgm_map);
+	sub.set_addrmap(AS_IO, &taitojc_state::hc11_io_map);
+	sub.set_config(1, 1280, 0x00);
 
-	MCFG_CPU_ADD("dsp", TMS32051, XTAL(10'000'000)*4) // 40MHz, clock source = CY7C991
-	MCFG_CPU_PROGRAM_MAP(tms_program_map)
-	MCFG_CPU_DATA_MAP(tms_data_map)
+	TMS32051(config, m_dsp, XTAL(10'000'000)*4); // 40MHz, clock source = CY7C991
+	m_dsp->set_addrmap(AS_PROGRAM, &taitojc_state::tms_program_map);
+	m_dsp->set_addrmap(AS_DATA, &taitojc_state::tms_data_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
-	MCFG_TC0640FIO_READ_0_CB(IOPORT("SERVICE"))
-	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
-	MCFG_TC0640FIO_READ_2_CB(IOPORT("START"))
-	MCFG_TC0640FIO_READ_3_CB(IOPORT("UNUSED"))
-	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(taitojc_state, coin_control_w))
-	MCFG_TC0640FIO_READ_7_CB(IOPORT("BUTTONS"))
+	TC0640FIO(config, m_tc0640fio, 0);
+	m_tc0640fio->read_0_callback().set_ioport("SERVICE");
+	m_tc0640fio->read_1_callback().set_ioport("COINS");
+	m_tc0640fio->read_2_callback().set_ioport("START");
+	m_tc0640fio->read_3_callback().set_ioport("UNUSED");
+	m_tc0640fio->write_4_callback().set(FUNC(taitojc_state::coin_control_w));
+	m_tc0640fio->read_7_callback().set_ioport("BUTTONS");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(taitojc_state, screen_update_taitojc)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(taitojc_state::screen_update_taitojc));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, m_palette).set_entries(32768);
 
-	MCFG_DEVICE_ADD("tc0780fpa", TC0780FPA, 0)
+	TC0780FPA(config, m_tc0780fpa, 0);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
-MACHINE_CONFIG_END
+	TAITO_EN(config, "taito_en", 0);
+}
 
-MACHINE_CONFIG_START(taitojc_state::dendego)
+void taitojc_state::dendego(machine_config &config)
+{
 	taitojc(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dendego_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitojc_state::dendego_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(taitojc_state, screen_update_dendego)
+	m_screen->set_screen_update(FUNC(taitojc_state::screen_update_dendego));
 
 	/* sound hardware */
-	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "subwoofer", 0.20)
-MACHINE_CONFIG_END
+	SPEAKER(config, "vibration").subwoofer();
+
+	/* clock frequency & pin 7 not verified */
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "vibration", 0.20);
+}
 
 
 
@@ -1164,7 +1164,7 @@ READ16_MEMBER(taitojc_state::dendego2_dsp_idle_skip_r)
 }
 
 
-DRIVER_INIT_MEMBER(taitojc_state,taitojc)
+void taitojc_state::init_taitojc()
 {
 	m_has_dsp_hack = 1;
 
@@ -1172,17 +1172,17 @@ DRIVER_INIT_MEMBER(taitojc_state,taitojc)
 		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::taitojc_dsp_idle_skip_r),this));
 }
 
-DRIVER_INIT_MEMBER(taitojc_state,dendego2)
+void taitojc_state::init_dendego2()
 {
-	DRIVER_INIT_CALL(taitojc);
+	init_taitojc();
 
 	if (DSP_IDLESKIP)
 		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::dendego2_dsp_idle_skip_r),this));
 }
 
-DRIVER_INIT_MEMBER(taitojc_state,dangcurv)
+void taitojc_state::init_dangcurv()
 {
-	DRIVER_INIT_CALL(taitojc);
+	init_taitojc();
 
 	m_has_dsp_hack = 0;
 }
@@ -2103,20 +2103,20 @@ ROM_START( dangcurvj ) /* Dangerous Curves Ver 2.2 J */
 ROM_END
 
 
-GAME( 1995, dangcurv,  0,        taitojc, dangcurv, taitojc_state, dangcurv, ROT0, "Taito", "Dangerous Curves (Ver 2.9 O)",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )                        // DANGEROUS CURVES       VER 2.9 O   1995.08.24   17:45
-GAME( 1995, dangcurvj, dangcurv, taitojc, dangcurv, taitojc_state, dangcurv, ROT0, "Taito", "Dangerous Curves (Ver 2.2 J)",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )                        // DANGEROUS CURVES       VER 2.2 J   1995.07.20   17:45
-GAME( 1995, landgear,  0,        taitojc, landgear, taitojc_state, taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 O)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // LANDING GEAR           VER 4.2 O   Feb  8 1996  09:46:22
-GAME( 1995, landgearj, landgear, taitojc, landgear, taitojc_state, taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // LANDING GEAR           VER 4.2 J   Feb  8 1996  09:46:22
-GAME( 1995, landgeara, landgear, taitojc, landgear, taitojc_state, taitojc,  ROT0, "Taito", "Landing Gear (Ver 3.1 O)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // LANDING GEAR           VER 3.1 O   Feb  8 1996  09:46:22
-GAME( 1995, landgearja,landgear, taitojc, landgear, taitojc_state, taitojc,  ROT0, "Taito", "Landing Gear (Ver 3.0 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // LANDING GEAR           VER 3.0 J   Feb  8 1996  09:46:22
-GAME( 1996, sidebs,    0,        taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side (Ver 2.7 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE           VER 2.7 J   1996/10/11   14:54:10
-GAME( 1996, sidebsja,  sidebs,   taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side (Ver 2.6 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE           VER 2.6 J   1996/ 7/ 1   18:41:51
-GAME( 1996, sidebsjb,  sidebs,   taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side (Ver 2.5 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE           VER 2.5 J   1996/ 6/20   18:13:14
-GAMEL(1996, dendego,   0,        dendego, dendego,  taitojc_state, taitojc,  ROT0, "Taito", "Densha de GO! (Ver 2.2 J)",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego ) // DENSYA DE GO           VER 2.2 J   1997/ 2/ 4   12:00:28
-GAMEL(1996, dendegox,  dendego,  dendego, dendego,  taitojc_state, taitojc,  ROT0, "Taito", "Densha de GO! EX (Ver 2.4 J)",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego ) // DENSYA DE GO           VER 2.4 J   1997/ 4/18   13:38:34
-GAME( 1997, sidebs2,   0,        taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 OK)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE2          VER 2.6 OK  1997/ 6/ 4   17:27:37
-GAME( 1997, sidebs2u,  sidebs2,  taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 A)",                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE2          VER 2.6 A   1997/ 6/19   09:39:22
-GAME( 1997, sidebs2j,  sidebs2,  taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side 2 Evoluzione RR (Ver 3.1 J)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE2          VER 3.1 J   1997/10/ 7   13:55:38
-GAME( 1997, sidebs2ja, sidebs2,  taitojc, sidebs,   taitojc_state, taitojc,  ROT0, "Taito", "Side by Side 2 Evoluzione (Ver 2.4 J)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE2          VER 2.4 J   1997/ 5/26   13:06:37
-GAMEL(1998, dendego2,  0,        dendego, dendego,  taitojc_state, dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen (Ver 2.5 J)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego ) // DENSYA DE GO2          VER 2.5 J   1998/ 3/ 2   15:30:55
-GAMEL(1998, dendego23k,dendego2, dendego, dendego,  taitojc_state, dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen 3000-bandai (Ver 2.20 J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego ) // DENSYA DE GO! 2 3000   VER 2.20 J  1998/ 7/15   17:42:38
+GAME( 1995, dangcurv,  0,        taitojc, dangcurv, taitojc_state, init_dangcurv, ROT0, "Taito", "Dangerous Curves (Ver 2.9 O)",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )                        // DANGEROUS CURVES       VER 2.9 O   1995.08.24   17:45
+GAME( 1995, dangcurvj, dangcurv, taitojc, dangcurv, taitojc_state, init_dangcurv, ROT0, "Taito", "Dangerous Curves (Ver 2.2 J)",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )                        // DANGEROUS CURVES       VER 2.2 J   1995.07.20   17:45
+GAME( 1995, landgear,  0,        taitojc, landgear, taitojc_state, init_taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 O)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // LANDING GEAR           VER 4.2 O   Feb  8 1996  09:46:22
+GAME( 1995, landgearj, landgear, taitojc, landgear, taitojc_state, init_taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // LANDING GEAR           VER 4.2 J   Feb  8 1996  09:46:22
+GAME( 1995, landgeara, landgear, taitojc, landgear, taitojc_state, init_taitojc,  ROT0, "Taito", "Landing Gear (Ver 3.1 O)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // LANDING GEAR           VER 3.1 O   Feb  8 1996  09:46:22
+GAME( 1995, landgearja,landgear, taitojc, landgear, taitojc_state, init_taitojc,  ROT0, "Taito", "Landing Gear (Ver 3.0 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // LANDING GEAR           VER 3.0 J   Feb  8 1996  09:46:22
+GAME( 1996, sidebs,    0,        taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side (Ver 2.7 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE           VER 2.7 J   1996/10/11   14:54:10
+GAME( 1996, sidebsja,  sidebs,   taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side (Ver 2.6 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE           VER 2.6 J   1996/ 7/ 1   18:41:51
+GAME( 1996, sidebsjb,  sidebs,   taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side (Ver 2.5 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE           VER 2.5 J   1996/ 6/20   18:13:14
+GAMEL(1996, dendego,   0,        dendego, dendego,  taitojc_state, init_taitojc,  ROT0, "Taito", "Densha de GO! (Ver 2.2 J)",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego ) // DENSYA DE GO           VER 2.2 J   1997/ 2/ 4   12:00:28
+GAMEL(1996, dendegox,  dendego,  dendego, dendego,  taitojc_state, init_taitojc,  ROT0, "Taito", "Densha de GO! EX (Ver 2.4 J)",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego ) // DENSYA DE GO           VER 2.4 J   1997/ 4/18   13:38:34
+GAME( 1997, sidebs2,   0,        taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 OK)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE2          VER 2.6 OK  1997/ 6/ 4   17:27:37
+GAME( 1997, sidebs2u,  sidebs2,  taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 A)",                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE2          VER 2.6 A   1997/ 6/19   09:39:22
+GAME( 1997, sidebs2j,  sidebs2,  taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side 2 Evoluzione RR (Ver 3.1 J)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE2          VER 3.1 J   1997/10/ 7   13:55:38
+GAME( 1997, sidebs2ja, sidebs2,  taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side 2 Evoluzione (Ver 2.4 J)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                 // SIDE BY SIDE2          VER 2.4 J   1997/ 5/26   13:06:37
+GAMEL(1998, dendego2,  0,        dendego, dendego,  taitojc_state, init_dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen (Ver 2.5 J)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego ) // DENSYA DE GO2          VER 2.5 J   1998/ 3/ 2   15:30:55
+GAMEL(1998, dendego23k,dendego2, dendego, dendego,  taitojc_state, init_dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen 3000-bandai (Ver 2.20 J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego ) // DENSYA DE GO! 2 3000   VER 2.20 J  1998/ 7/15   17:42:38

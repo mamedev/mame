@@ -153,7 +153,7 @@ std::unique_ptr<util::disasm_interface> pps4_device::create_disassembler()
  */
 inline u8 pps4_device::ROP()
 {
-	const u8 op = m_direct->read_byte(m_P & 0xFFF);
+	const u8 op = m_cache->read_byte(m_P & 0xFFF);
 	m_Ip = m_I1;         // save previous opcode
 	m_P = (m_P + 1) & 0xFFF;
 	m_icount -= 1;
@@ -169,7 +169,7 @@ inline u8 pps4_device::ROP()
  */
 inline u8 pps4_device::ARG()
 {
-	const u8 arg = m_direct->read_byte(m_P & 0xFFF);
+	const u8 arg = m_cache->read_byte(m_P & 0xFFF);
 	m_P = (m_P + 1) & 0xFFF;
 	m_icount -= 1;
 	return arg;
@@ -1569,7 +1569,7 @@ void pps4_device::execute_run()
 void pps4_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 

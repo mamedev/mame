@@ -72,7 +72,7 @@ private:
 	int m_g_cycles;
 
 	address_space *m_program;
-	direct_read_data<-1> *m_direct;
+	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_cache;
 	address_space *m_io;
 
 	void update_P();

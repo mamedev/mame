@@ -28,6 +28,7 @@
 #include "machine/ripple_counter.h"
 #include "machine/tms5501.h"
 #include "video/tms9927.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -125,7 +126,7 @@ static INPUT_PORTS_START( compucolor2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F13 POINT X")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("FG ON")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad =") PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y3")
@@ -145,7 +146,7 @@ static INPUT_PORTS_START( compucolor2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F11 POINT INC")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ERASE LINE")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad +") PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y5")
@@ -155,7 +156,7 @@ static INPUT_PORTS_START( compucolor2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F10 X BAR XO")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad X") PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad " UTF8_MULTIPLY) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y6")
@@ -396,47 +397,45 @@ void compucolor2_state::machine_reset()
 
 MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 	// basic machine hardware
-	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL(17'971'200)/9)
-	MCFG_CPU_PROGRAM_MAP(compucolor2_mem)
-	MCFG_CPU_IO_MAP(compucolor2_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(compucolor2_state,int_ack)
+	MCFG_DEVICE_ADD(I8080_TAG, I8080, XTAL(17'971'200)/9)
+	MCFG_DEVICE_PROGRAM_MAP(compucolor2_mem)
+	MCFG_DEVICE_IO_MAP(compucolor2_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(compucolor2_state,int_ack)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(17'971'200)/2, 93*6, 0, 64*6, 268, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(compucolor2_state, screen_update)
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
-	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL(17'971'200)/2/6)
-	MCFG_TMS9927_CHAR_WIDTH(6)
-	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE("blink", ripple_counter_device, clock_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CRT5027(config, m_vtac, XTAL(17'971'200)/2/6);
+	m_vtac->set_char_width(6);
+	m_vtac->vsyn_callback().set("blink", FUNC(ripple_counter_device::clock_w));
+	m_vtac->set_screen("screen");
 
-	MCFG_DEVICE_ADD("blink", RIPPLE_COUNTER, 0) // 74LS393 at UG10
-	MCFG_RIPPLE_COUNTER_STAGES(8)
-	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(DEVWRITELINE(TMS5501_TAG, tms5501_device, sens_w)) MCFG_DEVCB_BIT(4)
+	ripple_counter_device &blink(RIPPLE_COUNTER(config, "blink")); // 74LS393 at UG10
+	blink.set_stages(8);
+	blink.count_out_cb().set(m_mioc, FUNC(tms5501_device::sens_w)).bit(4);
 
 	// devices
-	MCFG_DEVICE_ADD(TMS5501_TAG, TMS5501, XTAL(17'971'200)/9)
-	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE(I8080_TAG, I8085_INTR_LINE))
-	MCFG_TMS5501_XMT_CALLBACK(WRITELINE(compucolor2_state, xmt_w))
-	MCFG_TMS5501_XI_CALLBACK(READ8(compucolor2_state, xi_r))
-	MCFG_TMS5501_XO_CALLBACK(WRITE8(compucolor2_state, xo_w))
+	TMS5501(config, m_mioc, XTAL(17'971'200)/9);
+	m_mioc->int_callback().set_inputline(I8080_TAG, I8085_INTR_LINE);
+	m_mioc->xmt_callback().set(FUNC(compucolor2_state::xmt_w));
+	m_mioc->xi_callback().set(FUNC(compucolor2_state::xi_r));
+	m_mioc->xo_callback().set(FUNC(compucolor2_state::xo_w));
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_mioc, FUNC(tms5501_device::rcv_w));
 
-	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd0", compucolor_floppy_port_devices, "floppy")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+	COMPUCOLOR_FLOPPY_PORT(config, m_floppy0, compucolor_floppy_port_devices, "floppy");
+	m_floppy0->rxd_handler().set(m_mioc, FUNC(tms5501_device::rcv_w));
 
-	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd1", compucolor_floppy_port_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+	COMPUCOLOR_FLOPPY_PORT(config, m_floppy1, compucolor_floppy_port_devices, nullptr);
+	m_floppy1->rxd_handler().set(m_mioc, FUNC(tms5501_device::rcv_w));
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,16K")
+	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("8K,16K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "compclr2_flop")
@@ -445,9 +444,9 @@ MACHINE_CONFIG_END
 ROM_START( compclr2 )
 	ROM_REGION( 0x4000, I8080_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "678", "v6.78" )
-	ROMX_LOAD( "v678.rom", 0x0000, 0x4000, BAD_DUMP CRC(5e559469) SHA1(fe308774aae1294c852fe24017e58d892d880cd3), ROM_BIOS(1) )
+	ROMX_LOAD( "v678.rom", 0x0000, 0x4000, BAD_DUMP CRC(5e559469) SHA1(fe308774aae1294c852fe24017e58d892d880cd3), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "879", "v8.79" )
-	ROMX_LOAD( "v879.rom", 0x0000, 0x4000, BAD_DUMP CRC(4de8e652) SHA1(e5c55da3ac893b8a5a99c8795af3ca72b1645f3f), ROM_BIOS(2) )
+	ROMX_LOAD( "v879.rom", 0x0000, 0x4000, BAD_DUMP CRC(4de8e652) SHA1(e5c55da3ac893b8a5a99c8795af3ca72b1645f3f), ROM_BIOS(1) )
 
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "chargen.uf6", 0x000, 0x400, BAD_DUMP CRC(7eef135a) SHA1(be488ef32f54c6e5f551fb84ab12b881aef72dd9) )
@@ -465,4 +464,4 @@ ROM_START( compclr2 )
 	ROM_LOAD( "82s129.ug5", 0x00, 0x20, NO_DUMP ) // Color PROM
 ROM_END
 
-COMP( 1977, compclr2,    0,      0,      compucolor2,        compucolor2, compucolor2_state, 0,      "Intelligent Systems Corporation",  "Compucolor II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1977, compclr2, 0, 0, compucolor2, compucolor2, compucolor2_state, empty_init, "Intelligent Systems Corporation", "Compucolor II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

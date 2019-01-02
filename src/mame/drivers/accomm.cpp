@@ -25,6 +25,7 @@
 #include "bus/econet/econet.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -59,7 +60,7 @@ public:
 
 	void accomm(machine_config &config);
 
-protected:
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(ch00switch_w);
@@ -69,10 +70,8 @@ protected:
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_READ8_MEMBER(sheila_r);
 	DECLARE_WRITE8_MEMBER(sheila_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_WRITE_LINE_MEMBER(econet_clk_w);
 
-	DECLARE_PALETTE_INIT(accomm);
+	void accomm_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(vbl_int);
 
 	virtual void machine_reset() override;
@@ -97,7 +96,6 @@ protected:
 	inline uint8_t read_vram( uint16_t addr );
 	inline void plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 
-private:
 	bool m_ch00rom_enabled;
 
 	/* ULA context */
@@ -147,9 +145,9 @@ static const rgb_t electron_palette[8]=
 	rgb_t(0x000,0x000,0x000)
 };
 
-PALETTE_INIT_MEMBER(accomm_state, accomm)
+void accomm_state::accomm_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, electron_palette, ARRAY_LENGTH(electron_palette));
+	palette.set_pen_colors(0, electron_palette);
 }
 
 READ8_MEMBER(accomm_state::read_keyboard1)
@@ -220,6 +218,7 @@ void accomm_state::video_start()
 
 WRITE8_MEMBER(accomm_state::ch00switch_w)
 {
+	logerror("ch00switch_w: offset %04x, data %02x\n", offset, data);
 	if (!machine().side_effects_disabled())
 		m_ch00rom_enabled = false;
 }
@@ -238,17 +237,15 @@ uint32_t accomm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 {
 	int i;
 	int x = 0;
-	int pal[16];
 	int scanline = screen.vpos();
 	rectangle r = cliprect;
-	r.min_y = r.max_y = scanline;
+	r.sety(scanline, scanline);
 
 	if (scanline == 0)
-	{
 		m_ula.screen_addr = m_ula.screen_start - m_ula.screen_base;
-	}
 
 	/* set up palette */
+	int pal[16];
 	switch( m_ula.screen_mode )
 	{
 	case 0: case 3: case 4: case 6: case 7: /* 2 colour mode */
@@ -441,7 +438,7 @@ READ8_MEMBER(accomm_state::ram_r)
 
 	if (m_ch00rom_enabled && (offset < 0x10000))
 	{
-		data = memregion("maincpu")->base()[0x30000 + offset];
+		data = memregion("maincpu")->base()[offset];
 	}
 	else
 	{
@@ -623,42 +620,30 @@ void accomm_state::interrupt_handler(int mode, int interrupt)
 	}
 }
 
-WRITE_LINE_MEMBER(accomm_state::write_acia_clock)
-{
-	m_acia->write_txc(state);
-	m_acia->write_rxc(state);
-}
-
-WRITE_LINE_MEMBER(accomm_state::econet_clk_w)
-{
-	m_adlc->rxc_w(state);
-	m_adlc->txc_w(state);
-}
-
 void accomm_state::main_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rw(this, FUNC(accomm_state::ram_r), FUNC(accomm_state::ram_w));                                       /* System RAM */
-	map(0x200000, 0x3fffff).noprw();                                                           /* External expansion RAM */
-	map(0x400000, 0x400000).noprw();                                                           /* MODEM */
-	map(0x410000, 0x410000).ram();                                                           /* Econet ID */
-	map(0x420000, 0x42000f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));          /* 6522 VIA (printer etc) */
-	map(0x430000, 0x430001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));            /* 2641 ACIA (RS423) */
-	map(0x440000, 0x440000).w(this, FUNC(accomm_state::ch00switch_w));                                           /* CH00SWITCH */
-	map(0x450000, 0x457fff).ram().share("vram");                                          /* Video RAM */
-	map(0x458000, 0x459fff).r(this, FUNC(accomm_state::read_keyboard1));                                          /* Video ULA */
-	map(0x45a000, 0x45bfff).r(this, FUNC(accomm_state::read_keyboard2));                                          /* Video ULA */
-	map(0x45fe00, 0x45feff).rw(this, FUNC(accomm_state::sheila_r), FUNC(accomm_state::sheila_w));                                 /* Video ULA */
-	map(0x460000, 0x467fff).ram().share("nvram");                                         /* CMOS RAM */
-	map(0x470000, 0x47001f).rw(m_adlc, FUNC(mc6854_device::read), FUNC(mc6854_device::write));            /* 68B54 (Econet) */
-	map(0x480000, 0x7fffff).noprw();                                                           /* Reserved */
-	map(0x800000, 0xbfffff).noprw();                                                           /* External expansion IO  */
-	map(0xc00000, 0xf7ffff).noprw();                                                           /* External expansion ROM */
-	map(0xf80000, 0xf9ffff).noprw();                                                           /* Empty */
-	map(0xfa0000, 0xfbffff).noprw();                                                           /* ROM bank 4 */
-	map(0xfc0000, 0xfcffff).rom().region("maincpu", 0x000000);                            /* ROM bank 3 */
-	map(0xfd0000, 0xfdffff).rom().region("maincpu", 0x010000);                            /* ROM bank 2 */
-	map(0xfe0000, 0xfeffff).rom().region("maincpu", 0x020000);                            /* ROM bank 0 */
-	map(0xff0000, 0xffffff).rom().region("maincpu", 0x030000);                            /* ROM bank 1 */
+	map(0x000000, 0x1fffff).rw(FUNC(accomm_state::ram_r), FUNC(accomm_state::ram_w));               /* System RAM */
+	map(0x200000, 0x3fffff).noprw();                                                                /* External expansion RAM */
+	map(0x400000, 0x400000).noprw();                                                                /* MODEM */
+	map(0x410000, 0x410000).ram();                                                                  /* Econet ID */
+	map(0x420000, 0x42000f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));     /* 6522 VIA (printer etc) */
+	map(0x430000, 0x430001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));  /* 2641 ACIA (RS423) */
+	map(0x440000, 0x44ffff).w(FUNC(accomm_state::ch00switch_w));                                    /* CH00SWITCH */
+	map(0x450000, 0x457fff).ram().share("vram");                                                    /* Video RAM */
+	map(0x458000, 0x459fff).r(FUNC(accomm_state::read_keyboard1));                                  /* Video ULA */
+	map(0x45a000, 0x45bfff).r(FUNC(accomm_state::read_keyboard2));                                  /* Video ULA */
+	map(0x45fe00, 0x45feff).rw(FUNC(accomm_state::sheila_r), FUNC(accomm_state::sheila_w));         /* Video ULA */
+	map(0x460000, 0x467fff).ram().share("nvram");                                                   /* CMOS RAM */
+	map(0x470000, 0x47001f).rw(m_adlc, FUNC(mc6854_device::read), FUNC(mc6854_device::write));      /* 68B54 (Econet) */
+	map(0x480000, 0x7fffff).noprw();                                                                /* Reserved */
+	map(0x800000, 0xbfffff).noprw();                                                                /* External expansion IO   */
+	map(0xc00000, 0xf7ffff).rom().region("ext", 0);                                                 /* External expansion ROM  */
+	map(0xf80000, 0xf9ffff).rom().region("maincpu", 0x060000);                                      /* Empty      (ROM Slot 3) */
+	map(0xfa0000, 0xfbffff).rom().region("maincpu", 0x040000);                                      /* ROM bank 4 (ROM Slot 2) */
+	map(0xfc0000, 0xfcffff).rom().region("maincpu", 0x030000);                                      /* ROM bank 3 (ROM Slot 1) */
+	map(0xfd0000, 0xfdffff).rom().region("maincpu", 0x020000);                                      /* ROM bank 2 (ROM Slot 1) */
+	map(0xfe0000, 0xfeffff).rom().region("maincpu", 0x000000);                                      /* ROM bank 0 (ROM Slot 0) */
+	map(0xff0000, 0xffffff).rom().region("maincpu", 0x010000);                                      /* ROM bank 1 (ROM Slot 0) */
 }
 
 static INPUT_PORTS_START( accomm )
@@ -713,7 +698,7 @@ static INPUT_PORTS_START( accomm )
 	PORT_START("LINE1.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)      PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)      PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD)) PORT_NAME("Keypad =")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD))
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)      PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
 
 	PORT_START("LINE1.9")
@@ -831,82 +816,162 @@ static INPUT_PORTS_START( accomm )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(accomm_state::accomm)
-	MCFG_CPU_ADD("maincpu", G65816, 16_MHz_XTAL / 8)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", accomm_state, vbl_int)
+void accomm_state::accomm(machine_config &config)
+{
+	G65816(config, m_maincpu, 16_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &accomm_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(accomm_state::vbl_int));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 50.08 )
-	MCFG_SCREEN_SIZE( 640, 312 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 640-1, 0, 256-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(accomm_state, screen_update)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50.08);
+	screen.set_size(640, 312);
+	screen.set_visarea(0, 640 - 1, 0, 256 - 1);
+	screen.set_screen_update(FUNC(accomm_state::screen_update));
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD( "palette", 16 )
-	MCFG_PALETTE_INIT_OWNER(accomm_state, accomm)
+	PALETTE(config, "palette", FUNC(accomm_state::accomm_palette), 16);
 
-	MCFG_DEFAULT_LAYOUT(layout_accomm)
+	config.set_default_layout(layout_accomm);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("1M")
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("1M");
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 300)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* rtc pcf8573 */
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL(16'000'000) / 16)
-	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	VIA6522(config, m_via, 16_MHz_XTAL / 16);
+	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_via->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", G65816_LINE_IRQ))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set("serial", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("serial", FUNC(rs232_port_device::write_rts));
+	m_acia->irq_handler().set_inputline("maincpu", G65816_LINE_IRQ);
 
-	MCFG_RS232_PORT_ADD("serial", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+	rs232_port_device &serial(RS232_PORT(config, "serial", default_rs232_devices, nullptr));
+	serial.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
+	serial.dcd_handler().set(m_acia, FUNC(acia6850_device::write_dcd));
+	serial.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL(16'000'000) / 13)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(accomm_state, write_acia_clock))
+	CLOCK(config, m_acia_clock, 16_MHz_XTAL / 13);
+	m_acia_clock->signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	m_acia_clock->signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	/* econet */
-	MCFG_DEVICE_ADD("mc6854", MC6854, 0)
-	MCFG_MC6854_OUT_TXD_CB(DEVWRITELINE(ECONET_TAG, econet_device, data_w))
-	MCFG_MC6854_OUT_IRQ_CB(INPUTLINE("maincpu", G65816_LINE_NMI))
-	MCFG_ECONET_ADD()
-	MCFG_ECONET_CLK_CALLBACK(WRITELINE(accomm_state, econet_clk_w))
-	MCFG_ECONET_DATA_CALLBACK(DEVWRITELINE("mc6854", mc6854_device, set_rx))
-	MCFG_ECONET_SLOT_ADD("econet254", 254, econet_devices, nullptr)
+	MC6854(config, m_adlc);
+	m_adlc->out_txd_cb().set("econet", FUNC(econet_device::host_data_w));
+	m_adlc->out_irq_cb().set_inputline(m_maincpu, G65816_LINE_NMI);
+
+	econet_device &econet(ECONET(config, "econet", 0));
+	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
+	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
+	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
+
+	econet_slot_device &econet_slot(ECONET_SLOT(config, "econet254", 0));
+	econet_devices(econet_slot);
+	econet_slot.set_slot(254);
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522", via6522_device, write_ca1))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-MACHINE_CONFIG_END
+	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));
+	centronics.ack_handler().set(m_via, FUNC(via6522_device::write_ca1));
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	centronics.set_output_latch(cent_data_out);
+}
 
 ROM_START(accomm)
-	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("100")
-	ROM_SYSTEM_BIOS(0, "100", "1.00 13/Nov/86") /* Version 1.00 13/Nov/86 (C)1986 */
-	ROMX_LOAD( "romv100-3.rom", 0x000000, 0x010000, CRC(bd87a157) SHA1(b9b9ed1aab9ffef2de988b2cfeac293afa11448a), ROM_BIOS(1) )
-	ROMX_LOAD( "romv100-2.rom", 0x010000, 0x010000, CRC(3438adee) SHA1(cd9d5522d9430cb2e1936210b77d2edd280f9419), ROM_BIOS(1) )
-	ROMX_LOAD( "romv100-1.rom", 0x020000, 0x010000, CRC(adc6a073) SHA1(3e87f21fafc1d69f33c5b541a20a98e82aacbfab), ROM_BIOS(1) )
-	ROMX_LOAD( "romv100-0.rom", 0x030000, 0x010000, CRC(6d22950d) SHA1(d4cbdccf8d2bc836fb81182b2ed344d7134fe5c9), ROM_BIOS(1) )
-	/* Version 1.70 04/Jun/87 (C)1987 */
-	/* Versone 3.00 13/gen/88 (C)1988 */
+	ROM_SYSTEM_BIOS(0, "100", "MOS v1.00 13/Nov/86") /* MOS: Version 1.00 13/Nov/86 (C)1986 */
+	ROMX_LOAD("romv100-0.rom", 0x000000, 0x010000, CRC(6d22950d) SHA1(d4cbdccf8d2bc836fb81182b2ed344d7134fe5c9), ROM_BIOS(0))
+	ROM_RELOAD(                0x010000, 0x010000)
+	ROMX_LOAD("romv100-1.rom", 0x020000, 0x010000, CRC(adc6a073) SHA1(3e87f21fafc1d69f33c5b541a20a98e82aacbfab), ROM_BIOS(0))
+	ROM_RELOAD(                0x030000, 0x010000)
+	ROMX_LOAD("romv100-2.rom", 0x040000, 0x010000, CRC(3438adee) SHA1(cd9d5522d9430cb2e1936210b77d2edd280f9419), ROM_BIOS(0))
+	ROM_RELOAD(                0x050000, 0x010000)
+	ROMX_LOAD("romv100-3.rom", 0x060000, 0x010000, CRC(bd87a157) SHA1(b9b9ed1aab9ffef2de988b2cfeac293afa11448a), ROM_BIOS(0))
+	ROM_RELOAD(                0x070000, 0x010000)
+
+	ROM_REGION(0x380000, "ext", ROMREGION_ERASEFF)
 ROM_END
 
-COMP( 1986,  accomm,  0, 0, accomm,  accomm, accomm_state,  0,  "Acorn", "Acorn Communicator", MACHINE_NOT_WORKING )
+ROM_START(accommp)
+	ROM_REGION(0x80000, "maincpu", 0)
+	/* ROM labels on both evaluation prototypes were hand written A, B, C, D */
+	ROM_DEFAULT_BIOS("011-1985")
+	/* Serial B01-PPC01-0000004 (owned by Acorn co-founder Chris Curry) */
+	ROM_SYSTEM_BIOS(0, "011-1985", "CMOS v0.11 1985") /* CMOS version 0.11 October (C)1985 */
+	ROMX_LOAD("004-a.rom", 0x000000, 0x008000, CRC(d0d4d5e3) SHA1(67710e349235ed5c71380b5a7d4b570ce355b10e), ROM_BIOS(0))
+	ROM_RELOAD(            0x008000, 0x008000)
+	ROM_RELOAD(            0x010000, 0x008000)
+	ROM_RELOAD(            0x018000, 0x008000)
+	ROMX_LOAD("004-b.rom", 0x020000, 0x010000, CRC(e2fcef94) SHA1(fd065bcdb6c48bee39db9f71b8d193ee228557f7), ROM_BIOS(0))
+	ROM_RELOAD(            0x030000, 0x010000)
+	ROMX_LOAD("004-c.rom", 0x040000, 0x008000, CRC(348c0018) SHA1(9681b6b9eefa9ba294fac6a41dec12ba203e5142), ROM_BIOS(0))
+	ROM_RELOAD(            0x048000, 0x008000)
+	ROM_RELOAD(            0x050000, 0x008000)
+	ROM_RELOAD(            0x058000, 0x008000)
+	ROMX_LOAD("004-d.rom", 0x060000, 0x010000, CRC(1379eb9f) SHA1(8d57bc7e279c5f17c6f0e4d1d5fa7f784aadd549), ROM_BIOS(0))
+	ROM_RELOAD(            0x070000, 0x010000)
+	/* Serial ending 094 */
+	ROM_SYSTEM_BIOS(1, "011-1986", "CMOS v0.11 1986") /* CMOS version 0.11 October (C)1985 */
+	ROMX_LOAD("094-a.rom", 0x008000, 0x008000, CRC(d0d4d5e3) SHA1(67710e349235ed5c71380b5a7d4b570ce355b10e), ROM_BIOS(1))
+	ROM_RELOAD(            0x008000, 0x008000)
+	ROM_RELOAD(            0x010000, 0x008000)
+	ROM_RELOAD(            0x018000, 0x008000)
+	ROMX_LOAD("094-b.rom", 0x020000, 0x008000, CRC(8d793909) SHA1(392028386f831dfae3353e0b7b51a608798e89c6), ROM_BIOS(1))
+	ROM_RELOAD(            0x028000, 0x008000)
+	ROM_RELOAD(            0x030000, 0x008000)
+	ROM_RELOAD(            0x038000, 0x008000)
+	ROMX_LOAD("094-c.rom", 0x040000, 0x008000, CRC(e544e849) SHA1(31cd2dcd2a50880a97b12d61ef144f7d7f112345), ROM_BIOS(1))
+	ROM_RELOAD(            0x048000, 0x008000)
+	ROM_RELOAD(            0x050000, 0x008000)
+	ROM_RELOAD(            0x058000, 0x008000)
+	ROMX_LOAD("094-d-view+castoff.rom", 0x060000, 0x010000, CRC(8027df77) SHA1(51751bfdcf68683c092b6442fb22f11cb565898c), ROM_BIOS(1))
+	ROM_RELOAD(            0x070000, 0x010000)
+
+	ROM_REGION(0x380000, "ext", ROMREGION_ERASEFF)
+ROM_END
+
+ROM_START(accommb)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_DEFAULT_BIOS("170")
+	ROM_SYSTEM_BIOS(0, "170", "MOS v1.70 04/Jun/87") /* MOS: Version 1.70 04/Jun/87 (C)1987 */
+	ROMX_LOAD("0252.200-1-rom0-v1.00.rom", 0x000000, 0x010000, CRC(6d22950d) SHA1(d4cbdccf8d2bc836fb81182b2ed344d7134fe5c9), ROM_BIOS(0))
+	ROM_RELOAD(                            0x010000, 0x010000)
+	ROMX_LOAD("0252.201-1-rom1-v1.00.rom", 0x020000, 0x010000, CRC(adc6a073) SHA1(3e87f21fafc1d69f33c5b541a20a98e82aacbfab), ROM_BIOS(0))
+	ROM_RELOAD(                            0x030000, 0x010000)
+	ROMX_LOAD("0252.202-1-rom2-v1.00.rom", 0x040000, 0x010000, CRC(3438adee) SHA1(cd9d5522d9430cb2e1936210b77d2edd280f9419), ROM_BIOS(0))
+	ROM_RELOAD(                            0x050000, 0x010000)
+	ROMX_LOAD("0252.203-1-rom3-v1.00.rom", 0x060000, 0x010000, CRC(bd87a157) SHA1(b9b9ed1aab9ffef2de988b2cfeac293afa11448a), ROM_BIOS(0))
+	ROM_RELOAD(                            0x070000, 0x010000)
+
+	/* Expansion board: Acorn Computer 0167,000 Issue 1 Spectar II */
+	/* Contains 8 slots for ASTRON Data Cards */
+	ROM_REGION(0x380000, "ext", ROMREGION_ERASEFF)
+	ROM_LOAD("spectar-v1.0-0267-200-03.ic1", 0x000000, 0x010000, CRC(71ad0491) SHA1(c3ace8cdd2383e97eb58d64d011444da678d537c))
+ROM_END
+
+ROM_START(accommi)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_DEFAULT_BIOS("300")
+	ROM_SYSTEM_BIOS(0, "300", "MOS v3.00 13/gen/88") /* MOS: Versione 3.00 13/gen/88 (C)1988 */
+	ROMX_LOAD("rom0.rom",        0x000000, 0x020000, CRC(841bd984) SHA1(2c3bc77178e5bf0342e0410f6c398bb3ac40d0c4), ROM_BIOS(0))
+	ROMX_LOAD("252216-iss1.rom", 0x020000, 0x020000, CRC(40767d31) SHA1(258f4ed92d74523aaaa4aa250db5a99428aaf960), ROM_BIOS(0))
+	ROMX_LOAD("rom2.rom",        0x040000, 0x010000, CRC(e3511af8) SHA1(88a5654a5e84a31078a0a64139fe84db08196c2a), ROM_BIOS(0))
+	ROM_RELOAD(                  0x050000, 0x010000)
+
+	ROM_REGION(0x380000, "ext", ROMREGION_ERASEFF)
+ROM_END
+
+COMP( 1986, accomm,  0,      0, accomm, accomm, accomm_state, empty_init, "Acorn", "Acorn Communicator",             MACHINE_NOT_WORKING )
+COMP( 1985, accommp, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn", "Acorn Communicator (prototype)", MACHINE_NOT_WORKING )
+COMP( 1987, accommb, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn", "Acorn Briefcase Communicator",   MACHINE_NOT_WORKING )
+COMP( 1988, accommi, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn", "Acorn Communicator (Italian)",   MACHINE_NOT_WORKING )

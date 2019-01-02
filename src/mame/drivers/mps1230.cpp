@@ -92,15 +92,16 @@ public:
 		m_maincpu(*this, CPU_TAG)
 	{ }
 
+	void mps1000(machine_config &config);
+	void mps1230(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void mps1000(machine_config &config);
-	void mps1230(machine_config &config);
 	void mps1230_map(address_map &map);
-private:
 };
 
 /***************************************************************************
@@ -138,13 +139,13 @@ static INPUT_PORTS_START( mps1230 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(mps1230_state::mps1230)
-	MCFG_CPU_ADD(CPU_TAG, UPD7810, 11060000)
-	MCFG_CPU_PROGRAM_MAP(mps1230_map)
+	MCFG_DEVICE_ADD(CPU_TAG, UPD7810, 11060000)
+	MCFG_DEVICE_PROGRAM_MAP(mps1230_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mps1230_state::mps1000)
-	MCFG_CPU_ADD(CPU_TAG, Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(mps1230_map)
+	MCFG_DEVICE_ADD(CPU_TAG, Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(mps1230_map)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -169,6 +170,6 @@ ROM_START(mps1230)
 	ROM_LOAD( "peek.f03ee",   0x000000, 0x010000, CRC(b5215f25) SHA1(dcfdd16942652447c472301392d9b39514547af1) ) // ver 2.1E, 09/AUG/1989
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     STATE          INIT  COMPANY                        FULLNAME */
-COMP( 1986, mps1000,  0,        0,        mps1000,     mps1230,  mps1230_state, 0,    "Commodore Business Machines", "MPS-1000 Printer",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_OTHER )
-COMP( 1988, mps1230,  0,        0,        mps1230,     mps1230,  mps1230_state, 0,    "Commodore Business Machines", "MPS-1230 NLQ Printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_OTHER )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                        FULLNAME */
+COMP( 1986, mps1000, 0,      0,      mps1000, mps1230, mps1230_state, empty_init, "Commodore Business Machines", "MPS-1000 Printer",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_OTHER )
+COMP( 1988, mps1230, 0,      0,      mps1230, mps1230, mps1230_state, empty_init, "Commodore Business Machines", "MPS-1230 NLQ Printer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_OTHER )

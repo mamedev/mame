@@ -18,18 +18,18 @@
 
 uint8_t sc61860_device::READ_OP()
 {
-	return m_direct->read_byte(m_pc++);
+	return m_cache->read_byte(m_pc++);
 }
 
 uint8_t sc61860_device::READ_OP_ARG()
 {
-	return m_direct->read_byte(m_pc++);
+	return m_cache->read_byte(m_pc++);
 }
 
 uint16_t sc61860_device::READ_OP_ARG_WORD()
 {
-	uint16_t t=m_direct->read_byte(m_pc++)<<8;
-	t|=m_direct->read_byte(m_pc++);
+	uint16_t t=m_cache->read_byte(m_pc++)<<8;
+	t|=m_cache->read_byte(m_pc++);
 	return t;
 }
 

@@ -41,6 +41,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void chance(machine_config &config);
+	void play_1(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_WRITE8_MEMBER(port02_w);
@@ -55,12 +59,10 @@ public:
 	DECLARE_READ_LINE_MEMBER(ef4_r);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
-	void chance(machine_config &config);
-	void play_1(machine_config &config);
 	void chance_map(address_map &map);
 	void play_1_io(address_map &map);
 	void play_1_map(address_map &map);
-private:
+
 	uint16_t m_resetcnt;
 	uint16_t m_clockcnt;
 	uint16_t m_waitcnt;
@@ -93,13 +95,13 @@ void play_1_state::chance_map(address_map &map)
 
 void play_1_state::play_1_io(address_map &map)
 {
-	map(0x01, 0x01).portr("IN1").w(this, FUNC(play_1_state::port01_w)); //segments
-	map(0x02, 0x02).portr("IN2").w(this, FUNC(play_1_state::port02_w)); // N1-8
-	map(0x03, 0x03).portr("IN3").w(this, FUNC(play_1_state::port03_w)); // D1-4
-	map(0x04, 0x04).portr("IN4").w(this, FUNC(play_1_state::port04_w)); // U1-8
-	map(0x05, 0x05).portr("IN5").w(this, FUNC(play_1_state::port05_w)); // V1-8
-	map(0x06, 0x06).portr("IN6").w(this, FUNC(play_1_state::port06_w)); // W1-8
-	map(0x07, 0x07).r(this, FUNC(play_1_state::port07_r));
+	map(0x01, 0x01).portr("IN1").w(FUNC(play_1_state::port01_w)); //segments
+	map(0x02, 0x02).portr("IN2").w(FUNC(play_1_state::port02_w)); // N1-8
+	map(0x03, 0x03).portr("IN3").w(FUNC(play_1_state::port03_w)); // D1-4
+	map(0x04, 0x04).portr("IN4").w(FUNC(play_1_state::port04_w)); // U1-8
+	map(0x05, 0x05).portr("IN5").w(FUNC(play_1_state::port05_w)); // V1-8
+	map(0x06, 0x06).portr("IN6").w(FUNC(play_1_state::port06_w)); // W1-8
+	map(0x07, 0x07).r(FUNC(play_1_state::port07_r));
 }
 
 static INPUT_PORTS_START( chance )
@@ -470,36 +472,36 @@ WRITE_LINE_MEMBER( play_1_state::clock_w )
 
 MACHINE_CONFIG_START(play_1_state::play_1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CDP1802, 400000) // 2 gates, 1 cap, 1 resistor oscillating somewhere between 350 to 450 kHz
-	MCFG_CPU_PROGRAM_MAP(play_1_map)
-	MCFG_CPU_IO_MAP(play_1_io)
-	MCFG_COSMAC_WAIT_CALLBACK(READLINE(play_1_state, wait_r))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(play_1_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(play_1_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(play_1_state, ef3_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(play_1_state, ef4_r))
+	CDP1802(config, m_maincpu, 400000); // 2 gates, 1 cap, 1 resistor oscillating somewhere between 350 to 450 kHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &play_1_state::play_1_map);
+	m_maincpu->set_addrmap(AS_IO, &play_1_state::play_1_io);
+	m_maincpu->wait_cb().set(FUNC(play_1_state::wait_r));
+	m_maincpu->clear_cb().set(FUNC(play_1_state::clear_r));
+	m_maincpu->ef2_cb().set(FUNC(play_1_state::ef2_r));
+	m_maincpu->ef3_cb().set(FUNC(play_1_state::ef3_r));
+	m_maincpu->ef4_cb().set(FUNC(play_1_state::ef4_r));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_play_1)
+	config.set_default_layout(layout_play_1);
 
 	MCFG_DEVICE_ADD("xpoint", CLOCK, 100) // crossing-point detector
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(play_1_state, clock_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_1_state, clock_w))
 
 	/* Sound */
 	genpin_audio(config);
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADD("monotone", CLOCK, 0) // sound device
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(play_1_state::chance)
 	play_1(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(chance_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(chance_map)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -530,6 +532,15 @@ ROM_START(lastlap)
 ROM_END
 
 /*-------------------------------------------------------------------
+/ Third World (??/78)
+/-------------------------------------------------------------------*/
+ROM_START(thrdwrld)
+	ROM_REGION(0x800, "roms", 0)
+	ROM_LOAD("3rdwrlda.bin", 0x0000, 0x0400, CRC(253f1b93) SHA1(7ff5267d0dfe6ae19ec6b0412902f4ce83f23ed1))
+	ROM_LOAD("3rdwrldb.bin", 0x0400, 0x0400, CRC(5e2ba9c0) SHA1(abd285aa5702c7fb84257b4341f64ff83c1fc0ce))
+ROM_END
+
+/*-------------------------------------------------------------------
 / Chance (09/78)
 /-------------------------------------------------------------------*/
 ROM_START(chance)
@@ -548,10 +559,21 @@ ROM_START(party)
 	ROM_LOAD("party_b.bin", 0x0400, 0x0400, CRC(5e2ba9c0) SHA1(abd285aa5702c7fb84257b4341f64ff83c1fc0ce))
 ROM_END
 
+/*-------------------------------------------------------------------
+/ Night Fever (??/79)
+/-------------------------------------------------------------------*/
+ROM_START(ngtfever)
+	ROM_REGION(0x800, "roms", 0)
+	ROM_LOAD("nfevera.bin", 0x0000, 0x0400, CRC(253f1b93) SHA1(7ff5267d0dfe6ae19ec6b0412902f4ce83f23ed1))
+	ROM_LOAD("nfeverb.bin", 0x0400, 0x0400, CRC(5e2ba9c0) SHA1(abd285aa5702c7fb84257b4341f64ff83c1fc0ce))
+ROM_END
 
-/* Big Town, Last Lap and Party all reportedly share the same roms with different playfield/machine artworks */
-GAME(1978, bigtown,  0,       play_1, play_1,   play_1_state, 0, ROT0, "Playmatic", "Big Town",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978, lastlap,  bigtown, play_1, play_1,   play_1_state, 0, ROT0, "Playmatic", "Last Lap",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979, party,    bigtown, play_1, play_1,   play_1_state, 0, ROT0, "Playmatic", "Party",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978, spcgambl, 0,       play_1, spcgambl, play_1_state, 0, ROT0, "Playmatic", "Space Gambler", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978, chance,   0,       chance, chance,   play_1_state, 0, ROT0, "Playmatic", "Chance",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+
+/* Big Town, Last Lap, Night Fever, Party and Third World all reportedly share the same roms with different playfield/machine artworks */
+GAME(1978, bigtown,  0,       play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Big Town",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, lastlap,  bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Last Lap",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979, party,    bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Party",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979, ngtfever, bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Sonic",     "Night Fever",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, thrdwrld, bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Sonic",     "Third World",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, spcgambl, 0,       play_1, spcgambl, play_1_state, empty_init, ROT0, "Playmatic", "Space Gambler", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, chance,   0,       chance, chance,   play_1_state, empty_init, ROT0, "Playmatic", "Chance",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

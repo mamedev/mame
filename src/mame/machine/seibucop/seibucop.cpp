@@ -36,6 +36,10 @@
     - (fixed) several if not all enemies definitely wants some sort of "axis aligned bounding box" in order to stop from going out of range
         (when i.e. first boss goes to bottom of the screen and become unreachable)
     - (btanb) Throw is made by quickly double jumping (!)
+    - (btanb) seldomly enemies thrown animates weirdly (bounces to the left when thrown to the right).
+      Culprit is with command 0x905 param +0x28, but it looks like this parameter is coming
+      from program ROM itself. Also a PCB recording video shows the same phenomenon, it's just sloppy
+      programming basically.
     Heated Barrel
     - (btanb) if player moves in diagonal a bogus projectile is fired.
     - gives random value to hi-score if you continue (only the first time, not a bug?);
@@ -45,12 +49,11 @@
     - (fixed) level 3+ boss movements looks wrong;
     - stage 3 "homing" missiles doesn't seem to like our 6200 hookup here, except it's NOT 6200!?
     - (fixed) barrels seen in later levels seems to fail an axis aligned bounding box, not unlike Legionnaire.
-	Godzilla
-	- few elements doesn't collide properly (i.e. Super X missiles, Tokyo's tower in stage 1), 
-	  Z axis check makes no sense whatsoever. 
-	  Kludged to work in per-game driver_init.
+    Godzilla
+    - few elements doesn't collide properly (i.e. Super X missiles, Tokyo's tower in stage 1),
+      Z axis check makes no sense whatsoever. Kludged to work in per-game driver_init.
     SD Gundam
-    - stage 3 mid-boss still has the sprite garbage bug;
+    - stage 3: mid-boss still has the sprite garbage bug;
     - stage 4: has sprite stuck on bottom-left of screen;
     Seibu Cup Soccer
     - Handles collision detection via the 130e/3bb0 macros
@@ -167,7 +170,8 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	m_LEGACY_r1(0),
 
 	m_videoramout_cb(*this),
-	m_palette(*this, ":palette")
+	m_paletteramout_cb(*this),
+	m_host_cpu(*this, finder_base::DUMMY_TAG)
 {
 	memset(cop_func_trigger, 0, sizeof(uint16_t)*(0x100/8));
 	memset(cop_func_value, 0, sizeof(uint16_t)*(0x100/8));
@@ -276,8 +280,8 @@ void raiden2cop_device::device_start()
 	save_item(NAME(m_LEGACY_r1));
 
 	m_videoramout_cb.resolve_safe();
-	// TODO: tag parameter in device
-	m_host_cpu = machine().device<cpu_device>("maincpu");
+	m_paletteramout_cb.resolve_safe();
+
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 	m_host_endian = m_host_space->endianness() == ENDIANNESS_BIG; // m_cpu_is_68k
 
@@ -534,7 +538,7 @@ int raiden2cop_device::find_trigger_match(uint16_t triggerval, uint16_t mask)
 
 				if (triggerval == 0xa180 || triggerval == 0xa980 || triggerval == 0xb100 || triggerval == 0xb900) /* collisions */
 					otherlog = 0;
-				
+
 				// TODO: disable Z axis in driver code.
 				if (triggerval == 0xb000 || triggerval == 0xb800)
 					otherlog = 0;
@@ -1306,7 +1310,7 @@ WRITE16_MEMBER( raiden2cop_device::cop_unk_param_b_w)
 	COMBINE_DATA(&m_cop_unk_param_b);
 }
 
-// cupsoc always writes 0xF before commands 0x5105, 0x5905, 0xD104 and 0xF105 and 0xE before 0xD104, then resets this to zero
+// cupsoc always writes 0xF before commands 0x5105, 0x5905, 0xD104 and 0xF105 and 0xE before 0xDDE5, then resets this to zero
 // zeroteam writes 0xE here before 0xEDE5, then resets it to zero
 WRITE16_MEMBER( raiden2cop_device::cop_precmd_w)
 {

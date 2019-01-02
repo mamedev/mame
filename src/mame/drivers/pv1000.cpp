@@ -10,6 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -133,8 +134,8 @@ void pv1000_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 class pv1000_state : public driver_device
 {
 public:
-	pv1000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pv1000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "pv1000_sound"),
 		m_cart(*this, "cartslot"),
@@ -142,8 +143,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
-		{ }
+	{ }
 
+	void pv1000(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(gfxram_w);
@@ -173,7 +177,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	void pv1000(machine_config &config);
 	void pv1000(address_map &map);
 	void pv1000_io(address_map &map);
 };
@@ -183,14 +186,14 @@ void pv1000_state::pv1000(address_map &map)
 {
 	//AM_RANGE(0x0000, 0x7fff)      // mapped by the cartslot
 	map(0xb800, 0xbbff).ram().share("videoram");
-	map(0xbc00, 0xbfff).ram().w(this, FUNC(pv1000_state::gfxram_w)).region("gfxram", 0);
+	map(0xbc00, 0xbfff).ram().w(FUNC(pv1000_state::gfxram_w)).region("gfxram", 0);
 }
 
 
 void pv1000_state::pv1000_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf8, 0xff).rw(this, FUNC(pv1000_state::io_r), FUNC(pv1000_state::io_w));
+	map(0xf8, 0xff).rw(FUNC(pv1000_state::io_r), FUNC(pv1000_state::io_w));
 }
 
 
@@ -431,7 +434,7 @@ static const gfx_layout pv1000_3bpp_gfx =
 };
 
 
-static GFXDECODE_START( pv1000 )
+static GFXDECODE_START( gfx_pv1000 )
 	GFXDECODE_ENTRY( "gfxrom", 8, pv1000_3bpp_gfx, 0, 8 )
 	GFXDECODE_ENTRY( "gfxram", 8, pv1000_3bpp_gfx, 0, 8 )
 GFXDECODE_END
@@ -439,24 +442,23 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(pv1000_state::pv1000)
 
-	MCFG_CPU_ADD( "maincpu", Z80, 17897725/5 )
-	MCFG_CPU_PROGRAM_MAP( pv1000 )
-	MCFG_CPU_IO_MAP( pv1000_io )
+	MCFG_DEVICE_ADD( "maincpu", Z80, 17897725/5 )
+	MCFG_DEVICE_PROGRAM_MAP( pv1000 )
+	MCFG_DEVICE_IO_MAP( pv1000_io )
 
 
 	/* D65010G031 - Video & sound chip */
-	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS( 17897725/3, 380, 0, 256, 262, 0, 192 )
-	MCFG_SCREEN_UPDATE_DRIVER(pv1000_state, screen_update_pv1000)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(17897725/3, 380, 0, 256, 262, 0, 192);
+	m_screen->set_screen_update(FUNC(pv1000_state::screen_update_pv1000));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pv1000 )
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pv1000)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD( "pv1000_sound", PV1000, 17897725 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	SPEAKER(config, "mono").front_center();
+	PV1000(config, m_sound, 17897725).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* Cartridge slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "pv1000_cart")
@@ -474,5 +476,5 @@ ROM_START( pv1000 )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE           INIT  COMPANY   FULLNAME    FLAGS */
-CONS( 1983, pv1000,  0,      0,      pv1000,  pv1000, pv1000_state,   0,    "Casio",  "PV-1000",  MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME    FLAGS */
+CONS( 1983, pv1000, 0,      0,      pv1000,  pv1000, pv1000_state, empty_init, "Casio", "PV-1000",  MACHINE_SUPPORTS_SAVE )

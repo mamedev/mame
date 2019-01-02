@@ -25,7 +25,7 @@
 #define OVERLAY_CURSOR_BLINK        BIT(m_roll_overlay[0], 14)
 #define OVERLAY_CHARACTER_BLINK     BIT(m_roll_overlay[0], 15)
 
-PALETTE_INIT_MEMBER(cgc7900_state, cgc7900)
+void cgc7900_state::cgc7900_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0xff));
@@ -215,7 +215,7 @@ static const gfx_layout cgc7900_charlayout =
     GFXDECODE( cgc7900 )
 -------------------------------------------------*/
 
-static GFXDECODE_START( cgc7900 )
+static GFXDECODE_START( gfx_cgc7900 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, cgc7900_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -234,11 +234,10 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900_video)
 	MCFG_SCREEN_UPDATE_DRIVER(cgc7900_state, screen_update)
 	MCFG_SCREEN_SIZE(1024, 768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cgc7900_state, irq<0xc>))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cgc7900_state, irq<0xc>))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cgc7900)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(cgc7900_state, cgc7900)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_cgc7900)
+	PALETTE(config, m_palette, FUNC(cgc7900_state::cgc7900_palette), 8);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink", cgc7900_state, blink_tick, attotime::from_hz(XTAL(28'480'000)/7500000))
 MACHINE_CONFIG_END

@@ -38,11 +38,9 @@
 
 DEFINE_DEVICE_TYPE(A2BUS_THEMILL, a2bus_themill_device, "a2themill", "Stellation Two The Mill")
 
-#define M6809_TAG         "m6809"
-
 void a2bus_themill_device::m6809_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(a2bus_themill_device::dma_r), FUNC(a2bus_themill_device::dma_w));
+	map(0x0000, 0xffff).rw(FUNC(a2bus_themill_device::dma_r), FUNC(a2bus_themill_device::dma_w));
 }
 
 /***************************************************************************
@@ -53,19 +51,24 @@ void a2bus_themill_device::m6809_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_themill_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6809_TAG, M6809, 1021800)   // M6809 runs at ~1 MHz as per Stellation Two's print ads
-	MCFG_CPU_PROGRAM_MAP(m6809_mem)
-MACHINE_CONFIG_END
+void a2bus_themill_device::device_add_mconfig(machine_config &config)
+{
+	MC6809E(config, m_6809, 1021800);   // 6809E runs at ~1 MHz as per Stellation Two's print ads
+	m_6809->set_addrmap(AS_PROGRAM, &a2bus_themill_device::m6809_mem);
+}
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_a2bus_card_interface(mconfig, *this),
-	m_6809(*this, M6809_TAG), m_bEnabled(false), m_flipAddrSpace(false), m_6809Mode(false), m_status(0)
+a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_a2bus_card_interface(mconfig, *this)
+	, m_6809(*this, "m6809")
+	, m_bEnabled(false)
+	, m_flipAddrSpace(false)
+	, m_6809Mode(false)
+	, m_status(0)
 {
 }
 

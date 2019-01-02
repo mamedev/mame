@@ -1180,6 +1180,45 @@
 		</part>
 	</software>
 
+	<software name="gpilotsp" cloneof="gpilots">
+		<!-- prototype - different revisions of the 68k and z80 programs, gfx + samples different ROM arrangement but same data, rest identical-->
+		<description>Ghost Pilots (prototype)</description>
+		<year>1991</year>
+		<publisher>SNK</publisher>
+		<sharedfeat name="release" value="AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_byte" name="p1" offset="0x000001" size="0x080000" crc="c42125b4" sha1="b5879d06152bba0c0211c44fff4837b54405e7ee" />
+				<rom loadflag="load16_byte" name="p2" offset="0x000000" size="0x080000" crc="5a4db1f3" sha1="535b6abd266bba174d20bfff17b2668c6a36d1e6" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="s1" crc="a6d83d53" sha1="9a8c092f89521cc0b27a385aa72e29cbaca926c5" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="m1" crc="32a108cf" sha1="4d38a283376725e1c1aca0d5aeedd4862146ba1f" />
+			</dataarea>
+			<dataarea name="ymsnd" size="0x180000">
+				<rom name="v11" offset="0x000000" size="0x080000" crc="8cc44140" sha1="0a88d8962e057bf0cabd4819d4ba67e093c49b82" />
+				<rom name="v12" offset="0x080000" size="0x080000" crc="415c61cd" sha1="638e5fd9b02b4553df42f00188a7ac52a5a7bf84" />
+				<rom name="v13" offset="0x100000" size="0x080000" crc="4a9e6f03" sha1="d3ac11f333b03d8a318921bdaefb14598e289a14" />
+			</dataarea>
+			<dataarea name="ymsnd.deltat" size="0x80000">
+				<rom name="v21" offset="0x000000" size="0x080000" crc="7abf113d" sha1="5b2a0e70f2eaf4638b44702dacd4cb17838fb1d5" />
+			</dataarea>
+			<dataarea name="sprites" size="0x400000">
+				<!-- note, load32_byte -->
+				<rom loadflag="load32_byte" name="c11" offset="0x000000" size="0x080000" crc="7a5158b3" sha1="01dd241534c16e81ce1113a53495606d8f907e1e" />
+				<rom loadflag="load32_byte" name="c12" offset="0x000002" size="0x080000" crc="41e67a5a" sha1="21df717cea93c0c4c5773e98ffefcdc2a06b83c4" />
+				<rom loadflag="load32_byte" name="c13" offset="0x000001" size="0x080000" crc="5f80c0d0" sha1="48a5c081de88811b170da794634f1a82e42bd472" />
+				<rom loadflag="load32_byte" name="c14" offset="0x000003" size="0x080000" crc="61227b93" sha1="563283401cf648edd7cc881969a1107d78f31b75" />
+				<rom loadflag="load32_byte" name="c15" offset="0x200000" size="0x080000" crc="96de9bb5" sha1="c3d42b1dd27cc153310a6fc14a02380b6b673574" />
+				<rom loadflag="load32_byte" name="c16" offset="0x200002" size="0x080000" crc="2b904c85" sha1="9e162449af1f37cc22900df09e37226e74d62d35" />
+				<rom loadflag="load32_byte" name="c17" offset="0x200001" size="0x080000" crc="c0d7517d" sha1="db60e23d1b3323ad757c1fda009f2c08abd5630b" />
+				<rom loadflag="load32_byte" name="c18" offset="0x200003" size="0x080000" crc="75569e35" sha1="fac74ec97c6612bffdfd1239c115d6247eb7fabc" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!--
 	ID-0021
@@ -3113,7 +3152,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!--
 	ID-0058
 	. NGM-058
@@ -4643,6 +4682,46 @@
 		</part>
 	</software>
 
+	<software name="stakwindev" cloneof="stakwin" supported="no">
+		<description>Stakes Winner / Stakes Winner - GI Kinzen  Seiha e no Michi (early development board)</description>
+		<year>1995</year>
+		<publisher>Saurus</publisher>
+		<info name="alt_title" value="ステークスウィナー"/>
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_byte" name="sp1.sp1" offset="0x000001" size="0x080000" crc="96b58fa4" sha1="23c8c2a4d7a16838fb54306fb193b355edc75060" />
+				<rom loadflag="load16_byte" name="sp2.sp2" offset="0x000000" size="0x080000" crc="4e7202ee" sha1="ab10dda5594ad8a21af219c6907a9841de7384c3" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="s1.s1" crc="2193d089" sha1="1b6f57d2f4265f210194488356fc3653dfa35932" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x080000">
+				<rom offset="0x000000" size="0x080000" name="m1.m1" crc="daedbcd7" sha1="d6d0e67ff7865ff5a0262aba381468e198d50536" />
+			</dataarea>
+			<dataarea name="ymsnd" size="0x200000">
+				<rom name="v1.v1" offset="0x000000" size="0x080000" crc="ac590b85" sha1="47ff2ba9648b7145c29b534cd1f6839abb43bee2" />
+				<rom name="v2.v2" offset="0x080000" size="0x080000" crc="23ad8a91" sha1="da620c182fe9fc36421da73f2937e627d9a641bf" />
+				<rom name="v3.v3" offset="0x100000" size="0x080000" crc="e2d216b6" sha1="28b70e57a352ef6a08a5564f7756113a66e7dbb7" />
+				</dataarea>
+			<dataarea name="sprites" size="0x800000">
+				<rom loadflag="load32_byte" name="c1.c1"   offset="0x000000" size="0x080000" crc="fb2f29d3" sha1="1f4cf27d7da1262bae28a8dd88c56d8a9324e982" />
+				<rom loadflag="load32_byte" name="c2.c2"   offset="0x000002" size="0x080000" crc="6108e6db" sha1="f4cdb5df29698f1ba362a227b82d43c3baaa8948" />
+				<rom loadflag="load32_byte" name="c3.c3"   offset="0x000001" size="0x080000" crc="702a21b1" sha1="79006062b516bda35bb77c864ba9ea26135ee8ed" />
+				<rom loadflag="load32_byte" name="c4.c4"   offset="0x000003" size="0x080000" crc="3223b05f" sha1="1595f8029f71c3acd949ddd5539d62424c0b697e" />
+				<rom loadflag="load32_byte" name="c5.c5"   offset="0x200000" size="0x080000" crc="36b93e77" sha1="19431b1ad44b9418f26b94c15572d11caec0994e" />
+				<rom loadflag="load32_byte" name="c6.c6"   offset="0x200002" size="0x080000" crc="a7a104c8" sha1="421a8ef11e299b7379a8198c871c8f11ad97deb0" />
+				<rom loadflag="load32_byte" name="c7.c7"   offset="0x200001" size="0x080000" crc="f0d8b2ca" sha1="2565a44d3ee9375af595d84638c7a76f631f8f9b" />
+				<rom loadflag="load32_byte" name="c8.c8"   offset="0x200003" size="0x080000" crc="3bdd06eb" sha1="dce84eb477229dfa8233cde8b946b64db1efae1d" />
+				<rom loadflag="load32_byte" name="c9.c9"   offset="0x400000" size="0x080000" crc="25621e44" sha1="3e380c1f52233dd1346c0363d920d1f96491cc45" />
+				<rom loadflag="load32_byte" name="c10.c10" offset="0x400002" size="0x080000" crc="17b2115e" sha1="8c5d1b12ac7e739a7ac1f2189a2f3ca959d06377" />
+				<rom loadflag="load32_byte" name="c11.c11" offset="0x400001" size="0x080000" crc="7d3cd161" sha1="5ac30c35e815dd2b0235394c1768e419395a1b5a" />
+				<rom loadflag="load32_byte" name="c12.c12" offset="0x400003" size="0x080000" crc="c6970ed6" sha1="e963d0a5fb718e0eec2115d63ab34a0de0523792" />
+			</dataarea>
+		</part>
+	</software>
+
 
 	<!--
 	ID-0089
@@ -5239,7 +5318,7 @@
 	<software name="puzzledp">
 		<description>Puzzle De Pon!</description>
 		<year>1995</year>
-		<publisher>Taito (Visco license)</publisher>
+		<publisher>Visco</publisher>
 		<info name="serial" value="NGM-202"/>
 		<info name="release" value="19951128"/>
 		<info name="alt_title" value="パズルdeポン！"/>
@@ -6561,7 +6640,7 @@
 				<rom name="234-v1.v1" offset="0x000000" size="0x400000" crc="ed66b76f" sha1="8a05ff06d9b6f01c6c16b3026282eaabb0e25b44" />   <!-- TC5332204 -->
 				<rom name="234-v2.v2" offset="0x400000" size="0x400000" crc="a0e7f6e2" sha1="753ff74fa9294f695aae511ae01ead119b114a57" />   <!-- TC5332204 -->
 				<rom name="234-v3.v3" offset="0x800000" size="0x400000" crc="a506e1e2" sha1="b3e04ba1a5cb50b77c6fbe9fe353b9b64b6f3f74" />   <!-- TC5332204 -->
-				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20A1F4833E5E29BA0073C1712D7A17AB7A2A035C" />   <!-- TC5332204 -->
+				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20a1f4833e5e29ba0073c1712d7a17ab7a2a035c" />   <!-- TC5332204 -->
 			</dataarea>
 			<dataarea name="sprites" size="0x2800000">
 				<rom loadflag="load16_byte" name="234-c1.c1" offset="0x000000" size="0x800000" crc="9f7e2bd3" sha1="2828aca0c0f5802110f10453c1cf640f69736554" />    <!-- TC5364205 -->
@@ -6598,7 +6677,7 @@
 				<rom name="234-v1.v1" offset="0x000000" size="0x400000" crc="ed66b76f" sha1="8a05ff06d9b6f01c6c16b3026282eaabb0e25b44" />   <!-- TC5332204 -->
 				<rom name="234-v2.v2" offset="0x400000" size="0x400000" crc="a0e7f6e2" sha1="753ff74fa9294f695aae511ae01ead119b114a57" />   <!-- TC5332204 -->
 				<rom name="234-v3.v3" offset="0x800000" size="0x400000" crc="a506e1e2" sha1="b3e04ba1a5cb50b77c6fbe9fe353b9b64b6f3f74" />   <!-- TC5332204 -->
-				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20A1F4833E5E29BA0073C1712D7A17AB7A2A035C" />   <!-- TC5332204 -->
+				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20a1f4833e5e29ba0073c1712d7a17ab7a2a035c" />   <!-- TC5332204 -->
 			</dataarea>
 			<dataarea name="sprites" size="0x2800000">
 				<rom loadflag="load16_byte" name="234-c1.c1" offset="0x000000" size="0x800000" crc="9f7e2bd3" sha1="2828aca0c0f5802110f10453c1cf640f69736554" />    <!-- TC5364205 -->
@@ -6632,7 +6711,7 @@
 				<rom name="234-v1.v1" offset="0x000000" size="0x400000" crc="ed66b76f" sha1="8a05ff06d9b6f01c6c16b3026282eaabb0e25b44" />   <!-- TC5332204 -->
 				<rom name="234-v2.v2" offset="0x400000" size="0x400000" crc="a0e7f6e2" sha1="753ff74fa9294f695aae511ae01ead119b114a57" />   <!-- TC5332204 -->
 				<rom name="234-v3.v3" offset="0x800000" size="0x400000" crc="a506e1e2" sha1="b3e04ba1a5cb50b77c6fbe9fe353b9b64b6f3f74" />   <!-- TC5332204 -->
-				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20A1F4833E5E29BA0073C1712D7A17AB7A2A035C" />   <!-- TC5332204 -->
+				<rom name="234-v4.v4" offset="0xc00000" size="0x400000" crc="0e34157f" sha1="20a1f4833e5e29ba0073c1712d7a17ab7a2a035c" />   <!-- TC5332204 -->
 			</dataarea>
 			<dataarea name="sprites" size="0x2800000">
 				<rom loadflag="load16_byte" name="234-c1.c1" offset="0x000000" size="0x800000" crc="9f7e2bd3" sha1="2828aca0c0f5802110f10453c1cf640f69736554" />    <!-- TC5364205 -->
@@ -6655,7 +6734,7 @@
 	<software name="puzzldpr" cloneof="puzzledp">
 		<description>Puzzle De Pon! R!</description>
 		<year>1997</year>
-		<publisher>Taito (Visco license)</publisher>
+		<publisher>Visco</publisher>
 		<info name="serial" value="NGM-2350?"/>
 		<info name="alt_title" value="パズル de ポン! R"/>
 		<sharedfeat name="release" value="MVS" />   <!-- MVS ONLY RELEASE -->
@@ -8186,11 +8265,57 @@
 			<!-- revision 2000.4.1 -->
 			<feature name="slot" value="sma_mslug3" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
-				<rom loadflag="load16_word_swap" name="neo-sma" offset="0x0c0000" size="0x040000" crc="9cd55736" sha1="d6efb2b313127c2911d47d9324626b3f1e7c6ccb" />
+				<rom loadflag="load16_word_swap" name="green.neo-sma" offset="0x0c0000" size="0x040000" crc="9cd55736" sha1="d6efb2b313127c2911d47d9324626b3f1e7c6ccb" />
 				<!-- stored in the custom chip -->
-				<!-- The SMA for this release has a green colour marking; the older revision has a white colour marking -->
+				<!-- The SMA has a green colour marking -->
 				<rom loadflag="load16_word_swap" name="256-pg1.p1" offset="0x100000" size="0x400000" crc="b07edfd5" sha1="dcbd9e500bfae98d754e55cdbbbbf9401013f8ee" />  <!-- TC5332202 -->
 				<rom loadflag="load16_word_swap" name="256-pg2.p2" offset="0x500000" size="0x400000" crc="6097c26b" sha1="248ec29d21216f29dc6f5f3f0e1ad1601b3501b6" />  <!-- TC5332202 -->
+			</dataarea>
+			<dataarea name="fixed" size="0x80000">
+				<!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
+				<rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x080000">
+				<rom offset="0x000000" size="0x080000" name="256-m1.m1" crc="eaeec116" sha1="54419dbb21edc8c4b37eaac2e7ad9496d2de037a" />   <!-- mask rom TC534000 -->
+			</dataarea>
+			<dataarea name="ymsnd" size="0x1000000">
+				<rom name="256-v1.v1" offset="0x000000" size="0x400000" crc="f2690241" sha1="fd56babc1934d10e0d27c32f032f9edda7ca8ce9" />   <!-- TC5332204 -->
+				<rom name="256-v2.v2" offset="0x400000" size="0x400000" crc="7e2a10bd" sha1="0d587fb9f64cba0315ce2d8a03e2b8fe34936dff" />   <!-- TC5332204 -->
+				<rom name="256-v3.v3" offset="0x800000" size="0x400000" crc="0eaec17c" sha1="c3ed613cc6993edd6fc0d62a90bcd85de8e21915" />   <!-- TC5332204 -->
+				<rom name="256-v4.v4" offset="0xc00000" size="0x400000" crc="9b4b22d4" sha1="9764fbf8453e52f80aa97a46fb9cf5937ef15a31" />   <!-- TC5332204 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x4000000">
+				<!-- Encrypted -->
+				<rom loadflag="load16_byte" name="256-c1.c1" offset="0x000000" size="0x800000" crc="5a79c34e" sha1="b8aa51fa50935cae62ab3d125b723ab888691e60" />    <!-- TC5364205 -->
+				<rom loadflag="load16_byte" name="256-c2.c2" offset="0x000001" size="0x800000" crc="944c362c" sha1="3843ab300f956280475469caee70135658f67089" />    <!-- TC5364205 -->
+				<rom loadflag="load16_byte" name="256-c3.c3" offset="0x1000000" size="0x800000" crc="6e69d36f" sha1="94e8cf42e999114b4bd8b30e0aa2f365578c4c9a" />   <!-- TC5364205 -->
+				<rom loadflag="load16_byte" name="256-c4.c4" offset="0x1000001" size="0x800000" crc="b755b4eb" sha1="804700a0966a48f130c434ede3f970792ea74fa5" />   <!-- TC5364205 -->
+				<rom loadflag="load16_byte" name="256-c5.c5" offset="0x2000000" size="0x800000" crc="7aacab47" sha1="312c1c9846175fe1a3cad51d5ae230cf674fc93d" />   <!-- TC5364205 -->
+				<rom loadflag="load16_byte" name="256-c6.c6" offset="0x2000001" size="0x800000" crc="c698fd5d" sha1="16818883b06849ba2f8d61bdd5e21aaf99bd8408" />   <!-- TC5364205 -->
+				<rom loadflag="load16_byte" name="256-c7.c7" offset="0x3000000" size="0x800000" crc="cfceddd2" sha1="7def666adf8bd1703f40c61f182fc040b6362dc9" />   <!-- TC5364205 -->
+				<rom loadflag="load16_byte" name="256-c8.c8" offset="0x3000001" size="0x800000" crc="4d9be34c" sha1="a737bdfa2b815aea7067e7af2636e83a9409c414" />   <!-- TC5364205 -->
+			</dataarea>
+		</part>
+	</software>
+
+<software name="mslug3a" cloneof="mslug3"> <!-- see neogeo.cpp for notes on this set -->
+		<description>Metal Slug 3 (NGM-2560, earlier)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="NGM-2560"/>
+		<info name="release" value="20000323"/>
+		<info name="alt_title" value="メタルスラッグ 3"/>
+		<sharedfeat name="release" value="MVS" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<!-- revision Mar/17/2000 1:36 (from SMA rom) -->
+			<feature name="slot" value="sma_mslug3a" />
+			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
+				<rom loadflag="load16_word_swap" name="white.neo-sma" offset="0x0c0000" size="0x040000" crc="c60d29b2" sha1="1647260ccbda833b35005608ef1fdc82fba02f04" />
+				<!-- stored in the custom chip -->
+				<!-- The SMA has a white colour marking -->
+				<rom loadflag="load16_word_swap" name="256.p1" offset="0x100000" size="0x400000" crc="a1177628" sha1="4c4c379d9fc3a83265b7f32fbfce9d16b7d0f0fd" />  <!-- TC5332202 -->
+				<rom loadflag="load16_word_swap" name="256.p2" offset="0x500000" size="0x400000" crc="9b659826" sha1="d6bd03cf61879217922c18db4d3bd77095c0fe19" />  <!-- TC5332202 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x80000">
 				<!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
@@ -8523,7 +8648,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!--
 	ID-0262
 	. NGM-262?
@@ -9274,7 +9399,7 @@
 	-->
 
 	<software name="kof2003">
-		<description>The King of Fighters 2003 (NGM-2710)</description>
+		<description>The King of Fighters 2003 (NGM-2710, Export)</description>
 		<year>2003</year>
 		<publisher>SNK Playmore</publisher>
 		<info name="serial" value="NGM-2710"/>
@@ -9952,7 +10077,7 @@
 			</dataarea>
 			<dataarea name="ymsnd" size="0x400000">
 				<rom name="nitd-v1.bin" offset="0x000000" size="0x200000" crc="79008868" sha1="90bd6aaefd37341297ab1f4ae7246e52facd87d0" />
-				<rom name="nitd-v2.bin" offset="0x200000" size="0x200000" crc="728558F9" sha1="309aa7c933c199b2e540a601b363e7af8744fe00" />
+				<rom name="nitd-v2.bin" offset="0x200000" size="0x200000" crc="728558f9" sha1="309aa7c933c199b2e540a601b363e7af8744fe00" />
 			</dataarea>
 			<dataarea name="sprites" size="0x800000">
 				<rom loadflag="load16_byte" name="nitd-c1.bin" offset="0x000000" size="0x200000" crc="b4353190" sha1="90d5352e243a05f5c2be4fa7475667bb56e78016" />

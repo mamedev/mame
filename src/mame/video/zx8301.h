@@ -35,20 +35,6 @@
 #pragma once
 
 
-
-
-///*************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-///*************************************************************************
-
-#define MCFG_ZX8301_CPU(_tag) \
-	downcast<zx8301_device &>(*device).set_cpu_tag("^" _tag);
-
-#define MCFG_ZX8301_VSYNC_CALLBACK(_write) \
-	devcb = &downcast<zx8301_device &>(*device).set_vsync_wr_callback(DEVCB_##_write);
-
-
-
 ///*************************************************************************
 //  TYPE DEFINITIONS
 ///*************************************************************************
@@ -61,10 +47,15 @@ class zx8301_device :   public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T> zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: zx8301_device(mconfig, tag, owner, clock)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu_tag));
+	}
+
 	zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_vsync_wr_callback(Object &&cb) { return m_write_vsync.set_callback(std::forward<Object>(cb)); }
-	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
+	auto vsync_wr_callback() { return m_write_vsync.bind(); }
 
 	DECLARE_WRITE8_MEMBER( control_w );
 	DECLARE_READ8_MEMBER( data_r );

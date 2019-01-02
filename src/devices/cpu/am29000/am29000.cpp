@@ -131,9 +131,9 @@ device_memory_interface::space_config_vector am29000_cpu_device::memory_space_co
 void am29000_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
 	m_data = &space(AS_DATA);
-	m_datadirect = m_data->direct<0>();
+	m_datacache = m_data->cache<2, 0, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 	m_cfg = (PRL_AM29000 | PRL_REV_D) << CFG_PRL_SHIFT;
 
@@ -511,7 +511,7 @@ uint32_t am29000_cpu_device::read_program_word(uint32_t address)
 {
 	/* TODO: ROM enable? */
 	if (m_cps & CPS_PI || m_cps & CPS_RE)
-		return m_direct->read_dword(address);
+		return m_cache->read_dword(address);
 	else
 	{
 		fatalerror("Am29000 instruction MMU translation enabled!\n");
@@ -658,7 +658,7 @@ void am29000_cpu_device::execute_run()
 			if (m_cfg & CFG_VF)
 			{
 				uint32_t vaddr = m_vab | m_exception_queue[0] * 4;
-				uint32_t vect = m_datadirect->read_dword(vaddr);
+				uint32_t vect = m_datacache->read_dword(vaddr);
 
 				m_pc = vect & ~3;
 				m_next_pc = m_pc;

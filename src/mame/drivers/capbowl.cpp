@@ -111,7 +111,7 @@
 INTERRUPT_GEN_MEMBER(capbowl_state::interrupt)
 {
 	if (ioport("SERVICE")->read() & 1)                      /* get status of the F2 key */
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);    /* trigger self test */
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);    /* trigger self test */
 }
 
 
@@ -212,27 +212,27 @@ void capbowl_state::capbowl_map(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr("bank1");
 	map(0x4000, 0x4000).writeonly().share("rowaddress");
-	map(0x4800, 0x4800).w(this, FUNC(capbowl_state::capbowl_rom_select_w));
+	map(0x4800, 0x4800).w(FUNC(capbowl_state::capbowl_rom_select_w));
 	map(0x5000, 0x57ff).ram().share("nvram");
-	map(0x5800, 0x5fff).rw(this, FUNC(capbowl_state::tms34061_r), FUNC(capbowl_state::tms34061_w));
-	map(0x6000, 0x6000).w(this, FUNC(capbowl_state::sndcmd_w));
-	map(0x6800, 0x6800).w(this, FUNC(capbowl_state::track_reset_w)).nopr();   /* + watchdog */
-	map(0x7000, 0x7000).r(this, FUNC(capbowl_state::track_0_r));         /* + other inputs */
-	map(0x7800, 0x7800).r(this, FUNC(capbowl_state::track_1_r));         /* + other inputs */
+	map(0x5800, 0x5fff).rw(FUNC(capbowl_state::tms34061_r), FUNC(capbowl_state::tms34061_w));
+	map(0x6000, 0x6000).w(FUNC(capbowl_state::sndcmd_w));
+	map(0x6800, 0x6800).w(FUNC(capbowl_state::track_reset_w)).nopr();   /* + watchdog */
+	map(0x7000, 0x7000).r(FUNC(capbowl_state::track_0_r));         /* + other inputs */
+	map(0x7800, 0x7800).r(FUNC(capbowl_state::track_1_r));         /* + other inputs */
 	map(0x8000, 0xffff).rom();
 }
 
 
 void capbowl_state::bowlrama_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw(this, FUNC(capbowl_state::bowlrama_blitter_r), FUNC(capbowl_state::bowlrama_blitter_w));
+	map(0x0000, 0x001f).rw(FUNC(capbowl_state::bowlrama_blitter_r), FUNC(capbowl_state::bowlrama_blitter_w));
 	map(0x4000, 0x4000).writeonly().share("rowaddress");
 	map(0x5000, 0x57ff).ram().share("nvram");
-	map(0x5800, 0x5fff).rw(this, FUNC(capbowl_state::tms34061_r), FUNC(capbowl_state::tms34061_w));
-	map(0x6000, 0x6000).w(this, FUNC(capbowl_state::sndcmd_w));
-	map(0x6800, 0x6800).w(this, FUNC(capbowl_state::track_reset_w)).nopr();    /* + watchdog */
-	map(0x7000, 0x7000).r(this, FUNC(capbowl_state::track_0_r));         /* + other inputs */
-	map(0x7800, 0x7800).r(this, FUNC(capbowl_state::track_1_r));         /* + other inputs */
+	map(0x5800, 0x5fff).rw(FUNC(capbowl_state::tms34061_r), FUNC(capbowl_state::tms34061_w));
+	map(0x6000, 0x6000).w(FUNC(capbowl_state::sndcmd_w));
+	map(0x6800, 0x6800).w(FUNC(capbowl_state::track_reset_w)).nopr();    /* + watchdog */
+	map(0x7000, 0x7000).r(FUNC(capbowl_state::track_0_r));         /* + other inputs */
+	map(0x7800, 0x7800).r(FUNC(capbowl_state::track_1_r));         /* + other inputs */
 	map(0x8000, 0xffff).rom();
 }
 
@@ -249,7 +249,7 @@ void capbowl_state::sound_map(address_map &map)
 	map(0x0000, 0x07ff).ram();
 	map(0x1000, 0x1001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x2000, 0x2000).nopw(); /* watchdog */
-	map(0x6000, 0x6000).w("dac", FUNC(dac_byte_interface::write));
+	map(0x6000, 0x6000).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x7000, 0x7000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x8000, 0xffff).rom();
 }
@@ -319,18 +319,16 @@ void capbowl_state::machine_reset()
 MACHINE_CONFIG_START(capbowl_state::capbowl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
-	MCFG_CPU_PROGRAM_MAP(capbowl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", capbowl_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
+	MCFG_DEVICE_PROGRAM_MAP(capbowl_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", capbowl_state,  interrupt)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // ~0.3s
+	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5); // ~0.3s
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-//  MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // TODO
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
@@ -347,22 +345,22 @@ MACHINE_CONFIG_START(capbowl_state::capbowl)
 	MCFG_TMS34061_INTERRUPT_CB(INPUTLINE("maincpu", M6809_FIRQ_LINE))      /* interrupt gen callback */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 2)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
-	MCFG_AY8910_PORT_A_READ_CB(DEVREADLINE("ticket", ticket_dispenser_device, line_r)) MCFG_DEVCB_BIT(7)
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITELINE("ticket", ticket_dispenser_device, motor_w)) MCFG_DEVCB_BIT(7)  /* Also a status LED. See memory map above */
-	MCFG_SOUND_ROUTE(0, "speaker", 0.07)
-	MCFG_SOUND_ROUTE(1, "speaker", 0.07)
-	MCFG_SOUND_ROUTE(2, "speaker", 0.07)
-	MCFG_SOUND_ROUTE(3, "speaker", 0.75)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 2));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
+	ymsnd.port_a_read_callback().set("ticket", FUNC(ticket_dispenser_device::line_r)).lshift(7);
+	ymsnd.port_b_write_callback().set("ticket", FUNC(ticket_dispenser_device::motor_w)).bit(7); // Also a status LED. See memory map above
+	ymsnd.add_route(0, "speaker", 0.07);
+	ymsnd.add_route(1, "speaker", 0.07);
+	ymsnd.add_route(2, "speaker", 0.07);
+	ymsnd.add_route(3, "speaker", 0.75);
 
-	MCFG_SOUND_ADD("dac", DAC0832, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	DAC0832(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -371,8 +369,8 @@ MACHINE_CONFIG_START(capbowl_state::bowlrama)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bowlrama_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bowlrama_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -466,7 +464,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(capbowl_state,capbowl)
+void capbowl_state::init_capbowl()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -481,9 +479,9 @@ DRIVER_INIT_MEMBER(capbowl_state,capbowl)
  *
  *************************************/
 
-GAME( 1988, capbowl,  0,       capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Coors Light Bowling",    MACHINE_SUPPORTS_SAVE )
-GAME( 1991, bowlrama, 0,       bowlrama, capbowl, capbowl_state, 0,        ROT270, "P&P Marketing",                    "Bowl-O-Rama Rev 1.0",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, capbowl,  0,       capbowl,  capbowl, capbowl_state, init_capbowl, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl_state, init_capbowl, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl_state, init_capbowl, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl_state, init_capbowl, ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl_state, init_capbowl, ROT270, "Incredible Technologies / Capcom", "Coors Light Bowling",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bowlrama, 0,       bowlrama, capbowl, capbowl_state, empty_init,   ROT270, "P&P Marketing",                    "Bowl-O-Rama Rev 1.0",    MACHINE_SUPPORTS_SAVE )

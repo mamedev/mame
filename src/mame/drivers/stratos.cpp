@@ -24,7 +24,11 @@ public:
 		, nvram_bank(*this, "nvram_bank")
 	{ }
 
-	DECLARE_DRIVER_INIT(stratos);
+	void stratos(machine_config &config);
+
+	void init_stratos();
+
+private:
 	DECLARE_WRITE8_MEMBER(p2000_w);
 	DECLARE_READ8_MEMBER(p2200_r);
 	DECLARE_WRITE8_MEMBER(p2200_w);
@@ -37,9 +41,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void stratos(machine_config &config);
 	void stratos_mem(address_map &map);
-private:
+
 	std::unique_ptr<uint8_t[]> nvram_data;
 	uint8_t control, led_latch_control;
 	uint32_t individual_leds;
@@ -54,7 +57,7 @@ private:
 	required_memory_bank nvram_bank;
 };
 
-DRIVER_INIT_MEMBER( stratos_state, stratos )
+void stratos_state::init_stratos()
 {
 	nvram_data = std::make_unique<uint8_t[]>(0x2000);
 	nvram->set_base(nvram_data.get(), 0x2000);
@@ -80,7 +83,7 @@ void stratos_state::machine_reset()
 
 void stratos_state::show_leds()
 {
-	static const char *led_pos[18] = {
+	static char const *const led_pos[18] = {
 		nullptr, nullptr, "gPawn", "gKnight", "gBishop", "gRook", "gQueen", "gKing", nullptr, nullptr, "rPawn", "rKnight", "rBishop", "rRook", "rQueen", "rKing", nullptr, nullptr
 	};
 	char str_red[64];
@@ -122,7 +125,7 @@ uint32_t stratos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	if(machine().input().code_pressed(KEYCODE_W)) {
 		if(!nmi) {
-			maincpu->set_input_line(M65C02_NMI_LINE, PULSE_LINE);
+			maincpu->pulse_input_line(M65C02_NMI_LINE, attotime::zero);
 			nmi = true;
 		}
 	} else
@@ -333,12 +336,12 @@ WRITE8_MEMBER(stratos_state::lcd_w)
 void stratos_state::stratos_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2000).w(this, FUNC(stratos_state::p2000_w));
-	map(0x2200, 0x2200).rw(this, FUNC(stratos_state::p2200_r), FUNC(stratos_state::p2200_w));
-	map(0x2400, 0x2400).w(this, FUNC(stratos_state::p2400_w));
-	map(0x2600, 0x2600).rw(this, FUNC(stratos_state::control_r), FUNC(stratos_state::control_w));
+	map(0x2000, 0x2000).w(FUNC(stratos_state::p2000_w));
+	map(0x2200, 0x2200).rw(FUNC(stratos_state::p2200_r), FUNC(stratos_state::p2200_w));
+	map(0x2400, 0x2400).w(FUNC(stratos_state::p2400_w));
+	map(0x2600, 0x2600).rw(FUNC(stratos_state::control_r), FUNC(stratos_state::control_w));
 	map(0x2800, 0x37ff).bankrw("nvram_bank");
-	map(0x3800, 0x3800).rw(this, FUNC(stratos_state::lcd_r), FUNC(stratos_state::lcd_w));
+	map(0x3800, 0x3800).rw(FUNC(stratos_state::lcd_r), FUNC(stratos_state::lcd_w));
 	map(0x4000, 0x7fff).bankr("bank_4000");
 	map(0x8000, 0xffff).bankr("bank_8000");
 }
@@ -347,8 +350,8 @@ static INPUT_PORTS_START( stratos )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(stratos_state::stratos)
-	MCFG_CPU_ADD("maincpu", M65C02, 5670000)
-	MCFG_CPU_PROGRAM_MAP(stratos_mem)
+	MCFG_DEVICE_ADD("maincpu", M65C02, 5670000)
+	MCFG_DEVICE_PROGRAM_MAP(stratos_mem)
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -358,7 +361,7 @@ MACHINE_CONFIG_START(stratos_state::stratos)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", stratos_state, irq_timer, attotime::from_hz(1000))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
 
 ROM_START( stratos )
@@ -371,5 +374,5 @@ ROM_START( stratos )
 	ROM_FILL(0x00000, 0x10000, 0xff)
 ROM_END
 
-/*     YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS          INIT     COMPANY    FULLNAME                           FLAGS */
-CONS(  1986, stratos,  0,       0,      stratos,   stratos,  stratos_state, stratos, "Saitek",  "Kasparov Stratos Chess Computer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY    FULLNAME                           FLAGS */
+CONS(  1986, stratos, 0,      0,      stratos, stratos, stratos_state, init_stratos, "Saitek",  "Kasparov Stratos Chess Computer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -39,13 +39,13 @@ static const rgb_t nc_palette[NC_NUM_COLOURS] =
 
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(nc_state, nc)
+void nc_state::nc_colours(palette_device &palette) const
 {
-	palette.set_pen_colors(0, nc_palette, ARRAY_LENGTH(nc_palette));
+	palette.set_pen_colors(0, nc_palette);
 }
 
 
-void nc_state::nc200_video_set_backlight(int state)
+void nc200_state::nc200_video_set_backlight(int state)
 {
 	m_nc200_backlight = state;
 }
@@ -56,65 +56,40 @@ void nc_state::nc200_video_set_backlight(int state)
   Do NOT call osd_update_display() from this function,
   it will be called by the main emulation engine.
 ***************************************************************************/
-uint32_t nc_state::screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nc_state::screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int height, int width, int const (&pens)[2])
 {
-	int y;
-	int b;
-	int x;
-	int height, width;
-	int pens[2];
-
-	if (m_type==NC_TYPE_200)
+	for (int y = 0; y < height; y++)
 	{
-		height = NC200_SCREEN_HEIGHT;
-		width = NC200_SCREEN_WIDTH;
-
-		if (m_nc200_backlight)
-		{
-			pens[0] = 2;
-			pens[1] = 3;
-		}
-		else
-		{
-			pens[0] = 0;
-			pens[1] = 1;
-		}
-	}
-	else
-	{
-		height = NC_SCREEN_HEIGHT;
-		width = NC_SCREEN_WIDTH;
-		pens[0] = 2;
-		pens[1] = 3;
-	}
-
-
-	for (y=0; y<height; y++)
-	{
-		int by;
 		/* 64 bytes per line */
-		char *line_ptr = ((char*)m_ram->pointer()) + m_display_memory_start + (y<<6);
+		char const *line_ptr = ((char const *)m_ram->pointer()) + m_display_memory_start + (y<<6);
 
-		x = 0;
-		for (by=0; by<width>>3; by++)
+		for (int x = 0, by = 0; by < (width >> 3); by++)
 		{
-			int px;
-			unsigned char byte;
+			unsigned char byte = line_ptr[0];
 
-			byte = line_ptr[0];
-
-			px = x;
-			for (b=0; b<8; b++)
+			for (int b = 0; b < 8; b++)
 			{
-				bitmap.pix16(y, px) = pens[(byte>>7) & 0x01];
+				bitmap.pix16(y, x) = pens[(byte>>7) & 0x01];
 				byte = byte<<1;
-				px++;
+				x++;
 			}
 
-			x = px;
-
-			line_ptr = line_ptr+1;
+			line_ptr++;
 		}
 	}
 	return 0;
+}
+
+
+uint32_t nc100_state::screen_update_nc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int const pens[]{ 2, 3 };
+	return screen_update_nc(screen, bitmap, cliprect, NC_SCREEN_HEIGHT, NC_SCREEN_WIDTH, pens);
+}
+
+
+uint32_t nc200_state::screen_update_nc200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int const pens[]{ m_nc200_backlight ? 2 : 0, m_nc200_backlight ? 3 : 1 };
+	return screen_update_nc(screen, bitmap, cliprect, NC200_SCREEN_HEIGHT, NC200_SCREEN_WIDTH, pens);
 }

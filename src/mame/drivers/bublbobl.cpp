@@ -306,11 +306,11 @@ void bublbobl_state::bublbobl_maincpu_map(address_map &map)
 {
 	common_maincpu_map(map);
 	map(0xfa00, 0xfa00).mirror(0x007c).r(m_sound_to_main, FUNC(generic_latch_8_device::read)).w(m_main_to_sound, FUNC(generic_latch_8_device::write));
-	map(0xfa01, 0xfa01).mirror(0x007c).r(this, FUNC(bublbobl_state::common_sound_semaphores_r));
-	map(0xfa03, 0xfa03).mirror(0x007c).w(this, FUNC(bublbobl_state::bublbobl_soundcpu_reset_w));
+	map(0xfa01, 0xfa01).mirror(0x007c).r(FUNC(bublbobl_state::common_sound_semaphores_r));
+	map(0xfa03, 0xfa03).mirror(0x007c).w(FUNC(bublbobl_state::bublbobl_soundcpu_reset_w));
 	map(0xfa80, 0xfa80).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xfb00, 0xfb00).mirror(0x003f).w(this, FUNC(bublbobl_state::bublbobl_nmitrigger_w));
-	map(0xfb40, 0xfb40).mirror(0x003f).w(this, FUNC(bublbobl_state::bublbobl_bankswitch_w));
+	map(0xfb00, 0xfb00).mirror(0x003f).w(FUNC(bublbobl_state::bublbobl_nmitrigger_w));
+	map(0xfb40, 0xfb40).mirror(0x003f).w(FUNC(bublbobl_state::bublbobl_bankswitch_w));
 	map(0xfc00, 0xffff).ram().share("mcu_sharedram");
 }
 
@@ -330,7 +330,7 @@ void bublbobl_state::subcpu_map(address_map &map)
  1  0  1  0  x  x  x  x  x  x  x  x  x  x  x  *  RW YM3526 OPL chip
  1  0  1  1                                *  *  decoded by 74ls155@ic33
  1  0  1  1  x  x  x  x  x  x  x  x  x  x  0  0  R maincpu_to_sound latch 74ls374 @ic24 and clear maincpu_has_written semaphore
- 1  0  1  1  x  x  x  x  x  x  x  x  x  x  0  0  W sound_to_maincpu latch 74ls374 @ic25 and set sound_has_written sempaphore
+ 1  0  1  1  x  x  x  x  x  x  x  x  x  x  0  0  W sound_to_maincpu latch 74ls374 @ic25 and set sound_has_written semaphore
  1  0  1  1  x  x  x  x  x  x  x  x  x  x  0  1  R read semaphores in d0 and d1
  1  0  1  1  x  x  x  x  x  x  x  x  x  x  0  1  W set latch to enable sound cpu nmi on maincpu_has_written semaphore active
  1  0  1  1  x  x  x  x  x  x  x  x  x  x  1  x  R OPEN BUS
@@ -339,7 +339,7 @@ void bublbobl_state::subcpu_map(address_map &map)
  1  0  1  1  x  x  x  x  x  x  x  x  x  x  x  0  RW sound latch[2]
  1  1  x  x  x  x  x  x  x  x  x  x  x  x  x  x  OPEN BUS
 (1  1  *  *  *  *  *  *  *  *  *  *  *  *  *  *  R  DIAGNOSTIC ROM[4])
-   [1] Technicaly A12 is conencted to the 6264 SRAM too, but the 74ls138 disables the SRAM when A12 is high, so only half is usable
+   [1] Technicaly A12 is connected to the 6264 SRAM too, but the 74ls138 disables the SRAM when A12 is high, so only half is usable
    [4] While normally not populated (or even present? not shown on the schematic at all? possibly a holdover from tokio?)
        the sound code probes for a ROM here, and will use it if found.
 Sound cpu semaphores are both active low:
@@ -350,24 +350,24 @@ void bublbobl_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x9001).mirror(0x0ffe).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xa000, 0xa001).mirror(0x0ffe).rw("ym2", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
+	map(0x9000, 0x9001).mirror(0x0ffe).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa001).mirror(0x0ffe).rw("ym3526", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
 	map(0xb000, 0xb000).mirror(0x0ffc).r(m_main_to_sound, FUNC(generic_latch_8_device::read)).w(m_sound_to_main, FUNC(generic_latch_8_device::write));
-	map(0xb001, 0xb001).mirror(0x0ffc).r(this, FUNC(bublbobl_state::common_sound_semaphores_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
+	map(0xb001, 0xb001).mirror(0x0ffc).r(FUNC(bublbobl_state::common_sound_semaphores_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
 	map(0xb002, 0xb002).mirror(0x0ffc).w(m_soundnmi, FUNC(input_merger_device::in_clear<0>));
 	map(0xe000, 0xffff).rom(); // space for diagnostic ROM?
 }
 
 void bublbobl_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x0000).rw(this, FUNC(bublbobl_state::bublbobl_mcu_ddr1_r), FUNC(bublbobl_state::bublbobl_mcu_ddr1_w));
-	map(0x0001, 0x0001).rw(this, FUNC(bublbobl_state::bublbobl_mcu_ddr2_r), FUNC(bublbobl_state::bublbobl_mcu_ddr2_w));
-	map(0x0002, 0x0002).rw(this, FUNC(bublbobl_state::bublbobl_mcu_port1_r), FUNC(bublbobl_state::bublbobl_mcu_port1_w));
-	map(0x0003, 0x0003).rw(this, FUNC(bublbobl_state::bublbobl_mcu_port2_r), FUNC(bublbobl_state::bublbobl_mcu_port2_w));
-	map(0x0004, 0x0004).rw(this, FUNC(bublbobl_state::bublbobl_mcu_ddr3_r), FUNC(bublbobl_state::bublbobl_mcu_ddr3_w));
-	map(0x0005, 0x0005).rw(this, FUNC(bublbobl_state::bublbobl_mcu_ddr4_r), FUNC(bublbobl_state::bublbobl_mcu_ddr4_w));
-	map(0x0006, 0x0006).rw(this, FUNC(bublbobl_state::bublbobl_mcu_port3_r), FUNC(bublbobl_state::bublbobl_mcu_port3_w));
-	map(0x0007, 0x0007).rw(this, FUNC(bublbobl_state::bublbobl_mcu_port4_r), FUNC(bublbobl_state::bublbobl_mcu_port4_w));
+	map(0x0000, 0x0000).rw(FUNC(bublbobl_state::bublbobl_mcu_ddr1_r), FUNC(bublbobl_state::bublbobl_mcu_ddr1_w));
+	map(0x0001, 0x0001).rw(FUNC(bublbobl_state::bublbobl_mcu_ddr2_r), FUNC(bublbobl_state::bublbobl_mcu_ddr2_w));
+	map(0x0002, 0x0002).rw(FUNC(bublbobl_state::bublbobl_mcu_port1_r), FUNC(bublbobl_state::bublbobl_mcu_port1_w));
+	map(0x0003, 0x0003).rw(FUNC(bublbobl_state::bublbobl_mcu_port2_r), FUNC(bublbobl_state::bublbobl_mcu_port2_w));
+	map(0x0004, 0x0004).rw(FUNC(bublbobl_state::bublbobl_mcu_ddr3_r), FUNC(bublbobl_state::bublbobl_mcu_ddr3_w));
+	map(0x0005, 0x0005).rw(FUNC(bublbobl_state::bublbobl_mcu_ddr4_r), FUNC(bublbobl_state::bublbobl_mcu_ddr4_w));
+	map(0x0006, 0x0006).rw(FUNC(bublbobl_state::bublbobl_mcu_port3_r), FUNC(bublbobl_state::bublbobl_mcu_port3_w));
+	map(0x0007, 0x0007).rw(FUNC(bublbobl_state::bublbobl_mcu_port4_r), FUNC(bublbobl_state::bublbobl_mcu_port4_w));
 	map(0x0040, 0x00ff).ram();
 	map(0xf000, 0xffff).rom();
 }
@@ -376,16 +376,16 @@ void bublbobl_state::bootleg_map(address_map &map)
 {
 	common_maincpu_map(map);
 	map(0xfa00, 0xfa00).mirror(0x007c).r(m_sound_to_main, FUNC(generic_latch_8_device::read)).w(m_main_to_sound, FUNC(generic_latch_8_device::write));
-	map(0xfa01, 0xfa01).mirror(0x007c).r(this, FUNC(bublbobl_state::common_sound_semaphores_r));
-	map(0xfa03, 0xfa03).mirror(0x007c).w(this, FUNC(bublbobl_state::bublbobl_soundcpu_reset_w));
+	map(0xfa01, 0xfa01).mirror(0x007c).r(FUNC(bublbobl_state::common_sound_semaphores_r));
+	map(0xfa03, 0xfa03).mirror(0x007c).w(FUNC(bublbobl_state::bublbobl_soundcpu_reset_w));
 	map(0xfa80, 0xfa80).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xfb00, 0xfb00).mirror(0x003f).w(this, FUNC(bublbobl_state::bublbobl_nmitrigger_w));
-	map(0xfb40, 0xfb40).mirror(0x003f).w(this, FUNC(bublbobl_state::bublbobl_bankswitch_w));
+	map(0xfb00, 0xfb00).mirror(0x003f).w(FUNC(bublbobl_state::bublbobl_nmitrigger_w));
+	map(0xfb40, 0xfb40).mirror(0x003f).w(FUNC(bublbobl_state::bublbobl_bankswitch_w));
 	// above here is identical to non-bootleg
 	map(0xfc00, 0xfcff).ram();
 	map(0xfd00, 0xfdff).ram();
-	map(0xfe00, 0xfe03).rw(this, FUNC(bublbobl_state::boblbobl_ic43_a_r), FUNC(bublbobl_state::boblbobl_ic43_a_w));
-	map(0xfe80, 0xfe83).rw(this, FUNC(bublbobl_state::boblbobl_ic43_b_r), FUNC(bublbobl_state::boblbobl_ic43_b_w));
+	map(0xfe00, 0xfe03).rw(FUNC(bublbobl_state::boblbobl_ic43_a_r), FUNC(bublbobl_state::boblbobl_ic43_a_w));
+	map(0xfe80, 0xfe83).rw(FUNC(bublbobl_state::boblbobl_ic43_b_r), FUNC(bublbobl_state::boblbobl_ic43_b_w));
 	map(0xff00, 0xff00).portr("DSW0");
 	map(0xff01, 0xff01).portr("DSW1");
 	map(0xff02, 0xff02).portr("IN0");
@@ -404,9 +404,9 @@ void bublbobl_state::tokio_map(address_map &map)
 	map(0xfa05, 0xfa05).portr("IN0");
 	map(0xfa06, 0xfa06).portr("IN1");
 	map(0xfa07, 0xfa07).portr("IN2");
-	map(0xfa80, 0xfa80).w(this, FUNC(bublbobl_state::tokio_bankswitch_w));
-	map(0xfb00, 0xfb00).w(this, FUNC(bublbobl_state::tokio_videoctrl_w));
-	map(0xfb80, 0xfb80).w(this, FUNC(bublbobl_state::bublbobl_nmitrigger_w));
+	map(0xfa80, 0xfa80).w(FUNC(bublbobl_state::tokio_bankswitch_w));
+	map(0xfb00, 0xfb00).w(FUNC(bublbobl_state::tokio_videoctrl_w));
+	map(0xfb80, 0xfb80).w(FUNC(bublbobl_state::bublbobl_nmitrigger_w));
 	map(0xfc00, 0xfc00).r(m_sound_to_main, FUNC(generic_latch_8_device::read)).w(m_main_to_sound, FUNC(generic_latch_8_device::write));
 }
 
@@ -419,7 +419,7 @@ void bublbobl_state::tokio_map_mcu(address_map &map)
 void bublbobl_state::tokio_map_bootleg(address_map &map)
 {
 	tokio_map(map);
-	map(0xfe00, 0xfe00).r(this, FUNC(bublbobl_state::tokiob_mcu_r));
+	map(0xfe00, 0xfe00).r(FUNC(bublbobl_state::tokiob_mcu_r));
 }
 
 
@@ -434,10 +434,10 @@ void bublbobl_state::tokio_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
 	map(0x9000, 0x9000).r(m_main_to_sound, FUNC(generic_latch_8_device::read)).w(m_sound_to_main, FUNC(generic_latch_8_device::write));
-	map(0x9800, 0x9800).r(this, FUNC(bublbobl_state::common_sound_semaphores_r));
+	map(0x9800, 0x9800).r(FUNC(bublbobl_state::common_sound_semaphores_r));
 	map(0xa000, 0xa000).w(m_soundnmi, FUNC(input_merger_device::in_clear<0>));
 	map(0xa800, 0xa800).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
-	map(0xb000, 0xb001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xb000, 0xb001).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xe000, 0xffff).rom(); // space for diagnostic ROM?
 }
 
@@ -803,7 +803,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( bublbobl )
+static GFXDECODE_START( gfx_bublbobl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -826,9 +826,12 @@ MACHINE_RESET_MEMBER(bublbobl_state,common) // things common on both tokio and b
 	m_soundnmi->in_w<0>(0); // clear sound NMI stuff
 	m_soundnmi->in_w<1>(0);
 	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); // if a subcpu nmi is active (extremely remote chance), it is cleared
-	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE); // maincpu is reset
-	m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE); // subcpu is reset
-	common_sreset(PULSE_LINE); // /SRESET is pulsed
+	if (!m_sreset_old)
+	{
+		// /SRESET is pulsed
+		common_sreset(ASSERT_LINE);
+		common_sreset(CLEAR_LINE);
+	}
 }
 
 
@@ -844,83 +847,79 @@ MACHINE_RESET_MEMBER(bublbobl_state,tokio)
 	tokio_videoctrl_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // TODO: does /RESET clear this the same as above? probably yes, needs tracing...
 }
 
-MACHINE_CONFIG_START(bublbobl_state::tokio)
-
+void bublbobl_state::tokio(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(tokio_map_mcu)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
+	Z80(config, m_maincpu, MAIN_XTAL/4); // 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bublbobl_state::tokio_map_mcu);
+	m_maincpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(tokio_subcpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
+	Z80(config, m_subcpu, MAIN_XTAL/4); // 6 MHz
+	m_subcpu->set_addrmap(AS_PROGRAM, &bublbobl_state::tokio_subcpu_map);
+	m_subcpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8) // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(tokio_sound_map) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
+	Z80(config, m_audiocpu, MAIN_XTAL/8); // 3 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bublbobl_state::tokio_sound_map); // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MAIN_XTAL/8) // 3 Mhz
+	TAITO68705_MCU(config, "bmcu", MAIN_XTAL/8); // 3 Mhz
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu") // is this necessary?
+	config.m_perfect_cpu_quantum = subtag("maincpu"); // is this necessary?
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
 	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, tokio)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, tokio)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(bublbobl_state, screen_update_bublbobl)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(bublbobl_state::screen_update_bublbobl));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bublbobl)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bublbobl);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256).set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<1>))
+	GENERIC_LATCH_8(config, m_main_to_sound).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
+	GENERIC_LATCH_8(config, m_sound_to_main);
 
-	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
+	YM2203(config, m_ym2203, MAIN_XTAL/8);
+	m_ym2203->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ym2203->add_route(0, "mono", 0.08);
+	m_ym2203->add_route(1, "mono", 0.08);
+	m_ym2203->add_route(2, "mono", 0.08);
+	m_ym2203->add_route(3, "mono", 1.0);
+}
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, MAIN_XTAL/8)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.08)
-	MCFG_SOUND_ROUTE(1, "mono", 0.08)
-	MCFG_SOUND_ROUTE(2, "mono", 0.08)
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(bublbobl_state::bublboblp)
+void bublbobl_state::bublboblp(machine_config &config)
+{
 	tokio(config);
-	MCFG_DEVICE_REMOVE("bmcu") // no mcu, socket is empty
+	config.device_remove("bmcu"); // no mcu, socket is empty
 
 	// watchdog circuit is actually present on the prototype pcb, but is either
 	// hooked up wrong in MAME for tokio in general, or is disabled with a wire
 	// jumper under the epoxy
-	MCFG_DEVICE_REMOVE("watchdog")
-	MCFG_WATCHDOG_ADD("watchdog") // this adds back a watchdog, but due to the way MAME handles watchdogs, it will never fire unless it first gets at least one pulse, which it never will.
+	config.device_remove("watchdog");
+	WATCHDOG_TIMER(config, "watchdog"); // this adds back a watchdog, but due to the way MAME handles watchdogs, it will never fire unless it first gets at least one pulse, which it never will.
 
-	MCFG_CPU_REPLACE("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(tokio_map) // no mcu or resistors at all
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
-MACHINE_CONFIG_END
+	Z80(config.replace(), m_maincpu, MAIN_XTAL/4); // 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bublbobl_state::tokio_map); // no mcu or resistors at all
+	m_maincpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold));
+}
 
-MACHINE_CONFIG_START(bublbobl_state::tokiob)
+void bublbobl_state::tokiob(machine_config &config)
+{
 	tokio(config);
-	MCFG_DEVICE_REMOVE("bmcu") // no mcu, but see below...
+	config.device_remove("bmcu"); // no mcu, but see below...
 
-	MCFG_CPU_REPLACE("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(tokio_map_bootleg) // resistor tying mcu's footprint PA6 pin low so mcu reads always return 0xBF
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
-MACHINE_CONFIG_END
+	Z80(config.replace(), m_maincpu, MAIN_XTAL/4); // 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bublbobl_state::tokio_map_bootleg); // resistor tying mcu's footprint PA6 pin low so mcu reads always return 0xBF
+	m_maincpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold));
+}
 
 
 MACHINE_START_MEMBER(bublbobl_state,bublbobl)
@@ -960,69 +959,61 @@ MACHINE_RESET_MEMBER(bublbobl_state,bublbobl)
 	m_port4_out = 0;
 }
 
-MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
-
+void bublbobl_state::bublbobl_nomcu(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(bublbobl_maincpu_map)
+	Z80(config, m_maincpu, MAIN_XTAL/4); // 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bublbobl_state::bublbobl_maincpu_map);
 
-	MCFG_CPU_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(subcpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
+	Z80(config, m_subcpu, MAIN_XTAL/4); // 6 MHz
+	m_subcpu->set_addrmap(AS_PROGRAM, &bublbobl_state::subcpu_map);
+	m_subcpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8) // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(sound_map) // IRQs are triggered by the YM2203
+	Z80(config, m_audiocpu, MAIN_XTAL/8); // 3 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bublbobl_state::sound_map); // IRQs are triggered by the YM2203
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	config.m_minimum_quantum = attotime::from_hz(6000); // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
 	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, bublbobl)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, bublbobl)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(bublbobl_state, screen_update_bublbobl)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(bublbobl_state::screen_update_bublbobl));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bublbobl)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bublbobl);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256).set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	INPUT_MERGER_ANY_HIGH(config, m_soundirq).output_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_main_to_sound).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
+	GENERIC_LATCH_8(config, m_sound_to_main);
 
-	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<1>))
+	YM2203(config, m_ym2203, MAIN_XTAL/8);
+	m_ym2203->irq_handler().set("soundirq", FUNC(input_merger_device::in_w<0>));
+	m_ym2203->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
+	YM3526(config, m_ym3526, MAIN_XTAL/8);
+	m_ym3526->irq_handler().set("soundirq", FUNC(input_merger_device::in_w<1>));
+	m_ym3526->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-	MCFG_SOUND_ADD("ym1", YM2203, MAIN_XTAL/8)
-	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<0>))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_SOUND_ADD("ym2", YM3526, MAIN_XTAL/8)
-	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(bublbobl_state::bublbobl)
+void bublbobl_state::bublbobl(machine_config &config)
+{
 	bublbobl_nomcu(config);
-	MCFG_CPU_ADD("mcu", M6801, XTAL(4'000'000)) // actually 6801U4 - xtal is 4MHz, divided by 4 internally
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	M6801(config, m_mcu, XTAL(4'000'000)); // actually 6801U4 - xtal is 4MHz, divided by 4 internally
+	m_mcu->set_addrmap(AS_PROGRAM, &bublbobl_state::mcu_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", M6801_IRQ_LINE)) // same clock latches the INT pin on the second Z80
-MACHINE_CONFIG_END
+	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ_LINE); // same clock latches the INT pin on the second Z80
+}
 
 MACHINE_START_MEMBER(bublbobl_state,boblbobl)
 {
@@ -1041,17 +1032,17 @@ MACHINE_RESET_MEMBER(bublbobl_state,boblbobl)
 	m_ic43_b = 0;
 }
 
-MACHINE_CONFIG_START(bublbobl_state::boblbobl)
+void bublbobl_state::boblbobl(machine_config &config)
+{
 	bublbobl_nomcu(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bootleg_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold) // interrupt mode 1, unlike Bubble Bobble
+	m_maincpu->set_addrmap(AS_PROGRAM, &bublbobl_state::bootleg_map);
+	m_maincpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold)); // interrupt mode 1, unlike Bubble Bobble
 
 	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, boblbobl)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, boblbobl)
-MACHINE_CONFIG_END
+}
 
 
 MACHINE_START_MEMBER(bub68705_state, bub68705)
@@ -1076,19 +1067,20 @@ MACHINE_RESET_MEMBER(bub68705_state, bub68705)
 	m_latch = 0;
 }
 
-MACHINE_CONFIG_START(bub68705_state::bub68705)
+void bub68705_state::bub68705(machine_config &config)
+{
 	bublbobl_nomcu(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("mcu", M68705P3, XTAL(4'000'000)) // xtal is 4MHz, divided by 4 internally
-	MCFG_M68705_PORTC_R_CB(IOPORT("IN0"))
-	MCFG_M68705_PORTA_W_CB(WRITE8(bub68705_state, port_a_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(bub68705_state, port_b_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bub68705_state, bublbobl_m68705_interrupt) // ??? should come from the same clock which latches the INT pin on the second Z80
+	M68705P3(config, m_mcu, XTAL(4'000'000)); // xtal is 4MHz, divided by 4 internally
+	m_mcu->portc_r().set_ioport("IN0");
+	m_mcu->porta_w().set(FUNC(bub68705_state::port_a_w));
+	m_mcu->portb_w().set(FUNC(bub68705_state::port_b_w));
+	m_mcu->set_vblank_int("screen", FUNC(bub68705_state::bublbobl_m68705_interrupt)); // ??? should come from the same clock which latches the INT pin on the second Z80
 
 	MCFG_MACHINE_START_OVERRIDE(bub68705_state, bub68705)
 	MCFG_MACHINE_RESET_OVERRIDE(bub68705_state, bub68705)
-MACHINE_CONFIG_END
+}
 
 
 
@@ -2012,23 +2004,22 @@ void bublbobl_state::configure_banks(  )
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,common)
+void bublbobl_state::init_common()
 {
 	configure_banks();
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,dland)
+void bublbobl_state::init_dland()
 {
 	// rearrange gfx to original format
-	int i;
 	uint8_t* src = memregion("gfx1")->base();
-	for (i = 0; i < 0x40000; i++)
+	for (int i = 0; i < 0x40000; i++)
 		src[i] = bitswap<8>(src[i],7,6,5,4,0,1,2,3);
 
-	for (i = 0x40000; i < 0x80000; i++)
+	for (int i = 0x40000; i < 0x80000; i++)
 		src[i] = bitswap<8>(src[i],7,4,5,6,3,0,1,2);
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 }
 
 
@@ -2037,32 +2028,32 @@ DRIVER_INIT_MEMBER(bublbobl_state,dland)
  *  Game driver(s)
  *
  *************************************/
-//    YEAR  NAME        PARENT    MACHINE   INPUT       STATE           INIT    ROT    COMPANY     FULLNAME      FLAGS
-GAME( 1986, tokio,      0,        tokio,    tokio,      bublbobl_state, common, ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (newer)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokioo,     tokio,    tokio,    tokio,      bublbobl_state, common, ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (older)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokiou,     tokio,    tokio,    tokio,      bublbobl_state, common, ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokiob,     tokio,    tokiob,   tokio_base, bublbobl_state, common, ROT90, "bootleg",                                     "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT    MACHINE    INPUT       STATE           INIT         ROT    COMPANY     FULLNAME      FLAGS
+GAME( 1986, tokio,      0,        tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (newer)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokioo,     tokio,    tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (older)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokiou,     tokio,    tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokiob,     tokio,    tokiob,    tokio_base, bublbobl_state, init_common, ROT90, "bootleg",                                     "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, bublboblp,  bublbobl, bublboblp, bublboblp, bublbobl_state, common, ROT0,  "Taito Corporation",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bublbobl,   0,        bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bublbobl1,  bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bublboblr,  bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 5.1)",    MACHINE_SUPPORTS_SAVE ) // newest release, with mode select
-GAME( 1986, bublboblr1, bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 1.0)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublboblp,  bublbobl, bublboblp, bublboblp,  bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublbobl,   0,        bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublbobl1,  bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublboblr,  bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 5.1)",    MACHINE_SUPPORTS_SAVE ) // newest release, with mode select
+GAME( 1986, bublboblr1, bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 1.0)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, boblbobl,   bublbobl, boblbobl, boblbobl,   bublbobl_state, common, ROT0,  "bootleg",         "Bobble Bobble (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobl,  bublbobl, boblbobl, sboblbobl,  bublbobl_state, common, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobla, bublbobl, boblbobl, boblbobl,   bublbobl_state, common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 2)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblboblb, bublbobl, boblbobl, sboblboblb, bublbobl_state, common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 3)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblbobld, bublbobl, boblbobl, sboblboblb, bublbobl_state, common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 4)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sboblboblc, bublbobl, boblbobl, sboblboblb, bublbobl_state, common, ROT0,  "bootleg",         "Super Bubble Bobble (bootleg)",            MACHINE_SUPPORTS_SAVE ) // the title screen on this one isn't hacked
-GAME( 1986, bub68705,   bublbobl, bub68705, bublbobl,   bub68705_state, common, ROT0,  "bootleg",         "Bubble Bobble (bootleg with 68705)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, boblbobl,   bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_common, ROT0,  "bootleg",         "Bobble Bobble (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblbobl,  bublbobl, boblbobl,  sboblbobl,  bublbobl_state, init_common, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblbobla, bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboblb, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 3)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblbobld, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 4)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboblc, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bubble Bobble (bootleg)",            MACHINE_SUPPORTS_SAVE ) // the title screen on this one isn't hacked
+GAME( 1986, bub68705,   bublbobl, bub68705,  bublbobl,   bub68705_state, init_common, ROT0,  "bootleg",         "Bubble Bobble (bootleg with 68705)",       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, dland,      bublbobl, boblbobl, dland,      bublbobl_state, dland,  ROT0,  "bootleg", "Dream Land / Super Dream Land (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, dland,      bublbobl, boblbobl,  dland,      bublbobl_state, init_dland,  ROT0,  "bootleg", "Dream Land / Super Dream Land (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2013, bbredux,    bublbobl, boblbobl, boblbobl,   bublbobl_state, common, ROT0,  "bootleg (Punji)",  "Bubble Bobble ('bootleg redux' hack for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE ) // for use on non-MCU bootleg boards (Bobble Bobble etc.) has more faithful simulation of the protection device (JAN-04-2015 release)
-GAME( 2013, bublboblb,  bublbobl, boblbobl, boblcave,   bublbobl_state, common, ROT0,  "bootleg (Aladar)", "Bubble Bobble (for Bobble Bobble PCB)",                      MACHINE_SUPPORTS_SAVE ) // alt bootleg/hack to restore proper MCU behavior to bootleg boards
+GAME( 2013, bbredux,    bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_common, ROT0,  "bootleg (Punji)",  "Bubble Bobble ('bootleg redux' hack for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE ) // for use on non-MCU bootleg boards (Bobble Bobble etc.) has more faithful simulation of the protection device (JAN-04-2015 release)
+GAME( 2013, bublboblb,  bublbobl, boblbobl,  boblcave,   bublbobl_state, init_common, ROT0,  "bootleg (Aladar)", "Bubble Bobble (for Bobble Bobble PCB)",                      MACHINE_SUPPORTS_SAVE ) // alt bootleg/hack to restore proper MCU behavior to bootleg boards
 
-GAME( 2013, bublcave,   bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2",                         MACHINE_SUPPORTS_SAVE )
-GAME( 2013, boblcave,   bublbobl, boblbobl, boblcave,   bublbobl_state, common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2 (for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 2012, bublcave11, bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.1",                         MACHINE_SUPPORTS_SAVE )
-GAME( 2012, bublcave10, bublbobl, bublbobl, bublbobl,   bublbobl_state, common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.0",                         MACHINE_SUPPORTS_SAVE )
+GAME( 2013, bublcave,   bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2",                         MACHINE_SUPPORTS_SAVE )
+GAME( 2013, boblcave,   bublbobl, boblbobl,  boblcave,   bublbobl_state, init_common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.2 (for Bobble Bobble PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, bublcave11, bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.1",                         MACHINE_SUPPORTS_SAVE )
+GAME( 2012, bublcave10, bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "hack (Bisboch and Aladar)", "Bubble Bobble: Lost Cave V1.0",                         MACHINE_SUPPORTS_SAVE )

@@ -14,6 +14,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "machine/upd1990a.h"
@@ -24,6 +25,7 @@
 #include "bus/neogeo/carts.h"
 #include "bus/neogeo_ctrl/ctrl.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -48,6 +50,7 @@ protected:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_memcard(*this, "memcard")
+		, m_systemlatch(*this, "systemlatch")
 		, m_soundlatch(*this, "soundlatch")
 		, m_soundlatch2(*this, "soundlatch2")
 		, m_region_maincpu(*this, "maincpu")
@@ -81,7 +84,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(display_position_vblank_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
 
-	uint32_t screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual DECLARE_WRITE8_MEMBER(io_control_w);
 	DECLARE_WRITE8_MEMBER(audio_command_w);
@@ -110,7 +113,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	virtual void neogeo_postload();
+	virtual void device_post_load() override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -122,6 +125,7 @@ protected:
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_device<ng_memcard_device> m_memcard;
+	required_device<hc259_device> m_systemlatch;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 
@@ -200,7 +204,7 @@ private:
 
 	// color/palette related
 	std::vector<uint16_t> m_paletteram;
-	uint8_t        m_palette_lookup[32][4];
+	uint8_t      m_palette_lookup[32][4];
 	int          m_screen_shadow;
 	int          m_palette_bank;
 };
@@ -208,6 +212,9 @@ private:
 
 class ngarcade_base_state : public neogeo_base_state
 {
+public:
+	DECLARE_CUSTOM_INPUT_MEMBER(startsel_edge_joy_r);
+
 protected:
 	ngarcade_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: neogeo_base_state(mconfig, type, tag)

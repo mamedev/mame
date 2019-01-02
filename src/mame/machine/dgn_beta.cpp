@@ -67,7 +67,7 @@
 #include "includes/dgn_beta.h"
 #include "includes/coco.h"
 #include "machine/mos6551.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 #include "debugger.h"
 #include "debug/debugcon.h"
@@ -811,13 +811,13 @@ WRITE_LINE_MEMBER( dgn_beta_state::dgnbeta_fdc_drq_w )
 
 READ8_MEMBER( dgn_beta_state::dgnbeta_wd2797_r )
 {
-	return m_fdc->read(space, offset & 0x03);
+	return m_fdc->read(offset & 0x03);
 }
 
 WRITE8_MEMBER( dgn_beta_state::dgnbeta_wd2797_w )
 {
 	m_wd2797_written = 1;
-	m_fdc->write(space, offset & 0x03, data);
+	m_fdc->write(offset & 0x03, data);
 }
 
 /* Scan physical keyboard into Keyboard array */

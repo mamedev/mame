@@ -7,78 +7,100 @@
     driver by Aaron Giles
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_GAELCO3D_H
+#define MAME_INCLUDES_GAELCO3D_H
 
-#include "sound/dmadac.h"
-#include "video/poly.h"
+#pragma once
+
+#include "cpu/adsp2100/adsp2100.h"
+#include "cpu/tms32031/tms32031.h"
+#include "machine/74259.h"
 #include "machine/eepromser.h"
 #include "machine/gaelco3d.h"
 #include "machine/gen_latch.h"
-#include "machine/74259.h"
 #include "machine/timer.h"
-#include "cpu/adsp2100/adsp2100.h"
+#include "sound/dmadac.h"
+#include "video/poly.h"
 #include "screen.h"
 
 #define SOUND_CHANNELS  4
 
-struct gaelco3d_object_data
-{
-	uint32_t tex, color;
-	float ooz_dx, ooz_dy, ooz_base;
-	float uoz_dx, uoz_dy, uoz_base;
-	float voz_dx, voz_dy, voz_base;
-	float z0;
-};
-
-class gaelco3d_state;
-
-class gaelco3d_renderer : public poly_manager<float, gaelco3d_object_data, 1, 2000>
-{
-public:
-	gaelco3d_renderer(gaelco3d_state &state);
-
-	bitmap_ind16 &screenbits() { return m_screenbits; }
-	uint32_t polygons() { uint32_t result = m_polygons; m_polygons = 0; return result; }
-
-	void render_poly(screen_device &screen, uint32_t *polydata);
-
-private:
-	gaelco3d_state &m_state;
-	bitmap_ind16 m_screenbits;
-	bitmap_ind16 m_zbuffer;
-	uint32_t m_polygons;
-	offs_t m_texture_size;
-	offs_t m_texmask_size;
-	std::unique_ptr<uint8_t[]> m_texture;
-	std::unique_ptr<uint8_t[]> m_texmask;
-
-	void render_noz_noperspective(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
-	void render_normal(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
-	void render_alphablend(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
-};
 
 class gaelco3d_state : public driver_device
 {
 public:
 	gaelco3d_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_adsp_ram_base(*this,"adsp_ram_base"),
-			m_m68k_ram_base(*this,"m68k_ram_base",0),
-			m_tms_comm_base(*this,"tms_comm_base",0),
-			m_adsp_control_regs(*this,"adsp_regs"),
-			m_adsp_fastram_base(*this,"adsp_fastram") ,
-		m_maincpu(*this, "maincpu"),
-		m_adsp(*this, "adsp"),
-		m_eeprom(*this, "eeprom"),
-		m_tms(*this, "tms"),
-		m_serial(*this, "serial"),
-		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch"),
-		m_mainlatch(*this, "mainlatch"),
-		m_outlatch(*this, "outlatch"),
-		m_paletteram16(*this, "paletteram"),
-		m_paletteram32(*this, "paletteram"),
-		m_analog(*this, {"ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3"})
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_adsp_ram_base(*this, "adsp_ram_base")
+		, m_m68k_ram_base(*this, "m68k_ram_base", 0)
+		, m_tms_comm_base(*this, "tms_comm_base", 0)
+		, m_adsp_control_regs(*this, "adsp_regs")
+		, m_adsp_fastram_base(*this, "adsp_fastram")
+		, m_maincpu(*this, "maincpu")
+		, m_adsp(*this, "adsp")
+		, m_eeprom(*this, "eeprom")
+		, m_tms(*this, "tms")
+		, m_dmadac(*this, "dac%u", 0U)
+		, m_serial(*this, "serial")
+		, m_screen(*this, "screen")
+		, m_soundlatch(*this, "soundlatch")
+		, m_mainlatch(*this, "mainlatch")
+		, m_outlatch(*this, "outlatch")
+		, m_adsp_autobuffer_timer(*this, "adsp_timer")
+		, m_paletteram16(*this, "paletteram")
+		, m_paletteram32(*this, "paletteram")
+		, m_analog(*this, "ANALOG%u", 0U)
+		, m_adsp_bank(*this, "adspbank")
+	{ }
+
+	void footbpow(machine_config &config);
+	void gaelco3d2(machine_config &config);
+	void gaelco3d(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(analog_bit_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(fp_analog_bit_r);
+
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	struct gaelco3d_object_data
+	{
+		uint32_t tex, color;
+		float ooz_dx, ooz_dy, ooz_base;
+		float uoz_dx, uoz_dy, uoz_base;
+		float voz_dx, voz_dy, voz_base;
+		float z0;
+	};
+
+	class gaelco3d_renderer : public poly_manager<float, gaelco3d_object_data, 1, 2000>
+	{
+	public:
+		gaelco3d_renderer(gaelco3d_state &state);
+		~gaelco3d_renderer() {}
+
+		bitmap_ind16 &screenbits() { return m_screenbits; }
+		uint32_t polygons() { uint32_t result = m_polygons; m_polygons = 0; return result; }
+
+		void render_poly(screen_device &screen, uint32_t *polydata);
+
+	protected:
+		gaelco3d_state &m_state;
+
+	private:
+		bitmap_ind16 m_screenbits;
+		bitmap_ind16 m_zbuffer;
+		uint32_t m_polygons;
+		offs_t m_texture_size;
+		offs_t m_texmask_size;
+		std::unique_ptr<uint8_t[]> m_texture;
+		std::unique_ptr<uint8_t[]> m_texmask;
+
+		void render_noz_noperspective(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
+		void render_normal(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
+		void render_alphablend(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
+	};
 
 	required_shared_ptr<uint32_t> m_adsp_ram_base;
 	required_shared_ptr<uint16_t> m_m68k_ram_base;
@@ -88,16 +110,19 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<adsp21xx_device> m_adsp;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<cpu_device> m_tms;
+	required_device<tms32031_device> m_tms;
+	required_device_array<dmadac_sound_device, SOUND_CHANNELS> m_dmadac;
 	required_device<gaelco_serial_device> m_serial;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<ls259_device> m_mainlatch;
 	required_device<ls259_device> m_outlatch;
+	required_device<timer_device> m_adsp_autobuffer_timer;
 
 	optional_shared_ptr<uint16_t> m_paletteram16;
 	optional_shared_ptr<uint32_t> m_paletteram32;
 	optional_ioport_array<4> m_analog;
+	required_memory_bank m_adsp_bank;
 
 	uint8_t m_sound_status;
 	offs_t m_tms_offset_xor;
@@ -107,18 +132,17 @@ public:
 	uint8_t m_fp_clock;
 	uint8_t m_fp_state;
 	uint8_t m_framenum;
-	timer_device *m_adsp_autobuffer_timer;
 	uint8_t m_adsp_ireg;
 	offs_t m_adsp_ireg_base;
 	offs_t m_adsp_incs;
 	offs_t m_adsp_size;
-	dmadac_sound_device *m_dmadac[SOUND_CHANNELS];
 	std::unique_ptr<rgb_t[]> m_palette;
 	std::unique_ptr<uint32_t[]> m_polydata_buffer;
 	uint32_t m_polydata_count;
 	int m_lastscan;
 	int m_video_changed;
 	std::unique_ptr<gaelco3d_renderer> m_poly;
+
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	DECLARE_READ16_MEMBER(sound_status_r);
 	DECLARE_WRITE16_MEMBER(sound_status_w);
@@ -139,28 +163,23 @@ public:
 	DECLARE_WRITE32_MEMBER(gaelco3d_render_w);
 	DECLARE_WRITE16_MEMBER(gaelco3d_paletteram_w);
 	DECLARE_WRITE32_MEMBER(gaelco3d_paletteram_020_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(analog_bit_r);
 	DECLARE_WRITE_LINE_MEMBER(ser_irq);
 	DECLARE_READ16_MEMBER(eeprom_data_r);
-	DECLARE_DRIVER_INIT(gaelco3d);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+
 	DECLARE_MACHINE_RESET(gaelco3d2);
 	DECLARE_MACHINE_RESET(common);
-	uint32_t screen_update_gaelco3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(adsp_autobuffer_irq);
 	void gaelco3d_render(screen_device &screen);
 	DECLARE_WRITE32_MEMBER(adsp_tx_callback);
 	DECLARE_WRITE_LINE_MEMBER(fp_analog_clock_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(fp_analog_bit_r);
-	void footbpow(machine_config &config);
-	void gaelco3d2(machine_config &config);
-	void gaelco3d(machine_config &config);
+
 	void adsp_data_map(address_map &map);
 	void adsp_program_map(address_map &map);
 	void main020_map(address_map &map);
 	void main_map(address_map &map);
 	void tms_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GAELCO3D_H

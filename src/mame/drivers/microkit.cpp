@@ -49,14 +49,16 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
+	void microkit(machine_config &config);
+
+private:
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_READ8_MEMBER(ram_r);
 
-	void microkit(machine_config &config);
 	void microkit_io(address_map &map);
 	void microkit_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	uint8_t m_resetcnt;
 	uint8_t m_ram_data;
@@ -67,7 +69,7 @@ private:
 
 void microkit_state::microkit_mem(address_map &map)
 {
-	map(0x0000, 0x0000).rw(this, FUNC(microkit_state::ram_r), FUNC(microkit_state::ram_w));
+	map(0x0000, 0x0000).rw(FUNC(microkit_state::ram_r), FUNC(microkit_state::ram_w));
 	map(0x8000, 0x81ff).rom().region("maincpu", 0);
 	map(0x8200, 0x83ff).ram();
 }
@@ -118,20 +120,21 @@ static DEVICE_INPUT_DEFAULTS_START( serial_keyb )
 DEVICE_INPUT_DEFAULTS_END
 
 
-MACHINE_CONFIG_START(microkit_state::microkit)
+void microkit_state::microkit(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", CDP1802, 1750000)
-	MCFG_CPU_PROGRAM_MAP(microkit_mem)
-	MCFG_CPU_IO_MAP(microkit_io)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(microkit_state, clear_r))
+	CDP1802(config, m_maincpu, 1750000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &microkit_state::microkit_mem);
+	m_maincpu->set_addrmap(AS_IO, &microkit_state::microkit_io);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(microkit_state::clear_r));
 
 	/* video hardware */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(INPUTLINE("maincpu", COSMAC_INPUT_LINE_EF4))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", serial_keyb)
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-MACHINE_CONFIG_END
+	RS232_PORT(config, m_rs232, default_rs232_devices, "keyboard");
+	m_rs232->rxd_handler().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF4);
+	m_rs232->set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(serial_keyb));
+	GENERIC_TERMINAL(config, m_terminal, 0);
+}
 
 ROM_START( microkit )
 	ROM_REGION( 0x200, "maincpu", ROMREGION_INVERT )
@@ -139,4 +142,4 @@ ROM_START( microkit )
 	ROM_LOAD( "4.2a", 0x100, 0x100, CRC(27267bad) SHA1(838df9be2dc175584a1a6ee1770039118e49482e) )
 ROM_END
 
-COMP( 1975, microkit,    0,      0,      microkit,        microkit, microkit_state, 0,      "RCA",  "COSMAC Microkit",  MACHINE_IS_SKELETON )
+COMP( 1975, microkit, 0, 0, microkit, microkit, microkit_state, empty_init, "RCA",  "COSMAC Microkit",  MACHINE_IS_SKELETON )

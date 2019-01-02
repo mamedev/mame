@@ -64,7 +64,7 @@ void tms32051_device::tms32051_internal_pgm(address_map &map)
 
 void tms32051_device::tms32051_internal_data(address_map &map)
 {
-	map(0x0000, 0x005f).rw(this, FUNC(tms32051_device::cpuregs_r), FUNC(tms32051_device::cpuregs_w));
+	map(0x0000, 0x005f).rw(FUNC(tms32051_device::cpuregs_r), FUNC(tms32051_device::cpuregs_w));
 	map(0x0060, 0x007f).ram();                         // DARAM B2
 	map(0x0100, 0x02ff).ram().share("daram_b0");    // DARAM B0     TODO: is unconnected if CNF = 1
 	map(0x0300, 0x04ff).ram();                         // DARAM B1
@@ -108,7 +108,7 @@ void tms32053_device::tms32053_internal_pgm(address_map &map)
 
 void tms32053_device::tms32053_internal_data(address_map &map)
 {
-	map(0x0000, 0x005f).rw(this, FUNC(tms32053_device::cpuregs_r), FUNC(tms32053_device::cpuregs_w));
+	map(0x0000, 0x005f).rw(FUNC(tms32053_device::cpuregs_r), FUNC(tms32053_device::cpuregs_w));
 	map(0x0060, 0x007f).ram();                         // DARAM B2
 	map(0x0100, 0x02ff).ram().share("daram_b0");    // DARAM B0     TODO: is unconnected if CNF = 1
 	map(0x0300, 0x04ff).ram();                         // DARAM B1
@@ -130,7 +130,7 @@ std::unique_ptr<util::disasm_interface> tms32051_device::create_disassembler()
 
 #define CYCLES(x)       (m_icount -= x)
 
-#define ROPCODE()       m_direct->read_word(m_pc++)
+#define ROPCODE()       m_cache->read_word(m_pc++)
 
 void tms32051_device::CHANGE_PC(uint16_t new_pc)
 {
@@ -187,7 +187,7 @@ void tms32051_device::delay_slot(uint16_t startpc)
 void tms32051_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-1>();
+	m_cache = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 

@@ -118,13 +118,13 @@ WRITE_LINE_MEMBER(dectalk_isa_device::clock_w)
 
 void dectalk_isa_device::dectalk_cpu_io(address_map &map)
 {
-	map(0x0400, 0x0401).rw(this, FUNC(dectalk_isa_device::cmd_r), FUNC(dectalk_isa_device::status_w)); //PCS0
-	map(0x0480, 0x0481).rw(this, FUNC(dectalk_isa_device::data_r), FUNC(dectalk_isa_device::data_w)); //PCS1
-	map(0x0500, 0x0501).w(this, FUNC(dectalk_isa_device::dsp_dma_w)); //PCS2
-	map(0x0580, 0x0581).r(this, FUNC(dectalk_isa_device::host_irq_r)); //PCS3
-	map(0x0600, 0x0601).w(this, FUNC(dectalk_isa_device::output_ctl_w)); //PCS4
-	map(0x0680, 0x0680).rw(this, FUNC(dectalk_isa_device::dma_r), FUNC(dectalk_isa_device::dma_w)); //PCS5
-	map(0x0700, 0x0701).w(this, FUNC(dectalk_isa_device::irq_line_w)); //PCS6
+	map(0x0400, 0x0401).rw(FUNC(dectalk_isa_device::cmd_r), FUNC(dectalk_isa_device::status_w)); //PCS0
+	map(0x0480, 0x0481).rw(FUNC(dectalk_isa_device::data_r), FUNC(dectalk_isa_device::data_w)); //PCS1
+	map(0x0500, 0x0501).w(FUNC(dectalk_isa_device::dsp_dma_w)); //PCS2
+	map(0x0580, 0x0581).r(FUNC(dectalk_isa_device::host_irq_r)); //PCS3
+	map(0x0600, 0x0601).w(FUNC(dectalk_isa_device::output_ctl_w)); //PCS4
+	map(0x0680, 0x0680).rw(FUNC(dectalk_isa_device::dma_r), FUNC(dectalk_isa_device::dma_w)); //PCS5
+	map(0x0700, 0x0701).w(FUNC(dectalk_isa_device::irq_line_w)); //PCS6
 }
 
 void dectalk_isa_device::dectalk_cpu_map(address_map &map)
@@ -135,8 +135,8 @@ void dectalk_isa_device::dectalk_cpu_map(address_map &map)
 
 void dectalk_isa_device::dectalk_dsp_io(address_map &map)
 {
-	map(0x0, 0x0).r(this, FUNC(dectalk_isa_device::dsp_dma_r));
-	map(0x1, 0x1).rw(this, FUNC(dectalk_isa_device::dsp_dma_r), FUNC(dectalk_isa_device::dac_w));
+	map(0x0, 0x0).r(FUNC(dectalk_isa_device::dsp_dma_r));
+	map(0x1, 0x1).rw(FUNC(dectalk_isa_device::dsp_dma_r), FUNC(dectalk_isa_device::dac_w));
 }
 
 void dectalk_isa_device::dectalk_dsp_map(address_map &map)
@@ -157,22 +157,25 @@ const tiny_rom_entry* dectalk_isa_device::device_rom_region() const
 	return ROM_NAME( dectalk_isa );
 }
 
-MACHINE_CONFIG_START(dectalk_isa_device::device_add_mconfig)
-	MCFG_CPU_ADD("dectalk_cpu", I80186, XTAL(20'000'000))
-	MCFG_CPU_IO_MAP(dectalk_cpu_io)
-	MCFG_CPU_PROGRAM_MAP(dectalk_cpu_map)
-	MCFG_80186_TMROUT0_HANDLER(WRITELINE(dectalk_isa_device, clock_w));
+void dectalk_isa_device::device_add_mconfig(machine_config &config)
+{
+	I80186(config, m_cpu, XTAL(20'000'000));
+	m_cpu->set_addrmap(AS_PROGRAM, &dectalk_isa_device::dectalk_cpu_map);
+	m_cpu->set_addrmap(AS_IO, &dectalk_isa_device::dectalk_cpu_io);
+	m_cpu->tmrout0_handler().set(FUNC(dectalk_isa_device::clock_w));
 
-	MCFG_CPU_ADD("dectalk_dsp", TMS32015, XTAL(20'000'000))
-	MCFG_CPU_IO_MAP(dectalk_dsp_io)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(dectalk_isa_device, bio_line_r))
-	MCFG_CPU_PROGRAM_MAP(dectalk_dsp_map)
+	TMS32015(config, m_dsp, XTAL(20'000'000));
+	m_dsp->set_addrmap(AS_PROGRAM, &dectalk_isa_device::dectalk_dsp_map);
+	m_dsp->set_addrmap(AS_IO, &dectalk_isa_device::dectalk_dsp_io);
+	m_dsp->bio().set(FUNC(dectalk_isa_device::bio_line_r));
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "speaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	SPEAKER(config, "speaker").front_center();
+	DAC_12BIT_R2R(config, m_dac, 0).add_route(0, "speaker", 1.0); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 WRITE8_MEMBER(dectalk_isa_device::write)
 {

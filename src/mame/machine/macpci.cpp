@@ -72,7 +72,7 @@ READ16_MEMBER ( macpci_state::mac_via_r )
 
 	if (LOG_VIA)
 		printf("mac_via_r: offset=0x%02x (PC=%x)\n", offset, m_maincpu->pc());
-	data = m_via1->read(space, offset);
+	data = m_via1->read(offset);
 
 	m_maincpu->adjust_icount(m_via_cycles);
 
@@ -88,9 +88,9 @@ WRITE16_MEMBER ( macpci_state::mac_via_w )
 		printf("mac_via_w: offset=0x%02x data=0x%08x (PC=%x)\n", offset, data, m_maincpu->pc());
 
 	if (ACCESSING_BITS_0_7)
-		m_via1->write(space, offset, data & 0xff);
+		m_via1->write(offset, data & 0xff);
 	if (ACCESSING_BITS_8_15)
-		m_via1->write(space, offset, (data >> 8) & 0xff);
+		m_via1->write(offset, (data >> 8) & 0xff);
 
 	m_maincpu->adjust_icount(m_via_cycles);
 }
@@ -143,7 +143,7 @@ void macpci_state::mac_driver_init(model_t model)
 }
 
 #define MAC_DRIVER_INIT(label, model)   \
-DRIVER_INIT_MEMBER(macpci_state,label)  \
+void macpci_state::init_##label()  \
 {   \
 	mac_driver_init(model ); \
 }
@@ -168,23 +168,18 @@ READ32_MEMBER(macpci_state::mac_read_id)
 
 READ16_MEMBER ( macpci_state::mac_scc_r )
 {
-	scc8530_t *scc = machine().device<scc8530_t>("scc");
-	uint16_t result;
-
-	result = scc->reg_r(space, offset);
+	uint16_t result = m_scc->reg_r(space, offset);
 	return (result << 8) | result;
 }
 
 WRITE16_MEMBER ( macpci_state::mac_scc_w )
 {
-	scc8530_t *scc = machine().device<scc8530_t>("scc");
-	scc->reg_w(space, offset, data);
+	m_scc->reg_w(space, offset, data);
 }
 
 WRITE16_MEMBER ( macpci_state::mac_scc_2_w )
 {
-	scc8530_t *scc = machine().device<scc8530_t>("scc");
-	scc->reg_w(space, offset, data >> 8);
+	m_scc->reg_w(space, offset, data >> 8);
 }
 
 READ8_MEMBER(macpci_state::mac_5396_r)

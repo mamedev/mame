@@ -129,8 +129,7 @@ playing the automaton. Bits 0-2 of PORTB control the organ.
 #include "emu.h"
 #include "includes/polyplay.h"
 
-#include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -155,7 +154,7 @@ static const z80_daisy_config daisy_chain_zrepp[] =
 
 INTERRUPT_GEN_MEMBER(polyplay_state::nmi_handler)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /* I/O Port handling */
@@ -183,47 +182,12 @@ READ8_MEMBER(polyplay_state::pio_portb_r)
 
 WRITE8_MEMBER(polyplay_state::pio_portb_w)
 {
-	uint8_t lightState = data & 0x07;
+	uint8_t const lightState = data & 0x07;
 	//uint8_t soundState = data & 0xe0;
 
 	// there is a DS8205D attached to bit 0 and 1
-	switch (lightState)
-	{
-		case 0:
-			output().set_lamp_value(1, 1);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 0);
-			break;
-
-		case 1:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 1);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 0);
-			break;
-
-		case 2:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 1);
-			output().set_lamp_value(4, 0);
-			break;
-
-		case 3:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 1);
-			break;
-
-		default:
-			output().set_lamp_value(1, 0);
-			output().set_lamp_value(2, 0);
-			output().set_lamp_value(3, 0);
-			output().set_lamp_value(4, 0);
-			break;
-	}
+	for (unsigned i = 0; 4 > i; ++i)
+		m_lamps[i] = (lightState == i) ? 1 : 0;
 }
 
 INPUT_CHANGED_MEMBER(polyplay_state::input_changed)
@@ -238,7 +202,7 @@ void polyplay_state::polyplay_mem_zre(address_map &map)
 	map(0x0c00, 0x0fff).ram();
 	map(0x1000, 0x8fff).rom();
 	map(0xe800, 0xebff).rom().region("gfx1", 0);
-	map(0xec00, 0xf7ff).ram().w(this, FUNC(polyplay_state::polyplay_characterram_w)).share("characterram");
+	map(0xec00, 0xf7ff).ram().w(FUNC(polyplay_state::polyplay_characterram_w)).share("characterram");
 	map(0xf800, 0xffff).ram().share("videoram");
 }
 
@@ -251,7 +215,7 @@ void polyplay_state::polyplay_mem_zrepp(address_map &map)
 	map(0xd000, 0xd7ff).rom().region("gfx1", 0);
 
 	map(0xea00, 0xebff).ram();
-	map(0xec00, 0xf7ff).ram().w(this, FUNC(polyplay_state::polyplay_characterram_w)).share("characterram");
+	map(0xec00, 0xf7ff).ram().w(FUNC(polyplay_state::polyplay_characterram_w)).share("characterram");
 
 	map(0xf800, 0xffff).ram().share("videoram");
 }
@@ -305,7 +269,7 @@ static const gfx_layout charlayout_3_bit =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( polyplay )
+static GFXDECODE_START( gfx_polyplay )
 	GFXDECODE_ENTRY( "gfx1",  0x0000, charlayout_1_bit, 0, 1 )
 	GFXDECODE_ENTRY( nullptr, 0xec00, charlayout_3_bit, 2, 1 )
 GFXDECODE_END
@@ -314,25 +278,25 @@ GFXDECODE_END
 /* the machine driver */
 MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80CPU_TAG, Z80, POLYPLAY_MAIN_CLOCK / 4) /* UB880D */
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_zre)
-	MCFG_CPU_PROGRAM_MAP(polyplay_mem_zre)
-	MCFG_CPU_IO_MAP(polyplay_io_zre)
-	MCFG_CPU_PERIODIC_INT_DRIVER(polyplay_state, nmi_handler, 100) /* A302 - zero cross detection from AC (50Hz) */
+	Z80(config, m_maincpu, POLYPLAY_MAIN_CLOCK / 4); /* UB880D */
+	m_maincpu->set_daisy_config(daisy_chain_zre);
+	m_maincpu->set_addrmap(AS_PROGRAM, &polyplay_state::polyplay_mem_zre);
+	m_maincpu->set_addrmap(AS_IO, &polyplay_state::polyplay_io_zre);
+	m_maincpu->set_periodic_int(FUNC(polyplay_state::nmi_handler), attotime::from_hz(100)); /* A302 - zero cross detection from AC (50Hz) */
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, POLYPLAY_MAIN_CLOCK / 4) /* UB857D */
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80CPU_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(polyplay_state, ctc_zc0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(polyplay_state, ctc_zc1_w))
-	//MCFG_Z80CTC_ZC2_CB(WRITELINE(polyplay_state, ctc_zc2_w))
+	Z80CTC(config, m_z80ctc, POLYPLAY_MAIN_CLOCK / 4); /* UB857D */
+	m_z80ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_z80ctc->zc_callback<0>().set(FUNC(polyplay_state::ctc_zc0_w));
+	m_z80ctc->zc_callback<1>().set(FUNC(polyplay_state::ctc_zc1_w));
+	//m_z80ctc->zc_callback<2>().set(FUNC(polyplay_state::ctc_zc2_w));
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, POLYPLAY_MAIN_CLOCK / 4) /* UB855D */
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80CPU_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(polyplay_state, pio_porta_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(polyplay_state, pio_porta_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(polyplay_state, pio_portb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(polyplay_state, pio_portb_w))
+	Z80PIO(config, m_z80pio, POLYPLAY_MAIN_CLOCK / 4); /* UB855D */
+	m_z80pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_z80pio->in_pa_callback().set(FUNC(polyplay_state::pio_porta_r));
+	m_z80pio->out_pa_callback().set(FUNC(polyplay_state::pio_porta_w));
+	m_z80pio->in_pb_callback().set(FUNC(polyplay_state::pio_portb_r));
+	m_z80pio->out_pb_callback().set(FUNC(polyplay_state::pio_portb_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -340,33 +304,30 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(polyplay_state, screen_update_polyplay)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", polyplay)
-	MCFG_PALETTE_ADD("palette", 10)
-	MCFG_PALETTE_INIT_OWNER(polyplay_state, polyplay)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_polyplay);
+	PALETTE(config, m_palette, FUNC(polyplay_state::polyplay_palette), 10);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker1", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_SOUND_ADD("speaker2", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker1).add_route(ALL_OUTPUTS, "mono", 0.5);
+	SPEAKER_SOUND(config, m_speaker2).add_route(ALL_OUTPUTS, "mono", 0.5);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(polyplay_state::polyplay_zrepp)
+void polyplay_state::polyplay_zrepp(machine_config &config)
+{
 	polyplay_zre(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY(Z80CPU_TAG) /* UB880D */
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_zrepp)
-	MCFG_CPU_PROGRAM_MAP(polyplay_mem_zrepp)
-	MCFG_CPU_IO_MAP(polyplay_io_zrepp)
+	m_maincpu->set_daisy_config(daisy_chain_zrepp);
+	m_maincpu->set_addrmap(AS_PROGRAM, &polyplay_state::polyplay_mem_zrepp);
+	m_maincpu->set_addrmap(AS_IO, &polyplay_state::polyplay_io_zrepp);
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, POLYPLAY_MAIN_CLOCK / 4) /* UB8560D */
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE(Z80CPU_TAG, INPUT_LINE_IRQ0))
-MACHINE_CONFIG_END
+	Z80SIO(config, m_z80sio, POLYPLAY_MAIN_CLOCK / 4); /* UB8560D */
+	m_z80sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+}
 
 
 /* ROM loading and mapping */
@@ -438,6 +399,6 @@ ROM_START( polyplay2c )
 ROM_END
 
 /* game driver */
-GAMEL( 1986, polyplay,   0,         polyplay_zre,   polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE)",            0, layout_polyplay )
-GAMEL( 1989, polyplay2,  0,         polyplay_zrepp, polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP)",         0, layout_polyplay )
-GAMEL( 1989, polyplay2c, polyplay2, polyplay_zrepp, polyplay, polyplay_state, 0, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP - Czech)", 0, layout_polyplay )
+GAMEL( 1986, polyplay,   0,         polyplay_zre,   polyplay, polyplay_state, empty_init, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE)",            0, layout_polyplay )
+GAMEL( 1989, polyplay2,  0,         polyplay_zrepp, polyplay, polyplay_state, empty_init, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP)",         0, layout_polyplay )
+GAMEL( 1989, polyplay2c, polyplay2, polyplay_zrepp, polyplay, polyplay_state, empty_init, ROT0, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Play (ZRE-PP - Czech)", 0, layout_polyplay )

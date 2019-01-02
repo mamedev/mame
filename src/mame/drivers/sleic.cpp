@@ -38,15 +38,15 @@ public:
 
 	void sleic(machine_config &config);
 	void sleic_map(address_map &map);
-protected:
 
+	void init_sleic();
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
-public:
-	DECLARE_DRIVER_INIT(sleic);
 };
 
 
@@ -63,14 +63,14 @@ void sleic_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(sleic_state,sleic)
+void sleic_state::init_sleic()
 {
 }
 
 MACHINE_CONFIG_START(sleic_state::sleic)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, 8000000)
-	MCFG_CPU_PROGRAM_MAP(sleic_map)
+	MCFG_DEVICE_ADD("maincpu", I8088, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(sleic_map)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
@@ -151,7 +151,7 @@ ROM_START(sleicpin)
 	ROM_LOAD("sp02-1_1.rom", 0x00000, 0x80000, CRC(0e4851a0) SHA1(0692ee2df0b560e2013db9c03fd27c6eb12e618d))
 ROM_END
 
-GAME(1992,  bikerace,  0,         sleic,  sleic, sleic_state,  sleic,  ROT0,  "Sleic",    "Bike Race",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992,  bikerace2, bikerace,  sleic,  sleic, sleic_state,  sleic,  ROT0,  "Sleic",    "Bike Race (2-ball play)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993,  sleicpin,  0,         sleic,  sleic, sleic_state,  sleic,  ROT0,  "Sleic",    "Sleic Pin Ball",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  iomoon,    0,         sleic,  sleic, sleic_state,  sleic,  ROT0,  "Sleic",    "Io Moon",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  bikerace,  0,         sleic,  sleic, sleic_state, init_sleic, ROT0, "Sleic", "Bike Race",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  bikerace2, bikerace,  sleic,  sleic, sleic_state, init_sleic, ROT0, "Sleic", "Bike Race (2-ball play)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  sleicpin,  0,         sleic,  sleic, sleic_state, init_sleic, ROT0, "Sleic", "Sleic Pin Ball",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  iomoon,    0,         sleic,  sleic, sleic_state, init_sleic, ROT0, "Sleic", "Io Moon",                 MACHINE_IS_SKELETON_MECHANICAL)

@@ -55,6 +55,7 @@ Due to no input checking, misuse of commands can crash the system.
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -70,6 +71,10 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void z1013k76(machine_config &config);
+	void z1013(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(z1013_keyboard_w);
 	DECLARE_READ8_MEMBER(port_b_r);
 	DECLARE_WRITE8_MEMBER(port_b_w);
@@ -77,11 +82,9 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER(z1013);
 	uint32_t screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void z1013k76(machine_config &config);
-	void z1013(machine_config &config);
 	void z1013_io(address_map &map);
 	void z1013_mem(address_map &map);
-private:
+
 	uint8_t m_keyboard_line;
 	bool m_keyboard_part;
 	virtual void machine_reset() override;
@@ -104,7 +107,7 @@ void z1013_state::z1013_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("z80pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0x08, 0x08).w(this, FUNC(z1013_state::z1013_keyboard_w));
+	map(0x08, 0x08).w(FUNC(z1013_state::z1013_keyboard_w));
 }
 
 /* Input ports */
@@ -363,16 +366,16 @@ static const gfx_layout z1013_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( z1013 )
+static GFXDECODE_START( gfx_z1013 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, z1013_charlayout, 0, 1 )
 GFXDECODE_END
 
 /* Machine driver */
 MACHINE_CONFIG_START(z1013_state::z1013)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(1'000'000) )
-	MCFG_CPU_PROGRAM_MAP(z1013_mem)
-	MCFG_CPU_IO_MAP(z1013_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(1'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(z1013_mem)
+	MCFG_DEVICE_IO_MAP(z1013_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -383,18 +386,17 @@ MACHINE_CONFIG_START(z1013_state::z1013)
 	MCFG_SCREEN_UPDATE_DRIVER(z1013_state, screen_update_z1013)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", z1013)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_z1013)
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(1'000'000))
-	MCFG_Z80PIO_IN_PB_CB(READ8(z1013_state, port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(z1013_state, port_b_w))
+	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(1'000'000)));
+	pio.in_pb_callback().set(FUNC(z1013_state::port_b_r));
+	pio.out_pb_callback().set(FUNC(z1013_state::port_b_w));
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
@@ -404,19 +406,20 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(z1013_state::z1013k76)
 	z1013(config);
-	MCFG_DEVICE_REMOVE("z80pio")
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(1'000'000))
-	MCFG_Z80PIO_IN_PB_CB(READ8(z1013_state, k7659_port_b_r))
+
+	z80pio_device &pio(*subdevice<z80pio_device>("z80pio"));
+	pio.in_pb_callback().set(FUNC(z1013_state::k7659_port_b_r));
+	pio.out_pb_callback().set_nop();
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( z1013 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "202", "Original" )
-	ROMX_LOAD( "mon_202.bin", 0xf000, 0x0800, CRC(5884edab) SHA1(c3a45ea5cc4da2b7c270068ba1e2d75916960709), ROM_BIOS(1))
+	ROMX_LOAD( "mon_202.bin", 0xf000, 0x0800, CRC(5884edab) SHA1(c3a45ea5cc4da2b7c270068ba1e2d75916960709), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS( 1, "jm", "Jens Muller version" )
-	ROMX_LOAD( "mon_jm_1992.bin", 0xf000, 0x0800, CRC(186d2888) SHA1(b52ccb557c41c96bace7db4c4f5031a0cd736168), ROM_BIOS(2))
+	ROMX_LOAD( "mon_jm_1992.bin", 0xf000, 0x0800, CRC(186d2888) SHA1(b52ccb557c41c96bace7db4c4f5031a0cd736168), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
@@ -447,10 +450,10 @@ ROM_END
 ROM_START( z1013s60 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
-	ROMX_LOAD( "mon_rb_s6009.bin", 0xf000, 0x1000, CRC(b37faeed) SHA1(ce2e69af5378d39284e8b3be23da50416a0b0fbe), ROM_BIOS(1))
+	ROMX_LOAD( "mon_rb_s6009.bin", 0xf000, 0x1000, CRC(b37faeed) SHA1(ce2e69af5378d39284e8b3be23da50416a0b0fbe), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
-	ROMX_LOAD( "4k-moni-k7652.bin", 0xf000, 0x1000, CRC(a1625fce) SHA1(f0847399502b38a73ad26b38ee2d85ba04ab85ec), ROM_BIOS(2))
+	ROMX_LOAD( "4k-moni-k7652.bin", 0xf000, 0x1000, CRC(a1625fce) SHA1(f0847399502b38a73ad26b38ee2d85ba04ab85ec), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "chargen",0)
 	ROM_LOAD ("z1013font.bin",   0x0000, 0x0800, CRC(7023088f) SHA1(8b197a51c070efeba173d10be197bd41e764358c))
@@ -467,9 +470,9 @@ ROM_START( z1013k69 )
 ROM_END
 /* Driver */
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE      INPUT      STATE        INIT  COMPANY                           FULLNAME               FLAGS
-COMP( 1985, z1013,     0,      0,      z1013,       z1013_8x4, z1013_state, 0,    "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x4)",  0 )
-COMP( 1985, z1013a2,   z1013,  0,      z1013,       z1013_8x8, z1013_state, 0,    "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x8)",  0 )
-COMP( 1985, z1013k76,  z1013,  0,      z1013k76,    z1013,     z1013_state, 0,    "VEB Robotron Electronics Riesa", "Z1013 (K7659)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1985, z1013s60,  z1013,  0,      z1013k76,    z1013_8x8, z1013_state, 0,    "VEB Robotron Electronics Riesa", "Z1013 (K7652/S6009)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1985, z1013k69,  z1013,  0,      z1013k76,    z1013,     z1013_state, 0,    "VEB Robotron Electronics Riesa", "Z1013 (K7669)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT      CLASS        INIT        COMPANY                           FULLNAME               FLAGS
+COMP( 1985, z1013,    0,      0,      z1013,    z1013_8x4, z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x4)",  0 )
+COMP( 1985, z1013a2,  z1013,  0,      z1013,    z1013_8x8, z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x8)",  0 )
+COMP( 1985, z1013k76, z1013,  0,      z1013k76, z1013,     z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (K7659)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1985, z1013s60, z1013,  0,      z1013k76, z1013_8x8, z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (K7652/S6009)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1985, z1013k69, z1013,  0,      z1013k76, z1013,     z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (K7669)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

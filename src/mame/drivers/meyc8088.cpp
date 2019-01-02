@@ -30,6 +30,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -39,19 +40,28 @@
 class meyc8088_state : public driver_device
 {
 public:
-	meyc8088_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	meyc8088_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_vram(*this, "vram"),
 		m_heartbeat(*this, "heartbeat"),
-		m_switches(*this, {"C0", "C1", "C2", "C3"})
+		m_switches(*this, "C%u", 0U),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void meyc8088(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<timer_device> m_heartbeat;
 
-	optional_ioport_array<4> m_switches;
+	required_ioport_array<4> m_switches;
+
+	output_finder<16> m_lamps;
 
 	uint8_t m_status;
 	uint8_t m_common;
@@ -61,17 +71,16 @@ public:
 	DECLARE_READ8_MEMBER(video5_flip_r);
 	DECLARE_WRITE8_MEMBER(screen_flip_w);
 	DECLARE_READ8_MEMBER(screen_flip_r);
-	DECLARE_READ8_MEMBER(meyc8088_input_r);
-	DECLARE_READ8_MEMBER(meyc8088_status_r);
-	DECLARE_WRITE8_MEMBER(meyc8088_lights1_w);
-	DECLARE_WRITE8_MEMBER(meyc8088_lights2_w);
-	DECLARE_WRITE8_MEMBER(meyc8088_common_w);
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_WRITE8_MEMBER(lights1_w);
+	DECLARE_WRITE8_MEMBER(lights2_w);
+	DECLARE_WRITE8_MEMBER(common_w);
 
-	DECLARE_PALETTE_INIT(meyc8088);
-	uint32_t screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_meyc8088);
+	void meyc8088_palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
-	void meyc8088(machine_config &config);
 	void meyc8088_map(address_map &map);
 };
 
@@ -122,16 +131,16 @@ static const res_net_info meyc8088_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(meyc8088_state, meyc8088)
+void meyc8088_state:: meyc8088_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
 
 	compute_res_net_all(rgb, color_prom, meyc8088_decode_info, meyc8088_net_info);
 	palette.set_pen_colors(0, rgb);
 }
 
-uint32_t meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t meyc8088_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t v[5];
 	v[4] = m_status << 2 & 0x10; // video5: color prom d4
@@ -160,7 +169,7 @@ uint32_t meyc8088_state::screen_update_meyc8088(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE_LINE_MEMBER(meyc8088_state::screen_vblank_meyc8088)
+WRITE_LINE_MEMBER(meyc8088_state::screen_vblank)
 {
 	// LC255(200ns pulse) rising edge asserts INTR at start and end of vblank
 	// INTA wired back to INTR to clear it, vector is hardwired to $20
@@ -222,16 +231,16 @@ void meyc8088_state::meyc8088_map(address_map &map)
 	map(0xb0800, 0xb0807).rw("i8155_2", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0xb1000, 0xb10ff).rw("i8155_1", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0xb1800, 0xb1807).rw("i8155_1", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0xb2000, 0xb2000).w(this, FUNC(meyc8088_state::drive_w));
+	map(0xb2000, 0xb2000).w(FUNC(meyc8088_state::drive_w));
 	map(0xb3000, 0xb3000).noprw(); // i8251A data (debug related, unpopulated on sold boards)
 	map(0xb3800, 0xb3800).noprw(); // "
-	map(0xb4000, 0xb4000).rw(this, FUNC(meyc8088_state::screen_flip_r), FUNC(meyc8088_state::screen_flip_w));
-	map(0xb5000, 0xb5000).rw(this, FUNC(meyc8088_state::video5_flip_r), FUNC(meyc8088_state::video5_flip_w));
+	map(0xb4000, 0xb4000).rw(FUNC(meyc8088_state::screen_flip_r), FUNC(meyc8088_state::screen_flip_w));
+	map(0xb5000, 0xb5000).rw(FUNC(meyc8088_state::video5_flip_r), FUNC(meyc8088_state::video5_flip_w));
 	map(0xf8000, 0xfffff).rom();
 }
 
 
-READ8_MEMBER(meyc8088_state::meyc8088_input_r)
+READ8_MEMBER(meyc8088_state::input_r)
 {
 	uint8_t ret = 0xff;
 
@@ -244,7 +253,7 @@ READ8_MEMBER(meyc8088_state::meyc8088_input_r)
 	return ret;
 }
 
-READ8_MEMBER(meyc8088_state::meyc8088_status_r)
+READ8_MEMBER(meyc8088_state::status_r)
 {
 	// d0: /CR2
 	// d1: screen on
@@ -256,21 +265,21 @@ READ8_MEMBER(meyc8088_state::meyc8088_status_r)
 }
 
 
-WRITE8_MEMBER(meyc8088_state::meyc8088_lights1_w)
+WRITE8_MEMBER(meyc8088_state::lights1_w)
 {
 	// lite 1-8
 	for (int i = 0; i < 8; i++)
-		output().set_lamp_value(i, ~data >> i & 1);
+		m_lamps[i] = BIT(~data, i);
 }
 
-WRITE8_MEMBER(meyc8088_state::meyc8088_lights2_w)
+WRITE8_MEMBER(meyc8088_state::lights2_w)
 {
 	// lite 9-16
 	for (int i = 0; i < 8; i++)
-		output().set_lamp_value(i + 8, ~data >> i & 1);
+		m_lamps[i + 8] = BIT(~data, i);
 }
 
-WRITE8_MEMBER(meyc8088_state::meyc8088_common_w)
+WRITE8_MEMBER(meyc8088_state::common_w)
 {
 	// d0: /CR2
 	m_status = (m_status & ~1) | (data & 1);
@@ -280,6 +289,14 @@ WRITE8_MEMBER(meyc8088_state::meyc8088_common_w)
 
 	// d2-d5: /common
 	m_common = data >> 2 & 0xf;
+}
+
+void meyc8088_state::machine_start()
+{
+	m_lamps.resolve();
+
+	save_item(NAME(m_status));
+	save_item(NAME(m_common));
 }
 
 
@@ -350,43 +367,42 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(meyc8088_state::meyc8088)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, (XTAL(15'000'000) / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
-	MCFG_CPU_PROGRAM_MAP(meyc8088_map)
+	MCFG_DEVICE_ADD(m_maincpu, I8088, (XTAL(15'000'000) / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
+	MCFG_DEVICE_PROGRAM_MAP(meyc8088_map)
 
-	MCFG_DEVICE_ADD("i8155_1", I8155, XTAL(15'000'000) / (3*1))
+	i8155_device &i8155_1(I8155(config, "i8155_1", XTAL(15'000'000) / (3*1)));
 	// all ports set to input
-	MCFG_I8155_IN_PORTA_CB(READ8(meyc8088_state, meyc8088_input_r))
-	MCFG_I8155_IN_PORTB_CB(IOPORT("SW"))
-	MCFG_I8155_IN_PORTC_CB(READ8(meyc8088_state, meyc8088_status_r))
+	i8155_1.in_pa_callback().set(FUNC(meyc8088_state::input_r));
+	i8155_1.in_pb_callback().set_ioport("SW");
+	i8155_1.in_pc_callback().set(FUNC(meyc8088_state::status_r));
 	// i8251A trigger txc/rxc (debug related, unpopulated on sold boards)
 
-	MCFG_DEVICE_ADD("i8155_2", I8155, XTAL(15'000'000) / (3*32))
+	i8155_device &i8155_2(I8155(config, "i8155_2", XTAL(15'000'000) / (3*32)));
 	// all ports set to output
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(meyc8088_state, meyc8088_lights2_w))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(meyc8088_state, meyc8088_lights1_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(meyc8088_state, meyc8088_common_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("dac", dac_bit_interface, write))
+	i8155_2.out_pa_callback().set(FUNC(meyc8088_state::lights2_w));
+	i8155_2.out_pb_callback().set(FUNC(meyc8088_state::lights1_w));
+	i8155_2.out_pc_callback().set(FUNC(meyc8088_state::common_w));
+	i8155_2.out_to_callback().set("dac", FUNC(dac_bit_interface::write));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD("heartbeat", meyc8088_state, heartbeat_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000)/3, 320, 0, 256, 261, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(meyc8088_state, screen_update_meyc8088)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(meyc8088_state, screen_vblank_meyc8088))
+	MCFG_SCREEN_UPDATE_DRIVER(meyc8088_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, meyc8088_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(meyc8088_state, meyc8088)
+	PALETTE(config, "palette", FUNC(meyc8088_state::meyc8088_palette), 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -401,4 +417,4 @@ ROM_START( gldarrow )
 ROM_END
 
 
-GAMEL(1984, gldarrow, 0,        meyc8088, gldarrow, meyc8088_state, 0, ROT0,  "Meyco Games, Inc.", "Golden Arrow (Standard G8-03)", 0, layout_gldarrow )
+GAMEL( 1984, gldarrow, 0, meyc8088, gldarrow, meyc8088_state, empty_init, ROT0, "Meyco Games, Inc.", "Golden Arrow (Standard G8-03)", MACHINE_SUPPORTS_SAVE, layout_gldarrow )

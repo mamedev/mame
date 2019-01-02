@@ -129,14 +129,14 @@ void inufuku_state::inufuku_map(address_map &map)
 
 	map(0x300000, 0x301fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");                        // palette ram
 	map(0x380000, 0x3801ff).writeonly().share("bg_rasterram");                                  // bg raster ram
-	map(0x400000, 0x401fff).rw(this, FUNC(inufuku_state::inufuku_bg_videoram_r), FUNC(inufuku_state::inufuku_bg_videoram_w)).share("bg_videoram");     // bg ram
-	map(0x402000, 0x403fff).rw(this, FUNC(inufuku_state::inufuku_tx_videoram_r), FUNC(inufuku_state::inufuku_tx_videoram_w)).share("tx_videoram");     // text ram
+	map(0x400000, 0x401fff).rw(FUNC(inufuku_state::inufuku_bg_videoram_r), FUNC(inufuku_state::inufuku_bg_videoram_w)).share("bg_videoram");     // bg ram
+	map(0x402000, 0x403fff).rw(FUNC(inufuku_state::inufuku_tx_videoram_r), FUNC(inufuku_state::inufuku_tx_videoram_w)).share("tx_videoram");     // text ram
 	map(0x404000, 0x40ffff).ram(); // ?? mirror (3on3dunk)
 	map(0x580000, 0x581fff).ram().share("spriteram1");                          // sprite table + sprite attribute
 	map(0x600000, 0x61ffff).ram().share("spriteram2");                                          // cell table
 
-	map(0x780000, 0x780013).w(this, FUNC(inufuku_state::inufuku_palettereg_w)); // bg & text palettebank register
-	map(0x7a0000, 0x7a0023).w(this, FUNC(inufuku_state::inufuku_scrollreg_w));  // bg & text scroll register
+	map(0x780000, 0x780013).w(FUNC(inufuku_state::inufuku_palettereg_w)); // bg & text palettebank register
+	map(0x7a0000, 0x7a0023).w(FUNC(inufuku_state::inufuku_scrollreg_w));  // bg & text scroll register
 //  AM_RANGE(0x7e0000, 0x7e0001) AM_WRITENOP                    // ?
 
 	map(0x800000, 0xbfffff).rom(); // data rom
@@ -160,7 +160,7 @@ void inufuku_state::inufuku_sound_map(address_map &map)
 void inufuku_state::inufuku_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(inufuku_state::inufuku_soundrombank_w));
+	map(0x00, 0x00).w(FUNC(inufuku_state::inufuku_soundrombank_w));
 	map(0x04, 0x04).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }
@@ -287,13 +287,13 @@ static const gfx_layout spritelayout_alt =
 	128*8
 };
 
-static GFXDECODE_START( inufuku )
+static GFXDECODE_START( gfx_inufuku )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,    0, 256*16 )  // bg
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 256*16 )  // text
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  0, 256*16 )  // sprite
 GFXDECODE_END
 
-static GFXDECODE_START( _3on3dunk )
+static GFXDECODE_START( gfx_3on3dunk )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,    0, 256*16 )  // bg
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 256*16 )  // text
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_alt,  0, 256*16 )  // sprite
@@ -333,61 +333,58 @@ void inufuku_state::machine_reset()
 	m_tx_palettebank = 0;
 }
 
-MACHINE_CONFIG_START(inufuku_state::inufuku)
-
+void inufuku_state::inufuku(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32000000/2) /* 16.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(inufuku_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", inufuku_state,  irq1_line_hold)
+	M68000(config, m_maincpu, 32000000/2); /* 16.00 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &inufuku_state::inufuku_map);
+	m_maincpu->set_vblank_int("screen", FUNC(inufuku_state::irq1_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, 32000000/4)       /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(inufuku_sound_map)
-	MCFG_CPU_IO_MAP(inufuku_sound_io_map)
-								/* IRQs are triggered by the YM2610 */
+	Z80(config, m_audiocpu, 32000000/4);       /* 8.00 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &inufuku_state::inufuku_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &inufuku_state::inufuku_sound_io_map); /* IRQs are triggered by the YM2610 */
 
-
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2300))
-	MCFG_SCREEN_SIZE(2048, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
-	MCFG_SCREEN_UPDATE_DRIVER(inufuku_state, screen_update_inufuku)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(inufuku_state, screen_vblank_inufuku))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2300));
+	screen.set_size(2048, 256);
+	screen.set_visarea(0, 319, 0, 223);
+	screen.set_screen_update(FUNC(inufuku_state::screen_update_inufuku));
+	screen.screen_vblank().set(FUNC(inufuku_state::screen_vblank_inufuku));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
-	MCFG_VSYSTEM_SPR_SET_OFFSETS(0,1) // reference videos confirm at least the +1 against tilemaps in 3on3dunk (the highscore header text and black box are meant to be 1 pixel misaligned, although there is currently a priority bug there too)
-	MCFG_VSYSTEM_SPR_SET_PDRAW(true)
-	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( inufuku_state, inufuku_tile_callback )
-	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR(config, m_spr, 0);
+	m_spr->set_offsets(0, 1); // reference videos confirm at least the +1 against tilemaps in 3on3dunk (the highscore header text and black box are meant to be 1 pixel misaligned, although there is currently a priority bug there too)
+	m_spr->set_pdraw(true);
+	m_spr->set_tile_indirect_cb(FUNC(inufuku_state::inufuku_tile_callback), this);
+	m_spr->set_gfx_region(2);
+	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", inufuku)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_inufuku);
+	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 4096);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 32000000/4)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.75)
-	MCFG_SOUND_ROUTE(2, "mono", 0.75)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 32000000/4));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.75);
+	ymsnd.add_route(2, "mono", 0.75);
+}
 
-
-MACHINE_CONFIG_START(inufuku_state::_3on3dunk)
+void inufuku_state::_3on3dunk(machine_config &config)
+{
 	inufuku(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", _3on3dunk)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_3on3dunk);
+}
 
 
 
@@ -461,5 +458,5 @@ ROM_END
 
 ******************************************************************************/
 
-GAME( 1998, inufuku,  0, inufuku,   inufuku, inufuku_state, 0, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, 3on3dunk, 0, _3on3dunk, inufuku, inufuku_state, 0, ROT0, "Video System Co.", "3 On 3 Dunk Madness (US, prototype? 1997/02/04)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // tilemap priority is wrong in places (basketball before explosion in attract, highscores)
+GAME( 1998, inufuku,  0, inufuku,   inufuku, inufuku_state, empty_init, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)",         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, 3on3dunk, 0, _3on3dunk, inufuku, inufuku_state, empty_init, ROT0, "Video System Co.", "3 On 3 Dunk Madness (US, prototype? 1997/02/04)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // tilemap priority is wrong in places (basketball before explosion in attract, highscores)

@@ -117,7 +117,7 @@ uint8_t z180_device::ROP()
 	offs_t addr = _PCD;
 	_PC++;
 	m_extra_cycles += IO_DCNTL >> 6; // memory wait states
-	return m_odirect->read_byte(MMU_REMAP_ADDR(addr));
+	return m_ocache->read_byte(MMU_REMAP_ADDR(addr));
 }
 
 /****************************************************************
@@ -131,7 +131,7 @@ uint8_t z180_device::ARG()
 	offs_t addr = _PCD;
 	_PC++;
 	m_extra_cycles += IO_DCNTL >> 6; // memory wait states
-	return m_direct->read_byte(MMU_REMAP_ADDR(addr));
+	return m_cache->read_byte(MMU_REMAP_ADDR(addr));
 }
 
 uint32_t z180_device::ARG16()
@@ -139,7 +139,7 @@ uint32_t z180_device::ARG16()
 	offs_t addr = _PCD;
 	_PC += 2;
 	m_extra_cycles += (IO_DCNTL >> 6) * 2; // memory wait states
-	return m_direct->read_byte(MMU_REMAP_ADDR(addr)) | (m_direct->read_byte(MMU_REMAP_ADDR(addr+1)) << 8);
+	return m_cache->read_byte(MMU_REMAP_ADDR(addr)) | (m_cache->read_byte(MMU_REMAP_ADDR(addr+1)) << 8);
 }
 
 /***************************************************************

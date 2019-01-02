@@ -58,6 +58,7 @@
 
 #include "bus/rs232/rs232.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -78,6 +79,9 @@ public:
 		, m_serial(*this, "SERIAL")
 	{ }
 
+	void proteus3(machine_config &config);
+
+private:
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
 	DECLARE_WRITE8_MEMBER(video_w);
 	void kbd_put(u8 data);
@@ -105,9 +109,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER (write_f14_clock){ write_acia_clocks(mc14411_device::TIMER_F14, state); }
 	DECLARE_WRITE_LINE_MEMBER (write_f15_clock){ write_acia_clocks(mc14411_device::TIMER_F15, state); }
 
-	void proteus3(machine_config &config);
 	void proteus3_mem(address_map &map);
-private:
+
 	uint8_t m_video_data;
 	uint8_t m_flashcnt;
 	uint16_t m_curs_pos;
@@ -176,7 +179,7 @@ void proteus3_state::kbd_put(u8 data)
 {
 	if (data == 0x08)
 		data = 0x0f; // take care of backspace (bios 1 and 2)
-	m_pia->portb_w(data);
+	m_pia->write_portb(data);
 	m_pia->cb1_w(1);
 	m_pia->cb1_w(0);
 }
@@ -349,7 +352,7 @@ static const gfx_layout charlayout =
 	8*8                    /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( proteus3 )
+static GFXDECODE_START( gfx_proteus3 )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -379,8 +382,8 @@ void proteus3_state::machine_reset()
 
 MACHINE_CONFIG_START(proteus3_state::proteus3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL(3'579'545))  /* Divided by 4 internally */
-	MCFG_CPU_PROGRAM_MAP(proteus3_mem)
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(3'579'545))  /* Divided by 4 internally */
+	MCFG_DEVICE_PROGRAM_MAP(proteus3_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -390,53 +393,55 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*12-1)
 	MCFG_SCREEN_UPDATE_DRIVER(proteus3_state, screen_update_proteus3)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", proteus3)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_proteus3)
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(proteus3_state, video_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(proteus3_state, ca2_w))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(proteus3_state, kbd_put))
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(proteus3_state::video_w));
+	m_pia->ca2_handler().set(FUNC(proteus3_state::ca2_w));
+	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(proteus3_state::kbd_put));
 
 	/* cassette */
-	MCFG_DEVICE_ADD ("acia1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(proteus3_state, acia1_txdata_w))
+	ACIA6850(config, m_acia1, 0);
+	m_acia1->txd_handler().set(FUNC(proteus3_state::acia1_txdata_w));
+
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", proteus3_state, timer_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", proteus3_state, timer_p, attotime::from_hz(40000))
 
 	// optional tty keyboard
-	MCFG_DEVICE_ADD ("acia2", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_cts))
+	ACIA6850(config, m_acia2, 0);
+	m_acia2->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia2->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.rxd_handler().set(m_acia2, FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set(m_acia2, FUNC(acia6850_device::write_cts));
 
 	/* Bit Rate Generator */
-	MCFG_MC14411_ADD ("brg", XTAL(1'843'200)) // crystal needs verification but is the likely one
-	MCFG_MC14411_F1_CB(WRITELINE (proteus3_state, write_f1_clock))
-	MCFG_MC14411_F2_CB(WRITELINE (proteus3_state, write_f2_clock))
-	MCFG_MC14411_F3_CB(WRITELINE (proteus3_state, write_f3_clock))
-	MCFG_MC14411_F4_CB(WRITELINE (proteus3_state, write_f4_clock))
-	MCFG_MC14411_F5_CB(WRITELINE (proteus3_state, write_f5_clock))
-	MCFG_MC14411_F6_CB(WRITELINE (proteus3_state, write_f6_clock))
-	MCFG_MC14411_F7_CB(WRITELINE (proteus3_state, write_f7_clock))
-	MCFG_MC14411_F8_CB(WRITELINE (proteus3_state, write_f8_clock))
-	MCFG_MC14411_F9_CB(WRITELINE (proteus3_state, write_f9_clock))
-	MCFG_MC14411_F10_CB(WRITELINE (proteus3_state, write_f10_clock))
-	MCFG_MC14411_F11_CB(WRITELINE (proteus3_state, write_f11_clock))
-	MCFG_MC14411_F12_CB(WRITELINE (proteus3_state, write_f12_clock))
-	MCFG_MC14411_F13_CB(WRITELINE (proteus3_state, write_f13_clock))
-	MCFG_MC14411_F14_CB(WRITELINE (proteus3_state, write_f14_clock))
-	MCFG_MC14411_F15_CB(WRITELINE (proteus3_state, write_f15_clock))
+	MC14411(config, m_brg, XTAL(1'843'200)); // crystal needs verification but is the likely one
+	m_brg->out_f<1>().set(FUNC(proteus3_state::write_f1_clock));
+	m_brg->out_f<2>().set(FUNC(proteus3_state::write_f2_clock));
+	m_brg->out_f<3>().set(FUNC(proteus3_state::write_f3_clock));
+	m_brg->out_f<4>().set(FUNC(proteus3_state::write_f4_clock));
+	m_brg->out_f<5>().set(FUNC(proteus3_state::write_f5_clock));
+	m_brg->out_f<6>().set(FUNC(proteus3_state::write_f6_clock));
+	m_brg->out_f<7>().set(FUNC(proteus3_state::write_f7_clock));
+	m_brg->out_f<8>().set(FUNC(proteus3_state::write_f8_clock));
+	m_brg->out_f<9>().set(FUNC(proteus3_state::write_f9_clock));
+	m_brg->out_f<10>().set(FUNC(proteus3_state::write_f10_clock));
+	m_brg->out_f<11>().set(FUNC(proteus3_state::write_f11_clock));
+	m_brg->out_f<12>().set(FUNC(proteus3_state::write_f12_clock));
+	m_brg->out_f<13>().set(FUNC(proteus3_state::write_f13_clock));
+	m_brg->out_f<14>().set(FUNC(proteus3_state::write_f14_clock));
+	m_brg->out_f<15>().set(FUNC(proteus3_state::write_f15_clock));
 MACHINE_CONFIG_END
 
 
@@ -448,21 +453,21 @@ MACHINE_CONFIG_END
 ROM_START(proteus3)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "14k", "14k BASIC")
-	ROMX_LOAD( "bas1.bin",     0xc800, 0x0800, CRC(016bf2d6) SHA1(89605dbede3b6fd101ee0548e5c545a0824fcfd3), ROM_BIOS(1) )
-	ROMX_LOAD( "bas2.bin",     0xd000, 0x0800, CRC(39d3e543) SHA1(dd0fe220e3c2a48ce84936301311cbe9f1597ca7), ROM_BIOS(1) )
-	ROMX_LOAD( "bas3.bin",     0xd800, 0x0800, CRC(3a41617d) SHA1(175406f4732389e226bc50d27ada39e6ea48de34), ROM_BIOS(1) )
-	ROMX_LOAD( "bas4.bin",     0xe000, 0x0800, CRC(ee9d77ee) SHA1(f7e60a1ab88a3accc8ffdc545657c071934d09d2), ROM_BIOS(1) )
-	ROMX_LOAD( "bas5.bin",     0xe800, 0x0800, CRC(bd81bb34) SHA1(6325735e5750a9536e63b67048f74711fae1fa42), ROM_BIOS(1) )
-	ROMX_LOAD( "bas6.bin",     0xf000, 0x0800, CRC(60cd006b) SHA1(28354f78490da1eb5116cbbc43eaca0670f7f398), ROM_BIOS(1) )
-	ROMX_LOAD( "bas7.bin",     0xf800, 0x0800, CRC(84c3dc22) SHA1(8fddba61b5f0270ca2daef32ab5edfd60300c776), ROM_BIOS(1) )
+	ROMX_LOAD( "bas1.bin",     0xc800, 0x0800, CRC(016bf2d6) SHA1(89605dbede3b6fd101ee0548e5c545a0824fcfd3), ROM_BIOS(0) )
+	ROMX_LOAD( "bas2.bin",     0xd000, 0x0800, CRC(39d3e543) SHA1(dd0fe220e3c2a48ce84936301311cbe9f1597ca7), ROM_BIOS(0) )
+	ROMX_LOAD( "bas3.bin",     0xd800, 0x0800, CRC(3a41617d) SHA1(175406f4732389e226bc50d27ada39e6ea48de34), ROM_BIOS(0) )
+	ROMX_LOAD( "bas4.bin",     0xe000, 0x0800, CRC(ee9d77ee) SHA1(f7e60a1ab88a3accc8ffdc545657c071934d09d2), ROM_BIOS(0) )
+	ROMX_LOAD( "bas5.bin",     0xe800, 0x0800, CRC(bd81bb34) SHA1(6325735e5750a9536e63b67048f74711fae1fa42), ROM_BIOS(0) )
+	ROMX_LOAD( "bas6.bin",     0xf000, 0x0800, CRC(60cd006b) SHA1(28354f78490da1eb5116cbbc43eaca0670f7f398), ROM_BIOS(0) )
+	ROMX_LOAD( "bas7.bin",     0xf800, 0x0800, CRC(84c3dc22) SHA1(8fddba61b5f0270ca2daef32ab5edfd60300c776), ROM_BIOS(0) )
 	ROM_FILL( 0xc000, 1, 0x00 )  // if c000 isn't 0 it assumes a rom is there and jumps to it
 
 	ROM_SYSTEM_BIOS( 1, "8k", "8k BASIC")
-	ROMX_LOAD( "proteus3_basic8k.m0", 0xe000, 0x2000, CRC(7d9111c2) SHA1(3c032c9c7f87d22a1a9819b3b812be84404d2ad2), ROM_BIOS(2) )
+	ROMX_LOAD( "proteus3_basic8k.m0", 0xe000, 0x2000, CRC(7d9111c2) SHA1(3c032c9c7f87d22a1a9819b3b812be84404d2ad2), ROM_BIOS(1) )
 	ROM_RELOAD( 0xc000, 0x2000 )
 
 	ROM_SYSTEM_BIOS( 2, "8kms", "8k Micro-Systemes BASIC")
-	ROMX_LOAD( "ms1_basic8k.bin", 0xe000, 0x2000, CRC(b5476e28) SHA1(c8c2366d549b2645c740be4ab4237e05c3cab4a9), ROM_BIOS(3) )
+	ROMX_LOAD( "ms1_basic8k.bin", 0xe000, 0x2000, CRC(b5476e28) SHA1(c8c2366d549b2645c740be4ab4237e05c3cab4a9), ROM_BIOS(2) )
 	ROM_RELOAD( 0xc000, 0x2000 )
 
 	ROM_REGION(0x400, "chargen", 0)
@@ -483,5 +488,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY                  FULLNAME       FLAGS
-COMP( 1978, proteus3, 0,      0,      proteus3, proteus3, proteus3_state, 0,    "Proteus International", "Proteus III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                  FULLNAME       FLAGS
+COMP( 1978, proteus3, 0,      0,      proteus3, proteus3, proteus3_state, empty_init, "Proteus International", "Proteus III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

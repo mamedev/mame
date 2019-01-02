@@ -14,9 +14,87 @@
 class x68k_hdc_image_device :   public device_t,
 								public device_image_interface
 {
+	enum class sasi_phase : u8
+	{
+		BUSFREE = 0,
+		ARBITRATION,
+		SELECTION,
+		RESELECTION,
+		COMMAND,
+		DATA,
+		STATUS,
+		MESSAGE,
+		READ,
+		WRITE
+	};
+
+	// SASI commands, based on the SASI standard
+	enum sasi_cmd : u8
+	{
+		// Class 0 (6-byte) commands
+		SASI_CMD_TEST_UNIT_READY = 0,
+		SASI_CMD_REZERO_UNIT,
+		SASI_CMD_RESERVED_02,
+		SASI_CMD_REQUEST_SENSE,
+		SASI_CMD_FORMAT_UNIT,
+		SASI_CMD_RESERVED_05,
+		SASI_CMD_FORMAT_UNIT_06,  // the X68000 uses command 0x06 for Format Unit, despite the SASI specs saying 0x04
+		SASI_CMD_RESERVED_07,
+		SASI_CMD_READ,
+		SASI_CMD_RESERVED_09,
+		SASI_CMD_WRITE,
+		SASI_CMD_SEEK,
+		SASI_CMD_RESERVED_0C,
+		SASI_CMD_RESERVED_0D,
+		SASI_CMD_RESERVED_0E,
+		SASI_CMD_WRITE_FILE_MARK,
+		SASI_CMD_INVALID_10,
+		SASI_CMD_INVALID_11,
+		SASI_CMD_RESERVE_UNIT,
+		SASI_CMD_RELEASE_UNIT,
+		SASI_CMD_INVALID_14,
+		SASI_CMD_INVALID_15,
+		SASI_CMD_READ_CAPACITY,
+		SASI_CMD_INVALID_17,
+		SASI_CMD_INVALID_18,
+		SASI_CMD_INVALID_19,
+		SASI_CMD_READ_DIAGNOSTIC,
+		SASI_CMD_WRITE_DIAGNOSTIC,
+		SASI_CMD_INVALID_1C,
+		SASI_CMD_INVALID_1D,
+		SASI_CMD_INVALID_1E,
+		SASI_CMD_INQUIRY,
+		// Class 1 commands  (yes, just the one)
+		SASI_CMD_RESERVED_20,
+		SASI_CMD_RESERVED_21,
+		SASI_CMD_RESERVED_22,
+		SASI_CMD_SET_BLOCK_LIMITS = 0x28,
+		// Class 2 commands
+		SASI_CMD_EXTENDED_ADDRESS_READ = 0x48,
+		SASI_CMD_INVALID_49,
+		SASI_CMD_EXTENDED_ADDRESS_WRITE,
+		SASI_CMD_WRITE_AND_VERIFY = 0x54,
+		SASI_CMD_VERIFY,
+		SASI_CMD_INVALID_56,
+		SASI_CMD_SEARCH_DATA_HIGH,
+		SASI_CMD_SEARCH_DATA_EQUAL,
+		SASI_CMD_SEARCH_DATA_LOW,
+		// controller-specific commands
+		SASI_CMD_SPECIFY = 0xc2
+	};
+
+	enum sasi_status : u8
+	{
+		SASI_STATUS_MSG = 1 << 4,   // MSG
+		SASI_STATUS_CD = 1 << 3,    // C/D (Command/Data)
+		SASI_STATUS_IO = 1 << 2,    // I/O
+		SASI_STATUS_BSY = 1 << 1,   // BSY
+		SASI_STATUS_REQ = 1 << 0    // REQ
+	};
+
 public:
 	// construction/destruction
-	x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_HARDDISK; }
@@ -36,30 +114,23 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 private:
-	int m_phase;
-	unsigned char m_status_port;  // read at 0xe96003
-	unsigned char m_status;       // status phase output
-	//unsigned char m_message;
-	unsigned char m_command[10];
-	unsigned char m_sense[4];
-	int m_command_byte_count;
-	int m_command_byte_total;
-	int m_current_command;
-	int m_transfer_byte_count;
-	int m_transfer_byte_total;
-	int m_msg;  // MSG
-	int m_cd;   // C/D (Command/Data)
-	int m_bsy;  // BSY
-	int m_io;   // I/O
-	int m_req;  // REQ
+	TIMER_CALLBACK_MEMBER(req_timer_callback);
+
+	sasi_phase m_phase;
+	u8 m_status_port;  // read at 0xe96003
+	u8 m_status;       // status phase output
+	u8 m_command[10];
+	u8 m_sense[4];
+	u16 m_command_byte_count;
+	u16 m_command_byte_total;
+	u8 m_current_command;
+	u16 m_transfer_byte_count;
+	u16 m_transfer_byte_total;
+	emu_timer *m_req_timer;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(X68KHDC, x68k_hdc_image_device)
-
-#define MCFG_X68KHDC_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, X68KHDC, 0)
 
 #endif // MAME_MACHINE_X68K_HDC_H

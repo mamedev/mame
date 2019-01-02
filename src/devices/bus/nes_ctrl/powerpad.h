@@ -45,7 +45,6 @@ private:
 
 
 // device type definition
-extern const device_type NES_POWERPAD;
-
+DECLARE_DEVICE_TYPE(NES_POWERPAD, nes_powerpad_device)
 
 #endif // MAME_BUS_NES_CTRL_POWERPAD_H

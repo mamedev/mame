@@ -23,7 +23,6 @@
 #include "emu.h"
 #include "rcm.h"
 
-#include "cpu/m6502/m6502.h"
 
 
 #ifdef NES_PCB_DEBUG
@@ -276,7 +275,7 @@ void nes_3dblock_device::hblank_irq(int scanline, int vblank, int blanked)
 	{
 		m_irq_count--;
 		if (!m_irq_count)
-			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			hold_irq_line();
 	}
 }
 

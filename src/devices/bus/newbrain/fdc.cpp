@@ -49,9 +49,9 @@ ROM_START( newbrain_fdc )
 	ROM_REGION( 0x2000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS("issue2")
 	ROM_SYSTEM_BIOS( 0, "issue1", "Issue 1" )
-	ROMX_LOAD( "d417-1.rom", 0x0000, 0x2000, CRC(40fad31c) SHA1(5137be4cc026972c0ffd4fa6990e8583bdfce163), ROM_BIOS(1) )
+	ROMX_LOAD( "d417-1.rom", 0x0000, 0x2000, CRC(40fad31c) SHA1(5137be4cc026972c0ffd4fa6990e8583bdfce163), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "issue2", "Issue 2" )
-	ROMX_LOAD( "d417-2.rom", 0x0000, 0x2000, CRC(e8bda8b9) SHA1(c85a76a5ff7054f4ef4a472ce99ebaed1abd269c), ROM_BIOS(2) )
+	ROMX_LOAD( "d417-2.rom", 0x0000, 0x2000, CRC(e8bda8b9) SHA1(c85a76a5ff7054f4ef4a472ce99ebaed1abd269c), ROM_BIOS(1) )
 ROM_END
 
 
@@ -84,9 +84,9 @@ void newbrain_fdc_device::newbrain_fdc_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x71);
-	map(0x00, 0x01).mirror(0x10).m(UPD765_TAG, FUNC(upd765a_device::map));
-	map(0x20, 0x20).mirror(0x11).w(this, FUNC(newbrain_fdc_device::fdc_auxiliary_w));
-	map(0x40, 0x40).mirror(0x11).r(this, FUNC(newbrain_fdc_device::fdc_control_r));
+	map(0x00, 0x01).mirror(0x10).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x20, 0x20).mirror(0x11).w(FUNC(newbrain_fdc_device::fdc_auxiliary_w));
+	map(0x40, 0x40).mirror(0x11).r(FUNC(newbrain_fdc_device::fdc_control_r));
 }
 
 
@@ -94,9 +94,10 @@ void newbrain_fdc_device::newbrain_fdc_io(address_map &map)
 //  newbrain_floppies
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( newbrain_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void newbrain_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 
 //-------------------------------------------------
@@ -104,12 +105,12 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(newbrain_fdc_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(newbrain_fdc_mem)
-	MCFG_CPU_IO_MAP(newbrain_fdc_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(newbrain_fdc_mem)
+	MCFG_DEVICE_IO_MAP(newbrain_fdc_io)
 
-	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(newbrain_fdc_device, fdc_int_w))
+	UPD765A(config, m_fdc, 8'000'000, false, true);
+	m_fdc->intrq_wr_callback().set(FUNC(newbrain_fdc_device::fdc_int_w));
 
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", newbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", newbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)

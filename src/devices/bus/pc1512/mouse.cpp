@@ -113,6 +113,7 @@ ioport_constructor pc1512_mouse_device::device_input_ports() const
 //  SLOT_INTERFACE( pc1512_mouse_port_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( pc1512_mouse_port_devices )
-	SLOT_INTERFACE("mouse", PC1512_MOUSE)
-SLOT_INTERFACE_END
+void pc1512_mouse_port_devices(device_slot_interface &device)
+{
+	device.option_add("mouse", PC1512_MOUSE);
+}

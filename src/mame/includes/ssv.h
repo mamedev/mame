@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_SSV_H
+#define MAME_INCLUDES_SSV_H
+
+#pragma once
 
 #include "cpu/upd7725/upd7725.h"
 #include "video/st0020.h"
@@ -8,13 +12,14 @@
 #include "machine/timer.h"
 #include "machine/upd4701.h"
 #include "sound/es5506.h"
+#include "emupal.h"
 #include "screen.h"
 
 class ssv_state : public driver_device
 {
 public:
-	ssv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ssv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ensoniq(*this, "ensoniq"),
 		m_eeprom(*this, "eeprom"),
@@ -29,6 +34,7 @@ public:
 		m_gdfs_tmapscroll(*this, "gdfs_tmapscroll"),
 		m_gdfs_st0020(*this, "st0020_spr"),
 		m_input_sel(*this, "input_sel"),
+		m_raster_interrupt_enabled(false),
 		m_io_key(*this, "KEY%u", 0U),
 		m_io_service(*this, "SERVICE"),
 		m_io_paddle(*this, "PADDLE"),
@@ -37,6 +43,40 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void ssv(machine_config &config);
+	void gdfs(machine_config &config);
+	void dynagear(machine_config &config);
+	void hypreac2(machine_config &config);
+	void meosism(machine_config &config);
+	void drifto94(machine_config &config);
+	void stmblade(machine_config &config);
+	void srmp4(machine_config &config);
+	void srmp7(machine_config &config);
+	void twineag2(machine_config &config);
+	void ryorioh(machine_config &config);
+	void janjans1(machine_config &config);
+	void eaglshot(machine_config &config);
+	void survarts(machine_config &config);
+	void sxyreac2(machine_config &config);
+	void ultrax(machine_config &config);
+	void vasara(machine_config &config);
+	void sxyreact(machine_config &config);
+	void mslider(machine_config &config);
+	void jsk(machine_config &config);
+	void hypreact(machine_config &config);
+	void keithlcy(machine_config &config);
+	void pastelis(machine_config &config);
+	void cairblad(machine_config &config);
+
+	void init_ssv();
+	void init_ssv_tilescram();
+	void init_eaglshot();
+	void init_sexy();
+	void init_ssv_irq1();
+	void init_jsk();
+	void init_pastelis();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<es5506_device> m_ensoniq;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -62,6 +102,7 @@ public:
 	std::unique_ptr<uint16_t[]> m_eaglshot_gfxram;
 	tilemap_t *m_gdfs_tmap;
 	int m_interrupt_ultrax;
+	bool m_raster_interrupt_enabled;
 	uint16_t m_sxyreact_serial;
 	int m_sxyreact_dial;
 	uint32_t m_latches[8];
@@ -102,28 +143,6 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 
-	DECLARE_DRIVER_INIT(gdfs);
-	DECLARE_DRIVER_INIT(sxyreac2);
-	DECLARE_DRIVER_INIT(hypreac2);
-	DECLARE_DRIVER_INIT(hypreact);
-	DECLARE_DRIVER_INIT(dynagear);
-	DECLARE_DRIVER_INIT(eaglshot);
-	DECLARE_DRIVER_INIT(srmp4);
-	DECLARE_DRIVER_INIT(srmp7);
-	DECLARE_DRIVER_INIT(keithlcy);
-	DECLARE_DRIVER_INIT(meosism);
-	DECLARE_DRIVER_INIT(vasara);
-	DECLARE_DRIVER_INIT(cairblad);
-	DECLARE_DRIVER_INIT(sxyreact);
-	DECLARE_DRIVER_INIT(janjans1);
-	DECLARE_DRIVER_INIT(ryorioh);
-	DECLARE_DRIVER_INIT(drifto94);
-	DECLARE_DRIVER_INIT(survarts);
-	DECLARE_DRIVER_INIT(ultrax);
-	DECLARE_DRIVER_INIT(stmblade);
-	DECLARE_DRIVER_INIT(jsk);
-	DECLARE_DRIVER_INIT(twineag2);
-	DECLARE_DRIVER_INIT(mslider);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(gdfs);
@@ -138,38 +157,18 @@ public:
 	void update_irq_state();
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	void drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,uint32_t code,uint32_t color,int flipx,int flipy,int x0,int y0,int shadow);
-	void draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int scroll);
+	void drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy, int shadow, int realline, int line);
+	void drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx,uint32_t code, uint32_t color, int flipx, int flipy, int base_sx, int base_sy,int shadow);
+
+	void draw_16x16_tile_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int flipx, int flipy, int mode, int code, int color, int sx, int sy, int realline, int line);
+	void get_tile(int x, int y, int size, int page, int& code, int& attr, int& flipx, int& flipy);
+	void draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &cliprect, int in_sy, int scroll);
 	void draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr);
+
+	void draw_sprites_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int code, int flipx, int flipy, int gfx, int shadow, int color, int sx, int sy, int xnum, int ynum);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void enable_video(int enable);
-	void init(int interrupt_ultrax);
-	void init_hypreac2_common();
-	void init_eaglshot_banking();
 
-	void ssv(machine_config &config);
-	void gdfs(machine_config &config);
-	void dynagear(machine_config &config);
-	void hypreac2(machine_config &config);
-	void meosism(machine_config &config);
-	void drifto94(machine_config &config);
-	void stmblade(machine_config &config);
-	void srmp4(machine_config &config);
-	void srmp7(machine_config &config);
-	void twineag2(machine_config &config);
-	void ryorioh(machine_config &config);
-	void janjans1(machine_config &config);
-	void eaglshot(machine_config &config);
-	void survarts(machine_config &config);
-	void sxyreac2(machine_config &config);
-	void ultrax(machine_config &config);
-	void vasara(machine_config &config);
-	void sxyreact(machine_config &config);
-	void mslider(machine_config &config);
-	void jsk(machine_config &config);
-	void hypreact(machine_config &config);
-	void keithlcy(machine_config &config);
-	void cairblad(machine_config &config);
 	void drifto94_map(address_map &map);
 	void dsp_data_map(address_map &map);
 	void dsp_prg_map(address_map &map);
@@ -190,7 +189,7 @@ public:
 	void sxyreact_map(address_map &map);
 	void twineag2_map(address_map &map);
 	void ultrax_map(address_map &map);
-protected:
+
 	optional_ioport_array<4> m_io_key;
 	optional_ioport m_io_service;
 	optional_ioport m_io_paddle;
@@ -200,3 +199,5 @@ protected:
 
 	void ssv_map(address_map &map, u32 rom);
 };
+
+#endif // MAME_INCLUDES_SSV_H

@@ -20,18 +20,17 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gsp(*this, "gsp"),
 		m_adsp(*this, "adsp"),
-		m_dsp32c_1(*this, "dsp32c_1"),
-		m_dsp32c_2(*this, "dsp32c_2"),
+		m_dsp32c(*this, "dsp32c_%u", 1U),
 		m_cage(*this, "cage"),
 		m_adsp_internal_program_ram(*this, "adsp_intprog"),
 		m_gsp_dram(*this, "gsp_dram"),
 		m_gsp_vram(*this, "gsp_vram")
 	{ }
 
-	DECLARE_DRIVER_INIT(metalmx);
+	void init_metalmx();
 	void metalmx(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ32_MEMBER(unk_r);
 	DECLARE_READ32_MEMBER(watchdog_r);
 	DECLARE_WRITE32_MEMBER(shifter_w);
@@ -39,10 +38,8 @@ protected:
 	DECLARE_WRITE32_MEMBER(reset_w);
 	DECLARE_READ32_MEMBER(sound_data_r);
 	DECLARE_WRITE32_MEMBER(sound_data_w);
-	DECLARE_WRITE32_MEMBER(dsp32c_1_w);
-	DECLARE_READ32_MEMBER(dsp32c_1_r);
-	DECLARE_WRITE32_MEMBER(dsp32c_2_w);
-	DECLARE_READ32_MEMBER(dsp32c_2_r);
+	template<int Chip> DECLARE_WRITE32_MEMBER(dsp32c_w);
+	template<int Chip> DECLARE_READ32_MEMBER(dsp32c_r);
 	DECLARE_WRITE32_MEMBER(host_gsp_w);
 	DECLARE_READ32_MEMBER(host_gsp_r);
 	DECLARE_READ32_MEMBER(host_dram_r);
@@ -61,12 +58,10 @@ protected:
 	void gsp_map(address_map &map);
 	void main_map(address_map &map);
 
-private:
 	required_device<m68ec020_device> m_maincpu;
 	required_device<tms34020_device> m_gsp;
 	required_device<adsp2105_device> m_adsp;
-	required_device<dsp32c_device> m_dsp32c_1;
-	required_device<dsp32c_device> m_dsp32c_2;
+	required_device_array<dsp32c_device, 2> m_dsp32c;
 	required_device<atari_cage_device> m_cage;
 
 	required_shared_ptr<uint32_t> m_adsp_internal_program_ram;

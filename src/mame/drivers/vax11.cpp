@@ -70,19 +70,20 @@
 #include "machine/terminal.h"
 #include "machine/rx01.h"
 
-#define TERMINAL_TAG "terminal"
 
 class vax11_state : public driver_device
 {
 public:
 	vax11_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
+	void vax11(machine_config &config);
+
+private:
+	required_device<t11_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER( term_r );
 	DECLARE_READ16_MEMBER( term_tx_status_r );
@@ -91,7 +92,6 @@ public:
 	void kbd_put(u8 data);
 	uint8_t m_term_data;
 	uint16_t m_term_status;
-	void vax11(machine_config &config);
 	void vax11_mem(address_map &map);
 };
 
@@ -124,10 +124,10 @@ void vax11_state::vax11_mem(address_map &map)
 
 	map(0xfe78, 0xfe7b).rw("rx01", FUNC(rx01_device::read), FUNC(rx01_device::write));
 
-	map(0xff70, 0xff71).r(this, FUNC(vax11_state::term_rx_status_r));
-	map(0xff72, 0xff73).r(this, FUNC(vax11_state::term_r));
-	map(0xff74, 0xff75).r(this, FUNC(vax11_state::term_tx_status_r));
-	map(0xff76, 0xff77).w(this, FUNC(vax11_state::term_w));
+	map(0xff70, 0xff71).r(FUNC(vax11_state::term_rx_status_r));
+	map(0xff72, 0xff73).r(FUNC(vax11_state::term_r));
+	map(0xff74, 0xff75).r(FUNC(vax11_state::term_tx_status_r));
+	map(0xff76, 0xff77).w(FUNC(vax11_state::term_w));
 }
 
 /* Input ports */
@@ -140,18 +140,19 @@ void vax11_state::kbd_put(u8 data)
 	m_term_status = 0xffff;
 }
 
-MACHINE_CONFIG_START(vax11_state::vax11)
+void vax11_state::vax11(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, XTAL(4'000'000)) // Need proper CPU here
-	MCFG_T11_INITIAL_MODE(0 << 13)
-	MCFG_CPU_PROGRAM_MAP(vax11_mem)
+	T11(config, m_maincpu, XTAL(4'000'000)); // Need proper CPU here
+	m_maincpu->set_initial_mode(0 << 13);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vax11_state::vax11_mem);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(vax11_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(vax11_state::kbd_put));
 
-	MCFG_RX01_ADD("rx01")
-MACHINE_CONFIG_END
+	RX01(config, "rx01", 0);
+}
 
 ROM_START( vax785 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -173,5 +174,5 @@ ROM_START( vax785 )
 
 ROM_END
 
-/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY                          FULLNAME      FLAGS */
-COMP( 1984, vax785,  0,       0,      vax11,   vax11, vax11_state, 0,    "Digital Equipment Corporation", "VAX-11/785", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY                          FULLNAME      FLAGS */
+COMP( 1984, vax785, 0,      0,      vax11,   vax11, vax11_state, empty_init, "Digital Equipment Corporation", "VAX-11/785", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

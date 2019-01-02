@@ -152,13 +152,13 @@ void crshrace_state::crshrace_map(address_map &map)
 	map(0x300000, 0x3fffff).rom().region("user1", 0);
 	map(0x400000, 0x4fffff).rom().region("user2", 0).mirror(0x100000);
 	map(0xa00000, 0xa0ffff).ram().share("spriteram2");
-	map(0xd00000, 0xd01fff).ram().w(this, FUNC(crshrace_state::crshrace_videoram1_w)).share("videoram1");
+	map(0xd00000, 0xd01fff).ram().w(FUNC(crshrace_state::crshrace_videoram1_w)).share("videoram1");
 	map(0xe00000, 0xe01fff).ram().share("spriteram");
 	map(0xfe0000, 0xfeffff).ram();
-	map(0xffc000, 0xffc001).w(this, FUNC(crshrace_state::crshrace_roz_bank_w));
-	map(0xffd000, 0xffdfff).ram().w(this, FUNC(crshrace_state::crshrace_videoram2_w)).share("videoram2");
+	map(0xffc000, 0xffc001).w(FUNC(crshrace_state::crshrace_roz_bank_w));
+	map(0xffd000, 0xffdfff).ram().w(FUNC(crshrace_state::crshrace_videoram2_w)).share("videoram2");
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xfff000, 0xfff001).portr("P1").w(this, FUNC(crshrace_state::crshrace_gfxctrl_w));
+	map(0xfff000, 0xfff001).portr("P1").w(FUNC(crshrace_state::crshrace_gfxctrl_w));
 	map(0xfff002, 0xfff003).portr("P2");
 	map(0xfff004, 0xfff005).portr("DSW0");
 	map(0xfff006, 0xfff007).portr("DSW2");
@@ -179,7 +179,7 @@ void crshrace_state::sound_map(address_map &map)
 void crshrace_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(crshrace_state::crshrace_sh_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(crshrace_state::crshrace_sh_bankswitch_w));
 	map(0x04, 0x04).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }
@@ -379,7 +379,7 @@ static const gfx_layout spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( crshrace )
+static GFXDECODE_START( gfx_crshrace )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 512, 32 )
@@ -402,58 +402,57 @@ void crshrace_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-MACHINE_CONFIG_START(crshrace_state::crshrace)
-
+void crshrace_state::crshrace(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,16000000)    /* 16 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(crshrace_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", crshrace_state,  irq1_line_hold)
+	M68000(config, m_maincpu, 16000000);    /* 16 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &crshrace_state::crshrace_map);
+	m_maincpu->set_vblank_int("screen", FUNC(crshrace_state::irq1_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)   /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-
+	Z80(config, m_audiocpu, 4000000);   /* 4 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &crshrace_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &crshrace_state::sound_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(crshrace_state, screen_update_crshrace)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("spriteram2", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(crshrace_state::screen_update_crshrace));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.screen_vblank().append(m_spriteram2, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crshrace)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_crshrace);
+	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 2048);
 
-	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
-	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( crshrace_state, crshrace_tile_callback )
-	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
-	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR(config, m_spr, 0);
+	m_spr->set_tile_indirect_cb(FUNC(crshrace_state::crshrace_tile_callback), this);
+	m_spr->set_gfx_region(2);
+	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+	BUFFERED_SPRITERAM16(config, m_spriteram2);
 
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
-	MCFG_K053936_WRAP(1)
-	MCFG_K053936_OFFSETS(-48, -21)
+	K053936(config, m_k053936, 0);
+	m_k053936->set_wrap(1);
+	m_k053936->set_offsets(-48, -21);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
+}
 
 
 ROM_START( crshrace )
@@ -537,14 +536,14 @@ void crshrace_state::crshrace_patch_code( uint16_t offset )
 #endif
 
 
-DRIVER_INIT_MEMBER(crshrace_state,crshrace)
+void crshrace_state::init_crshrace()
 {
 	#if CRSHRACE_3P_HACK
 	crshrace_patch_code(0x003778);
 	#endif
 }
 
-DRIVER_INIT_MEMBER(crshrace_state,crshrace2)
+void crshrace_state::init_crshrace2()
 {
 	#if CRSHRACE_3P_HACK
 	crshrace_patch_code(0x003796);
@@ -552,5 +551,5 @@ DRIVER_INIT_MEMBER(crshrace_state,crshrace2)
 }
 
 
-GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace_state, crshrace,  ROT270, "Video System Co.", "Lethal Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, crshrace2, ROT270, "Video System Co.", "Lethal Crash Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace,  0,        crshrace, crshrace,  crshrace_state, init_crshrace,  ROT270, "Video System Co.", "Lethal Crash Race / Bakuretsu Crash Race (set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, crshrace2, crshrace, crshrace, crshrace2, crshrace_state, init_crshrace2, ROT270, "Video System Co.", "Lethal Crash Race / Bakuretsu Crash Race (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

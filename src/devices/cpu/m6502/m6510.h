@@ -14,12 +14,6 @@
 
 #include "m6502.h"
 
-#define MCFG_M6510_PORT_CALLBACKS(_read, _write) \
-	downcast<m6510_device *>(device)->set_callbacks(DEVCB_##_read, DEVCB_##_write);
-
-#define MCFG_M6510_PORT_PULLS(_up, _down) \
-	downcast<m6510_device *>(device)->set_pulls(_up, _down);
-
 class m6510_device : public m6502_device {
 public:
 	m6510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -27,10 +21,8 @@ public:
 	uint8_t get_port();
 	void set_pulls(uint8_t pullup, uint8_t pulldown);
 
-	template<class _read, class _write> void set_callbacks(_read rd, _write wr) {
-		read_port.set_callback(rd);
-		write_port.set_callback(wr);
-	}
+	auto read_callback() { return read_port.bind(); }
+	auto write_callback() { return write_port.bind(); }
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;

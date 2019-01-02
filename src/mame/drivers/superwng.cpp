@@ -35,6 +35,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -44,8 +45,8 @@ TODO:
 class superwng_state : public driver_device
 {
 public:
-	superwng_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	superwng_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_videoram_bg(*this, "videorabg"),
@@ -56,6 +57,14 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void superwng(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<uint8_t> m_videoram_bg;
@@ -90,14 +99,11 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(superwng);
+	void superwng_palette(palette_device &palette) const;
 	uint32_t screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(superwng_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(superwng_sound_nmi_assert);
-	void superwng(machine_config &config);
+
 	void superwng_map(address_map &map);
 	void superwng_sound_map(address_map &map);
 };
@@ -198,7 +204,7 @@ uint32_t superwng_state::screen_update_superwng(screen_device &screen, bitmap_in
 }
 
 
-static const uint8_t superwng_colors[]= /* temporary */
+static constexpr uint8_t superwng_colors[]= /* temporary */
 {
 	0x00, 0xc4, 0xff, 0x87, 0x00, 0xb0, 0xff, 0x2f, 0x00, 0x07, 0xff, 0xe0, 0x00, 0x86, 0xff, 0xc6,
 	0x00, 0x07, 0x3f, 0xff, 0x00, 0xb0, 0x38, 0x27, 0x00, 0x20, 0xff, 0x27, 0x00, 0xa4, 0xff, 0x87,
@@ -206,31 +212,27 @@ static const uint8_t superwng_colors[]= /* temporary */
 	0x00, 0xc0, 0x07, 0x3f, 0x00, 0x1f, 0x3f, 0xff, 0x00, 0x86, 0x05, 0xff, 0x00, 0xc0, 0xe8, 0xff
 };
 
-PALETTE_INIT_MEMBER(superwng_state, superwng)
+void superwng_state::superwng_palette(palette_device &palette) const
 {
-	int i;
-	const uint8_t * ptr=superwng_colors;
-
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		bit0 = BIT(*ptr, 0);
-		bit1 = BIT(*ptr, 1);
-		bit2 = BIT(*ptr, 2);
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(superwng_colors[i], 0);
+		bit1 = BIT(superwng_colors[i], 1);
+		bit2 = BIT(superwng_colors[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		bit0 = BIT(*ptr, 3);
-		bit1 = BIT(*ptr, 4);
-		bit2 = BIT(*ptr, 5);
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(superwng_colors[i], 3);
+		bit1 = BIT(superwng_colors[i], 4);
+		bit2 = BIT(superwng_colors[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		bit0 = BIT(*ptr, 6);
-		bit1 = BIT(*ptr, 7);
-		b = 0x4f * bit0 + 0xa8 * bit1;
+		bit0 = BIT(superwng_colors[i], 6);
+		bit1 = BIT(superwng_colors[i], 7);
+		int const b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
-		++ptr;
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -325,32 +327,32 @@ void superwng_state::superwng_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x6fff).bankr("bank1");
 	map(0x7000, 0x7fff).ram();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(superwng_state::superwng_bg_vram_w)).share("videorabg");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(superwng_state::superwng_fg_vram_w)).share("videorafg");
-	map(0x8800, 0x8bff).ram().w(this, FUNC(superwng_state::superwng_bg_cram_w)).share("colorrabg");
-	map(0x8c00, 0x8fff).ram().w(this, FUNC(superwng_state::superwng_fg_cram_w)).share("colorrafg");
+	map(0x8000, 0x83ff).ram().w(FUNC(superwng_state::superwng_bg_vram_w)).share("videorabg");
+	map(0x8400, 0x87ff).ram().w(FUNC(superwng_state::superwng_fg_vram_w)).share("videorafg");
+	map(0x8800, 0x8bff).ram().w(FUNC(superwng_state::superwng_bg_cram_w)).share("colorrabg");
+	map(0x8c00, 0x8fff).ram().w(FUNC(superwng_state::superwng_fg_cram_w)).share("colorrafg");
 	map(0x9800, 0x99ff).ram();
 	map(0xa000, 0xa000).portr("P1");
-	map(0xa000, 0xa000).w(this, FUNC(superwng_state::superwng_hopper_w));
+	map(0xa000, 0xa000).w(FUNC(superwng_state::superwng_hopper_w));
 	map(0xa080, 0xa080).portr("P2");
 	map(0xa100, 0xa100).portr("DSW1");
-	map(0xa100, 0xa100).w(this, FUNC(superwng_state::superwng_sound_interrupt_w));
+	map(0xa100, 0xa100).w(FUNC(superwng_state::superwng_sound_interrupt_w));
 	map(0xa180, 0xa180).portr("DSW2");
 	map(0xa180, 0xa180).nopw(); // watchdog? int ack?
-	map(0xa181, 0xa181).w(this, FUNC(superwng_state::superwng_nmi_enable_w));
-	map(0xa182, 0xa182).w(this, FUNC(superwng_state::superwng_tilebank_w));
-	map(0xa183, 0xa183).w(this, FUNC(superwng_state::superwng_flip_screen_w));
-	map(0xa184, 0xa184).w(this, FUNC(superwng_state::superwng_cointcnt1_w));
-	map(0xa185, 0xa185).w(this, FUNC(superwng_state::superwng_unk_a185_w));  // unknown, always(?) 0
-	map(0xa186, 0xa186).w(this, FUNC(superwng_state::superwng_cointcnt2_w));
-	map(0xa187, 0xa187).w(this, FUNC(superwng_state::superwng_unk_a187_w)); // unknown, always(?) 0
+	map(0xa181, 0xa181).w(FUNC(superwng_state::superwng_nmi_enable_w));
+	map(0xa182, 0xa182).w(FUNC(superwng_state::superwng_tilebank_w));
+	map(0xa183, 0xa183).w(FUNC(superwng_state::superwng_flip_screen_w));
+	map(0xa184, 0xa184).w(FUNC(superwng_state::superwng_cointcnt1_w));
+	map(0xa185, 0xa185).w(FUNC(superwng_state::superwng_unk_a185_w));  // unknown, always(?) 0
+	map(0xa186, 0xa186).w(FUNC(superwng_state::superwng_cointcnt2_w));
+	map(0xa187, 0xa187).w(FUNC(superwng_state::superwng_unk_a187_w)); // unknown, always(?) 0
 }
 
 void superwng_state::superwng_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x3000, 0x3000).w(this, FUNC(superwng_state::superwng_sound_nmi_clear_w));
+	map(0x3000, 0x3000).w(FUNC(superwng_state::superwng_sound_nmi_clear_w));
 	map(0x4000, 0x4000).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x5000, 0x5000).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x6000, 0x6000).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
@@ -456,7 +458,7 @@ static const gfx_layout spritelayout =
 	16*8*4
 };
 
-static GFXDECODE_START( superwng )
+static GFXDECODE_START( gfx_superwng )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout,     0, 16 )
 GFXDECODE_END
@@ -478,13 +480,13 @@ void superwng_state::machine_reset()
 MACHINE_CONFIG_START(superwng_state::superwng)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(superwng_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", superwng_state,  superwng_nmi_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(superwng_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", superwng_state,  superwng_nmi_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(superwng_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(superwng_state, superwng_sound_nmi_assert,  4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(superwng_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(superwng_state, superwng_sound_nmi_assert,  4*60)
 
 
 	/* video hardware */
@@ -494,21 +496,19 @@ MACHINE_CONFIG_START(superwng_state::superwng)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(superwng_state, screen_update_superwng)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", superwng)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superwng);
 
-	MCFG_PALETTE_ADD("palette", 0x40)
-	MCFG_PALETTE_INIT_OWNER(superwng_state, superwng)
+	PALETTE(config, m_palette, FUNC(superwng_state::superwng_palette), 0x40);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(superwng_state, superwng_sound_byte_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &ay1(AY8910(config, "ay1", MASTER_CLOCK/12));
+	ay1.port_a_read_callback().set(FUNC(superwng_state::superwng_sound_byte_r));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_SOUND_ADD("ay2", AY8910, MASTER_CLOCK/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, "ay2", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 ROM_START( superwng )
@@ -530,4 +530,4 @@ ROM_START( superwng )
 ROM_END
 
 
-GAME( 1985, superwng,   0,      superwng, superwng, superwng_state, 0, ROT90, "Wing", "Super Wing", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // crashes after bonus stage, see notes, bad rom?
+GAME( 1985, superwng,   0,      superwng, superwng, superwng_state, empty_init, ROT90, "Wing", "Super Wing", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // crashes after bonus stage, see notes, bad rom?

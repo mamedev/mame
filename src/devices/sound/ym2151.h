@@ -37,19 +37,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_YM2151_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, YM2151, _clock)
-
-#define MCFG_YM2151_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<ym2151_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-#define MCFG_YM2151_PORT_WRITE_HANDLER(_devcb) \
-	devcb = &downcast<ym2151_device &>(*device).set_port_write_handler(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -64,8 +51,8 @@ public:
 	ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irqhandler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_port_write_handler(Object &&cb) { return m_portwritehandler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irqhandler.bind(); }
+	auto port_write_handler() { return m_portwritehandler.bind(); }
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);

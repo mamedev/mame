@@ -50,12 +50,14 @@ public:
 
 	void goldhexa(machine_config &config);
 	void hexapres(machine_config &config);
+
+private:
 	void audio_io_map(address_map &map);
 	void audio_mem_map(address_map &map);
 	void hexapres_audio_io_map(address_map &map);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -95,41 +97,45 @@ void yuvomz80_state::hexapres_audio_io_map(address_map &map)
 static INPUT_PORTS_START( goldhexa )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(yuvomz80_state::goldhexa)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+void yuvomz80_state::goldhexa(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(8'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &yuvomz80_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &yuvomz80_state::io_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(audio_mem_map)
-	MCFG_CPU_IO_MAP(audio_io_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(8'000'000)));
+	audiocpu.set_addrmap(AS_PROGRAM, &yuvomz80_state::audio_mem_map);
+	audiocpu.set_addrmap(AS_IO, &yuvomz80_state::audio_io_map);
 
-	MCFG_DEVICE_ADD("ppi0", I8255A, 0)
-	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
-	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
-	MCFG_DEVICE_ADD("ppi3", I8255A, 0)
+	I8255A(config, "ppi0", 0);
+	I8255A(config, "ppi1", 0);
+	I8255A(config, "ppi2", 0);
+	I8255A(config, "ppi3", 0);
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-MACHINE_CONFIG_END
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-MACHINE_CONFIG_START(yuvomz80_state::hexapres)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000))
-	MCFG_DEVICE_DISABLE()
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
+	ymz.add_route(0, "lspeaker", 1.00);
+	ymz.add_route(1, "rspeaker", 1.00);
+}
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(audio_mem_map)
-	MCFG_CPU_IO_MAP(hexapres_audio_io_map)
+void yuvomz80_state::hexapres(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(8'000'000));
+	m_maincpu->set_disable();
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000) // type guessed
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-	MCFG_SOUND_ROUTE(2, "mono", 1.0)
-MACHINE_CONFIG_END
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(8'000'000)));
+	audiocpu.set_addrmap(AS_PROGRAM, &yuvomz80_state::audio_mem_map);
+	audiocpu.set_addrmap(AS_IO, &yuvomz80_state::hexapres_audio_io_map);
+
+	SPEAKER(config, "mono").front_center();
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000)); // type guessed
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(2, "mono", 1.0);
+}
 
 
 ROM_START( goldhexa )
@@ -158,5 +164,5 @@ ROM_START( hexapres )
 	ROM_LOAD( "ghp_voib.bin",  0x00000, 0x80000, CRC(8be745fe) SHA1(840bbb212c8c519f2e4633f8db731fcf3f55635a) )
 ROM_END
 
-GAME( 200?, goldhexa, 0, goldhexa, goldhexa, yuvomz80_state, 0, ROT0, "Yubis", "Golden Hexa", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hexapres, 0, hexapres, goldhexa, yuvomz80_state, 0, ROT0, "Yubis", "Hexa President", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, goldhexa, 0, goldhexa, goldhexa, yuvomz80_state, empty_init, ROT0, "Yubis", "Golden Hexa", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hexapres, 0, hexapres, goldhexa, yuvomz80_state, empty_init, ROT0, "Yubis", "Hexa President", MACHINE_IS_SKELETON_MECHANICAL )

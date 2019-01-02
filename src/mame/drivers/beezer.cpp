@@ -34,6 +34,7 @@
 #include "sound/mm5837.h"
 #include "sound/dac76.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -45,8 +46,8 @@
 class beezer_state : public driver_device
 {
 public:
-	beezer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	beezer_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sysbank(*this, "sysbank"),
 		m_banked_roms(*this, "banked"),
@@ -59,7 +60,8 @@ public:
 		m_via_audio(*this, "via_u18"),
 		m_ptm(*this, "ptm"),
 		m_dac(*this, "dac"),
-		m_timer_count(nullptr),
+		m_dac_timer(nullptr),
+		m_scanline_timer(nullptr),
 		m_count(0), m_noise(0),
 		m_pbus(0xff), m_x(0), m_y(0), m_z(0)
 	{
@@ -67,9 +69,10 @@ public:
 		m_dac_data[0] = m_dac_data[1] = m_dac_data[2] = m_dac_data[3] = 0;
 	}
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
-	uint32_t screen_update_beezer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(beezer);
+	void scanline_cb();
+	void dac_update_cb();
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void palette_init(palette_device &palette);
 	DECLARE_WRITE8_MEMBER(palette_w);
 	DECLARE_READ8_MEMBER(line_r);
 
@@ -97,6 +100,13 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	enum
+	{
+		TIMER_DAC,
+		TIMER_SCANLINE
+	};
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
@@ -117,7 +127,8 @@ private:
 	double m_weights_g[3];
 	double m_weights_b[2];
 
-	emu_timer *m_timer_count;
+	emu_timer *m_dac_timer;
+	emu_timer *m_scanline_timer;
 
 	int m_ch_sign[4];
 	uint8_t m_dac_data[4];
@@ -137,7 +148,7 @@ void beezer_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).ram().share("videoram");
 	map(0xc000, 0xcfff).m(m_sysbank, FUNC(address_map_bank_device::amap8));
-	map(0xd000, 0xdfff).rom().region("maincpu", 0x0000).w(this, FUNC(beezer_state::bankswitch_w)); // g1
+	map(0xd000, 0xdfff).rom().region("maincpu", 0x0000).w(FUNC(beezer_state::bankswitch_w)); // g1
 	map(0xe000, 0xefff).rom().region("maincpu", 0x1000); // g3
 	map(0xf000, 0xffff).rom().region("maincpu", 0x2000); // g5
 }
@@ -145,8 +156,8 @@ void beezer_state::main_map(address_map &map)
 void beezer_state::banked_map(address_map &map)
 {
 	map(0x0600, 0x0600).mirror(0x1ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x0800, 0x080f).mirror(0x1f0).w(this, FUNC(beezer_state::palette_w));
-	map(0x0a00, 0x0a00).mirror(0x1ff).r(this, FUNC(beezer_state::line_r));
+	map(0x0800, 0x080f).mirror(0x1f0).w(FUNC(beezer_state::palette_w));
+	map(0x0a00, 0x0a00).mirror(0x1ff).r(FUNC(beezer_state::line_r));
 	map(0x0e00, 0x0e0f).mirror(0x1f0).rw("via_u6", FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0x1000, 0x1fff).bankr("rombank_f1");
 	map(0x2000, 0x2fff).bankr("rombank_f3");
@@ -163,7 +174,7 @@ void beezer_state::sound_map(address_map &map)
 	map(0x0800, 0x0fff).ram(); // 2d, optional (can be rom)
 	map(0x1000, 0x1007).mirror(0x07f8).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x1800, 0x180f).mirror(0x07f0).rw(m_via_audio, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x8000, 0x8003).mirror(0x1ffc).w(this, FUNC(beezer_state::dac_w));
+	map(0x8000, 0x8003).mirror(0x1ffc).w(FUNC(beezer_state::dac_w));
 //  AM_RANGE(0xa000, 0xbfff) AM_ROM // 2d (can be ram, unpopulated)
 //  AM_RANGE(0xc000, 0xdfff) AM_ROM // 4d (unpopulated)
 	map(0xe000, 0xffff).rom().region("audiocpu", 0); // 6d
@@ -222,19 +233,24 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-TIMER_DEVICE_CALLBACK_MEMBER( beezer_state::scanline_cb )
+void beezer_state::scanline_cb()
 {
+	const int scanline = m_screen->vpos();
+
 	// TDISP, each 32 lines
-	m_via_system->write_ca2((param & 32) ? 1 : 0);
+	m_via_system->write_ca2((scanline & 32) ? 1 : 0);
 
 	// actually unused by the game (points to a tight loop)
-	if (param == 240)
+	if (scanline == 240)
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 	else
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+
+
+	m_scanline_timer->adjust(m_screen->time_until_pos(scanline + 1));
 }
 
-uint32_t beezer_state::screen_update_beezer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t beezer_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -248,7 +264,7 @@ uint32_t beezer_state::screen_update_beezer(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(beezer_state, beezer)
+void beezer_state::palette_init(palette_device &device)
 {
 	const int resistances_rg[3] = { 1200, 560, 330 };
 	const int resistances_b[2]  = { 560, 330 };
@@ -281,6 +297,16 @@ READ8_MEMBER( beezer_state::line_r )
 //**************************************************************************
 
 void beezer_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_DAC: dac_update_cb(); break;
+	case TIMER_SCANLINE: scanline_cb(); break;
+	default: assert_always(false, "Unknown id in beezer_state::device_timer");
+	}
+}
+
+void beezer_state::dac_update_cb()
 {
 	// channel multiplexer at u52
 	int ch = m_count++ & 3;
@@ -437,7 +463,8 @@ void beezer_state::machine_start()
 		m_rombank[i]->configure_entries(0, 2, m_banked_roms->base() + (i * 0x2000), 0x1000);
 
 	// allocate timers
-	m_timer_count = timer_alloc(0);
+	m_dac_timer = timer_alloc(TIMER_DAC);
+	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
 
 	// register for state saving
 	save_pointer(NAME(m_ch_sign), 4);
@@ -458,7 +485,8 @@ void beezer_state::machine_reset()
 	bankswitch_w(machine().dummy_space(), 0, 0);
 
 	// start timer
-	m_timer_count->adjust(attotime::zero, 0, attotime::from_hz((XTAL(4'000'000) / 4) / 16));
+	m_dac_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL(4'000'000) / 4) / 16));
+	m_scanline_timer->adjust(m_screen->scan_period());
 }
 
 
@@ -466,74 +494,72 @@ void beezer_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(beezer_state::beezer)
+void beezer_state::beezer(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(12'000'000) / 3)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MC6809(config, m_maincpu, XTAL(12'000'000) / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &beezer_state::main_map);
 
-	MCFG_DEVICE_ADD("sysbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(15)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	ADDRESS_MAP_BANK(config, m_sysbank, 0);
+	m_sysbank->set_addrmap(AS_PROGRAM, &beezer_state::banked_map);
+	m_sysbank->set_endianness(ENDIANNESS_BIG);
+	m_sysbank->set_data_width(8);
+	m_sysbank->set_addr_width(15);
+	m_sysbank->set_stride(0x1000);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", beezer_state, scanline_cb, "screen", 0, 1)
+	VIA6522(config, m_via_system, XTAL(12'000'000) / 12);
+	m_via_system->readpa_handler().set(FUNC(beezer_state::via_system_pa_r));
+	m_via_system->readpb_handler().set(FUNC(beezer_state::via_system_pb_r));
+	m_via_system->writepa_handler().set(FUNC(beezer_state::via_system_pa_w));
+	m_via_system->writepb_handler().set(FUNC(beezer_state::via_system_pb_w));
+	m_via_system->cb1_handler().set(m_via_audio, FUNC(via6522_device::write_ca2));
+	m_via_system->cb2_handler().set(m_via_audio, FUNC(via6522_device::write_ca1));
+	m_via_system->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("via_u6", VIA6522, XTAL(12'000'000) / 12)
-	MCFG_VIA6522_READPA_HANDLER(READ8(beezer_state, via_system_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(beezer_state, via_system_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(beezer_state, via_system_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(beezer_state, via_system_pb_w))
-	MCFG_VIA6522_CB1_HANDLER(DEVWRITELINE("via_u18", via6522_device, write_ca2))
-	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("via_u18", via6522_device, write_ca1))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(384, 256)
-	MCFG_SCREEN_VISIBLE_AREA(16, 304-1, 0, 240-1) // 288 x 240, correct?
-	MCFG_SCREEN_UPDATE_DRIVER(beezer_state, screen_update_beezer)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(384, 256);
+	m_screen->set_visarea(16, 304-1, 0, 240-1); // 288 x 240, correct?
+	m_screen->set_screen_update(FUNC(beezer_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(beezer_state, beezer)
+	PALETTE(config, m_palette, FUNC(beezer_state::palette_init), 16);
 
 	// sound hardware
-	MCFG_CPU_ADD("audiocpu", MC6809, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MC6809(config, m_audiocpu, XTAL(4'000'000));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &beezer_state::sound_map);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("audio_irqs")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", M6809_IRQ_LINE))
+	input_merger_device &audio_irqs(INPUT_MERGER_ANY_HIGH(config, "audio_irqs"));
+	audio_irqs.output_handler().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("via_u18", VIA6522, XTAL(4'000'000) / 4)
-	MCFG_VIA6522_READPA_HANDLER(READ8(beezer_state, via_audio_pa_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(beezer_state, via_audio_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(beezer_state, via_audio_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("via_u6", via6522_device, write_cb1))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(beezer_state, dmod_clr_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(beezer_state, dmod_data_w))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("audio_irqs", input_merger_device, in_w<0>))
+	VIA6522(config, m_via_audio, XTAL(4'000'000) / 4);
+	m_via_audio->readpa_handler().set(FUNC(beezer_state::via_audio_pa_r));
+	m_via_audio->writepa_handler().set(FUNC(beezer_state::via_audio_pa_w));
+	m_via_audio->writepb_handler().set(FUNC(beezer_state::via_audio_pb_w));
+	m_via_audio->ca2_handler().set(m_via_system, FUNC(via6522_device::write_cb1));
+	m_via_audio->cb1_handler().set(FUNC(beezer_state::dmod_clr_w));
+	m_via_audio->cb2_handler().set(FUNC(beezer_state::dmod_data_w));
+	m_via_audio->irq_handler().set("audio_irqs", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(4'000'000) / 4)
-	MCFG_PTM6840_O1_CB(WRITELINE(beezer_state, ptm_o1_w))
-	MCFG_PTM6840_O2_CB(WRITELINE(beezer_state, ptm_o2_w))
-	MCFG_PTM6840_O3_CB(WRITELINE(beezer_state, ptm_o3_w))
-	MCFG_PTM6840_IRQ_CB(DEVWRITELINE("audio_irqs", input_merger_device, in_w<1>))
+	PTM6840(config, m_ptm, XTAL(4'000'000) / 4);
+	m_ptm->o1_callback().set(FUNC(beezer_state::ptm_o1_w));
+	m_ptm->o2_callback().set(FUNC(beezer_state::ptm_o2_w));
+	m_ptm->o3_callback().set(FUNC(beezer_state::ptm_o3_w));
+	m_ptm->irq_callback().set("audio_irqs", FUNC(input_merger_device::in_w<1>));
 	// schematics show an input labeled VCO to channel 2, but the source is unknown
 
-	MCFG_MM5837_ADD("noise")
-	MCFG_MM5837_VDD(12)
-	MCFG_MM5837_OUTPUT_CB(WRITELINE(beezer_state, noise_w))
+	mm5837_device &noise(MM5837(config, "noise"));
+	noise.set_vdd_voltage(12);
+	noise.output_callback().set(FUNC(beezer_state::noise_w));
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC76, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "speaker").front_center();
+	DAC76(config, m_dac, 0);
+	m_dac->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
 //**************************************************************************
@@ -604,6 +630,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS         INIT  ROTATION  COMPANY            FULLNAME          FLAGS
-GAME( 1982, beezer,  0,      beezer,  beezer, beezer_state, 0,    ROT90,    "Tong Electronic", "Beezer (set 1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, beezer1, beezer, beezer,  beezer, beezer_state, 0,    ROT90,    "Tong Electronic", "Beezer (set 2)", MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME     PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY            FULLNAME          FLAGS
+GAME( 1982, beezer,  0,      beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (set 1)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, beezer1, beezer, beezer,  beezer, beezer_state, empty_init, ROT90,    "Tong Electronic", "Beezer (set 2)", MACHINE_IMPERFECT_SOUND )

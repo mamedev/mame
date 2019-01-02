@@ -46,14 +46,15 @@
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class carjmbre_state : public driver_device
 {
 public:
-	carjmbre_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	carjmbre_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_videoram(*this, "videoram"),
@@ -80,7 +81,7 @@ public:
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
-	DECLARE_PALETTE_INIT(carjmbre);
+	void carjmbre_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -117,10 +118,10 @@ static const res_net_decode_info carjmbre_decode_info =
 {
 	1,      // there may be two proms needed to construct color
 	0, 63,  // start/end
-	//  R,   G,   B,
-	{   0,   0,   0, },     // offsets
-	{   0,   3,   6, },     // shifts
-	{0x07,0x07,0x03, }      // masks
+	//  R,   G,   B
+	{   0,   0,   0 },     // offsets
+	{   0,   3,   6 },     // shifts
+	{0x07,0x07,0x03 }      // masks
 };
 
 static const res_net_info carjmbre_net_info =
@@ -133,7 +134,7 @@ static const res_net_info carjmbre_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(carjmbre_state, carjmbre)
+void carjmbre_state::carjmbre_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -244,11 +245,11 @@ WRITE8_MEMBER(carjmbre_state::flipscreen_w)
 void carjmbre_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8803, 0x8803).w(this, FUNC(carjmbre_state::nmi_enable_w));
-	map(0x8805, 0x8805).w(this, FUNC(carjmbre_state::bgcolor_w));
-	map(0x8807, 0x8807).w(this, FUNC(carjmbre_state::flipscreen_w));
+	map(0x8803, 0x8803).w(FUNC(carjmbre_state::nmi_enable_w));
+	map(0x8805, 0x8805).w(FUNC(carjmbre_state::bgcolor_w));
+	map(0x8807, 0x8807).w(FUNC(carjmbre_state::flipscreen_w));
 	map(0x8000, 0x87ff).ram(); // 6116
-	map(0x9000, 0x97ff).ram().w(this, FUNC(carjmbre_state::videoram_w)).share("videoram"); // 2114*4
+	map(0x9000, 0x97ff).ram().w(FUNC(carjmbre_state::videoram_w)).share("videoram"); // 2114*4
 	map(0x9800, 0x98ff).ram().share("spriteram"); // 5101*2
 	map(0xa000, 0xa000).portr("IN1");
 	map(0xa800, 0xa800).portr("IN2");
@@ -349,7 +350,7 @@ static const gfx_layout carjmbre_spritelayout =
 	16*8
 };
 
-static GFXDECODE_START( carjmbre )
+static GFXDECODE_START( gfx_carjmbre )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x2_planar, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, carjmbre_spritelayout, 0, 16 )
 GFXDECODE_END
@@ -358,13 +359,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(carjmbre_state::carjmbre)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", carjmbre_state, vblank_nmi)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", carjmbre_state, vblank_nmi)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'432'000)/6/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -373,22 +374,19 @@ MACHINE_CONFIG_START(carjmbre_state::carjmbre)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(carjmbre_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carjmbre)
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INIT_OWNER(carjmbre_state, carjmbre)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_carjmbre);
+	PALETTE(config, m_palette, FUNC(carjmbre_state::carjmbre_palette), 64);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/6/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay1", XTAL(18'432'000)/6/2).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'432'000)/6/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay2", XTAL(18'432'000)/6/2).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 
@@ -429,4 +427,4 @@ ROM_START( carjmbre )
 ROM_END
 
 
-GAME( 1983, carjmbre, 0, carjmbre, carjmbre, carjmbre_state, 0, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, carjmbre, 0, carjmbre, carjmbre, carjmbre_state, empty_init, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )

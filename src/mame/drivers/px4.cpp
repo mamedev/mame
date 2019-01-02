@@ -23,6 +23,8 @@
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
+#include "diserial.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -82,9 +84,14 @@ public:
 		m_centronics_busy(0), m_centronics_perror(0)
 	{ }
 
-	DECLARE_DRIVER_INIT( px4 );
+	void px4(machine_config &config);
 
-	DECLARE_PALETTE_INIT( px4 );
+	void init_px4();
+
+	DECLARE_INPUT_CHANGED_MEMBER( key_callback );
+
+protected:
+	void px4_palette(palette_device &palette) const;
 	uint32_t screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( icrlc_r );
@@ -115,7 +122,6 @@ public:
 	DECLARE_WRITE8_MEMBER( swr_w );
 	DECLARE_WRITE8_MEMBER( ioctlr_w );
 
-	DECLARE_INPUT_CHANGED_MEMBER( key_callback );
 
 	TIMER_DEVICE_CALLBACK_MEMBER( ext_cassette_read );
 	TIMER_DEVICE_CALLBACK_MEMBER( frc_tick );
@@ -133,10 +139,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
 	DECLARE_WRITE_LINE_MEMBER( centronics_perror_w ) { m_centronics_perror = state; }
 
-	void px4(machine_config &config);
 	void px4_io(address_map &map);
 	void px4_mem(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -147,7 +152,6 @@ protected:
 	virtual void rcv_callback() override;
 	virtual void rcv_complete() override;
 
-private:
 	// z80 interrupt sources
 	enum
 	{
@@ -253,29 +257,30 @@ class px4p_state : public px4_state
 {
 public:
 	px4p_state(const machine_config &mconfig, device_type type, const char *tag) :
-	px4_state(mconfig, type, tag),
-	m_rdnvram(*this, "rdnvram"),
-	m_rdsocket(*this, "ramdisk_socket"),
-	m_ramdisk_address(0),
-	m_ramdisk(nullptr)
+		px4_state(mconfig, type, tag),
+		m_rdnvram(*this, "rdnvram"),
+		m_rdsocket(*this, "ramdisk_socket"),
+		m_ramdisk_address(0),
+		m_ramdisk(nullptr)
 	{ }
 
-	DECLARE_DRIVER_INIT( px4p );
+	void px4p(machine_config &config);
 
-	DECLARE_PALETTE_INIT( px4p );
+	void init_px4p();
+
+private:
+	void px4p_palette(palette_device &palette) const;
 
 	DECLARE_WRITE8_MEMBER( ramdisk_address_w );
 	DECLARE_READ8_MEMBER( ramdisk_data_r );
 	DECLARE_WRITE8_MEMBER( ramdisk_data_w );
 	DECLARE_READ8_MEMBER( ramdisk_control_r );
 
-	void px4p(machine_config &config);
 	void px4p_io(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 
-private:
 	required_device<nvram_device> m_rdnvram;
 	required_device<generic_slot_device> m_rdsocket;
 
@@ -1214,16 +1219,16 @@ uint32_t px4_state::screen_update_px4(screen_device &screen, bitmap_ind16 &bitma
 //  DRIVER INIT
 //**************************************************************************
 
-DRIVER_INIT_MEMBER( px4_state, px4 )
+void px4_state::init_px4()
 {
 	// map os rom and last half of memory
 	membank("bank1")->set_base(memregion("os")->base());
 	membank("bank2")->set_base(m_ram->pointer() + 0x8000);
 }
 
-DRIVER_INIT_MEMBER( px4p_state, px4p )
+void px4p_state::init_px4p()
 {
-	DRIVER_INIT_CALL(px4);
+	init_px4();
 
 	// reserve memory for external ram-disk
 	m_ramdisk = std::make_unique<uint8_t[]>(0x20000);
@@ -1270,37 +1275,37 @@ void px4_state::px4_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	// gapnit, 0x00-0x07
-	map(0x00, 0x00).rw(this, FUNC(px4_state::icrlc_r), FUNC(px4_state::ctrl1_w));
-	map(0x01, 0x01).rw(this, FUNC(px4_state::icrhc_r), FUNC(px4_state::cmdr_w));
-	map(0x02, 0x02).rw(this, FUNC(px4_state::icrlb_r), FUNC(px4_state::ctrl2_w));
-	map(0x03, 0x03).r(this, FUNC(px4_state::icrhb_r));
-	map(0x04, 0x04).rw(this, FUNC(px4_state::isr_r), FUNC(px4_state::ier_w));
-	map(0x05, 0x05).rw(this, FUNC(px4_state::str_r), FUNC(px4_state::bankr_w));
-	map(0x06, 0x06).rw(this, FUNC(px4_state::sior_r), FUNC(px4_state::sior_w));
+	map(0x00, 0x00).rw(FUNC(px4_state::icrlc_r), FUNC(px4_state::ctrl1_w));
+	map(0x01, 0x01).rw(FUNC(px4_state::icrhc_r), FUNC(px4_state::cmdr_w));
+	map(0x02, 0x02).rw(FUNC(px4_state::icrlb_r), FUNC(px4_state::ctrl2_w));
+	map(0x03, 0x03).r(FUNC(px4_state::icrhb_r));
+	map(0x04, 0x04).rw(FUNC(px4_state::isr_r), FUNC(px4_state::ier_w));
+	map(0x05, 0x05).rw(FUNC(px4_state::str_r), FUNC(px4_state::bankr_w));
+	map(0x06, 0x06).rw(FUNC(px4_state::sior_r), FUNC(px4_state::sior_w));
 	map(0x07, 0x07).noprw();
 	// gapndl, 0x08-0x0f
-	map(0x08, 0x08).w(this, FUNC(px4_state::vadr_w));
-	map(0x09, 0x09).w(this, FUNC(px4_state::yoff_w));
-	map(0x0a, 0x0a).w(this, FUNC(px4_state::fr_w));
-	map(0x0b, 0x0b).w(this, FUNC(px4_state::spur_w));
+	map(0x08, 0x08).w(FUNC(px4_state::vadr_w));
+	map(0x09, 0x09).w(FUNC(px4_state::yoff_w));
+	map(0x0a, 0x0a).w(FUNC(px4_state::fr_w));
+	map(0x0b, 0x0b).w(FUNC(px4_state::spur_w));
 	map(0x0c, 0x0f).noprw();
 	// gapnio, 0x10-0x1f
-	map(0x10, 0x13).rw(this, FUNC(px4_state::ctgif_r), FUNC(px4_state::ctgif_w));
-	map(0x14, 0x14).rw(this, FUNC(px4_state::artdir_r), FUNC(px4_state::artdor_w));
-	map(0x15, 0x15).rw(this, FUNC(px4_state::artsr_r), FUNC(px4_state::artmr_w));
-	map(0x16, 0x16).rw(this, FUNC(px4_state::iostr_r), FUNC(px4_state::artcr_w));
-	map(0x17, 0x17).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x18, 0x18).w(this, FUNC(px4_state::swr_w));
-	map(0x19, 0x19).w(this, FUNC(px4_state::ioctlr_w));
+	map(0x10, 0x13).rw(FUNC(px4_state::ctgif_r), FUNC(px4_state::ctgif_w));
+	map(0x14, 0x14).rw(FUNC(px4_state::artdir_r), FUNC(px4_state::artdor_w));
+	map(0x15, 0x15).rw(FUNC(px4_state::artsr_r), FUNC(px4_state::artmr_w));
+	map(0x16, 0x16).rw(FUNC(px4_state::iostr_r), FUNC(px4_state::artcr_w));
+	map(0x17, 0x17).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x18, 0x18).w(FUNC(px4_state::swr_w));
+	map(0x19, 0x19).w(FUNC(px4_state::ioctlr_w));
 	map(0x1a, 0x1f).noprw();
 }
 
 void px4p_state::px4p_io(address_map &map)
 {
 	px4_io(map);
-	map(0x90, 0x92).w(this, FUNC(px4p_state::ramdisk_address_w));
-	map(0x93, 0x93).rw(this, FUNC(px4p_state::ramdisk_data_r), FUNC(px4p_state::ramdisk_data_w));
-	map(0x94, 0x94).r(this, FUNC(px4p_state::ramdisk_control_r));
+	map(0x90, 0x92).w(FUNC(px4p_state::ramdisk_address_w));
+	map(0x93, 0x93).rw(FUNC(px4p_state::ramdisk_data_r), FUNC(px4p_state::ramdisk_data_w));
+	map(0x94, 0x94).r(FUNC(px4p_state::ramdisk_control_r));
 }
 
 
@@ -1463,13 +1468,13 @@ INPUT_PORTS_END
 //  PALETTE
 //**************************************************************************
 
-PALETTE_INIT_MEMBER( px4_state, px4 )
+void px4_state::px4_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-PALETTE_INIT_MEMBER( px4p_state, px4p )
+void px4p_state::px4p_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(149, 157, 130));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -1482,9 +1487,9 @@ PALETTE_INIT_MEMBER( px4p_state, px4p )
 
 MACHINE_CONFIG_START(px4_state::px4)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(7'372'800) / 2)    // uPD70008
-	MCFG_CPU_PROGRAM_MAP(px4_mem)
-	MCFG_CPU_IO_MAP(px4_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(7'372'800) / 2)    // uPD70008
+	MCFG_DEVICE_PROGRAM_MAP(px4_mem)
+	MCFG_DEVICE_IO_MAP(px4_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -1494,28 +1499,25 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_SCREEN_UPDATE_DRIVER(px4_state, screen_update_px4)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_px4)
+	config.set_default_layout(layout_px4);
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(px4_state, px4)
+	PALETTE(config, "palette", FUNC(px4_state::px4_palette), 2);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("one_sec", px4_state, upd7508_1sec_callback, attotime::from_seconds(1))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("frc", px4_state, frc_tick, attotime::from_hz(XTAL(7'372'800) / 2 / 6))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64k")
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	RAM(config, RAM_TAG).set_default_size("64K");
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	// centronics printer
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(px4_state, centronics_busy_w))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(px4_state, centronics_perror_w))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, px4_state, centronics_busy_w))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, px4_state, centronics_perror_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -1527,15 +1529,15 @@ MACHINE_CONFIG_START(px4_state::px4)
 
 	// sio port
 	MCFG_EPSON_SIO_ADD("sio", nullptr)
-	MCFG_EPSON_SIO_RX(WRITELINE(px4_state, sio_rx_w))
-	MCFG_EPSON_SIO_PIN(WRITELINE(px4_state, sio_pin_w))
+	MCFG_EPSON_SIO_RX(WRITELINE(*this, px4_state, sio_rx_w))
+	MCFG_EPSON_SIO_PIN(WRITELINE(*this, px4_state, sio_pin_w))
 
 	// rs232 port
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(px4_state, rs232_rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(px4_state, rs232_dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(px4_state, rs232_dsr_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(px4_state, rs232_cts_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(FUNC(px4_state::rs232_rx_w));
+	m_rs232->dcd_handler().set(FUNC(px4_state::rs232_dcd_w));
+	m_rs232->dsr_handler().set(FUNC(px4_state::rs232_dsr_w));
+	m_rs232->cts_handler().set(FUNC(px4_state::rs232_cts_w));
 
 	// rom capsules
 	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px4_cart")
@@ -1548,13 +1550,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(px4p_state::px4p)
 	px4(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(px4p_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(px4p_io)
 
-	MCFG_NVRAM_ADD_0FILL("rdnvram")
+	NVRAM(config, "rdnvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(px4p_state, px4p)
+	subdevice<palette_device>("palette")->set_init(FUNC(px4p_state::px4p_palette));
 
 	MCFG_GENERIC_CARTSLOT_ADD("ramdisk_socket", generic_plain_slot, "px4_cart")
 MACHINE_CONFIG_END
@@ -1569,9 +1570,9 @@ MACHINE_CONFIG_END
 ROM_START( px4 )
 	ROM_REGION(0x8000, "os", 0)
 	ROM_SYSTEM_BIOS(0, "default",  "PX-4 OS ROM")
-	ROMX_LOAD("m25122aa_po_px4.10c", 0x0000, 0x8000, CRC(62d60dc6) SHA1(3d32ec79a317de7c84c378302e95f48d56505502), ROM_BIOS(1))
+	ROMX_LOAD("m25122aa_po_px4.10c", 0x0000, 0x8000, CRC(62d60dc6) SHA1(3d32ec79a317de7c84c378302e95f48d56505502), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "ramtest",  "PX-4/PX-8 DRAM Test Ver. 1.0")
-	ROMX_LOAD("ramtest.10c", 0x0000, 0x8000, CRC(f8aced5f) SHA1(a5a2f398e602aa349c3636d6659dd0c7eaba07fb), ROM_BIOS(2))
+	ROMX_LOAD("ramtest.10c", 0x0000, 0x8000, CRC(f8aced5f) SHA1(a5a2f398e602aa349c3636d6659dd0c7eaba07fb), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "slave", 0)
 	ROM_LOAD("upd7508.bin", 0x0000, 0x1000, NO_DUMP)
@@ -1580,9 +1581,9 @@ ROM_END
 ROM_START( px4p )
 	ROM_REGION(0x8000, "os", 0)
 	ROM_SYSTEM_BIOS(0, "default",  "PX-4+ OS ROM")
-	ROMX_LOAD("b0_pxa.10c", 0x0000, 0x8000, CRC(d74b9ef5) SHA1(baceee076c12f5a16f7a26000e9bc395d021c455), ROM_BIOS(1))
+	ROMX_LOAD("b0_pxa.10c", 0x0000, 0x8000, CRC(d74b9ef5) SHA1(baceee076c12f5a16f7a26000e9bc395d021c455), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "ramtest",  "PX-4/PX-8 DRAM Test Ver. 1.0")
-	ROMX_LOAD("ramtest.10c", 0x0000, 0x8000, CRC(f8aced5f) SHA1(a5a2f398e602aa349c3636d6659dd0c7eaba07fb), ROM_BIOS(2))
+	ROMX_LOAD("ramtest.10c", 0x0000, 0x8000, CRC(f8aced5f) SHA1(a5a2f398e602aa349c3636d6659dd0c7eaba07fb), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "slave", 0)
 	ROM_LOAD("upd7508.bin", 0x0000, 0x1000, NO_DUMP)
@@ -1593,6 +1594,6 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT      CLASS       INIT  COMPANY  FULLNAME  FLAGS
-COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4_state,  px4,  "Epson", "PX-4",   0 )
-COMP( 1985, px4p, px4,    0,      px4p,    px4_h450a, px4p_state, px4p, "Epson", "PX-4+",  0 )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT      CLASS       INIT       COMPANY  FULLNAME  FLAGS
+COMP( 1985, px4,  0,      0,      px4,     px4_h450a, px4_state,  init_px4,  "Epson", "PX-4",   0 )
+COMP( 1985, px4p, px4,    0,      px4p,    px4_h450a, px4p_state, init_px4p, "Epson", "PX-4+",  0 )

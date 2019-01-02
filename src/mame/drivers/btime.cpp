@@ -190,13 +190,13 @@ void btime_state::btime_map(address_map &map)
 	map(0x0c00, 0x0c0f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x1000, 0x13ff).ram().share("videoram");
 	map(0x1400, 0x17ff).ram().share("colorram");
-	map(0x1800, 0x1bff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
-	map(0x1c00, 0x1fff).rw(this, FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
+	map(0x1800, 0x1bff).rw(FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
+	map(0x1c00, 0x1fff).rw(FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
 	map(0x4000, 0x4000).portr("P1").nopw();
 	map(0x4001, 0x4001).portr("P2");
-	map(0x4002, 0x4002).portr("SYSTEM").w(this, FUNC(btime_state::btime_video_control_w));
+	map(0x4002, 0x4002).portr("SYSTEM").w(FUNC(btime_state::btime_video_control_w));
 	map(0x4003, 0x4003).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x4004, 0x4004).portr("DSW2").w(this, FUNC(btime_state::bnj_scroll1_w));
+	map(0x4004, 0x4004).portr("DSW2").w(FUNC(btime_state::bnj_scroll1_w));
 	map(0xb000, 0xffff).rom();
 }
 
@@ -206,12 +206,12 @@ void btime_state::cookrace_map(address_map &map)
 	map(0x0500, 0x3fff).rom();
 	map(0xc000, 0xc3ff).ram().share("videoram");
 	map(0xc400, 0xc7ff).ram().share("colorram");
-	map(0xc800, 0xcbff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
-	map(0xcc00, 0xcfff).rw(this, FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
+	map(0xc800, 0xcbff).rw(FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
+	map(0xcc00, 0xcfff).rw(FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
 	map(0xd000, 0xd0ff).ram();                         /* background? */
 	map(0xd100, 0xd3ff).ram();                         /* ? */
 	map(0xd400, 0xd7ff).ram().share("bnj_bgram");
-	map(0xe000, 0xe000).portr("DSW1").w(this, FUNC(btime_state::bnj_video_control_w));
+	map(0xe000, 0xe000).portr("DSW1").w(FUNC(btime_state::bnj_video_control_w));
 	map(0xe300, 0xe300).portr("DSW1");   /* mirror address used on high score name entry */
 													/* screen */
 	map(0xe001, 0xe001).portr("DSW2").w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -227,14 +227,14 @@ void btime_state::tisland_map(address_map &map)
 	map(0x0c00, 0x0c0f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x1000, 0x13ff).ram().share("videoram");
 	map(0x1400, 0x17ff).ram().share("colorram");
-	map(0x1800, 0x1bff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
-	map(0x1c00, 0x1fff).rw(this, FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
+	map(0x1800, 0x1bff).rw(FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
+	map(0x1c00, 0x1fff).rw(FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
 	map(0x4000, 0x4000).portr("P1").nopw();
 	map(0x4001, 0x4001).portr("P2");
-	map(0x4002, 0x4002).portr("SYSTEM").w(this, FUNC(btime_state::btime_video_control_w));
+	map(0x4002, 0x4002).portr("SYSTEM").w(FUNC(btime_state::btime_video_control_w));
 	map(0x4003, 0x4003).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x4004, 0x4004).portr("DSW2").w(this, FUNC(btime_state::bnj_scroll1_w));
-	map(0x4005, 0x4005).w(this, FUNC(btime_state::bnj_scroll2_w));
+	map(0x4004, 0x4004).portr("DSW2").w(FUNC(btime_state::bnj_scroll1_w));
+	map(0x4005, 0x4005).w(FUNC(btime_state::bnj_scroll2_w));
 	map(0x9000, 0xffff).rom();
 }
 
@@ -243,16 +243,16 @@ void btime_state::zoar_map(address_map &map)
 	map(0x0000, 0x07ff).ram().share("rambase");
 	map(0x8000, 0x83ff).writeonly().share("videoram");
 	map(0x8400, 0x87ff).writeonly().share("colorram");
-	map(0x8800, 0x8bff).w(this, FUNC(btime_state::btime_mirrorvideoram_w));
-	map(0x8c00, 0x8fff).w(this, FUNC(btime_state::btime_mirrorcolorram_w));
-	map(0x9000, 0x9000).w(this, FUNC(btime_state::zoar_video_control_w));
-	map(0x9800, 0x9800).r(this, FUNC(btime_state::zoar_dsw1_read));
+	map(0x8800, 0x8bff).w(FUNC(btime_state::btime_mirrorvideoram_w));
+	map(0x8c00, 0x8fff).w(FUNC(btime_state::btime_mirrorcolorram_w));
+	map(0x9000, 0x9000).w(FUNC(btime_state::zoar_video_control_w));
+	map(0x9800, 0x9800).r(FUNC(btime_state::zoar_dsw1_read));
 	map(0x9801, 0x9801).portr("DSW2");
 	map(0x9802, 0x9802).portr("P1");
 	map(0x9803, 0x9803).portr("P2");
 	map(0x9800, 0x9803).writeonly().share("zoar_scrollram");
-	map(0x9804, 0x9804).portr("SYSTEM").w(this, FUNC(btime_state::bnj_scroll2_w));
-	map(0x9805, 0x9805).w(this, FUNC(btime_state::bnj_scroll1_w));
+	map(0x9804, 0x9804).portr("SYSTEM").w(FUNC(btime_state::bnj_scroll2_w));
+	map(0x9805, 0x9805).w(FUNC(btime_state::bnj_scroll1_w));
 	map(0x9806, 0x9806).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xd000, 0xffff).rom();
 }
@@ -260,11 +260,11 @@ void btime_state::zoar_map(address_map &map)
 void btime_state::lnc_map(address_map &map)
 {
 	map(0x0000, 0x3bff).ram().share("rambase");
-	map(0x3c00, 0x3fff).ram().w(this, FUNC(btime_state::lnc_videoram_w)).share("videoram");
+	map(0x3c00, 0x3fff).ram().w(FUNC(btime_state::lnc_videoram_w)).share("videoram");
 	map(0x7800, 0x7bff).writeonly().share("colorram");  /* this is just here to initialize the pointer */
-	map(0x7c00, 0x7fff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::lnc_mirrorvideoram_w));
+	map(0x7c00, 0x7fff).rw(FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::lnc_mirrorvideoram_w));
 	map(0x8000, 0x8000).portr("DSW1").nopw();     /* ??? */
-	map(0x8001, 0x8001).portr("DSW2").w(this, FUNC(btime_state::bnj_video_control_w));
+	map(0x8001, 0x8001).portr("DSW2").w(FUNC(btime_state::bnj_video_control_w));
 	map(0x8003, 0x8003).writeonly().share("lnc_charbank");
 	map(0x9000, 0x9000).portr("P1").nopw();     /* IRQ ack??? */
 	map(0x9001, 0x9001).portr("P2");
@@ -276,16 +276,16 @@ void btime_state::lnc_map(address_map &map)
 void btime_state::mmonkey_map(address_map &map)
 {
 	map(0x0000, 0x3bff).ram().share("rambase");
-	map(0x3c00, 0x3fff).ram().w(this, FUNC(btime_state::lnc_videoram_w)).share("videoram");
+	map(0x3c00, 0x3fff).ram().w(FUNC(btime_state::lnc_videoram_w)).share("videoram");
 	map(0x7800, 0x7bff).writeonly().share("colorram");      /* this is just here to initialize the pointer */
-	map(0x7c00, 0x7fff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::lnc_mirrorvideoram_w));
+	map(0x7c00, 0x7fff).rw(FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::lnc_mirrorvideoram_w));
 	map(0x8000, 0x8000).portr("DSW1");
-	map(0x8001, 0x8001).portr("DSW2").w(this, FUNC(btime_state::bnj_video_control_w));
+	map(0x8001, 0x8001).portr("DSW2").w(FUNC(btime_state::bnj_video_control_w));
 	map(0x8003, 0x8003).writeonly().share("lnc_charbank");
 	map(0x9000, 0x9000).portr("P1").nopw(); /* IRQ ack??? */
 	map(0x9001, 0x9001).portr("P2");
 	map(0x9002, 0x9002).portr("SYSTEM").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xb000, 0xbfff).rw(this, FUNC(btime_state::mmonkey_protection_r), FUNC(btime_state::mmonkey_protection_w));
+	map(0xb000, 0xbfff).rw(FUNC(btime_state::mmonkey_protection_r), FUNC(btime_state::mmonkey_protection_w));
 	map(0xc000, 0xffff).rom();
 }
 
@@ -293,18 +293,18 @@ void btime_state::bnj_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("rambase");
 	map(0x1000, 0x1000).portr("DSW1");
-	map(0x1001, 0x1001).portr("DSW2").w(this, FUNC(btime_state::bnj_video_control_w));
+	map(0x1001, 0x1001).portr("DSW2").w(FUNC(btime_state::bnj_video_control_w));
 	map(0x1002, 0x1002).portr("P1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1003, 0x1003).portr("P2");
 	map(0x1004, 0x1004).portr("SYSTEM");
 	map(0x4000, 0x43ff).ram().share("videoram");
 	map(0x4400, 0x47ff).ram().share("colorram");
-	map(0x4800, 0x4bff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
-	map(0x4c00, 0x4fff).rw(this, FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
-	map(0x5000, 0x51ff).ram().w(this, FUNC(btime_state::bnj_background_w)).share("bnj_bgram");
+	map(0x4800, 0x4bff).rw(FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
+	map(0x4c00, 0x4fff).rw(FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
+	map(0x5000, 0x51ff).ram().w(FUNC(btime_state::bnj_background_w)).share("bnj_bgram");
 	map(0x5200, 0x53ff).ram();
-	map(0x5400, 0x5400).w(this, FUNC(btime_state::bnj_scroll1_w));
-	map(0x5800, 0x5800).w(this, FUNC(btime_state::bnj_scroll2_w));
+	map(0x5400, 0x5400).w(FUNC(btime_state::bnj_scroll1_w));
+	map(0x5800, 0x5800).w(FUNC(btime_state::bnj_scroll2_w));
 	map(0x5c00, 0x5c0f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xa000, 0xffff).rom();
 }
@@ -312,7 +312,7 @@ void btime_state::bnj_map(address_map &map)
 void btime_state::disco_map(address_map &map)
 {
 	map(0x0000, 0x04ff).ram().share("rambase");
-	map(0x2000, 0x7fff).ram().w(this, FUNC(btime_state::deco_charram_w)).share("deco_charram");
+	map(0x2000, 0x7fff).ram().w(FUNC(btime_state::deco_charram_w)).share("deco_charram");
 	map(0x8000, 0x83ff).ram().share("videoram");
 	map(0x8400, 0x87ff).ram().share("colorram");
 	map(0x8800, 0x881f).ram().share("spriteram");
@@ -321,7 +321,7 @@ void btime_state::disco_map(address_map &map)
 	map(0x9400, 0x9400).portr("P2");
 	map(0x9800, 0x9800).portr("DSW1");
 	map(0x9a00, 0x9a00).portr("DSW2").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x9c00, 0x9c00).portr("VBLANK").w(this, FUNC(btime_state::disco_video_control_w));
+	map(0x9c00, 0x9c00).portr("VBLANK").w(FUNC(btime_state::disco_video_control_w));
 	map(0xa000, 0xffff).rom();
 }
 
@@ -335,7 +335,7 @@ void btime_state::audio_map(address_map &map)
 	map(0x6000, 0x7fff).w("ay2", FUNC(ay8910_device::data_w));
 	map(0x8000, 0x9fff).w("ay2", FUNC(ay8910_device::address_w));
 	map(0xa000, 0xbfff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xc000, 0xdfff).w(this, FUNC(btime_state::audio_nmi_enable_w));
+	map(0xc000, 0xdfff).w(FUNC(btime_state::audio_nmi_enable_w));
 	map(0xe000, 0xefff).mirror(0x1000).rom();
 }
 
@@ -1104,36 +1104,36 @@ static const gfx_layout bnj_tile16layout =
 	64*8
 };
 
-static GFXDECODE_START( btime )
+static GFXDECODE_START( gfx_btime )
 	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
 	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, tile16layout,    8, 1 ) /* background tiles */
 GFXDECODE_END
 
-static GFXDECODE_START( cookrace )
+static GFXDECODE_START( gfx_cookrace )
 	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
 	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, tile8layout,     8, 1 ) /* background tiles */
 GFXDECODE_END
 
-static GFXDECODE_START( lnc )
+static GFXDECODE_START( gfx_lnc )
 	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
 	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
 GFXDECODE_END
 
-static GFXDECODE_START( bnj )
+static GFXDECODE_START( gfx_bnj )
 	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 1 ) /* char set #1 */
 	GFXDECODE_ENTRY( "gfx1", 0, tile16layout,    0, 1 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, bnj_tile16layout,8, 1 ) /* background tiles */
 GFXDECODE_END
 
-static GFXDECODE_START( zoar )
+static GFXDECODE_START( gfx_zoar )
 	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 8 ) /* char set #1 */
 	GFXDECODE_ENTRY( "gfx3", 0, tile16layout,    0, 8 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, tile16layout,    0, 8 ) /* background tiles */
 GFXDECODE_END
 
-static GFXDECODE_START( disco )
+static GFXDECODE_START( gfx_disco )
 	GFXDECODE_ENTRY( nullptr, 0, disco_tile8layout,  0, 4 ) /* char set #1 */
 	GFXDECODE_ENTRY( nullptr, 0, disco_tile16layout, 0, 4 ) /* sprites */
 GFXDECODE_END
@@ -1188,7 +1188,7 @@ static const discrete_mixer_desc btime_sound_mixer_desc =
 static const discrete_op_amp_filt_info btime_opamp_desc =
 	{BTIME_R51, 0, BTIME_R50, 0, BTIME_R49, CAP_U(0.068), CAP_U(0.068), 0, 0, 5.0, -5.0};
 
-static DISCRETE_SOUND_START( btime_sound )
+static DISCRETE_SOUND_START( btime_sound_discrete )
 
 	DISCRETE_INPUTX_STREAM(NODE_01, 0, 5.0/32767.0, 0)
 	DISCRETE_INPUTX_STREAM(NODE_02, 1, 5.0/32767.0, 0)
@@ -1280,11 +1280,11 @@ MACHINE_RESET_MEMBER(btime_state,mmonkey)
 MACHINE_CONFIG_START(btime_state::btime)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO_CPU7, HCLK2)   /* seletable between H2/H4 via jumper */
-	MCFG_CPU_PROGRAM_MAP(btime_map)
+	MCFG_DEVICE_ADD("maincpu", DECO_CPU7, HCLK2)   /* seletable between H2/H4 via jumper */
+	MCFG_DEVICE_PROGRAM_MAP(btime_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, HCLK1/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("8vck", btime_state, audio_nmi_gen, "screen", 0, 8)
 
 	MCFG_INPUT_MERGER_ALL_HIGH("audionmi")
@@ -1294,40 +1294,37 @@ MACHINE_CONFIG_START(btime_state::btime)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_btime)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_MACHINE_START_OVERRIDE(btime_state,btime)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,btime)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", btime)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_btime)
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(btime_state,btime)
-	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
+	PALETTE(config, m_palette, FUNC(btime_state::btime_palette)).set_format(palette_device::BGR_233_inverted, 16);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_SOUND_ADD("ay1", AY8910, HCLK2)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(5), RES_K(5), RES_K(5))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(btime_state, ay_audio_nmi_enable_w))
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 2)
+	ay8910_device &ay1(AY8910(config, "ay1", HCLK2));
+	ay1.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay1.set_resistors_load(RES_K(5), RES_K(5), RES_K(5));
+	ay1.port_a_write_callback().set(FUNC(btime_state::ay_audio_nmi_enable_w));
+	ay1.add_route(0, "discrete", 1.0, 0);
+	ay1.add_route(1, "discrete", 1.0, 1);
+	ay1.add_route(2, "discrete", 1.0, 2);
 
-	MCFG_SOUND_ADD("ay2", AY8910, HCLK2)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(1), RES_K(5), RES_K(5))
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(1, "discrete", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(2, "discrete", 1.0, 5)
+	ay8910_device &ay2(AY8910(config, "ay2", HCLK2));
+	ay2.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay2.set_resistors_load(RES_K(1), RES_K(5), RES_K(5));
+	ay2.add_route(0, "discrete", 1.0, 3);
+	ay2.add_route(1, "discrete", 1.0, 4);
+	ay2.add_route(2, "discrete", 1.0, 5);
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(btime_sound)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, btime_sound_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1336,14 +1333,14 @@ MACHINE_CONFIG_START(btime_state::cookrace)
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK2)
-	MCFG_CPU_PROGRAM_MAP(cookrace_map)
+	MCFG_DEVICE_REPLACE("maincpu", DECO_C10707, HCLK2)
+	MCFG_DEVICE_PROGRAM_MAP(cookrace_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cookrace)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cookrace)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_cookrace)
@@ -1354,17 +1351,16 @@ MACHINE_CONFIG_START(btime_state::lnc)
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK2)
-	MCFG_CPU_PROGRAM_MAP(lnc_map)
+	MCFG_DEVICE_REPLACE("maincpu", DECO_C10707, HCLK2)
+	MCFG_DEVICE_PROGRAM_MAP(lnc_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,lnc)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", lnc)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lnc)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(8)
-	MCFG_PALETTE_INIT_OWNER(btime_state,lnc)
+	m_palette->set_entries(8);
+	m_palette->set_init(FUNC(btime_state::lnc_palette));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_lnc)
@@ -1386,8 +1382,8 @@ MACHINE_CONFIG_START(btime_state::mmonkey)
 	wtennis(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mmonkey_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mmonkey_map)
 
 	MCFG_MACHINE_START_OVERRIDE(btime_state,mmonkey)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,mmonkey)
@@ -1397,12 +1393,12 @@ MACHINE_CONFIG_START(btime_state::bnj)
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK4)
-	MCFG_CPU_CLOCK(HCLK4)
-	MCFG_CPU_PROGRAM_MAP(bnj_map)
+	MCFG_DEVICE_REPLACE("maincpu", DECO_C10707, HCLK4)
+	MCFG_DEVICE_CLOCK(HCLK4)
+	MCFG_DEVICE_PROGRAM_MAP(bnj_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", bnj)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bnj)
 
 	MCFG_VIDEO_START_OVERRIDE(btime_state,bnj)
 
@@ -1416,8 +1412,8 @@ MACHINE_CONFIG_START(btime_state::sdtennis)
 	bnj(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("audiocpu", DECO_C10707, HCLK1/3/2)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_REPLACE("audiocpu", DECO_C10707, HCLK1/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 MACHINE_CONFIG_END
 
 
@@ -1425,28 +1421,27 @@ MACHINE_CONFIG_START(btime_state::zoar)
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(zoar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(zoar_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", zoar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zoar)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64)
+	m_palette->set_entries(64);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_zoar)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ay1", AY8910, HCLK1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(5), RES_K(5), RES_K(5))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(btime_state, ay_audio_nmi_enable_w))
+	ay8910_device &ay1(AY8910(config.replace(), "ay1", HCLK1));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.23);
+	ay1.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay1.set_resistors_load(RES_K(5), RES_K(5), RES_K(5));
+	ay1.port_a_write_callback().set(FUNC(btime_state::ay_audio_nmi_enable_w));
 
-	MCFG_SOUND_REPLACE("ay2", AY8910, HCLK1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	ay8910_device &ay2(AY8910(config.replace(), "ay2", HCLK1));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.23);
 MACHINE_CONFIG_END
 
 
@@ -1454,21 +1449,19 @@ MACHINE_CONFIG_START(btime_state::disco)
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(HCLK4)
-	MCFG_CPU_PROGRAM_MAP(disco_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(HCLK4)
+	MCFG_DEVICE_PROGRAM_MAP(disco_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(disco_audio_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(disco_audio_map)
 
-	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	m_soundlatch->set_separate_acknowledge(true);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", disco)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_disco)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32)
+	m_palette->set_entries(32);
 
 	MCFG_VIDEO_START_OVERRIDE(btime_state,disco)
 
@@ -1481,11 +1474,11 @@ MACHINE_CONFIG_START(btime_state::tisland)
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tisland_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tisland_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", zoar)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zoar)
 MACHINE_CONFIG_END
 
 
@@ -1992,67 +1985,73 @@ READ8_MEMBER(btime_state::wtennis_reset_hack_r)
 	return RAM[0xc15f];
 }
 
-DRIVER_INIT_MEMBER(btime_state,btime)
+void btime_state::init_btime()
 {
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
-DRIVER_INIT_MEMBER(btime_state,zoar)
+void btime_state::init_zoar()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
 	/* At location 0xD50A is what looks like an undocumented opcode. I tried
 	   implementing it given what opcode 0x23 should do, but it still didn't
-	   work in demo mode. So this could be another protection or a bad ROM read.
-	   I'm NOPing it out for now. */
+	   work in demo mode, this could be another protection.
+
+	   The ROM has been confirmed as good on multiple working PCBs, so this
+	   isn't a bitrot issue */
 	memset(&rom[0xd50a],0xea,8);
 
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
-DRIVER_INIT_MEMBER(btime_state,tisland)
+void btime_state::init_tisland()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
 	/* At location 0xa2b6 there's a strange RLA followed by a BPL that reads from an
 	   unmapped area that causes the game to fail in several circumstances.On the Cassette
 	   version the RLA (33) is in reality a BIT (24),so I'm guessing that there's something
-	   wrong going on in the encryption scheme.*/
+	   wrong going on in the encryption scheme.
+
+	   There are other locations with similar problems. These ROMs have NOT yet been
+	   confirmed on multiple PCBs, so this could still be a bad dump.
+	   */
 	memset(&rom[0xa2b6],0x24,1);
 
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
-DRIVER_INIT_MEMBER(btime_state,lnc)
+void btime_state::init_lnc()
 {
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
-DRIVER_INIT_MEMBER(btime_state,bnj)
+void btime_state::init_bnj()
 {
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
-DRIVER_INIT_MEMBER(btime_state,disco)
+void btime_state::init_disco()
 {
-	DRIVER_INIT_CALL(btime);
+	init_btime();
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
-DRIVER_INIT_MEMBER(btime_state,cookrace)
+void btime_state::init_cookrace()
 {
 	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
 	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
-DRIVER_INIT_MEMBER(btime_state,protennb)
+void btime_state::init_protennb()
 {
-	DRIVER_INIT_CALL(btime);
+	init_btime();
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
-DRIVER_INIT_MEMBER(btime_state,wtennis)
+void btime_state::init_wtennis()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc15f, 0xc15f, read8_delegate(FUNC(btime_state::wtennis_reset_hack_r),this));
 
@@ -2061,28 +2060,28 @@ DRIVER_INIT_MEMBER(btime_state,wtennis)
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
-DRIVER_INIT_MEMBER(btime_state,sdtennis)
+void btime_state::init_sdtennis()
 {
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
 
-GAME( 1982, btime,    0,       btime,    btime,    btime_state, btime,    ROT270, "Data East Corporation", "Burger Time (Data East set 1)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, btime2,   btime,   btime,    btime,    btime_state, btime,    ROT270, "Data East Corporation", "Burger Time (Data East set 2)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, btime3,   btime,   btime,    btime,    btime_state, btime,    ROT270, "Data East USA Inc.",    "Burger Time (Data East USA)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, btimem,   btime,   btime,    btime,    btime_state, btime,    ROT270, "Data East (Bally Midway license)", "Burger Time (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, cookrace, btime,   cookrace, cookrace, btime_state, cookrace, ROT270, "bootleg",               "Cook Race",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tisland,  0,       tisland,  btime,    btime_state, tisland,  ROT270, "Data East Corporation", "Treasure Island",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, lnc,      0,       lnc,      lnc,      btime_state, lnc,      ROT270, "Data East Corporation", "Lock'n'Chase",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1982, protennb, 0,       disco,    disco,    btime_state, protennb, ROT270, "bootleg",               "Tennis (bootleg of Pro Tennis)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, wtennis,  0,       wtennis,  wtennis,  btime_state, wtennis,  ROT270, "bootleg",               "World Tennis",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mmonkey,  0,       mmonkey,  mmonkey,  btime_state, lnc,      ROT270, "Technos Japan / Roller Tron", "Minky Monkey", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, brubber,  0,       bnj,      bnj,      btime_state, bnj,      ROT270, "Data East",             "Burnin' Rubber",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bnj,      brubber, bnj,      bnj,      btime_state, bnj,      ROT270, "Data East USA",         "Bump 'n' Jump",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bnjm,     brubber, bnj,      bnj,      btime_state, bnj,      ROT270, "Data East USA (Bally Midway license)", "Bump 'n' Jump (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, caractn,  brubber, bnj,      bnj,      btime_state, bnj,      ROT270, "bootleg",               "Car Action (set 1)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, caractn2, brubber, bnj,      caractn2, btime_state, bnj,      ROT270, "bootleg",               "Car Action (set 2)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zoar,     0,       zoar,     zoar,     btime_state, zoar,     ROT270, "Data East USA",         "Zoar",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, disco,    0,       disco,    disco,    btime_state, disco,    ROT270, "Data East",             "Disco No.1",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1982, discof,   disco,   disco,    disco,    btime_state, disco,    ROT270, "Data East",             "Disco No.1 (Rev.F)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1983, sdtennis, 0,       sdtennis, sdtennis, btime_state, sdtennis, ROT270, "Data East Corporation", "Super Doubles Tennis",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, btime,    0,       btime,    btime,    btime_state, init_btime,    ROT270, "Data East Corporation", "Burger Time (Data East set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, btime2,   btime,   btime,    btime,    btime_state, init_btime,    ROT270, "Data East Corporation", "Burger Time (Data East set 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, btime3,   btime,   btime,    btime,    btime_state, init_btime,    ROT270, "Data East USA Inc.",    "Burger Time (Data East USA)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, btimem,   btime,   btime,    btime,    btime_state, init_btime,    ROT270, "Data East (Bally Midway license)", "Burger Time (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, cookrace, btime,   cookrace, cookrace, btime_state, init_cookrace, ROT270, "bootleg",               "Cook Race",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tisland,  0,       tisland,  btime,    btime_state, init_tisland,  ROT270, "Data East Corporation", "Treasure Island",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, lnc,      0,       lnc,      lnc,      btime_state, init_lnc,      ROT270, "Data East Corporation", "Lock'n'Chase",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, protennb, 0,       disco,    disco,    btime_state, init_protennb, ROT270, "bootleg",               "Tennis (bootleg of Pro Tennis)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wtennis,  0,       wtennis,  wtennis,  btime_state, init_wtennis,  ROT270, "bootleg",               "World Tennis",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mmonkey,  0,       mmonkey,  mmonkey,  btime_state, init_lnc,      ROT270, "Technos Japan / Roller Tron", "Minky Monkey", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, brubber,  0,       bnj,      bnj,      btime_state, init_bnj,      ROT270, "Data East",             "Burnin' Rubber",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bnj,      brubber, bnj,      bnj,      btime_state, init_bnj,      ROT270, "Data East USA",         "Bump 'n' Jump",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bnjm,     brubber, bnj,      bnj,      btime_state, init_bnj,      ROT270, "Data East USA (Bally Midway license)", "Bump 'n' Jump (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, caractn,  brubber, bnj,      bnj,      btime_state, init_bnj,      ROT270, "bootleg",               "Car Action (set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, caractn2, brubber, bnj,      caractn2, btime_state, init_bnj,      ROT270, "bootleg",               "Car Action (set 2)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zoar,     0,       zoar,     zoar,     btime_state, init_zoar,     ROT270, "Data East USA",         "Zoar",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, disco,    0,       disco,    disco,    btime_state, init_disco,    ROT270, "Data East",             "Disco No.1",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, discof,   disco,   disco,    disco,    btime_state, init_disco,    ROT270, "Data East",             "Disco No.1 (Rev.F)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1983, sdtennis, 0,       sdtennis, sdtennis, btime_state, init_sdtennis, ROT270, "Data East Corporation", "Super Doubles Tennis",           MACHINE_SUPPORTS_SAVE )

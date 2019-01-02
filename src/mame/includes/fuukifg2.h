@@ -1,36 +1,45 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia,Paul Priest
+#ifndef MAME_INCLUDES_FUUKIFG2_H
+#define MAME_INCLUDES_FUUKIFG2_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "video/fuukifg.h"
+#include "emupal.h"
 #include "screen.h"
 
 class fuuki16_state : public driver_device
 {
 public:
+	fuuki16_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_oki(*this, "oki")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_fuukivid(*this, "fuukivid")
+		, m_soundlatch(*this, "soundlatch")
+		, m_vram(*this, "vram.%u", 0)
+		, m_vregs(*this, "vregs")
+		, m_unknown(*this, "unknown")
+		, m_priority(*this, "priority")
+		, m_soundbank(*this, "soundbank")
+	{ }
+
+	void fuuki16(machine_config &config);
+
+private:
 	enum
 	{
 		TIMER_LEVEL_1_INTERRUPT,
 		TIMER_VBLANK_INTERRUPT,
 		TIMER_RASTER_INTERRUPT
 	};
-
-	fuuki16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_oki(*this, "oki"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_fuukivid(*this, "fuukivid"),
-		m_soundlatch(*this, "soundlatch"),
-		m_vram(*this, "vram.%u", 0),
-		m_vregs(*this, "vregs"),
-		m_unknown(*this, "unknown"),
-		m_priority(*this, "priority")
-		{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -48,6 +57,8 @@ public:
 	required_shared_ptr<uint16_t> m_unknown;
 	required_shared_ptr<uint16_t> m_priority;
 
+	required_memory_bank m_soundbank;
+
 	/* video-related */
 	tilemap_t     *m_tilemap[4];
 
@@ -59,30 +70,23 @@ public:
 	DECLARE_WRITE16_MEMBER(vregs_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(sound_rombank_w);
-	DECLARE_WRITE16_MEMBER(vram_0_w);
-	DECLARE_WRITE16_MEMBER(vram_1_w);
-	DECLARE_WRITE16_MEMBER(vram_2_w);
-	DECLARE_WRITE16_MEMBER(vram_3_w);
+	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(oki_banking_w);
 
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
-	TILE_GET_INFO_MEMBER(get_tile_info_2);
-	TILE_GET_INFO_MEMBER(get_tile_info_3);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	inline void get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
-	inline void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _N_);
 	void draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
 
-	void fuuki16(machine_config &config);
 	void fuuki16_map(address_map &map);
 	void fuuki16_sound_io_map(address_map &map);
 	void fuuki16_sound_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_FUUKIFG2_H

@@ -34,7 +34,7 @@ centronics_printer_device::centronics_printer_device(const machine_config &mconf
 
 MACHINE_CONFIG_START(centronics_printer_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("printer", PRINTER, 0)
-	MCFG_PRINTER_ONLINE_CB(WRITELINE(centronics_printer_device, printer_online))
+	MCFG_PRINTER_ONLINE_CB(WRITELINE(*this, centronics_printer_device, printer_online))
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------

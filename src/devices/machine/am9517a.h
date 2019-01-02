@@ -51,15 +51,15 @@ public:
 	// construction/destruction
 	am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_hreq_callback(Object &&cb) { return m_out_hreq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_eop_callback(Object &&cb) { return m_out_eop_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_hreq_callback() { return m_out_hreq_cb.bind(); }
+	auto out_eop_callback() { return m_out_eop_cb.bind(); }
 
-	template <class Object> devcb_base &set_in_memr_callback(Object &&cb) { return m_in_memr_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_memw_callback(Object &&cb) { return m_out_memw_cb.set_callback(std::forward<Object>(cb)); }
+	auto in_memr_callback() { return m_in_memr_cb.bind(); }
+	auto out_memw_callback() { return m_out_memw_cb.bind(); }
 
-	template <unsigned C, class Object> devcb_base &set_in_ior_callback(Object &&cb) { return m_in_ior_cb[C].set_callback(std::forward<Object>(cb)); }
-	template <unsigned C, class Object> devcb_base &set_out_iow_callback(Object &&cb) { return m_out_iow_cb[C].set_callback(std::forward<Object>(cb)); }
-	template <unsigned C, class Object> devcb_base &set_out_dack_callback(Object &&cb) { return m_out_dack_cb[C].set_callback(std::forward<Object>(cb)); }
+	template <unsigned C> auto in_ior_callback() { return m_in_ior_cb[C].bind(); }
+	template <unsigned C> auto out_iow_callback() { return m_out_iow_cb[C].bind(); }
+	template <unsigned C> auto out_dack_callback() { return m_out_dack_cb[C].bind(); }
 
 	virtual DECLARE_READ8_MEMBER( read );
 	virtual DECLARE_WRITE8_MEMBER( write );
@@ -68,6 +68,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ready_w );
 	DECLARE_WRITE_LINE_MEMBER( eop_w );
 
+	template <unsigned C> DECLARE_WRITE_LINE_MEMBER( dreq_w ) { dma_request(C, state); }
 	DECLARE_WRITE_LINE_MEMBER( dreq0_w );
 	DECLARE_WRITE_LINE_MEMBER( dreq1_w );
 	DECLARE_WRITE_LINE_MEMBER( dreq2_w );
@@ -82,6 +83,11 @@ protected:
 	virtual void execute_run() override;
 
 	virtual void end_of_process();
+
+	virtual void dma_read();
+	virtual void dma_write();
+
+	virtual int transfer_size(int const channel) const { return 1; }
 
 	int m_icount;
 	uint32_t m_address_mask;
@@ -110,15 +116,13 @@ protected:
 	uint8_t m_request;
 
 private:
-	inline void dma_request(int channel, int state);
+	void dma_request(int channel, int state);
 	inline bool is_request_active(int channel);
 	inline bool is_software_request_active(int channel);
 	inline void set_hreq(int state);
 	inline void set_dack();
 	inline void set_eop(int state);
 	inline int get_state1(bool msb_changed);
-	inline void dma_read();
-	inline void dma_write();
 	inline void dma_advance();
 
 	devcb_write_line   m_out_hreq_cb;
@@ -133,11 +137,17 @@ private:
 };
 
 
-class upd71071_v53_device :  public am9517a_device
+class v5x_dmau_device : public am9517a_device
 {
 public:
 	// construction/destruction
-	upd71071_v53_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
+	v5x_dmau_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
+
+	auto in_mem16r_callback() { return m_in_mem16r_cb.bind(); }
+	auto out_mem16w_callback() { return m_out_mem16w_cb.bind(); }
+
+	template <unsigned C> auto in_io16r_callback() { return m_in_io16r_cb[C].bind(); }
+	template <unsigned C> auto out_io16w_callback() { return m_out_io16w_cb[C].bind(); }
 
 	virtual DECLARE_READ8_MEMBER( read ) override;
 	virtual DECLARE_WRITE8_MEMBER( write ) override;
@@ -147,10 +157,20 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	virtual void dma_read() override;
+	virtual void dma_write() override;
+
+	virtual int transfer_size(int const channel) const override { return (m_channel[channel].m_mode & 0x1) ? 2 : 1; }
+
+	// 16 bit transfer callbacks
+	devcb_read16 m_in_mem16r_cb;
+	devcb_write16 m_out_mem16w_cb;
+	devcb_read16 m_in_io16r_cb[4];
+	devcb_write16 m_out_io16w_cb[4];
+
 	int m_selected_channel;
 	int m_base;
 	uint8_t m_command_high;
-
 };
 
 
@@ -170,77 +190,7 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(AM9517A,      am9517a_device)
-DECLARE_DEVICE_TYPE(V53_DMAU,     upd71071_v53_device)
+DECLARE_DEVICE_TYPE(V5X_DMAU,     v5x_dmau_device)
 DECLARE_DEVICE_TYPE(PCXPORT_DMAC, pcxport_dmac_device)
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_AM9517A_OUT_HREQ_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_out_hreq_callback(DEVCB_##_devcb);
-
-#define MCFG_AM9517A_OUT_EOP_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_out_eop_callback(DEVCB_##_devcb);
-
-#define MCFG_AM9517A_IN_MEMR_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_in_memr_callback(DEVCB_##_devcb);
-
-#define MCFG_AM9517A_OUT_MEMW_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_out_memw_callback(DEVCB_##_devcb);
-
-#define MCFG_AM9517A_IN_IOR_0_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_in_ior_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_AM9517A_IN_IOR_1_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_in_ior_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_AM9517A_IN_IOR_2_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_in_ior_callback<2>(DEVCB_##_devcb);
-
-#define MCFG_AM9517A_IN_IOR_3_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_in_ior_callback<3>(DEVCB_##_devcb);
-
-#define MCFG_AM9517A_OUT_IOW_0_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_out_iow_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_AM9517A_OUT_IOW_1_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_out_iow_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_AM9517A_OUT_IOW_2_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_out_iow_callback<2>(DEVCB_##_devcb);
-
-#define MCFG_AM9517A_OUT_IOW_3_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_out_iow_callback<3>(DEVCB_##_devcb);
-
-#define MCFG_AM9517A_OUT_DACK_0_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_out_dack_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_AM9517A_OUT_DACK_1_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_out_dack_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_AM9517A_OUT_DACK_2_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_out_dack_callback<2>(DEVCB_##_devcb);
-
-#define MCFG_AM9517A_OUT_DACK_3_CB(_devcb) \
-	devcb = &downcast<am9517a_device &>(*device).set_out_dack_callback<3>(DEVCB_##_devcb);
-
-#define MCFG_I8237_OUT_HREQ_CB MCFG_AM9517A_OUT_HREQ_CB
-#define MCFG_I8237_OUT_EOP_CB MCFG_AM9517A_OUT_EOP_CB
-#define MCFG_I8237_IN_MEMR_CB MCFG_AM9517A_IN_MEMR_CB
-#define MCFG_I8237_OUT_MEMW_CB MCFG_AM9517A_OUT_MEMW_CB
-#define MCFG_I8237_IN_IOR_0_CB MCFG_AM9517A_IN_IOR_0_CB
-#define MCFG_I8237_IN_IOR_1_CB MCFG_AM9517A_IN_IOR_1_CB
-#define MCFG_I8237_IN_IOR_2_CB MCFG_AM9517A_IN_IOR_2_CB
-#define MCFG_I8237_IN_IOR_3_CB MCFG_AM9517A_IN_IOR_3_CB
-#define MCFG_I8237_OUT_IOW_0_CB MCFG_AM9517A_OUT_IOW_0_CB
-#define MCFG_I8237_OUT_IOW_1_CB MCFG_AM9517A_OUT_IOW_1_CB
-#define MCFG_I8237_OUT_IOW_2_CB MCFG_AM9517A_OUT_IOW_2_CB
-#define MCFG_I8237_OUT_IOW_3_CB MCFG_AM9517A_OUT_IOW_3_CB
-#define MCFG_I8237_OUT_DACK_0_CB MCFG_AM9517A_OUT_DACK_0_CB
-#define MCFG_I8237_OUT_DACK_1_CB MCFG_AM9517A_OUT_DACK_1_CB
-#define MCFG_I8237_OUT_DACK_2_CB MCFG_AM9517A_OUT_DACK_2_CB
-#define MCFG_I8237_OUT_DACK_3_CB MCFG_AM9517A_OUT_DACK_3_CB
 
 #endif // MAME_MACHINE_AM9517_H

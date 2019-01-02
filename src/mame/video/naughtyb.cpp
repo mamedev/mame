@@ -2,7 +2,7 @@
 // copyright-holders:Brad Oliver,Sal and John Bugliarisi,Paul Priest
 /***************************************************************************
 
-  video.c
+  naughtyb.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -59,39 +59,38 @@ static const res_net_info naughtyb_net_info =
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(naughtyb_state, naughtyb)
+void naughtyb_state::naughtyb_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances[2] = { 270, 130 };
-	double weights[2];
+	static constexpr int resistances[2] = { 270, 130 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double weights[2];
 	compute_resistor_weights(0, 255, -1.0,
 			2, resistances, weights, 0, 0,
-			2, resistances, weights, 0, 0,
+			2, resistances, weights, 0, 0, // FIXME: same destination twice?
 			0, nullptr, nullptr, 0, 0);
 
 	for (int i = 0;i < palette.entries(); i++)
 	{
 		int bit0, bit1;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i+0x100] >> 0) & 0x01;
-		r = combine_2_weights(weights, bit0, bit1);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i+0x100], 0);
+		int const r = combine_2_weights(weights, bit0, bit1);
 
-		/* green component */
-		bit0 = (color_prom[i] >> 2) & 0x01;
-		bit1 = (color_prom[i+0x100] >> 2) & 0x01;
-		g = combine_2_weights(weights, bit0, bit1);
+		// green component
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i+0x100], 2);
+		int const g = combine_2_weights(weights, bit0, bit1);
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 1) & 0x01;
-		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
-		b = combine_2_weights(weights, bit0, bit1);
+		// blue component
+		bit0 = BIT(color_prom[i], 1);
+		bit1 = BIT(color_prom[i+0x100], 1);
+		int const b = combine_2_weights(weights, bit0, bit1);
 
-		palette.set_pen_color(bitswap<8>(i,5,7,6,2,1,0,4,3), rgb_t(r, g, b));
+		palette.set_pen_color(bitswap<8>(i, 5, 7, 6, 2, 1, 0, 4, 3), rgb_t(r, g, b));
 	}
 }
 
@@ -154,11 +153,11 @@ WRITE8_MEMBER(naughtyb_state::popflame_videoreg_w)
   Each column in the virtual screen is 64 (40h) characters high.
   Thus, column 27 is stored in VRAm at address 0-3fh,
   column 26 is stored at 40-7f, and so on.
-  This illustration shows the horizonal scroll register set to zero,
+  This illustration shows the horizontal scroll register set to zero,
   so the topmost 32 rows of the virtual screen are shown.
 
   The following screen-to-memory mapping. This is shown from player's viewpoint,
-  which with the CRT rotated 90 degrees CCW. This example shows the horizonal
+  which with the CRT rotated 90 degrees CCW. This example shows the horizontal
   scroll register set to zero.
 
 

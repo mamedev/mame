@@ -77,7 +77,7 @@ void dmv_k803_device::device_reset()
 
 MACHINE_CONFIG_START(dmv_k803_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
-	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(dmv_k803_device, rtc_irq_w))
+	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, dmv_k803_device, rtc_irq_w))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

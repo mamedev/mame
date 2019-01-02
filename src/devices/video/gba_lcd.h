@@ -9,12 +9,12 @@
     By R. Belmont, Ryan Holtz
 
 ***************************************************************************/
-
 #ifndef MAME_VIDEO_GBA_LCD_H
 #define MAME_VIDEO_GBA_LCD_H
 
 #pragma once
 
+#include "emupal.h"
 
 
 //**************************************************************************
@@ -33,19 +33,19 @@ DECLARE_DEVICE_TYPE(GBA_LCD, gba_lcd_device)
 		MCFG_DEVICE_ADD(_tag, GBA_LCD, 0)
 
 #define MCFG_GBA_LCD_INT_HBLANK(_devcb) \
-	devcb = &downcast<gba_lcd_device &>(*device).set_int_hblank_callback(DEVCB_##_devcb);
+	downcast<gba_lcd_device &>(*device).set_int_hblank_callback(DEVCB_##_devcb);
 
 #define MCFG_GBA_LCD_INT_VBLANK(_devcb) \
-	devcb = &downcast<gba_lcd_device &>(*device).set_int_vblank_callback(DEVCB_##_devcb);
+	downcast<gba_lcd_device &>(*device).set_int_vblank_callback(DEVCB_##_devcb);
 
 #define MCFG_GBA_LCD_INT_VCOUNT(_devcb) \
-	devcb = &downcast<gba_lcd_device &>(*device).set_int_vcount_callback(DEVCB_##_devcb);
+	downcast<gba_lcd_device &>(*device).set_int_vcount_callback(DEVCB_##_devcb);
 
 #define MCFG_GBA_LCD_DMA_HBLANK(_devcb) \
-	devcb = &downcast<gba_lcd_device &>(*device).set_dma_hblank_callback(DEVCB_##_devcb);
+	downcast<gba_lcd_device &>(*device).set_dma_hblank_callback(DEVCB_##_devcb);
 
 #define MCFG_GBA_LCD_DMA_VBLANK(_devcb) \
-	devcb = &downcast<gba_lcd_device &>(*device).set_dma_vblank_callback(DEVCB_##_devcb);
+	downcast<gba_lcd_device &>(*device).set_dma_vblank_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -208,8 +208,7 @@ private:
 	uint32_t decrease_brightness(uint32_t color);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(gba);
-
+	void gba_palette(palette_device &palette) const;
 
 	devcb_write_line m_int_hblank_cb;   /* H-Blank interrupt callback function */
 	devcb_write_line m_int_vblank_cb;   /* V-Blank interrupt callback function */

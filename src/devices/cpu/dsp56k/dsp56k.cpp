@@ -118,7 +118,7 @@ void dsp56k_device::dsp56156_program_map(address_map &map)
 void dsp56k_device::dsp56156_x_data_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();                              /* 1-5 */
-	map(0xffc0, 0xffff).rw(this, FUNC(dsp56k_device::peripheral_register_r), FUNC(dsp56k_device::peripheral_register_w));   /* 1-5 On-chip peripheral registers memory mapped in data space */
+	map(0xffc0, 0xffff).rw(FUNC(dsp56k_device::peripheral_register_r), FUNC(dsp56k_device::peripheral_register_w));   /* 1-5 On-chip peripheral registers memory mapped in data space */
 }
 
 
@@ -141,7 +141,7 @@ device_memory_interface::space_config_vector dsp56k_device::memory_space_config(
 /***************************************************************************
     MEMORY ACCESSORS
 ***************************************************************************/
-#define ROPCODE(pc)   cpustate->direct->read_word(pc)
+#define ROPCODE(pc)   cpustate->cache->read_word(pc)
 
 
 /***************************************************************************
@@ -292,7 +292,7 @@ void dsp56k_device::device_start()
 	save_item(NAME(m_dsp56k_core.peripheral_ram));
 
 	m_dsp56k_core.program = &space(AS_PROGRAM);
-	m_dsp56k_core.direct = m_dsp56k_core.program->direct<-1>();
+	m_dsp56k_core.cache = m_dsp56k_core.program->cache<1, -1, ENDIANNESS_LITTLE>();
 	m_dsp56k_core.data = &space(AS_DATA);
 
 	state_add(DSP56K_PC,     "PC", m_dsp56k_core.PCU.pc).formatstr("%04X");

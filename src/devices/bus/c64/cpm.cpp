@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(C64_CPM, c64_cpm_cartridge_device, "c64_cpm", "C64 CP/M cartr
 
 void c64_cpm_cartridge_device::z80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(c64_cpm_cartridge_device::dma_r), FUNC(c64_cpm_cartridge_device::dma_w));
+	map(0x0000, 0xffff).rw(FUNC(c64_cpm_cartridge_device::dma_r), FUNC(c64_cpm_cartridge_device::dma_w));
 }
 
 
@@ -52,7 +52,7 @@ void c64_cpm_cartridge_device::z80_mem(address_map &map)
 
 void c64_cpm_cartridge_device::z80_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(c64_cpm_cartridge_device::dma_r), FUNC(c64_cpm_cartridge_device::dma_w));
+	map(0x0000, 0xffff).rw(FUNC(c64_cpm_cartridge_device::dma_r), FUNC(c64_cpm_cartridge_device::dma_w));
 }
 
 
@@ -60,11 +60,12 @@ void c64_cpm_cartridge_device::z80_io(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_cpm_cartridge_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, 3000000)
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-	MCFG_CPU_IO_MAP(z80_io)
-MACHINE_CONFIG_END
+void c64_cpm_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_maincpu, 3000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c64_cpm_cartridge_device::z80_mem);
+	m_maincpu->set_addrmap(AS_IO, &c64_cpm_cartridge_device::z80_io);
+}
 
 
 

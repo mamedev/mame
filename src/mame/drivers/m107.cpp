@@ -30,12 +30,11 @@ confirmed for m107 games as well.
 #include "includes/iremipt.h"
 
 #include "cpu/nec/nec.h"
-#include "cpu/nec/v25.h"
+#include "machine/gen_latch.h"
 #include "machine/irem_cpu.h"
 #include "sound/ym2151.h"
 #include "sound/iremga20.h"
 #include "speaker.h"
-
 
 /*****************************************************************************/
 
@@ -73,7 +72,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
 }
 
 
-
 /*****************************************************************************/
 
 WRITE8_MEMBER(m107_state::coincounter_w)
@@ -84,7 +82,7 @@ WRITE8_MEMBER(m107_state::coincounter_w)
 
 WRITE8_MEMBER(m107_state::bankswitch_w)
 {
-	membank("bank1")->set_entry((data & 0x06) >> 1);
+	m_mainbank->set_entry((data & 0x06) >> 1);
 	if (data & 0xf9)
 		logerror("%05x: bankswitch %04x\n", m_maincpu->pc(), data);
 }
@@ -98,13 +96,26 @@ WRITE16_MEMBER(m107_state::sound_reset_w)
 
 void m107_state::main_map(address_map &map)
 {
-	map(0x00000, 0x9ffff).rom();
-	map(0xa0000, 0xbffff).bankr("bank1");
-	map(0xd0000, 0xdffff).ram().w(this, FUNC(m107_state::vram_w)).share("vram_data");
+	map(0xd0000, 0xdffff).ram().w(FUNC(m107_state::vram_w)).share("vram_data");
 	map(0xe0000, 0xeffff).ram(); /* System ram */
 	map(0xf8000, 0xf8fff).ram().share("spriteram");
 	map(0xf9000, 0xf9fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffff0, 0xfffff).rom().region("maincpu", 0x7fff0);
+}
+
+// Not bankswitched
+void m107_state::firebarr_map(address_map &map)
+{
+	map(0x00000, 0xbffff).rom();
+	main_map(map);
+}
+
+// Bankswitched
+void m107_state::dsoccr94_map(address_map &map)
+{
+	map(0x00000, 0x9ffff).rom();
+	map(0xa0000, 0xbffff).bankr("mainbank");
+	main_map(map);
 }
 
 void m107_state::main_portmap(address_map &map)
@@ -114,21 +125,21 @@ void m107_state::main_portmap(address_map &map)
 	map(0x04, 0x05).portr("DSW");
 	map(0x06, 0x07).portr("P3_P4");
 	map(0x08, 0x08).r("soundlatch2", FUNC(generic_latch_8_device::read));   // answer from sound CPU
-	map(0x00, 0x00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x02, 0x02).w(this, FUNC(m107_state::coincounter_w));
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(FUNC(m107_state::coincounter_w));
 	map(0x04, 0x05).nopw(); /* ??? 0008 */
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x9f).w(this, FUNC(m107_state::control_w));
+	map(0x80, 0x9f).w(FUNC(m107_state::control_w));
 	map(0xa0, 0xaf).nopw(); /* Written with 0's in interrupt */
-	map(0xb0, 0xb1).w(this, FUNC(m107_state::spritebuffer_w));
+	map(0xb0, 0xb1).w(FUNC(m107_state::spritebuffer_w));
 	map(0xc0, 0xc3).nopr(); /* Only wpksoc: ticket related? */
-	map(0xc0, 0xc1).w(this, FUNC(m107_state::sound_reset_w));
+	map(0xc0, 0xc1).w(FUNC(m107_state::sound_reset_w));
 }
 
 void m107_state::dsoccr94_io_map(address_map &map)
 {
 	main_portmap(map);
-	map(0x06, 0x06).w(this, FUNC(m107_state::bankswitch_w));
+	map(0x06, 0x06).w(FUNC(m107_state::bankswitch_w));
 }
 
 /* same as M107 but with an extra i/o board */
@@ -145,6 +156,7 @@ WRITE16_MEMBER(m107_state::wpksoc_output_w)
 void m107_state::wpksoc_map(address_map &map)
 {
 	main_map(map);
+	map(0x00000, 0x7ffff).rom();
 	map(0xf0000, 0xf0001).portr("WPK_DSW0");
 	map(0xf0002, 0xf0003).portr("WPK_DSW1");
 	map(0xf0004, 0xf0005).portr("WPK_DSW2");
@@ -153,7 +165,7 @@ void m107_state::wpksoc_map(address_map &map)
 void m107_state::wpksoc_io_map(address_map &map)
 {
 	main_portmap(map);
-	map(0x22, 0x23).w(this, FUNC(m107_state::wpksoc_output_w));
+	map(0x22, 0x23).w(FUNC(m107_state::wpksoc_output_w));
 	map(0xc0, 0xc1).portr("WPK_IN0");
 	map(0xc2, 0xc3).portr("WPK_IN1");
 }
@@ -166,7 +178,7 @@ void m107_state::sound_map(address_map &map)
 	map(0xa0000, 0xa3fff).ram();
 	map(0xa8000, 0xa803f).rw("irem", FUNC(iremga20_device::irem_ga20_r), FUNC(iremga20_device::irem_ga20_w)).umask16(0x00ff);
 	map(0xa8040, 0xa8043).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0xa8044, 0xa8044).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0xa8044, 0xa8044).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0xa8046, 0xa8046).w("soundlatch2", FUNC(generic_latch_8_device::write));
 	map(0xffff0, 0xfffff).rom().region("soundcpu", 0x1fff0);
 }
@@ -705,102 +717,101 @@ static const gfx_layout spritelayout2 =
 	32*8
 };
 
-static GFXDECODE_START( m107 )
+static GFXDECODE_START( gfx_m107 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 128 )
 GFXDECODE_END
 
-static GFXDECODE_START( firebarr )
+static GFXDECODE_START( gfx_firebarr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2,0, 128 )
 GFXDECODE_END
 
 /***************************************************************************/
 
-MACHINE_CONFIG_START(m107_state::firebarr)
-
+void m107_state::firebarr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V33, XTAL(28'000'000)/2)    /* NEC V33, 28MHz clock */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
+	V33(config, m_maincpu, XTAL(28'000'000)/2);    /* NEC V33, 28MHz clock */
+	m_maincpu->set_addrmap(AS_PROGRAM, &m107_state::firebarr_map);
+	m_maincpu->set_addrmap(AS_IO, &m107_state::main_portmap);
+	m_maincpu->set_irq_acknowledge_callback("upd71059c", FUNC(pic8259_device::inta_cb));
 
-	MCFG_CPU_ADD("soundcpu", V35, XTAL(14'318'181))
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_V25_CONFIG(rtypeleo_decryption_table)
+	V35(config, m_soundcpu, XTAL(14'318'181));
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m107_state::sound_map);
+	m_soundcpu->set_decryption_table(rtypeleo_decryption_table);
 
-	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_upd71059c, 0);
+	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m107_state, scanline_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(m107_state::scanline_interrupt), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
-	MCFG_SCREEN_UPDATE_DRIVER(m107_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	BUFFERED_SPRITERAM16(config, "spriteram");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firebarr)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(80, 511-112, 8, 247); /* 320 x 240 */
+	m_screen->set_screen_update(FUNC(m107_state::screen_update));
+	m_screen->set_palette(m_palette);
 
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_firebarr);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP1))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set_inputline(m_soundcpu, NEC_INPUT_LINE_INTP1);
+	soundlatch.set_separate_acknowledge(true);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("upd71059c", pic8259_device, ir3_w))
+	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set(m_upd71059c, FUNC(pic8259_device::ir3_w));
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4));
+	ymsnd.irq_handler().set_inputline(m_soundcpu, NEC_INPUT_LINE_INTP0);
+	ymsnd.add_route(0, "lspeaker", 0.40);
+	ymsnd.add_route(1, "rspeaker", 0.40);
 
-	MCFG_IREMGA20_ADD("irem", XTAL(14'318'181)/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	iremga20_device &ga20(IREMGA20(config, "irem", XTAL(14'318'181)/4));
+	ga20.add_route(0, "lspeaker", 1.0);
+	ga20.add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(m107_state::dsoccr94)
+void m107_state::dsoccr94(machine_config &config)
+{
 	firebarr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(20000000/2)  /* NEC V33, Could be 28MHz clock? */
-	MCFG_CPU_IO_MAP(dsoccr94_io_map)
+	m_maincpu->set_clock(20000000/2);  /* NEC V33, Could be 28MHz clock? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &m107_state::dsoccr94_map);
+	m_maincpu->set_addrmap(AS_IO, &m107_state::dsoccr94_io_map);
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(dsoccr94_decryption_table)
+	m_soundcpu->set_decryption_table(dsoccr94_decryption_table);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", m107)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_m107);
+}
 
 
-MACHINE_CONFIG_START(m107_state::wpksoc)
+void m107_state::wpksoc(machine_config &config)
+{
 	firebarr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wpksoc_map)
-	MCFG_CPU_IO_MAP(wpksoc_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m107_state::wpksoc_map);
+	m_maincpu->set_addrmap(AS_IO, &m107_state::wpksoc_io_map);
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(leagueman_decryption_table)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(leagueman_decryption_table);
+}
 
-MACHINE_CONFIG_START(m107_state::airass)
+void m107_state::airass(machine_config &config)
+{
 	firebarr(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", m107)
+	m_gfxdecode->set_info(gfx_m107);
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_V25_CONFIG(gunforce_decryption_table)
-MACHINE_CONFIG_END
+	m_soundcpu->set_decryption_table(gunforce_decryption_table);
+}
 
 /***************************************************************************/
 
@@ -826,7 +837,7 @@ ROM_START( airass )
 	ROM_LOAD( "w49.020", 0x200000, 0x100000, CRC(17b5caf2) SHA1(df38f9a625226c96ac921182ef975e598d9bc245) ) /* IC13 */
 	ROM_LOAD( "w50.030", 0x300000, 0x100000, CRC(63e4bec3) SHA1(252b4493e1bc368021389e65295036523c401ad4) ) /* IC14 */
 
-	ROM_REGION( 0x40000, "user1", 0 )   /* sprite tables */
+	ROM_REGION( 0x40000, "sprtable", 0 )   /* sprite tables */
 	ROM_LOAD16_BYTE( "f4-b-drh-.drh", 0x000001, 0x20000, CRC(12001372) SHA1(a5346d8a741cd1a93aa289562bb56d2fc40c1bbb) ) /* IC10 */
 	ROM_LOAD16_BYTE( "f4-b-drl-.drl", 0x000000, 0x20000, CRC(08cb7533) SHA1(9e0d8f8498bddfa1c6135abbab4465e9eeb033fe) ) /* IC1  */
 
@@ -861,7 +872,7 @@ ROM_START( firebarr )
 	ROM_LOAD16_BYTE( "f4-030.030", 0x300000, 0x80000, CRC(7e7b30cd) SHA1(eca9d2a5d9f9deebb565456018126bc37a1de1d8) ) /* IC14 */
 	ROM_LOAD16_BYTE( "f4-031.031", 0x300001, 0x80000, CRC(83ac56c5) SHA1(47e1063c71d5570fecf8591c2cb7c74fd45199f5) ) /* IC5  */
 
-	ROM_REGION( 0x40000, "user1", 0 )   /* sprite tables */
+	ROM_REGION( 0x40000, "sprtable", 0 )   /* sprite tables */
 	ROM_LOAD16_BYTE( "f4-b-drh-.drh", 0x000001, 0x20000, CRC(12001372) SHA1(a5346d8a741cd1a93aa289562bb56d2fc40c1bbb) ) /* IC10 */
 	ROM_LOAD16_BYTE( "f4-b-drl-.drl", 0x000000, 0x20000, CRC(08cb7533) SHA1(9e0d8f8498bddfa1c6135abbab4465e9eeb033fe) ) /* IC1  */
 
@@ -881,13 +892,13 @@ ROM_START( dsoccr94 )
 	ROM_LOAD16_BYTE( "a3-sl0-c-0.ic37", 0x00000, 0x10000, CRC(768132e5) SHA1(1bb64516eb58d3b246f08e1c07f091e78085689f) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )   /* chars */
-	ROM_LOAD16_BYTE( "ds_c00.ic29", 0x000000, 0x100000, CRC(2d31d418) SHA1(6cd0e362bc2e3f2b20d96ee97a04bff46ee3016a) ) /* MASK ROMs with no "official" rom label */
+	ROM_LOAD16_BYTE( "ds_c00.ic29", 0x000000, 0x100000, CRC(2d31d418) SHA1(6cd0e362bc2e3f2b20d96ee97a04bff46ee3016a) ) /* mask ROMs with no "official" ROM label */
 	ROM_LOAD16_BYTE( "ds_c10.ic28", 0x000001, 0x100000, CRC(57f7bcd3) SHA1(a38e7cdfdea72d882fba414cae391ba09443e73c) )
 	ROM_LOAD16_BYTE( "ds_c01.ic21", 0x200000, 0x100000, CRC(9d31a464) SHA1(1e38ac296f64d77fabfc0d5f7921a9b7a8424875) )
 	ROM_LOAD16_BYTE( "ds_c11.ic20", 0x200001, 0x100000, CRC(a372e79f) SHA1(6b0889cfc2970028832566e25257927ddc461ea6) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites */
-	ROM_LOAD( "ds_000.ic11", 0x000000, 0x100000, CRC(366b3e29) SHA1(cb016dcbdc6e8ea56c28c00135263666b07df991) ) /* MASK ROMs with no "official" rom label */
+	ROM_LOAD( "ds_000.ic11", 0x000000, 0x100000, CRC(366b3e29) SHA1(cb016dcbdc6e8ea56c28c00135263666b07df991) ) /* mask ROMs with no "official" ROM label */
 	ROM_LOAD( "ds_010.ic12", 0x100000, 0x100000, CRC(28a4cc40) SHA1(7f4e1ef995eaadf1945ee22ab3270cb8a21c601d) )
 	ROM_LOAD( "ds_020.ic13", 0x200000, 0x100000, CRC(5a310f7f) SHA1(21969e4247c8328d27118d00604096deaf6700af) )
 	ROM_LOAD( "ds_030.ic14", 0x300000, 0x100000, CRC(328b1f45) SHA1(4cbbd4d9be4fc151d426175bdbd35d8481bf2966) )
@@ -908,13 +919,13 @@ ROM_START( dsoccr94k )
 	ROM_LOAD16_BYTE( "a3-sl0-c-0.ic37", 0x00000, 0x10000, CRC(768132e5) SHA1(1bb64516eb58d3b246f08e1c07f091e78085689f) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )   /* chars */
-	ROM_LOAD16_BYTE( "ds_c00.ic29", 0x000000, 0x100000, CRC(2d31d418) SHA1(6cd0e362bc2e3f2b20d96ee97a04bff46ee3016a) ) /* MASK ROMs with no "official" rom label */
+	ROM_LOAD16_BYTE( "ds_c00.ic29", 0x000000, 0x100000, CRC(2d31d418) SHA1(6cd0e362bc2e3f2b20d96ee97a04bff46ee3016a) ) /* mask ROMs with no "official" ROM label */
 	ROM_LOAD16_BYTE( "ds_c10.ic28", 0x000001, 0x100000, CRC(57f7bcd3) SHA1(a38e7cdfdea72d882fba414cae391ba09443e73c) )
 	ROM_LOAD16_BYTE( "ds_c01.ic21", 0x200000, 0x100000, CRC(9d31a464) SHA1(1e38ac296f64d77fabfc0d5f7921a9b7a8424875) )
 	ROM_LOAD16_BYTE( "ds_c11.ic20", 0x200001, 0x100000, CRC(a372e79f) SHA1(6b0889cfc2970028832566e25257927ddc461ea6) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* sprites */
-	ROM_LOAD( "ds_000.ic11", 0x000000, 0x100000, CRC(366b3e29) SHA1(cb016dcbdc6e8ea56c28c00135263666b07df991) ) /* MASK ROMs with no "official" rom label */
+	ROM_LOAD( "ds_000.ic11", 0x000000, 0x100000, CRC(366b3e29) SHA1(cb016dcbdc6e8ea56c28c00135263666b07df991) ) /* mask ROMs with no "official" ROM label */
 	ROM_LOAD( "ds_010.ic12", 0x100000, 0x100000, CRC(28a4cc40) SHA1(7f4e1ef995eaadf1945ee22ab3270cb8a21c601d) )
 	ROM_LOAD( "ds_020.ic13", 0x200000, 0x100000, CRC(5a310f7f) SHA1(21969e4247c8328d27118d00604096deaf6700af) )
 	ROM_LOAD( "ds_030.ic14", 0x300000, 0x100000, CRC(328b1f45) SHA1(4cbbd4d9be4fc151d426175bdbd35d8481bf2966) )
@@ -981,42 +992,38 @@ ROM_START( kftgoal )
 	ROM_REGION( 0x100000, "irem", 0 )    /* ADPCM samples */
 	ROM_LOAD( "pk-da0.da0", 0x000000, 0x80000, BAD_DUMP CRC(26a34cf4) SHA1(a8a7cd91cdc6d644ee02ca16e7fdc8debf8f3a5f) ) //clearly taken from World PK Soccer, it says "World PK Soccer" at title screen
 
-	ROM_REGION( 0x2000, "eeprom", 0 ) /* ST M28C64C-20PI Eeprom */
+	ROM_REGION( 0x2000, "eeprom", 0 ) /* ST M28C64C-20PI EEPROM */
 	ROM_LOAD( "st-m28c64c.eeprom", 0x000, 0x2000, CRC(8e0c8b7c) SHA1(0b57290d709e6d54ce1bb3a5c01b80590203c1dd) )
 ROM_END
 
 /***************************************************************************/
 
-DRIVER_INIT_MEMBER(m107_state,firebarr)
+void m107_state::init_firebarr()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->set_base(&ROM[0xa0000]);
-
 	m_spritesystem = 1;
 }
 
-DRIVER_INIT_MEMBER(m107_state,dsoccr94)
+void m107_state::init_wpksoc()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
-
 	m_spritesystem = 0;
 }
 
-DRIVER_INIT_MEMBER(m107_state,wpksoc)
+void m107_state::init_dsoccr94()
 {
-	m_spritesystem = 0;
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	m_mainbank->configure_entries(0, 4, &ROM[0x80000], 0x20000);
+
+	init_wpksoc();
 }
 
 /***************************************************************************/
 
-GAME( 1993, airass,    0,        airass,   firebarr, m107_state, firebarr, ROT270, "Irem", "Air Assault (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // possible location test, but sound code is newer than Japan version
-GAME( 1993, firebarr,  airass,   firebarr, firebarr, m107_state, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, airass,    0,        airass,   firebarr, m107_state, init_firebarr, ROT270, "Irem", "Air Assault (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // possible location test, but sound code is newer than Japan version
+GAME( 1993, firebarr,  airass,   firebarr, firebarr, m107_state, init_firebarr, ROT270, "Irem", "Fire Barrel (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, dsoccr94,  0,        dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (World, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dsoccr94k, dsoccr94, dsoccr94, dsoccr94, m107_state, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (Korea, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // default team selected is Korea, so likely a Korean set
+GAME( 1994, dsoccr94,  0,        dsoccr94, dsoccr94, m107_state, init_dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (World, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dsoccr94k, dsoccr94, dsoccr94, dsoccr94, m107_state, init_dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (Korea, M107 hardware)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // default team selected is Korea, so likely a Korean set
 
-GAME( 1995, wpksoc,    0,        wpksoc,   wpksoc,   m107_state, wpksoc,   ROT0,   "Jaleco", "World PK Soccer",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, kftgoal,   wpksoc,   wpksoc,   wpksoc,   m107_state, wpksoc,   ROT0,   "Jaleco", "Kick for the Goal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wpksoc,    0,        wpksoc,   wpksoc,   m107_state, init_wpksoc,   ROT0,   "Jaleco", "World PK Soccer",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, kftgoal,   wpksoc,   wpksoc,   wpksoc,   m107_state, init_wpksoc,   ROT0,   "Jaleco", "Kick for the Goal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

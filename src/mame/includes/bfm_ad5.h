@@ -16,7 +16,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_DRIVER_INIT(ad5);
+	void init_ad5();
 	void bfm_ad5(machine_config &config);
 
 protected:

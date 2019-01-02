@@ -27,10 +27,11 @@ public:
 		m_extra(*this, "extra")
 	{ }
 
-	DECLARE_DRIVER_INIT(thunderj);
 	void thunderj(machine_config &config);
 
-protected:
+	void init_thunderj();
+
+private:
 	virtual void machine_start() override;
 	DECLARE_WRITE_LINE_MEMBER(scanline_int_write_line);
 	DECLARE_READ16_MEMBER(special_port2_r);
@@ -43,7 +44,6 @@ protected:
 	void extra_map(address_map &map);
 	void main_map(address_map &map);
 
-private:
 	required_device<screen_device> m_screen;
 	required_device<atari_jsa_ii_device> m_jsa;
 	required_device<atari_vad_device> m_vad;

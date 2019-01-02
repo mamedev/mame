@@ -20,6 +20,7 @@
 
 #include "bus/odyssey2/slot.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -28,15 +29,26 @@
 class odyssey2_state : public driver_device
 {
 public:
-	odyssey2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	odyssey2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_i8244(*this, "i8244"),
 		m_cart(*this, "cartslot"),
 		m_keyboard(*this, "KEY.%u", 0),
-		m_joysticks(*this, "JOY.%u", 0) { }
+		m_joysticks(*this, "JOY.%u", 0)
+	{ }
 
-	required_device<cpu_device> m_maincpu;
+	void odyssey2_cartslot(machine_config &config);
+	void videopac(machine_config &config);
+	void odyssey2(machine_config &config);
+
+	void init_odyssey2();
+
+	uint32_t screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+
+	required_device<i8048_device> m_maincpu;
 	required_device<i8244_device> m_i8244;
 	required_device<o2_cart_slot_device> m_cart;
 
@@ -44,29 +56,19 @@ public:
 	uint8_t m_p1;
 	uint8_t m_p2;
 	uint8_t m_lum;
-	DECLARE_READ8_MEMBER(io_read);
-	DECLARE_WRITE8_MEMBER(io_write);
-	DECLARE_READ8_MEMBER(bus_read);
-	DECLARE_WRITE8_MEMBER(bus_write);
-	DECLARE_READ8_MEMBER(p1_read);
-	DECLARE_WRITE8_MEMBER(p1_write);
-	DECLARE_READ8_MEMBER(p2_read);
-	DECLARE_WRITE8_MEMBER(p2_write);
+
+
 	DECLARE_READ_LINE_MEMBER(t1_read);
-	DECLARE_DRIVER_INIT(odyssey2);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(odyssey2);
-	uint32_t screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void odyssey2_palette(palette_device &palette) const;
 
 	DECLARE_WRITE16_MEMBER(scanline_postprocess);
 
-	void odyssey2_cartslot(machine_config &config);
-	void videopac(machine_config &config);
-	void odyssey2(machine_config &config);
 	void odyssey2_io(address_map &map);
 	void odyssey2_mem(address_map &map);
-protected:
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	/* constants */
 	static const uint8_t P1_BANK_LO_BIT          = 0x01;
 	static const uint8_t P1_BANK_HI_BIT          = 0x02;
@@ -79,6 +81,15 @@ protected:
 
 	required_ioport_array<6> m_keyboard;
 	required_ioport_array<2> m_joysticks;
+
+	DECLARE_READ8_MEMBER(io_read);
+	DECLARE_WRITE8_MEMBER(io_write);
+	DECLARE_READ8_MEMBER(bus_read);
+	DECLARE_WRITE8_MEMBER(bus_write);
+	DECLARE_READ8_MEMBER(p1_read);
+	DECLARE_WRITE8_MEMBER(p1_write);
+	DECLARE_READ8_MEMBER(p2_read);
+	DECLARE_WRITE8_MEMBER(p2_write);
 };
 
 class g7400_state : public odyssey2_state
@@ -90,22 +101,27 @@ public:
 		, m_ef9340_1(*this, "ef9340_1")
 	{ }
 
+	void g7400(machine_config &config);
+	void odyssey3(machine_config &config);
+
+private:
 	required_device<i8243_device> m_i8243;
 	required_device<ef9340_1_device> m_ef9340_1;
 
-	DECLARE_PALETTE_INIT(g7400);
+	void g7400_palette(palette_device &palette) const;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(p2_write);
 	DECLARE_READ8_MEMBER(io_read);
 	DECLARE_WRITE8_MEMBER(io_write);
-	DECLARE_WRITE8_MEMBER(i8243_port_w);
+	void i8243_p4_w(uint8_t data);
+	void i8243_p5_w(uint8_t data);
+	void i8243_p6_w(uint8_t data);
+	void i8243_p7_w(uint8_t data);
 	DECLARE_WRITE16_MEMBER(scanline_postprocess);
 
-	void g7400(machine_config &config);
-	void odyssey3(machine_config &config);
 	void g7400_io(address_map &map);
-protected:
+
 	uint8_t m_ic674_decode[8];
 	uint8_t m_ic678_decode[8];
 };
@@ -121,13 +137,13 @@ void odyssey2_state::odyssey2_mem(address_map &map)
 
 void odyssey2_state::odyssey2_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(odyssey2_state::io_read), FUNC(odyssey2_state::io_write));
+	map(0x00, 0xff).rw(FUNC(odyssey2_state::io_read), FUNC(odyssey2_state::io_write));
 }
 
 
 void g7400_state::g7400_io(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(g7400_state::io_read), FUNC(g7400_state::io_write));
+	map(0x00, 0xff).rw(FUNC(g7400_state::io_read), FUNC(g7400_state::io_write));
 }
 
 
@@ -217,70 +233,62 @@ INPUT_PORTS_END
    light back / grid colors
    black, blue, green, light green, red, violet, yellow, light grey */
 
-const uint8_t odyssey2_colors[] =
+constexpr rgb_t odyssey2_colors[] =
 {
-	/* Background,Grid Dim */
-	0x00,0x00,0x00,   /* Black */                                         // i r g b
-	0x1A,0x37,0xBE,   /* Blue           - Calibrated To Real VideoPac */  // i r g B
-	0x00,0x6D,0x07,   /* Green          - Calibrated To Real VideoPac */  // i r G b
-	0x2A,0xAA,0xBE,   /* Blue-Green     - Calibrated To Real VideoPac */  // i r G B
-	0x79,0x00,0x00,   /* Red            - Calibrated To Real VideoPac */  // i R g b
-	0x94,0x30,0x9F,   /* Violet         - Calibrated To Real VideoPac */  // i R g B
-	0x77,0x67,0x0B,   /* Khaki          - Calibrated To Real VideoPac */  // i R g B
-	0xCE,0xCE,0xCE,   /* Lt Grey */                                       // i R G B
+	// Background,Grid Dim
+	{ 0x00, 0x00, 0x00 },   /* Black */                                         // i r g b
+	{ 0x1a, 0x37, 0xbe },   /* Blue           - Calibrated To Real VideoPac */  // i r g B
+	{ 0x00, 0x6d, 0x07 },   /* Green          - Calibrated To Real VideoPac */  // i r G b
+	{ 0x2a, 0xaa, 0xbe },   /* Blue-Green     - Calibrated To Real VideoPac */  // i r G B
+	{ 0x79, 0x00, 0x00 },   /* Red            - Calibrated To Real VideoPac */  // i R g b
+	{ 0x94, 0x30, 0x9f },   /* Violet         - Calibrated To Real VideoPac */  // i R g B
+	{ 0x77, 0x67, 0x0b },   /* Khaki          - Calibrated To Real VideoPac */  // i R g B
+	{ 0xce, 0xce, 0xce },   /* Lt Grey */                                       // i R G B
 
-	/* Background,Grid Bright */
-	0x67,0x67,0x67,   /* Grey           - Calibrated To Real VideoPac */  // I R g B
-	0x5C,0x80,0xF6,   /* Lt Blue        - Calibrated To Real VideoPac */  // I R g B
-	0x56,0xC4,0x69,   /* Lt Green       - Calibrated To Real VideoPac */  // I R g B
-	0x77,0xE6,0xEB,   /* Lt Blue-Green  - Calibrated To Real VideoPac */  // I R g b
-	0xC7,0x51,0x51,   /* Lt Red         - Calibrated To Real VideoPac */  // I R g b
-	0xDC,0x84,0xE8,   /* Lt Violet      - Calibrated To Real VideoPac */  // I R g B
-	0xC6,0xB8,0x6A,   /* Lt Yellow      - Calibrated To Real VideoPac */  // I R G b
-	0xFF,0xFF,0xFF,   /* White */                                         // I R G B
+	// Background,Grid Bright
+	{ 0x67, 0x67, 0x67 },   /* Grey           - Calibrated To Real VideoPac */  // I R g B
+	{ 0x5c, 0x80, 0xf6 },   /* Lt Blue        - Calibrated To Real VideoPac */  // I R g B
+	{ 0x56, 0xc4, 0x69 },   /* Lt Green       - Calibrated To Real VideoPac */  // I R g B
+	{ 0x77, 0xe6, 0xeb },   /* Lt Blue-Green  - Calibrated To Real VideoPac */  // I R g b
+	{ 0xc7, 0x51, 0x51 },   /* Lt Red         - Calibrated To Real VideoPac */  // I R g b
+	{ 0xdc, 0x84, 0xe8 },   /* Lt Violet      - Calibrated To Real VideoPac */  // I R g B
+	{ 0xc6, 0xb8, 0x6a },   /* Lt Yellow      - Calibrated To Real VideoPac */  // I R G b
+	{ 0xff, 0xff, 0xff }    /* White */                                         // I R G B
 };
 
 
-PALETTE_INIT_MEMBER(odyssey2_state, odyssey2)
+void odyssey2_state::odyssey2_palette(palette_device &palette) const
 {
-	for ( int i = 0; i < 16; i++ )
-	{
-		palette.set_pen_color( i, odyssey2_colors[i*3], odyssey2_colors[i*3+1], odyssey2_colors[i*3+2] );
-	}
+	palette.set_pen_colors(0, odyssey2_colors);
 }
 
 
-PALETTE_INIT_MEMBER(g7400_state, g7400)
+void g7400_state::g7400_palette(palette_device &palette) const
 {
-	const uint8_t g7400_colors[] =
-	{
-	0x00,0x00,0x00, // Black
-	0x1A,0x37,0xBE, // Blue
-	0x00,0x6D,0x07, // Green
-	0x2A,0xAA,0xBE, // Blue-Green
-	0x79,0x00,0x00, // Red
-	0x94,0x30,0x9F, // Violet
-	0x77,0x67,0x0B, // Khaki
-	0xCE,0xCE,0xCE, // Lt Grey
+	constexpr rgb_t g7400_colors[]{
+		{ 0x00, 0x00, 0x00 }, // Black
+		{ 0x1a, 0x37, 0xbe }, // Blue
+		{ 0x00, 0x6d, 0x07 }, // Green
+		{ 0x2a, 0xaa, 0xbe }, // Blue-Green
+		{ 0x79, 0x00, 0x00 }, // Red
+		{ 0x94, 0x30, 0x9f }, // Violet
+		{ 0x77, 0x67, 0x0b }, // Khaki
+		{ 0xce, 0xce, 0xce }, // Lt Grey
 
-	0x67,0x67,0x67, // Grey
-	0x5C,0x80,0xF6, // Lt Blue
-	0x56,0xC4,0x69, // Lt Green
-	0x77,0xE6,0xEB, // Lt Blue-Green
-	0xC7,0x51,0x51, // Lt Red
-	0xDC,0x84,0xE8, // Lt Violet
-	0xC6,0xB8,0x6A, // Lt Yellow
-	0xff,0xff,0xff  // White
-
+		{ 0x67, 0x67, 0x67 }, // Grey
+		{ 0x5c, 0x80, 0xf6 }, // Lt Blue
+		{ 0x56, 0xc4, 0x69 }, // Lt Green
+		{ 0x77, 0xe6, 0xeb }, // Lt Blue-Green
+		{ 0xc7, 0x51, 0x51 }, // Lt Red
+		{ 0xdc, 0x84, 0xe8 }, // Lt Violet
+		{ 0xc6, 0xb8, 0x6a }, // Lt Yellow
+		{ 0xff, 0xff, 0xff }  // White
 	};
 
-	for ( int i = 0; i < 16; i++ )
-	{
-		palette.set_pen_color( i, g7400_colors[i*3], g7400_colors[i*3+1], g7400_colors[i*3+2] );
-	}
+	palette.set_pen_colors(0, g7400_colors);
 }
 
-DRIVER_INIT_MEMBER(odyssey2_state,odyssey2)
+void odyssey2_state::init_odyssey2()
 {
 	uint8_t *gfx = memregion("gfx1")->base();
 
@@ -543,7 +551,7 @@ WRITE8_MEMBER(odyssey2_state::p2_write)
 WRITE8_MEMBER(g7400_state::p2_write)
 {
 	m_p2 = data;
-	m_i8243->p2_w( space, 0, m_p2 & 0x0f );
+	m_i8243->p2_w(m_p2 & 0x0f);
 }
 
 
@@ -575,43 +583,47 @@ WRITE8_MEMBER(odyssey2_state::bus_write)
     i8243 in the g7400
 */
 
-WRITE8_MEMBER(g7400_state::i8243_port_w)
+void g7400_state::i8243_p4_w(uint8_t data)
 {
-	switch ( offset & 3 )
-	{
-		case 0: // "port 4"
-logerror("setting ef-port4 to %02x\n", data);
-			m_ic674_decode[4] = BIT(data,0);
-			m_ic674_decode[5] = BIT(data,1);
-			m_ic674_decode[6] = BIT(data,2);
-			m_ic674_decode[7] = BIT(data,3);
-			break;
+	// "port 4"
+	logerror("setting ef-port4 to %02x\n", data);
+	m_ic674_decode[4] = BIT(data,0);
+	m_ic674_decode[5] = BIT(data,1);
+	m_ic674_decode[6] = BIT(data,2);
+	m_ic674_decode[7] = BIT(data,3);
+}
 
-		case 1: // "port 5"
-logerror("setting ef-port5 to %02x\n", data);
-			m_ic674_decode[0] = BIT(data,0);
-			m_ic674_decode[1] = BIT(data,1);
-			m_ic674_decode[2] = BIT(data,2);
-			m_ic674_decode[3] = BIT(data,3);
-			break;
 
-		case 2: // "port 6"
-logerror("setting vdc-port6 to %02x\n", data);
-			m_ic678_decode[4] = BIT(data,0);
-			m_ic678_decode[5] = BIT(data,1);
-			m_ic678_decode[6] = BIT(data,2);
-			m_ic678_decode[7] = BIT(data,3);
-			break;
+void g7400_state::i8243_p5_w(uint8_t data)
+{
+	// "port 5"
+	logerror("setting ef-port5 to %02x\n", data);
+	m_ic674_decode[0] = BIT(data,0);
+	m_ic674_decode[1] = BIT(data,1);
+	m_ic674_decode[2] = BIT(data,2);
+	m_ic674_decode[3] = BIT(data,3);
+}
 
-		case 3: // "port 7"
-logerror("setting vdc-port7 to %02x\n", data);
-			m_ic678_decode[0] = BIT(data,0);
-			m_ic678_decode[1] = BIT(data,1);
-			m_ic678_decode[2] = BIT(data,2);
-			m_ic678_decode[3] = BIT(data,3);
-			break;
 
-	}
+void g7400_state::i8243_p6_w(uint8_t data)
+{
+	// "port 6"
+	logerror("setting vdc-port6 to %02x\n", data);
+	m_ic678_decode[4] = BIT(data,0);
+	m_ic678_decode[5] = BIT(data,1);
+	m_ic678_decode[6] = BIT(data,2);
+	m_ic678_decode[7] = BIT(data,3);
+}
+
+
+void g7400_state::i8243_p7_w(uint8_t data)
+{
+	// "port 7"
+	logerror("setting vdc-port7 to %02x\n", data);
+	m_ic678_decode[0] = BIT(data,0);
+	m_ic678_decode[1] = BIT(data,1);
+	m_ic678_decode[2] = BIT(data,2);
+	m_ic678_decode[3] = BIT(data,3);
 }
 
 
@@ -654,7 +666,7 @@ static const gfx_layout odyssey2_spritelayout =
 };
 
 
-static GFXDECODE_START( odyssey2 )
+static GFXDECODE_START( gfx_odyssey2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, odyssey2_graphicslayout, 0, 2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, odyssey2_spritelayout, 0, 2 )
 GFXDECODE_END
@@ -670,17 +682,18 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(odyssey2_state::odyssey2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8048, ( ( XTAL(7'159'090) * 3 ) / 4 ) )
-	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
-	MCFG_CPU_IO_MAP(odyssey2_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(odyssey2_state, p1_read))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(odyssey2_state, p1_write))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(odyssey2_state, p2_read))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(odyssey2_state, p2_write))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(odyssey2_state, bus_read))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(odyssey2_state, bus_write))
-	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("cartslot", o2_cart_slot_device, t0_read))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(odyssey2_state, t1_read))
+	I8048(config, m_maincpu, ((XTAL(7'159'090) * 3) / 4));
+	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey2_state::odyssey2_mem);
+	m_maincpu->set_addrmap(AS_IO, &odyssey2_state::odyssey2_io);
+	m_maincpu->p1_in_cb().set(FUNC(odyssey2_state::p1_read));
+	m_maincpu->p1_out_cb().set(FUNC(odyssey2_state::p1_write));
+	m_maincpu->p2_in_cb().set(FUNC(odyssey2_state::p2_read));
+	m_maincpu->p2_out_cb().set(FUNC(odyssey2_state::p2_write));
+	m_maincpu->bus_in_cb().set(FUNC(odyssey2_state::bus_read));
+	m_maincpu->bus_out_cb().set(FUNC(odyssey2_state::bus_write));
+	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
+	m_maincpu->t1_in_cb().set(FUNC(odyssey2_state::t1_read));
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -689,13 +702,12 @@ MACHINE_CONFIG_START(odyssey2_state::odyssey2)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_odyssey2);
+	PALETTE(config, "palette", FUNC(odyssey2_state::odyssey2_palette), 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_I8244_ADD( "i8244", XTAL(7'159'090)/2 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( odyssey2_state, scanline_postprocess ) )
+	SPEAKER(config, "mono").front_center();
+	MCFG_I8244_ADD( "i8244", XTAL(7'159'090)/2 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, odyssey2_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	odyssey2_cartslot(config);
@@ -704,9 +716,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(odyssey2_state::videopac)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8048, ( XTAL(17'734'470) / 3 ) )
-	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
-	MCFG_CPU_IO_MAP(odyssey2_io)
+	I8048(config, m_maincpu, (XTAL(17'734'470) / 3));
+	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey2_state::odyssey2_mem);
+	m_maincpu->set_addrmap(AS_IO, &odyssey2_state::odyssey2_io);
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -715,13 +728,12 @@ MACHINE_CONFIG_START(odyssey2_state::videopac)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(odyssey2_state, odyssey2)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_odyssey2);
+	PALETTE(config, "palette", FUNC(odyssey2_state::odyssey2_palette), 16);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_I8245_ADD( "i8244", XTAL(17'734'470)/5 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( odyssey2_state, scanline_postprocess ) )
+	SPEAKER(config, "mono").front_center();
+	MCFG_I8245_ADD( "i8244", XTAL(17'734'470)/5 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, odyssey2_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	odyssey2_cartslot(config);
@@ -730,36 +742,40 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(g7400_state::g7400)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8048, XTAL(5'911'000) )
-	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
-	MCFG_CPU_IO_MAP(g7400_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(g7400_state, p1_read))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(g7400_state, p1_write))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(g7400_state, p2_read))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(g7400_state, p2_write))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(g7400_state, bus_read))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(g7400_state, bus_write))
-	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("cartslot", o2_cart_slot_device, t0_read))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(g7400_state, t1_read))
-	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("i8243", i8243_device, prog_w))
+	I8048(config, m_maincpu, XTAL(5'911'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &g7400_state::odyssey2_mem);
+	m_maincpu->set_addrmap(AS_IO, &g7400_state::g7400_io);
+	m_maincpu->p1_in_cb().set(FUNC(g7400_state::p1_read));
+	m_maincpu->p1_out_cb().set(FUNC(g7400_state::p1_write));
+	m_maincpu->p2_in_cb().set(FUNC(g7400_state::p2_read));
+	m_maincpu->p2_out_cb().set(FUNC(g7400_state::p2_write));
+	m_maincpu->bus_in_cb().set(FUNC(g7400_state::bus_read));
+	m_maincpu->bus_out_cb().set(FUNC(g7400_state::bus_write));
+	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
+	m_maincpu->t1_in_cb().set(FUNC(g7400_state::t1_read));
+	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( 3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
+	MCFG_SCREEN_RAW_PARAMS(3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_odyssey2);
+	PALETTE(config, "palette", FUNC(g7400_state::g7400_palette), 16);
 
-	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(g7400_state,i8243_port_w))
+	I8243(config, m_i8243);
+	m_i8243->p4_out_cb().set(FUNC(g7400_state::i8243_p4_w));
+	m_i8243->p5_out_cb().set(FUNC(g7400_state::i8243_p5_w));
+	m_i8243->p6_out_cb().set(FUNC(g7400_state::i8243_p6_w));
+	m_i8243->p7_out_cb().set(FUNC(g7400_state::i8243_p7_w));
 
-	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
+	MCFG_EF9340_1_ADD("ef9340_1", 3540000, "screen")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_I8245_ADD( "i8244", 3540000 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( g7400_state, scanline_postprocess ) )
+	SPEAKER(config, "mono").front_center();
+	MCFG_I8245_ADD("i8244", 3540000 * 2, "screen", INPUTLINE("maincpu", 0), WRITE16(*this, g7400_state, scanline_postprocess))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	odyssey2_cartslot(config);
@@ -771,36 +787,40 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(g7400_state::odyssey3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8048, XTAL(5'911'000) )
-	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
-	MCFG_CPU_IO_MAP(g7400_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(g7400_state, p1_read))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(g7400_state, p1_write))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(g7400_state, p2_read))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(g7400_state, p2_write))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(g7400_state, bus_read))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(g7400_state, bus_write))
-	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("cartslot", o2_cart_slot_device, t0_read))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(g7400_state, t1_read))
-	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("i8243", i8243_device, prog_w))
+	I8048(config, m_maincpu, XTAL(5'911'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &g7400_state::odyssey2_mem);
+	m_maincpu->set_addrmap(AS_IO, &g7400_state::g7400_io);
+	m_maincpu->p1_in_cb().set(FUNC(g7400_state::p1_read));
+	m_maincpu->p1_out_cb().set(FUNC(g7400_state::p1_write));
+	m_maincpu->p2_in_cb().set(FUNC(g7400_state::p2_read));
+	m_maincpu->p2_out_cb().set(FUNC(g7400_state::p2_write));
+	m_maincpu->bus_in_cb().set(FUNC(g7400_state::bus_read));
+	m_maincpu->bus_out_cb().set(FUNC(g7400_state::bus_write));
+	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
+	m_maincpu->t1_in_cb().set(FUNC(g7400_state::t1_read));
+	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( 3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
+	MCFG_SCREEN_RAW_PARAMS(3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", odyssey2 )
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_odyssey2);
+	PALETTE(config, "palette", FUNC(g7400_state::g7400_palette), 16);
 
-	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(g7400_state,i8243_port_w))
+	I8243(config, m_i8243);
+	m_i8243->p4_out_cb().set(FUNC(g7400_state::i8243_p4_w));
+	m_i8243->p5_out_cb().set(FUNC(g7400_state::i8243_p5_w));
+	m_i8243->p6_out_cb().set(FUNC(g7400_state::i8243_p6_w));
+	m_i8243->p7_out_cb().set(FUNC(g7400_state::i8243_p7_w));
 
-	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
+	MCFG_EF9340_1_ADD("ef9340_1", 3540000, "screen")
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_I8244_ADD( "i8244", 3540000 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( g7400_state, scanline_postprocess ) )
+	SPEAKER(config, "mono").front_center();
+	MCFG_I8244_ADD("i8244", 3540000 * 2, "screen", INPUTLINE("maincpu", 0), WRITE16(*this, g7400_state, scanline_postprocess))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	odyssey2_cartslot(config);
@@ -820,9 +840,9 @@ ROM_END
 ROM_START (videopac)
 	ROM_REGION(0x10000,"maincpu",0)    /* safer for the memory handler/bankswitching??? */
 	ROM_SYSTEM_BIOS( 0, "g7000", "g7000" )
-	ROMX_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee), ROM_BIOS(1))
+	ROMX_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "c52", "c52" )
-	ROMX_LOAD ("c52.bin", 0x0000, 0x0400, CRC(a318e8d6) SHA1(a6120aed50831c9c0d95dbdf707820f601d9452e), ROM_BIOS(2))
+	ROMX_LOAD ("c52.bin", 0x0000, 0x0400, CRC(a318e8d6) SHA1(a6120aed50831c9c0d95dbdf707820f601d9452e), ROM_BIOS(1))
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 
@@ -848,9 +868,9 @@ ROM_START (odyssey3)
 	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY     FULLNAME                                FLAGS */
-COMP( 1978, odyssey2, 0,        0,      odyssey2, odyssey2, odyssey2_state, odyssey2, "Magnavox", "Odyssey 2",                            0 )
-COMP( 1979, videopac, odyssey2, 0,      videopac, odyssey2, odyssey2_state, odyssey2, "Philips",  "Videopac G7000/C52",                   0 )
-COMP( 1983, g7400,    odyssey2, 0,      g7400,    odyssey2, g7400_state,    odyssey2, "Philips",  "Videopac Plus G7400",                  MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1983, jopac,    odyssey2, 0,      g7400,    odyssey2, g7400_state,    odyssey2, "Brandt",   "Jopac JO7400",                         MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1983, odyssey3, odyssey2, 0,      odyssey3, odyssey2, g7400_state,    odyssey2, "Magnavox", "Odyssey 3 Command Center (prototype)", MACHINE_IMPERFECT_GRAPHICS )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY     FULLNAME                                FLAGS */
+COMP( 1978, odyssey2, 0,        0,      odyssey2, odyssey2, odyssey2_state, init_odyssey2, "Magnavox", "Odyssey 2",                            0 )
+COMP( 1979, videopac, odyssey2, 0,      videopac, odyssey2, odyssey2_state, init_odyssey2, "Philips",  "Videopac G7000/C52",                   0 )
+COMP( 1983, g7400,    odyssey2, 0,      g7400,    odyssey2, g7400_state,    init_odyssey2, "Philips",  "Videopac Plus G7400",                  MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, jopac,    odyssey2, 0,      g7400,    odyssey2, g7400_state,    init_odyssey2, "Brandt",   "Jopac JO7400",                         MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, odyssey3, odyssey2, 0,      odyssey3, odyssey2, g7400_state,    init_odyssey2, "Magnavox", "Odyssey 3 Command Center (prototype)", MACHINE_IMPERFECT_GRAPHICS )

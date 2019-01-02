@@ -13,8 +13,10 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vreadere(machine_config &config);
+
+private:
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 uint32_t vreadere_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -27,7 +29,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(vreadere_state::vreadere)
 	/* basic machine hardware */
-	// MCFG_CPU_ADD("maincpu", unknown, unknown) // CPU type is unknown, epoxy blob
+	// MCFG_DEVICE_ADD("maincpu", unknown, unknown) // CPU type is unknown, epoxy blob
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -43,4 +45,4 @@ ROM_START( vreadere )
 	ROM_LOAD( "27-08291.u2", 0x000000, 0x400000, CRC(f2eb801f) SHA1(33e2d28ab2f04b17f66880898832265d50de54d4) )
 ROM_END
 
-COMP( 2004, vreadere,      0,      0,      vreadere,     vreadere, vreadere_state, 0,    "Video Technology", "Reader Laptop E (Germany)", MACHINE_IS_SKELETON )
+COMP( 2004, vreadere, 0, 0, vreadere, vreadere, vreadere_state, empty_init, "Video Technology", "Reader Laptop E (Germany)", MACHINE_IS_SKELETON )

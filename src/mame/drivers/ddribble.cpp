@@ -107,30 +107,30 @@ WRITE8_MEMBER(ddribble_state::ddribble_vlm5030_ctrl_w)
 
 void ddribble_state::cpu0_map(address_map &map)
 {
-	map(0x0000, 0x0004).w(this, FUNC(ddribble_state::K005885_0_w));                                              /* video registers (005885 #1) */
-	map(0x0800, 0x0804).w(this, FUNC(ddribble_state::K005885_1_w));                                              /* video registers (005885 #2) */
+	map(0x0000, 0x0004).w(FUNC(ddribble_state::K005885_0_w));                                              /* video registers (005885 #1) */
+	map(0x0800, 0x0804).w(FUNC(ddribble_state::K005885_1_w));                                              /* video registers (005885 #2) */
 	map(0x1800, 0x187f).ram().w("palette", FUNC(palette_device::write_indirect)).share("palette");  /* palette */
-	map(0x2000, 0x2fff).ram().w(this, FUNC(ddribble_state::ddribble_fg_videoram_w)).share("fg_videoram");   /* Video RAM 1 */
+	map(0x2000, 0x2fff).ram().w(FUNC(ddribble_state::ddribble_fg_videoram_w)).share("fg_videoram");   /* Video RAM 1 */
 	map(0x3000, 0x3fff).ram().share("spriteram_1");                             /* Object RAM 1 */
 	map(0x4000, 0x5fff).ram().share("sharedram");                                   /* shared RAM with CPU #1 */
-	map(0x6000, 0x6fff).ram().w(this, FUNC(ddribble_state::ddribble_bg_videoram_w)).share("bg_videoram");   /* Video RAM 2 */
+	map(0x6000, 0x6fff).ram().w(FUNC(ddribble_state::ddribble_bg_videoram_w)).share("bg_videoram");   /* Video RAM 2 */
 	map(0x7000, 0x7fff).ram().share("spriteram_2");                             /* Object RAM 2 */
-	map(0x8000, 0x8000).w(this, FUNC(ddribble_state::ddribble_bankswitch_w));                                        /* bankswitch control */
+	map(0x8000, 0x8000).w(FUNC(ddribble_state::ddribble_bankswitch_w));                                        /* bankswitch control */
 	map(0x8000, 0x9fff).bankr("bank1");                                                        /* banked ROM */
 	map(0xa000, 0xffff).rom();                                                             /* ROM */
 }
 
 void ddribble_state::cpu1_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rw(this, FUNC(ddribble_state::ddribble_sharedram_r), FUNC(ddribble_state::ddribble_sharedram_w));           /* shared RAM with CPU #0 */
-	map(0x2000, 0x27ff).rw(this, FUNC(ddribble_state::ddribble_snd_sharedram_r), FUNC(ddribble_state::ddribble_snd_sharedram_w));   /* shared RAM with CPU #2 */
+	map(0x0000, 0x1fff).rw(FUNC(ddribble_state::ddribble_sharedram_r), FUNC(ddribble_state::ddribble_sharedram_w));           /* shared RAM with CPU #0 */
+	map(0x2000, 0x27ff).rw(FUNC(ddribble_state::ddribble_snd_sharedram_r), FUNC(ddribble_state::ddribble_snd_sharedram_w));   /* shared RAM with CPU #2 */
 	map(0x2800, 0x2800).portr("DSW1");
 	map(0x2801, 0x2801).portr("P1");
 	map(0x2802, 0x2802).portr("P2");
 	map(0x2803, 0x2803).portr("SYSTEM");                                         /* coinsw & start */
 	map(0x2c00, 0x2c00).portr("DSW2");
 	map(0x3000, 0x3000).portr("DSW3");
-	map(0x3400, 0x3400).w(this, FUNC(ddribble_state::ddribble_coin_counter_w));                              /* coin counters */
+	map(0x3400, 0x3400).w(FUNC(ddribble_state::ddribble_coin_counter_w));                              /* coin counters */
 	map(0x3c00, 0x3c00).w("watchdog", FUNC(watchdog_timer_device::reset_w));        /* watchdog reset */
 	map(0x8000, 0xffff).rom();                                                         /* ROM */
 }
@@ -221,7 +221,7 @@ static const gfx_layout spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( ddribble )
+static GFXDECODE_START( gfx_ddribble )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,    48,  1 )   /* colors 48-63 */
 	GFXDECODE_ENTRY( "gfx2", 0x00000, charlayout,    16,  1 )   /* colors 16-31 */
 	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout,  32,  1 )   /* colors 32-47 */
@@ -260,18 +260,18 @@ void ddribble_state::machine_reset()
 MACHINE_CONFIG_START(ddribble_state::ddribble)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu0_map)
+	MCFG_DEVICE_ADD(m_maincpu, MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu0_map)
 
-	MCFG_CPU_ADD("cpu1", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_ADD(m_cpu1, MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
 
-	MCFG_CPU_ADD("cpu2", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_ADD("cpu2", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synch */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -283,34 +283,31 @@ MACHINE_CONFIG_START(ddribble_state::ddribble)
     MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1) */
 	MCFG_SCREEN_UPDATE_DRIVER(ddribble_state, screen_update_ddribble)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddribble_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ddribble_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddribble)
-	MCFG_PALETTE_ADD("palette", 64 + 256)
-	MCFG_PALETTE_INDIRECT_ENTRIES(64)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(ddribble_state, ddribble)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_ddribble);
+	PALETTE(config, "palette", FUNC(ddribble_state::ddribble_palette)).set_format(palette_device::xBGR_555, 64 + 256, 64);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(ddribble_state, ddribble_vlm5030_busy_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ddribble_state, ddribble_vlm5030_ctrl_w))
-	MCFG_SOUND_ROUTE(0, "filter1", 0.25)
-	MCFG_SOUND_ROUTE(1, "filter2", 0.25)
-	MCFG_SOUND_ROUTE(2, "filter3", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 0.25)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
+	ymsnd.port_b_read_callback().set(FUNC(ddribble_state::ddribble_vlm5030_busy_r));
+	ymsnd.port_a_write_callback().set(FUNC(ddribble_state::ddribble_vlm5030_ctrl_w));
+	ymsnd.add_route(0, "filter1", 0.25);
+	ymsnd.add_route(1, "filter2", 0.25);
+	ymsnd.add_route(2, "filter3", 0.25);
+	ymsnd.add_route(3, "mono", 0.25);
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD(m_vlm, VLM5030, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 
-	MCFG_FILTER_RC_ADD("filter1", 0)
+	MCFG_DEVICE_ADD(m_filter1, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter2", 0)
+	MCFG_DEVICE_ADD(m_filter2, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter3", 0)
+	MCFG_DEVICE_ADD(m_filter3, FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -379,5 +376,5 @@ ROM_START( ddribblep )
 	ROM_LOAD( "voice_10.d7", 0x10000, 0x10000, CRC(b4c97494) SHA1(93f7c3c93f6f790c3f480e183da0105b5ac3593b) )
 ROM_END
 
-GAME( 1986, ddribble,  0,        ddribble, ddribble, ddribble_state, 0, ROT0, "Konami", "Double Dribble", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ddribblep, ddribble, ddribble, ddribble, ddribble_state, 0, ROT0, "Konami", "Double Dribble (prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ddribble,  0,        ddribble, ddribble, ddribble_state, empty_init, ROT0, "Konami", "Double Dribble", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ddribblep, ddribble, ddribble, ddribble, ddribble_state, empty_init, ROT0, "Konami", "Double Dribble (prototype?)", MACHINE_SUPPORTS_SAVE )

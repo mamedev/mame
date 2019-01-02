@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-25 02:01+1100\n"
+"POT-Creation-Date: 2018-04-28 15:32+1000\n"
 "PO-Revision-Date: 2016-03-05 13:02+0100\n"
 "Last-Translator: aviloria\n"
 "Language-Team: Español; Castellano <>\n"
@@ -1925,6 +1925,8 @@ msgid ""
 "ROM Audit \tDisabled\n"
 "Samples Audit \tDisabled\n"
 msgstr ""
+"Auditoría de ROMs \tDesactivada\n"
+"Auditoría de muestras \tDesactivada\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1167
 #, c-format
@@ -2177,7 +2179,7 @@ msgstr "Elige el modo de acceso"
 
 #: src/frontend/mame/ui/filesel.cpp:516
 msgid "Read-only"
-msgstr "Sólo lectura"
+msgstr "Solo lectura"
 
 #: src/frontend/mame/ui/filesel.cpp:518
 msgid "Read-write"
@@ -2488,6 +2490,182 @@ msgstr " COLORES"
 #: src/frontend/mame/ui/viewgfx.cpp:406
 msgid " PENS"
 msgstr " PLUMAS"
+
+#: src/frontend/mame/ui/devopt.cpp:39
+#, c-format
+msgid ""
+"[This option is currently mounted in the running system]\n"
+"\n"
+"Option: %1$s\n"
+"Device: %2$s\n"
+"\n"
+"The selected option enables the following items:\n"
+msgstr ""
+"[Esta opción está actualmente montada en el sistema en ejecución]\n"
+"\n"
+"Opción: %1$s\n"
+"Dispositivo: %2$s\n"
+"\n"
+"La opción seleccionada activa los siguientes elementos:\n"
+
+#: src/frontend/mame/ui/devopt.cpp:40
+#, c-format
+msgid ""
+"[This option is NOT currently mounted in the running system]\n"
+"\n"
+"Option: %1$s\n"
+"Device: %2$s\n"
+"\n"
+"If you select this option, the following items will be enabled:\n"
+msgstr ""
+"[Esta opción NO está actualmente montada en el sistema en ejecución]\n"
+"\n"
+"Opción: %1$s\n"
+"Dispositivo: %2$s\n"
+"\n"
+"Si seleccionas esta opción se activarán los siguientes elementos:\n"
+
+#: src/frontend/mame/ui/devopt.cpp:48
+msgid "* CPU:\n"
+msgstr "* Procesador:\n"
+
+#: src/frontend/mame/ui/devopt.cpp:72 src/frontend/mame/ui/devopt.cpp:133
+#, c-format
+msgid "  %1$d×%2$s %3$d.%4$06d MHz\n"
+msgstr "  %1$d×%2$s %3$d.%4$06d MHz\n"
+
+#: src/frontend/mame/ui/devopt.cpp:72 src/frontend/mame/ui/devopt.cpp:133
+msgid "  %1$d×%2$s %5$d.%6$03d kHz\n"
+msgstr "  %1$d×%2$s %5$d.%6$03d kHz\n"
+
+#: src/frontend/mame/ui/devopt.cpp:73 src/frontend/mame/ui/devopt.cpp:134
+msgid "  %2$s %3$d.%4$06d MHz\n"
+msgstr "  %2$s %3$d.%4$06d MHz\n"
+
+#: src/frontend/mame/ui/devopt.cpp:73 src/frontend/mame/ui/devopt.cpp:134
+msgid "  %2$s %5$d.%6$03d kHz\n"
+msgstr "  %2$s %5$d.%6$03d kHz\n"
+
+#: src/frontend/mame/ui/devopt.cpp:85
+msgid "* Video:\n"
+msgstr "* Vídeo:\n"
+
+#: src/frontend/mame/ui/devopt.cpp:90
+#, c-format
+msgid "  Screen '%1$s': Vector\n"
+msgstr "  Pantalla '%1$s': Vectorial\n"
+
+#: src/frontend/mame/ui/devopt.cpp:99
+#, c-format
+msgid "  Screen '%1$s': %2$d × %3$d (V) %4$f Hz\n"
+msgstr "  Pantalla '%1$s': %2$d × %3$d (V) %4$f Hz\n"
+
+#: src/frontend/mame/ui/devopt.cpp:100
+#, c-format
+msgid "  Screen '%1$s': %2$d × %3$d (H) %4$f Hz\n"
+msgstr "  Pantalla '%1$s': %2$d × %3$d (H) %4$f Hz\n"
+
+#: src/frontend/mame/ui/devopt.cpp:113
+msgid "* Sound:\n"
+msgstr "* Sonido:\n"
+
+#: src/frontend/mame/ui/devopt.cpp:133
+#, c-format
+msgid "  %1$d×%2$s\n"
+msgstr "  %1$d×%2$s\n"
+
+#: src/frontend/mame/ui/devopt.cpp:134
+msgid "  %2$s\n"
+msgstr "  %2$s\n"
+
+#: src/frontend/mame/ui/devopt.cpp:164
+#, c-format
+msgid ""
+"* BIOS settings:\n"
+"  %1$d options    [default: %2$s]\n"
+msgstr ""
+"* Configuración de la BIOS:\n"
+"  %1$d opciones    [por defecto: %2$s]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:204 src/frontend/mame/ui/devopt.cpp:220
+#: src/frontend/mame/ui/devopt.cpp:265
+#, c-format
+msgid "  %1$s    [default: %2$s]\n"
+msgstr "  %1$s    [por defecto: %2$s]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:209 src/frontend/mame/ui/devopt.cpp:225
+#, c-format
+msgid "  %1$s\n"
+msgstr "  %1$s\n"
+
+#: src/frontend/mame/ui/devopt.cpp:230
+msgid "* DIP switch settings:\n"
+msgstr "* Configuración de los interruptores DIP:\n"
+
+#: src/frontend/mame/ui/devopt.cpp:232
+msgid "* Configuration settings:\n"
+msgstr "* Configuración:\n"
+
+#: src/frontend/mame/ui/devopt.cpp:234
+msgid "* Input device(s):\n"
+msgstr "* Dispositivo(s) de entrada:\n"
+
+#: src/frontend/mame/ui/devopt.cpp:236
+#, c-format
+msgid "  User inputs    [%1$d inputs]\n"
+msgstr "  Entradas de usuario    [%1$d entradas]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:238
+#, c-format
+msgid "  Mahjong inputs    [%1$d inputs]\n"
+msgstr "  Entradas de Mahjong    [%1$d entradas]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:240
+#, c-format
+msgid "  Hanafuda inputs    [%1$d inputs]\n"
+msgstr "  Entradas de Hanafuda    [%1$d entradas]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:242
+#, c-format
+msgid "  Gambling inputs    [%1$d inputs]\n"
+msgstr "  Entradas de Gambling    [%1$d entradas]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:244
+#, c-format
+msgid "  Analog inputs    [%1$d inputs]\n"
+msgstr "  Entradas analógicas    [%1$d entradas]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:246
+#, c-format
+msgid "  Adjuster inputs    [%1$d inputs]\n"
+msgstr "  Entradas del regulador    [%1$d entradas]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:248
+#, c-format
+msgid "  Keypad inputs    [%1$d inputs]\n"
+msgstr "  Entradas del Keypoad    [%1$d entradas]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:250
+#, c-format
+msgid "  Keyboard inputs    [%1$d inputs]\n"
+msgstr "  Entradas del teclado    [%1$d entradas]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:255
+msgid "* Media Options:\n"
+msgstr "* Opciones de medios:\n"
+
+#: src/frontend/mame/ui/devopt.cpp:257
+#, c-format
+msgid "  %1$s    [tag: %2$s]\n"
+msgstr "  %1$s    [reseña: %2$s]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:263
+msgid "* Slot Options:\n"
+msgstr "* Opciones de ranuras:\n"
+
+#: src/frontend/mame/ui/devopt.cpp:270
+msgid "[None]\n"
+msgstr "[Ninguna]\n"
 
 #: plugins/timer/init.lua:94
 msgid "Current time"
@@ -2804,21 +2982,21 @@ msgstr "Limpiar inspecciones"
 msgid "Cheat Finder"
 msgstr "Buscador de Trucos"
 
-#: plugins/portname/init.lua:67
+#: plugins/portname/init.lua:69
 msgid "Save input names to file"
 msgstr "Guardar los nombres de entrada a fichero"
 
-#: plugins/portname/init.lua:87 plugins/portname/init.lua:92
-#: plugins/portname/init.lua:108
+#: plugins/portname/init.lua:100 plugins/portname/init.lua:105
+#: plugins/portname/init.lua:121
 msgid "Failed to save input name file"
 msgstr "Error al guardar el fichero nombres de entrada"
 
-#: plugins/portname/init.lua:119
+#: plugins/portname/init.lua:133
 #, lua-format
 msgid "Input port name file saved to %s"
 msgstr "Fichero de nombres de puertos de entrada guardado en %s"
 
-#: plugins/portname/init.lua:124
+#: plugins/portname/init.lua:138
 msgid "Input ports"
 msgstr "Puertos de entrada"
 

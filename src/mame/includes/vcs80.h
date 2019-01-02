@@ -7,7 +7,7 @@
 
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/ram.h"
 #include "machine/bankdev.h"
@@ -31,7 +31,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	void vcs80(machine_config &config);
+
+private:
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_ioport m_y0;
 	required_ioport m_y1;
@@ -80,9 +83,9 @@ public:
 	/* keyboard state */
 	int m_keylatch;
 	int m_keyclk;
-	DECLARE_DRIVER_INIT(vcs80);
+	void init_vcs80();
 	TIMER_DEVICE_CALLBACK_MEMBER(vcs80_keyboard_tick);
-	void vcs80(machine_config &config);
+
 	void vcs80_bd_mem(address_map &map);
 	void vcs80_io(address_map &map);
 	void vcs80_mem(address_map &map);

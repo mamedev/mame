@@ -192,6 +192,7 @@ WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_1_w)
 	}
 
 }
+
 /******************************************************************************/
 
 
@@ -199,10 +200,10 @@ void vsnes_state::vsnes_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram().share("work_ram");
 	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(this, FUNC(vsnes_state::sprite_dma_0_w));
-	map(0x4016, 0x4016).rw(this, FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
-	map(0x4017, 0x4017).r(this, FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
-	map(0x4020, 0x4020).rw(this, FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
+	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_0_w));
+	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
+	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
+	map(0x4020, 0x4020).rw(FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
 	map(0x6000, 0x7fff).bankrw("extra1");
 	map(0x8000, 0xffff).rom();
 }
@@ -211,10 +212,10 @@ void vsnes_state::vsnes_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram().share("work_ram_1");
 	map(0x2000, 0x3fff).rw(m_ppu2, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(this, FUNC(vsnes_state::sprite_dma_1_w));
-	map(0x4016, 0x4016).rw(this, FUNC(vsnes_state::vsnes_in0_1_r), FUNC(vsnes_state::vsnes_in0_1_w));
-	map(0x4017, 0x4017).r(this, FUNC(vsnes_state::vsnes_in1_1_r));  /* IN1 - input port 2 / PSG second control register */
-	map(0x4020, 0x4020).w(this, FUNC(vsnes_state::vsnes_coin_counter_1_w));
+	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_1_w));
+	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_1_r), FUNC(vsnes_state::vsnes_in0_1_w));
+	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_1_r));  /* IN1 - input port 2 / PSG second control register */
+	map(0x4020, 0x4020).w(FUNC(vsnes_state::vsnes_coin_counter_1_w));
 	map(0x6000, 0x7fff).bankrw("extra2");
 	map(0x8000, 0xffff).rom();
 }
@@ -236,7 +237,7 @@ WRITE8_MEMBER(vsnes_state::bootleg_sound_write)
 {
 	m_bootleg_sound_offset = offset;
 	m_bootleg_sound_data = data;
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 READ8_MEMBER(vsnes_state::vsnes_bootleg_z80_data_r)
@@ -250,11 +251,11 @@ void vsnes_state::vsnes_cpu1_bootleg_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x1800).ram().share("work_ram");
 	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4000, 0x4017).w(this, FUNC(vsnes_state::bootleg_sound_write));
-	map(0x4014, 0x4014).w(this, FUNC(vsnes_state::sprite_dma_0_w));
-	map(0x4016, 0x4016).rw(this, FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
-	map(0x4017, 0x4017).r(this, FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
-	map(0x4020, 0x4020).rw(this, FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
+	map(0x4000, 0x4017).w(FUNC(vsnes_state::bootleg_sound_write));
+	map(0x4014, 0x4014).w(FUNC(vsnes_state::sprite_dma_0_w));
+	map(0x4016, 0x4016).rw(FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
+	map(0x4017, 0x4017).r(FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
+	map(0x4020, 0x4020).rw(FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
 	map(0x6000, 0x7fff).bankrw("extra1");
 	map(0x8000, 0xffff).rom();
 }
@@ -269,15 +270,15 @@ void vsnes_state::vsnes_bootleg_z80_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
 
-	map(0x4000, 0x4000).r(this, FUNC(vsnes_state::vsnes_bootleg_z80_data_r)); // read in IRQ & NMI
+	map(0x4000, 0x4000).r(FUNC(vsnes_state::vsnes_bootleg_z80_data_r)); // read in IRQ & NMI
 
-	map(0x6000, 0x6000).r(this, FUNC(vsnes_state::vsnes_bootleg_z80_latch_r)); // read in NMI, not explicitly stored (purpose? maybe clear IRQ ?)
-	map(0x6001, 0x6001).r(this, FUNC(vsnes_state::vsnes_bootleg_z80_address_r)); // ^
+	map(0x6000, 0x6000).r(FUNC(vsnes_state::vsnes_bootleg_z80_latch_r)); // read in NMI, not explicitly stored (purpose? maybe clear IRQ ?)
+	map(0x6001, 0x6001).r(FUNC(vsnes_state::vsnes_bootleg_z80_address_r)); // ^
 
 
-	map(0x60FA, 0x60FA).w("sn1", FUNC(sn76489_device::write));
-	map(0x60F9, 0x60F9).w("sn2", FUNC(sn76489_device::write));
-	map(0x60FF, 0x60FF).w("sn3", FUNC(sn76489_device::write));
+	map(0x60FA, 0x60FA).w("sn1", FUNC(sn76489_device::command_w));
+	map(0x60F9, 0x60F9).w("sn2", FUNC(sn76489_device::command_w));
+	map(0x60FF, 0x60FF).w("sn3", FUNC(sn76489_device::command_w));
 
 }
 
@@ -1700,182 +1701,155 @@ static INPUT_PORTS_START( supxevs )
 	PORT_DIPSETTING(    0xc0, "RP2C04-0004" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(vsnes_state::vsnes)
-
+void vsnes_state::vsnes(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_map)
-								/* some carts also trigger IRQs */
+	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_map);
+	/* some carts also trigger IRQs */
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen1", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vsnes_state, screen_update_vsnes)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
+	screen1.set_refresh_hz(60);
+	screen1.set_size(32*8, 262);
+	screen1.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 8*4*16)
-
-	MCFG_PALETTE_INIT_OWNER(vsnes_state,vsnes)
-	MCFG_VIDEO_START_OVERRIDE(vsnes_state,vsnes)
-
-	MCFG_PPU2C04_ADD("ppu1")
-	MCFG_PPU2C0X_SET_SCREEN("screen1")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
+	PPU_2C04(config, m_ppu1);
+	m_ppu1->set_screen("screen1");
+	m_ppu1->set_cpu_tag(m_maincpu);
+	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+}
 
-MACHINE_CONFIG_START(vsnes_state::jajamaru)
+void vsnes_state::jajamaru(machine_config &config)
+{
 	vsnes(config);
 
-	MCFG_DEVICE_REMOVE( "ppu1" )
-	MCFG_PPU2C05_01_ADD("ppu1")
-	MCFG_PPU2C0X_SET_SCREEN("screen1")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
-MACHINE_CONFIG_END
+	PPU_2C05_01(config.replace(), m_ppu1);
+	m_ppu1->set_screen("screen1");
+	m_ppu1->set_cpu_tag(m_maincpu);
+	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
 
-MACHINE_CONFIG_START(vsnes_state::mightybj)
+void vsnes_state::mightybj(machine_config &config)
+{
 	vsnes(config);
 
-	MCFG_DEVICE_REMOVE( "ppu1" )
-	MCFG_PPU2C05_02_ADD("ppu1")
-	MCFG_PPU2C0X_SET_SCREEN("screen1")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
-MACHINE_CONFIG_END
+	PPU_2C05_02(config.replace(), m_ppu1);
+	m_ppu1->set_screen("screen1");
+	m_ppu1->set_cpu_tag(m_maincpu);
+	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
 
-MACHINE_CONFIG_START(vsnes_state::vsgshoe)
+void vsnes_state::vsgshoe(machine_config &config)
+{
 	vsnes(config);
 
-	MCFG_DEVICE_REMOVE( "ppu1" )
-	MCFG_PPU2C05_03_ADD("ppu1")
-	MCFG_PPU2C0X_SET_SCREEN("screen1")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
-MACHINE_CONFIG_END
+	PPU_2C05_03(config.replace(), m_ppu1);
+	m_ppu1->set_screen("screen1");
+	m_ppu1->set_cpu_tag(m_maincpu);
+	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
 
-MACHINE_CONFIG_START(vsnes_state::topgun)
+void vsnes_state::topgun(machine_config &config)
+{
 	vsnes(config);
 
-	MCFG_DEVICE_REMOVE( "ppu1" )
-	MCFG_PPU2C05_04_ADD("ppu1")
-	MCFG_PPU2C0X_SET_SCREEN("screen1")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
-MACHINE_CONFIG_END
+	PPU_2C05_04(config.replace(), m_ppu1);
+	m_ppu1->set_screen("screen1");
+	m_ppu1->set_cpu_tag(m_maincpu);
+	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
 
-MACHINE_CONFIG_START(vsnes_state::vsdual)
-
+void vsnes_state::vsdual(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_map)
+	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_map);
 
-	MCFG_CPU_ADD("sub", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(vsnes_cpu2_map)
+	N2A03(config, m_subcpu, NTSC_APU_CLOCK);
+	m_subcpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu2_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsdual)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)
 
+	config.set_default_layout(layout_dualhsxs);
 
-	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 2*8*4*16)
-	MCFG_PALETTE_INIT_OWNER(vsnes_state,vsdual)
+	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
+	screen1.set_refresh_hz(60);
+	screen1.set_size(32*8, 262);
+	screen1.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen2.set_refresh_hz(60);
+	screen2.set_size(32*8, 262);
+	screen2.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen2.set_screen_update("ppu2", FUNC(ppu2c0x_device::screen_update));
 
-	MCFG_SCREEN_ADD("screen1", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vsnes_state, screen_update_vsnes)
-	MCFG_SCREEN_PALETTE("palette")
+	PPU_2C04(config, m_ppu1);
+	m_ppu1->set_screen("screen1");
+	m_ppu1->set_cpu_tag(m_maincpu);
+	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_SCREEN_ADD("screen2", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vsnes_state, screen_update_vsnes_bottom)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_VIDEO_START_OVERRIDE(vsnes_state,vsdual)
-
-	MCFG_PPU2C04_ADD("ppu1")
-	MCFG_PPU2C0X_SET_SCREEN("screen1")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
-
-	MCFG_PPU2C04_ADD("ppu2")
-	MCFG_PPU2C0X_SET_SCREEN("screen2")
-	MCFG_PPU2C0X_CPU("sub")
-	MCFG_PPU2C0X_COLORBASE(512)
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_2)
+	PPU_2C04(config, m_ppu2);
+	m_ppu2->set_screen("screen2");
+	m_ppu2->set_cpu_tag(m_subcpu);
+	m_ppu2->int_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+}
 
-MACHINE_CONFIG_START(vsnes_state::vsdual_pi)
+void vsnes_state::vsdual_pi(machine_config &config)
+{
 	vsdual(config);
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 	// need high level of interleave to keep screens in sync in Balloon Fight.
 	// however vsmahjng doesn't like perfect interleave? you end up needing to reset it to boot? maybe something in a bad default state? watchdog?
-	// as the board would always be running in 'perfect interleave' the fact the Mahjong game doens't work like this needs investigating.
-MACHINE_CONFIG_END
+	// as the board would always be running in 'perfect interleave' the fact the Mahjong game doesn't work like this needs investigating.
+}
 
-
-MACHINE_CONFIG_START(vsnes_state::vsnes_bootleg)
-
+void vsnes_state::vsnes_bootleg(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,XTAL(16'000'000)/4) // 4mhz? seems too high but flickers badly otherwise, issue elsewhere?
-	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_bootleg_map)
-								/* some carts also trigger IRQs */
+	M6502(config, m_maincpu, XTAL(16'000'000)/4); // 4mhz? seems too high but flickers badly otherwise, issue elsewhere?
+	m_maincpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_cpu1_bootleg_map);
+	/* some carts also trigger IRQs */
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
 
-	MCFG_CPU_ADD("sub", Z80,XTAL(16'000'000)/4)         /* ? MHz */ // Z8400APS-Z80CPU
-	MCFG_CPU_PROGRAM_MAP(vsnes_bootleg_z80_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen1", vsnes_state,  irq0_line_hold)
-//  MCFG_CPU_PERIODIC_INT_DRIVER(vsnes_state, nmi_line_pulse)
+	Z80(config, m_subcpu, XTAL(16'000'000)/4); /* ? MHz */ // Z8400APS-Z80CPU
+	m_subcpu->set_addrmap(AS_PROGRAM, &vsnes_state::vsnes_bootleg_z80_map);
+	m_subcpu->set_vblank_int("screen1", FUNC(vsnes_state::irq0_line_hold));
+//  m_subcpu->set_periodic_int(FUNC(vsnes_state::nmi_line_pulse));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen1", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vsnes_state, screen_update_vsnes)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
+	screen1.set_refresh_hz(60);
+	screen1.set_size(32*8, 262);
+	screen1.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen1.set_screen_update("ppu1", FUNC(ppu2c0x_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 8*4*16)
-
-	MCFG_PALETTE_INIT_OWNER(vsnes_state,vsnes)
-	MCFG_VIDEO_START_OVERRIDE(vsnes_state,vsnes)
-
-	MCFG_PPU2C04_ADD("ppu1")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_SCREEN("screen1")
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
-	MCFG_PPU2C0X_IGNORE_SPRITE_WRITE_LIMIT // bootleg seems to need this - code to set the sprite address is replaced with complete copy loops??
+	PPU_2C04(config, m_ppu1);
+	m_ppu1->set_cpu_tag(m_maincpu);
+	m_ppu1->set_screen("screen1");
+	m_ppu1->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_ppu1->use_sprite_write_limitation_disable(); // bootleg seems to need this - code to set the sprite address is replaced with complete copy loops??
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// PCB has 2, code accesses 3? which 2 really exist?
-	MCFG_SOUND_ADD("sn1", SN76489, XTAL(16'000'000)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("sn2", SN76489, XTAL(16'000'000)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("sn3", SN76489, XTAL(16'000'000)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SN76489(config, "sn1", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489(config, "sn2", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489(config, "sn3", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /******************************************************************************/
 
@@ -1886,25 +1860,26 @@ MACHINE_CONFIG_END
     on each PPU.
 */
 
-#define PALETTE_STANDARD    \
-	ROM_REGION( 0xc0, "palette", 0 )    \
+#define PALETTE_STANDARD(_tag)    \
+	ROM_REGION( 0xc0, _tag, 0 )    \
 	ROM_LOAD( "rp2c0x.pal", 0x00, 0xc0, CRC(48de65dc) SHA1(d10acafc8da9ff479c270ec01180cca61efe62f5) )
 
-#define PALETTE_2C04_0001   \
-	ROM_REGION( 0xc0, "palette", 0 )    \
+#define PALETTE_2C04_0001(_tag)   \
+	ROM_REGION( 0xc0, _tag, 0 )    \
 	ROM_LOAD( "rp2c04-0001.pal", 0x00, 0xc0, CRC(a6293faa) SHA1(190a410a3d818e124b2b9d2ef9fb3da003bb5d4c) )
 
-#define PALETTE_2C04_0002   \
-	ROM_REGION( 0xc0, "palette", 0 )    \
+#define PALETTE_2C04_0002(_tag)   \
+	ROM_REGION( 0xc0, _tag, 0 )    \
 	ROM_LOAD( "rp2c04-0002.pal", 0x00, 0xc0, CRC(fd19ae5e) SHA1(8ed14347c5a0b1a8a4d6365d6727e0951a00131c) )
 
-#define PALETTE_2C04_0003   \
-	ROM_REGION( 0xc0, "palette", 0 )    \
+#define PALETTE_2C04_0003(_tag)   \
+	ROM_REGION( 0xc0, _tag, 0 )    \
 	ROM_LOAD( "rp2c04-0003.pal", 0x00, 0xc0, CRC(fd6c578b) SHA1(653182ce0cbaff66a8fc5788e32cc088b6735f2e) )
 
-#define PALETTE_2C04_0004   \
-	ROM_REGION( 0xc0, "palette", 0 )    \
+#define PALETTE_2C04_0004(_tag)   \
+	ROM_REGION( 0xc0, _tag, 0 )    \
 	ROM_LOAD( "rp2c04-0004.pal", 0x00, 0xc0, CRC(0c2e8e4d) SHA1(0f9090225eb1f08ae5072d40af3e95547cbce05f) )
+
 
 /*  correct label format. revision number is stamped(red), other letters are printed(black)
     game code in line 1, ROM position in line 2
@@ -1935,7 +1910,7 @@ ROM_START( suprmrio ) /* Vs. Super Mario Bros. (Set E Rev 4) */
 	ROM_LOAD( "mds-sm4-4__2bor8b_e.2b or 8b", 0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
 	ROM_LOAD( "mds-sm4-4__2aor8a_e.2a or 8a", 0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
 
-	PALETTE_2C04_0004
+	PALETTE_2C04_0004("ppu1:palette")
 ROM_END
 
 ROM_START( suprmrioa ) /* Vs. Super Mario Bros. (Set unknown, possibly operator hack of E rev 4 to make the game harder) */
@@ -1949,7 +1924,7 @@ ROM_START( suprmrioa ) /* Vs. Super Mario Bros. (Set unknown, possibly operator 
 	ROM_LOAD( "mds-sm4-4__2bor8b_e.2b or 8b", 0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
 	ROM_LOAD( "mds-sm4-4__2aor8a_e.2a or 8a", 0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
 
-	PALETTE_2C04_0004
+	PALETTE_2C04_0004("ppu1:palette")
 ROM_END
 
 
@@ -1968,7 +1943,7 @@ ROM_START( suprmriobl2 )
 	ROM_LOAD( "2-2764.bin",  0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
 	ROM_LOAD( "5-2764.bin",  0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
 
-	PALETTE_2C04_0004
+	PALETTE_2C04_0004("ppu1:palette")
 ROM_END
 
 ROM_START( suprmriobl )
@@ -1992,14 +1967,14 @@ ROM_START( suprmriobl )
 
 	ROM_REGION( 0x4000,"pals", 0  )
 	ROM_LOAD( "pal16l8.1",  0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
-	ROM_LOAD( "pal16r6a.2.bad.dump",  0x000, 0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "pal16r6a.2", 0x000, 0x104, NO_DUMP )
 	ROM_LOAD( "pal16r8.3",  0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
 	ROM_LOAD( "pal16l8.4",  0x000, 0x104, CRC(6f6de82d) SHA1(3d59b222d25457b2f89b559409721db37d6a81d8) )
 	ROM_LOAD( "pal16r6.5",  0x000, 0x104, CRC(ceff7c7c) SHA1(52fd344c591478469369cd0862d1facfe23e12fb) )
 	ROM_LOAD( "pal16r8.6",  0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
 	ROM_LOAD( "pal16r8a.7", 0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
 
-	PALETTE_2C04_0004
+	PALETTE_2C04_0004("ppu1:palette")
 ROM_END
 
 ROM_START( skatekds )
@@ -2013,7 +1988,7 @@ ROM_START( skatekds )
 	ROM_LOAD( "__skatekds,.2b",  0x0000, 0x2000,CRC(f3980303) SHA1(b9a25c906d1861c89e2e40e878a34d318daf6619) )
 	ROM_LOAD( "__skatekds,.2a",  0x2000, 0x2000,CRC(7a0ab7eb) SHA1(b6c32791481fafddc8504adb4eaed30a2fb3a03e) )
 
-	PALETTE_2C04_0004
+	PALETTE_2C04_0004("ppu1:palette")
 ROM_END
 
 ROM_START( iceclimb )
@@ -2027,7 +2002,7 @@ ROM_START( iceclimb )
 	ROM_LOAD( "mds-ic4-4 b.8b",  0x0000, 0x2000, CRC(331460b4) SHA1(4cf94d711cdb5715d14f1ab3cadec245e0adfb1e) ) /* Matches Ice Climber Dual screen rev A rom */
 	ROM_LOAD( "mds-ic4-4 b.8a",  0x2000, 0x2000, CRC(4ec44fb3) SHA1(676e0ab574dec08df562c6f278e8a9cc7c8afa41) ) /* Matches Ice Climber Dual screen rev A rom */
 
-	PALETTE_2C04_0004
+	PALETTE_2C04_0004("ppu1:palette")
 ROM_END
 
 ROM_START( iceclimba ) /* Version A? */
@@ -2041,7 +2016,7 @@ ROM_START( iceclimba ) /* Version A? */
 	ROM_LOAD( "mds-ic4-4 b.8b",  0x0000, 0x2000, CRC(331460b4) SHA1(4cf94d711cdb5715d14f1ab3cadec245e0adfb1e) ) /* Matches Ice Climber Dual screen rev A rom */
 	ROM_LOAD( "mds-ic4-4 b.8a",  0x2000, 0x2000, CRC(4ec44fb3) SHA1(676e0ab574dec08df562c6f278e8a9cc7c8afa41) ) /* Matches Ice Climber Dual screen rev A rom */
 
-	PALETTE_2C04_0004
+	PALETTE_2C04_0004("ppu1:palette")
 ROM_END
 
 /* Gun games */
@@ -2056,7 +2031,7 @@ ROM_START( duckhunt ) /* Vs. Duck Hunt (Set E) */
 	ROM_LOAD( "mds-dh3 e.2b or 8b", 0x0000, 0x2000, CRC(0c52ec28) SHA1(c8fb6a5d4c13a7075d313326e2da9ce88780a88d) )
 	ROM_LOAD( "mds-dh3 e.2a or 8a", 0x2000, 0x2000, CRC(3d238df3) SHA1(e868ef3d5357ef5294e4faeecc9dbf801c5253e8) )
 
-	PALETTE_STANDARD
+	PALETTE_STANDARD("ppu1:palette")
 ROM_END
 
 ROM_START( hogalley )
@@ -2071,7 +2046,7 @@ ROM_START( hogalley )
 	// there is another dump of mds-ha4-1 e-1.2b or 8b ( CRC 0x7623e954 ) where 0xFE1 = 04,  the dump we use is probably the correct one
 	ROM_LOAD( "mds-ha4-1 e-1.2a or 8a",  0x2000, 0x2000, CRC(78c842b6) SHA1(39f2a7fc1f1cbe2378a369e45b5cbb05057db3f0) )
 
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
 ROM_END
 
 /* From Gumshoe readme:
@@ -2097,7 +2072,7 @@ ROM_START( vsgshoe )
 	ROM_LOAD( "mds-gm5.2b",  0x0000, 0x2000, CRC(192c3360) SHA1(5ddbe007d8bc693a0b7c92f33e6ed6b27dc1c08e) )
 	ROM_LOAD( "mds-gm5.2a",  0x2000, 0x2000, CRC(823dd178) SHA1(77578a48ded0c244d1ae30aafaa9259b7dd0dfc4) )
 
-	PALETTE_STANDARD
+	PALETTE_STANDARD("ppu1:palette")
 ROM_END
 
 ROM_START( vsfdf )
@@ -2108,7 +2083,7 @@ ROM_START( vsfdf )
 	ROM_REGION( 0x10000,"gfx1", 0 ) /* PPU memory */
 	ROM_LOAD( "cha2.1",  0x00000, 0x10000, CRC(a2f88df0) SHA1(10ef432d3132b01a1fcb38d8f521edd2a029ac5e) )
 
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
 ROM_END
 
 ROM_START( goonies ) /* Vs. The Goonies (Set E) */
@@ -2118,7 +2093,7 @@ ROM_START( goonies ) /* Vs. The Goonies (Set E) */
 	ROM_REGION( 0x10000,"gfx1", 0 ) /* PPU memory */
 	ROM_LOAD( "mds-gn chr e.u4", 0x0000, 0x10000, CRC(4c4b61b0) SHA1(7221c2499531e591a5a99e2cb339ae3a76b662c2) )
 
-	PALETTE_2C04_0003
+	PALETTE_2C04_0003("ppu1:palette")
 ROM_END
 
 ROM_START( vsgradus )
@@ -2128,7 +2103,7 @@ ROM_START( vsgradus )
 	ROM_REGION( 0x10000,"gfx1", 0 ) /* PPU memory */
 	ROM_LOAD( "mds-gr__chr_e.u4",  0x0000, 0x10000, CRC(23cf2fc3) SHA1(0a3f48aec529b92abc261952e632af7ff766b1ef) )
 
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
 ROM_END
 
 ROM_START( btlecity )
@@ -2143,7 +2118,7 @@ ROM_START( btlecity )
 	ROM_LOAD( "bc.2a",  0x2000, 0x2000, CRC(a9b49a05) SHA1(c14706e6a5524f81e79c101e32deef9f3d60de3f) )
 
 	/* also compatible with 2C04-0002, 2C04-0003, 2C04-0004 via dipswitches */
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
 ROM_END
 
 ROM_START( cluclu )
@@ -2157,7 +2132,7 @@ ROM_START( cluclu )
 	ROM_LOAD( "cl.8b",  0x0000, 0x2000, CRC(960d9a6c) SHA1(2569d59fd880cfc2eb4638294d1429ba749f5dcb) )
 	ROM_LOAD( "cl.8a",  0x2000, 0x2000, CRC(e3139791) SHA1(33d9e6d2a3233ee311c2cef2d0a425ded2cf3b0f) )
 
-	PALETTE_2C04_0004
+	PALETTE_2C04_0004("ppu1:palette")
 ROM_END
 
 
@@ -2172,7 +2147,7 @@ ROM_START( excitebk ) /* EB4-3 = Excite Bike, Palette 3, revision 'E' */
 	ROM_LOAD( "mds-eb4-3e.2b",  0x0000, 0x2000, CRC(80be1f50) SHA1(d8544b9a0a9d8719ab601fa9c68c4305385b14c7) )
 	ROM_LOAD( "mds-eb4-3e.2a",  0x2000, 0x2000, CRC(001e8e0b) SHA1(c4c2a11ade7788bac9dd61ea8de319c4111d2592) )
 
-	PALETTE_2C04_0003
+	PALETTE_2C04_0003("ppu1:palette")
 ROM_END
 
 ROM_START( excitebko ) /* EB4-3 = Excite Bike, Palette 3, unknown revision */
@@ -2186,7 +2161,7 @@ ROM_START( excitebko ) /* EB4-3 = Excite Bike, Palette 3, unknown revision */
 	ROM_LOAD( "mds-eb4-3.2b",  0x0000, 0x2000, CRC(80be1f50) SHA1(d8544b9a0a9d8719ab601fa9c68c4305385b14c7) ) /* Need to verify correct label */
 	ROM_LOAD( "mds-eb4-3.2a",  0x2000, 0x2000, CRC(a9b49a05) SHA1(c14706e6a5524f81e79c101e32deef9f3d60de3f) ) /* Need to verify correct label */
 
-	PALETTE_2C04_0003
+	PALETTE_2C04_0003("ppu1:palette")
 ROM_END
 
 ROM_START( excitebkj ) /* EB4-4 A = Excite Bike, Palette 4, rev A */
@@ -2200,7 +2175,7 @@ ROM_START( excitebkj ) /* EB4-4 A = Excite Bike, Palette 4, rev A */
 	ROM_LOAD( "mds-eb4-4 a.8b",  0x0000, 0x2000, CRC(62a76c52) SHA1(7ebd0dac976abe8636f4f75a3b2a473d7a54934d) )
 	ROM_LOAD( "mds-eb4-4 a.8a",  0x2000, 0x2000, CRC(a9b49a05) SHA1(c14706e6a5524f81e79c101e32deef9f3d60de3f) )
 
-	PALETTE_2C04_0004
+	PALETTE_2C04_0004("ppu1:palette")
 ROM_END
 
 ROM_START( jajamaru )
@@ -2214,7 +2189,7 @@ ROM_START( jajamaru )
 	ROM_LOAD( "12.bin",  0x0000, 0x2000, CRC(c91d536a) SHA1(8cb4b0819652df484553b9dd1f82391d51c90fcc) )
 	ROM_LOAD( "11.bin",  0x2000, 0x2000, CRC(f0034c04) SHA1(402dcf6ad443baeee3038ecab12db008a1ad2787) )
 
-	PALETTE_STANDARD
+	PALETTE_STANDARD("ppu1:palette")
 ROM_END
 
 ROM_START( smgolf )
@@ -2228,7 +2203,7 @@ ROM_START( smgolf )
 	ROM_LOAD( "mds-gf4-2 f.2b or 8b",  0x0000, 0x2000, CRC(2782a3e5) SHA1(4e57aab58fb250da951a9aecd21d6aa79e697bcb) )
 	ROM_LOAD( "mds-gf4-2 f.2a or 8a",  0x2000, 0x2000, CRC(6e93fdef) SHA1(44f46421adabbc40135c681592cb5226b7c9012a) )
 
-	PALETTE_2C04_0002
+	PALETTE_2C04_0002("ppu1:palette")
 ROM_END
 
 ROM_START( smgolfb ) /* Set ID should be something like MDS-GF4-2 xx */
@@ -2242,7 +2217,7 @@ ROM_START( smgolfb ) /* Set ID should be something like MDS-GF4-2 xx */
 	ROM_LOAD( "mds-gf4-2 f.2b or 8b",  0x0000, 0x2000, CRC(2782a3e5) SHA1(4e57aab58fb250da951a9aecd21d6aa79e697bcb) ) /* Need to verify correct label */
 	ROM_LOAD( "mds-gf4-2 f.2a or 8a",  0x2000, 0x2000, CRC(6e93fdef) SHA1(44f46421adabbc40135c681592cb5226b7c9012a) ) /* Need to verify correct label */
 
-	PALETTE_2C04_0002
+	PALETTE_2C04_0002("ppu1:palette")
 ROM_END
 
 ROM_START( smgolfj )
@@ -2256,7 +2231,7 @@ ROM_START( smgolfj )
 	ROM_LOAD( "mds-gf3 b.8b",  0x0000, 0x2000, CRC(7ef68029) SHA1(a639e463fd0abfb1bff0dd17aa0c9f70a72ee139) )
 	ROM_LOAD( "mds-gf3 b.8a",  0x2000, 0x2000, CRC(f2285878) SHA1(e0d34161a1879975f51c12222cf366228170b0e3) )
 
-	PALETTE_STANDARD
+	PALETTE_STANDARD("ppu1:palette")
 ROM_END
 
 ROM_START( ladygolfe ) /* Vs. Stroke & Match Golf (Ladies Version, set E) */
@@ -2270,7 +2245,7 @@ ROM_START( ladygolfe ) /* Vs. Stroke & Match Golf (Ladies Version, set E) */
 	ROM_LOAD( "mds-lg4 e.2b or 8b", 0x0000, 0x2000, CRC(95618947) SHA1(e8f09bffa3fa1a1cac8fa25df9fba962951c1fb3) )
 	ROM_LOAD( "mds-lg4 e.2a or 8a", 0x2000, 0x2000, CRC(d07407b1) SHA1(b998b46fe83e76fac3d7b71495d1da8580a731f9) )
 
-	PALETTE_2C04_0002
+	PALETTE_2C04_0002("ppu1:palette")
 ROM_END
 
 ROM_START( ladygolf )
@@ -2284,7 +2259,7 @@ ROM_START( ladygolf )
 	ROM_LOAD( "mds-lg4 e.2b or 8b", 0x0000, 0x2000, CRC(95618947) SHA1(e8f09bffa3fa1a1cac8fa25df9fba962951c1fb3) ) /* Need to verify correct label */
 	ROM_LOAD( "mds-lg4 e.2a or 8a", 0x2000, 0x2000, CRC(d07407b1) SHA1(b998b46fe83e76fac3d7b71495d1da8580a731f9) ) /* Need to verify correct label */
 
-	PALETTE_2C04_0002
+	PALETTE_2C04_0002("ppu1:palette")
 ROM_END
 
 ROM_START( nvs_machrider ) /* Set ID should be something like MDS-MR4-2 xx */
@@ -2298,7 +2273,7 @@ ROM_START( nvs_machrider ) /* Set ID should be something like MDS-MR4-2 xx */
 	ROM_LOAD( "mr-2b",  0x0000, 0x2000, CRC(33a2b41a) SHA1(671f37bce742e63250296e62c143f8a82f860b04) ) /* Need to verify correct label */
 	ROM_LOAD( "mr-2a",  0x2000, 0x2000, CRC(685899d8) SHA1(02b6a9bc21367c481d0091fa8a8f2d1b841244bf) ) /* Need to verify correct label */
 
-	PALETTE_2C04_0002
+	PALETTE_2C04_0002("ppu1:palette")
 ROM_END
 
 ROM_START( nvs_machridera )
@@ -2312,7 +2287,7 @@ ROM_START( nvs_machridera )
 	ROM_LOAD( "mds-mr4-1 a.2b or 8b",  0x0000, 0x2000, CRC(59867e36) SHA1(2b5546aa9f140277d611d6d5516b1343e5e672a0) )
 	ROM_LOAD( "mds-mr4-1 a.2a or 8a",  0x2000, 0x2000, CRC(ccfedc5a) SHA1(3d6321681fbe256d7c71037205d45d22fc264569) )
 
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
 ROM_END
 
 ROM_START( vspinbal ) /* E-1 Set; used Nintendo labels, e and 1 written in red marker */
@@ -2326,7 +2301,7 @@ ROM_START( vspinbal ) /* E-1 Set; used Nintendo labels, e and 1 written in red m
 	ROM_LOAD( "mds-pn4_1__8b_e.8b",  0x0000, 0x2000, CRC(8822ee9e) SHA1(950113952e6d356e45e03479ba5dd5a8cb131609) )
 	ROM_LOAD( "mds-pn4_1__8a_e.8a",  0x2000, 0x2000, CRC(cbe98a28) SHA1(c00c5f15a33611bfe3ad420b93b1cc2cae011c3e) )
 
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
 ROM_END
 
 ROM_START( vspinbalj )
@@ -2340,7 +2315,7 @@ ROM_START( vspinbalj )
 	ROM_LOAD( "mds-pn3 b.8b",  0x0000, 0x2000, CRC(1e3fec3e) SHA1(aef18cee358af202ec48c1c36986e42e134466b1) )
 	ROM_LOAD( "mds-pn3 b.8a",  0x2000, 0x2000, CRC(6f963a65) SHA1(af69564b51aa42ef0815c952e0d0d0d928651685) )
 
-	PALETTE_STANDARD
+	PALETTE_STANDARD("ppu1:palette")
 ROM_END
 
 ROM_START( vsslalom )
@@ -2353,7 +2328,7 @@ ROM_START( vsslalom )
 	ROM_REGION( 0x2000,"gfx1", 0 ) /* PPU memory */
 	ROM_LOAD( "mds-sl4.2a",  0x0000, 0x2000, CRC(977bb126) SHA1(9b12cd37246237c24a8077c6184a2f71d342ac47) )
 
-	PALETTE_2C04_0002
+	PALETTE_2C04_0002("ppu1:palette")
 ROM_END
 
 ROM_START( vssoccer )
@@ -2367,7 +2342,7 @@ ROM_START( vssoccer )
 	ROM_LOAD( "mds-sc4-2 a.2b or 8b",  0x0000, 0x2000, CRC(307b19ab) SHA1(b35ef4c2cf071db77cec1b4529b43a20cfcce172) )
 	ROM_LOAD( "mds-sc4-2 a.2a or 8a",  0x2000, 0x2000, CRC(7263613a) SHA1(aa5673b57833d1f32c2cb0230a809397ec6103b4) )
 
-	PALETTE_2C04_0002
+	PALETTE_2C04_0002("ppu1:palette")
 ROM_END
 
 ROM_START( vssoccera ) /* Set ID should be something like MDS-SC4-3 xx */
@@ -2381,7 +2356,7 @@ ROM_START( vssoccera ) /* Set ID should be something like MDS-SC4-3 xx */
 	ROM_LOAD( "mds-sc4-3.2b",  0x0000, 0x2000, CRC(307b19ab) SHA1(b35ef4c2cf071db77cec1b4529b43a20cfcce172) ) /* Need to verify correct label */
 	ROM_LOAD( "mds-sc4-3.2a",  0x2000, 0x2000, CRC(7263613a) SHA1(aa5673b57833d1f32c2cb0230a809397ec6103b4) ) /* Need to verify correct label */
 
-	PALETTE_2C04_0003
+	PALETTE_2C04_0003("ppu1:palette")
 ROM_END
 
 ROM_START( starlstr )
@@ -2396,7 +2371,7 @@ ROM_START( starlstr )
 	ROM_LOAD( "sl_05.2a",  0x2000, 0x2000, CRC(2bbb45fd) SHA1(53c3588bd25baa6b8ff41f4755db9e0e806c9719) )
 
 	/* also compatible with 2C04-0001, 2C04-0002, 2C04-0003, 2C04-0004 via dipswitches */
-	PALETTE_STANDARD
+	PALETTE_STANDARD("ppu1:palette")
 ROM_END
 
 ROM_START( vstetris )
@@ -2409,7 +2384,7 @@ ROM_START( vstetris )
 	ROM_LOAD( "char.8b",  0x0000, 0x2000, CRC(51e8d403) SHA1(ed734994d164c4b59794249a13bce333896b3ee5) )
 
 	/* also compatible with 2C03, 2C04-0002, 2C04-0003, 2C04-0004 via dipswitches */
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
 ROM_END
 
 ROM_START( drmario )
@@ -2419,7 +2394,7 @@ ROM_START( drmario )
 	ROM_REGION( 0x8000,"gfx1", 0 ) /* PPU memory */
 	ROM_LOAD( "dm-u3chr",  0x0000, 0x8000, CRC(91871aa5) SHA1(32a4299ead7b37f49877dc9597653b07a73ddbf3) )
 
-	PALETTE_2C04_0003
+	PALETTE_2C04_0003("ppu1:palette")
 ROM_END
 
 ROM_START( cstlevna )
@@ -2428,7 +2403,7 @@ ROM_START( cstlevna )
 
 	/* No cart gfx - uses vram */
 
-	PALETTE_2C04_0002
+	PALETTE_2C04_0002("ppu1:palette")
 ROM_END
 
 ROM_START( topgun )
@@ -2437,7 +2412,7 @@ ROM_START( topgun )
 
 	/* No cart gfx - uses vram */
 
-	PALETTE_STANDARD
+	PALETTE_STANDARD("ppu1:palette")
 ROM_END
 
 ROM_START( tkoboxng )
@@ -2449,7 +2424,7 @@ ROM_START( tkoboxng )
 
 	/* also compatible with 2C03 via dipswitches
 	    Manual clearly states "RP2C04 0004" as PPU type, but the palette files argue that this is incorrect */
-	PALETTE_2C04_0003
+	PALETTE_2C04_0003("ppu1:palette")
 ROM_END
 
 ROM_START( rbibb )
@@ -2460,7 +2435,7 @@ ROM_START( rbibb )
 	ROM_LOAD( "rbi-cha",  0x0000, 0x8000, CRC(a3c14889) SHA1(ef00f4fbf21cf34e946957b9b6825b8e2cb16536) )
 
 	/* also compatible with 2C03, 2C04-0002, 2C04-0003, 2C04-0004 via dipswitches */
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
 ROM_END
 
 ROM_START( rbibba )
@@ -2471,7 +2446,7 @@ ROM_START( rbibba )
 	ROM_LOAD( "rbi-cha",  0x0000, 0x8000, CRC(a3c14889) SHA1(ef00f4fbf21cf34e946957b9b6825b8e2cb16536) )
 
 	/* also compatible with 2C03, 2C04-0002, 2C04-0003, 2C04-0004 via dipswitches */
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
 ROM_END
 
 ROM_START( vsskykid )
@@ -2482,7 +2457,7 @@ ROM_START( vsskykid )
 	ROM_LOAD( "sk-cha",  0x0000, 0x8000, CRC(9bd44dad) SHA1(bf33d175b6ab991d63a0acaf83ba22d5b7ab11b9) )
 
 	/* also compatible with 2C03, 2C04-0002, 2C04-0003, 2C04-0004 via dipswitches */
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
 ROM_END
 
 ROM_START( nvs_platoon )
@@ -2492,7 +2467,7 @@ ROM_START( nvs_platoon )
 	ROM_REGION( 0x20000,"gfx1", 0 ) /* PPU memory */
 	ROM_LOAD( "chrver0.ic6",  0x00000, 0x20000, CRC(689df57d) SHA1(854aaa9feb16e3f239fba6069fbf65e69858fe73) )
 
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
 ROM_END
 
 ROM_START( bnglngby )
@@ -2509,7 +2484,7 @@ ROM_START( bnglngby )
 	ROM_REGION( 0x2000, "user1", 0 ) /* unknown */
 	ROM_LOAD( "mds-rb4-2 b.1a", 0x0000, 0x2000, CRC(b49939ad) SHA1(ebaab2864d9ff9876e9d2666746c4bab57e49ec3) ) /* Unknown, maps at 0xe000, maybe from another set, but we have other roms? */
 
-	PALETTE_2C04_0002
+	PALETTE_2C04_0002("ppu1:palette")
 ROM_END
 
 ROM_START( supxevs )
@@ -2521,7 +2496,7 @@ ROM_START( supxevs )
 	ROM_LOAD( "cha",   0x00000, 0x08000, CRC(e27c7434) SHA1(a033bbaf0c28504ed2a641dea28f016a88ef03ac) )
 
 	/* also compatible with 2C04-0002, 2C04-0003, 2C04-0004 via dipswitches */
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
 ROM_END
 
 ROM_START( nvs_mightybj )
@@ -2534,7 +2509,7 @@ ROM_START( nvs_mightybj )
 	ROM_REGION( 0x2000, "gfx1", 0 ) /* PPU memory */
 	ROM_LOAD( "2b.bin",  0x0000, 0x2000, CRC(5425a4d0) SHA1(09eb9d93b680c9eefde5ee6e16cf81de931cccb9) )
 
-	PALETTE_STANDARD
+	PALETTE_STANDARD("ppu1:palette")
 ROM_END
 
 /* Dual System */
@@ -2560,7 +2535,9 @@ ROM_START( balonfgt )
 	ROM_LOAD( "mds-bf4 a-3.8b",  0x0000, 0x2000, CRC(f27d9aa0) SHA1(429a1ad2a07947e4c4809495bfab55bf0f0e428f) )
 	ROM_LOAD( "mds-bf4 a-3.8a",  0x2000, 0x2000, CRC(76e6bbf8) SHA1(a4cae3a129a787162050187453b1583c8735fb46) )
 
-	PALETTE_2C04_0003
+	PALETTE_2C04_0003("ppu1:palette")
+	ROM_REGION( 0xc0, "ppu2:palette", 0 )
+	ROM_COPY( "ppu1:palette", 0x00, 0x00, 0xc0 )
 ROM_END
 
 ROM_START( vsmahjng )
@@ -2580,7 +2557,9 @@ ROM_START( vsmahjng )
 	ROM_REGION( 0x4000,"gfx2", 0 ) /* PPU memory */
 	ROM_LOAD( "mj.8b",  0x0000, 0x2000, CRC(9dae3502) SHA1(b7ffbc17af35eeac1b06c651f6c25f71827e9c3b) )
 
-	PALETTE_STANDARD
+	PALETTE_STANDARD("ppu1:palette")
+	ROM_REGION( 0xc0, "ppu2:palette", 0 )
+	ROM_COPY( "ppu1:palette", 0x00, 0x00, 0xc0 )
 ROM_END
 
 ROM_START( vsbball )
@@ -2604,7 +2583,9 @@ ROM_START( vsbball )
 	ROM_LOAD( "mds-ba__8b_e.8b",  0x0000, 0x2000, CRC(3ff8bec3) SHA1(28c1bf89ed1046243ca8cf122cefa0752c242577) )
 	ROM_LOAD( "mds-ba__8a_e.8a",  0x2000, 0x2000, CRC(13b20cfd) SHA1(cb333cbea09557a9d2bdc351fabc61fc7760c35d) )
 
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
+	ROM_REGION( 0xc0, "ppu2:palette", 0 )
+	ROM_COPY( "ppu1:palette", 0x00, 0x00, 0xc0 )
 ROM_END
 
 ROM_START( vsbballj )
@@ -2628,7 +2609,9 @@ ROM_START( vsbballj )
 	ROM_LOAD( "mds-ba a.8b",    0x0000, 0x2000, CRC(919147d0) SHA1(9fccdfccc2a3ec634e350880ded7053f36c377bc) )
 	ROM_LOAD( "mds-ba a.8a",    0x2000, 0x2000, CRC(3f7edb00) SHA1(f59d24f15bdb8903187eabc1578dcb60443614ed) )
 
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
+	ROM_REGION( 0xc0, "ppu2:palette", 0 )
+	ROM_COPY( "ppu1:palette", 0x00, 0x00, 0xc0 )
 ROM_END
 
 ROM_START( vsbballja )
@@ -2652,7 +2635,9 @@ ROM_START( vsbballja )
 	ROM_LOAD( "mds-ba a.8b",    0x0000, 0x2000, CRC(919147d0) SHA1(9fccdfccc2a3ec634e350880ded7053f36c377bc) )
 	ROM_LOAD( "mds-ba a.8a",    0x2000, 0x2000, CRC(3f7edb00) SHA1(f59d24f15bdb8903187eabc1578dcb60443614ed) )
 
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
+	ROM_REGION( 0xc0, "ppu2:palette", 0 )
+	ROM_COPY( "ppu1:palette", 0x00, 0x00, 0xc0 )
 ROM_END
 
 ROM_START( vsbballjb )
@@ -2676,7 +2661,9 @@ ROM_START( vsbballjb )
 	ROM_LOAD( "mds-ba a.8b",    0x0000, 0x2000, CRC(919147d0) SHA1(9fccdfccc2a3ec634e350880ded7053f36c377bc) )
 	ROM_LOAD( "mds-ba a.8a",    0x2000, 0x2000, CRC(3f7edb00) SHA1(f59d24f15bdb8903187eabc1578dcb60443614ed) )
 
-	PALETTE_2C04_0001
+	PALETTE_2C04_0001("ppu1:palette")
+	ROM_REGION( 0xc0, "ppu2:palette", 0 )
+	ROM_COPY( "ppu1:palette", 0x00, 0x00, 0xc0 )
 ROM_END
 
 ROM_START( vstennis )
@@ -2700,7 +2687,9 @@ ROM_START( vstennis )
 	ROM_LOAD( "mds-te a.8b",  0x0000, 0x2000, CRC(c81e9260) SHA1(6d4809a05364cc05485ee1add833428529af2be6) )
 	ROM_LOAD( "mds-te a.8a",  0x2000, 0x2000, CRC(d91eb295) SHA1(6b69bcef5421a6bcde89a2d1f514853f9f7992c3) )
 
-	PALETTE_STANDARD
+	PALETTE_STANDARD("ppu1:palette")
+	ROM_REGION( 0xc0, "ppu2:palette", 0 )
+	ROM_COPY( "ppu1:palette", 0x00, 0x00, 0xc0 )
 ROM_END
 
 ROM_START( vstennisa )
@@ -2724,7 +2713,9 @@ ROM_START( vstennisa )
 	ROM_LOAD( "mds-te a.8b",  0x0000, 0x2000, CRC(c81e9260) SHA1(6d4809a05364cc05485ee1add833428529af2be6) )
 	ROM_LOAD( "mds-te a.8a",  0x2000, 0x2000, CRC(d91eb295) SHA1(6b69bcef5421a6bcde89a2d1f514853f9f7992c3) )
 
-	PALETTE_STANDARD
+	PALETTE_STANDARD("ppu1:palette")
+	ROM_REGION( 0xc0, "ppu2:palette", 0 )
+	ROM_COPY( "ppu1:palette", 0x00, 0x00, 0xc0 )
 ROM_END
 
 ROM_START( vstennisb )
@@ -2748,7 +2739,9 @@ ROM_START( vstennisb )
 	ROM_LOAD( "8b",  0x0000, 0x2000, CRC(c81e9260) SHA1(6d4809a05364cc05485ee1add833428529af2be6) )
 	ROM_LOAD( "8a",  0x2000, 0x2000, CRC(d91eb295) SHA1(6b69bcef5421a6bcde89a2d1f514853f9f7992c3) )
 
-	PALETTE_STANDARD
+	PALETTE_STANDARD("ppu1:palette")
+	ROM_REGION( 0xc0, "ppu2:palette", 0 )
+	ROM_COPY( "ppu1:palette", 0x00, 0x00, 0xc0 )
 ROM_END
 
 ROM_START( wrecking )
@@ -2772,7 +2765,9 @@ ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "wr.8b",  0x0000, 0x2000, CRC(455d77ac) SHA1(fa09d0be51cc780f6c16cd314facc84043e1e69b) )
 	ROM_LOAD( "wr.8a",  0x2000, 0x2000, CRC(653350d8) SHA1(d9aa699394654deaf50fadd8a652f08a340377eb) )
 
-	PALETTE_2C04_0002
+	PALETTE_2C04_0002("ppu1:palette")
+	ROM_REGION( 0xc0, "ppu2:palette", 0 )
+	ROM_COPY( "ppu1:palette", 0x00, 0x00, 0xc0 )
 ROM_END
 
 ROM_START( iceclmrd )
@@ -2796,7 +2791,9 @@ ROM_START( iceclmrd )
 	ROM_LOAD( "mds-ic4-4 a.8b",  0x0000, 0x2000, CRC(331460b4) SHA1(4cf94d711cdb5715d14f1ab3cadec245e0adfb1e) )
 	ROM_LOAD( "mds-ic4-4 a.8a",  0x2000, 0x2000, CRC(4ec44fb3) SHA1(676e0ab574dec08df562c6f278e8a9cc7c8afa41) )
 
-	PALETTE_2C04_0004
+	PALETTE_2C04_0004("ppu1:palette")
+	ROM_REGION( 0xc0, "ppu2:palette", 0 )
+	ROM_COPY( "ppu1:palette", 0x00, 0x00, 0xc0 )
 ROM_END
 
 /******************************************************************************/
@@ -2807,62 +2804,62 @@ ROM_END
 */
 
 /*    YEAR  NAME      PARENT     MACHINE        INPUT     STATE        INIT      MONITOR  */
-GAME( 1985, btlecity, 0,         vsnes,         btlecity, vsnes_state, vsnormal, ROT0, "Namco",                  "Vs. Battle City",                 0 )
-GAME( 1985, starlstr, 0,         vsnes,         starlstr, vsnes_state, vsnormal, ROT0, "Namco",                  "Vs. Star Luster",                 0 )
-GAME( 1987, cstlevna, 0,         vsnes,         cstlevna, vsnes_state, vsvram,   ROT0, "Konami",                 "Vs. Castlevania",                 0 )
-GAME( 1984, cluclu,   0,         vsnes,         cluclu,   vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Clu Clu Land",                0 )
-GAME( 1990, drmario,  0,         vsnes,         drmario,  vsnes_state, drmario,  ROT0, "Nintendo",               "Vs. Dr. Mario",                   0 )
-GAME( 1984, excitebk, 0,         vsnes,         excitebk, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 E)",    0 )
-GAME( 1984, excitebko,excitebk,  vsnes,         excitebk, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 ?)",    0 ) // older
-GAME( 1984, excitebkj,excitebk,  vsnes,         excitebk, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-4 A)",    0 ) // likely Japan
-GAME( 1986, goonies,  0,         vsnes,         goonies,  vsnes_state, vskonami, ROT0, "Konami",                 "Vs. The Goonies (set E)",         0 )
-GAME( 1984, iceclimb, 0,         vsnes,         iceclmbj, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 B-1)", 0 )
-GAME( 1984, iceclimba,iceclimb,  vsnes,         iceclimb, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 ?)",   0 )
-GAME( 1985, nvs_machrider, 0,    vsnes,         machridr, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Endurance Course Version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1985, nvs_machridera,nvs_machrider, vsnes,   machridj, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Fighting Course Version, set MR4-1 A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, rbibb,    0,         vsnes,         rbibb,    vsnes_state, rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 1)", 0 )
-GAME( 1986, rbibba,   rbibb,     vsnes,         rbibb,    vsnes_state, rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 2)", 0 )
-GAME( 1986, suprmrio, 0,         vsnes,         suprmrio, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set SM4-4 E)", 0 )
-GAME( 1986, suprmrioa,suprmrio,  vsnes,         suprmrio, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set ?, harder)", 0 )
-GAME( 1986, suprmriobl,suprmrio, vsnes_bootleg, suprmrio, vsnes_state, vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 1)", MACHINE_NOT_WORKING ) // timer starts at 200(!)
-GAME( 1986, suprmriobl2,suprmrio,vsnes_bootleg, suprmrio, vsnes_state, vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 2)", MACHINE_NOT_WORKING ) // timer starts at 300
-GAME( 1988, skatekds, suprmrio,  vsnes,         suprmrio, vsnes_state, vsnormal, ROT0, "hack (Two-Bit Score)",   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
-GAME( 1985, vsskykid, 0,         vsnes,         vsskykid, vsnes_state, MMC3,     ROT0, "Namco",                  "Vs. Super SkyKid", 0 )
-GAME( 1987, tkoboxng, 0,         vsnes,         tkoboxng, vsnes_state, tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing", 0 )
-GAME( 1984, smgolf,   0,         vsnes,         golf4s,   vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 F)",       0 )
-GAME( 1984, smgolfb,  smgolf,    vsnes,         golf,     vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 ?)",       0 )
-GAME( 1984, smgolfj,  smgolf,    vsnes,         golf,     vsnes_state, vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Stroke & Match Golf (Men Version) (Japan, set GF3 B)", 0 )
-GAME( 1984, ladygolfe,smgolf,    vsnes,         golf,     vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)",      0 )
-GAME( 1984, ladygolf, smgolf,    vsnes,         golf,     vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 ?)",      0 )
-GAME( 1984, vspinbal, 0,         vsnes,         vspinbal, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Pinball (US, set PN4 E-1)",  0 )
-GAME( 1984, vspinbalj,vspinbal,  vsnes,         vspinblj, vsnes_state, vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Pinball (Japan, set PN3 B)", 0 )
-GAME( 1986, vsslalom, 0,         vsnes,         vsslalom, vsnes_state, vsnormal, ROT0, "Rare Coin-It Inc.",      "Vs. Slalom", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1985, vssoccer, 0,         vsnes,         vssoccer, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-2 A)", 0 )
-GAME( 1985, vssoccera,vssoccer,  vsnes,         vssoccer, vsnes_state, bnglngby, ROT0, "Nintendo",               "Vs. Soccer (set SC4-3 ?)", 0 )
-GAME( 1986, vsgradus, 0,         vsnes,         vsgradus, vsnes_state, vskonami, ROT0, "Konami",                 "Vs. Gradius (US, set GR E)", 0 )
-GAME( 1987, nvs_platoon,  0,     vsnes,         platoon,  vsnes_state, platoon,  ROT0, "Ocean Software Limited", "Vs. Platoon", 0 )
-GAME( 1987, vstetris, 0,         vsnes,         vstetris, vsnes_state, vsnormal, ROT0, "Academysoft-Elorg",      "Vs. Tetris" , 0 )
-GAME( 1986, nvs_mightybj, 0,     mightybj,      mightybj, vsnes_state, vsnormal, ROT0, "Tecmo",                  "Vs. Mighty Bomb Jack (Japan)", 0 )
-GAME( 1985, jajamaru, 0,         jajamaru,      jajamaru, vsnes_state, vsnormal, ROT0, "Jaleco",                 "Vs. Ninja Jajamaru Kun (Japan)", 0 )
-GAME( 1987, topgun,   0,         topgun,        topgun,   vsnes_state, vsvram,   ROT0, "Konami",                 "Vs. Top Gun", 0)
-GAME( 1985, bnglngby, 0,         vsnes,         bnglngby, vsnes_state, bnglngby, ROT0, "Nintendo / Broderbund Software Inc.",  "Vs. Raid on Bungeling Bay (RD4-2 B)", 0 )
-GAME( 1986, supxevs,  0,         vsnes,         supxevs,  vsnes_state, supxevs,  ROT0, "Namco",                  "Vs. Super Xevious", 0 )
+GAME( 1985, btlecity, 0,         vsnes,         btlecity, vsnes_state, init_vsnormal, ROT0, "Namco",                  "Vs. Battle City",                 0 )
+GAME( 1985, starlstr, 0,         vsnes,         starlstr, vsnes_state, init_vsnormal, ROT0, "Namco",                  "Vs. Star Luster",                 0 )
+GAME( 1987, cstlevna, 0,         vsnes,         cstlevna, vsnes_state, init_vsvram,   ROT0, "Konami",                 "Vs. Castlevania",                 0 )
+GAME( 1984, cluclu,   0,         vsnes,         cluclu,   vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Clu Clu Land",                0 )
+GAME( 1990, drmario,  0,         vsnes,         drmario,  vsnes_state, init_drmario,  ROT0, "Nintendo",               "Vs. Dr. Mario",                   0 )
+GAME( 1984, excitebk, 0,         vsnes,         excitebk, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 E)",    0 )
+GAME( 1984, excitebko,excitebk,  vsnes,         excitebk, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 ?)",    0 ) // older
+GAME( 1984, excitebkj,excitebk,  vsnes,         excitebk, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-4 A)",    0 ) // likely Japan
+GAME( 1986, goonies,  0,         vsnes,         goonies,  vsnes_state, init_vskonami, ROT0, "Konami",                 "Vs. The Goonies (set E)",         0 )
+GAME( 1984, iceclimb, 0,         vsnes,         iceclmbj, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 B-1)", 0 )
+GAME( 1984, iceclimba,iceclimb,  vsnes,         iceclimb, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 ?)",   0 )
+GAME( 1985, nvs_machrider, 0,    vsnes,         machridr, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Endurance Course Version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, nvs_machridera,nvs_machrider,vsnes, machridj, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Fighting Course Version, set MR4-1 A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rbibb,    0,         vsnes,         rbibb,    vsnes_state, init_rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 1)", 0 )
+GAME( 1986, rbibba,   rbibb,     vsnes,         rbibb,    vsnes_state, init_rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 2)", 0 )
+GAME( 1986, suprmrio, 0,         vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set SM4-4 E)", 0 )
+GAME( 1986, suprmrioa,suprmrio,  vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set ?, harder)", 0 )
+GAME( 1986, suprmriobl,suprmrio, vsnes_bootleg, suprmrio, vsnes_state, init_vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 1)", MACHINE_NOT_WORKING ) // timer starts at 200(!)
+GAME( 1986, suprmriobl2,suprmrio,vsnes_bootleg, suprmrio, vsnes_state, init_vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 2)", MACHINE_NOT_WORKING ) // timer starts at 300
+GAME( 1988, skatekds, suprmrio,  vsnes,         suprmrio, vsnes_state, init_vsnormal, ROT0, "hack (Two-Bit Score)",   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
+GAME( 1985, vsskykid, 0,         vsnes,         vsskykid, vsnes_state, init_MMC3,     ROT0, "Namco",                  "Vs. Super SkyKid", 0 )
+GAME( 1987, tkoboxng, 0,         vsnes,         tkoboxng, vsnes_state, init_tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing", 0 )
+GAME( 1984, smgolf,   0,         vsnes,         golf4s,   vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 F)",       0 )
+GAME( 1984, smgolfb,  smgolf,    vsnes,         golf,     vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 ?)",       0 )
+GAME( 1984, smgolfj,  smgolf,    vsnes,         golf,     vsnes_state, init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Stroke & Match Golf (Men Version) (Japan, set GF3 B)", 0 )
+GAME( 1984, ladygolfe,smgolf,    vsnes,         golf,     vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)",      0 )
+GAME( 1984, ladygolf, smgolf,    vsnes,         golf,     vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 ?)",      0 )
+GAME( 1984, vspinbal, 0,         vsnes,         vspinbal, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Pinball (US, set PN4 E-1)",  0 )
+GAME( 1984, vspinbalj,vspinbal,  vsnes,         vspinblj, vsnes_state, init_vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Pinball (Japan, set PN3 B)", 0 )
+GAME( 1986, vsslalom, 0,         vsnes,         vsslalom, vsnes_state, init_vsnormal, ROT0, "Rare Coin-It Inc.",      "Vs. Slalom", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, vssoccer, 0,         vsnes,         vssoccer, vsnes_state, init_vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-2 A)", 0 )
+GAME( 1985, vssoccera,vssoccer,  vsnes,         vssoccer, vsnes_state, init_bnglngby, ROT0, "Nintendo",               "Vs. Soccer (set SC4-3 ?)", 0 )
+GAME( 1986, vsgradus, 0,         vsnes,         vsgradus, vsnes_state, init_vskonami, ROT0, "Konami",                 "Vs. Gradius (US, set GR E)", 0 )
+GAME( 1987, nvs_platoon,  0,     vsnes,         platoon,  vsnes_state, init_platoon,  ROT0, "Ocean Software Limited", "Vs. Platoon", 0 )
+GAME( 1987, vstetris, 0,         vsnes,         vstetris, vsnes_state, init_vsnormal, ROT0, "Academysoft-Elorg",      "Vs. Tetris" , 0 )
+GAME( 1986, nvs_mightybj, 0,     mightybj,      mightybj, vsnes_state, init_vsnormal, ROT0, "Tecmo",                  "Vs. Mighty Bomb Jack (Japan)", 0 )
+GAME( 1985, jajamaru, 0,         jajamaru,      jajamaru, vsnes_state, init_vsnormal, ROT0, "Jaleco",                 "Vs. Ninja Jajamaru Kun (Japan)", 0 )
+GAME( 1987, topgun,   0,         topgun,        topgun,   vsnes_state, init_vsvram,   ROT0, "Konami",                 "Vs. Top Gun", 0)
+GAME( 1985, bnglngby, 0,         vsnes,         bnglngby, vsnes_state, init_bnglngby, ROT0, "Nintendo / Broderbund Software Inc.",  "Vs. Raid on Bungeling Bay (RD4-2 B)", 0 )
+GAME( 1986, supxevs,  0,         vsnes,         supxevs,  vsnes_state, init_supxevs,  ROT0, "Namco",                  "Vs. Super Xevious", 0 )
 
 /* Light Gun games */
-GAME( 1985, duckhunt, 0,         vsnes,         duckhunt, vsnes_state, vsgun,    ROT0, "Nintendo",               "Vs. Duck Hunt (set DH3 E)",         0 )
-GAME( 1985, hogalley, 0,         vsnes,         hogalley, vsnes_state, vsgun,    ROT0, "Nintendo",               "Vs. Hogan's Alley (set HA4-1 E-1)", 0 )
-GAME( 1986, vsgshoe,  0,         vsgshoe,       vsgshoe,  vsnes_state, vsgshoe,  ROT0, "Nintendo",               "Vs. Gumshoe (set GM5)",             0 )
-GAME( 1988, vsfdf,    0,         vsnes,         vsfdf,    vsnes_state, vsfdf,    ROT0, "Sunsoft",                "Vs. Freedom Force",                 0 )
+GAME( 1985, duckhunt, 0,         vsnes,         duckhunt, vsnes_state, init_vsgun,    ROT0, "Nintendo",               "Vs. Duck Hunt (set DH3 E)",         0 )
+GAME( 1985, hogalley, 0,         vsnes,         hogalley, vsnes_state, init_vsgun,    ROT0, "Nintendo",               "Vs. Hogan's Alley (set HA4-1 E-1)", 0 )
+GAME( 1986, vsgshoe,  0,         vsgshoe,       vsgshoe,  vsnes_state, init_vsgshoe,  ROT0, "Nintendo",               "Vs. Gumshoe (set GM5)",             0 )
+GAME( 1988, vsfdf,    0,         vsnes,         vsfdf,    vsnes_state, init_vsfdf,    ROT0, "Sunsoft",                "Vs. Freedom Force",                 0 )
 
 /* Dual games */
-GAME( 1984, vstennis, 0,         vsdual_pi,     vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set TE A-3)" ,  0 )
-GAME( 1984, vstennisa,vstennis,  vsdual_pi,     vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 2)",        0 )
-GAME( 1984, vstennisb,vstennis,  vsdual_pi,     vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 3)",        MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, wrecking, 0,         vsdual_pi,     wrecking, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Wrecking Crew",                    0 )
-GAME( 1984, balonfgt, 0,         vsdual_pi,     balonfgt, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Balloon Fight (set BF4 A-3)",      0 )
-GAME( 1984, vsmahjng, 0,         vsdual,        vsmahjng, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Mahjong (Japan)",                  0 )
-GAME( 1984, vsbball,  0,         vsdual_pi,     vsbball,  vsnes_state, vsdual,   ROT0, "Nintendo of America",    "Vs. BaseBall (US, set BA E-1)",        0 )
-GAME( 1984, vsbballj, vsbball,   vsdual_pi,     vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-3)",     0 )
-GAME( 1984, vsbballja,vsbball,   vsdual_pi,     vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-2)",     0 )
-GAME( 1984, vsbballjb,vsbball,   vsdual_pi,     vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-1)",     0 )
-GAME( 1984, iceclmrd, 0,         vsdual_pi,     iceclmrj, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Ice Climber Dual (set IC4-4 A-1)", 0 )
+GAME( 1984, vstennis, 0,         vsdual_pi,     vstennis, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set TE A-3)" ,  0 )
+GAME( 1984, vstennisa,vstennis,  vsdual_pi,     vstennis, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 2)",        0 )
+GAME( 1984, vstennisb,vstennis,  vsdual_pi,     vstennis, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 3)",        MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, wrecking, 0,         vsdual_pi,     wrecking, vsnes_state, init_vsdual,   ROT0, "Nintendo",               "Vs. Wrecking Crew",                    0 )
+GAME( 1984, balonfgt, 0,         vsdual_pi,     balonfgt, vsnes_state, init_vsdual,   ROT0, "Nintendo",               "Vs. Balloon Fight (set BF4 A-3)",      0 )
+GAME( 1984, vsmahjng, 0,         vsdual,        vsmahjng, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Mahjong (Japan)",                  0 )
+GAME( 1984, vsbball,  0,         vsdual_pi,     vsbball,  vsnes_state, init_vsdual,   ROT0, "Nintendo of America",    "Vs. BaseBall (US, set BA E-1)",        0 )
+GAME( 1984, vsbballj, vsbball,   vsdual_pi,     vsbballj, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-3)",     0 )
+GAME( 1984, vsbballja,vsbball,   vsdual_pi,     vsbballj, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-2)",     0 )
+GAME( 1984, vsbballjb,vsbball,   vsdual_pi,     vsbballj, vsnes_state, init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-1)",     0 )
+GAME( 1984, iceclmrd, 0,         vsdual_pi,     iceclmrj, vsnes_state, init_vsdual,   ROT0, "Nintendo",               "Vs. Ice Climber Dual (set IC4-4 A-1)", 0 )

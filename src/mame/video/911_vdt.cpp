@@ -17,7 +17,6 @@ TODO:
 #include "911_chr.h"
 #include "911_key.h"
 
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -45,7 +44,7 @@ static const gfx_layout fontlayout_8bit =
 	10*8            /* every char takes 10 consecutive bytes */
 };
 
-static GFXDECODE_START( vdt911 )
+static GFXDECODE_START( gfx_vdt911 )
 	// Caution: Array must use same order as vdt911_model_t
 	// US
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_device::US_chr_offset, fontlayout_7bit, 0, 4 )
@@ -75,19 +74,19 @@ static GFXDECODE_START( vdt911 )
 	GFXDECODE_ENTRY( vdt911_chr_region, vdt911_device::frenchWP_chr_offset, fontlayout_7bit, 0, 4 )
 GFXDECODE_END
 
-static const unsigned char vdt911_colors[] =
+static constexpr rgb_t vdt911_colors[] =
 {
-	0x00,0x00,0x00, /* black */
-	0xC0,0xC0,0xC0, /* low intensity */
-	0xFF,0xFF,0xFF  /* high intensity */
+	{ 0x00, 0x00, 0x00 }, // black
+	{ 0xc0, 0xc0, 0xc0 }, // low intensity
+	{ 0xff, 0xff, 0xff }  // high intensity
 };
 
-static const unsigned short vdt911_palette[] =
+static const unsigned short vdt911_pens[] =
 {
-	0, 2,   /* high intensity */
-	0, 1,   /* low intensity */
-	2, 0,   /* high intensity, reverse */
-	2, 1    /* low intensity, reverse */
+	0, 2,   // high intensity
+	0, 1,   // low intensity
+	2, 0,   // high intensity, reverse
+	2, 1    // low intensity, reverse
 };
 
 /*
@@ -105,18 +104,13 @@ static const unsigned short vdt911_palette[] =
 /*
     Initialize vdt911 palette
 */
-PALETTE_INIT_MEMBER(vdt911_device, vdt911)
+void vdt911_device::vdt911_palette(palette_device &palette) const
 {
-	uint8_t i, r, g, b;
+	for (int i = 0; i < ARRAY_LENGTH(vdt911_colors); i++)
+		palette.set_indirect_color(i, vdt911_colors[i]);
 
-	for ( i = 0; i < 3; i++ )
-	{
-		r = vdt911_colors[i*3]; g = vdt911_colors[i*3+1]; b = vdt911_colors[i*3+2];
-		palette.set_indirect_color(i, rgb_t(r, g, b));
-	}
-
-	for(i=0;i<8;i++)
-		palette.set_pen_indirect(i, vdt911_palette[i]);
+	for (int i = 0; i < ARRAY_LENGTH(vdt911_pens); i++)
+		palette.set_pen_indirect(i, vdt911_pens[i]);
 }
 
 /*
@@ -148,11 +142,13 @@ static void apply_char_overrides(int nb_char_overrides, const char_override_t ch
 DEFINE_DEVICE_TYPE(VDT911, vdt911_device, "vdt911", "911 VDT")
 
 vdt911_device::vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VDT911, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, GFXDECODE_NAME(vdt911), "palette"),
-		m_beeper(*this, "beeper"),
-		m_keyint_line(*this),
-		m_lineint_line(*this)
+	: device_t(mconfig, VDT911, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, gfx_vdt911, "palette")
+	, m_beeper(*this, "beeper")
+	, m_screen(*this, "screen")
+	, m_keys(*this, "KEY%u", 0U)
+	, m_keyint_line(*this)
+	, m_lineint_line(*this)
 {
 }
 
@@ -249,7 +245,11 @@ void vdt911_device::device_reset()
 	else
 		m_cursor_address_mask = 0x7ff;   /* 2 kb of RAM */
 
-	m_line_timer->adjust(attotime::from_msec(0), 0, attotime::from_hz(get_refresh_rate()));
+	// European models have 50 Hz
+	int lines = (m_model == model::US) || (m_model == model::Japanese) ? 262 : 314;
+	attotime refresh = attotime::from_hz(11.004_MHz_XTAL / 700 / lines);
+	m_screen->configure(700, lines, m_screen->visible_area(), refresh.as_attoseconds());
+	m_line_timer->adjust(attotime::from_msec(0), 0, refresh);
 }
 
 /*
@@ -461,7 +461,7 @@ WRITE8_MEMBER( vdt911_device::cru_w )
 void vdt911_device::refresh(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y)
 {
 	gfx_element *gfx = this->gfx(unsigned(m_model));
-	int height = (m_screen_size == screen_size::char_960) ? 12 : /*25*/24;
+	int height = (m_screen_size == screen_size::char_960) ? 12 : 24;
 
 	int use_8bit_charcodes = USES_8BIT_CHARCODES();
 	int address = 0;
@@ -550,12 +550,10 @@ void vdt911_device::check_keyboard()
 	modifier_state_t modifier_state;
 	int repeat_mode;
 
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
-
 	/* read current key state */
 	for (i = 0; i < 6; i++)
 	{
-		key_buf[i] = ioport(keynames[i])->read();
+		key_buf[i] = m_keys[i]->read();
 	}
 
 	/* parse modifier keys */
@@ -662,12 +660,6 @@ void vdt911_device::check_keyboard()
 			}
 		}
 	}
-}
-
-int vdt911_device::get_refresh_rate()
-{
-	// European models have 50 Hz
-	return ((m_model == model::US) || (m_model == model::Japanese))? 60 : 50;
 }
 
 uint32_t vdt911_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -803,22 +795,16 @@ INPUT_PORTS_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(vdt911_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, vdt911_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(11.004_MHz_XTAL, 700, 0, 560, 262, 0, 240);
+	screen.set_screen_update(FUNC(vdt911_device::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_SCREEN_SIZE(560, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 560-1, 0, /*250*/280-1)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.50)
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(3)
-	MCFG_PALETTE_INIT_OWNER(vdt911_device, vdt911)
+	PALETTE(config, "palette", FUNC(vdt911_device::vdt911_palette), ARRAY_LENGTH(vdt911_pens), ARRAY_LENGTH(vdt911_colors));
 MACHINE_CONFIG_END
 
 ioport_constructor vdt911_device::device_input_ports() const

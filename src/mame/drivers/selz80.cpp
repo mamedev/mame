@@ -50,18 +50,20 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void selz80(machine_config &config);
+	void dagz80(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 	DECLARE_MACHINE_RESET(dagz80);
 	DECLARE_MACHINE_RESET(selz80);
 
-	void selz80(machine_config &config);
-	void dagz80(machine_config &config);
 	void dagz80_mem(address_map &map);
 	void selz80_io(address_map &map);
 	void selz80_mem(address_map &map);
-private:
+
 	uint8_t m_digit;
 	void setup_baud();
 	required_device<cpu_device> m_maincpu;
@@ -93,8 +95,7 @@ void selz80_state::selz80_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0x18, 0x18).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x19, 0x19).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x18, 0x19).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /* Input ports */
@@ -217,41 +218,41 @@ void selz80_state::machine_start()
 
 MACHINE_CONFIG_START(selz80_state::selz80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000)) // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
-	MCFG_CPU_PROGRAM_MAP(selz80_mem)
-	MCFG_CPU_IO_MAP(selz80_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
+	MCFG_DEVICE_PROGRAM_MAP(selz80_mem)
+	MCFG_DEVICE_IO_MAP(selz80_io)
 	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, selz80 )
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_selz80)
+	config.set_default_layout(layout_selz80);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	CLOCK(config, m_clock, 153600);
+	m_clock->signal_handler().set("uart", FUNC(i8251_device::write_txc));
+	m_clock->signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	i8251_device &uart(I8251(config, "uart", 0));
+	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("uart", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("uart", FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set("uart", FUNC(i8251_device::write_cts));
 
-	MCFG_DEVICE_ADD("i8279", I8279, 5000000 / 2) // based on divider
-	MCFG_I8279_OUT_SL_CB(WRITE8(selz80_state, scanlines_w))         // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(selz80_state, digit_w))           // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(selz80_state, kbd_r))                 // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC)
+	i8279_device &kbdc(I8279(config, "i8279", 5000000 / 2)); // based on divider
+	kbdc.out_sl_callback().set(FUNC(selz80_state::scanlines_w));    // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(selz80_state::digit_w));      // display A&B
+	kbdc.in_rl_callback().set(FUNC(selz80_state::kbd_r));           // kbd RL lines
+	kbdc.in_shift_callback().set_constant(1);                       // Shift key
+	kbdc.in_ctrl_callback().set_constant(1);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(selz80_state::dagz80)
 	selz80(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dagz80_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dagz80_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, dagz80 )
 MACHINE_CONFIG_END
 
@@ -260,9 +261,9 @@ MACHINE_CONFIG_END
 ROM_START( selz80 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v3.3", "V3.3")
-	ROMX_LOAD( "z80-trainer.rom", 0x0000, 0x1000, CRC(eed1755f) SHA1(72e6ebfccb0e50034660bc36db1a741932311ce1), ROM_BIOS(1)) // (c)TEL86/V3.3
+	ROMX_LOAD( "z80-trainer.rom", 0x0000, 0x1000, CRC(eed1755f) SHA1(72e6ebfccb0e50034660bc36db1a741932311ce1), ROM_BIOS(0)) // (c)TEL86/V3.3
 	ROM_SYSTEM_BIOS(1, "v3.2", "V3.2")
-	ROMX_LOAD( "moniz80_3.2_04.12.1985.bin", 0x0000, 0x1000, CRC(3a3cf574) SHA1(ba6cd2276ce66f3a4545baf4d396f6c06d51dc38), ROM_BIOS(2)) // (c)SEL85/V3.2
+	ROMX_LOAD( "moniz80_3.2_04.12.1985.bin", 0x0000, 0x1000, CRC(3a3cf574) SHA1(ba6cd2276ce66f3a4545baf4d396f6c06d51dc38), ROM_BIOS(1)) // (c)SEL85/V3.2
 	ROM_LOAD( "term80-a000.bin", 0xa000, 0x2000, CRC(0a58c0a7) SHA1(d1b4b3b2ad0d084175b1ff6966653d8b20025252))
 	ROM_LOAD( "term80-e000.bin", 0xe000, 0x2000, CRC(158e08e6) SHA1(f1add43bcf8744a01238fb893ee284872d434db5))
 ROM_END
@@ -275,6 +276,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY  FULLNAME           FLAGS
-COMP( 1985, selz80, 0,      0,      selz80,  selz80, selz80_state, 0,    "SEL",   "SEL Z80 Trainer", MACHINE_NO_SOUND_HW)
-COMP( 1988, dagz80, selz80, 0,      dagz80,  selz80, selz80_state, 0,    "DAG",   "DAG Z80 Trainer", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME           FLAGS
+COMP( 1985, selz80, 0,      0,      selz80,  selz80, selz80_state, empty_init, "SEL",   "SEL Z80 Trainer", MACHINE_NO_SOUND_HW)
+COMP( 1988, dagz80, selz80, 0,      dagz80,  selz80, selz80_state, empty_init, "DAG",   "DAG Z80 Trainer", MACHINE_NO_SOUND_HW)

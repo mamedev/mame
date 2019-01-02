@@ -7,10 +7,11 @@
 
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/m68000/m68000.h"
 #include "bus/centronics/ctronics.h"
+#include "imagedev/floppy.h"
 #include "machine/am9519.h"
 #include "machine/keyboard.h"
 #include "machine/ram.h"
@@ -22,6 +23,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "u12"
@@ -38,8 +40,8 @@
 class trs80m2_state : public driver_device
 {
 public:
-	trs80m2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	trs80m2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_ctc(*this, Z80CTC_TAG),
 		m_dmac(*this, Z80DMA_TAG),
@@ -103,7 +105,7 @@ protected:
 
 	virtual void video_start() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dma_device> m_dmac;
 	required_device<z80pio_device> m_pio;

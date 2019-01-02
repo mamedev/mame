@@ -90,7 +90,7 @@ DEFINE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device, "ppu2c05_04", "2C05_04 PPU")
 void ppu2c0x_device::ppu2c0x(address_map &map)
 {
 	map(0x0000, 0x3eff).ram();
-	map(0x3f00, 0x3fff).rw(this, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
+	map(0x3f00, 0x3fff).rw(FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 //  AM_RANGE(0x0000, 0x3fff) AM_RAM
 }
 
@@ -124,9 +124,11 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
+	, device_palette_interface(mconfig, *this)
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(), address_map_constructor(FUNC(ppu2c0x_device::ppu2c0x), this))
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_scanline(0)  // reset the scanline count
+	, m_int_callback(*this)
 	, m_refresh_data(0)
 	, m_refresh_latch(0)
 	, m_x_fine(0)
@@ -138,7 +140,6 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	, m_tile_page(0)
 	, m_sprite_page(0)
 	, m_back_color(0)
-	, m_color_base(0)
 	, m_scan_scale(1) // set the scan scale (this is for dual monitor vertical setups)
 	, m_tilecount(0)
 	, m_draw_phase(0)
@@ -154,10 +155,12 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 
 	/* usually, no security value... */
 	m_security_value = 0;
-
-	m_nmi_callback_proc = nmi_delegate();
 }
 
+ppu2c0x_rgb_device::ppu2c0x_rgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, type, tag, owner, clock)
+	, m_palette_data(*this, "palette", 0xc0)
+{
+}
 
 // NTSC NES
 ppu2c02_device::ppu2c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C02, tag, owner, clock)
@@ -165,12 +168,12 @@ ppu2c02_device::ppu2c02_device(const machine_config &mconfig, const char *tag, d
 }
 
 // Playchoice 10
-ppu2c03b_device::ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C03B, tag, owner, clock)
+ppu2c03b_device::ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_rgb_device(mconfig, PPU_2C03B, tag, owner, clock)
 {
 }
 
 // Vs. Unisystem
-ppu2c04_device::ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C04, tag, owner, clock)
+ppu2c04_device::ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_rgb_device(mconfig, PPU_2C04, tag, owner, clock)
 {
 }
 
@@ -189,22 +192,22 @@ ppupalc_device::ppupalc_device(const machine_config &mconfig, const char *tag, d
 
 // The PPU_2C05 variants have different protection value, set at device start, but otherwise are all the same...
 // Vs. Unisystem (Ninja Jajamaru Kun)
-ppu2c05_01_device::ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_01, tag, owner, clock)
+ppu2c05_01_device::ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_rgb_device(mconfig, PPU_2C05_01, tag, owner, clock)
 {
 	m_security_value = 0x1b;    // game (jajamaru) doesn't seem to ever actually check it
 }
 // Vs. Unisystem (Mighty Bomb Jack)
-ppu2c05_02_device::ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_02, tag, owner, clock)
+ppu2c05_02_device::ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_rgb_device(mconfig, PPU_2C05_02, tag, owner, clock)
 {
 	m_security_value = 0x3d;
 }
 // Vs. Unisystem (Gumshoe)
-ppu2c05_03_device::ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_03, tag, owner, clock)
+ppu2c05_03_device::ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_rgb_device(mconfig, PPU_2C05_03, tag, owner, clock)
 {
 	m_security_value = 0x1c;
 }
 // Vs. Unisystem (Top Gun)
-ppu2c05_04_device::ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, PPU_2C05_04, tag, owner, clock)
+ppu2c05_04_device::ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_rgb_device(mconfig, PPU_2C05_04, tag, owner, clock)
 {
 	m_security_value = 0x1b;
 }
@@ -217,7 +220,7 @@ ppu2c05_04_device::ppu2c05_04_device(const machine_config &mconfig, const char *
 void ppu2c0x_device::device_start()
 {
 	// bind our handler
-	m_nmi_callback_proc.bind_relative_to(*owner());
+	m_int_callback.resolve_safe();
 
 	// allocate timers
 	m_hblank_timer = timer_alloc(TIMER_HBLANK);
@@ -230,7 +233,7 @@ void ppu2c0x_device::device_start()
 	m_nmi_timer->adjust(attotime::never);
 
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
-	m_bitmap = std::make_unique<bitmap_ind16>(VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
+	m_bitmap = std::make_unique<bitmap_rgb32>(VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
 	m_spriteram = make_unique_clear<uint8_t[]>(SPRITERAM_SIZE);
 	m_colortable = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable));
 	m_colortable_mono = std::make_unique<pen_t[]>(ARRAY_LENGTH(default_colortable_mono));
@@ -239,11 +242,13 @@ void ppu2c0x_device::device_start()
 	for (int i = 0; i < ARRAY_LENGTH(default_colortable_mono); i++)
 	{
 		/* monochromatic table */
-		m_colortable_mono[i] = default_colortable_mono[i] + m_color_base;
+		m_colortable_mono[i] = default_colortable_mono[i];
 
 		/* color table */
-		m_colortable[i] = default_colortable[i] + m_color_base;
+		m_colortable[i] = default_colortable[i];
 	}
+
+	init_palette();
 
 	// register for state saving
 	save_item(NAME(m_scanline));
@@ -265,9 +270,9 @@ void ppu2c0x_device::device_start()
 	save_item(NAME(m_palette_ram));
 	save_item(NAME(m_draw_phase));
 	save_item(NAME(m_tilecount));
-	save_pointer(NAME(m_spriteram.get()), SPRITERAM_SIZE);
-	save_pointer(NAME(m_colortable.get()), ARRAY_LENGTH(default_colortable));
-	save_pointer(NAME(m_colortable_mono.get()), ARRAY_LENGTH(default_colortable_mono));
+	save_pointer(NAME(m_spriteram), SPRITERAM_SIZE);
+	save_pointer(NAME(m_colortable), ARRAY_LENGTH(default_colortable));
+	save_pointer(NAME(m_colortable_mono), ARRAY_LENGTH(default_colortable_mono));
 	save_item(NAME(*m_bitmap));
 }
 
@@ -305,12 +310,12 @@ inline void ppu2c0x_device::writebyte(offs_t address, uint8_t data)
  *
  *************************************/
 
-void ppu2c0x_device::init_palette(palette_device &palette, int first_entry)
+void ppu2c0x_device::init_palette()
 {
-	init_palette(palette, first_entry, false);
+	init_palette(false);
 }
 
-void ppu2c0x_device::init_palette(palette_device &palette, int first_entry, bool indirect)
+void ppu2c0x_device::init_palette(bool indirect)
 {
 	/* This routine builds a palette using a transformation from */
 	/* the YUV (Y, B-Y, R-Y) to the RGB color space */
@@ -319,17 +324,13 @@ void ppu2c0x_device::init_palette(palette_device &palette, int first_entry, bool
 	/* 16 colors, with 4 luminance levels for each color     */
 	/* The 16 colors circle around the YUV color space,      */
 
-	int color_intensity, color_num, color_emphasis;
+	const double tint = 0.22; /* adjust to taste */
+	const double hue = 287.0;
 
-	double R, G, B;
-
-	double tint = 0.22; /* adjust to taste */
-	double hue = 287.0;
-
-	double Kr = 0.2989;
-	double Kb = 0.1145;
-	double Ku = 2.029;
-	double Kv = 1.140;
+	const double Kr = 0.2989;
+	const double Kb = 0.1145;
+	const double Ku = 2.029;
+	const double Kv = 1.140;
 
 	static const double brightness[3][4] =
 	{
@@ -338,8 +339,10 @@ void ppu2c0x_device::init_palette(palette_device &palette, int first_entry, bool
 		{ 0, 0.24, 0.47, 0.77 }
 	};
 
+	int entry = 0;
+
 	/* Loop through the emphasis modes (8 total) */
-	for (color_emphasis = 0; color_emphasis < 8; color_emphasis++)
+	for (int color_emphasis = 0; color_emphasis < 8; color_emphasis++)
 	{
 		/*
 		double r_mod = 0.0;
@@ -360,10 +363,10 @@ void ppu2c0x_device::init_palette(palette_device &palette, int first_entry, bool
 		*/
 
 		/* loop through the 4 intensities */
-		for (color_intensity = 0; color_intensity < 4; color_intensity++)
+		for (int color_intensity = 0; color_intensity < 4; color_intensity++)
 		{
 			/* loop through the 16 colors */
-			for (color_num = 0; color_num < 16; color_num++)
+			for (int color_num = 0; color_num < 16; color_num++)
 			{
 				double sat;
 				double y, u, v;
@@ -397,9 +400,9 @@ void ppu2c0x_device::init_palette(palette_device &palette, int first_entry, bool
 				v = sat * sin(rad);
 
 				/* Transform to RGB */
-				R = (y + Kv * v) * 255.0;
-				G = (y - (Kb * Ku * u + Kr * Kv * v) / (1 - Kb - Kr)) * 255.0;
-				B = (y + Ku * u) * 255.0;
+				double R = (y + Kv * v) * 255.0;
+				double G = (y - (Kb * Ku * u + Kr * Kv * v) / (1 - Kb - Kr)) * 255.0;
+				double B = (y + Ku * u) * 255.0;
 
 				/* Clipping, in case of saturation */
 				if (R < 0)
@@ -417,9 +420,9 @@ void ppu2c0x_device::init_palette(palette_device &palette, int first_entry, bool
 
 				/* Round, and set the value */
 				if (indirect)
-					palette.set_indirect_color(first_entry++, rgb_t(floor(R + .5), floor(G + .5), floor(B + .5)));
+					set_indirect_color(entry++, rgb_t(floor(R + .5), floor(G + .5), floor(B + .5)));
 				else
-					palette.set_pen_color(first_entry++, floor(R + .5), floor(G + .5), floor(B + .5));
+					set_pen_color(entry++, floor(R + .5), floor(G + .5), floor(B + .5));
 			}
 		}
 	}
@@ -427,24 +430,19 @@ void ppu2c0x_device::init_palette(palette_device &palette, int first_entry, bool
 	/* color tables are modified at run-time, and are initialized on 'ppu2c0x_reset' */
 }
 
-void ppu2c0x_device::init_palette_rgb( palette_device &palette, int first_entry )
+void ppu2c0x_rgb_device::init_palette()
 {
-	int color_emphasis, color_num;
-
-	int R, G, B;
-
-	uint8_t *palette_data = machine().root_device().memregion("palette")->base();
-
 	/* Loop through the emphasis modes (8 total) */
-	for (color_emphasis = 0; color_emphasis < 8; color_emphasis++)
+	int entry = 0;
+	for (int color_emphasis = 0; color_emphasis < 8; color_emphasis++)
 	{
-		for (color_num = 0; color_num < 64; color_num++)
+		for (int color_num = 0; color_num < 64; color_num++)
 			{
-				R = ((color_emphasis & 1) ? 7 : palette_data[color_num * 3]);
-				G = ((color_emphasis & 2) ? 7 : palette_data[color_num * 3 + 1]);
-				B = ((color_emphasis & 4) ? 7 : palette_data[color_num * 3 + 2]);
+				int R = ((color_emphasis & 1) ? 7 : m_palette_data[color_num * 3]);
+				int G = ((color_emphasis & 2) ? 7 : m_palette_data[color_num * 3 + 1]);
+				int B = ((color_emphasis & 4) ? 7 : m_palette_data[color_num * 3 + 2]);
 
-				palette.set_pen_color(first_entry++, pal3bit(R), pal3bit(G), pal3bit(B));
+				set_pen_color(entry++, pal3bit(R), pal3bit(G), pal3bit(B));
 			}
 	}
 
@@ -478,7 +476,6 @@ static const gfx_layout ppu_charlayout =
 void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	int blanked, vblank;
-	int *regs = &m_regs[0];
 
 	switch (id)
 	{
@@ -496,8 +493,8 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		case TIMER_NMI:
 			// Actually fire the VMI
-			if (!m_nmi_callback_proc.isnull())
-				m_nmi_callback_proc(regs);
+			m_int_callback(ASSERT_LINE);
+			m_int_callback(CLEAR_LINE);
 
 			m_nmi_timer->adjust(attotime::never);
 			break;
@@ -583,14 +580,14 @@ void ppu2c0x_device::shift_tile_plane_data(uint8_t &pix)
 	m_planebuf[1] = m_planebuf[1] << 1;
 }
 
-void ppu2c0x_device::draw_tile_pixel(uint8_t pix, int color, uint16_t back_pen, uint16_t *&dest, const pen_t *color_table)
+void ppu2c0x_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t *&dest, const pen_t *color_table)
 {
-	uint16_t pen;
+	pen_t pen;
 
 	if (pix)
 	{
 		const pen_t *paldata = &color_table[4 * color];
-		pen = paldata[pix];
+		pen = this->pen(paldata[pix]);
 	}
 	else
 	{
@@ -600,7 +597,7 @@ void ppu2c0x_device::draw_tile_pixel(uint8_t pix, int color, uint16_t back_pen, 
 	*dest = pen;
 }
 
-void ppu2c0x_device::draw_tile(uint8_t *line_priority, int color_byte, int color_bits, int address, int start_x, uint16_t back_pen, uint16_t *&dest, const pen_t *color_table)
+void ppu2c0x_device::draw_tile(uint8_t *line_priority, int color_byte, int color_bits, int address, int start_x, pen_t back_pen, uint32_t *&dest, const pen_t *color_table)
 {
 	int color = (((color_byte >> color_bits) & 0x03));
 
@@ -624,12 +621,10 @@ void ppu2c0x_device::draw_tile(uint8_t *line_priority, int color_byte, int color
 	}
 }
 
-void ppu2c0x_device::draw_background( uint8_t *line_priority )
+void ppu2c0x_device::draw_background(uint8_t *line_priority)
 {
-	bitmap_ind16 &bitmap = *m_bitmap;
+	bitmap_rgb32 &bitmap = *m_bitmap;
 	int start_x = (m_x_fine ^ 0x07) - 7;
-	uint16_t back_pen;
-	uint16_t *dest;
 
 	uint8_t scroll_x_coarse, scroll_y_coarse, scroll_y_fine, color_mask;
 	int x, tile_index, i;
@@ -651,7 +646,7 @@ void ppu2c0x_device::draw_background( uint8_t *line_priority )
 	}
 
 	/* cache the background pen */
-	back_pen = (m_back_color & color_mask) + m_color_base;
+	pen_t back_pen = pen(m_back_color & color_mask);
 
 	/* determine where in the nametable to start drawing from */
 	/* based on the current scanline and scroll regs */
@@ -665,7 +660,7 @@ void ppu2c0x_device::draw_background( uint8_t *line_priority )
 	tile_index = ((m_refresh_data & 0xc00) | 0x2000) + scroll_y_coarse * 32;
 
 	/* set up dest */
-	dest = &bitmap.pix16(m_scanline, start_x);
+	uint32_t *dest = &bitmap.pix32(m_scanline, start_x);
 
 	/* draw the 32 or 33 tiles that make up a line */
 	while (m_tilecount < 34)
@@ -721,7 +716,7 @@ void ppu2c0x_device::draw_background( uint8_t *line_priority )
 	/* if the left 8 pixels for the background are off, blank 'em */
 	if (!(m_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND_L8))
 	{
-		dest = &bitmap.pix16(m_scanline);
+		dest = &bitmap.pix32(m_scanline);
 		for (i = 0; i < 8; i++)
 		{
 			*(dest++) = back_pen;
@@ -752,10 +747,10 @@ void ppu2c0x_device::make_sprite_pixel_data(uint8_t &pixel_data, int flipx)
 	}
 }
 
-void ppu2c0x_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_ind16& bitmap)
+void ppu2c0x_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap)
 {
 	const pen_t *paldata = &m_colortable[4 * color];
-	bitmap.pix16(m_scanline, sprite_xpos + pixel) = paldata[pixel_data];
+	bitmap.pix32(m_scanline, sprite_xpos + pixel) = pen(paldata[pixel_data]);
 }
 
 void ppu2c0x_device::read_extra_sprite_bits(int sprite_index)
@@ -763,9 +758,9 @@ void ppu2c0x_device::read_extra_sprite_bits(int sprite_index)
 	// needed for some clones
 }
 
-void ppu2c0x_device::draw_sprites( uint8_t *line_priority )
+void ppu2c0x_device::draw_sprites(uint8_t *line_priority)
 {
-	bitmap_ind16 &bitmap = *m_bitmap;
+	bitmap_rgb32 &bitmap = *m_bitmap;
 
 	int sprite_xpos, sprite_ypos, sprite_index;
 	int tile, index1;
@@ -934,7 +929,7 @@ void ppu2c0x_device::draw_sprites( uint8_t *line_priority )
  *
  *************************************/
 
-void ppu2c0x_device::render_scanline( void )
+void ppu2c0x_device::render_scanline()
 {
 	uint8_t line_priority[VISIBLE_SCREEN_WIDTH];
 
@@ -951,23 +946,17 @@ void ppu2c0x_device::render_scanline( void )
 		draw_background(line_priority);
 	else
 	{
-		bitmap_ind16 &bitmap = *m_bitmap;
-		uint8_t color_mask;
-		uint16_t back_pen;
-		int i;
+		bitmap_rgb32 &bitmap = *m_bitmap;
 
 		/* setup the color mask and colortable to use */
-		if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-			color_mask = 0xf0;
-		else
-			color_mask = 0xff;
+		uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0xf0 : 0xff;
 
 		/* cache the background pen */
-		back_pen = (m_back_color & color_mask) + m_color_base;
+		pen_t back_pen = pen(m_back_color & color_mask);
 
 		// Fill this scanline with the background pen.
-		for (i = 0; i < bitmap.width(); i++)
-			bitmap.pix16(m_scanline, i) = back_pen;
+		for (int i = 0; i < bitmap.width(); i++)
+			bitmap.pix32(m_scanline, i) = back_pen;
 	}
 
 	m_draw_phase = PPU_DRAW_OAM;
@@ -981,7 +970,7 @@ void ppu2c0x_device::render_scanline( void )
 	g_profiler.stop();
 }
 
-void ppu2c0x_device::update_scanline( void )
+void ppu2c0x_device::update_scanline()
 {
 	if (m_scanline <= BOTTOM_VISIBLE_SCANLINE)
 	{
@@ -998,16 +987,11 @@ void ppu2c0x_device::update_scanline( void )
 		}
 		else
 		{
-			bitmap_ind16 &bitmap = *m_bitmap;
-			uint8_t color_mask;
-			uint16_t back_pen;
-			int i;
+			bitmap_rgb32 &bitmap = *m_bitmap;
+			pen_t back_pen;
 
 			/* setup the color mask and colortable to use */
-			if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-				color_mask = 0xf0;
-			else
-				color_mask = 0xff;
+			uint8_t color_mask = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO) ? 0xf0 : 0xff;
 
 			/* cache the background pen */
 			if (m_videomem_addr >= 0x3f00)
@@ -1016,21 +1000,16 @@ void ppu2c0x_device::update_scanline( void )
 				// both the sprites and background are disabled, the PPU paints the scanline
 				// with the palette entry at the VRAM address instead of the usual background
 				// pen. Micro Machines makes use of this feature.
-				int pen_num;
+				int pen_num = m_palette_ram[(m_videomem_addr & 0x03) ? (m_videomem_addr & 0x1f) : 0];
 
-				if (m_videomem_addr & 0x03)
-					pen_num = m_palette_ram[m_videomem_addr & 0x1f];
-				else
-					pen_num = m_palette_ram[0];
-
-				back_pen = pen_num + m_color_base;
+				back_pen = pen(pen_num);
 			}
 			else
-				back_pen = (m_back_color & color_mask) + m_color_base;
+				back_pen = pen(m_back_color & color_mask);
 
 			// Fill this scanline with the background pen.
-			for (i = 0; i < bitmap.width(); i++)
-				bitmap.pix16(m_scanline, i) = back_pen;
+			for (int i = 0; i < bitmap.width(); i++)
+				bitmap.pix32(m_scanline, i) = back_pen;
 		}
 
 		/* increment the fine y-scroll */
@@ -1063,7 +1042,6 @@ void ppu2c0x_device::update_scanline( void )
 
 WRITE8_MEMBER( ppu2c0x_device::palette_write )
 {
-	int color_base = m_color_base;
 	int color_emphasis = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
 
 	// palette RAM is only 6 bits wide
@@ -1073,8 +1051,8 @@ WRITE8_MEMBER( ppu2c0x_device::palette_write )
 	if (offset & 0x3)
 	{
 		m_palette_ram[offset & 0x1f] = data;
-		m_colortable[offset & 0x1f] = color_base + data + color_emphasis;
-		m_colortable_mono[offset & 0x1f] = color_base + (data & 0xf0) + color_emphasis;
+		m_colortable[offset & 0x1f] = data + color_emphasis;
+		m_colortable_mono[offset & 0x1f] = (data & 0xf0) + color_emphasis;
 	}
 	else
 	{
@@ -1084,8 +1062,8 @@ WRITE8_MEMBER( ppu2c0x_device::palette_write )
 			m_back_color = data;
 			for (i = 0; i < 32; i += 4)
 			{
-				m_colortable[i] = color_base + data + color_emphasis;
-				m_colortable_mono[i] = color_base + (data & 0xf0) + color_emphasis;
+				m_colortable[i] = data + color_emphasis;
+				m_colortable_mono[i] = (data & 0xf0) + color_emphasis;
 			}
 		}
 		m_palette_ram[offset & 0xf] = m_palette_ram[(offset & 0xf) + 0x10] = data;
@@ -1173,10 +1151,6 @@ READ8_MEMBER( ppu2c0x_device::read )
 
 WRITE8_MEMBER( ppu2c0x_device::write )
 {
-	int color_base;
-
-	color_base = m_color_base;
-
 	if (offset >= PPU_MAX_REG)
 	{
 		logerror("PPU %s: Attempting to write past the chip: offset %x, data %x\n", this->tag(), offset, data);
@@ -1220,7 +1194,7 @@ WRITE8_MEMBER( ppu2c0x_device::write )
 				{
 					uint8_t oldColor = m_palette_ram[i];
 
-					m_colortable[i] = color_base + oldColor + (data & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
+					m_colortable[i] = oldColor + (data & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
 				}
 			}
 
@@ -1355,9 +1329,15 @@ void ppu2c0x_device::spriteram_dma( address_space &space, const uint8_t page )
  *
  *************************************/
 
-void ppu2c0x_device::render( bitmap_ind16 &bitmap, int flipx, int flipy, int sx, int sy )
+void ppu2c0x_device::render(bitmap_rgb32 &bitmap, int flipx, int flipy, int sx, int sy)
 {
 	copybitmap(bitmap, *m_bitmap, flipx, flipy, sx, sy, bitmap.cliprect());
+}
+
+uint32_t ppu2c0x_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	render(bitmap, 0, 0, 0, 0);
+	return 0;
 }
 
 /*************************************
@@ -1366,7 +1346,7 @@ void ppu2c0x_device::render( bitmap_ind16 &bitmap, int flipx, int flipy, int sx,
  *
  *************************************/
 
-int ppu2c0x_device::get_pixel( int x, int y )
+rgb_t ppu2c0x_device::get_pixel(int x, int y)
 {
 	if (x >= VISIBLE_SCREEN_WIDTH)
 		x = VISIBLE_SCREEN_WIDTH - 1;
@@ -1374,5 +1354,5 @@ int ppu2c0x_device::get_pixel( int x, int y )
 	if (y >= VISIBLE_SCREEN_HEIGHT)
 		y = VISIBLE_SCREEN_HEIGHT - 1;
 
-	return m_bitmap->pix16(y, x);
+	return rgb_t(m_bitmap->pix32(y, x));
 }

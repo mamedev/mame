@@ -131,4 +131,4 @@ ROM_START( sburners )
 ROM_END
 
 
-GAME( 1975, sburners,  0, sburners, 0, sburners_state, 0, ROT0, "Allied Leisure", "Street Burners [TTL]", MACHINE_IS_SKELETON )
+GAME( 1975, sburners, 0, sburners, 0, sburners_state, empty_init, ROT0, "Allied Leisure", "Street Burners [TTL]", MACHINE_IS_SKELETON )

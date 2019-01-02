@@ -1,6 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Priest, David Haywood, Luca Elia
+#ifndef MAME_INCLUDES_FUUKIFG3_H
+#define MAME_INCLUDES_FUUKIFG3_H
+
+#pragma once
+
 #include "video/fuukifg.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* Define clocks based on actual OSC on the PCB */
@@ -15,25 +21,34 @@
 class fuuki32_state : public driver_device
 {
 public:
+	fuuki32_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_fuukivid(*this, "fuukivid")
+		, m_vram(*this, "vram.%u", 0)
+		, m_vregs(*this, "vregs")
+		, m_priority(*this, "priority")
+		, m_tilebank(*this, "tilebank")
+		, m_shared_ram(*this, "shared_ram")
+		, m_soundbank(*this, "soundbank")
+		, m_system(*this, "SYSTEM")
+		, m_inputs(*this, "INPUTS")
+		, m_dsw1(*this, "DSW1")
+		, m_dsw2(*this, "DSW2")
+	{ }
+
+	void fuuki32(machine_config &config);
+
+private:
 	enum
 	{
 		TIMER_LEVEL_1_INTERRUPT,
 		TIMER_VBLANK_INTERRUPT,
 		TIMER_RASTER_INTERRUPT
 	};
-
-	fuuki32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_fuukivid(*this, "fuukivid"),
-		m_vram(*this, "vram.%u", 0),
-		m_vregs(*this, "vregs"),
-		m_priority(*this, "priority"),
-		m_tilebank(*this, "tilebank")
-		{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -47,8 +62,16 @@ public:
 	required_shared_ptr<uint32_t> m_vregs;
 	required_shared_ptr<uint32_t> m_priority;
 	required_shared_ptr<uint32_t> m_tilebank;
+	required_shared_ptr<uint8_t> m_shared_ram;
 	//uint32_t *    m_buf_spriteram;
 	//uint32_t *    m_buf_spriteram2;
+
+	required_memory_bank m_soundbank;
+
+	required_ioport m_system;
+	required_ioport m_inputs;
+	required_ioport m_dsw1;
+	required_ioport m_dsw2;
 
 	/* video-related */
 	tilemap_t     *m_tilemap[4];
@@ -58,24 +81,15 @@ public:
 	emu_timer   *m_level_1_interrupt_timer;
 	emu_timer   *m_vblank_interrupt_timer;
 	emu_timer   *m_raster_interrupt_timer;
-	uint8_t       m_shared_ram[16];
 
-	DECLARE_READ32_MEMBER(snd_020_r);
-	DECLARE_WRITE32_MEMBER(snd_020_w);
+	DECLARE_READ8_MEMBER(snd_020_r);
+	DECLARE_WRITE8_MEMBER(snd_020_w);
 	DECLARE_WRITE32_MEMBER(vregs_w);
 	DECLARE_WRITE8_MEMBER(sound_bw_w);
-	DECLARE_READ8_MEMBER(snd_z80_r);
-	DECLARE_WRITE8_MEMBER(snd_z80_w);
 	DECLARE_WRITE8_MEMBER(snd_ymf278b_w);
-	DECLARE_WRITE32_MEMBER(vram_0_w);
-	DECLARE_WRITE32_MEMBER(vram_1_w);
-	DECLARE_WRITE32_MEMBER(vram_2_w);
-	DECLARE_WRITE32_MEMBER(vram_3_w);
+	template<int Layer> DECLARE_WRITE32_MEMBER(vram_w);
 
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
-	TILE_GET_INFO_MEMBER(get_tile_info_2);
-	TILE_GET_INFO_MEMBER(get_tile_info_3);
+	template<int Layer, int ColShift> TILE_GET_INFO_MEMBER(get_tile_info);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -83,15 +97,13 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	inline void get_tile_info8bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
-	inline void get_tile_info4bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
-	inline void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask, int _N_);
 	void draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
 
-	void fuuki32(machine_config &config);
 	void fuuki32_map(address_map &map);
 	void fuuki32_sound_io_map(address_map &map);
 	void fuuki32_sound_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_FUUKIFG3_H

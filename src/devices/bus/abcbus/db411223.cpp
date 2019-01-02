@@ -69,9 +69,9 @@ void databoard_4112_23_t::databoard_4112_23_io(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(databoard_4112_23_t::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(databoard_4112_23_mem)
-	MCFG_CPU_IO_MAP(databoard_4112_23_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(databoard_4112_23_mem)
+	MCFG_DEVICE_IO_MAP(databoard_4112_23_io)
 MACHINE_CONFIG_END
 
 

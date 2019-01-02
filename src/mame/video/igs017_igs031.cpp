@@ -1,9 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli, Luca Elia
-
-/* IGS017 / IGS031 video device */
-
 /*
+
+IGS017 / IGS031 video device
 
 what's the difference between IGS017 and IGS031? encryption?
 
@@ -12,38 +11,33 @@ providing the interface to the 8255, or is it coincidence?
 
 */
 
-
-
 #include "emu.h"
 #include "igs017_igs031.h"
-
-
 
 void igs017_igs031_device::map(address_map &map)
 {
 	map(0x1000, 0x17ff).ram().share("spriteram");
 //  map(0x1800, 0x1bff).ram() //.w("palette", FUNC(palette_device::write).share("palette");
-	map(0x1800, 0x1bff).ram().w(this, FUNC(igs017_igs031_device::palram_w)).share("palram");
+	map(0x1800, 0x1bff).ram().w(FUNC(igs017_igs031_device::palram_w)).share("palram");
 	map(0x1c00, 0x1fff).ram();
 
-	map(0x2010, 0x2013).r(this, FUNC(igs017_igs031_device::i8255_r));
-	map(0x2012, 0x2012).w(this, FUNC(igs017_igs031_device::video_disable_w));
+	map(0x2010, 0x2013).r(FUNC(igs017_igs031_device::i8255_r));
+	map(0x2012, 0x2012).w(FUNC(igs017_igs031_device::video_disable_w));
 
-	map(0x2014, 0x2014).w(this, FUNC(igs017_igs031_device::nmi_enable_w));
-	map(0x2015, 0x2015).w(this, FUNC(igs017_igs031_device::irq_enable_w));
+	map(0x2014, 0x2014).w(FUNC(igs017_igs031_device::nmi_enable_w));
+	map(0x2015, 0x2015).w(FUNC(igs017_igs031_device::irq_enable_w));
 
-	map(0x4000, 0x5fff).ram().w(this, FUNC(igs017_igs031_device::fg_w)).share("fg_videoram");
-	map(0x6000, 0x7fff).ram().w(this, FUNC(igs017_igs031_device::bg_w)).share("bg_videoram");
+	map(0x4000, 0x5fff).ram().w(FUNC(igs017_igs031_device::fg_w)).share("fg_videoram");
+	map(0x6000, 0x7fff).ram().w(FUNC(igs017_igs031_device::bg_w)).share("bg_videoram");
 
 }
 
 READ8_MEMBER(igs017_igs031_device::i8255_r)
 {
 	if (m_i8255)
-		return m_i8255->read(space, offset);
+		return m_i8255->read(offset);
 
-	logerror("igs017_igs031_device::i8255_r with no 8255 device %02x\n", offset);
-
+	logerror("igs017_igs031_device::i8255_r(%02x) with no 8255 device\n", offset);
 	return 0;
 }
 
@@ -60,7 +54,7 @@ static const gfx_layout layout_8x8x4 =
 };
 
 GFXDECODE_MEMBER( igs017_igs031_device::gfxinfo )
-	GFXDECODE_DEVICE( "^tilemaps", 0, layout_8x8x4,   0, 16 )
+	GFXDECODE_DEVICE( "^tilemaps", 0, layout_8x8x4, 0, 16 )
 //  GFXDECODE_DEVICE( DEVICE_SELF, 0, spritelayout, 0, 0x1000 )
 GFXDECODE_END
 
@@ -80,7 +74,7 @@ igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const 
 		m_i8255(*this, "^ppi8255"),
 		m_palette(*this, "^palette")
 {
-	m_palette_scramble_cb =  igs017_igs031_palette_scramble_delegate(FUNC(igs017_igs031_device::palette_callback_straight), this);
+	m_palette_scramble_cb = igs017_igs031_palette_scramble_delegate(FUNC(igs017_igs031_device::palette_callback_straight), this);
 	m_revbits = 0;
 }
 
@@ -96,15 +90,12 @@ uint16_t igs017_igs031_device::palette_callback_straight(uint16_t bgr)
 	return bgr;
 }
 
-
 void igs017_igs031_device::device_start()
 {
 	m_palette_scramble_cb.bind_relative_to(*owner());
 
-	m_fg_tilemap = &machine().tilemap().create(*this,  tilemap_get_info_delegate(FUNC(igs017_igs031_device::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_bg_tilemap = &machine().tilemap().create(*this,  tilemap_get_info_delegate(FUNC(igs017_igs031_device::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-
-
+	m_fg_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(igs017_igs031_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(igs017_igs031_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 64,32);
 
 	m_fg_tilemap->set_transparent_pen(0xf);
 	m_bg_tilemap->set_transparent_pen(0xf);
@@ -112,29 +103,25 @@ void igs017_igs031_device::device_start()
 	m_toggle = 0;
 	m_debug_addr = 0;
 	m_debug_width = 512;
-
-
 }
 
 void igs017_igs031_device::video_start()
 {
-	// make sure thie happens AFTER driver init, or things won't work
+	// make sure this happens AFTER driver init, or things won't work
 	expand_sprites();
 
 	if (m_revbits)
 	{
 		uint8_t *rom  =   memregion("^tilemaps")->base();
-		int size    =   memregion("^tilemaps")->bytes();
-		int i;
+		int size      =   memregion("^tilemaps")->bytes();
 
-		for (i = 0; i < size ; i++)
+		for (int i = 0; i < size ; i++)
 		{
 			rom[i] = bitswap<8>(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
 //          rom[i^1] = bitswap<8>(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
 		}
 	}
 }
-
 
 void igs017_igs031_device::device_reset()
 {
@@ -152,7 +139,6 @@ WRITE8_MEMBER(igs017_igs031_device::write)
 {
 	space_w(offset, data);
 }
-
 
 void igs017_igs031_device::space_w(int offset, uint8_t data)
 {
@@ -217,20 +203,17 @@ WRITE8_MEMBER(igs017_igs031_device::bg_w)
 }
 
 
-
-
 // Eeach 16 bit word in the sprites gfx roms contains three 5 bit pens: x-22222-11111-00000 (little endian!).
 // This routine expands each word into three bytes.
 void igs017_igs031_device::expand_sprites()
 {
 	uint8_t *rom  =   memregion("^sprites")->base();
-	int size    =   memregion("^sprites")->bytes();
-	int i;
+	int size      =   memregion("^sprites")->bytes();
 
 	m_sprites_gfx_size   =   size / 2 * 3;
 	m_sprites_gfx        =   std::make_unique<uint8_t[]>(m_sprites_gfx_size);
 
-	for (i = 0; i < size / 2 ; i++)
+	for (int i = 0; i < size / 2 ; i++)
 	{
 		uint16_t pens = (rom[i*2+1] << 8) | rom[i*2];
 
@@ -239,7 +222,6 @@ void igs017_igs031_device::expand_sprites()
 		m_sprites_gfx[i * 3 + 2] = (pens >> 10) & 0x1f;
 	}
 }
-
 
 /***************************************************************************
                               Sprites Format
@@ -399,36 +381,16 @@ uint32_t igs017_igs031_device::screen_update_igs017(screen_device &screen, bitma
 	return 0;
 }
 
-#if 0
-WRITE16_MEMBER(igs017_igs031_device::irq_enable_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_irq_enable = data & 1;
-
-	if (data != 0 && data != 1 && data != 0xff)
-		logerror("%s: irq_enable = %04x\n", machine().describe_context(), data);
-}
-
-WRITE16_MEMBER(igs017_igs031_device::nmi_enable_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_nmi_enable = data & 1;
-
-	if (data != 0 && data != 1 && data != 0xff)
-		logerror("%s: nmi_enable = %04x\n", machine().describe_context(), data);
-}
-#endif
-
 WRITE8_MEMBER(igs017_igs031_device::nmi_enable_w)
 {
 	m_nmi_enable = data & 1;
-	if (data & (~1))
+	if (data != 0 && data != 1 && data != 0xff)
 		logerror("%s: nmi_enable = %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(igs017_igs031_device::irq_enable_w)
 {
 	m_irq_enable = data & 1;
-	if (data & (~1))
+	if (data != 0 && data != 1 && data != 0xff)
 		logerror("%s: irq_enable = %02x\n", machine().describe_context(), data);
 }

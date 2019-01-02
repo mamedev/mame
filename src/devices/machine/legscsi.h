@@ -8,12 +8,12 @@
 #include "bus/scsi/scsihle.h"
 
 #define MCFG_LEGACY_SCSI_PORT(_tag) \
-	downcast<legacy_scsi_host_adapter &>(*device).set_scsi_port("^" _tag);
+	downcast<legacy_scsi_host_adapter &>(*device).set_scsi_port(_tag);
 
 class legacy_scsi_host_adapter : public device_t
 {
 public:
-	void set_scsi_port(const char *tag) { m_scsi_port.set_tag(tag); }
+	template <typename T> void set_scsi_port(T && tag) { m_scsi_port.set_tag(std::forward<T>(tag)); }
 
 protected:
 	legacy_scsi_host_adapter(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

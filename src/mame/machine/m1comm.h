@@ -12,11 +12,6 @@
 #include "machine/am9517a.h"
 #include "machine/mb89374.h"
 
-#define M1COMM_TAG "m1comm"
-#define M1COMM_CPU_REGION "m1comm:commcpu"
-
-#define MCFG_M1COMM_ADD(_tag ) \
-	MCFG_DEVICE_ADD(_tag, M1COMM, 0)
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -112,6 +107,6 @@ private:
 };
 
 // device type definition
-extern const device_type M1COMM;
+DECLARE_DEVICE_TYPE(M1COMM, m1comm_device)
 
 #endif  // MAME_MACHINE_M1COMM_H

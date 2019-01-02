@@ -133,16 +133,6 @@
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cloak_state::start_led_1_w)
-{
-	output().set_led_value(0, !state);
-}
-
-WRITE_LINE_MEMBER(cloak_state::start_led_2_w)
-{
-	output().set_led_value(1, !state);
-}
-
 WRITE_LINE_MEMBER(cloak_state::coin_counter_l_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -183,22 +173,22 @@ WRITE8_MEMBER(cloak_state::cloak_nvram_enable_w)
 void cloak_state::master_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07ff).ram().w(this, FUNC(cloak_state::cloak_videoram_w)).share("videoram");
+	map(0x0400, 0x07ff).ram().w(FUNC(cloak_state::cloak_videoram_w)).share("videoram");
 	map(0x0800, 0x0fff).ram().share("share1");
 	map(0x1000, 0x100f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));       /* DSW0 also */
 	map(0x1800, 0x180f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));       /* DSW1 also */
 	map(0x2000, 0x2000).portr("P1");
 	map(0x2200, 0x2200).portr("P2");
 	map(0x2400, 0x2400).portr("SYSTEM");
-	map(0x2600, 0x2600).w(this, FUNC(cloak_state::cloak_custom_w));
+	map(0x2600, 0x2600).w(FUNC(cloak_state::cloak_custom_w));
 	map(0x2800, 0x29ff).ram().share("nvram");
 	map(0x2f00, 0x2fff).noprw();
 	map(0x3000, 0x30ff).ram().share("spriteram");
-	map(0x3200, 0x327f).w(this, FUNC(cloak_state::cloak_paletteram_w));
+	map(0x3200, 0x327f).w(FUNC(cloak_state::cloak_paletteram_w));
 	map(0x3800, 0x3807).w("outlatch", FUNC(ls259_device::write_d7));
 	map(0x3a00, 0x3a00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x3c00, 0x3c00).w(this, FUNC(cloak_state::cloak_irq_reset_0_w));
-	map(0x3e00, 0x3e00).w(this, FUNC(cloak_state::cloak_nvram_enable_w));
+	map(0x3c00, 0x3c00).w(FUNC(cloak_state::cloak_irq_reset_0_w));
+	map(0x3e00, 0x3e00).w(FUNC(cloak_state::cloak_nvram_enable_w));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -212,12 +202,12 @@ void cloak_state::master_map(address_map &map)
 void cloak_state::slave_map(address_map &map)
 {
 	map(0x0000, 0x0007).ram();
-	map(0x0008, 0x000f).rw(this, FUNC(cloak_state::graph_processor_r), FUNC(cloak_state::graph_processor_w));
+	map(0x0008, 0x000f).rw(FUNC(cloak_state::graph_processor_r), FUNC(cloak_state::graph_processor_w));
 	map(0x0010, 0x07ff).ram();
 	map(0x0800, 0x0fff).ram().share("share1");
-	map(0x1000, 0x1000).w(this, FUNC(cloak_state::cloak_irq_reset_1_w));
-	map(0x1200, 0x1200).w(this, FUNC(cloak_state::cloak_clearbmp_w));
-	map(0x1400, 0x1400).w(this, FUNC(cloak_state::cloak_custom_w));
+	map(0x1000, 0x1000).w(FUNC(cloak_state::cloak_irq_reset_1_w));
+	map(0x1200, 0x1200).w(FUNC(cloak_state::cloak_clearbmp_w));
+	map(0x1400, 0x1400).w(FUNC(cloak_state::cloak_custom_w));
 	map(0x2000, 0xffff).rom();
 }
 
@@ -311,7 +301,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( cloak )
+static GFXDECODE_START( gfx_cloak )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0,  1 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  32,  1 )
 GFXDECODE_END
@@ -323,58 +313,57 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(cloak_state::cloak)
-
+void cloak_state::cloak(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1000000)     /* 1 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cloak_state, irq0_line_hold,  4*60)
+	M6502(config, m_maincpu, 1000000);     /* 1 MHz ???? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cloak_state::master_map);
+	m_maincpu->set_periodic_int(FUNC(cloak_state::irq0_line_hold), attotime::from_hz(4*60));
 
-	MCFG_CPU_ADD("slave", M6502, 1250000)       /* 1.25 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cloak_state, irq0_line_hold,  2*60)
+	M6502(config, m_slave, 1250000);       /* 1.25 MHz ???? */
+	m_slave->set_addrmap(AS_PROGRAM, &cloak_state::slave_map);
+	m_slave->set_periodic_int(FUNC(cloak_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1000))
+	config.m_minimum_quantum = attotime::from_hz(1000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 10B
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cloak_state, coin_counter_r_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cloak_state, coin_counter_l_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cloak_state, cocktail_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)    // ???
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(cloak_state, start_led_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(cloak_state, start_led_1_w))
+	ls259_device &outlatch(LS259(config, "outlatch")); // 10B
+	outlatch.q_out_cb<0>().set(FUNC(cloak_state::coin_counter_r_w));
+	outlatch.q_out_cb<1>().set(FUNC(cloak_state::coin_counter_l_w));
+	outlatch.q_out_cb<3>().set(FUNC(cloak_state::cocktail_w));
+	outlatch.q_out_cb<5>().set_nop();   // ???
+	outlatch.q_out_cb<6>().set_output("led1").invert(); // START LED 2
+	outlatch.q_out_cb<7>().set_output("led0").invert(); // START LED 1
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 3*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cloak_state, screen_update_cloak)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 3*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(cloak_state::screen_update_cloak));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cloak)
-	MCFG_PALETTE_ADD("palette", 64)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cloak);
+	PALETTE(config, m_palette).set_entries(64);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	/* more low pass filters ==> DISCRETE processing */
-	MCFG_SOUND_ADD("pokey1", POKEY, XTAL(10'000'000)/8)      /* Accurate to recording */
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("START"))
-	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(1), CAP_U(0.047), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	pokey_device &pokey1(POKEY(config, "pokey1", XTAL(10'000'000)/8));      /* Accurate to recording */
+	pokey1.allpot_r().set_ioport("START");
+	pokey1.set_output_opamp_low_pass(RES_K(1), CAP_U(0.047), 5.0);
+	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_SOUND_ADD("pokey2", POKEY, XTAL(10'000'000)/8)      /* Accurate to recording */
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW"))
-	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(1), CAP_U(0.022), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	pokey_device &pokey2(POKEY(config, "pokey2", XTAL(10'000'000)/8));      /* Accurate to recording */
+	pokey2.allpot_r().set_ioport("DSW");
+	pokey2.set_output_opamp_low_pass(RES_K(1), CAP_U(0.022), 5.0);
+	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -623,11 +612,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cloak,   0,     cloak, cloak, cloak_state, 0, ROT0, "Atari", "Cloak & Dagger (rev 5)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, cloaksp, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Cloak & Dagger (Spanish)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, cloakfr, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Cloak & Dagger (French)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, cloakgr, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Cloak & Dagger (German)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, agentx4, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Agent X (prototype, rev 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, agentx3, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Agent X (prototype, rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, agentx2, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Agent X (prototype, rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, agentx1, cloak, cloak, cloak, cloak_state, 0, ROT0, "Atari", "Agent X (prototype, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloak,   0,     cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Cloak & Dagger (rev 5)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloaksp, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Cloak & Dagger (Spanish)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloakfr, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Cloak & Dagger (French)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cloakgr, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Cloak & Dagger (German)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx4, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Agent X (prototype, rev 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx3, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Agent X (prototype, rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx2, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Agent X (prototype, rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, agentx1, cloak, cloak, cloak, cloak_state, empty_init, ROT0, "Atari", "Agent X (prototype, rev 1)", MACHINE_SUPPORTS_SAVE )

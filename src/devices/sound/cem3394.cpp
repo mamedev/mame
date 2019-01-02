@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    CEM3394 sound driver.
+    Curtis Electromusic Specialties CEM3394 µP-Controllable Synthesizer Voice
 
     This driver handles CEM-3394 analog synth chip. Very crudely.
 
@@ -105,7 +105,7 @@
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(CEM3394, cem3394_device, "cem3394", "CEM3394")
+DEFINE_DEVICE_TYPE(CEM3394, cem3394_device, "cem3394", "CEM3394 Synthesizer Voice")
 
 //**************************************************************************
 //  LIVE DEVICE

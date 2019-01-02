@@ -12,49 +12,48 @@
 #include "includes/lvcards.h"
 
 
-PALETTE_INIT_MEMBER(lvcards_state, lvcards)//Ever so slightly different, but different enough.
+void lvcards_state::lvcards_palette(palette_device &palette) const//Ever so slightly different, but different enough.
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	for ( i = 0; i < palette.entries(); i++ )
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int bit0, bit1, bit2, bit3;
 
-		/* red component */
+		// red component
 		bit0 = (color_prom[0] >> 0) & 0x11;
 		bit1 = (color_prom[0] >> 1) & 0x11;
 		bit2 = (color_prom[0] >> 2) & 0x11;
 		bit3 = (color_prom[0] >> 3) & 0x11;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		/* green component */
+		// green component
 		bit0 = (color_prom[palette.entries()] >> 0) & 0x11;
 		bit1 = (color_prom[palette.entries()] >> 1) & 0x11;
 		bit2 = (color_prom[palette.entries()] >> 2) & 0x11;
 		bit3 = (color_prom[palette.entries()] >> 3) & 0x11;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		/* blue component */
-		bit0 = (color_prom[2*palette.entries()] >> 0) & 0x11;
-		bit1 = (color_prom[2*palette.entries()] >> 1) & 0x11;
-		bit2 = (color_prom[2*palette.entries()] >> 2) & 0x11;
-		bit3 = (color_prom[2*palette.entries()] >> 3) & 0x11;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// blue component
+		bit0 = (color_prom[2 * palette.entries()] >> 0) & 0x11;
+		bit1 = (color_prom[2 * palette.entries()] >> 1) & 0x11;
+		bit2 = (color_prom[2 * palette.entries()] >> 2) & 0x11;
+		bit3 = (color_prom[2 * palette.entries()] >> 3) & 0x11;
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 
 		color_prom++;
 	}
 }
 
-WRITE8_MEMBER(lvcards_state::lvcards_videoram_w)
+WRITE8_MEMBER(lvcards_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lvcards_state::lvcards_colorram_w)
+WRITE8_MEMBER(lvcards_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

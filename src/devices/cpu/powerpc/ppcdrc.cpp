@@ -533,6 +533,7 @@ static void cfunc_printf_probe(void *param)
 void ppc_device::ppc_cfunc_printf_probe()
 {
 	printf(" PC=%08X\n", m_core->pc);
+	printf(" LR=%08X\n", m_core->spr[SPR_LR]);
 	printf(" r0=%08X  r1=%08X  r2=%08X  r3=%08X\n",
 		m_core->r[0], m_core->r[1], m_core->r[2], m_core->r[3]);
 	printf(" r4=%08X  r5=%08X  r6=%08X  r7=%08X\n",
@@ -567,6 +568,17 @@ void ppc_device::ppc_cfunc_unimplemented()
 {
 	uint32_t opcode = m_core->arg0;
 	fatalerror("PC=%08X: Unimplemented op %08X\n", m_core->pc, opcode);
+}
+
+static void cfunc_ppccom_mismatch(void *param)
+{
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppc_cfunc_ppccom_mismatch();
+}
+
+void ppc_device::ppc_cfunc_ppccom_mismatch()
+{
+//  printf("cfunc_ppccom_mismatch %08X\n", m_core->pc);
 }
 
 static void cfunc_ppccom_tlb_fill(void *param)
@@ -767,6 +779,7 @@ void ppc_device::static_generate_tlb_mismatch()
 	UML_LOAD(block, I2, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);    // load    i2,[vtlb],i1,dword
 	UML_MOV(block, mem(&m_core->param0), I0);                               // mov     [param0],i0
 	UML_MOV(block, mem(&m_core->param1), TRANSLATE_FETCH);                  // mov     [param1],TRANSLATE_FETCH
+	UML_CALLC(block, (c_function)cfunc_ppccom_mismatch, this);
 	UML_CALLC(block, (c_function)cfunc_ppccom_tlb_fill, this);              // callc   tlbfill,ppc
 	UML_LOAD(block, I1, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);    // load    i1,[vtlb],i1,dword
 	UML_TEST(block, I1, VTLB_FETCH_ALLOWED);                                // test    i1,VTLB_FETCH_ALLOWED
@@ -1626,7 +1639,7 @@ void ppc_device::generate_checksum_block(drcuml_block &block, compiler_state *co
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			void *base = m_direct->read_ptr(seqhead->physpc, m_codexor);
+			const void *base = m_prptr(seqhead->physpc);
 			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i0,base,dword
 			UML_CMP(block, I0, seqhead->opptr.l[0]);                                // cmp     i0,*opptr
 			UML_EXHc(block, COND_NE, *m_nocode, seqhead->pc);              // exne    nocode,seqhead->pc
@@ -1640,20 +1653,20 @@ void ppc_device::generate_checksum_block(drcuml_block &block, compiler_state *co
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				void *base = m_direct->read_ptr(seqhead->physpc, m_codexor);
+				const void *base = m_prptr(seqhead->physpc);
 				UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);             // load    i0,base,dword
 				UML_CMP(block, I0, curdesc->opptr.l[0]);                            // cmp     i0,*opptr
 				UML_EXHc(block, COND_NE, *m_nocode, seqhead->pc);          // exne    nocode,seqhead->pc
 			}
 #else
 		uint32_t sum = 0;
-		void *base = m_direct->read_ptr(seqhead->physpc, m_codexor);
+		const void *base = m_prptr(seqhead->physpc);
 		UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                     // load    i0,base,dword
 		sum += seqhead->opptr.l[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				base = m_direct->read_ptr(curdesc->physpc, m_codexor);
+				base = m_prptr(curdesc->physpc);
 				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);             // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                                 // add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
@@ -3456,8 +3469,30 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			return true;
 
 		case 0x254: /* ESA */
+			assert(m_flavor == PPC_MODEL_602);
+
+			// TODO: SE bit page attribute checking
+			UML_TEST(block, MSR32, MSR602_SA);                                              // test    [msr],MSR602_SA
+			UML_EXHc(block, COND_NZ, *m_exception[EXCEPTION_PROGRAM], 0x20000);             // exh program,0x20000,nz
+			UML_ROLINS(block, SPR32(SPR602_ESASRR), MSR32, 17, SPR602_ESASRR_EE);           // rolins  msr32,esasrr,17,1
+			UML_ROLINS(block, SPR32(SPR602_ESASRR), MSR32, 11, SPR602_ESASRR_SA);           // rolins  msr32,esasrr,11,2
+			UML_ROLINS(block, SPR32(SPR602_ESASRR), MSR32, 11, SPR602_ESASRR_AP);           // rolins  msr32,esasrr,11,4
+			UML_ROLINS(block, SPR32(SPR602_ESASRR), MSR32, 21, SPR602_ESASRR_PR);           // rolins  msr32,esasrr,21,8
+			UML_AND(block, MSR32, MSR32, ~(MSR602_AP | MSR_EE | MSR_PR));                   // and     msr,msr,~(MSR_EE | MSR_PR | MSR_AP)
+			UML_OR(block, MSR32, MSR32, MSR602_SA);                                         // or      msr,msr,MSR_SA
+			generate_update_mode(block);                                                    // <update mode>
+			return true;
+
 		case 0x274: /* DSA */
-			/* no-op for now */
+			assert(m_flavor == PPC_MODEL_602);
+
+			UML_TEST(block, MSR32, MSR602_SA);                                              // test    [msr],MSR602_SA
+			UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_PROGRAM], 0x20000);              // exh program,0x20000,z
+			UML_ROLINS(block, MSR32, SPR32(SPR602_ESASRR), 15, MSR_EE);                     // rolins  msr32,esasrr,15,0x00008000
+			UML_ROLINS(block, MSR32, SPR32(SPR602_ESASRR), 21, MSR602_SA);                  // rolins  msr32,esasrr,21,0x00400000
+			UML_ROLINS(block, MSR32, SPR32(SPR602_ESASRR), 21, MSR602_AP);                  // rolins  msr32,esasrr,21,0x00800000
+			UML_ROLINS(block, MSR32, SPR32(SPR602_ESASRR), 11, MSR_PR);                     // rolins  msr32,esasrr,11,0x00004000
+			generate_update_mode(block);                                                    // <update mode>
 			return true;
 	}
 

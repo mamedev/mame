@@ -5,12 +5,19 @@
     Pandora's Palace
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_PANDORAS_H
+#define MAME_INCLUDES_PANDORAS_H
+
+#pragma once
+
+#include "cpu/mcs48/mcs48.h"
+#include "emupal.h"
 
 class pandoras_state : public driver_device
 {
 public:
-	pandoras_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pandoras_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
@@ -19,7 +26,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -40,7 +48,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_mcu;
+	required_device<i8039_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -63,7 +71,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pandoras);
+	void pandoras_palette(palette_device &palette) const;
 	uint32_t screen_update_pandoras(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* sr );
@@ -74,3 +82,5 @@ public:
 	void pandoras_slave_map(address_map &map);
 	void pandoras_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_PANDORAS_H

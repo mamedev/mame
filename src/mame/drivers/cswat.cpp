@@ -26,6 +26,7 @@ TODO:
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/mb88xx/mb88xx.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -139,13 +140,13 @@ READ8_MEMBER(cswat_state::sensors_r)
 
 void cswat_state::cswat_map(address_map &map)
 {
-	map(0x0000, 0x0bff).ram().w(this, FUNC(cswat_state::videoram_w)).share("videoram");
+	map(0x0000, 0x0bff).ram().w(FUNC(cswat_state::videoram_w)).share("videoram");
 	map(0x0c00, 0x0fff).ram();
 //  AM_RANGE(0x1800, 0x1800) AM_READNOP // ? reads here after writing to $4000
-	map(0x2000, 0x2000).w(this, FUNC(cswat_state::irq_ack_w)); // writes 1 at end of vblank irq, 0 at gamestart
-	map(0x2000, 0x2001).r(this, FUNC(cswat_state::dipswitch_r));
-	map(0x2002, 0x2002).w(this, FUNC(cswat_state::irq_ack_w)); // writes 0 at start of vblank irq
-	map(0x2002, 0x2002).r(this, FUNC(cswat_state::sensors_r));
+	map(0x2000, 0x2000).w(FUNC(cswat_state::irq_ack_w)); // writes 1 at end of vblank irq, 0 at gamestart
+	map(0x2000, 0x2001).r(FUNC(cswat_state::dipswitch_r));
+	map(0x2002, 0x2002).w(FUNC(cswat_state::irq_ack_w)); // writes 0 at start of vblank irq
+	map(0x2002, 0x2002).r(FUNC(cswat_state::sensors_r));
 	map(0x2003, 0x2003).portr("IN0");
 //  AM_RANGE(0x4000, 0x4009) AM_NOP // ?
 	map(0x8000, 0xffff).rom();
@@ -236,14 +237,14 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( cswat )
+static GFXDECODE_START( gfx_cswat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 256 )
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(cswat_state::nmi_handler)
 {
 	if (m_nmi_enabled)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void cswat_state::machine_reset()
@@ -259,10 +260,10 @@ void cswat_state::machine_start()
 MACHINE_CONFIG_START(cswat_state::cswat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(18'432'000)/3/4) // HD68A09EP, 1.5MHz?
-	MCFG_CPU_PROGRAM_MAP(cswat_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cswat_state, irq0_line_assert)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cswat_state, nmi_handler, 300) // ?
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(18'432'000)/3/4) // HD68A09EP, 1.5MHz?
+	MCFG_DEVICE_PROGRAM_MAP(cswat_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cswat_state, irq0_line_assert)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cswat_state, nmi_handler, 300) // ?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -274,7 +275,7 @@ MACHINE_CONFIG_START(cswat_state::cswat)
 
 	MCFG_SCREEN_UPDATE_DRIVER(cswat_state, screen_update_cswat)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cswat)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cswat)
 	MCFG_PALETTE_ADD("palette", 4*256)
 
 	/* sound hardware */
@@ -307,4 +308,4 @@ ROM_START( cswat )
 ROM_END
 
 
-GAME( 1984, cswat, 0, cswat, cswat, cswat_state, 0, ROT0, "Namco", "Cosmoswat", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, cswat, 0, cswat, cswat, cswat_state, empty_init, ROT0, "Namco", "Cosmoswat", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )

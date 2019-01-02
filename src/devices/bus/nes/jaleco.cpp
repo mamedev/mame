@@ -21,7 +21,6 @@
 #include "emu.h"
 #include "jaleco.h"
 
-#include "cpu/m6502/m6502.h"
 #include "sound/samples.h"
 #include "speaker.h"
 
@@ -210,7 +209,7 @@ void nes_ss88006_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_mmc_prg_bank));
 	save_item(NAME(m_mmc_vrom_bank));
@@ -435,7 +434,7 @@ void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			{
 				if (!(m_irq_count & 0x000f))
 				{
-					m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+					set_irq_line(ASSERT_LINE);
 					m_irq_count = (m_irq_count & 0xfff0) | 0x000f;
 				}
 				else
@@ -445,7 +444,7 @@ void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			{
 				if (!(m_irq_count & 0x00ff))
 				{
-					m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+					set_irq_line(ASSERT_LINE);
 					m_irq_count = (m_irq_count & 0xff00) | 0x00ff;
 				}
 				else
@@ -455,7 +454,7 @@ void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			{
 				if (!(m_irq_count & 0x0fff))
 				{
-					m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+					set_irq_line(ASSERT_LINE);
 					m_irq_count = (m_irq_count & 0xf000) | 0x0fff;
 				}
 				else
@@ -465,7 +464,7 @@ void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			{
 				if (!m_irq_count)
 				{
-					m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+					set_irq_line(ASSERT_LINE);
 					m_irq_count = 0xffff;
 				}
 				else
@@ -537,12 +536,12 @@ WRITE8_MEMBER(nes_ss88006_device::ss88006_write)
 			break;
 		case 0x7000:
 			m_irq_count = m_irq_count_latch;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x7001:
 			m_irq_enable = data & 0x01;
 			m_irq_mode = data & 0x0e;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 
 		case 0x7002:
@@ -772,79 +771,79 @@ static const char *const jf33_sample_names[] =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nes_jf13_device::device_add_mconfig)
-
+void nes_jf13_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(16)
-	MCFG_SAMPLES_NAMES(jf13_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(16);
+	m_samples->set_samples_names(jf13_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf17_adpcm_device::device_add_mconfig)
-
+void nes_jf17_adpcm_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(20)
-	MCFG_SAMPLES_NAMES(jf17_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(20);
+	m_samples->set_samples_names(jf17_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf19_adpcm_device::device_add_mconfig)
-
+void nes_jf19_adpcm_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(20)
-	MCFG_SAMPLES_NAMES(jf19_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(20);
+	m_samples->set_samples_names(jf19_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf23_device::device_add_mconfig)
-
+void nes_jf23_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(20)
-	MCFG_SAMPLES_NAMES(jf23_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(20);
+	m_samples->set_samples_names(jf23_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf24_device::device_add_mconfig)
-
+void nes_jf24_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(6)
-	MCFG_SAMPLES_NAMES(jf24_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(jf24_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf29_device::device_add_mconfig)
-
+void nes_jf29_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(20)
-	MCFG_SAMPLES_NAMES(jf29_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(20);
+	m_samples->set_samples_names(jf29_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf33_device::device_add_mconfig)
-
+void nes_jf33_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(20)
-	MCFG_SAMPLES_NAMES(jf33_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(20);
+	m_samples->set_samples_names(jf33_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}

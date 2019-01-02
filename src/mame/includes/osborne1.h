@@ -15,6 +15,8 @@
 
 #include "cpu/z80/z80.h"
 
+#include "imagedev/floppy.h"
+
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/ram.h"
@@ -24,6 +26,7 @@
 
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -32,15 +35,15 @@ class osborne1_state : public driver_device
 public:
 	osborne1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_ram(*this, RAM_TAG),
+		m_screen(*this, "screen"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
 		m_speaker(*this, "speaker"),
 		m_pia0(*this, "pia_0"),
 		m_pia1(*this, "pia_1"),
 		m_acia(*this, "acia"),
 		m_fdc(*this, "mb8877"),
-		m_ram(*this, RAM_TAG),
 		m_ieee(*this, IEEE488_TAG),
 		m_floppy0(*this, "mb8877:0"),
 		m_floppy1(*this, "mb8877:1"),
@@ -58,7 +61,23 @@ public:
 	{
 	}
 
+	void osborne1(machine_config &config);
 
+	void init_osborne1();
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_key);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void osborne1nv_io(address_map &map);
+
+	required_device<ram_device>             m_ram;
+	required_device<screen_device>          m_screen;
+	required_device<z80_device>             m_maincpu;
+
+private:
 	DECLARE_WRITE8_MEMBER(bank_0xxx_w);
 	DECLARE_WRITE8_MEMBER(bank_1xxx_w);
 	DECLARE_READ8_MEMBER(bank_2xxx_3xxx_r);
@@ -79,32 +98,22 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(serial_acia_irq_func);
 
-	DECLARE_INPUT_CHANGED_MEMBER(reset_key);
-
-	DECLARE_DRIVER_INIT(osborne1);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	required_device<cpu_device>             m_maincpu;
 	required_device<gfxdecode_device>       m_gfxdecode;
-	required_device<screen_device>          m_screen;
 	required_device<speaker_sound_device>   m_speaker;
 	required_device<pia6821_device>         m_pia0;
 	required_device<pia6821_device>         m_pia1;
 	required_device<acia6850_device>        m_acia;
 	required_device<mb8877_device>          m_fdc;
-	required_device<ram_device>             m_ram;
 	required_device<ieee488_device>         m_ieee;
 	required_device<floppy_connector>       m_floppy0;
 	required_device<floppy_connector>       m_floppy1;
 
-	void osborne1(machine_config &config);
-	void osborne1_io(address_map &map);
 	void osborne1_mem(address_map &map);
 	void osborne1_op(address_map &map);
-	void osborne1nv_io(address_map &map);
-protected:
+	void osborne1_io(address_map &map);
+
 	TIMER_CALLBACK_MEMBER(video_callback);
 	TIMER_CALLBACK_MEMBER(acia_rxc_txc_callback);
 
@@ -170,11 +179,12 @@ public:
 	{
 	}
 
+	void osborne1nv(machine_config &config);
+
+private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr_changed);
 
-	void osborne1nv(machine_config &config);
-protected:
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8>         m_p_nuevo;
 };

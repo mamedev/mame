@@ -22,14 +22,18 @@ Wicat - various systems.
 #include "cpu/8x300/8x300.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z8000/z8000.h"
+#include "imagedev/floppy.h"
+#include "machine/74259.h"
 #include "machine/6522via.h"
 #include "machine/am9517a.h"
 #include "machine/im6402.h"
+#include "machine/input_merger.h"
 #include "machine/mc2661.h"
 #include "machine/mm58274c.h"
 #include "machine/wd_fdc.h"
 #include "machine/x2212.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "wicat.lh"
@@ -37,37 +41,37 @@ Wicat - various systems.
 class wicat_state : public driver_device
 {
 public:
-	wicat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wicat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
 		m_rtc(*this, "rtc"),
 		m_via(*this, "via"),
-		m_uart0(*this,"uart0"),
-		m_uart1(*this,"uart1"),
-		m_uart2(*this,"uart2"),
-		m_uart3(*this,"uart3"),
-		m_uart4(*this,"uart4"),
-		m_uart5(*this,"uart5"),
-		m_uart6(*this,"uart6"),
-		m_videocpu(*this,"videocpu"),
-		m_videoctrl(*this,"video"),
-		m_videodma(*this,"videodma"),
-		m_videouart0(*this,"videouart0"),
-		m_videouart1(*this,"videouart1"),
-		m_videouart(*this,"videouart"),
-		m_videosram(*this,"vsram"),
+		m_uart(*this, "uart%u", 0U),
+		m_videocpu(*this, "videocpu"),
+		m_videoctrl(*this, "videoctrl"),
+		m_videoirq(*this, "videoirq"),
+		m_crtc(*this, "video"),
+		m_videodma(*this, "videodma"),
+		m_videouart0(*this, "videouart0"),
+		m_videouart1(*this, "videouart1"),
+		m_videouart(*this, "videouart"),
+		m_videosram(*this, "vsram"),
 		m_palette(*this, "palette"),
-		m_chargen(*this,"g2char"),
+		m_chargen(*this, "g2char"),
 		m_fdc(*this,"fdc")
 	{
 	}
 
+	void wicat(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER(invalid_r);
 	DECLARE_WRITE16_MEMBER(invalid_w);
 	DECLARE_READ16_MEMBER(memmap_r);
 	DECLARE_WRITE16_MEMBER(memmap_w);
-	DECLARE_WRITE16_MEMBER(parallel_led_w);
+	DECLARE_WRITE_LINE_MEMBER(adir_w);
+	DECLARE_WRITE_LINE_MEMBER(bdir_w);
 	DECLARE_WRITE8_MEMBER(via_a_w);
 	DECLARE_WRITE8_MEMBER(via_b_w);
 	DECLARE_READ8_MEMBER(video_r);
@@ -86,34 +90,27 @@ public:
 	DECLARE_WRITE8_MEMBER(video_timer_w);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(video_ctrl_r);
-	DECLARE_WRITE8_MEMBER(video_ctrl_w);
 	DECLARE_READ8_MEMBER(video_status_r);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_w);
-	DECLARE_WRITE_LINE_MEMBER(dma_nmi_cb);
-	DECLARE_WRITE_LINE_MEMBER(crtc_cb);
+	DECLARE_WRITE_LINE_MEMBER(crtc_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(crtc_irq_clear_w);
 	DECLARE_READ8_MEMBER(hdc_r);
 	DECLARE_WRITE8_MEMBER(hdc_w);
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
 	DECLARE_READ16_MEMBER(via_r);
 	DECLARE_WRITE16_MEMBER(via_w);
-	DECLARE_WRITE_LINE_MEMBER(kb_data_ready);
 	I8275_DRAW_CHARACTER_MEMBER(wicat_display_pixels);
 
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<m68000_device> m_maincpu;
 	required_device<mm58274c_device> m_rtc;
 	required_device<via6522_device> m_via;
-	required_device<mc2661_device> m_uart0;
-	required_device<mc2661_device> m_uart1;
-	required_device<mc2661_device> m_uart2;
-	required_device<mc2661_device> m_uart3;
-	required_device<mc2661_device> m_uart4;
-	required_device<mc2661_device> m_uart5;
-	required_device<mc2661_device> m_uart6;
+	required_device_array<mc2661_device, 7> m_uart;
 	required_device<cpu_device> m_videocpu;
-	required_device<i8275_device> m_videoctrl;
+	required_device<ls259_device> m_videoctrl;
+	required_device<input_merger_device> m_videoirq;
+	required_device<i8275_device> m_crtc;
 	required_device<am9517a_device> m_videodma;
 	required_device<mc2661_device> m_videouart0;
 	required_device<mc2661_device> m_videouart1;
@@ -126,14 +123,12 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	void main_mem(address_map &map);
+	void video_io(address_map &map);
+	void video_mem(address_map &map);
+	void wd1000_io(address_map &map);
+	void wd1000_mem(address_map &map);
 
-	void wicat(machine_config &config);
-	void wicat_mem(address_map &map);
-	void wicat_video_io(address_map &map);
-	void wicat_video_mem(address_map &map);
-	void wicat_wd1000_io(address_map &map);
-	void wicat_wd1000_mem(address_map &map);
-private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void driver_start() override;
@@ -141,82 +136,77 @@ private:
 	void poll_kb();
 	void send_key(uint8_t val);
 
-	emu_timer* m_video_timer;
 	emu_timer* m_kb_timer;
 	emu_timer* m_kb_serial_timer;
-	static const device_timer_id VIDEO_TIMER = 0;
 	static const device_timer_id KB_TIMER = 1;
 	static const device_timer_id KB_SERIAL_TIMER = 2;
 
 	uint8_t m_portA;
 	uint8_t m_portB;
-	bool m_video_timer_irq;
-	bool m_video_kb_irq;
-	uint8_t m_nmi_enable;
-	uint8_t m_crtc_irq;
+	bool m_crtc_irq;
 	uint16_t m_kb_data;
 	uint8_t m_kb_bit;
 	uint32_t m_kb_keys[8];
 };
 
 
-void wicat_state::wicat_mem(address_map &map)
+void wicat_state::main_mem(address_map &map)
 {
 	map.unmap_value_low();
 	map.global_mask(0xffffff);
 	map(0x000000, 0x001fff).rom().region("c2", 0x0000);
 	map(0x020000, 0x1fffff).ram();
 	map(0x200000, 0x2fffff).ram();
-	map(0x300000, 0xdfffff).rw(this, FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
+	map(0x300000, 0xdfffff).rw(FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
 	map(0xeff800, 0xeffbff).ram();  // memory mapping SRAM, used during boot sequence for storing various data (TODO)
-	map(0xeffc00, 0xeffc01).rw(this, FUNC(wicat_state::memmap_r), FUNC(wicat_state::memmap_w));
-	map(0xf00000, 0xf00007).rw(m_uart0, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);  // UARTs
-	map(0xf00008, 0xf0000f).rw(m_uart1, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00010, 0xf00017).rw(m_uart2, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00018, 0xf0001f).rw(m_uart3, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00020, 0xf00027).rw(m_uart4, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00028, 0xf0002f).rw(m_uart5, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00030, 0xf00037).rw(m_uart6, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
-	map(0xf00040, 0xf0005f).rw(this, FUNC(wicat_state::via_r), FUNC(wicat_state::via_w));
+	map(0xeffc00, 0xeffc01).rw(FUNC(wicat_state::memmap_r), FUNC(wicat_state::memmap_w));
+	map(0xf00000, 0xf00007).rw(m_uart[0], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);  // UARTs
+	map(0xf00008, 0xf0000f).rw(m_uart[1], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00010, 0xf00017).rw(m_uart[2], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00018, 0xf0001f).rw(m_uart[3], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00020, 0xf00027).rw(m_uart[4], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00028, 0xf0002f).rw(m_uart[5], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00030, 0xf00037).rw(m_uart[6], FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00040, 0xf0005f).rw(FUNC(wicat_state::via_r), FUNC(wicat_state::via_w));
 	map(0xf00060, 0xf0007f).rw(m_rtc, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0xff00);
-	map(0xf000d0, 0xf000d1).w(this, FUNC(wicat_state::parallel_led_w));
-	map(0xf00180, 0xf0018f).rw(this, FUNC(wicat_state::hdc_r), FUNC(wicat_state::hdc_w));  // WD1000
-	map(0xf00190, 0xf0019f).rw(this, FUNC(wicat_state::fdc_r), FUNC(wicat_state::fdc_w));  // FD1795
-	map(0xf00f00, 0xf00fff).rw(this, FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
+	map(0xf000d0, 0xf000d0).w("ledlatch", FUNC(ls259_device::write_nibble_d3));
+	map(0xf00180, 0xf0018f).rw(FUNC(wicat_state::hdc_r), FUNC(wicat_state::hdc_w));  // WD1000
+	map(0xf00190, 0xf0019f).rw(FUNC(wicat_state::fdc_r), FUNC(wicat_state::fdc_w));  // FD1795
+	map(0xf00f00, 0xf00fff).rw(FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
 }
 
-void wicat_state::wicat_video_mem(address_map &map)
+void wicat_state::video_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("g1", 0x0000);
 	map(0x8000, 0xffff).ram();
 }
 
-void wicat_state::wicat_video_io(address_map &map)
+void wicat_state::video_io(address_map &map)
 {
 	// these are largely wild guesses...
-	map(0x0000, 0x0003).rw(this, FUNC(wicat_state::video_timer_r), FUNC(wicat_state::video_timer_w));  // some sort of timer?
-	map(0x0100, 0x0107).rw(this, FUNC(wicat_state::video_uart0_r), FUNC(wicat_state::video_uart0_w));  // INS2651 UART #1
-	map(0x0200, 0x0207).rw(this, FUNC(wicat_state::video_uart1_r), FUNC(wicat_state::video_uart1_w));  // INS2651 UART #2
-	map(0x0304, 0x0304).r(this, FUNC(wicat_state::video_status_r));
-	map(0x0400, 0x047f).rw(this, FUNC(wicat_state::videosram_r), FUNC(wicat_state::videosram_w));  // XD2210  4-bit NOVRAM
-	map(0x0500, 0x0500).w(this, FUNC(wicat_state::videosram_recall_w));
-	map(0x0600, 0x0600).w(this, FUNC(wicat_state::videosram_store_w));
-	map(0x0800, 0x080f).rw(this, FUNC(wicat_state::video_ctrl_r), FUNC(wicat_state::video_ctrl_w));
-	map(0x0a00, 0x0a1f).rw(this, FUNC(wicat_state::video_dma_r), FUNC(wicat_state::video_dma_w)); // AM9517A DMA
-	map(0x0b00, 0x0b03).rw(this, FUNC(wicat_state::video_r), FUNC(wicat_state::video_w));  // i8275 CRTC
+	map(0x0000, 0x0003).rw(FUNC(wicat_state::video_timer_r), FUNC(wicat_state::video_timer_w));  // some sort of timer?
+	map(0x0100, 0x0107).rw(FUNC(wicat_state::video_uart0_r), FUNC(wicat_state::video_uart0_w));  // INS2651 UART #1
+	map(0x0200, 0x0207).rw(FUNC(wicat_state::video_uart1_r), FUNC(wicat_state::video_uart1_w));  // INS2651 UART #2
+	map(0x0304, 0x0304).r(FUNC(wicat_state::video_status_r));
+	map(0x0400, 0x047f).rw(FUNC(wicat_state::videosram_r), FUNC(wicat_state::videosram_w));  // XD2210  4-bit NOVRAM
+	map(0x0500, 0x0500).w(FUNC(wicat_state::videosram_recall_w));
+	map(0x0600, 0x0600).w(FUNC(wicat_state::videosram_store_w));
+	map(0x0800, 0x0807).w("videoctrl", FUNC(ls259_device::write_d0)).umask16(0xffff);
+	map(0x0a00, 0x0a1f).rw(FUNC(wicat_state::video_dma_r), FUNC(wicat_state::video_dma_w)); // AM9517A DMA
+	map(0x0b00, 0x0b03).rw(FUNC(wicat_state::video_r), FUNC(wicat_state::video_w));  // i8275 CRTC
 	map(0x0e00, 0x0eff).ram();
 	map(0x4000, 0x5fff).ram().share("vram"); // video RAM?
 	map(0x8000, 0x8fff).rom().region("g2char", 0x0000);
 	map(0x9000, 0x9fff).rom().region("g2char", 0x0000);
 }
 
-void wicat_state::wicat_wd1000_mem(address_map &map)
+void wicat_state::wd1000_mem(address_map &map)
 {
 	map(0x0000, 0x17ff).rom().region("wd3", 0x0000);
 	map(0x1800, 0x1fff).noprw();
 }
 
-void wicat_state::wicat_wd1000_io(address_map &map)
+void wicat_state::wd1000_io(address_map &map)
 {
 	map(0x0000, 0x00ff).ram();  // left bank  - RAM
 	map(0x0100, 0x01ff).ram();  // right bank - I/O ports (TODO)
@@ -288,13 +278,13 @@ static INPUT_PORTS_START( wicat )
 
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(wicat_floppies)
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void wicat_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 void wicat_state::driver_start()
 {
-	m_video_timer = timer_alloc(VIDEO_TIMER);
 	m_kb_timer = timer_alloc(KB_TIMER);
 	m_kb_serial_timer = timer_alloc(KB_SERIAL_TIMER);
 }
@@ -308,12 +298,8 @@ void wicat_state::machine_reset()
 	// on the terminal board /DCD on both INS2651s are tied to GND
 	m_videouart0->dcd_w(0);
 	m_videouart1->dcd_w(0);
-	m_uart0->dcd_w(0);
-	m_uart1->dcd_w(0);
-	m_uart2->dcd_w(0);
-	m_uart3->dcd_w(0);
-	m_uart4->dcd_w(0);
-	m_uart5->dcd_w(0);
+	for (int i = 0; i < 6; i++)
+		m_uart[i]->dcd_w(0);
 
 	// initialise im6402 (terminal board)
 	m_videouart->cls1_w(1);
@@ -322,12 +308,8 @@ void wicat_state::machine_reset()
 	m_videouart->sbs_w(0);
 	m_videouart->crl_w(1);
 
-	m_video_timer_irq = false;
-	m_video_kb_irq = false;
-	m_video_timer->adjust(attotime::zero,0,attotime::from_hz(60));
 	m_kb_timer->adjust(attotime::zero,0,attotime::from_msec(50));
-	m_nmi_enable = 0;
-	m_crtc_irq = CLEAR_LINE;
+	m_crtc_irq = false;
 	for(auto & elem : m_kb_keys)
 		elem = 0;
 }
@@ -336,10 +318,6 @@ void wicat_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 {
 	switch (id)
 	{
-	case VIDEO_TIMER:
-		m_video_timer_irq = true;
-		m_videocpu->set_input_line(INPUT_LINE_IRQ0,ASSERT_LINE);
-		break;
 	case KB_TIMER:
 		poll_kb();
 		break;
@@ -389,16 +367,14 @@ void wicat_state::send_key(uint8_t val)
 	m_kb_serial_timer->adjust(attotime::zero,0,attotime::from_hz(1200));
 }
 
-WRITE16_MEMBER( wicat_state::parallel_led_w )
+WRITE_LINE_MEMBER(wicat_state::adir_w)
 {
-	// bit 0 - parallel port A direction (0 = input)
-	// bit 1 - parallel port B direction (0 = input)
-	output().set_value("led1",data & 0x0400);
-	output().set_value("led2",data & 0x0800);
-	output().set_value("led3",data & 0x1000);
-	output().set_value("led4",data & 0x2000);
-	output().set_value("led5",data & 0x4000);
-	output().set_value("led6",data & 0x8000);
+	// parallel port A direction (0 = input, 1 = output)
+}
+
+WRITE_LINE_MEMBER(wicat_state::bdir_w)
+{
+	// parallel port B direction (0 = input, 1 = output)
 }
 
 WRITE8_MEMBER( wicat_state::via_a_w )
@@ -417,7 +393,7 @@ READ16_MEMBER( wicat_state::invalid_r )
 {
 	if(!machine().side_effects_disabled())
 	{
-		m_maincpu->set_buserror_details(0x300000+offset*2-2,0,m_maincpu->get_fc());
+		m_maincpu->set_buserror_details(0x300000+offset*2-2,true,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
@@ -428,7 +404,7 @@ WRITE16_MEMBER( wicat_state::invalid_w )
 {
 	if(!machine().side_effects_disabled())
 	{
-		m_maincpu->set_buserror_details(0x300000+offset*2-2,1,m_maincpu->get_fc());
+		m_maincpu->set_buserror_details(0x300000+offset*2-2,false,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
@@ -514,16 +490,16 @@ READ8_MEMBER(wicat_state::fdc_r)
 	switch(offset)
 	{
 	case 0x00:
-		ret = m_fdc->status_r(space,0);
+		ret = m_fdc->status_r();
 		break;
 	case 0x01:
-		ret = m_fdc->track_r(space,0);
+		ret = m_fdc->track_r();
 		break;
 	case 0x02:
-		ret = m_fdc->sector_r(space,0);
+		ret = m_fdc->sector_r();
 		break;
 	case 0x03:
-		ret = m_fdc->data_r(space,0);
+		ret = m_fdc->data_r();
 		break;
 	case 0x08:
 		// Interrupt status (TODO, not part of the FD1795)
@@ -538,16 +514,16 @@ WRITE8_MEMBER(wicat_state::fdc_w)
 	switch(offset)
 	{
 	case 0x00:
-		m_fdc->cmd_w(space,0,data);
+		m_fdc->cmd_w(data);
 		break;
 	case 0x01:
-		m_fdc->track_w(space,0,data);
+		m_fdc->track_w(data);
 		break;
 	case 0x02:
-		m_fdc->sector_w(space,0,data);
+		m_fdc->sector_w(data);
 		break;
 	case 0x03:
-		m_fdc->data_w(space,0,data);
+		m_fdc->data_w(data);
 		break;
 	case 0x08:
 		// Interrupt disable / Drive select (TODO, not part of the FD1795)
@@ -558,16 +534,16 @@ WRITE8_MEMBER(wicat_state::fdc_w)
 READ16_MEMBER(wicat_state::via_r)
 {
 	if(ACCESSING_BITS_0_7)
-		return m_via->read(space,offset);
+		return m_via->read(offset);
 	return 0x00;
 }
 
 WRITE16_MEMBER(wicat_state::via_w)
 {
 	if(ACCESSING_BITS_0_7)
-		m_via->write(space,offset,data);
+		m_via->write(offset,data);
 	else if(ACCESSING_BITS_8_15)
-		m_via->write(space,offset,data>>8);
+		m_via->write(offset,data>>8);
 }
 
 READ8_MEMBER(wicat_state::video_r)
@@ -575,9 +551,9 @@ READ8_MEMBER(wicat_state::video_r)
 	switch(offset)
 	{
 	case 0x00:
-		return m_videoctrl->read(space,0);
+		return m_crtc->read(space,0);
 	case 0x02:
-		return m_videoctrl->read(space,1);
+		return m_crtc->read(space,1);
 	default:
 		return 0xff;
 	}
@@ -588,10 +564,10 @@ WRITE8_MEMBER(wicat_state::video_w)
 	switch(offset)
 	{
 	case 0x00:
-		m_videoctrl->write(space,0,data);
+		m_crtc->write(space,0,data);
 		break;
 	case 0x02:
-		m_videoctrl->write(space,1,data);
+		m_crtc->write(space,1,data);
 		break;
 	}
 }
@@ -620,25 +596,25 @@ WRITE8_MEMBER(wicat_state::video_dma_w)
 READ8_MEMBER(wicat_state::video_uart0_r)
 {
 	uint16_t noff = offset >> 1;
-	return m_videouart0->read(space,noff);
+	return m_videouart0->read(noff);
 }
 
 WRITE8_MEMBER(wicat_state::video_uart0_w)
 {
 	uint16_t noff = offset >> 1;
-	m_videouart0->write(space,noff,data);
+	m_videouart0->write(noff,data);
 }
 
 READ8_MEMBER(wicat_state::video_uart1_r)
 {
 	uint16_t noff = offset >> 1;
-	return m_videouart1->read(space,noff);
+	return m_videouart1->read(noff);
 }
 
 WRITE8_MEMBER(wicat_state::video_uart1_w)
 {
 	uint16_t noff = offset >> 1;
-	m_videouart1->write(space,noff,data);
+	m_videouart1->write(noff,data);
 }
 
 // XD2210 64 x 4bit NOVRAM
@@ -681,22 +657,16 @@ READ8_MEMBER(wicat_state::video_timer_r)
 	uint8_t ret = 0x00;
 
 	if(offset == 0x00)
-	{
-		if(m_video_timer_irq)
-		{
-			ret |= 0x08;
-			m_video_timer_irq = false;
-			m_videocpu->set_input_line(INPUT_LINE_IRQ0,CLEAR_LINE);
-		}
-		if(m_video_kb_irq)
-		{
-			ret |= 0x10;
-			m_video_kb_irq = false;
-			m_videocpu->set_input_line(INPUT_LINE_IRQ0,CLEAR_LINE);
-		}
-	}
+		return (m_videouart->dr_r() << 4) | (m_videouart->tbre_r() && m_videoctrl->q6_r() ? 0x08 : 0x00);
 	if(offset == 0x02)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			m_videouart->drr_w(1);
+			m_videouart->drr_w(0);
+		}
 		return m_videouart->read(space,0);
+	}
 	return ret;
 }
 
@@ -707,28 +677,10 @@ WRITE8_MEMBER(wicat_state::video_timer_w)
 		m_videouart->write(space,0,data);
 }
 
-READ8_MEMBER(wicat_state::video_ctrl_r)
-{
-	return 0x00;  // TODO
-}
-
-WRITE8_MEMBER(wicat_state::video_ctrl_w)
-{
-	if(offset == 0x07)
-		m_nmi_enable = data;
-}
-
 READ8_MEMBER(wicat_state::video_status_r)
 {
 	// this port is read in the NVI IRQ routine, which if bit 2 is set, will unmask DMA channel 0.  But no idea what triggers it...
-	if(m_crtc_irq == ASSERT_LINE)
-	{
-		m_crtc_irq = CLEAR_LINE;
-		m_videocpu->set_input_line(INPUT_LINE_IRQ0,CLEAR_LINE);
-		return 0x04;
-	}
-	else
-		return 0x00;
+	return m_crtc_irq ? 0x04 : 0x00;
 }
 
 WRITE_LINE_MEMBER(wicat_state::dma_hrq_w)
@@ -737,195 +689,169 @@ WRITE_LINE_MEMBER(wicat_state::dma_hrq_w)
 	m_videodma->hack_w(state);
 }
 
-WRITE_LINE_MEMBER(wicat_state::dma_nmi_cb)
+WRITE_LINE_MEMBER(wicat_state::crtc_irq_w)
 {
-	if(state)
+	if (state && m_videoctrl->q0_r())
 	{
-		if(m_nmi_enable != 0)
-			m_videocpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		m_crtc_irq = true;
+		m_videoirq->in_w<1>(1);
 	}
 }
 
-WRITE_LINE_MEMBER(wicat_state::kb_data_ready)
+WRITE_LINE_MEMBER(wicat_state::crtc_irq_clear_w)
 {
-	m_video_kb_irq = state ? ASSERT_LINE : CLEAR_LINE;
-	m_videocpu->set_input_line(INPUT_LINE_IRQ0,m_video_kb_irq);
-}
-
-WRITE_LINE_MEMBER(wicat_state::crtc_cb)
-{
-	m_crtc_irq = state ? ASSERT_LINE : CLEAR_LINE;
-	m_videocpu->set_input_line(INPUT_LINE_IRQ0,m_crtc_irq);
+	if (!state)
+	{
+		m_crtc_irq = false;
+		m_videoirq->in_w<1>(0);
+	}
 }
 
 I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 {
-	uint8_t romdata = m_chargen->base()[((charcode << 4) | linecount) + 1];
+	uint8_t romdata = vsp ? 0 : m_chargen->base()[(charcode << 4) | linecount];
 	const pen_t *pen = m_palette->pens();
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		int color = (romdata >> (7-i)) & 0x01;
-
-		if(vsp || linecount > 9)
-			color = 0;
+		int color = ((romdata & 0xc0) != 0) ^ rvv;
 
 		bitmap.pix32(y, x + i) = pen[color];
+		romdata <<= 1;
 	}
 }
 
-MACHINE_CONFIG_START(wicat_state::wicat)
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(wicat_mem)
+void wicat_state::wicat(machine_config &config)
+{
+	M68000(config, m_maincpu, 8_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wicat_state::main_mem);
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL(8'000'000))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(wicat_state, via_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(wicat_state, via_b_w))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))
+	VIA6522(config, m_via, 8_MHz_XTAL);
+	m_via->writepa_handler().set(FUNC(wicat_state::via_a_w));
+	m_via->writepb_handler().set(FUNC(wicat_state::via_b_w));
+	m_via->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	MCFG_DEVICE_ADD("rtc", MM58274C, 0)  // actually an MM58174AN, but should be compatible
-	MCFG_MM58274C_MODE24(0) // 12 hour
-	MCFG_MM58274C_DAY1(1)   // monday
+	MM58274C(config, m_rtc, 0);  // actually an MM58174AN, but should be compatible
+	m_rtc->set_mode24(0); // 12 hour
+	m_rtc->set_day1(1);   // monday
 
 	// internal terminal
-	MCFG_DEVICE_ADD("uart0", MC2661, XTAL(5'068'800))  // connected to terminal board
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("videouart0", mc2661_device, rx_w))
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("videouart0", mc2661_device, cts_w))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("videouart0", mc2661_device, dsr_w))
+	MC2661(config, m_uart[0], 5.0688_MHz_XTAL);  // connected to terminal board
+	m_uart[0]->txd_handler().set(m_videouart0, FUNC(mc2661_device::rx_w));
+	m_uart[0]->rxrdy_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+	m_uart[0]->rts_handler().set(m_videouart0, FUNC(mc2661_device::cts_w));
+	m_uart[0]->dtr_handler().set(m_videouart0, FUNC(mc2661_device::dsr_w));
 
 	// RS232C ports (x5)
-	MCFG_DEVICE_ADD("uart1", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_txd))
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_dtr))
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-
-	MCFG_DEVICE_ADD("uart2", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("serial2", rs232_port_device, write_txd))
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("serial2", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("serial2", rs232_port_device, write_dtr))
-
-	MCFG_DEVICE_ADD("uart3", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("serial3", rs232_port_device, write_txd))
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("serial3", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("serial3", rs232_port_device, write_dtr))
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-
-	MCFG_DEVICE_ADD("uart4", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("serial4", rs232_port_device, write_txd))
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("serial4", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("serial4", rs232_port_device, write_dtr))
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-
-	MCFG_DEVICE_ADD("uart5", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("serial5", rs232_port_device, write_txd))
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("serial5", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("serial5", rs232_port_device, write_dtr))
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
+	const char *serial_names[5] = { "serial1", "serial2", "serial3", "serial4", "serial5" };
+	for (int i = 1; i <= 5; i++)
+	{
+		MC2661(config, m_uart[i], 5.0688_MHz_XTAL);
+		m_uart[i]->txd_handler().set(serial_names[i - 1], FUNC(rs232_port_device::write_txd));
+		m_uart[i]->rts_handler().set(serial_names[i - 1], FUNC(rs232_port_device::write_rts));
+		m_uart[i]->dtr_handler().set(serial_names[i - 1], FUNC(rs232_port_device::write_dtr));
+		m_uart[i]->rxrdy_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+		m_uart[i]->txemt_dschg_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+	}
 
 	// modem
-	MCFG_DEVICE_ADD("uart6", MC2661, XTAL(5'068'800))  // connected to modem port
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(INPUTLINE("maincpu", M68K_IRQ_2))
+	MC2661(config, m_uart[6], 5.0688_MHz_XTAL);  // connected to modem port
+	m_uart[6]->rxrdy_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+	m_uart[6]->txemt_dschg_handler().set_inputline(m_maincpu, M68K_IRQ_2);
 
-	MCFG_RS232_PORT_ADD("serial1",default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1",mc2661_device,rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart1",mc2661_device,dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1",mc2661_device,cts_w))
+	const char *uart_names[5] = { "uart1", "uart2", "uart3", "uart4", "uart5" };
+	for (int i = 1; i <= 5; i++)
+	{
+		rs232_port_device &port(RS232_PORT(config, serial_names[i - 1], default_rs232_devices, nullptr));
+		port.rxd_handler().set(uart_names[i - 1], FUNC(mc2661_device::rx_w));
+		port.dcd_handler().set(uart_names[i - 1], FUNC(mc2661_device::dcd_w));
+		port.dsr_handler().set(uart_names[i - 1], FUNC(mc2661_device::dsr_w));
+		port.cts_handler().set(uart_names[i - 1], FUNC(mc2661_device::cts_w));
+	}
 
-	MCFG_RS232_PORT_ADD("serial2",default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart2",mc2661_device,rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart2",mc2661_device,dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart2",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart2",mc2661_device,cts_w))
-
-	MCFG_RS232_PORT_ADD("serial3",default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart3",mc2661_device,rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart3",mc2661_device,dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart3",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart3",mc2661_device,cts_w))
-
-	MCFG_RS232_PORT_ADD("serial4",default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart4",mc2661_device,rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart4",mc2661_device,dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart4",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart4",mc2661_device,cts_w))
-
-	MCFG_RS232_PORT_ADD("serial5",default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart5",mc2661_device,rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart5",mc2661_device,dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart5",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart5",mc2661_device,cts_w))
+	ls259_device &ledlatch(LS259(config, "ledlatch")); // U19 on I/O board
+	ledlatch.q_out_cb<0>().set(FUNC(wicat_state::adir_w));
+	ledlatch.q_out_cb<1>().set(FUNC(wicat_state::bdir_w));
+	ledlatch.q_out_cb<2>().set_output("led1").invert(); // 0 = on, 1 = off
+	ledlatch.q_out_cb<3>().set_output("led2").invert();
+	ledlatch.q_out_cb<4>().set_output("led3").invert();
+	ledlatch.q_out_cb<5>().set_output("led4").invert();
+	ledlatch.q_out_cb<6>().set_output("led5").invert();
+	ledlatch.q_out_cb<7>().set_output("led6").invert();
 
 	/* video hardware */
-	MCFG_CPU_ADD("videocpu",Z8002,XTAL(8'000'000)/2)  // AMD AMZ8002DC
-	MCFG_CPU_PROGRAM_MAP(wicat_video_mem)
-	MCFG_CPU_IO_MAP(wicat_video_io)
+	Z8002(config, m_videocpu, 8_MHz_XTAL/2);  // AMD AMZ8002DC
+	m_videocpu->set_addrmap(AS_PROGRAM, &wicat_state::video_mem);
+	m_videocpu->set_addrmap(AS_IO, &wicat_state::video_io);
 
-	MCFG_DEVICE_ADD("videodma", AM9517A, XTAL(8'000'000))  // clock is a bit of guess
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(wicat_state, dma_hrq_w))
-	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(wicat_state, dma_nmi_cb))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(wicat_state, vram_r))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(wicat_state, vram_w))
-	MCFG_AM9517A_OUT_IOW_0_CB(DEVWRITE8("video", i8275_device, dack_w))
-	MCFG_IM6402_ADD("videouart", 0, 0)
-	MCFG_IM6402_DR_CALLBACK(WRITELINE(wicat_state, kb_data_ready))
+	INPUT_MERGER_ANY_HIGH(config, m_videoirq).output_handler().set_inputline(m_videocpu, INPUT_LINE_IRQ0);
+
+	LS259(config, m_videoctrl);
+	m_videoctrl->q_out_cb<0>().set(FUNC(wicat_state::crtc_irq_clear_w));
+	m_videoctrl->q_out_cb<6>().set("tbreirq", FUNC(input_merger_device::in_w<1>));
+	m_videoctrl->q_out_cb<7>().set("dmairq", FUNC(input_merger_device::in_w<1>));
+	// Q1-Q5 are all used but unknown
+
+	AM9517A(config, m_videodma, 8_MHz_XTAL);  // clock is a bit of guess
+	m_videodma->out_hreq_callback().set(FUNC(wicat_state::dma_hrq_w));
+	m_videodma->out_eop_callback().set("dmairq", FUNC(input_merger_device::in_w<0>));
+	m_videodma->in_memr_callback().set(FUNC(wicat_state::vram_r));
+	m_videodma->out_memw_callback().set(FUNC(wicat_state::vram_w));
+	m_videodma->out_iow_callback<0>().set(m_crtc, FUNC(i8275_device::dack_w));
+
+	INPUT_MERGER_ALL_HIGH(config, "dmairq").output_handler().set_inputline(m_videocpu, INPUT_LINE_NMI);
+
+	IM6402(config, m_videouart, 0);
+	m_videouart->set_rrc(0);
+	m_videouart->set_trc(1200);
+	m_videouart->dr_callback().set(m_videoirq, FUNC(input_merger_device::in_w<2>));
+	m_videouart->tbre_callback().set("tbreirq", FUNC(input_merger_device::in_w<0>));
+
+	INPUT_MERGER_ALL_HIGH(config, "tbreirq").output_handler().set(m_videoirq, FUNC(input_merger_device::in_w<3>));
 
 	// terminal (2x INS2651, 1x IM6042 - one of these is for the keyboard, another communicates with the main board, the third is unknown)
-	MCFG_DEVICE_ADD("videouart0", MC2661, XTAL(5'068'800))  // the INS2651 looks similar enough to the MC2661...
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("uart0", mc2661_device, rx_w))
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("videocpu", INPUT_LINE_IRQ0))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("uart0", mc2661_device, cts_w))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("uart0", mc2661_device, dsr_w))
+	MC2661(config, m_videouart0, 5.0688_MHz_XTAL);  // the INS2651 looks similar enough to the MC2661...
+	m_videouart0->txd_handler().set(m_uart[0], FUNC(mc2661_device::rx_w));
+	m_videouart0->rxrdy_handler().set(m_videoirq, FUNC(input_merger_device::in_w<0>));
+	m_videouart0->rts_handler().set(m_uart[0], FUNC(mc2661_device::cts_w));
+	m_videouart0->dtr_handler().set(m_uart[0], FUNC(mc2661_device::dsr_w));
 
-	MCFG_DEVICE_ADD("videouart1", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_RXC(19200)
-	MCFG_MC2661_TXC(19200)
-	MCFG_MC2661_RXRDY_HANDLER(INPUTLINE("videocpu", INPUT_LINE_IRQ0))
+	MC2661(config, m_videouart1, 5.0688_MHz_XTAL);
+	m_videouart1->set_rxc(19200);
+	m_videouart1->set_txc(19200);
+	m_videouart1->rxrdy_handler().set(m_videoirq, FUNC(input_merger_device::in_w<4>));
 
-	MCFG_X2210_ADD("vsram")  // XD2210
+	X2210(config, "vsram");  // XD2210
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_SIZE(720,300)
-	MCFG_SCREEN_VISIBLE_AREA(0,720-1,0,300-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DEVICE("video",i8275_device,screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_raw(19.6608_MHz_XTAL, 1020, 0, 800, 324, 0, 300);
+	screen.set_screen_update("video", FUNC(i8275_device::screen_update));
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("video", I8275, XTAL(19'660'800)/8)
-	MCFG_I8275_CHARACTER_WIDTH(9)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(wicat_state, wicat_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("videodma",am9517a_device, dreq0_w))
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE(wicat_state,crtc_cb))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	I8275(config, m_crtc, 19.6608_MHz_XTAL/10);
+	m_crtc->set_character_width(10);
+	m_crtc->set_display_callback(FUNC(wicat_state::wicat_display_pixels), this);
+	m_crtc->drq_wr_callback().set(m_videodma, FUNC(am9517a_device::dreq0_w));
+	m_crtc->vrtc_wr_callback().set(FUNC(wicat_state::crtc_irq_w));
+	m_crtc->set_screen("screen");
 
-	MCFG_DEFAULT_LAYOUT(layout_wicat)
+	config.set_default_layout(layout_wicat);
 
 	/* Winchester Disk Controller (WD1000 + FD1795) */
-	MCFG_CPU_ADD("wd1kcpu",N8X300,XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(wicat_wd1000_mem)
-	MCFG_CPU_IO_MAP(wicat_wd1000_io)
-	MCFG_FD1795_ADD("fdc",XTAL(8'000'000))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", wicat_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	n8x300_cpu_device &wd1kcpu(N8X300(config, "wd1kcpu", 8_MHz_XTAL));
+	wd1kcpu.set_addrmap(AS_PROGRAM, &wicat_state::wd1000_mem);
+	wd1kcpu.set_addrmap(AS_IO, &wicat_state::wd1000_io);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "wicat")
-MACHINE_CONFIG_END
+	FD1795(config, m_fdc, 8_MHz_XTAL);
+	FLOPPY_CONNECTOR(config, "fdc:0", wicat_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+
+	SOFTWARE_LIST(config, "flop_list").set_type("wicat", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
 /* ROM definition */
 ROM_START( wicat )
@@ -944,15 +870,15 @@ ROM_START( wicat )
 	// System 150 CPU/MU board
 	ROM_REGION16_BE(0x2000, "c2", 0)
 	ROM_SYSTEM_BIOS( 0, "cms", "CMS HD / Floppy Boot / Boot v1.56" )
-	ROMX_LOAD("s156.a5", 0x00000, 0x0800, CRC(2c1e9542) SHA1(50184e04f0c881818e96e2162111d16304e8762f), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD("s156.a7", 0x00001, 0x0800, CRC(5a0cb30d) SHA1(aa106ad5a8b9e89613f7ea026d62832cfdb19fd0), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD("37m.b5",  0x01000, 0x0800, CRC(831571fb) SHA1(fcc647b3ef9f0cca3e8212f850f96676d24cf318), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD("37m.b7",  0x01001, 0x0800, CRC(3c346e8e) SHA1(d8ff8297d265b25655c854ed8515fa9e16c63f39), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD("s156.a5", 0x00000, 0x0800, CRC(2c1e9542) SHA1(50184e04f0c881818e96e2162111d16304e8762f), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD("s156.a7", 0x00001, 0x0800, CRC(5a0cb30d) SHA1(aa106ad5a8b9e89613f7ea026d62832cfdb19fd0), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD("37m.b5",  0x01000, 0x0800, CRC(831571fb) SHA1(fcc647b3ef9f0cca3e8212f850f96676d24cf318), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD("37m.b7",  0x01001, 0x0800, CRC(3c346e8e) SHA1(d8ff8297d265b25655c854ed8515fa9e16c63f39), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "wd3", "WD3 HD Boot / Boot v1.56" )
-	ROMX_LOAD("boot156.a5", 0x00000, 0x0800, CRC(58510a52) SHA1(d2135b056a04ba830b0ae1cef539e4a9a1b58f82), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD("boot156.a7", 0x00001, 0x0800, CRC(e53999f1) SHA1(9c6c6a3a56b5c16a35e1fe824f37c8ae739ebcb9), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD("wd3_15.b5",  0x01000, 0x0800, CRC(a765899b) SHA1(8427c564029914b7dbc29768ce451604180e390f), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD("wd3_15.b7",  0x01001, 0x0800, CRC(9d986585) SHA1(1ac7579c692f827b121c56dac0a77b15400caba1), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD("boot156.a5", 0x00000, 0x0800, CRC(58510a52) SHA1(d2135b056a04ba830b0ae1cef539e4a9a1b58f82), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD("boot156.a7", 0x00001, 0x0800, CRC(e53999f1) SHA1(9c6c6a3a56b5c16a35e1fe824f37c8ae739ebcb9), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD("wd3_15.b5",  0x01000, 0x0800, CRC(a765899b) SHA1(8427c564029914b7dbc29768ce451604180e390f), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD("wd3_15.b7",  0x01001, 0x0800, CRC(9d986585) SHA1(1ac7579c692f827b121c56dac0a77b15400caba1), ROM_SKIP(1) | ROM_BIOS(1) )
 
 	// Terminal CPU board (Graphical)
 	// "MG8000 VERSION 3.0"
@@ -1012,5 +938,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT  COMPANY               FULLNAME            FLAGS
-COMP( 1982, wicat, 0,      0,      wicat,   wicat, wicat_state, 0,    "Millennium Systems", "Wicat System 150", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY               FULLNAME            FLAGS
+COMP( 1982, wicat, 0,      0,      wicat,   wicat, wicat_state, empty_init, "Millennium Systems", "Wicat System 150", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

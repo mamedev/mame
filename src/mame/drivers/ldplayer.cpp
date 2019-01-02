@@ -17,6 +17,7 @@
 #include "ui/uimain.h"
 
 #include "emuopts.h"
+#include "romload.h"
 #include "speaker.h"
 #include "screen.h"
 
@@ -37,9 +38,6 @@ public:
 		, m_last_controls(0)
 		, m_playing(false) { }
 
-	// callback hook
-	static chd_file *get_disc_static(device_t *dummy, laserdisc_device &device) { return device.machine().driver_data<ldplayer_state>()->get_disc(); }
-
 	void ldplayer_ntsc(machine_config &config);
 
 protected:
@@ -48,8 +46,10 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	// callback hook
+	chd_file *get_disc(laserdisc_device &device);
+
 	// internal helpers
-	chd_file *get_disc();
 	void process_commands();
 
 	// derived classes
@@ -164,7 +164,7 @@ protected:
  *
  *************************************/
 
-chd_file *ldplayer_state::get_disc()
+chd_file *ldplayer_state::get_disc(laserdisc_device &device)
 {
 	bool found = false;
 	// open a path to the ROMs and find the first CHD file
@@ -634,11 +634,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ldv1000_state::ldv1000)
 	ldplayer_ntsc(config);
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&ldplayer_state::get_disc_static, device))
+	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&ldv1000_state::get_disc, this))
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_MODIFY("laserdisc")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -647,11 +648,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pr8210_state::pr8210)
 	ldplayer_ntsc(config);
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
-	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&ldplayer_state::get_disc_static, device))
+	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&pr8210_state::get_disc, this))
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_MODIFY("laserdisc")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -681,5 +683,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 2008, simldv1000, 0, ldv1000, ldplayer, ldv1000_state, 0, ROT0, "MAME", "Pioneer LDV-1000 Simulator", 0 )
-GAMEL(2008, simpr8210,  0, pr8210,  ldplayer, pr8210_state,  0, ROT0, "MAME", "Pioneer PR-8210 Simulator",  0, layout_pr8210 )
+GAME( 2008, simldv1000, 0, ldv1000, ldplayer, ldv1000_state, empty_init, ROT0, "MAME", "Pioneer LDV-1000 Simulator", 0 )
+GAMEL(2008, simpr8210,  0, pr8210,  ldplayer, pr8210_state,  empty_init, ROT0, "MAME", "Pioneer PR-8210 Simulator",  0, layout_pr8210 )

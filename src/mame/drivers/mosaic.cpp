@@ -40,6 +40,7 @@ Unknown 28 pin protection chip (possibly a PIC) at 5A (UC02 as silkscreened on P
 
 #include "cpu/z180/z180.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -121,8 +122,8 @@ void mosaic_state::mosaic_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).rom();
 	map(0x20000, 0x21fff).ram();
-	map(0x22000, 0x22fff).ram().w(this, FUNC(mosaic_state::bgvideoram_w)).share("bgvideoram");
-	map(0x23000, 0x23fff).ram().w(this, FUNC(mosaic_state::fgvideoram_w)).share("fgvideoram");
+	map(0x22000, 0x22fff).ram().w(FUNC(mosaic_state::bgvideoram_w)).share("bgvideoram");
+	map(0x23000, 0x23fff).ram().w(FUNC(mosaic_state::fgvideoram_w)).share("fgvideoram");
 	map(0x24000, 0x241ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 }
 
@@ -130,8 +131,8 @@ void mosaic_state::gfire2_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).rom();
 	map(0x10000, 0x17fff).ram();
-	map(0x22000, 0x22fff).ram().w(this, FUNC(mosaic_state::bgvideoram_w)).share("bgvideoram");
-	map(0x23000, 0x23fff).ram().w(this, FUNC(mosaic_state::fgvideoram_w)).share("fgvideoram");
+	map(0x22000, 0x22fff).ram().w(FUNC(mosaic_state::bgvideoram_w)).share("bgvideoram");
+	map(0x23000, 0x23fff).ram().w(FUNC(mosaic_state::fgvideoram_w)).share("fgvideoram");
 	map(0x24000, 0x241ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 }
 
@@ -141,7 +142,7 @@ void mosaic_state::mosaic_io_map(address_map &map)
 	map(0x00, 0x3f).nopw();    /* Z180 internal registers */
 	map(0x30, 0x30).nopr(); /* Z180 internal registers */
 	map(0x70, 0x71).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x72, 0x72).rw(this, FUNC(mosaic_state::protection_r), FUNC(mosaic_state::protection_w));
+	map(0x72, 0x72).rw(FUNC(mosaic_state::protection_r), FUNC(mosaic_state::protection_w));
 	map(0x74, 0x74).portr("P1");
 	map(0x76, 0x76).portr("P2");
 }
@@ -152,7 +153,7 @@ void mosaic_state::gfire2_io_map(address_map &map)
 	map(0x00, 0x3f).nopw();    /* Z180 internal registers */
 	map(0x30, 0x30).nopr(); /* Z180 internal registers */
 	map(0x70, 0x71).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x72, 0x72).rw(this, FUNC(mosaic_state::gfire2_protection_r), FUNC(mosaic_state::gfire2_protection_w));
+	map(0x72, 0x72).rw(FUNC(mosaic_state::gfire2_protection_r), FUNC(mosaic_state::gfire2_protection_w));
 	map(0x74, 0x74).portr("P1");
 	map(0x76, 0x76).portr("P2");
 }
@@ -261,7 +262,7 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( mosaic )
+static GFXDECODE_START( gfx_mosaic )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 1 )
 GFXDECODE_END
@@ -279,10 +280,10 @@ void mosaic_state::machine_reset()
 MACHINE_CONFIG_START(mosaic_state::mosaic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'288'000)/2)  /* 6.144MHz */
-	MCFG_CPU_PROGRAM_MAP(mosaic_map)
-	MCFG_CPU_IO_MAP(mosaic_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaic_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'288'000)/2)  /* 6.144MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mosaic_map)
+	MCFG_DEVICE_IO_MAP(mosaic_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaic_state,  irq0_line_hold)
 
 
 	/* video hardware */
@@ -294,24 +295,24 @@ MACHINE_CONFIG_START(mosaic_state::mosaic)
 	MCFG_SCREEN_UPDATE_DRIVER(mosaic_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mosaic)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mosaic);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 256);
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'288'000)/4) /* 3.072MHz or 3.579545MHz (14.31818MHz/4)? */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'288'000)/4)); /* 3.072MHz or 3.579545MHz (14.31818MHz/4)? */
+	ymsnd.port_a_read_callback().set_ioport("DSW");
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mosaic_state::gfire2)
 	mosaic(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gfire2_map)
-	MCFG_CPU_IO_MAP(gfire2_io_map)
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gfire2_map)
+	MCFG_DEVICE_IO_MAP(gfire2_io_map)
 MACHINE_CONFIG_END
 
 
@@ -375,6 +376,6 @@ ROM_END
 
 
 
-GAME( 1990, mosaic,  0,      mosaic, mosaic, mosaic_state, 0, ROT0, "Space",                 "Mosaic",         MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mosaica, mosaic, mosaic, mosaic, mosaic_state, 0, ROT0, "Space (Fuuki license)", "Mosaic (Fuuki)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gfire2,  0,      gfire2, gfire2, mosaic_state, 0, ROT0, "Topis Corp",            "Golden Fire II", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mosaic,  0,      mosaic, mosaic, mosaic_state, empty_init, ROT0, "Space",                 "Mosaic",         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mosaica, mosaic, mosaic, mosaic, mosaic_state, empty_init, ROT0, "Space (Fuuki license)", "Mosaic (Fuuki)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gfire2,  0,      gfire2, gfire2, mosaic_state, empty_init, ROT0, "Topis Corp",            "Golden Fire II", MACHINE_SUPPORTS_SAVE )

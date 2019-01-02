@@ -38,6 +38,7 @@
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -45,16 +46,54 @@ class dacholer_state : public driver_device
 {
 public:
 	dacholer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_audiocpu(*this,"audiocpu"),
-		m_msm(*this, "msm"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
-		m_bgvideoram(*this, "bgvideoram"),
-		m_fgvideoram(*this, "fgvideoram"),
-		m_spriteram(*this, "spriteram") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_audiocpu(*this,"audiocpu")
+		, m_msm(*this, "msm")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+		, m_bgvideoram(*this, "bgvideoram")
+		, m_fgvideoram(*this, "fgvideoram")
+		, m_spriteram(*this, "spriteram")
+		, m_leds(*this, "led%u", 0U)
+	{ }
+
+	void itaten(machine_config &config);
+	void dacholer(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
+
+private:
+	DECLARE_WRITE8_MEMBER(bg_scroll_x_w);
+	DECLARE_WRITE8_MEMBER(bg_scroll_y_w);
+	DECLARE_WRITE8_MEMBER(background_w);
+	DECLARE_WRITE8_MEMBER(foreground_w);
+	DECLARE_WRITE8_MEMBER(bg_bank_w);
+	DECLARE_WRITE8_MEMBER(coins_w);
+	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(adpcm_w);
+	DECLARE_WRITE8_MEMBER(snd_ack_w);
+	DECLARE_WRITE8_MEMBER(snd_irq_w);
+	DECLARE_WRITE8_MEMBER(music_irq_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void dacholer_palette(palette_device &palette) const;
+	uint32_t screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(sound_irq);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void itaten_main_map(address_map &map);
+	void itaten_snd_io_map(address_map &map);
+	void itaten_snd_map(address_map &map);
+	void main_io_map(address_map &map);
+	void main_map(address_map &map);
+	void snd_io_map(address_map &map);
+	void snd_map(address_map &map);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -68,6 +107,8 @@ public:
 	required_shared_ptr<uint8_t> m_bgvideoram;
 	required_shared_ptr<uint8_t> m_fgvideoram;
 	required_shared_ptr<uint8_t> m_spriteram;
+
+	output_finder<2> m_leds;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -83,37 +124,6 @@ public:
 	uint8_t m_music_interrupt_enable;
 	uint8_t m_snd_ack;
 
-	DECLARE_WRITE8_MEMBER(bg_scroll_x_w);
-	DECLARE_WRITE8_MEMBER(bg_scroll_y_w);
-	DECLARE_WRITE8_MEMBER(background_w);
-	DECLARE_WRITE8_MEMBER(foreground_w);
-	DECLARE_WRITE8_MEMBER(bg_bank_w);
-	DECLARE_WRITE8_MEMBER(coins_w);
-	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
-	DECLARE_WRITE8_MEMBER(snd_ack_w);
-	DECLARE_WRITE8_MEMBER(snd_irq_w);
-	DECLARE_WRITE8_MEMBER(music_irq_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(dacholer);
-	uint32_t screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(sound_irq);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
-	void itaten(machine_config &config);
-	void dacholer(machine_config &config);
-	void itaten_main_map(address_map &map);
-	void itaten_snd_io_map(address_map &map);
-	void itaten_snd_map(address_map &map);
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
-	void snd_io_map(address_map &map);
-	void snd_map(address_map &map);
 };
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
@@ -223,8 +233,8 @@ WRITE8_MEMBER(dacholer_state::coins_w)
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 
-	output().set_led_value(0, data & 4);
-	output().set_led_value(1, data & 8);
+	m_leds[0] = BIT(data, 2);
+	m_leds[1] = BIT(data, 3);
 }
 
 WRITE8_MEMBER(dacholer_state::main_irq_ack_w)
@@ -237,8 +247,8 @@ void dacholer_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8800, 0x97ff).ram();
-	map(0xc000, 0xc3ff).mirror(0x400).ram().w(this, FUNC(dacholer_state::background_w)).share("bgvideoram");
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(dacholer_state::foreground_w)).share("fgvideoram");
+	map(0xc000, 0xc3ff).mirror(0x400).ram().w(FUNC(dacholer_state::background_w)).share("bgvideoram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(dacholer_state::foreground_w)).share("fgvideoram");
 	map(0xe000, 0xe0ff).ram().share("spriteram");
 }
 
@@ -258,11 +268,11 @@ void dacholer_state::main_io_map(address_map &map)
 	map(0x03, 0x03).portr("DSWA");
 	map(0x04, 0x04).portr("DSWB");
 	map(0x05, 0x05).nopr(); // watchdog in itaten
-	map(0x20, 0x20).w(this, FUNC(dacholer_state::coins_w));
-	map(0x21, 0x21).w(this, FUNC(dacholer_state::bg_bank_w));
-	map(0x22, 0x22).w(this, FUNC(dacholer_state::bg_scroll_x_w));
-	map(0x23, 0x23).w(this, FUNC(dacholer_state::bg_scroll_y_w));
-	map(0x24, 0x24).w(this, FUNC(dacholer_state::main_irq_ack_w));
+	map(0x20, 0x20).w(FUNC(dacholer_state::coins_w));
+	map(0x21, 0x21).w(FUNC(dacholer_state::bg_bank_w));
+	map(0x22, 0x22).w(FUNC(dacholer_state::bg_scroll_x_w));
+	map(0x23, 0x23).w(FUNC(dacholer_state::bg_scroll_y_w));
+	map(0x24, 0x24).w(FUNC(dacholer_state::main_irq_ack_w));
 	map(0x27, 0x27).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
@@ -311,10 +321,10 @@ void dacholer_state::snd_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
-	map(0x04, 0x04).w(this, FUNC(dacholer_state::music_irq_w));
-	map(0x08, 0x08).w(this, FUNC(dacholer_state::snd_irq_w));
-	map(0x0c, 0x0c).w(this, FUNC(dacholer_state::snd_ack_w));
-	map(0x80, 0x80).w(this, FUNC(dacholer_state::adpcm_w));
+	map(0x04, 0x04).w(FUNC(dacholer_state::music_irq_w));
+	map(0x08, 0x08).w(FUNC(dacholer_state::snd_irq_w));
+	map(0x0c, 0x0c).w(FUNC(dacholer_state::snd_ack_w));
+	map(0x80, 0x80).w(FUNC(dacholer_state::adpcm_w));
 	map(0x86, 0x87).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0x8a, 0x8b).w("ay2", FUNC(ay8910_device::data_address_w));
 	map(0x8e, 0x8f).w("ay3", FUNC(ay8910_device::data_address_w));
@@ -559,13 +569,13 @@ static const gfx_layout spritelayout =
 	16*16*4
 };
 
-static GFXDECODE_START( dacholer )
+static GFXDECODE_START( gfx_dacholer )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0x10, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x10, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START( itaten )
+static GFXDECODE_START( gfx_itaten )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0x00, 1 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x10, 1 )
@@ -584,7 +594,7 @@ WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
 {
 	if (m_snd_interrupt_enable == 1 || (m_snd_interrupt_enable == 0 && m_msm_toggle == 1))
 	{
-		m_msm->data_w(m_msm_data >> 4);
+		m_msm->write_data(m_msm_data >> 4);
 		m_msm_data <<= 4;
 		m_msm_toggle ^= 1;
 		if (m_msm_toggle == 0)
@@ -596,6 +606,8 @@ WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
 
 void dacholer_state::machine_start()
 {
+	m_leds.resolve();
+
 	save_item(NAME(m_bg_bank));
 	save_item(NAME(m_msm_data));
 	save_item(NAME(m_msm_toggle));
@@ -615,42 +627,40 @@ void dacholer_state::machine_reset()
 	m_snd_ack = 0;
 }
 
-/* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
-PALETTE_INIT_MEMBER(dacholer_state, dacholer)
+// guess: use the same resistor values as Crazy Climber (needs checking on the real hardware)
+void dacholer_state::dacholer_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances_rg[3] = { 1000, 470, 220 };
-	static const int resistances_b [2] = { 470, 220 };
-	double weights_rg[3], weights_b[2];
-	int i;
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double weights_rg[3], weights_b[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 0,
 			2, resistances_b,  weights_b,  0, 0,
 			0, nullptr, nullptr, 0, 0);
 
-	for (i = 0;i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 6) & 0x01;
-		bit1 = (color_prom[i] >> 7) & 0x01;
-		b = combine_2_weights(weights_b, bit0, bit1);
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_2_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -660,16 +670,15 @@ PALETTE_INIT_MEMBER(dacholer_state, dacholer)
 MACHINE_CONFIG_START(dacholer_state::dacholer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/4)  /* ? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dacholer_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/4)  /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dacholer_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(19'968'000)/8) /* ? */
-	MCFG_CPU_PROGRAM_MAP(snd_map)
-	MCFG_CPU_IO_MAP(snd_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dacholer_state, sound_irq)
-
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(19'968'000)/8) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(snd_map)
+	MCFG_DEVICE_IO_MAP(snd_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dacholer_state, sound_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -678,45 +687,39 @@ MACHINE_CONFIG_START(dacholer_state::dacholer)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(dacholer_state, screen_update_dacholer)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(dacholer_state, dacholer)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dacholer)
-
+	PALETTE(config, m_palette, FUNC(dacholer_state::dacholer_palette), 32);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dacholer);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(19'968'000)/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	AY8910(config, "ay1", XTAL(19'968'000)/16).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(19'968'000)/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	AY8910(config, "ay2", XTAL(19'968'000)/16).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL(19'968'000)/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	AY8910(config, "ay3", XTAL(19'968'000)/16).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(dacholer_state, adpcm_int))          /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dacholer_state, adpcm_int))          /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 = 3906.25Hz playback  - guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dacholer_state::itaten)
 	dacholer(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(itaten_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(itaten_main_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(itaten_snd_map)
-	MCFG_CPU_IO_MAP(itaten_snd_io_map)
-	MCFG_CPU_VBLANK_INT_REMOVE()
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(itaten_snd_map)
+	MCFG_DEVICE_IO_MAP(itaten_snd_io_map)
+	MCFG_DEVICE_VBLANK_INT_REMOVE()
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", itaten)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_itaten)
 
 	MCFG_DEVICE_REMOVE("msm")
 MACHINE_CONFIG_END
@@ -858,6 +861,6 @@ ROM_START( itaten )
 ROM_END
 
 
-GAME( 1983, dacholer, 0, dacholer, dacholer, dacholer_state, 0, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, kickboy,  0, dacholer, kickboy,  dacholer_state, 0, ROT0, "Nichibutsu",         "Kick Boy",               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, itaten,   0, itaten,   itaten,   dacholer_state, 0, ROT0, "Nichibutsu / Alice", "Itazura Tenshi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dacholer, 0, dacholer, dacholer, dacholer_state, empty_init, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, kickboy,  0, dacholer, kickboy,  dacholer_state, empty_init, ROT0, "Nichibutsu",         "Kick Boy",               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, itaten,   0, itaten,   itaten,   dacholer_state, empty_init, ROT0, "Nichibutsu / Alice", "Itazura Tenshi (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -327,22 +327,9 @@ enum
 
 /*********************************************************************/
 
-WRITE8_MEMBER(snk_state::marvins_soundlatch_w)
-{
-	m_marvins_sound_busy_flag = 1;
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
-READ8_MEMBER(snk_state::marvins_soundlatch_r)
-{
-	m_marvins_sound_busy_flag = 0;
-	return m_soundlatch->read(space, 0);
-}
-
 CUSTOM_INPUT_MEMBER(snk_state::marvins_sound_busy)
 {
-	return m_marvins_sound_busy_flag;
+	return m_soundlatch->pending_r() ? 1 : 0;
 }
 
 READ8_MEMBER(snk_state::marvins_sound_nmi_ack_r)
@@ -459,7 +446,6 @@ TIMER_CALLBACK_MEMBER(snk_state::sndirq_update_callback)
 }
 
 
-
 WRITE_LINE_MEMBER(snk_state::ymirq_callback_1 )
 {
 	if (state)
@@ -473,7 +459,6 @@ WRITE_LINE_MEMBER(snk_state::ymirq_callback_2)
 }
 
 
-
 WRITE8_MEMBER(snk_state::snk_soundlatch_w)
 {
 	m_soundlatch->write(space, offset, data);
@@ -484,7 +469,6 @@ CUSTOM_INPUT_MEMBER(snk_state::snk_sound_busy)
 {
 	return (m_sound_status & 4) ? 1 : 0;
 }
-
 
 
 READ8_MEMBER(snk_state::snk_sound_status_r)
@@ -508,7 +492,6 @@ WRITE8_MEMBER(snk_state::snk_sound_status_w)
 }
 
 
-
 READ8_MEMBER(snk_state::tnk3_cmdirq_ack_r)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_CLEAR);
@@ -528,7 +511,6 @@ READ8_MEMBER(snk_state::tnk3_busy_clear_r)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), BUSY_CLEAR);
 	return 0xff;
 }
-
 
 
 /*****************************************************************************
@@ -720,9 +702,8 @@ hand, always returning 0xf inbetween valid values confuses the game.
 
 CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
 {
-	static const char *const ports[] = { "P1ROT", "P2ROT" };
 	int which = (int)(uintptr_t)param;
-	int value = ioport(ports[which])->read();
+	int value = m_rot_io[which]->read();
 
 	if ((m_last_value[which] == 0x5 && value == 0x6) || (m_last_value[which] == 0x6 && value == 0x5))
 	{
@@ -737,7 +718,7 @@ CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
 
 CUSTOM_INPUT_MEMBER(snk_state::gwarb_rotary)
 {
-	if (ioport("JOYSTICK_MODE")->read() == 1)
+	if (m_joymode_io->read() == 1)
 	{
 		return gwar_rotary(field, param);
 	}
@@ -784,12 +765,12 @@ WRITE8_MEMBER(snk_state::countryc_trackball_w)
 
 CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_x)
 {
-	return ioport(m_countryc_trackball ? "TRACKBALLX2" : "TRACKBALLX1")->read();
+	return m_trackball_x_io[m_countryc_trackball]->read();
 }
 
 CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_y)
 {
-	return ioport(m_countryc_trackball ? "TRACKBALLY2" : "TRACKBALLY1")->read();
+	return m_trackball_y_io[m_countryc_trackball]->read();
 }
 
 
@@ -802,14 +783,14 @@ CUSTOM_INPUT_MEMBER(snk_state::snk_bonus_r)
 	switch (bit_mask)
 	{
 		case 0x01:  /* older games : "Occurrence" Dip Switch (DSW2:1) */
-			return ((ioport("BONUS")->read() & bit_mask) >> 0);
+			return ((m_bonus_io->read() & bit_mask) >> 0);
 		case 0xc0:  /* older games : "Bonus Life" Dip Switches (DSW1:7,8) */
-			return ((ioport("BONUS")->read() & bit_mask) >> 6);
+			return ((m_bonus_io->read() & bit_mask) >> 6);
 
 		case 0x04:  /* later games : "Occurrence" Dip Switch (DSW1:3) */
-			return ((ioport("BONUS")->read() & bit_mask) >> 2);
+			return ((m_bonus_io->read() & bit_mask) >> 2);
 		case 0x30:  /* later games : "Bonus Life" Dip Switches (DSW2:5,6) */
-			return ((ioport("BONUS")->read() & bit_mask) >> 4);
+			return ((m_bonus_io->read() & bit_mask) >> 4);
 
 		default:
 			logerror("snk_bonus_r : invalid %02X bit_mask\n",bit_mask);
@@ -822,49 +803,49 @@ CUSTOM_INPUT_MEMBER(snk_state::snk_bonus_r)
 void snk_state::marvins_cpuA_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x6000).w(this, FUNC(snk_state::marvins_palette_bank_w));
+	map(0x6000, 0x6000).w(FUNC(snk_state::marvins_palette_bank_w));
 	map(0x8000, 0x8000).portr("IN0");
 	map(0x8100, 0x8100).portr("IN1");
 	map(0x8200, 0x8200).portr("IN2");
-	map(0x8300, 0x8300).w(this, FUNC(snk_state::marvins_soundlatch_w));
+	map(0x8300, 0x8300).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x8400, 0x8400).portr("DSW1");
 	map(0x8500, 0x8500).portr("DSW2");
-	map(0x8600, 0x8600).w(this, FUNC(snk_state::marvins_flipscreen_w));
-	map(0x8700, 0x8700).rw(this, FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
+	map(0x8600, 0x8600).w(FUNC(snk_state::marvins_flipscreen_w));
+	map(0x8700, 0x8700).rw(FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
 	map(0xc000, 0xcfff).ram().share("spriteram");   // + work ram
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::marvins_fg_videoram_w)).share("fg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::marvins_fg_videoram_w)).share("fg_videoram");
 	map(0xd800, 0xdfff).ram().share("share3");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
 	map(0xe800, 0xefff).ram().share("share5");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
-	map(0xf800, 0xf800).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xf900, 0xf900).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xfa00, 0xfa00).w(this, FUNC(snk_state::snk_fg_scrolly_w));
-	map(0xfb00, 0xfb00).w(this, FUNC(snk_state::snk_fg_scrollx_w));
-	map(0xfc00, 0xfc00).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xfd00, 0xfd00).w(this, FUNC(snk_state::snk_bg_scrollx_w));
-	map(0xfe00, 0xfe00).w(this, FUNC(snk_state::snk_sprite_split_point_w));
-	map(0xff00, 0xff00).w(this, FUNC(snk_state::marvins_scroll_msb_w));
+	map(0xf000, 0xf7ff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
+	map(0xf800, 0xf800).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xf900, 0xf900).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xfa00, 0xfa00).w(FUNC(snk_state::snk_fg_scrolly_w));
+	map(0xfb00, 0xfb00).w(FUNC(snk_state::snk_fg_scrollx_w));
+	map(0xfc00, 0xfc00).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xfd00, 0xfd00).w(FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xfe00, 0xfe00).w(FUNC(snk_state::snk_sprite_split_point_w));
+	map(0xff00, 0xff00).w(FUNC(snk_state::marvins_scroll_msb_w));
 }
 
 void snk_state::marvins_cpuB_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x8700, 0x8700).rw(this, FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
+	map(0x8700, 0x8700).rw(FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
 	map(0xc000, 0xcfff).ram().share("spriteram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::marvins_fg_videoram_w)).share("fg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::marvins_fg_videoram_w)).share("fg_videoram");
 	map(0xd800, 0xdfff).ram().share("share3");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
 	map(0xe800, 0xefff).ram().share("share5");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
-	map(0xf800, 0xf800).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xf900, 0xf900).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xfa00, 0xfa00).w(this, FUNC(snk_state::snk_fg_scrolly_w));
-	map(0xfb00, 0xfb00).w(this, FUNC(snk_state::snk_fg_scrollx_w));
-	map(0xfc00, 0xfc00).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xfd00, 0xfd00).w(this, FUNC(snk_state::snk_bg_scrollx_w));
-	map(0xfe00, 0xfe00).w(this, FUNC(snk_state::snk_sprite_split_point_w));
-	map(0xff00, 0xff00).w(this, FUNC(snk_state::marvins_scroll_msb_w));
+	map(0xf000, 0xf7ff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
+	map(0xf800, 0xf800).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xf900, 0xf900).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xfa00, 0xfa00).w(FUNC(snk_state::snk_fg_scrolly_w));
+	map(0xfb00, 0xfb00).w(FUNC(snk_state::snk_fg_scrollx_w));
+	map(0xfc00, 0xfc00).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xfd00, 0xfd00).w(FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xfe00, 0xfe00).w(FUNC(snk_state::snk_sprite_split_point_w));
+	map(0xff00, 0xff00).w(FUNC(snk_state::marvins_scroll_msb_w));
 }
 
 
@@ -875,46 +856,46 @@ void snk_state::madcrash_cpuA_map(address_map &map)
 	map(0x8000, 0x8000).portr("IN0");
 	map(0x8100, 0x8100).portr("IN1");
 	map(0x8200, 0x8200).portr("IN2");
-	map(0x8300, 0x8300).w(this, FUNC(snk_state::marvins_soundlatch_w));
+	map(0x8300, 0x8300).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x8400, 0x8400).portr("DSW1");
 	map(0x8500, 0x8500).portr("DSW2");
-	map(0x8600, 0x8600).mirror(0xff).w(this, FUNC(snk_state::marvins_flipscreen_w));
-	map(0x8700, 0x8700).rw(this, FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
+	map(0x8600, 0x8600).mirror(0xff).w(FUNC(snk_state::marvins_flipscreen_w));
+	map(0x8700, 0x8700).rw(FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
 	map(0xc000, 0xc7ff).ram().share("spriteram"); // + work ram
-	map(0xc800, 0xc800).mirror(0xff).w(this, FUNC(snk_state::marvins_palette_bank_w));
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
+	map(0xc800, 0xc800).mirror(0xff).w(FUNC(snk_state::marvins_palette_bank_w));
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
 	map(0xd800, 0xdfff).ram().share("share3");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(snk_state::marvins_fg_videoram_w)).share("fg_videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(snk_state::marvins_fg_videoram_w)).share("fg_videoram");
 	map(0xe800, 0xefff).ram().share("share5");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
-	map(0xf800, 0xf800).mirror(0xff).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xf900, 0xf900).mirror(0xff).w(this, FUNC(snk_state::snk_bg_scrollx_w));
-	map(0xfa00, 0xfa00).mirror(0xff).w(this, FUNC(snk_state::snk_sprite_split_point_w));
-	map(0xfb00, 0xfb00).mirror(0xff).w(this, FUNC(snk_state::marvins_scroll_msb_w));
-	map(0xfc00, 0xfc00).mirror(0xff).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xfd00, 0xfd00).mirror(0xff).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xfe00, 0xfe00).mirror(0xff).w(this, FUNC(snk_state::snk_fg_scrolly_w));
-	map(0xff00, 0xff00).mirror(0xff).w(this, FUNC(snk_state::snk_fg_scrollx_w));
+	map(0xf000, 0xf7ff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
+	map(0xf800, 0xf800).mirror(0xff).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xf900, 0xf900).mirror(0xff).w(FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xfa00, 0xfa00).mirror(0xff).w(FUNC(snk_state::snk_sprite_split_point_w));
+	map(0xfb00, 0xfb00).mirror(0xff).w(FUNC(snk_state::marvins_scroll_msb_w));
+	map(0xfc00, 0xfc00).mirror(0xff).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xfd00, 0xfd00).mirror(0xff).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xfe00, 0xfe00).mirror(0xff).w(FUNC(snk_state::snk_fg_scrolly_w));
+	map(0xff00, 0xff00).mirror(0xff).w(FUNC(snk_state::snk_fg_scrollx_w));
 }
 
 void snk_state::madcrash_cpuB_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
-	map(0x8700, 0x8700).w(this, FUNC(snk_state::snk_cpuB_nmi_ack_w));   // vangrd2
-	map(0xa000, 0xa000).w(this, FUNC(snk_state::snk_cpuB_nmi_ack_w));   // madcrash
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(snk_state::marvins_fg_videoram_w)).share("fg_videoram");
+	map(0x8700, 0x8700).w(FUNC(snk_state::snk_cpuB_nmi_ack_w));   // vangrd2
+	map(0xa000, 0xa000).w(FUNC(snk_state::snk_cpuB_nmi_ack_w));   // madcrash
+	map(0xc000, 0xc7ff).ram().w(FUNC(snk_state::marvins_fg_videoram_w)).share("fg_videoram");
 	map(0xc800, 0xcfff).ram().share("share5");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
-	map(0xd800, 0xd800).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xd900, 0xd900).w(this, FUNC(snk_state::snk_bg_scrollx_w));
-	map(0xda00, 0xda00).w(this, FUNC(snk_state::snk_sprite_split_point_w));
-	map(0xdb00, 0xdb00).w(this, FUNC(snk_state::marvins_scroll_msb_w));
-	map(0xdc00, 0xdc00).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xdd00, 0xdd00).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xde00, 0xde00).w(this, FUNC(snk_state::snk_fg_scrolly_w));
-	map(0xdf00, 0xdf00).w(this, FUNC(snk_state::snk_fg_scrollx_w));
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
+	map(0xd800, 0xd800).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xd900, 0xd900).w(FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xda00, 0xda00).w(FUNC(snk_state::snk_sprite_split_point_w));
+	map(0xdb00, 0xdb00).w(FUNC(snk_state::marvins_scroll_msb_w));
+	map(0xdc00, 0xdc00).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xdd00, 0xdd00).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xde00, 0xde00).w(FUNC(snk_state::snk_fg_scrolly_w));
+	map(0xdf00, 0xdf00).w(FUNC(snk_state::snk_fg_scrollx_w));
 	map(0xe000, 0xe7ff).ram().share("spriteram");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
 	map(0xf800, 0xffff).ram().share("share3");
 }
 
@@ -924,47 +905,47 @@ void snk_state::madcrush_cpuA_map(address_map &map)
 	map(0x8000, 0x8000).portr("IN0");
 	map(0x8100, 0x8100).portr("IN1");
 	map(0x8200, 0x8200).portr("IN2");
-	map(0x8300, 0x8300).w(this, FUNC(snk_state::marvins_soundlatch_w));
+	map(0x8300, 0x8300).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x8400, 0x8400).portr("DSW1");
 	map(0x8500, 0x8500).portr("DSW2");
-	map(0x8600, 0x8600).mirror(0xff).w(this, FUNC(snk_state::marvins_flipscreen_w));
-	map(0x8700, 0x8700).rw(this, FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
+	map(0x8600, 0x8600).mirror(0xff).w(FUNC(snk_state::marvins_flipscreen_w));
+	map(0x8700, 0x8700).rw(FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
 	map(0xc000, 0xc7ff).ram().share("spriteram"); // + work ram
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::marvins_fg_videoram_w)).share("fg_videoram");
-	map(0xc800, 0xc800).mirror(0xff).w(this, FUNC(snk_state::marvins_palette_bank_w));
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::marvins_fg_videoram_w)).share("fg_videoram");
+	map(0xc800, 0xc800).mirror(0xff).w(FUNC(snk_state::marvins_palette_bank_w));
 	map(0xd800, 0xdfff).ram().share("share5");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
 	map(0xe800, 0xefff).ram().share("share3");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
-	map(0xf800, 0xf800).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xf900, 0xf900).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xfa00, 0xfa00).w(this, FUNC(snk_state::snk_fg_scrolly_w));
-	map(0xfb00, 0xfb00).w(this, FUNC(snk_state::snk_fg_scrollx_w));
-	map(0xfc00, 0xfc00).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xfd00, 0xfd00).w(this, FUNC(snk_state::snk_bg_scrollx_w));
-	map(0xfe00, 0xfe00).w(this, FUNC(snk_state::snk_sprite_split_point_w));
-	map(0xff00, 0xff00).w(this, FUNC(snk_state::marvins_scroll_msb_w));
+	map(0xf000, 0xf7ff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
+	map(0xf800, 0xf800).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xf900, 0xf900).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xfa00, 0xfa00).w(FUNC(snk_state::snk_fg_scrolly_w));
+	map(0xfb00, 0xfb00).w(FUNC(snk_state::snk_fg_scrollx_w));
+	map(0xfc00, 0xfc00).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xfd00, 0xfd00).w(FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xfe00, 0xfe00).w(FUNC(snk_state::snk_sprite_split_point_w));
+	map(0xff00, 0xff00).w(FUNC(snk_state::marvins_scroll_msb_w));
 }
 
 void snk_state::madcrush_cpuB_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
-	map(0xa000, 0xa000).w(this, FUNC(snk_state::snk_cpuB_nmi_ack_w));
+	map(0xa000, 0xa000).w(FUNC(snk_state::snk_cpuB_nmi_ack_w));
 	map(0xc000, 0xc7ff).ram().share("spriteram");   // + work ram
 	map(0xc800, 0xcfff).ram().share("share5");
-	map(0xc800, 0xc800).mirror(0xff).w(this, FUNC(snk_state::marvins_palette_bank_w));
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::marvins_fg_videoram_w)).share("fg_videoram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram"); // ??
+	map(0xc800, 0xc800).mirror(0xff).w(FUNC(snk_state::marvins_palette_bank_w));
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::marvins_fg_videoram_w)).share("fg_videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram"); // ??
 	map(0xe800, 0xefff).ram().share("share3");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
-	map(0xf800, 0xf800).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xf900, 0xf900).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xfa00, 0xfa00).w(this, FUNC(snk_state::snk_fg_scrolly_w));
-	map(0xfb00, 0xfb00).w(this, FUNC(snk_state::snk_fg_scrollx_w));
-	map(0xfc00, 0xfc00).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xfd00, 0xfd00).w(this, FUNC(snk_state::snk_bg_scrollx_w));
-	map(0xfe00, 0xfe00).w(this, FUNC(snk_state::snk_sprite_split_point_w));
-	map(0xff00, 0xff00).w(this, FUNC(snk_state::marvins_scroll_msb_w));
+	map(0xf000, 0xf7ff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
+	map(0xf800, 0xf800).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xf900, 0xf900).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xfa00, 0xfa00).w(FUNC(snk_state::snk_fg_scrolly_w));
+	map(0xfb00, 0xfb00).w(FUNC(snk_state::snk_fg_scrollx_w));
+	map(0xfc00, 0xfc00).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xfd00, 0xfd00).w(FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xfe00, 0xfe00).w(FUNC(snk_state::snk_sprite_split_point_w));
+	map(0xff00, 0xff00).w(FUNC(snk_state::marvins_scroll_msb_w));
 }
 
 
@@ -974,29 +955,29 @@ void snk_state::jcross_cpuA_map(address_map &map)
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa100, 0xa100).portr("IN1");
 	map(0xa200, 0xa200).portr("IN2");
-	map(0xa300, 0xa300).w(this, FUNC(snk_state::sgladiat_soundlatch_w));
+	map(0xa300, 0xa300).w(FUNC(snk_state::sgladiat_soundlatch_w));
 	map(0xa400, 0xa400).portr("DSW1");
 	map(0xa500, 0xa500).portr("DSW2");
-	map(0xa600, 0xa600).w(this, FUNC(snk_state::sgladiat_flipscreen_w));    // flip screen, bg palette bank
-	map(0xa700, 0xa700).rw(this, FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
-	map(0xd300, 0xd300).w(this, FUNC(snk_state::jcross_scroll_msb_w));
-	map(0xd400, 0xd400).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xd500, 0xd500).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xd600, 0xd600).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xd700, 0xd700).w(this, FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xa600, 0xa600).w(FUNC(snk_state::sgladiat_flipscreen_w));    // flip screen, bg palette bank
+	map(0xa700, 0xa700).rw(FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
+	map(0xd300, 0xd300).w(FUNC(snk_state::jcross_scroll_msb_w));
+	map(0xd400, 0xd400).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xd500, 0xd500).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xd600, 0xd600).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xd700, 0xd700).w(FUNC(snk_state::snk_bg_scrollx_w));
 	map(0xd800, 0xdfff).ram().share("spriteram"); // + work ram
-	map(0xe000, 0xefff).ram().w(this, FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
+	map(0xe000, 0xefff).ram().w(FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
 	map(0xffff, 0xffff).nopw();    // simply a program patch to not write to two not existing video registers?
 }
 
 void snk_state::jcross_cpuB_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xa700, 0xa700).rw(this, FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
+	map(0xa700, 0xa700).rw(FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
 	map(0xc000, 0xc7ff).ram().share("spriteram");
-	map(0xc800, 0xd7ff).ram().w(this, FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
+	map(0xc800, 0xd7ff).ram().w(FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
 }
 
 
@@ -1006,37 +987,37 @@ void snk_state::sgladiat_cpuA_map(address_map &map)
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa100, 0xa100).portr("IN1");
 	map(0xa200, 0xa200).portr("IN2");
-	map(0xa300, 0xa300).w(this, FUNC(snk_state::sgladiat_soundlatch_w));
+	map(0xa300, 0xa300).w(FUNC(snk_state::sgladiat_soundlatch_w));
 	map(0xa400, 0xa400).portr("DSW1");
 	map(0xa500, 0xa500).portr("DSW2");
-	map(0xa600, 0xa600).w(this, FUNC(snk_state::sgladiat_flipscreen_w));    // flip screen, bg palette bank
-	map(0xa700, 0xa700).rw(this, FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
+	map(0xa600, 0xa600).w(FUNC(snk_state::sgladiat_flipscreen_w));    // flip screen, bg palette bank
+	map(0xa700, 0xa700).rw(FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
 	map(0xd200, 0xd200).nopw();    // unknown
-	map(0xd300, 0xd300).w(this, FUNC(snk_state::sgladiat_scroll_msb_w));
-	map(0xd400, 0xd400).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xd500, 0xd500).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xd600, 0xd600).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xd700, 0xd700).w(this, FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xd300, 0xd300).w(FUNC(snk_state::sgladiat_scroll_msb_w));
+	map(0xd400, 0xd400).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xd500, 0xd500).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xd600, 0xd600).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xd700, 0xd700).w(FUNC(snk_state::snk_bg_scrollx_w));
 	map(0xd800, 0xdfff).ram().share("spriteram"); // + work ram
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
 	map(0xe800, 0xefff).ram();
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
+	map(0xf000, 0xf7ff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
 }
 
 void snk_state::sgladiat_cpuB_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xa000, 0xa000).rw(this, FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
-	map(0xa600, 0xa600).w(this, FUNC(snk_state::sgladiat_flipscreen_w));    // flip screen, bg palette bank
+	map(0xa000, 0xa000).rw(FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
+	map(0xa600, 0xa600).w(FUNC(snk_state::sgladiat_flipscreen_w));    // flip screen, bg palette bank
 	map(0xc000, 0xc7ff).ram().share("spriteram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
 	map(0xda00, 0xda00).nopw();    // unknown
-	map(0xdb00, 0xdb00).w(this, FUNC(snk_state::sgladiat_scroll_msb_w));
-	map(0xdc00, 0xdc00).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xdd00, 0xdd00).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xde00, 0xde00).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xdf00, 0xdf00).w(this, FUNC(snk_state::snk_bg_scrollx_w));
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
+	map(0xdb00, 0xdb00).w(FUNC(snk_state::sgladiat_scroll_msb_w));
+	map(0xdc00, 0xdc00).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xdd00, 0xdd00).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xde00, 0xde00).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xdf00, 0xdf00).w(FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xe000, 0xe7ff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
 }
 
 
@@ -1046,28 +1027,28 @@ void snk_state::hal21_cpuA_map(address_map &map)
 	map(0xc000, 0xc000).portr("IN0");
 	map(0xc100, 0xc100).portr("IN1");
 	map(0xc200, 0xc200).portr("IN2");
-	map(0xc300, 0xc300).w(this, FUNC(snk_state::sgladiat_soundlatch_w));
+	map(0xc300, 0xc300).w(FUNC(snk_state::sgladiat_soundlatch_w));
 	map(0xc400, 0xc400).portr("DSW1");
 	map(0xc500, 0xc500).portr("DSW2");
-	map(0xc600, 0xc600).w(this, FUNC(snk_state::hal21_flipscreen_w));   // flip screen, bg tile and palette bank
-	map(0xc700, 0xc700).rw(this, FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
-	map(0xd300, 0xd300).w(this, FUNC(snk_state::jcross_scroll_msb_w));
-	map(0xd400, 0xd400).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xd500, 0xd500).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xd600, 0xd600).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xd700, 0xd700).w(this, FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xc600, 0xc600).w(FUNC(snk_state::hal21_flipscreen_w));   // flip screen, bg tile and palette bank
+	map(0xc700, 0xc700).rw(FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
+	map(0xd300, 0xd300).w(FUNC(snk_state::jcross_scroll_msb_w));
+	map(0xd400, 0xd400).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xd500, 0xd500).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xd600, 0xd600).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xd700, 0xd700).w(FUNC(snk_state::snk_bg_scrollx_w));
 	map(0xe000, 0xe7ff).ram().share("spriteram"); // + work ram
-	map(0xe800, 0xf7ff).ram().w(this, FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
+	map(0xe800, 0xf7ff).ram().w(FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
+	map(0xf800, 0xffff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
 }
 
 void snk_state::hal21_cpuB_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
-	map(0xa000, 0xa000).w(this, FUNC(snk_state::snk_cpuB_nmi_ack_w));
+	map(0xa000, 0xa000).w(FUNC(snk_state::snk_cpuB_nmi_ack_w));
 	map(0xc000, 0xc7ff).ram().share("spriteram");
-	map(0xd000, 0xdfff).ram().w(this, FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
+	map(0xd000, 0xdfff).ram().w(FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
+	map(0xe800, 0xefff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
 }
 
 
@@ -1077,31 +1058,31 @@ void snk_state::aso_cpuA_map(address_map &map)
 	map(0xc000, 0xc000).portr("IN0");
 	map(0xc100, 0xc100).portr("IN1");
 	map(0xc200, 0xc200).portr("IN2");
-	map(0xc400, 0xc400).w(this, FUNC(snk_state::snk_soundlatch_w));
+	map(0xc400, 0xc400).w(FUNC(snk_state::snk_soundlatch_w));
 	map(0xc500, 0xc500).portr("DSW1");
 	map(0xc600, 0xc600).portr("DSW2");
-	map(0xc700, 0xc700).rw(this, FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
-	map(0xc800, 0xc800).w(this, FUNC(snk_state::aso_videoattrs_w)); // flip screen, scroll msb
-	map(0xc900, 0xc900).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xca00, 0xca00).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xcb00, 0xcb00).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xcc00, 0xcc00).w(this, FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xc700, 0xc700).rw(FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
+	map(0xc800, 0xc800).w(FUNC(snk_state::aso_videoattrs_w)); // flip screen, scroll msb
+	map(0xc900, 0xc900).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xca00, 0xca00).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xcb00, 0xcb00).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xcc00, 0xcc00).w(FUNC(snk_state::snk_bg_scrollx_w));
 	map(0xce00, 0xce00).nopw();    // always 05?
-	map(0xcf00, 0xcf00).w(this, FUNC(snk_state::aso_bg_bank_w));    // tile and palette bank
+	map(0xcf00, 0xcf00).w(FUNC(snk_state::aso_bg_bank_w));    // tile and palette bank
 	map(0xd800, 0xdfff).ram().share("share1");
 	map(0xe000, 0xe7ff).ram().share("spriteram");   // + work ram
-	map(0xe800, 0xf7ff).ram().w(this, FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
+	map(0xe800, 0xf7ff).ram().w(FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
+	map(0xf800, 0xffff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
 }
 
 void snk_state::aso_cpuB_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc000).rw(this, FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
+	map(0xc000, 0xc000).rw(FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
 	map(0xc800, 0xcfff).ram().share("share1");
 	map(0xd000, 0xd7ff).ram().share("spriteram");
-	map(0xd800, 0xe7ff).ram().w(this, FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
+	map(0xd800, 0xe7ff).ram().w(FUNC(snk_state::marvins_bg_videoram_w)).share("bg_videoram");
+	map(0xf800, 0xffff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
 }
 
 
@@ -1113,31 +1094,38 @@ void snk_state::tnk3_cpuA_map(address_map &map)
 	map(0xc200, 0xc200).portr("IN2");
 	// c300 is an input in tnk3, output in athena/fitegolf (coin counter)
 	// and in countryc (trackball select) (see DRIVER_INIT).
-	map(0xc300, 0xc300).portr("IN3").w(this, FUNC(snk_state::athena_coin_counter_w));
-	map(0xc400, 0xc400).w(this, FUNC(snk_state::snk_soundlatch_w));
+	map(0xc300, 0xc300).portr("IN3").w(FUNC(snk_state::athena_coin_counter_w));
+	map(0xc400, 0xc400).w(FUNC(snk_state::snk_soundlatch_w));
 	map(0xc500, 0xc500).portr("DSW1");
 	map(0xc600, 0xc600).portr("DSW2");
-	map(0xc700, 0xc700).rw(this, FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
-	map(0xc800, 0xc800).w(this, FUNC(snk_state::tnk3_videoattrs_w));    // flip screen, char bank, scroll msb
-	map(0xc900, 0xc900).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xca00, 0xca00).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xcb00, 0xcb00).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xcc00, 0xcc00).w(this, FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xc700, 0xc700).rw(FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
+	map(0xc800, 0xc800).w(FUNC(snk_state::tnk3_videoattrs_w));    // flip screen, char bank, scroll msb
+	map(0xc900, 0xc900).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xca00, 0xca00).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xcb00, 0xcb00).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xcc00, 0xcc00).w(FUNC(snk_state::snk_bg_scrollx_w));
 	map(0xcf00, 0xcf00).nopw();    // fitegolf/countryc only. Either 0 or 1. Video related?
 	map(0xd000, 0xd7ff).ram().share("spriteram"); // + work ram
-	map(0xd800, 0xf7ff).ram().w(this, FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
+	map(0xd800, 0xf7ff).ram().w(FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
+	map(0xf800, 0xffff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
+}
+
+// replace coin counter with trackball select
+void snk_state::countryc_cpuA_map(address_map &map)
+{
+	tnk3_cpuA_map(map);
+	map(0xc300, 0xc300).portr("IN3").w(FUNC(snk_state::countryc_trackball_w));
 }
 
 void snk_state::tnk3_cpuB_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc000).rw(this, FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));   // tnk3, athena
-	map(0xc700, 0xc700).rw(this, FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));   // fitegolf
+	map(0xc000, 0xc000).rw(FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));   // tnk3, athena
+	map(0xc700, 0xc700).rw(FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));   // fitegolf
 	map(0xc800, 0xcfff).ram().share("spriteram");
-	map(0xd000, 0xefff).ram().w(this, FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
+	map(0xd000, 0xefff).ram().w(FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
 	map(0xf000, 0xf7ff).ram();
-	map(0xf800, 0xffff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
+	map(0xf800, 0xffff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
 }
 
 
@@ -1147,54 +1135,54 @@ void snk_state::ikari_cpuA_map(address_map &map)
 	map(0xc000, 0xc000).portr("IN0");
 	map(0xc100, 0xc100).portr("IN1");
 	map(0xc200, 0xc200).portr("IN2");
-	map(0xc300, 0xc300).portr("IN3").w(this, FUNC(snk_state::ikari_coin_counter_w)); // ikarijp doesn't use the coin counter
-	map(0xc400, 0xc400).w(this, FUNC(snk_state::snk_soundlatch_w));
+	map(0xc300, 0xc300).portr("IN3").w(FUNC(snk_state::ikari_coin_counter_w)); // ikarijp doesn't use the coin counter
+	map(0xc400, 0xc400).w(FUNC(snk_state::snk_soundlatch_w));
 	map(0xc500, 0xc500).portr("DSW1");
 	map(0xc600, 0xc600).portr("DSW2");
-	map(0xc700, 0xc700).rw(this, FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
-	map(0xc800, 0xc800).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xc880, 0xc880).w(this, FUNC(snk_state::snk_bg_scrollx_w));
-	map(0xc900, 0xc900).w(this, FUNC(snk_state::ikari_bg_scroll_msb_w));
-	map(0xc980, 0xc980).w(this, FUNC(snk_state::ikari_unknown_video_w));
-	map(0xca00, 0xca00).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xca80, 0xca80).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xcb00, 0xcb00).w(this, FUNC(snk_state::snk_sp32_scrolly_w));
-	map(0xcb80, 0xcb80).w(this, FUNC(snk_state::snk_sp32_scrollx_w));
-	map(0xcc00, 0xcc00).w(this, FUNC(snk_state::hardflags_scrolly_w));
-	map(0xcc80, 0xcc80).w(this, FUNC(snk_state::hardflags_scrollx_w));
-	map(0xcd00, 0xcd00).w(this, FUNC(snk_state::ikari_sp_scroll_msb_w));
-	map(0xcd80, 0xcd80).w(this, FUNC(snk_state::hardflags_scroll_msb_w));
-	map(0xce00, 0xce00).r(this, FUNC(snk_state::hardflags1_r));
-	map(0xce20, 0xce20).r(this, FUNC(snk_state::hardflags2_r));
-	map(0xce40, 0xce40).r(this, FUNC(snk_state::hardflags3_r));
-	map(0xce60, 0xce60).r(this, FUNC(snk_state::hardflags4_r));
-	map(0xce80, 0xce80).r(this, FUNC(snk_state::hardflags5_r));
-	map(0xcea0, 0xcea0).r(this, FUNC(snk_state::hardflags6_r));
-	map(0xcee0, 0xcee0).r(this, FUNC(snk_state::hardflags7_r));
+	map(0xc700, 0xc700).rw(FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
+	map(0xc800, 0xc800).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xc880, 0xc880).w(FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xc900, 0xc900).w(FUNC(snk_state::ikari_bg_scroll_msb_w));
+	map(0xc980, 0xc980).w(FUNC(snk_state::ikari_unknown_video_w));
+	map(0xca00, 0xca00).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xca80, 0xca80).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xcb00, 0xcb00).w(FUNC(snk_state::snk_sp32_scrolly_w));
+	map(0xcb80, 0xcb80).w(FUNC(snk_state::snk_sp32_scrollx_w));
+	map(0xcc00, 0xcc00).w(FUNC(snk_state::hardflags_scrolly_w));
+	map(0xcc80, 0xcc80).w(FUNC(snk_state::hardflags_scrollx_w));
+	map(0xcd00, 0xcd00).w(FUNC(snk_state::ikari_sp_scroll_msb_w));
+	map(0xcd80, 0xcd80).w(FUNC(snk_state::hardflags_scroll_msb_w));
+	map(0xce00, 0xce00).r(FUNC(snk_state::hardflags1_r));
+	map(0xce20, 0xce20).r(FUNC(snk_state::hardflags2_r));
+	map(0xce40, 0xce40).r(FUNC(snk_state::hardflags3_r));
+	map(0xce60, 0xce60).r(FUNC(snk_state::hardflags4_r));
+	map(0xce80, 0xce80).r(FUNC(snk_state::hardflags5_r));
+	map(0xcea0, 0xcea0).r(FUNC(snk_state::hardflags6_r));
+	map(0xcee0, 0xcee0).r(FUNC(snk_state::hardflags7_r));
 	// note the mirror. ikari and victroad use d800, ikarijp uses d000
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::snk_bg_videoram_w)).mirror(0x0800).share("bg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::snk_bg_videoram_w)).mirror(0x0800).share("bg_videoram");
 	map(0xe000, 0xf7ff).ram().share("spriteram");   // + work ram
-	map(0xf800, 0xffff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
+	map(0xf800, 0xffff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
 }
 
 void snk_state::ikari_cpuB_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc000).rw(this, FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
-	map(0xc980, 0xc980).w(this, FUNC(snk_state::ikari_unknown_video_w));
-	map(0xcc00, 0xcc00).w(this, FUNC(snk_state::hardflags_scrolly_w));
-	map(0xcc80, 0xcc80).w(this, FUNC(snk_state::hardflags_scrollx_w));
-	map(0xcd80, 0xcd80).w(this, FUNC(snk_state::hardflags_scroll_msb_w));
-	map(0xce00, 0xce00).r(this, FUNC(snk_state::hardflags1_r));
-	map(0xce20, 0xce20).r(this, FUNC(snk_state::hardflags2_r));
-	map(0xce40, 0xce40).r(this, FUNC(snk_state::hardflags3_r));
-	map(0xce60, 0xce60).r(this, FUNC(snk_state::hardflags4_r));
-	map(0xce80, 0xce80).r(this, FUNC(snk_state::hardflags5_r));
-	map(0xcea0, 0xcea0).r(this, FUNC(snk_state::hardflags6_r));
-	map(0xcee0, 0xcee0).r(this, FUNC(snk_state::hardflags7_r));
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::snk_bg_videoram_w)).mirror(0x0800).share("bg_videoram");
+	map(0xc000, 0xc000).rw(FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
+	map(0xc980, 0xc980).w(FUNC(snk_state::ikari_unknown_video_w));
+	map(0xcc00, 0xcc00).w(FUNC(snk_state::hardflags_scrolly_w));
+	map(0xcc80, 0xcc80).w(FUNC(snk_state::hardflags_scrollx_w));
+	map(0xcd80, 0xcd80).w(FUNC(snk_state::hardflags_scroll_msb_w));
+	map(0xce00, 0xce00).r(FUNC(snk_state::hardflags1_r));
+	map(0xce20, 0xce20).r(FUNC(snk_state::hardflags2_r));
+	map(0xce40, 0xce40).r(FUNC(snk_state::hardflags3_r));
+	map(0xce60, 0xce60).r(FUNC(snk_state::hardflags4_r));
+	map(0xce80, 0xce80).r(FUNC(snk_state::hardflags5_r));
+	map(0xcea0, 0xcea0).r(FUNC(snk_state::hardflags6_r));
+	map(0xcee0, 0xcee0).r(FUNC(snk_state::hardflags7_r));
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::snk_bg_videoram_w)).mirror(0x0800).share("bg_videoram");
 	map(0xe000, 0xf7ff).ram().share("spriteram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
+	map(0xf800, 0xffff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
 }
 
 
@@ -1204,62 +1192,62 @@ void snk_state::bermudat_cpuA_map(address_map &map)
 	map(0xc000, 0xc000).portr("IN0");
 	map(0xc100, 0xc100).portr("IN1");
 	map(0xc200, 0xc200).portr("IN2");
-	map(0xc300, 0xc300).portr("IN3").w(this, FUNC(snk_state::ikari_coin_counter_w));
-	map(0xc400, 0xc400).w(this, FUNC(snk_state::snk_soundlatch_w));
+	map(0xc300, 0xc300).portr("IN3").w(FUNC(snk_state::ikari_coin_counter_w));
+	map(0xc400, 0xc400).w(FUNC(snk_state::snk_soundlatch_w));
 	map(0xc500, 0xc500).portr("DSW1");
 	map(0xc600, 0xc600).portr("DSW2");
-	map(0xc700, 0xc700).rw(this, FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
-	map(0xc800, 0xc800).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xc840, 0xc840).w(this, FUNC(snk_state::snk_bg_scrollx_w));
-	map(0xc880, 0xc880).w(this, FUNC(snk_state::gwara_videoattrs_w));   // flip screen, scroll msb
-	map(0xc8c0, 0xc8c0).w(this, FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
-	map(0xc900, 0xc900).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xc940, 0xc940).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xc980, 0xc980).w(this, FUNC(snk_state::snk_sp32_scrolly_w));
-	map(0xc9c0, 0xc9c0).w(this, FUNC(snk_state::snk_sp32_scrollx_w));
+	map(0xc700, 0xc700).rw(FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
+	map(0xc800, 0xc800).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xc840, 0xc840).w(FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xc880, 0xc880).w(FUNC(snk_state::gwara_videoattrs_w));   // flip screen, scroll msb
+	map(0xc8c0, 0xc8c0).w(FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
+	map(0xc900, 0xc900).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xc940, 0xc940).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xc980, 0xc980).w(FUNC(snk_state::snk_sp32_scrolly_w));
+	map(0xc9c0, 0xc9c0).w(FUNC(snk_state::snk_sp32_scrollx_w));
 	// the "turbo check" addresses are only used by bermudat/bermudaj, not bermudaa/worldwar or the other games
-	map(0xca00, 0xca00).w(this, FUNC(snk_state::turbocheck16_1_w));
-	map(0xca40, 0xca40).w(this, FUNC(snk_state::turbocheck16_2_w));
-	map(0xca80, 0xca80).w(this, FUNC(snk_state::gwara_sp_scroll_msb_w));
-	map(0xcac0, 0xcac0).w(this, FUNC(snk_state::snk_sprite_split_point_w));
-	map(0xcb00, 0xcb00).r(this, FUNC(snk_state::turbocheck16_1_r));
-	map(0xcb10, 0xcb10).r(this, FUNC(snk_state::turbocheck16_2_r));
-	map(0xcb20, 0xcb20).r(this, FUNC(snk_state::turbocheck16_3_r));
-	map(0xcb30, 0xcb30).r(this, FUNC(snk_state::turbocheck16_4_r));
-	map(0xcb40, 0xcb40).r(this, FUNC(snk_state::turbocheck16_5_r));
-	map(0xcb50, 0xcb50).r(this, FUNC(snk_state::turbocheck16_6_r));
-	map(0xcb60, 0xcb60).r(this, FUNC(snk_state::turbocheck16_7_r));
-	map(0xcb70, 0xcb70).r(this, FUNC(snk_state::turbocheck16_8_r));
-	map(0xcc00, 0xcc00).w(this, FUNC(snk_state::turbocheck32_1_w));
-	map(0xcc40, 0xcc40).w(this, FUNC(snk_state::turbocheck32_2_w));
-	map(0xcc80, 0xcc80).w(this, FUNC(snk_state::turbocheck_msb_w));
-	map(0xccc0, 0xccc0).r(this, FUNC(snk_state::turbocheck32_1_r));
-	map(0xccd0, 0xccd0).r(this, FUNC(snk_state::turbocheck32_2_r));
-	map(0xcce0, 0xcce0).r(this, FUNC(snk_state::turbocheck32_3_r));
-	map(0xccf0, 0xccf0).r(this, FUNC(snk_state::turbocheck32_4_r));
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
+	map(0xca00, 0xca00).w(FUNC(snk_state::turbocheck16_1_w));
+	map(0xca40, 0xca40).w(FUNC(snk_state::turbocheck16_2_w));
+	map(0xca80, 0xca80).w(FUNC(snk_state::gwara_sp_scroll_msb_w));
+	map(0xcac0, 0xcac0).w(FUNC(snk_state::snk_sprite_split_point_w));
+	map(0xcb00, 0xcb00).r(FUNC(snk_state::turbocheck16_1_r));
+	map(0xcb10, 0xcb10).r(FUNC(snk_state::turbocheck16_2_r));
+	map(0xcb20, 0xcb20).r(FUNC(snk_state::turbocheck16_3_r));
+	map(0xcb30, 0xcb30).r(FUNC(snk_state::turbocheck16_4_r));
+	map(0xcb40, 0xcb40).r(FUNC(snk_state::turbocheck16_5_r));
+	map(0xcb50, 0xcb50).r(FUNC(snk_state::turbocheck16_6_r));
+	map(0xcb60, 0xcb60).r(FUNC(snk_state::turbocheck16_7_r));
+	map(0xcb70, 0xcb70).r(FUNC(snk_state::turbocheck16_8_r));
+	map(0xcc00, 0xcc00).w(FUNC(snk_state::turbocheck32_1_w));
+	map(0xcc40, 0xcc40).w(FUNC(snk_state::turbocheck32_2_w));
+	map(0xcc80, 0xcc80).w(FUNC(snk_state::turbocheck_msb_w));
+	map(0xccc0, 0xccc0).r(FUNC(snk_state::turbocheck32_1_r));
+	map(0xccd0, 0xccd0).r(FUNC(snk_state::turbocheck32_2_r));
+	map(0xcce0, 0xcce0).r(FUNC(snk_state::turbocheck32_3_r));
+	map(0xccf0, 0xccf0).r(FUNC(snk_state::turbocheck32_4_r));
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
 	map(0xd800, 0xdfff).ram().share("share2");
 	map(0xe000, 0xf7ff).ram().share("spriteram");   // + work ram
-	map(0xf800, 0xffff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
+	map(0xf800, 0xffff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
 }
 
 void snk_state::bermudat_cpuB_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc700, 0xc700).rw(this, FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
-	map(0xc800, 0xc800).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xc840, 0xc840).w(this, FUNC(snk_state::snk_bg_scrollx_w));
-	map(0xc880, 0xc880).w(this, FUNC(snk_state::gwara_videoattrs_w));   // flip screen, scroll msb
-	map(0xc8c0, 0xc8c0).w(this, FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
-	map(0xc900, 0xc900).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xc940, 0xc940).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xc980, 0xc980).w(this, FUNC(snk_state::snk_sp32_scrolly_w));
-	map(0xc9c0, 0xc9c0).w(this, FUNC(snk_state::snk_sp32_scrollx_w));
-	map(0xca80, 0xca80).w(this, FUNC(snk_state::gwara_sp_scroll_msb_w));
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
+	map(0xc700, 0xc700).rw(FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
+	map(0xc800, 0xc800).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xc840, 0xc840).w(FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xc880, 0xc880).w(FUNC(snk_state::gwara_videoattrs_w));   // flip screen, scroll msb
+	map(0xc8c0, 0xc8c0).w(FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
+	map(0xc900, 0xc900).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xc940, 0xc940).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xc980, 0xc980).w(FUNC(snk_state::snk_sp32_scrolly_w));
+	map(0xc9c0, 0xc9c0).w(FUNC(snk_state::snk_sp32_scrollx_w));
+	map(0xca80, 0xca80).w(FUNC(snk_state::gwara_sp_scroll_msb_w));
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
 	map(0xd800, 0xdfff).ram().share("share2");
 	map(0xe000, 0xf7ff).ram().share("spriteram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
+	map(0xf800, 0xffff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
 }
 
 
@@ -1269,37 +1257,37 @@ void snk_state::gwar_cpuA_map(address_map &map)
 	map(0xc000, 0xc000).portr("IN0");
 	map(0xc100, 0xc100).portr("IN1");
 	map(0xc200, 0xc200).portr("IN2");
-	map(0xc300, 0xc300).portr("IN3").w(this, FUNC(snk_state::ikari_coin_counter_w));
-	map(0xc400, 0xc400).w(this, FUNC(snk_state::snk_soundlatch_w));
+	map(0xc300, 0xc300).portr("IN3").w(FUNC(snk_state::ikari_coin_counter_w));
+	map(0xc400, 0xc400).w(FUNC(snk_state::snk_soundlatch_w));
 	map(0xc500, 0xc500).portr("DSW1");
 	map(0xc600, 0xc600).portr("DSW2");
-	map(0xc700, 0xc700).rw(this, FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
-	map(0xc800, 0xc800).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xc840, 0xc840).w(this, FUNC(snk_state::snk_bg_scrollx_w));
-	map(0xc880, 0xc880).w(this, FUNC(snk_state::gwar_videoattrs_w));    // flip screen, scroll msb
-	map(0xc8c0, 0xc8c0).w(this, FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
-	map(0xc900, 0xc900).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xc940, 0xc940).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xc980, 0xc980).w(this, FUNC(snk_state::snk_sp32_scrolly_w));
-	map(0xc9c0, 0xc9c0).w(this, FUNC(snk_state::snk_sp32_scrollx_w));
+	map(0xc700, 0xc700).rw(FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
+	map(0xc800, 0xc800).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xc840, 0xc840).w(FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xc880, 0xc880).w(FUNC(snk_state::gwar_videoattrs_w));    // flip screen, scroll msb
+	map(0xc8c0, 0xc8c0).w(FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
+	map(0xc900, 0xc900).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xc940, 0xc940).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xc980, 0xc980).w(FUNC(snk_state::snk_sp32_scrolly_w));
+	map(0xc9c0, 0xc9c0).w(FUNC(snk_state::snk_sp32_scrollx_w));
 	map(0xca00, 0xca00).nopw();    // always 0?
 	map(0xca40, 0xca40).nopw();    // always 0?
-	map(0xcac0, 0xcac0).w(this, FUNC(snk_state::snk_sprite_split_point_w));
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
+	map(0xcac0, 0xcac0).w(FUNC(snk_state::snk_sprite_split_point_w));
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
 	map(0xd800, 0xdfff).ram().share("share2");
 	map(0xe000, 0xf7ff).ram().share("spriteram");   // + work ram
-	map(0xf800, 0xffff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
+	map(0xf800, 0xffff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
 }
 
 void snk_state::gwar_cpuB_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc000).rw(this, FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
-	map(0xc8c0, 0xc8c0).w(this, FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
+	map(0xc000, 0xc000).rw(FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
+	map(0xc8c0, 0xc8c0).w(FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
 	map(0xd800, 0xdfff).ram().share("share2");
 	map(0xe000, 0xf7ff).ram().share("spriteram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
+	map(0xf800, 0xffff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
 }
 
 
@@ -1309,36 +1297,36 @@ void snk_state::gwara_cpuA_map(address_map &map)
 	map(0xc000, 0xc000).portr("IN0");
 	map(0xc100, 0xc100).portr("IN1");
 	map(0xc200, 0xc200).portr("IN2");
-	map(0xc300, 0xc300).portr("IN3").w(this, FUNC(snk_state::ikari_coin_counter_w));
-	map(0xc400, 0xc400).w(this, FUNC(snk_state::snk_soundlatch_w));
+	map(0xc300, 0xc300).portr("IN3").w(FUNC(snk_state::ikari_coin_counter_w));
+	map(0xc400, 0xc400).w(FUNC(snk_state::snk_soundlatch_w));
 	map(0xc500, 0xc500).portr("DSW1");
 	map(0xc600, 0xc600).portr("DSW2");
-	map(0xc700, 0xc700).rw(this, FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
-	map(0xc800, 0xcfff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
+	map(0xc700, 0xc700).rw(FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
+	map(0xc800, 0xcfff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
 	map(0xd800, 0xdfff).ram().share("share3");
 	map(0xe000, 0xf7ff).ram().share("spriteram");   // + work ram
-	map(0xf800, 0xf800).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xf840, 0xf840).w(this, FUNC(snk_state::snk_bg_scrollx_w));
-	map(0xf880, 0xf880).w(this, FUNC(snk_state::gwara_videoattrs_w));   // flip screen, scroll msb
-	map(0xf8c0, 0xf8c0).w(this, FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
-	map(0xf900, 0xf900).w(this, FUNC(snk_state::snk_sp16_scrolly_w));
-	map(0xf940, 0xf940).w(this, FUNC(snk_state::snk_sp16_scrollx_w));
-	map(0xf980, 0xf980).w(this, FUNC(snk_state::snk_sp32_scrolly_w));
-	map(0xf9c0, 0xf9c0).w(this, FUNC(snk_state::snk_sp32_scrollx_w));
-	map(0xfa80, 0xfa80).w(this, FUNC(snk_state::gwara_sp_scroll_msb_w));
-	map(0xfac0, 0xfac0).w(this, FUNC(snk_state::snk_sprite_split_point_w));
+	map(0xf800, 0xf800).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xf840, 0xf840).w(FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xf880, 0xf880).w(FUNC(snk_state::gwara_videoattrs_w));   // flip screen, scroll msb
+	map(0xf8c0, 0xf8c0).w(FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
+	map(0xf900, 0xf900).w(FUNC(snk_state::snk_sp16_scrolly_w));
+	map(0xf940, 0xf940).w(FUNC(snk_state::snk_sp16_scrollx_w));
+	map(0xf980, 0xf980).w(FUNC(snk_state::snk_sp32_scrolly_w));
+	map(0xf9c0, 0xf9c0).w(FUNC(snk_state::snk_sp32_scrollx_w));
+	map(0xfa80, 0xfa80).w(FUNC(snk_state::gwara_sp_scroll_msb_w));
+	map(0xfac0, 0xfac0).w(FUNC(snk_state::snk_sprite_split_point_w));
 }
 
 void snk_state::gwara_cpuB_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc000).rw(this, FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
-	map(0xc800, 0xcfff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
+	map(0xc000, 0xc000).rw(FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));
+	map(0xc800, 0xcfff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
 	map(0xd800, 0xdfff).ram().share("share3");
 	map(0xe000, 0xf7ff).ram().share("spriteram");   // + work ram
-	map(0xf8c0, 0xf8c0).w(this, FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
+	map(0xf8c0, 0xf8c0).w(FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
 }
 
 
@@ -1355,34 +1343,34 @@ void snk_state::tdfever_cpuA_map(address_map &map)
 	map(0xc380, 0xc380).portr("IN7");
 	map(0xc400, 0xc400).portr("IN8");
 	map(0xc480, 0xc480).portr("IN9");
-	map(0xc500, 0xc500).w(this, FUNC(snk_state::snk_soundlatch_w));
+	map(0xc500, 0xc500).w(FUNC(snk_state::snk_soundlatch_w));
 	map(0xc580, 0xc580).portr("DSW1");
 	map(0xc600, 0xc600).portr("DSW2");
-	map(0xc680, 0xc680).w(this, FUNC(snk_state::tdfever_coin_counter_w));
-	map(0xc700, 0xc700).rw(this, FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
-	map(0xc800, 0xc800).w(this, FUNC(snk_state::snk_bg_scrolly_w));
-	map(0xc840, 0xc840).w(this, FUNC(snk_state::snk_bg_scrollx_w));
-	map(0xc880, 0xc880).w(this, FUNC(snk_state::gwara_videoattrs_w));   // flip screen, scroll msb
-	map(0xc8c0, 0xc8c0).w(this, FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
-	map(0xc900, 0xc900).w(this, FUNC(snk_state::tdfever_sp_scroll_msb_w));
-	map(0xc980, 0xc980).w(this, FUNC(snk_state::snk_sp32_scrolly_w));
-	map(0xc9c0, 0xc9c0).w(this, FUNC(snk_state::snk_sp32_scrollx_w));
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
+	map(0xc680, 0xc680).w(FUNC(snk_state::tdfever_coin_counter_w));
+	map(0xc700, 0xc700).rw(FUNC(snk_state::snk_cpuB_nmi_trigger_r), FUNC(snk_state::snk_cpuA_nmi_ack_w));
+	map(0xc800, 0xc800).w(FUNC(snk_state::snk_bg_scrolly_w));
+	map(0xc840, 0xc840).w(FUNC(snk_state::snk_bg_scrollx_w));
+	map(0xc880, 0xc880).w(FUNC(snk_state::gwara_videoattrs_w));   // flip screen, scroll msb
+	map(0xc8c0, 0xc8c0).w(FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
+	map(0xc900, 0xc900).w(FUNC(snk_state::tdfever_sp_scroll_msb_w));
+	map(0xc980, 0xc980).w(FUNC(snk_state::snk_sp32_scrolly_w));
+	map(0xc9c0, 0xc9c0).w(FUNC(snk_state::snk_sp32_scrollx_w));
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
 	map(0xd800, 0xdfff).ram().share("share2");
-	map(0xe000, 0xf7ff).ram().w(this, FUNC(snk_state::tdfever_spriteram_w)).share("spriteram");    // + work ram
-	map(0xf800, 0xffff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
+	map(0xe000, 0xf7ff).ram().w(FUNC(snk_state::tdfever_spriteram_w)).share("spriteram");    // + work ram
+	map(0xf800, 0xffff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");    // + work RAM
 }
 
 void snk_state::tdfever_cpuB_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc000).rw(this, FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));   // tdfever, tdfever2
-	map(0xc700, 0xc700).rw(this, FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));   // fsoccer
-	map(0xc8c0, 0xc8c0).w(this, FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
+	map(0xc000, 0xc000).rw(FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));   // tdfever, tdfever2
+	map(0xc700, 0xc700).rw(FUNC(snk_state::snk_cpuA_nmi_trigger_r), FUNC(snk_state::snk_cpuB_nmi_ack_w));   // fsoccer
+	map(0xc8c0, 0xc8c0).w(FUNC(snk_state::gwar_tx_bank_w));   // char and palette bank
+	map(0xd000, 0xd7ff).ram().w(FUNC(snk_state::snk_bg_videoram_w)).share("bg_videoram");
 	map(0xd800, 0xdfff).ram().share("share2");
-	map(0xe000, 0xf7ff).ram().w(this, FUNC(snk_state::tdfever_spriteram_w)).share("spriteram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
+	map(0xe000, 0xf7ff).ram().w(FUNC(snk_state::tdfever_spriteram_w)).share("spriteram");
+	map(0xf800, 0xffff).ram().w(FUNC(snk_state::snk_tx_videoram_w)).share("tx_videoram");
 }
 
 /***********************************************************************/
@@ -1390,11 +1378,11 @@ void snk_state::tdfever_cpuB_map(address_map &map)
 void snk_state::marvins_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4000).r(this, FUNC(snk_state::marvins_soundlatch_r));
+	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x8002, 0x8007).w("wave", FUNC(snkwave_device::snkwave_w));
 	map(0x8008, 0x8009).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0xa000, 0xa000).r(this, FUNC(snk_state::marvins_sound_nmi_ack_r));
+	map(0xa000, 0xa000).r(FUNC(snk_state::marvins_sound_nmi_ack_r));
 	map(0xe000, 0xe7ff).ram();
 }
 
@@ -1409,8 +1397,8 @@ void snk_state::jcross_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xa000).r(this, FUNC(snk_state::sgladiat_soundlatch_r));
-	map(0xc000, 0xc000).r(this, FUNC(snk_state::sgladiat_sound_nmi_ack_r));
+	map(0xa000, 0xa000).r(FUNC(snk_state::sgladiat_soundlatch_r));
+	map(0xc000, 0xc000).r(FUNC(snk_state::sgladiat_sound_nmi_ack_r));
 	map(0xe000, 0xe001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0xe002, 0xe003).nopw();    // ? always FFFF, snkwave leftover?
 	map(0xe004, 0xe005).w("ay2", FUNC(ay8910_device::address_data_w));
@@ -1419,7 +1407,7 @@ void snk_state::jcross_sound_map(address_map &map)
 void snk_state::jcross_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(snk_state::sgladiat_sound_irq_ack_r));
+	map(0x00, 0x00).r(FUNC(snk_state::sgladiat_sound_irq_ack_r));
 }
 
 
@@ -1427,8 +1415,8 @@ void snk_state::hal21_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xa000).r(this, FUNC(snk_state::sgladiat_soundlatch_r));
-	map(0xc000, 0xc000).r(this, FUNC(snk_state::sgladiat_sound_nmi_ack_r));
+	map(0xa000, 0xa000).r(FUNC(snk_state::sgladiat_soundlatch_r));
+	map(0xc000, 0xc000).r(FUNC(snk_state::sgladiat_sound_nmi_ack_r));
 	map(0xe000, 0xe001).w("ay1", FUNC(ay8910_device::address_data_w));
 //  AM_RANGE(0xe002, 0xe002) AM_WRITENOP    // bitfielded(0-5) details unknown. Filter enable?
 	map(0xe008, 0xe009).w("ay2", FUNC(ay8910_device::address_data_w));
@@ -1446,10 +1434,10 @@ void snk_state::tnk3_YM3526_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xc000, 0xc000).r(this, FUNC(snk_state::tnk3_busy_clear_r));
+	map(0xc000, 0xc000).r(FUNC(snk_state::tnk3_busy_clear_r));
 	map(0xe000, 0xe001).rw("ym1", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
-	map(0xe004, 0xe004).r(this, FUNC(snk_state::tnk3_cmdirq_ack_r));
-	map(0xe006, 0xe006).r(this, FUNC(snk_state::tnk3_ymirq_ack_r));
+	map(0xe004, 0xe004).r(FUNC(snk_state::tnk3_cmdirq_ack_r));
+	map(0xe006, 0xe006).r(FUNC(snk_state::tnk3_ymirq_ack_r));
 }
 
 void snk_state::aso_YM3526_sound_map(address_map &map)
@@ -1457,11 +1445,11 @@ void snk_state::aso_YM3526_sound_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe000, 0xe000).r(this, FUNC(snk_state::tnk3_busy_clear_r));
+	map(0xe000, 0xe000).r(FUNC(snk_state::tnk3_busy_clear_r));
 	map(0xf000, 0xf001).rw("ym1", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
 //  AM_RANGE(0xf002, 0xf002) AM_READNOP unknown
-	map(0xf004, 0xf004).r(this, FUNC(snk_state::tnk3_cmdirq_ack_r));
-	map(0xf006, 0xf006).r(this, FUNC(snk_state::tnk3_ymirq_ack_r));
+	map(0xf004, 0xf004).r(FUNC(snk_state::tnk3_cmdirq_ack_r));
+	map(0xf006, 0xf006).r(FUNC(snk_state::tnk3_ymirq_ack_r));
 }
 
 void snk_state::YM3526_YM3526_sound_map(address_map &map)
@@ -1473,7 +1461,7 @@ void snk_state::YM3526_YM3526_sound_map(address_map &map)
 	map(0xec00, 0xec00).w("ym1", FUNC(ym3526_device::write_port_w));
 	map(0xf000, 0xf000).rw("ym2", FUNC(ym3526_device::status_port_r), FUNC(ym3526_device::control_port_w));
 	map(0xf400, 0xf400).w("ym2", FUNC(ym3526_device::write_port_w));
-	map(0xf800, 0xf800).rw(this, FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
+	map(0xf800, 0xf800).rw(FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
 }
 
 void snk_state::YM3812_sound_map(address_map &map)
@@ -1483,7 +1471,7 @@ void snk_state::YM3812_sound_map(address_map &map)
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe800, 0xe800).rw("ym1", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
 	map(0xec00, 0xec00).w("ym1", FUNC(ym3812_device::write_port_w));
-	map(0xf800, 0xf800).rw(this, FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
+	map(0xf800, 0xf800).rw(FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
 }
 
 void snk_state::YM3526_Y8950_sound_map(address_map &map)
@@ -1495,7 +1483,7 @@ void snk_state::YM3526_Y8950_sound_map(address_map &map)
 	map(0xec00, 0xec00).w("ym1", FUNC(ym3526_device::write_port_w));
 	map(0xf000, 0xf000).rw("ym2", FUNC(y8950_device::status_port_r), FUNC(y8950_device::control_port_w));
 	map(0xf400, 0xf400).w("ym2", FUNC(y8950_device::write_port_w));
-	map(0xf800, 0xf800).rw(this, FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
+	map(0xf800, 0xf800).rw(FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
 }
 
 void snk_state::YM3812_Y8950_sound_map(address_map &map)
@@ -1507,7 +1495,7 @@ void snk_state::YM3812_Y8950_sound_map(address_map &map)
 	map(0xec00, 0xec00).w("ym1", FUNC(ym3812_device::write_port_w));
 	map(0xf000, 0xf000).rw("ym2", FUNC(y8950_device::status_port_r), FUNC(y8950_device::control_port_w));
 	map(0xf400, 0xf400).w("ym2", FUNC(y8950_device::write_port_w));
-	map(0xf800, 0xf800).rw(this, FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
+	map(0xf800, 0xf800).rw(FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
 }
 
 void snk_state::Y8950_sound_map(address_map &map)
@@ -1517,7 +1505,7 @@ void snk_state::Y8950_sound_map(address_map &map)
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xf000, 0xf000).rw("ym2", FUNC(y8950_device::status_port_r), FUNC(y8950_device::control_port_w));
 	map(0xf400, 0xf400).w("ym2", FUNC(y8950_device::write_port_w));
-	map(0xf800, 0xf800).rw(this, FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
+	map(0xf800, 0xf800).rw(FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
 }
 
 /*********************************************************************/
@@ -2656,6 +2644,11 @@ static INPUT_PORTS_START( ikarijpb )
 	// this is accomplished by hooking the joystick input to the rotary input, plus
 	// of course the code is patched to handle that.
 
+	// According to a SNK 40th Anniversary Collection screenshot, this bootleg
+	// came from Korea:
+	// "The idea for Guevara's use of tanks with a human torso poking out of the top
+	// came from a poorly-programmed Korean bootleg of Ikari."
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x21, 0x01, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x42, 0x02, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
@@ -3293,9 +3286,10 @@ static INPUT_PORTS_START( tdfever )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	// TODO: tdfever2 has different dip switches (at least allow continue seems ignored)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, "2 Player Upright" )
 	PORT_DIPSETTING(    0x00, "4 Player Cocktail" )
@@ -3514,9 +3508,9 @@ static const gfx_layout charlayout_4bpp =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
+	{ STEP4(0,1) },
 	{ 4*1, 4*0, 4*3, 4*2, 4*5, 4*4, 4*7, 4*6 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ STEP8(0,4*8) },
 	32*8
 };
 
@@ -3525,11 +3519,10 @@ static const gfx_layout tilelayout_4bpp =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
+	{ STEP4(0,1) },
 	{ 4*1, 4*0, 4*3, 4*2, 4*5, 4*4, 4*7, 4*6,
 		32+4*1, 32+4*0, 32+4*3, 32+4*2, 32+4*5, 32+4*4, 32+4*7, 32+4*6 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-		8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	{ STEP16(0,4*16) },
 	64*16
 };
 
@@ -3539,9 +3532,8 @@ static const gfx_layout spritelayout_3bpp =
 	RGN_FRAC(1,3),
 	3,
 	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 7,6,5,4,3,2,1,0, 15,14,13,12,11,10,9,8 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(8*0+7,-1), STEP8(8*1+7,-1) },
+	{ STEP16(0,16) },
 	16*16
 };
 
@@ -3551,12 +3543,8 @@ static const gfx_layout spritelayout_4bpp =
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{
-		8,9,10,11,12,13,14,15,
-		0,1,2,3,4,5,6,7
-	},
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(8*1,1), STEP8(8*0,1) },
+	{ STEP16(0,16) },
 	16*16
 };
 
@@ -3566,20 +3554,8 @@ static const gfx_layout bigspritelayout_3bpp =
 	RGN_FRAC(1,3),
 	3,
 	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{
-		7,6,5,4,3,2,1,0,
-		15,14,13,12,11,10,9,8,
-		23,22,21,20,19,18,17,16,
-		31,30,29,28,27,26,25,24
-	},
-	{
-		0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32,
-		16*32+0*32, 16*32+1*32, 16*32+2*32, 16*32+3*32,
-		16*32+4*32, 16*32+5*32, 16*32+6*32, 16*32+7*32,
-		16*32+8*32, 16*32+9*32, 16*32+10*32, 16*32+11*32,
-		16*32+12*32, 16*32+13*32, 16*32+14*32, 16*32+15*32,
-	},
+	{ STEP8(8*0+7,-1), STEP8(8*1+7,-1), STEP8(8*2+7,-1), STEP8(8*3+7,-1) },
+	{ STEP32(0,32) },
 	16*32*2
 };
 
@@ -3589,26 +3565,14 @@ static const gfx_layout bigspritelayout_4bpp =
 	RGN_FRAC(1,4),
 	4,
 	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{
-		24,25,26,27,28,29,30,31,
-		16,17,18,19,20,21,22,23,
-		8,9,10,11,12,13,14,15,
-		0,1,2,3,4,5,6,7
-	},
-	{
-		0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32,
-		16*32+0*32, 16*32+1*32, 16*32+2*32, 16*32+3*32,
-		16*32+4*32, 16*32+5*32, 16*32+6*32, 16*32+7*32,
-		16*32+8*32, 16*32+9*32, 16*32+10*32, 16*32+11*32,
-		16*32+12*32, 16*32+13*32, 16*32+14*32, 16*32+15*32,
-	},
+	{ STEP8(8*3,1), STEP8(8*2,1), STEP8(8*1,1), STEP8(8*0,1) },
+	{ STEP32(0,32) },
 	16*32*2
 };
 
 /*********************************************************************/
 
-static GFXDECODE_START( marvins )
+static GFXDECODE_START( gfx_marvins )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,   0x180, 0x080>>4 )
 	GFXDECODE_ENTRY( "fg_tiles",   0, charlayout_4bpp,   0x080, 0x080>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, charlayout_4bpp,   0x100, 0x080>>4 )
@@ -3616,14 +3580,14 @@ static GFXDECODE_START( marvins )
 	/* colors 0x200-0x3ff contain shadows */
 GFXDECODE_END
 
-static GFXDECODE_START( tnk3 )
+static GFXDECODE_START( gfx_tnk3 )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,   0x180, 0x080>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, charlayout_4bpp,   0x080, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp, 0x000, 0x080>>3 )
 	/* colors 0x200-0x3ff contain shadows */
 GFXDECODE_END
 
-static GFXDECODE_START( ikari )
+static GFXDECODE_START( gfx_ikari )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x180, 0x080>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x100, 0x080>>4 )
 	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_3bpp,    0x000, 0x080>>3 )
@@ -3631,14 +3595,14 @@ static GFXDECODE_START( ikari )
 	/* colors 0x200-0x3ff contain shadows */
 GFXDECODE_END
 
-static GFXDECODE_START( gwar )
+static GFXDECODE_START( gfx_gwar )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x000, 0x100>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x300, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_4bpp,    0x100, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp32_tiles", 0, bigspritelayout_4bpp, 0x200, 0x100>>4 )
 GFXDECODE_END
 
-static GFXDECODE_START( tdfever )
+static GFXDECODE_START( gfx_tdfever )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x000, 0x100>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x200, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp32_tiles", 0, bigspritelayout_4bpp, 0x100, 0x100>>4 )
@@ -3647,483 +3611,430 @@ GFXDECODE_END
 
 /**********************************************************************/
 
-MACHINE_CONFIG_START(snk_state::marvins)
-
+void snk_state::marvins(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3360000)   /* 3.36 MHz */
-	MCFG_CPU_PROGRAM_MAP(marvins_cpuA_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 3360000);   /* 3.36 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::marvins_cpuA_map);
+	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("sub", Z80, 3360000)   /* 3.36 MHz */
-	MCFG_CPU_PROGRAM_MAP(marvins_cpuB_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_subcpu, 3360000);    /* 3.36 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::marvins_cpuB_map);
+	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* verified on schematics */
-	MCFG_CPU_PROGRAM_MAP(marvins_sound_map)
-	MCFG_CPU_IO_MAP(marvins_sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(snk_state, nmi_line_assert,  244)  // schematics show a separate 244Hz timer
+	Z80(config, m_audiocpu, 4000000);  /* verified on schematics */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::marvins_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &snk_state::marvins_sound_portmap);
+	m_audiocpu->set_periodic_int(FUNC(snk_state::nmi_line_assert), attotime::from_hz(244));  // schematics show a separate 244Hz timer
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_marvins)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(36*8, 28*8);
+	m_screen->set_visarea(0*8, 36*8-1, 1*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(snk_state::screen_update_marvins));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", marvins)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_marvins);
 
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette, FUNC(snk_state::tnk3_palette), 0x400);
+	m_palette->enable_shadows();
 
-	MCFG_PALETTE_INIT_OWNER(snk_state,tnk3)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,marvins)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000)  /* verified on schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* verified on schematics */
+	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);/* verified on schematics */
+	SNKWAVE(config, "wave", 8000000).add_route(ALL_OUTPUTS, "mono", 0.30);   /* verified on schematics */
+}
 
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000)  /* verified on schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-
-	MCFG_SNKWAVE_ADD("wave", 8000000)   /* verified on schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(snk_state::vangrd2)
+void snk_state::vangrd2(machine_config &config)
+{
 	marvins(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(madcrash_cpuA_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::madcrash_cpuA_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::madcrash_cpuB_map);
+}
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(madcrash_cpuB_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(snk_state::madcrush)
+void snk_state::madcrush(machine_config &config)
+{
 	marvins(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(madcrush_cpuA_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::madcrush_cpuA_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::madcrush_cpuB_map);
+}
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(madcrush_cpuB_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(snk_state::jcross)
-
+void snk_state::jcross(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3350000) /* NOT verified */
-	MCFG_CPU_PROGRAM_MAP(jcross_cpuA_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 3350000); /* NOT verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::jcross_cpuA_map);
+	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("sub", Z80, 3350000) /* NOT verified */
-	MCFG_CPU_PROGRAM_MAP(jcross_cpuB_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_subcpu, 3350000);  /* NOT verified */
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::jcross_cpuB_map);
+	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* NOT verified */
-	MCFG_CPU_PROGRAM_MAP(jcross_sound_map)
-	MCFG_CPU_IO_MAP(jcross_sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(snk_state, irq0_line_assert,  244) // Marvin's frequency, sounds ok
+	Z80(config, m_audiocpu, 4000000); /* NOT verified */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::jcross_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &snk_state::jcross_sound_portmap);
+	m_audiocpu->set_periodic_int(FUNC(snk_state::irq0_line_assert), attotime::from_hz(244)); // Marvin's frequency, sounds ok
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tnk3)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(36*8, 28*8);
+	m_screen->set_visarea(0*8, 36*8-1, 1*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(snk_state::screen_update_tnk3));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tnk3)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tnk3);
 
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette, FUNC(snk_state::tnk3_palette), 0x400);
+	m_palette->enable_shadows();
 
-	MCFG_PALETTE_INIT_OWNER(snk_state,tnk3)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,jcross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000)  /* NOT verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* NOT verified */
+	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* NOT verified */
+}
 
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000)  /* NOT verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(snk_state::sgladiat)
+void snk_state::sgladiat(machine_config &config)
+{
 	jcross(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sgladiat_cpuA_map)
-
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(sgladiat_cpuB_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::sgladiat_cpuA_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::sgladiat_cpuB_map);
 
 	/* video hardware */
 	/* visible area is correct. Debug info is shown in the black bars at the sides
 	   of the screen when the Debug dip switch is on */
 
 	MCFG_VIDEO_START_OVERRIDE(snk_state,sgladiat)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(snk_state::hal21)
+void snk_state::hal21(machine_config &config)
+{
 	jcross(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hal21_cpuA_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::hal21_cpuA_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::hal21_cpuB_map);
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(hal21_cpuB_map)
-
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(hal21_sound_map)
-	MCFG_CPU_IO_MAP(hal21_sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(snk_state, irq0_line_hold,  220) // music tempo, hand tuned
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::hal21_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &snk_state::hal21_sound_portmap);
+	m_audiocpu->set_periodic_int(FUNC(snk_state::irq0_line_hold), attotime::from_hz(220)); // music tempo, hand tuned
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(snk_state,hal21)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(snk_state::tnk3)
-
+void snk_state::tnk3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(13'400'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(tnk3_cpuA_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(13'400'000)/4); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::tnk3_cpuA_map);
+	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(13'400'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(tnk3_cpuB_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_subcpu, XTAL(13'400'000)/4); /* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::tnk3_cpuB_map);
+	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(tnk3_YM3526_sound_map)
+	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::tnk3_YM3526_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tnk3)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(36*8, 28*8);
+	m_screen->set_visarea(0*8, 36*8-1, 1*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(snk_state::screen_update_tnk3));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tnk3)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tnk3);
 
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette, FUNC(snk_state::tnk3_palette), 0x400);
+	m_palette->enable_shadows();
 
-	MCFG_PALETTE_INIT_OWNER(snk_state,tnk3)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,tnk3)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym1(YM3526(config, "ym1", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
+	ym1.add_route(ALL_OUTPUTS, "mono", 2.0);
+}
 
-
-MACHINE_CONFIG_START(snk_state::aso)
+void snk_state::aso(machine_config &config)
+{
 	tnk3(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(aso_cpuA_map)
-
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(aso_cpuB_map)
-
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(aso_YM3526_sound_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::aso_cpuA_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::aso_cpuB_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::aso_YM3526_sound_map);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(snk_state,aso)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(snk_state::athena)
+void snk_state::athena(machine_config &config)
+{
 	tnk3(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(YM3526_YM3526_sound_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_YM3526_sound_map);
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ym2", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_2))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym2.irq_handler().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
+}
 
-
-MACHINE_CONFIG_START(snk_state::fitegolf)
+void snk_state::fitegolf(machine_config &config)
+{
 	tnk3(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("audiocpu")
 	// xtal is 4MHz instead of 8MHz/2 but the end result is the same
-	MCFG_CPU_PROGRAM_MAP(YM3812_sound_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3812_sound_map);
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ym1", YM3812, XTAL(4'000'000)) /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_CONFIG_END
+	ym3812_device &ym1(YM3812(config.replace(), "ym1", XTAL(4'000'000))); /* verified on pcb */
+	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
+	ym1.add_route(ALL_OUTPUTS, "mono", 2.0);
+}
 
-MACHINE_CONFIG_START(snk_state::fitegolf2)
+void snk_state::fitegolf2(machine_config &config)
+{
 	fitegolf(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_fitegolf2)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(snk_state::screen_update_fitegolf2));
+}
 
+void snk_state::countryc(machine_config &config)
+{
+	fitegolf(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::countryc_cpuA_map);
+}
 
-MACHINE_CONFIG_START(snk_state::ikari)
-
+void snk_state::ikari(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(13'400'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(ikari_cpuA_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(13'400'000)/4); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::ikari_cpuA_map);
+	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(13'400'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(ikari_cpuB_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_subcpu, XTAL(13'400'000)/4); /* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::ikari_cpuB_map);
+	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(YM3526_YM3526_sound_map)
+	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_YM3526_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_ikari)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(36*8, 28*8);
+	m_screen->set_visarea(0*8, 36*8-1, 1*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(snk_state::screen_update_ikari));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ikari)
-
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ikari);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x400);
+	m_palette->enable_shadows();
 
 	MCFG_VIDEO_START_OVERRIDE(snk_state,ikari)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+	ym3526_device &ym1(YM3526(config, "ym1", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
+	ym1.add_route(ALL_OUTPUTS, "mono", 2.0);
 
-	MCFG_SOUND_ADD("ym2", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_2))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym2.irq_handler().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
+}
 
-
-MACHINE_CONFIG_START(snk_state::victroad)
+void snk_state::victroad(machine_config &config)
+{
 	ikari(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_Y8950_sound_map);
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ym2", Y8950, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_Y8950_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_2))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_CONFIG_END
+	y8950_device &ym2(Y8950(config.replace(), "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym2.irq().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
+}
 
-
-MACHINE_CONFIG_START(snk_state::bermudat)
-
+void snk_state::bermudat(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(bermudat_cpuA_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::bermudat_cpuA_map);
+	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(bermudat_cpuB_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_subcpu, XTAL(8'000'000)/2); /* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::bermudat_cpuB_map);
+	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map)
+	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_Y8950_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(24000))
+	config.m_minimum_quantum = attotime::from_hz(24000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
 	// this visible area matches the psychos pcb
-	MCFG_SCREEN_SIZE(50*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 50*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_gwar)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_size(50*8, 28*8);
+	m_screen->set_visarea(0*8, 50*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(snk_state::screen_update_gwar));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gwar)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gwar);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x400);
+
 	MCFG_VIDEO_START_OVERRIDE(snk_state,gwar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+	ym3526_device &ym1(YM3526(config, "ym1", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
+	ym1.add_route(ALL_OUTPUTS, "mono", 2.0);
 
-	MCFG_SOUND_ADD("ym2", Y8950, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_Y8950_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_2))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_CONFIG_END
+	y8950_device &ym2(Y8950(config, "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym2.irq().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
+}
 
-
-MACHINE_CONFIG_START(snk_state::psychos)
+void snk_state::psychos(machine_config &config)
+{
 	bermudat(config);
-
-	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(snk_state,psychos)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(snk_state::gwar)
+void snk_state::gwar(machine_config &config)
+{
 	bermudat(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::gwar_cpuA_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::gwar_cpuB_map);
+}
 
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gwar_cpuA_map)
-
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(gwar_cpuB_map)
-
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(snk_state::gwara)
+void snk_state::gwara(machine_config &config)
+{
 	bermudat(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::gwara_cpuA_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::gwara_cpuB_map);
+}
 
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gwara_cpuA_map)
-
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(gwara_cpuB_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(snk_state::chopper1)
+void snk_state::chopper1(machine_config &config)
+{
 	bermudat(config);
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(gwar_cpuB_map)
-
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(YM3812_Y8950_sound_map)
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::gwar_cpuB_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3812_Y8950_sound_map);
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ym1", YM3812, 4000000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3812_device &ym1(YM3812(config.replace(), "ym1", 4000000));
+	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
+	ym1.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(snk_state::choppera)
+void snk_state::choppera(machine_config &config)
+{
 	chopper1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::gwar_cpuA_map);
+}
 
+
+void snk_state::tdfever(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gwar_cpuA_map)
-MACHINE_CONFIG_END
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::tdfever_cpuA_map);
+	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
+	Z80(config, m_subcpu, 4000000);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::tdfever_cpuB_map);
+	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-MACHINE_CONFIG_START(snk_state::tdfever)
+	Z80(config, m_audiocpu, 4000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_Y8950_sound_map);
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(tdfever_cpuA_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
-
-	MCFG_CPU_ADD("sub", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(tdfever_cpuB_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
-
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(50*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 50*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tdfever)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(50*8, 28*8);
+	m_screen->set_visarea(0*8, 50*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(snk_state::screen_update_tdfever));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tdfever)
-
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tdfever);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x400).enable_shadows();
 
 	MCFG_VIDEO_START_OVERRIDE(snk_state,tdfever)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ym1", YM3526, 4000000)
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3526_device &ym1(YM3526(config, "ym1", 4000000));
+	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
+	ym1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_SOUND_ADD("ym2", Y8950, 4000000)
-	MCFG_Y8950_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_2))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	y8950_device &ym2(Y8950(config, "ym2", 4000000));
+	ym2.irq().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(snk_state::tdfever2)
+void snk_state::tdfever2(machine_config &config)
+{
 	tdfever(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(Y8950_sound_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::Y8950_sound_map);
 
 	/* sound hardware */
 
 	// apparently, no "ym1" in tdfever2
 	// (registers are written to but they cause sound not to work)
-	MCFG_DEVICE_REMOVE("ym1")
-MACHINE_CONFIG_END
+	config.device_remove("ym1");
+}
 
 
 /***********************************************************************/
@@ -5035,6 +4946,59 @@ ROM_START( ikaria )
 	ROM_LOAD( "15.rom", 0x18000, 0x8000, CRC(65a61c99) SHA1(767694c919180de208b6211b593db68fc5a66ff1) )
 	ROM_LOAD( "13.rom", 0x20000, 0x8000, CRC(315383d7) SHA1(1c1c5931e3447c4dcbd54fc8ae383b03cb5fbf5b) )
 	ROM_LOAD( "16.rom", 0x28000, 0x8000, CRC(e9b03e07) SHA1(124e5328a965ea2af28c4d74934a82394a2ffd72) )
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "ampal16r6a-a5004.1", 0x0000, 0x0104, CRC(a2e9a162) SHA1(35abf667725abea74d36c76552387e7a1debe75a) )
+	ROM_LOAD( "pal20l8a-a5004.2",   0x0200, 0x0144, CRC(28f2c404) SHA1(d0832ef9e6be6449018f9b224d5f7203820a5135) )
+	ROM_LOAD( "ampal16l8a-a5004.3", 0x0400, 0x0104, CRC(540351f2) SHA1(d9c3aebb839935c8b49678693b87cc2bca2a674d) )
+	ROM_LOAD( "ampal16l8a-a5004.4", 0x0600, 0x0104, CRC(540351f2) SHA1(d9c3aebb839935c8b49678693b87cc2bca2a674d) )
+ROM_END
+
+ROM_START( ikaria2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p1.l4",   0x0000, 0x4000, CRC(9605f856) SHA1(48fcf3a9a9c60428adc8973c051cf6b3098e37b7) ) // 27128
+	ROM_LOAD( "p2.bin",  0x4000, 0x8000, CRC(b585e931) SHA1(6eaf7592b2c42c5992c9fbece62640ad647f86ef) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "p3",  0x0000, 0x4000, CRC(8a9bd1f0) SHA1(dbf855e328daeddd38c64b7af2d303426d13bf3b) )
+	ROM_LOAD( "p4",  0x4000, 0x8000, CRC(f4101cb4) SHA1(cee0eb1cae9f584fb5a866d3a8725f6a3feba912) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ik5",  0x0000, 0x4000, CRC(863448fa) SHA1(19cad05dc9c4495f36e0d8627927ea6d0a971824) )
+	ROM_LOAD( "ik6",  0x4000, 0x8000, CRC(9b16aa57) SHA1(69866ce41c587721702c92ac2e9ba3f6645004cf) )
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "7122er.prm",  0x000, 0x400, CRC(b9bf2c2c) SHA1(8eb62152dcb04f463baf6ec2a66148eb947403ef) )
+	ROM_LOAD( "7122eg.prm",  0x400, 0x400, CRC(0703a770) SHA1(62861ef4987003d4965ef5018ccdf7157981d939) )
+	ROM_LOAD( "7122eb.prm",  0x800, 0x400, CRC(0a11cdde) SHA1(faae17398341317e7afbd06b903b8e9e65967bf1) )
+
+	ROM_REGION( 0x4000, "tx_tiles", 0 )
+	ROM_LOAD( "7.rom",    0x00000, 0x4000, CRC(a7eb4917) SHA1(6c07323cc243df4c5c30bc0daedbff3887309f65) )
+
+	ROM_REGION( 0x20000, "bg_tiles", 0 )
+	ROM_LOAD( "17.rom", 0x00000, 0x8000, CRC(e0dba976) SHA1(5a8f14f7a199b5fb1862debda0bceee42cddac59) )
+	ROM_LOAD( "18.rom", 0x08000, 0x8000, CRC(24947d5f) SHA1(ffd18074ced8171c9da56c839e8289afc29af2c9) )
+	ROM_LOAD( "19.rom", 0x10000, 0x8000, CRC(9ee59e91) SHA1(fe51d13ab73cb596a233669e304b2be66f9becae) )
+	ROM_LOAD( "20.rom", 0x18000, 0x8000, CRC(5da7ec1a) SHA1(4b212c1dfe4c18eced90ee3a783e7edf8d23c906) )
+
+	ROM_REGION( 0x18000, "sp16_tiles", 0 )
+	ROM_LOAD( "8.rom",  0x00000, 0x8000, CRC(9827c14a) SHA1(b54dcee95c6f6e46c187a117b4e7aaf1c0ece6c6) )
+	ROM_LOAD( "9.rom",  0x08000, 0x8000, CRC(545c790c) SHA1(7738738f4a1343b04efd029ecaefac74010451f0) )
+	ROM_LOAD( "10.rom", 0x10000, 0x8000, CRC(ec9ba07e) SHA1(6b492b2cd7b8cca948ce39c3450f1cc153f41d90) )
+
+	ROM_REGION( 0x30000, "sp32_tiles", 0 )
+	ROM_LOAD( "11.rom", 0x00000, 0x8000, CRC(5c75ea8f) SHA1(4e8ee56a2dbeb9ac2dd74bc584dba29433d91ae0) )
+	ROM_LOAD( "14.rom", 0x08000, 0x8000, CRC(3293fde4) SHA1(3e2f0fa00c22f1c0c1427d8d3de57dd9ec7682a9) )
+	ROM_LOAD( "12.rom", 0x10000, 0x8000, CRC(95138498) SHA1(8ac3d2cd793312434b9ffb8c47c30473f713e0e8) )
+	ROM_LOAD( "15.rom", 0x18000, 0x8000, CRC(65a61c99) SHA1(767694c919180de208b6211b593db68fc5a66ff1) )
+	ROM_LOAD( "13.rom", 0x20000, 0x8000, CRC(315383d7) SHA1(1c1c5931e3447c4dcbd54fc8ae383b03cb5fbf5b) )
+	ROM_LOAD( "16.rom", 0x28000, 0x8000, CRC(e9b03e07) SHA1(124e5328a965ea2af28c4d74934a82394a2ffd72) )
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "ampal16r6a-a5004.1", 0x0000, 0x0104, CRC(a2e9a162) SHA1(35abf667725abea74d36c76552387e7a1debe75a) )
+	ROM_LOAD( "pal20l8a-a5004.2",   0x0200, 0x0144, CRC(28f2c404) SHA1(d0832ef9e6be6449018f9b224d5f7203820a5135) )
+	ROM_LOAD( "ampal16l8a-a5004.3", 0x0400, 0x0104, CRC(540351f2) SHA1(d9c3aebb839935c8b49678693b87cc2bca2a674d) )
+	ROM_LOAD( "ampal16l8a-a5004.4", 0x0600, 0x0104, CRC(540351f2) SHA1(d9c3aebb839935c8b49678693b87cc2bca2a674d) )
 ROM_END
 
 ROM_START( ikarinc )
@@ -5352,244 +5316,6 @@ ROM_START( dogosokb )
 	ROM_LOAD( "up03_g5.rom", 0x10000, 0x10000, CRC(aae30cd6) SHA1(9d0d2c0f947387a0924bf0ed73de9305c1625054) )
 ROM_END
 
-/***********************************************************************/
-
-/*
-pals
-----
-Fuse Plot - a6003-3
-?
-
-PAL16L8/A/A-2/A-4
-*
-DD PAL16L8/A/A-2/A-4*
-QP20*
-QF2048*
-G0*
-F0*
-L0     11111111111111111111111111111111*
-L32    11111110111111111111111111111111*
-L64    11111111111111101111111111111011*
-L96    11111111110111101111111111111111*
-L128   00000000000000000000000000000000*
-L160   00000000000000000000000000000000*
-L192   00000000000000000000000000000000*
-L224   00000000000000000000000000000000*
-L256   11111111111111111111111111111111*
-L288   11101111111111111111111111111111*
-L320   10111111111111111111111111111111*
-L352   11111011111111111111111111111111*
-L384   11111111101111111111111111111111*
-L416   00000000000000000000000000000000*
-L448   00000000000000000000000000000000*
-L480   00000000000000000000000000000000*
-L512   11111111111111111111111111111111*
-L544   11111111111111111111111111111110*
-L576   11111111111111111111111111101111*
-L608   11111111111111111111111011111111*
-L640   11111111111111111110111111111111*
-L672   00000000000000000000000000000000*
-L704   00000000000000000000000000000000*
-L736   00000000000000000000000000000000*
-L768   11111111111111111111111111111111*
-L800   11111111111110111111111111111111*
-L832   11111111111111111011111111111111*
-L864   11111111111111111111101111111111*
-L896   11111111111111111111111110111111*
-L928   00000000000000000000000000000000*
-L960   00000000000000000000000000000000*
-L992   00000000000000000000000000000000*
-L1024  00000000000000000000000000000000*
-L1056  00000000000000000000000000000000*
-L1088  00000000000000000000000000000000*
-L1120  00000000000000000000000000000000*
-L1152  00000000000000000000000000000000*
-L1184  00000000000000000000000000000000*
-L1216  00000000000000000000000000000000*
-L1248  00000000000000000000000000000000*
-L1280  00000000000000000000000000000000*
-L1312  00000000000000000000000000000000*
-L1344  00000000000000000000000000000000*
-L1376  00000000000000000000000000000000*
-L1408  00000000000000000000000000000000*
-L1440  00000000000000000000000000000000*
-L1472  00000000000000000000000000000000*
-L1504  00000000000000000000000000000000*
-L1536  00000000000000000000000000000000*
-L1568  00000000000000000000000000000000*
-L1600  00000000000000000000000000000000*
-L1632  00000000000000000000000000000000*
-L1664  00000000000000000000000000000000*
-L1696  00000000000000000000000000000000*
-L1728  00000000000000000000000000000000*
-L1760  00000000000000000000000000000000*
-L1792  11111111111111111111111111111111*
-L1824  11111110111111111111111111111111*
-L1856  11111111111011111111111111110111*
-L1888  11111111111001110111011101111111*
-L1920  00000000000000000000000000000000*
-L1952  00000000000000000000000000000000*
-L1984  00000000000000000000000000000000*
-L2016  00000000000000000000000000000000*
-C57BE*
-?
-
-
-Fuse Plot - a6004-1
-?
-
-PAL16R6B-2/B-4
-*
-DD PAL16R6B-2/B-4*
-QP20*
-QF2048*
-G0*
-F0*
-L0     11111111111111111111111111111111*
-L32    11111111111111111111011111111111*
-L64    11111110111111111111111111111111*
-L96    00000000000000000000000000000000*
-L128   00000000000000000000000000000000*
-L160   00000000000000000000000000000000*
-L192   00000000000000000000000000000000*
-L224   00000000000000000000000000000000*
-L256   01111111011111111111111111111111*
-L288   00000000000000000000000000000000*
-L320   00000000000000000000000000000000*
-L352   00000000000000000000000000000000*
-L384   00000000000000000000000000000000*
-L416   00000000000000000000000000000000*
-L448   00000000000000000000000000000000*
-L480   00000000000000000000000000000000*
-L512   11111111101111111111111111111111*
-L544   00000000000000000000000000000000*
-L576   00000000000000000000000000000000*
-L608   00000000000000000000000000000000*
-L640   00000000000000000000000000000000*
-L672   00000000000000000000000000000000*
-L704   00000000000000000000000000000000*
-L736   00000000000000000000000000000000*
-L768   11111110111101110111101111111111*
-L800   00000000000000000000000000000000*
-L832   00000000000000000000000000000000*
-L864   00000000000000000000000000000000*
-L896   00000000000000000000000000000000*
-L928   00000000000000000000000000000000*
-L960   00000000000000000000000000000000*
-L992   00000000000000000000000000000000*
-L1024  11111101111111110111101111111111*
-L1056  00000000000000000000000000000000*
-L1088  00000000000000000000000000000000*
-L1120  00000000000000000000000000000000*
-L1152  00000000000000000000000000000000*
-L1184  00000000000000000000000000000000*
-L1216  00000000000000000000000000000000*
-L1248  00000000000000000000000000000000*
-L1280  11111101111111111111101111111111*
-L1312  00000000000000000000000000000000*
-L1344  00000000000000000000000000000000*
-L1376  00000000000000000000000000000000*
-L1408  00000000000000000000000000000000*
-L1440  00000000000000000000000000000000*
-L1472  00000000000000000000000000000000*
-L1504  00000000000000000000000000000000*
-L1536  00000000000000000000000000000000*
-L1568  00000000000000000000000000000000*
-L1600  00000000000000000000000000000000*
-L1632  00000000000000000000000000000000*
-L1664  00000000000000000000000000000000*
-L1696  00000000000000000000000000000000*
-L1728  00000000000000000000000000000000*
-L1760  00000000000000000000000000000000*
-L1792  11111111111111111111111111111111*
-L1824  11111101111111111111111110111111*
-L1856  01110111011111111111111111111111*
-L1888  01111111011111111111111110111111*
-L1920  01110101011111111111111111111111*
-L1952  00000000000000000000000000000000*
-L1984  00000000000000000000000000000000*
-L2016  00000000000000000000000000000000*
-C311C*
-?
-
-
-Fuse Plot - a6004-2
-?
-
-PAL20L8A/A-2
-*
-DD PAL20L8A/A-2*
-QP24*
-QF2560*
-G0*
-F0*
-L0     0000000000000000000000000000000000000000*
-L40    0000000000000000000000000000000000000000*
-L80    0000000000000000000000000000000000000000*
-L120   0000000000000000000000000000000000000000*
-L160   0000000000000000000000000000000000000000*
-L200   0000000000000000000000000000000000000000*
-L240   0000000000000000000000000000000000000000*
-L280   0000000000000000000000000000000000000000*
-L320   1111111111111111111111111111111111111111*
-L360   1010011001111011111111111111111111111111*
-L400   1010011010110111111111111111111111111111*
-L440   1111110111111111101110110111011110111111*
-L480   1111110111111111101110110111101101111111*
-L520   0000000000000000000000000000000000000000*
-L560   0000000000000000000000000000000000000000*
-L600   0000000000000000000000000000000000000000*
-L640   1111111111111111111111111111111111111111*
-L680   1010011001110111111111111111111111111111*
-L720   1111110111111111101110110111011101111111*
-L760   0000000000000000000000000000000000000000*
-L800   0000000000000000000000000000000000000000*
-L840   0000000000000000000000000000000000000000*
-L880   0000000000000000000000000000000000000000*
-L920   0000000000000000000000000000000000000000*
-L960   1111111111111111111111111111111111111111*
-L1000  1010101010110111111111111111111111111111*
-L1040  1111110111111111101110111011101101111111*
-L1080  0000000000000000000000000000000000000000*
-L1120  0000000000000000000000000000000000000000*
-L1160  0000000000000000000000000000000000000000*
-L1200  0000000000000000000000000000000000000000*
-L1240  0000000000000000000000000000000000000000*
-L1280  1111111111111111111111111111111111111111*
-L1320  1111111011111111111111111111111111111011*
-L1360  1111110111111111111111111111111111111110*
-L1400  0000000000000000000000000000000000000000*
-L1440  0000000000000000000000000000000000000000*
-L1480  0000000000000000000000000000000000000000*
-L1520  0000000000000000000000000000000000000000*
-L1560  0000000000000000000000000000000000000000*
-L1600  1111111111111111111111111111111111111111*
-L1640  1010101001111011111111111111111111111111*
-L1680  1010101001110111111111111111111111111111*
-L1720  1111110111111111101110111011011110111111*
-L1760  1111110111111111101110111011011101111111*
-L1800  0000000000000000000000000000000000000000*
-L1840  0000000000000000000000000000000000000000*
-L1880  0000000000000000000000000000000000000000*
-L1920  1111111111111111111111111111111111111111*
-L1960  1010011010111011111111111111111111111111*
-L2000  1111110111111111101110110111101110111111*
-L2040  0000000000000000000000000000000000000000*
-L2080  0000000000000000000000000000000000000000*
-L2120  0000000000000000000000000000000000000000*
-L2160  0000000000000000000000000000000000000000*
-L2200  0000000000000000000000000000000000000000*
-L2240  0000000000000000000000000000000000000000*
-L2280  0000000000000000000000000000000000000000*
-L2320  0000000000000000000000000000000000000000*
-L2360  0000000000000000000000000000000000000000*
-L2400  0000000000000000000000000000000000000000*
-L2440  0000000000000000000000000000000000000000*
-L2480  0000000000000000000000000000000000000000*
-L2520  0000000000000000000000000000000000000000*
-C63C0*
-?
-*/
 /***********************************************************************/
 
 ROM_START( bermudat )
@@ -6118,46 +5844,46 @@ ROM_END
 
 ROM_START( chopper )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "kk_01.rom",  0x0000, 0x10000,  CRC(8fa2f839) SHA1(13cfdbeb433aa3e1dc7e7927c00690e02ed08274) )
+	ROM_LOAD( "kk_a_ver2_1.8g",  0x00000, 0x10000, CRC(dc325860) SHA1(89391897e6f31d9c1d3b7f27618f63fe8018d42a) ) /* Verified Ver2, Red "A" stamped on label */
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "kk_04.rom",  0x00000, 0x10000, CRC(004f7d9a) SHA1(4d1c830f69dbf2f1523f9ad7da9b3275fd6b5dfb) )
+	ROM_LOAD( "kk_a_4.6g", 0x00000, 0x10000, CRC(56d10ba3) SHA1(345a80239fd425c7fe1dfec9385c99a307511e00) ) /* Red "A" stamped on label */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "kk_03.rom",  0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
+	ROM_LOAD( "kk_03.3d",  0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )
-	ROM_LOAD( "up03_k1.rom",  0x0000, 0x0400, CRC(7f07a45c) SHA1(f751d01d9c25609195b19643395290dab8b8bc5c) ) /* red */
-	ROM_LOAD( "up03_l1.rom",  0x0400, 0x0400, CRC(15359fc3) SHA1(4ced674fb18b80ebe5fd6459e0fb9542461dbc74) ) /* green */
-	ROM_LOAD( "up03_k2.rom",  0x0800, 0x0400, CRC(79b50f7d) SHA1(41579e498046570a6a74309310b5341fcde9c7de) ) /* blue */
+	ROM_LOAD( "k1.9w",  0x0000, 0x0400, CRC(7f07a45c) SHA1(f751d01d9c25609195b19643395290dab8b8bc5c) ) /* BPROM MMI 63S441N - red */
+	ROM_LOAD( "k3.9u",  0x0400, 0x0400, CRC(15359fc3) SHA1(4ced674fb18b80ebe5fd6459e0fb9542461dbc74) ) /* BPROM MMI 63S441N - green */
+	ROM_LOAD( "k2.9v",  0x0800, 0x0400, CRC(79b50f7d) SHA1(41579e498046570a6a74309310b5341fcde9c7de) ) /* BPROM MMI 63S441N - blue */
 
 	ROM_REGION( 0x8000, "tx_tiles", 0 )
-	ROM_LOAD( "kk_05.rom",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
+	ROM_LOAD( "kk_05.8p",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
 
 	ROM_REGION( 0x40000, "bg_tiles", 0 )
-	ROM_LOAD( "kk_10.rom",  0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
-	ROM_LOAD( "kk_11.rom",  0x10000, 0x10000, CRC(9af4cad0) SHA1(dd8c1a76e6a90661c5442c0a096cb9ffe496d12a) )
-	ROM_LOAD( "kk_12.rom",  0x20000, 0x10000, CRC(02fec778) SHA1(477a3e22f913cc7783d6cbfce86f98fea9eaf3ec) )
-	ROM_LOAD( "kk_13.rom",  0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
+	ROM_LOAD( "kk_10.8y",    0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
+	ROM_LOAD( "kk_a_11.8z",  0x10000, 0x10000, CRC(881ac259) SHA1(6cce41878c9d9712996d4987a9a578f1301b8feb) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_12.8ab", 0x20000, 0x10000, CRC(de96b331) SHA1(725cfe739f7ed0f37eb620d9566bfda1369f4d50) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_13.8ac",   0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
 
 	ROM_REGION( 0x20000, "sp16_tiles", 0 )
-	ROM_LOAD( "kk_09.rom",  0x00000, 0x08000, CRC(653c4342) SHA1(aacb3a7772dcea4c88f0010b3654f4159cfb6a8b) )
-	ROM_LOAD( "kk_08.rom",  0x08000, 0x08000, CRC(2da45894) SHA1(09f1ac544a119c9d3a9eeb0606f35585d35c2d1d) )
-	ROM_LOAD( "kk_07.rom",  0x10000, 0x08000, CRC(a0ebebdf) SHA1(83d8a9ba7b7ffd42e50afb017e4d0d40fe3e2739) )
-	ROM_LOAD( "kk_06.rom",  0x18000, 0x08000, CRC(284fad9e) SHA1(7bb572d7d5983a514e8381954ac89a720b86e9ba) )
+	ROM_LOAD( "kk_a_9.3k",  0x00000, 0x08000, CRC(106c2dcc) SHA1(919497757664c92e9955db50f5096ac81cec33c3) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_8.3l",  0x08000, 0x08000, CRC(d4f88f62) SHA1(ac89ffa83e0e207acce39711b93d94affc61c1cc) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_7.3n",  0x10000, 0x08000, CRC(28ae39f9) SHA1(7d51489b824b76710f6d4434a77f5f2833fcc532) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_6.3p",  0x18000, 0x08000, CRC(16774a36) SHA1(d1207513f790a30eef8802e63cfeeb10321d6ff7) ) /* Red "A" stamped on label */
 
 	ROM_REGION( 0x80000, "sp32_tiles", 0 )
-	ROM_LOAD( "kk_18.rom",  0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
-	ROM_LOAD( "kk_19.rom",  0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
-	ROM_LOAD( "kk_20.rom",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
-	ROM_LOAD( "kk_21.rom",  0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
-	ROM_LOAD( "kk_14.rom",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
-	ROM_LOAD( "kk_15.rom",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
-	ROM_LOAD( "kk_16.rom",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
-	ROM_LOAD( "kk_17.rom",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
+	ROM_LOAD( "kk_18.3ab", 0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
+	ROM_LOAD( "kk_19.2ad", 0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
+	ROM_LOAD( "kk_20.3y",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
+	ROM_LOAD( "kk_21.3aa", 0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
+	ROM_LOAD( "kk_14.3v",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
+	ROM_LOAD( "kk_15.3x",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
+	ROM_LOAD( "kk_16.3s",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
+	ROM_LOAD( "kk_17.3t",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
 
 	ROM_REGION( 0x10000, "ym2", 0 )
-	ROM_LOAD( "kk_02.rom",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
+	ROM_LOAD( "kk_2.3j",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16r6b.2c", 0x0000, 0x0104, CRC(311e5ae6) SHA1(8a3799e1611ac4086dda2755c5ad44c0dc16ff5b) )
@@ -6165,46 +5891,46 @@ ROM_END
 
 ROM_START( choppera )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1a.rom",  0x0000, 0x10000,  CRC(dc325860) SHA1(89391897e6f31d9c1d3b7f27618f63fe8018d42a) )
+	ROM_LOAD( "chpri-1.8g", 0x00000, 0x10000, CRC(a4e6e978) SHA1(dafc2a3da3725344023a09f5bdaedd0e8e1dbbe2) ) /* This set includes the revision "A" roms, so it's atleast Ver1 or later */
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "4a.rom",  0x00000, 0x10000, CRC(56d10ba3) SHA1(345a80239fd425c7fe1dfec9385c99a307511e00) )
+	ROM_LOAD( "kk_a_4.6g",  0x00000, 0x10000, CRC(56d10ba3) SHA1(345a80239fd425c7fe1dfec9385c99a307511e00) ) /* Red "A" stamped on label */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "kk_03.rom",  0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
+	ROM_LOAD( "kk_03.3d",  0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )
-	ROM_LOAD( "up03_k1.rom",  0x0000, 0x0400, CRC(7f07a45c) SHA1(f751d01d9c25609195b19643395290dab8b8bc5c) ) /* red */
-	ROM_LOAD( "up03_l1.rom",  0x0400, 0x0400, CRC(15359fc3) SHA1(4ced674fb18b80ebe5fd6459e0fb9542461dbc74) ) /* green */
-	ROM_LOAD( "up03_k2.rom",  0x0800, 0x0400, CRC(79b50f7d) SHA1(41579e498046570a6a74309310b5341fcde9c7de) ) /* blue */
+	ROM_LOAD( "k1.9w",  0x0000, 0x0400, CRC(7f07a45c) SHA1(f751d01d9c25609195b19643395290dab8b8bc5c) ) /* BPROM MMI 63S441N - red */
+	ROM_LOAD( "k3.9u",  0x0400, 0x0400, CRC(15359fc3) SHA1(4ced674fb18b80ebe5fd6459e0fb9542461dbc74) ) /* BPROM MMI 63S441N - green */
+	ROM_LOAD( "k2.9v",  0x0800, 0x0400, CRC(79b50f7d) SHA1(41579e498046570a6a74309310b5341fcde9c7de) ) /* BPROM MMI 63S441N - blue */
 
 	ROM_REGION( 0x8000, "tx_tiles", 0 )
-	ROM_LOAD( "kk_05.rom",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
+	ROM_LOAD( "kk_05.8p",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
 
 	ROM_REGION( 0x40000, "bg_tiles", 0 )
-	ROM_LOAD( "kk_10.rom",  0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
-	ROM_LOAD( "11a.rom",    0x10000, 0x10000, CRC(881ac259) SHA1(6cce41878c9d9712996d4987a9a578f1301b8feb) )
-	ROM_LOAD( "12a.rom",    0x20000, 0x10000, CRC(de96b331) SHA1(725cfe739f7ed0f37eb620d9566bfda1369f4d50) )
-	ROM_LOAD( "kk_13.rom",  0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
+	ROM_LOAD( "kk_10.8y",    0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
+	ROM_LOAD( "kk_a_11.8z",  0x10000, 0x10000, CRC(881ac259) SHA1(6cce41878c9d9712996d4987a9a578f1301b8feb) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_12.8ab", 0x20000, 0x10000, CRC(de96b331) SHA1(725cfe739f7ed0f37eb620d9566bfda1369f4d50) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_13.8ac",   0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
 
 	ROM_REGION( 0x20000, "sp16_tiles", 0 )
-	ROM_LOAD( "9a.rom",  0x00000, 0x08000, CRC(106c2dcc) SHA1(919497757664c92e9955db50f5096ac81cec33c3) )
-	ROM_LOAD( "8a.rom",  0x08000, 0x08000, CRC(d4f88f62) SHA1(ac89ffa83e0e207acce39711b93d94affc61c1cc) )
-	ROM_LOAD( "7a.rom",  0x10000, 0x08000, CRC(28ae39f9) SHA1(7d51489b824b76710f6d4434a77f5f2833fcc532) )
-	ROM_LOAD( "6a.rom",  0x18000, 0x08000, CRC(16774a36) SHA1(d1207513f790a30eef8802e63cfeeb10321d6ff7) )
+	ROM_LOAD( "kk_a_9.3k",  0x00000, 0x08000, CRC(106c2dcc) SHA1(919497757664c92e9955db50f5096ac81cec33c3) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_8.3l",  0x08000, 0x08000, CRC(d4f88f62) SHA1(ac89ffa83e0e207acce39711b93d94affc61c1cc) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_7.3n",  0x10000, 0x08000, CRC(28ae39f9) SHA1(7d51489b824b76710f6d4434a77f5f2833fcc532) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_6.3p",  0x18000, 0x08000, CRC(16774a36) SHA1(d1207513f790a30eef8802e63cfeeb10321d6ff7) ) /* Red "A" stamped on label */
 
 	ROM_REGION( 0x80000, "sp32_tiles", 0 )
-	ROM_LOAD( "kk_18.rom",  0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
-	ROM_LOAD( "kk_19.rom",  0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
-	ROM_LOAD( "kk_20.rom",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
-	ROM_LOAD( "kk_21.rom",  0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
-	ROM_LOAD( "kk_14.rom",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
-	ROM_LOAD( "kk_15.rom",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
-	ROM_LOAD( "kk_16.rom",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
-	ROM_LOAD( "kk_17.rom",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
+	ROM_LOAD( "kk_18.3ab", 0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
+	ROM_LOAD( "kk_19.2ad", 0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
+	ROM_LOAD( "kk_20.3y",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
+	ROM_LOAD( "kk_21.3aa", 0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
+	ROM_LOAD( "kk_14.3v",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
+	ROM_LOAD( "kk_15.3x",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
+	ROM_LOAD( "kk_16.3s",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
+	ROM_LOAD( "kk_17.3t",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
 
 	ROM_REGION( 0x10000, "ym2", 0 )
-	ROM_LOAD( "kk_02.rom",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
+	ROM_LOAD( "kk_2.3j",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16r6b.2c", 0x0000, 0x0104, CRC(311e5ae6) SHA1(8a3799e1611ac4086dda2755c5ad44c0dc16ff5b) )
@@ -6212,46 +5938,46 @@ ROM_END
 
 ROM_START( chopperb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "chpri-1.bin",  0x0000, 0x10000,  CRC(a4e6e978) SHA1(dafc2a3da3725344023a09f5bdaedd0e8e1dbbe2) )
+	ROM_LOAD( "kk_01.8g",  0x00000, 0x10000, CRC(8fa2f839) SHA1(13cfdbeb433aa3e1dc7e7927c00690e02ed08274) ) /* First / original version without revised A roms */
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "chpri-4.bin",  0x00000, 0x10000, CRC(56d10ba3) SHA1(345a80239fd425c7fe1dfec9385c99a307511e00) )
+	ROM_LOAD( "kk_04.6g",  0x00000, 0x10000, CRC(004f7d9a) SHA1(4d1c830f69dbf2f1523f9ad7da9b3275fd6b5dfb) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "kk_03.rom",  0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
+	ROM_LOAD( "kk_03.3d",  0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )
-	ROM_LOAD( "up03_k1.rom",  0x0000, 0x0400, CRC(7f07a45c) SHA1(f751d01d9c25609195b19643395290dab8b8bc5c) ) /* red */
-	ROM_LOAD( "up03_l1.rom",  0x0400, 0x0400, CRC(15359fc3) SHA1(4ced674fb18b80ebe5fd6459e0fb9542461dbc74) ) /* green */
-	ROM_LOAD( "up03_k2.rom",  0x0800, 0x0400, CRC(79b50f7d) SHA1(41579e498046570a6a74309310b5341fcde9c7de) ) /* blue */
+	ROM_LOAD( "k1.9w",  0x0000, 0x0400, CRC(7f07a45c) SHA1(f751d01d9c25609195b19643395290dab8b8bc5c) ) /* BPROM MMI 63S441N - red */
+	ROM_LOAD( "k3.9u",  0x0400, 0x0400, CRC(15359fc3) SHA1(4ced674fb18b80ebe5fd6459e0fb9542461dbc74) ) /* BPROM MMI 63S441N - green */
+	ROM_LOAD( "k2.9v",  0x0800, 0x0400, CRC(79b50f7d) SHA1(41579e498046570a6a74309310b5341fcde9c7de) ) /* BPROM MMI 63S441N - blue */
 
 	ROM_REGION( 0x8000, "tx_tiles", 0 )
-	ROM_LOAD( "kk_05.rom",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
+	ROM_LOAD( "kk_05.8p",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
 
 	ROM_REGION( 0x40000, "bg_tiles", 0 )
-	ROM_LOAD( "kk_10.rom",    0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
-	ROM_LOAD( "chpri-11.bin", 0x10000, 0x10000, CRC(881ac259) SHA1(6cce41878c9d9712996d4987a9a578f1301b8feb) )
-	ROM_LOAD( "chpri-12.bin", 0x20000, 0x10000, CRC(de96b331) SHA1(725cfe739f7ed0f37eb620d9566bfda1369f4d50) )
-	ROM_LOAD( "kk_13.rom",    0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
+	ROM_LOAD( "kk_10.8y",  0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
+	ROM_LOAD( "kk_11.8z",  0x10000, 0x10000, CRC(9af4cad0) SHA1(dd8c1a76e6a90661c5442c0a096cb9ffe496d12a) )
+	ROM_LOAD( "kk_12.8ab", 0x20000, 0x10000, CRC(02fec778) SHA1(477a3e22f913cc7783d6cbfce86f98fea9eaf3ec) )
+	ROM_LOAD( "kk_13.8ac", 0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
 
 	ROM_REGION( 0x20000, "sp16_tiles", 0 )
-	ROM_LOAD( "chpri-9.bin",  0x00000, 0x08000, CRC(106c2dcc) SHA1(919497757664c92e9955db50f5096ac81cec33c3) )
-	ROM_LOAD( "chpri-8.bin",  0x08000, 0x08000, CRC(d4f88f62) SHA1(ac89ffa83e0e207acce39711b93d94affc61c1cc) )
-	ROM_LOAD( "chpri-7.bin",  0x10000, 0x08000, CRC(28ae39f9) SHA1(7d51489b824b76710f6d4434a77f5f2833fcc532) )
-	ROM_LOAD( "chpri-6.bin",  0x18000, 0x08000, CRC(16774a36) SHA1(d1207513f790a30eef8802e63cfeeb10321d6ff7) )
+	ROM_LOAD( "kk_09.3k",  0x00000, 0x08000, CRC(653c4342) SHA1(aacb3a7772dcea4c88f0010b3654f4159cfb6a8b) )
+	ROM_LOAD( "kk_08.3l",  0x08000, 0x08000, CRC(2da45894) SHA1(09f1ac544a119c9d3a9eeb0606f35585d35c2d1d) )
+	ROM_LOAD( "kk_07.3n",  0x10000, 0x08000, CRC(a0ebebdf) SHA1(83d8a9ba7b7ffd42e50afb017e4d0d40fe3e2739) )
+	ROM_LOAD( "kk_06.3p",  0x18000, 0x08000, CRC(284fad9e) SHA1(7bb572d7d5983a514e8381954ac89a720b86e9ba) )
 
 	ROM_REGION( 0x80000, "sp32_tiles", 0 )
-	ROM_LOAD( "kk_18.rom",  0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
-	ROM_LOAD( "kk_19.rom",  0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
-	ROM_LOAD( "kk_20.rom",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
-	ROM_LOAD( "kk_21.rom",  0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
-	ROM_LOAD( "kk_14.rom",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
-	ROM_LOAD( "kk_15.rom",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
-	ROM_LOAD( "kk_16.rom",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
-	ROM_LOAD( "kk_17.rom",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
+	ROM_LOAD( "kk_18.3ab", 0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
+	ROM_LOAD( "kk_19.2ad", 0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
+	ROM_LOAD( "kk_20.3y",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
+	ROM_LOAD( "kk_21.3aa", 0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
+	ROM_LOAD( "kk_14.3v",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
+	ROM_LOAD( "kk_15.3x",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
+	ROM_LOAD( "kk_16.3s",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
+	ROM_LOAD( "kk_17.3t",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
 
 	ROM_REGION( 0x10000, "ym2", 0 )
-	ROM_LOAD( "kk_02.rom",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
+	ROM_LOAD( "kk_2.3j",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16r6b.2c", 0x0000, 0x0104, CRC(311e5ae6) SHA1(8a3799e1611ac4086dda2755c5ad44c0dc16ff5b) )
@@ -6259,13 +5985,13 @@ ROM_END
 
 ROM_START( legofair )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "up03_m4.rom",  0x0000, 0x10000,  CRC(79a485c0) SHA1(bbf51e7321656b6a04223909d4958ceb4892193a) )
+	ROM_LOAD( "up03_m4.rom", 0x00000, 0x10000, CRC(79a485c0) SHA1(bbf51e7321656b6a04223909d4958ceb4892193a) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "up03_m8.rom",  0x00000, 0x10000, CRC(96d3a4d9) SHA1(e23a06e6117eca14b24de2d6fd48f5aa2a26d3bb) )
+	ROM_LOAD( "up03_m8.rom", 0x00000, 0x10000, CRC(96d3a4d9) SHA1(e23a06e6117eca14b24de2d6fd48f5aa2a26d3bb) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "kk_03.rom",  0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
+	ROM_LOAD( "kk_03.3d",   0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )
 	ROM_LOAD( "up03_k1.rom",  0x0000, 0x0400, CRC(7f07a45c) SHA1(f751d01d9c25609195b19643395290dab8b8bc5c) ) /* red */
@@ -6273,32 +5999,35 @@ ROM_START( legofair )
 	ROM_LOAD( "up03_k2.rom",  0x0800, 0x0400, CRC(79b50f7d) SHA1(41579e498046570a6a74309310b5341fcde9c7de) ) /* blue */
 
 	ROM_REGION( 0x8000, "tx_tiles", 0 )
-	ROM_LOAD( "kk_05.rom",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
+	ROM_LOAD( "kk_05.8p",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
 
 	ROM_REGION( 0x40000, "bg_tiles", 0 )
-	ROM_LOAD( "kk_10.rom",  0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
-	ROM_LOAD( "kk_11.rom",  0x10000, 0x10000, CRC(9af4cad0) SHA1(dd8c1a76e6a90661c5442c0a096cb9ffe496d12a) )
-	ROM_LOAD( "kk_12.rom",  0x20000, 0x10000, CRC(02fec778) SHA1(477a3e22f913cc7783d6cbfce86f98fea9eaf3ec) )
-	ROM_LOAD( "kk_13.rom",  0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
+	ROM_LOAD( "kk_10.8y",  0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
+	ROM_LOAD( "kk_11.8z",  0x10000, 0x10000, CRC(9af4cad0) SHA1(dd8c1a76e6a90661c5442c0a096cb9ffe496d12a) )
+	ROM_LOAD( "kk_12.8ab", 0x20000, 0x10000, CRC(02fec778) SHA1(477a3e22f913cc7783d6cbfce86f98fea9eaf3ec) )
+	ROM_LOAD( "kk_13.8ac", 0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
 
 	ROM_REGION( 0x20000, "sp16_tiles", 0 )
-	ROM_LOAD( "kk_09.rom",  0x00000, 0x08000, CRC(653c4342) SHA1(aacb3a7772dcea4c88f0010b3654f4159cfb6a8b) )
-	ROM_LOAD( "kk_08.rom",  0x08000, 0x08000, CRC(2da45894) SHA1(09f1ac544a119c9d3a9eeb0606f35585d35c2d1d) )
-	ROM_LOAD( "kk_07.rom",  0x10000, 0x08000, CRC(a0ebebdf) SHA1(83d8a9ba7b7ffd42e50afb017e4d0d40fe3e2739) )
-	ROM_LOAD( "kk_06.rom",  0x18000, 0x08000, CRC(284fad9e) SHA1(7bb572d7d5983a514e8381954ac89a720b86e9ba) )
+	ROM_LOAD( "kk_09.3k",  0x00000, 0x08000, CRC(653c4342) SHA1(aacb3a7772dcea4c88f0010b3654f4159cfb6a8b) )
+	ROM_LOAD( "kk_08.3l",  0x08000, 0x08000, CRC(2da45894) SHA1(09f1ac544a119c9d3a9eeb0606f35585d35c2d1d) )
+	ROM_LOAD( "kk_07.3n",  0x10000, 0x08000, CRC(a0ebebdf) SHA1(83d8a9ba7b7ffd42e50afb017e4d0d40fe3e2739) )
+	ROM_LOAD( "kk_06.3p",  0x18000, 0x08000, CRC(284fad9e) SHA1(7bb572d7d5983a514e8381954ac89a720b86e9ba) )
 
 	ROM_REGION( 0x80000, "sp32_tiles", 0 )
-	ROM_LOAD( "kk_18.rom",  0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
-	ROM_LOAD( "kk_19.rom",  0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
-	ROM_LOAD( "kk_20.rom",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
-	ROM_LOAD( "kk_21.rom",  0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
-	ROM_LOAD( "kk_14.rom",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
-	ROM_LOAD( "kk_15.rom",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
-	ROM_LOAD( "kk_16.rom",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
-	ROM_LOAD( "kk_17.rom",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
+	ROM_LOAD( "kk_18.3ab", 0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
+	ROM_LOAD( "kk_19.2ad", 0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
+	ROM_LOAD( "kk_20.3y",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
+	ROM_LOAD( "kk_21.3aa", 0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
+	ROM_LOAD( "kk_14.3v",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
+	ROM_LOAD( "kk_15.3x",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
+	ROM_LOAD( "kk_16.3s",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
+	ROM_LOAD( "kk_17.3t",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
 
 	ROM_REGION( 0x10000, "ym2", 0 )
-	ROM_LOAD( "kk_02.rom",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
+	ROM_LOAD( "kk_2.3j",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "pal16r6b.2c", 0x0000, 0x0104, CRC(311e5ae6) SHA1(8a3799e1611ac4086dda2755c5ad44c0dc16ff5b) )
 ROM_END
 
 /***********************************************************************/
@@ -6572,70 +6301,115 @@ ROM_START( tdfever2 )
 	ROM_LOAD( "td21.7k", 0x30000, 0x10000, CRC(f5a96d8e) SHA1(33bb2c41426449179fc27ee88b2c8db27b4ed1da) )
 ROM_END
 
+ROM_START( tdfever2b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "fa-3.h8", 0x0000,  0x10000, CRC(09647773) SHA1(ab0ef5c65a69ddc57ba0982d52f3fe9d018818f5) ) // on main PCB, 27512
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "fa-1.m3", 0x00000, 0x10000, CRC(6ecfe4f1) SHA1(99bad879b540427738f3585e95a7fa03e54c0436) ) // on main PCB, 27512
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "fa-2.d3", 0x00000, 0x10000, CRC(d14eb61a) SHA1(01f2e8f0eabbeb7a44efc35fc18c0d210bccc146) ) // on main PCB, 27512
+
+	ROM_REGION( 0x0c00, "proms", 0 ) // on main PCB
+	ROM_LOAD( "82s137-1.8e", 0x000, 0x00400, CRC(1593c302) SHA1(46008b03c76547d57e3c8658f5f00321c2463cd5) ) /* red */
+	ROM_LOAD( "82s137-2.8d", 0x400, 0x00400, CRC(ac9df947) SHA1(214855e1015f7b519e336159c6ea62ab1f576353) ) /* green */
+	ROM_LOAD( "82s137-3.9e", 0x800, 0x00400, CRC(73cdf192) SHA1(63d1aa1b00035bbfe5bebd9bc9992a5d6f5abd10) ) /* blue */
+
+	ROM_REGION( 0x8000, "tx_tiles", 0 )
+	ROM_LOAD( "fa-14.f17", 0x0000,  0x8000,  CRC(d6521b0d) SHA1(79aba420b2f039d580892fa34de5d63be1a4f222) ) // on sub board, 27256
+
+	ROM_REGION( 0x60000, "bg_tiles", 0 ) // on sub board, all 27512, fa-19 and fa-20 are piggy-backed at b12
+	ROM_LOAD( "fa-15.b5",   0x00000, 0x10000, CRC(ad6e0927) SHA1(dd1c346fbf908af7b3e314f416937f48ade6af4c) )
+	ROM_LOAD( "fa-16.b7",   0x10000, 0x10000, CRC(181db036) SHA1(2c5ed172950fce1467517490a8ab3b7ac6594121) )
+	ROM_LOAD( "fa-17.b9",   0x20000, 0x10000, CRC(c5decca3) SHA1(12aff8adc0ad2bf903122ad065d182692d32fb7a) )
+	ROM_LOAD( "fa-18.b10", 0x30000, 0x10000, CRC(1f275a1c) SHA1(6d1a65d20d580ce093a1bf0c8c729a487239901b) )
+	ROM_LOAD( "fa-19.b12", 0x40000, 0x10000, CRC(f1081329) SHA1(efcc210d50923a8c9125227c741ba4b71cd9f688) )
+	ROM_LOAD( "fa-20.b12", 0x50000, 0x10000, CRC(cb152997) SHA1(776065ca3efcce17510a0ac08a49c4c1d0bad663) )
+
+	ROM_REGION( 0x80000, "sp32_tiles", 0 ) // on sub board, all 27512
+	ROM_LOAD( "fa-13.h23", 0x00000, 0x10000, CRC(88e2e819) SHA1(6d5529792dbd2ba63a1bc470e9d3ea63b876cfd8) )
+	ROM_LOAD( "fa-12.h21", 0x10000, 0x10000, CRC(047e618f) SHA1(1106d5b41082a0f245dd78ccaca1460f9599fe15) )
+	ROM_LOAD( "fa-11.h19", 0x20000, 0x10000, CRC(a0d53fbd) SHA1(a49f29b3f07ec833651aa0e37b0e87f3f72e0e3a) )
+	ROM_LOAD( "fa-10.h18", 0x30000, 0x10000, CRC(0efe5da6) SHA1(35715faac954eb0c9bc226da039f0705c41942c3) )
+	ROM_LOAD( "fa-9.h16",  0x40000, 0x10000, CRC(a8979657) SHA1(ec2f61a24b04437a9abd0a306923ae2aeee3eba9) )
+	ROM_LOAD( "fa-8.h15",  0x50000, 0x10000, CRC(1aa38303) SHA1(a1f511efc052ccf13e0271611f5ff6f2739ab861) )
+	ROM_LOAD( "fa-7.h14",  0x60000, 0x10000, CRC(72a5590d) SHA1(d8bd664702af9c66a2bda756d8417d1b69b0cab8) )
+	ROM_LOAD( "fa-6.h13",  0x70000, 0x10000, CRC(8cdc19cb) SHA1(5782cc0130bc379f76e2865055097bad71a998c6) )
+
+	ROM_REGION( 0x40000, "ym2", 0 ) // on main PCB, all 27512
+	ROM_LOAD( "fa-5.c13",  0x00000, 0x10000, CRC(e332e41f) SHA1(3fe41e35c5abbd8f8b9cff91bf85815275c62776) )
+	ROM_LOAD( "fa-4.c12",  0x10000, 0x10000, CRC(98af6d2d) SHA1(0f41f53d4143ec54b8e84cd480e3ab34c3e7ea20) )
+	ROM_LOAD( "fa-22.c11", 0x20000, 0x10000, CRC(34b4bce9) SHA1(bf9b000995dcbb27450c0ad1a8ef1bcc4feee080) )
+	ROM_LOAD( "fa-21.c10", 0x30000, 0x10000, CRC(1b52357b) SHA1(30ee641cad46cb86a36b1afa292da2dddc154f2f) )
+
+	ROM_REGION( 0x0a00, "plds", 0 )
+	ROM_LOAD( "pal16l8a.c1",  0x0000, 0x0104, CRC(9282d039) SHA1(7a85920fe2da8a19df6ca687704da08a0fa4b048) )
+	ROM_LOAD( "pal16l8a.h3",  0x0200, 0x0104, CRC(4ae59346) SHA1(f5c168f07d82a1c8956f3a7f690bb8a1dffb1bfb) )
+	ROM_LOAD( "pal16r8a.f2",  0x0400, 0x0104, CRC(311e5ae6) SHA1(8a3799e1611ac4086dda2755c5ad44c0dc16ff5b) )
+	ROM_LOAD( "pal16l8a.e7",  0x0600, 0x0104, CRC(4c2d02b3) SHA1(f97402225ce60b9d44c5d0cd0507e26a9f3509cb) )
+	ROM_LOAD( "pal16l8a.h11", 0x0800, 0x0104, CRC(e9a0efca) SHA1(a2439c07dc5f9fae2e8a6ea010b00c07e9a58012) )
+ROM_END
+
 /***********************************************************************/
 
-DRIVER_INIT_MEMBER(snk_state,countryc)
-{
-	// replace coin counter with trackball select
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc300, 0xc300, write8_delegate(FUNC(snk_state::countryc_trackball_w),this));
-}
 
+GAME( 1983, marvins,   0,        marvins,   marvins,   snk_state, empty_init, ROT270, "SNK",     "Marvin's Maze", 0 )
+GAME( 1984, vangrd2,   0,        vangrd2,   vangrd2,   snk_state, empty_init, ROT270, "SNK",     "Vanguard II", 0 )
+GAME( 1984, madcrash,  0,        vangrd2,   madcrash,  snk_state, empty_init, ROT0,   "SNK",     "Mad Crasher", 0 )
+GAME( 1984, madcrush,  madcrash, madcrush,  madcrash,  snk_state, empty_init, ROT0,   "SNK",     "Mad Crusher (Japan)", 0 )
 
+GAME( 1984, jcross,    0,        jcross,    jcross,    snk_state, empty_init, ROT270, "SNK",     "Jumping Cross (set 1)", 0 )
+GAME( 1984, jcrossa,   jcross,   jcross,    jcross,    snk_state, empty_init, ROT270, "SNK",     "Jumping Cross (set 2)", 0 )
+GAME( 1984, sgladiat,  0,        sgladiat,  sgladiat,  snk_state, empty_init, ROT0,   "SNK",     "Gladiator 1984", 0 )
+GAME( 1985, hal21,     0,        hal21,     hal21,     snk_state, empty_init, ROT270, "SNK",     "HAL21", 0 )
+GAME( 1985, hal21j,    hal21,    hal21,     hal21,     snk_state, empty_init, ROT270, "SNK",     "HAL21 (Japan)", 0 )
 
-GAME( 1983, marvins,   0,        marvins,   marvins,   snk_state, 0,        ROT270, "SNK",     "Marvin's Maze", 0 )
-GAME( 1984, vangrd2,   0,        vangrd2,   vangrd2,   snk_state, 0,        ROT270, "SNK",     "Vanguard II", 0 )
-GAME( 1984, madcrash,  0,        vangrd2,   madcrash,  snk_state, 0,        ROT0,   "SNK",     "Mad Crasher", 0 )
-GAME( 1984, madcrush,  madcrash, madcrush,  madcrash,  snk_state, 0,        ROT0,   "SNK",     "Mad Crusher (Japan)", 0 )
+GAME( 1985, aso,       0,        aso,       aso,       snk_state, empty_init, ROT270, "SNK",     "ASO - Armored Scrum Object", 0 )
+GAME( 1985, alphamis,  aso,      aso,       alphamis,  snk_state, empty_init, ROT270, "SNK",     "Alpha Mission", 0 )
+GAME( 1985, arian,     aso,      aso,       alphamis,  snk_state, empty_init, ROT270, "SNK",     "Arian Mission", 0 )
+GAME( 1985, tnk3,      0,        tnk3,      tnk3,      snk_state, empty_init, ROT270, "SNK",     "T.N.K III (US)", 0 )
+GAME( 1985, tnk3j,     tnk3,     tnk3,      tnk3,      snk_state, empty_init, ROT270, "SNK",     "T.A.N.K (Japan)", 0 )
+GAME( 1986, athena,    0,        athena,    athena,    snk_state, empty_init, ROT0,   "SNK",     "Athena", 0 )
+GAME( 1986, athenab,   athena,   athena,    athena,    snk_state, empty_init, ROT0,   "SNK",     "Athena (bootleg)", 0 ) // is this really a bootleg?
+GAME( 1987, sathena,   athena,   athena,    athena,    snk_state, empty_init, ROT0,   "bootleg", "Super Athena (bootleg)", 0 )
+GAME( 1988, fitegolf,  0,        fitegolf,  fitegolf,  snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (World?)", 0 )
+GAME( 1988, fitegolfu, fitegolf, fitegolf,  fitegolfu, snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US)", 0 )
+GAME( 1988, fitegolf2, fitegolf, fitegolf2, fitegolfu, snk_state, empty_init, ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US, Ver 2)", 0 )
+GAME( 1988, countryc,  0,        countryc,  countryc,  snk_state, empty_init, ROT0,   "SNK",     "Country Club", 0 )
 
-GAME( 1984, jcross,    0,        jcross,    jcross,    snk_state, 0,        ROT270, "SNK",     "Jumping Cross (set 1)", 0 )
-GAME( 1984, jcrossa,   jcross,   jcross,    jcross,    snk_state, 0,        ROT270, "SNK",     "Jumping Cross (set 2)", 0 )
-GAME( 1984, sgladiat,  0,        sgladiat,  sgladiat,  snk_state, 0,        ROT0,   "SNK",     "Gladiator 1984", 0 )
-GAME( 1985, hal21,     0,        hal21,     hal21,     snk_state, 0,        ROT270, "SNK",     "HAL21", 0 )
-GAME( 1985, hal21j,    hal21,    hal21,     hal21,     snk_state, 0,        ROT270, "SNK",     "HAL21 (Japan)", 0 )
+GAME( 1986, ikari,     0,        ikari,     ikari,     snk_state, empty_init, ROT270, "SNK",     "Ikari Warriors (US JAMMA)", 0 ) // distributed by Tradewest(?)
+GAME( 1986, ikaria,    ikari,    ikari,     ikaria,    snk_state, empty_init, ROT270, "SNK",     "Ikari Warriors (US, set 1)", 0 ) // distributed by Tradewest(?)
+GAME( 1986, ikaria2,   ikari,    ikari,     ikaria,    snk_state, empty_init, ROT270, "SNK",     "Ikari Warriors (US, set 2)", 0 ) // distributed by Tradewest(?)
+GAME( 1986, ikarinc,   ikari,    ikari,     ikarinc,   snk_state, empty_init, ROT270, "SNK",     "Ikari Warriors (US No Continues)", 0 ) // distributed by Tradewest(?)
+GAME( 1986, ikarijp,   ikari,    ikari,     ikarinc,   snk_state, empty_init, ROT270, "SNK",     "Ikari (Japan No Continues)", 0 )
+GAME( 1986, ikarijpb,  ikari,    ikari,     ikarijpb,  snk_state, empty_init, ROT270, "bootleg", "Ikari (Joystick hack bootleg)", 0 )
+GAME( 1986, ikariram,  ikari,    ikari,     ikarijpb,  snk_state, empty_init, ROT270, "bootleg", "Rambo 3 (bootleg of Ikari, Joystick hack)", 0 )
+GAME( 1986, victroad,  0,        victroad,  victroad,  snk_state, empty_init, ROT270, "SNK",     "Victory Road", 0 )
+GAME( 1986, dogosoke,  victroad, victroad,  victroad,  snk_state, empty_init, ROT270, "SNK",     "Dogou Souken", 0 )
+GAME( 1986, dogosokb,  victroad, victroad,  dogosokb,  snk_state, empty_init, ROT270, "bootleg", "Dogou Souken (Joystick hack bootleg)", 0 )
 
-GAME( 1985, aso,       0,        aso,       aso,       snk_state, 0,        ROT270, "SNK",     "ASO - Armored Scrum Object", 0 )
-GAME( 1985, alphamis,  aso,      aso,       alphamis,  snk_state, 0,        ROT270, "SNK",     "Alpha Mission", 0 )
-GAME( 1985, arian,     aso,      aso,       alphamis,  snk_state, 0,        ROT270, "SNK",     "Arian Mission", 0 )
-GAME( 1985, tnk3,      0,        tnk3,      tnk3,      snk_state, 0,        ROT270, "SNK",     "T.N.K III (US)", 0 )
-GAME( 1985, tnk3j,     tnk3,     tnk3,      tnk3,      snk_state, 0,        ROT270, "SNK",     "T.A.N.K (Japan)", 0 )
-GAME( 1986, athena,    0,        athena,    athena,    snk_state, 0,        ROT0,   "SNK",     "Athena", 0 )
-GAME( 1986, athenab,   athena,   athena,    athena,    snk_state, 0,        ROT0,   "SNK",     "Athena (bootleg)", 0 ) // is this really a bootleg?
-GAME( 1987, sathena,   athena,   athena,    athena,    snk_state, 0,        ROT0,   "bootleg", "Super Athena (bootleg)", 0 )
-GAME( 1988, fitegolf,  0,        fitegolf,  fitegolf,  snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (World?)", 0 )
-GAME( 1988, fitegolfu, fitegolf, fitegolf,  fitegolfu, snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US)", 0 )
-GAME( 1988, fitegolf2, fitegolf, fitegolf2, fitegolfu, snk_state, 0,        ROT0,   "SNK",     "Lee Trevino's Fighting Golf (US, Ver 2)", 0 )
-GAME( 1988, countryc,  0,        fitegolf,  countryc,  snk_state, countryc, ROT0,   "SNK",     "Country Club", 0 )
+GAME( 1987, bermudat,  0,        bermudat,  bermudat,  snk_state, empty_init, ROT270, "SNK",     "Bermuda Triangle (World?)", 0 )
+GAME( 1987, bermudatj, bermudat, bermudat,  bermudat,  snk_state, empty_init, ROT270, "SNK",     "Bermuda Triangle (Japan)", 0 )
+GAME( 1987, worldwar,  0,        bermudat,  worldwar,  snk_state, empty_init, ROT270, "SNK",     "World Wars (World?)", 0 )
+GAME( 1987, bermudata, worldwar, bermudat,  bermudaa,  snk_state, empty_init, ROT270, "SNK",     "Bermuda Triangle (World Wars) (US)", 0 )
+GAME( 1987, psychos,   0,        psychos,   psychos,   snk_state, empty_init, ROT0,   "SNK",     "Psycho Soldier (US)", 0 )
+GAME( 1987, psychosj,  psychos,  psychos,   psychos,   snk_state, empty_init, ROT0,   "SNK",     "Psycho Soldier (Japan)", 0 )
+GAME( 1987, gwar,      0,        gwar,      gwar,      snk_state, empty_init, ROT270, "SNK",     "Guerrilla War (US)", 0 )
+GAME( 1987, gwarj,     gwar,     gwar,      gwar,      snk_state, empty_init, ROT270, "SNK",     "Guevara (Japan)", 0 )
+GAME( 1987, gwara,     gwar,     gwara,     gwar,      snk_state, empty_init, ROT270, "SNK",     "Guerrilla War (Version 1, set 1)", 0 )
+GAME( 1987, gwarab,    gwar,     gwara,     gwar,      snk_state, empty_init, ROT270, "SNK",     "Guerrilla War (Version 1, set 2)", 0 )
+GAME( 1987, gwarb,     gwar,     gwar,      gwarb,     snk_state, empty_init, ROT270, "bootleg", "Guerrilla War (Joystick hack bootleg)", 0 )
+GAME( 1988, chopper,   0,        choppera,  choppera,  snk_state, empty_init, ROT270, "SNK",     "Chopper I (US Ver 2)", 0 )
+GAME( 1988, choppera,  chopper,  chopper1,  chopper,   snk_state, empty_init, ROT270, "SNK",     "Chopper I (US Ver 1?)", 0 )
+GAME( 1988, chopperb,  chopper,  chopper1,  chopper,   snk_state, empty_init, ROT270, "SNK",     "Chopper I (US)", 0 ) /* First version, without the rev "A" roms */
+GAME( 1988, legofair,  chopper,  chopper1,  chopper,   snk_state, empty_init, ROT270, "SNK",     "Koukuu Kihei Monogatari - The Legend of Air Cavalry (Japan)", 0 )
 
-GAME( 1986, ikari,     0,        ikari,     ikari,     snk_state, 0,        ROT270, "SNK",     "Ikari Warriors (US JAMMA)", 0 ) // distributed by Tradewest(?)
-GAME( 1986, ikaria,    ikari,    ikari,     ikaria,    snk_state, 0,        ROT270, "SNK",     "Ikari Warriors (US)", 0 ) // distributed by Tradewest(?)
-GAME( 1986, ikarinc,   ikari,    ikari,     ikarinc,   snk_state, 0,        ROT270, "SNK",     "Ikari Warriors (US No Continues)", 0 ) // distributed by Tradewest(?)
-GAME( 1986, ikarijp,   ikari,    ikari,     ikarinc,   snk_state, 0,        ROT270, "SNK",     "Ikari (Japan No Continues)", 0 )
-GAME( 1986, ikarijpb,  ikari,    ikari,     ikarijpb,  snk_state, 0,        ROT270, "bootleg", "Ikari (Joystick hack bootleg)", 0 )
-GAME( 1986, ikariram,  ikari,    ikari,     ikarijpb,  snk_state, 0,        ROT270, "bootleg", "Rambo 3 (bootleg of Ikari, Joystick hack)", 0 )
-GAME( 1986, victroad,  0,        victroad,  victroad,  snk_state, 0,        ROT270, "SNK",     "Victory Road", 0 )
-GAME( 1986, dogosoke,  victroad, victroad,  victroad,  snk_state, 0,        ROT270, "SNK",     "Dogou Souken", 0 )
-GAME( 1986, dogosokb,  victroad, victroad,  dogosokb,  snk_state, 0,        ROT270, "bootleg", "Dogou Souken (Joystick hack bootleg)", 0 )
-
-GAME( 1987, bermudat,  0,        bermudat,  bermudat,  snk_state, 0,        ROT270, "SNK",     "Bermuda Triangle (World?)", 0 )
-GAME( 1987, bermudatj, bermudat, bermudat,  bermudat,  snk_state, 0,        ROT270, "SNK",     "Bermuda Triangle (Japan)", 0 )
-GAME( 1987, worldwar,  0,        bermudat,  worldwar,  snk_state, 0,        ROT270, "SNK",     "World Wars (World?)", 0 )
-GAME( 1987, bermudata, worldwar, bermudat,  bermudaa,  snk_state, 0,        ROT270, "SNK",     "Bermuda Triangle (World Wars) (US)", 0 )
-GAME( 1987, psychos,   0,        psychos,   psychos,   snk_state, 0,        ROT0,   "SNK",     "Psycho Soldier (US)", 0 )
-GAME( 1987, psychosj,  psychos,  psychos,   psychos,   snk_state, 0,        ROT0,   "SNK",     "Psycho Soldier (Japan)", 0 )
-GAME( 1987, gwar,      0,        gwar,      gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (US)", 0 )
-GAME( 1987, gwarj,     gwar,     gwar,      gwar,      snk_state, 0,        ROT270, "SNK",     "Guevara (Japan)", 0 )
-GAME( 1987, gwara,     gwar,     gwara,     gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (Version 1, set 1)", 0 )
-GAME( 1987, gwarab,    gwar,     gwara,     gwar,      snk_state, 0,        ROT270, "SNK",     "Guerrilla War (Version 1, set 2)", 0 )
-GAME( 1987, gwarb,     gwar,     gwar,      gwarb,     snk_state, 0,        ROT270, "bootleg", "Guerrilla War (Joystick hack bootleg)", 0 )
-GAME( 1988, chopper,   0,        chopper1,  chopper,   snk_state, 0,        ROT270, "SNK",     "Chopper I (US set 1)", 0 )
-GAME( 1988, choppera,  chopper,  choppera,  choppera,  snk_state, 0,        ROT270, "SNK",     "Chopper I (US set 2)", 0 )
-GAME( 1988, chopperb,  chopper,  chopper1,  chopper,   snk_state, 0,        ROT270, "SNK",     "Chopper I (US set 3)", 0 )
-GAME( 1988, legofair,  chopper,  chopper1,  chopper,   snk_state, 0,        ROT270, "SNK",     "Koukuu Kihei Monogatari - The Legend of Air Cavalry (Japan)", 0 )
-
-GAME( 1987, tdfever,   0,        tdfever,   tdfever,   snk_state, 0,        ROT90,  "SNK",     "TouchDown Fever (US)", 0 )
-GAME( 1987, tdfeverj,  tdfever,  tdfever,   tdfever,   snk_state, 0,        ROT90,  "SNK",     "TouchDown Fever (Japan)", 0 )
-GAME( 1988, tdfever2,  tdfever,  tdfever2,  tdfever,   snk_state, 0,        ROT90,  "SNK",     "TouchDown Fever 2", 0 ) /* upgrade kit for Touchdown Fever */
-GAME( 1988, fsoccer,   0,        tdfever2,  fsoccer,   snk_state, 0,        ROT0,   "SNK",     "Fighting Soccer (version 4)", 0 )
-GAME( 1988, fsoccerj,  fsoccer,  tdfever2,  fsoccer,   snk_state, 0,        ROT0,   "SNK",     "Fighting Soccer (Japan)", 0 )
-GAME( 1988, fsoccerb,  fsoccer,  tdfever2,  fsoccerb,  snk_state, 0,        ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg)", 0 )
-GAME( 1988, fsoccerba, fsoccer,  tdfever2,  fsoccerb,  snk_state, 0,        ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg, alt)", 0 )
+GAME( 1987, tdfever,   0,        tdfever,   tdfever,   snk_state, empty_init, ROT90,  "SNK",     "TouchDown Fever (US)", 0 )
+GAME( 1987, tdfeverj,  tdfever,  tdfever,   tdfever,   snk_state, empty_init, ROT90,  "SNK",     "TouchDown Fever (Japan)", 0 )
+GAME( 1988, tdfever2,  tdfever,  tdfever2,  tdfever,   snk_state, empty_init, ROT90,  "SNK",     "TouchDown Fever 2", 0 ) /* upgrade kit for Touchdown Fever */
+GAME( 1988, tdfever2b, tdfever,  tdfever2,  tdfever,   snk_state, empty_init, ROT90,  "bootleg", "TouchDown Fever 2 (bootleg)", 0 )
+GAME( 1988, fsoccer,   0,        tdfever2,  fsoccer,   snk_state, empty_init, ROT0,   "SNK",     "Fighting Soccer (version 4)", 0 )
+GAME( 1988, fsoccerj,  fsoccer,  tdfever2,  fsoccer,   snk_state, empty_init, ROT0,   "SNK",     "Fighting Soccer (Japan)", 0 )
+GAME( 1988, fsoccerb,  fsoccer,  tdfever2,  fsoccerb,  snk_state, empty_init, ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg)", 0 )
+GAME( 1988, fsoccerba, fsoccer,  tdfever2,  fsoccerb,  snk_state, empty_init, ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg, alt)", 0 )

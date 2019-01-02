@@ -20,10 +20,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(ss50_##_slot_intf, _def_slot, false)
 
 #define MCFG_SS50_INTERFACE_IRQ_CALLBACK(_devcb) \
-	devcb = &downcast<ss50_interface_port_device &>(*device).set_irq_cb(DEVCB_##_devcb);
+	downcast<ss50_interface_port_device &>(*device).set_irq_cb(DEVCB_##_devcb);
 
 #define MCFG_SS50_INTERFACE_FIRQ_CALLBACK(_devcb) \
-	devcb = &downcast<ss50_interface_port_device &>(*device).set_firq_cb(DEVCB_##_devcb);
+	downcast<ss50_interface_port_device &>(*device).set_firq_cb(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -102,9 +102,9 @@ private:
 
 
 // device type definition
-extern const device_type SS50_INTERFACE;
+DECLARE_DEVICE_TYPE(SS50_INTERFACE, ss50_interface_port_device)
 
-SLOT_INTERFACE_EXTERN(ss50_default_2rs_devices);
-//SLOT_INTERFACE_EXTERN(ss50_default_4rs_devices);
+void ss50_default_2rs_devices(device_slot_interface &device);
+//void ss50_default_4rs_devices(device_slot_interface &device);
 
 #endif

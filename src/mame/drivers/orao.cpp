@@ -18,6 +18,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/wave.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -30,7 +31,7 @@ void orao_state::orao_mem(address_map &map)
 {
 	map(0x0000, 0x5fff).ram().share("memory");
 	map(0x6000, 0x7fff).ram().share("video_ram"); // video ram
-	map(0x8000, 0x9fff).rw(this, FUNC(orao_state::orao_io_r), FUNC(orao_state::orao_io_w));
+	map(0x8000, 0x9fff).rw(FUNC(orao_state::orao_io_r), FUNC(orao_state::orao_io_w));
 	map(0xa000, 0xafff).ram();  // extension
 	map(0xb000, 0xbfff).ram();  // DOS
 	map(0xc000, 0xdfff).rom();
@@ -172,8 +173,8 @@ INPUT_PORTS_END
 /* Machine driver */
 MACHINE_CONFIG_START(orao_state::orao)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1000000)
-	MCFG_CPU_PROGRAM_MAP(orao_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(orao_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -184,15 +185,13 @@ MACHINE_CONFIG_START(orao_state::orao)
 	MCFG_SCREEN_UPDATE_DRIVER(orao_state, screen_update_orao)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette")
 	MCFG_CASSETTE_FORMATS(orao_cassette_formats)
@@ -216,6 +215,6 @@ ROM_START( orao103 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  STATE       INIT     COMPANY         FULLNAME    FLAGS
-COMP( 1984, orao,     0,      0,      orao,    orao,  orao_state, orao,    "PEL Varazdin", "Orao 102", 0 )
-COMP( 1985, orao103,  orao,   0,      orao,    orao,  orao_state, orao103, "PEL Varazdin", "Orao 103", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT          COMPANY         FULLNAME    FLAGS
+COMP( 1984, orao,    0,      0,      orao,    orao,  orao_state, init_orao,    "PEL Varazdin", "Orao 102", 0 )
+COMP( 1985, orao103, orao,   0,      orao,    orao,  orao_state, init_orao103, "PEL Varazdin", "Orao 103", 0 )

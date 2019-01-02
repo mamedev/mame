@@ -161,7 +161,7 @@ WRITE16_MEMBER(pgm_asic3_state::pgm_asic3_w)
 
 /* Oriental Legend INIT */
 
-DRIVER_INIT_MEMBER(pgm_asic3_state,orlegend)
+void pgm_asic3_state::init_orlegend()
 {
 	pgm_basic_init();
 

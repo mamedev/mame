@@ -23,7 +23,6 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/intelfsh.h"
 #include "machine/nvram.h"
-#include "rendlay.h"
 #include "screen.h"
 
 
@@ -148,14 +147,14 @@ WRITE16_MEMBER ( ti68k_state::flash_w )
 {
 	// verification if it is flash memory
 	if (m_flash_mem)
-		m_flash->write(offset, data);
+		m_flash->write(space, offset, data);
 }
 
 READ16_MEMBER ( ti68k_state::flash_r )
 {
 	if (m_flash_mem)
 	{
-		return m_flash->read(offset);
+		return m_flash->read(space, offset);
 	}
 	else
 	{
@@ -201,7 +200,7 @@ void ti68k_state::ti92_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).ram().share("nvram");
 	map(0x200000, 0x5fffff).unmaprw();   // ROM
-	map(0x600000, 0x6fffff).rw(this, FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
+	map(0x600000, 0x6fffff).rw(FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
 }
 
 
@@ -209,10 +208,10 @@ void ti68k_state::ti89_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).ram().share("nvram");
-	map(0x200000, 0x3fffff).rw(this, FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0x200000, 0x3fffff).rw(FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
 	map(0x400000, 0x5fffff).noprw();
-	map(0x600000, 0x6fffff).rw(this, FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
-	map(0x700000, 0x7fffff).rw(this, FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
+	map(0x600000, 0x6fffff).rw(FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
+	map(0x700000, 0x7fffff).rw(FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
 }
 
 
@@ -221,9 +220,9 @@ void ti68k_state::ti92p_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).ram().share("nvram");
 	map(0x200000, 0x3fffff).noprw();
-	map(0x400000, 0x5fffff).rw(this, FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
-	map(0x600000, 0x6fffff).rw(this, FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
-	map(0x700000, 0x7fffff).rw(this, FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
+	map(0x400000, 0x5fffff).rw(FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0x600000, 0x6fffff).rw(FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
+	map(0x700000, 0x7fffff).rw(FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
 }
 
 
@@ -231,9 +230,9 @@ void ti68k_state::v200_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).ram().share("nvram");
-	map(0x200000, 0x5fffff).rw(this, FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
-	map(0x600000, 0x6fffff).rw(this, FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
-	map(0x700000, 0x70ffff).rw(this, FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
+	map(0x200000, 0x5fffff).rw(FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0x600000, 0x6fffff).rw(FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
+	map(0x700000, 0x70ffff).rw(FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
 }
 
 
@@ -241,9 +240,9 @@ void ti68k_state::ti89t_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x0fffff).ram().mirror(0x200000).share("nvram");
-	map(0x600000, 0x6fffff).rw(this, FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
-	map(0x700000, 0x70ffff).rw(this, FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
-	map(0x800000, 0xbfffff).rw(this, FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0x600000, 0x6fffff).rw(FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
+	map(0x700000, 0x70ffff).rw(FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
+	map(0x800000, 0xbfffff).rw(FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
 	map(0xc00000, 0xffffff).noprw();
 }
 
@@ -514,7 +513,7 @@ uint32_t ti68k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(ti68k_state, ti68k)
+void ti68k_state::ti68k_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -522,10 +521,10 @@ PALETTE_INIT_MEMBER(ti68k_state, ti68k)
 
 MACHINE_CONFIG_START(ti68k_state::ti89)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(ti89_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(ti89_mem)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -536,11 +535,9 @@ MACHINE_CONFIG_START(ti68k_state::ti89)
 	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 100-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(ti68k_state, ti68k)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	PALETTE(config, "palette", FUNC(ti68k_state::ti68k_palette), 2);
 
-	MCFG_SHARP_UNK128MBIT_ADD("flash")  //should be LH28F320 for ti89t and v200 and LH28F160S3T for other models
+	SHARP_UNK128MBIT(config, "flash");  //should be LH28F320 for ti89t and v200 and LH28F160S3T for other models
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ti68k_timer", ti68k_state, ti68k_timer_callback, attotime::from_hz(1<<14))
 MACHINE_CONFIG_END
@@ -548,8 +545,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti68k_state::ti92)
 	ti89(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ti92_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ti92_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -559,22 +556,22 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti68k_state::ti92p)
 	ti92(config);
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(ti92p_mem)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(ti92p_mem)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(ti68k_state::v200)
 	ti92(config);
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(v200_mem)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(v200_mem)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(ti68k_state::ti89t)
 	ti89(config);
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(ti89t_mem)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(ti89t_mem)
 MACHINE_CONFIG_END
 
 
@@ -582,105 +579,105 @@ MACHINE_CONFIG_END
 ROM_START( ti89 )
 	ROM_REGION16_BE( 0x200000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v100", "V 1.00 - HW1" )
-	ROMX_LOAD( "ti89v100.rom",   0x000000, 0x200000, CRC(264b34ad) SHA1(c87586a7e9b6d49fbe908fbb6f3c0038f3498573), ROM_BIOS(1))
+	ROMX_LOAD( "ti89v100.rom",   0x000000, 0x200000, CRC(264b34ad) SHA1(c87586a7e9b6d49fbe908fbb6f3c0038f3498573), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v100a", "V 1.00 [a] - HW1" )
-	ROMX_LOAD( "ti89v100a.rom",  0x000000, 0x200000, CRC(95199934) SHA1(b8e3cdeb4705b0c7e0a15ab6c6f62bcde14a3a55), ROM_BIOS(2))
+	ROMX_LOAD( "ti89v100a.rom",  0x000000, 0x200000, CRC(95199934) SHA1(b8e3cdeb4705b0c7e0a15ab6c6f62bcde14a3a55), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "v100m", "V 1.00 [m] - HW1" )
-	ROMX_LOAD( "ti89v100m.rom",  0x000000, 0x200000, CRC(b9059e06) SHA1(b33a7c2935eb9f73b210bcf6e7c7f32d1548a9d5), ROM_BIOS(3))
+	ROMX_LOAD( "ti89v100m.rom",  0x000000, 0x200000, CRC(b9059e06) SHA1(b33a7c2935eb9f73b210bcf6e7c7f32d1548a9d5), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "v100m2", "V 1.00 [m2] - HW1" )
-	ROMX_LOAD( "ti89v100m2.rom", 0x000000, 0x200000, CRC(cdd69d34) SHA1(1686362b0997bb9597f39b443490d4d8d85b56cc), ROM_BIOS(4))
+	ROMX_LOAD( "ti89v100m2.rom", 0x000000, 0x200000, CRC(cdd69d34) SHA1(1686362b0997bb9597f39b443490d4d8d85b56cc), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 4, "v105", "V 1.05 - HW1" )
-	ROMX_LOAD( "ti89v105.rom",   0x000000, 0x200000, CRC(3bc0b474) SHA1(46fe0cd511eb81d53dc12cc4bdacec8a5bba5171), ROM_BIOS(5))
+	ROMX_LOAD( "ti89v105.rom",   0x000000, 0x200000, CRC(3bc0b474) SHA1(46fe0cd511eb81d53dc12cc4bdacec8a5bba5171), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS( 5, "v201", "V 2.01 - HW1" )
-	ROMX_LOAD( "ti89v201.rom",   0x000000, 0x200000, CRC(fa6745e9) SHA1(e4ee6067df9b975356cef6c5a81d0ec664371c1d), ROM_BIOS(6))
+	ROMX_LOAD( "ti89v201.rom",   0x000000, 0x200000, CRC(fa6745e9) SHA1(e4ee6067df9b975356cef6c5a81d0ec664371c1d), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS( 6, "v203", "V 2.03 - HW1" )
-	ROMX_LOAD( "ti89v203.rom",   0x000000, 0x200000, CRC(a3a74eca) SHA1(55aae3561722a96973b430e3d4cb4f513298ea4e), ROM_BIOS(7))
+	ROMX_LOAD( "ti89v203.rom",   0x000000, 0x200000, CRC(a3a74eca) SHA1(55aae3561722a96973b430e3d4cb4f513298ea4e), ROM_BIOS(6))
 	ROM_SYSTEM_BIOS( 7, "v203m", "V 2.03 [m] - HW 1" )
-	ROMX_LOAD( "ti89v203m.rom",  0x000000, 0x200000, CRC(d79068f7) SHA1(5b6f571417889b11ae19eef99a5fda4f027d5ec2), ROM_BIOS(8))
+	ROMX_LOAD( "ti89v203m.rom",  0x000000, 0x200000, CRC(d79068f7) SHA1(5b6f571417889b11ae19eef99a5fda4f027d5ec2), ROM_BIOS(7))
 	ROM_SYSTEM_BIOS( 8, "v209",  "V 2.09 - HW 1" )
-	ROMX_LOAD( "ti89v209.rom",   0x000000, 0x200000, CRC(f76f9c15) SHA1(66409ef4b20190a3b7c0d48cbd30257580b47dcd), ROM_BIOS(9))
+	ROMX_LOAD( "ti89v209.rom",   0x000000, 0x200000, CRC(f76f9c15) SHA1(66409ef4b20190a3b7c0d48cbd30257580b47dcd), ROM_BIOS(8))
 	ROM_SYSTEM_BIOS( 9, "v105-2","V 1.05 - HW2" )
-	ROMX_LOAD( "ti89v105-2.rom", 0x000000, 0x200000, CRC(83817402) SHA1(b2ddf785e973cc3f9a437d058a68abdf7ca52ea2), ROM_BIOS(10))
+	ROMX_LOAD( "ti89v105-2.rom", 0x000000, 0x200000, CRC(83817402) SHA1(b2ddf785e973cc3f9a437d058a68abdf7ca52ea2), ROM_BIOS(9))
 	ROM_SYSTEM_BIOS( 10, "v203-2",  "V 2.03 - HW2" )
-	ROMX_LOAD( "ti89v203-2.rom", 0x000000, 0x200000, CRC(5e0400a9) SHA1(43c608ee72f15aed56cb5762948ec6a3c93dd9d8), ROM_BIOS(11))
+	ROMX_LOAD( "ti89v203-2.rom", 0x000000, 0x200000, CRC(5e0400a9) SHA1(43c608ee72f15aed56cb5762948ec6a3c93dd9d8), ROM_BIOS(10))
 	ROM_SYSTEM_BIOS( 11, "v203m-2", "V 2.03 [m] - HW2" )
-	ROMX_LOAD( "ti89v203m-2.rom", 0x000000, 0x200000, CRC(04d5d76d) SHA1(14ca44b64c29aa1bf274508ca40fe69224f5a7cc), ROM_BIOS(12))
+	ROMX_LOAD( "ti89v203m-2.rom", 0x000000, 0x200000, CRC(04d5d76d) SHA1(14ca44b64c29aa1bf274508ca40fe69224f5a7cc), ROM_BIOS(11))
 	ROM_SYSTEM_BIOS( 12, "v205-2", "V 2.05 - HW2" )
-	ROMX_LOAD( "ti89v205-2.rom", 0x000000, 0x200000, CRC(37c4653c) SHA1(f48d00a57430230e489e243383513485009b1b98), ROM_BIOS(13))
+	ROMX_LOAD( "ti89v205-2.rom", 0x000000, 0x200000, CRC(37c4653c) SHA1(f48d00a57430230e489e243383513485009b1b98), ROM_BIOS(12))
 	ROM_SYSTEM_BIOS( 13, "v205-2m", "V 2.05 [m] - HW2" )
-	ROMX_LOAD( "ti89v205m-2.rom", 0x000000, 0x200000, CRC(e58a23f9) SHA1(d4cb23fb4b414a43802c37dc3c572a8ede670e0f), ROM_BIOS(14))
+	ROMX_LOAD( "ti89v205m-2.rom", 0x000000, 0x200000, CRC(e58a23f9) SHA1(d4cb23fb4b414a43802c37dc3c572a8ede670e0f), ROM_BIOS(13))
 	ROM_SYSTEM_BIOS( 14, "v205-2m2","V 2.05 [m2] - HW2" )
-	ROMX_LOAD( "ti89v205m2-2.rom", 0x000000, 0x200000, CRC(a8ba976c) SHA1(38bd25ada5e2066c64761d1008a9327a37d68654), ROM_BIOS(15))
+	ROMX_LOAD( "ti89v205m2-2.rom", 0x000000, 0x200000, CRC(a8ba976c) SHA1(38bd25ada5e2066c64761d1008a9327a37d68654), ROM_BIOS(14))
 	ROM_SYSTEM_BIOS( 15,"v209-2", "V 2.09 - HW2" )
-	ROMX_LOAD( "ti89v209-2.rom", 0x000000, 0x200000, CRC(242a238f) SHA1(9668df314a0180ef210796e9cb651c5e9f17eb07), ROM_BIOS(16))
+	ROMX_LOAD( "ti89v209-2.rom", 0x000000, 0x200000, CRC(242a238f) SHA1(9668df314a0180ef210796e9cb651c5e9f17eb07), ROM_BIOS(15))
 ROM_END
 
 ROM_START( ti92 )
 	ROM_REGION16_BE( 0x200000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v111", "V 1.11" )
-	ROMX_LOAD( "ti92v111.rom",  0x000000, 0x100000, CRC(67878d52) SHA1(c0fdf162961922a76f286c93fd9b861ce20f23a3), ROM_BIOS(1))
+	ROMX_LOAD( "ti92v111.rom",  0x000000, 0x100000, CRC(67878d52) SHA1(c0fdf162961922a76f286c93fd9b861ce20f23a3), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v13e", "V 1.3 [e]" )
-	ROMX_LOAD( "ti92v13e.rom",  0x000000, 0x100000, CRC(316c8196) SHA1(82c8cd484c6aebe36f814a2023d2afad6d87f840), ROM_BIOS(2))
+	ROMX_LOAD( "ti92v13e.rom",  0x000000, 0x100000, CRC(316c8196) SHA1(82c8cd484c6aebe36f814a2023d2afad6d87f840), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "v14e", "V 1.4 [e]" )
-	ROMX_LOAD( "ti92v14e.rom",  0x000000, 0x100000, CRC(239e9405) SHA1(df2f1ab17d490fda43a02f5851b5a15052361b28), ROM_BIOS(3))
+	ROMX_LOAD( "ti92v14e.rom",  0x000000, 0x100000, CRC(239e9405) SHA1(df2f1ab17d490fda43a02f5851b5a15052361b28), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "v17e", "V 1.7 [e]" )
-	ROMX_LOAD( "ti92v17e.rom",  0x000000, 0x100000, CRC(83e27cc5) SHA1(aec5a6a6157ff94a4e665fa3fe747bacb6688cd4), ROM_BIOS(4))
+	ROMX_LOAD( "ti92v17e.rom",  0x000000, 0x100000, CRC(83e27cc5) SHA1(aec5a6a6157ff94a4e665fa3fe747bacb6688cd4), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 4, "v111e", "V 1.11 [e]" )
-	ROMX_LOAD( "ti92v111e.rom", 0x000000, 0x100000, CRC(4a343833) SHA1(ab4eaacc8c83a861c8d37df5c10e532d0d580460), ROM_BIOS(5))
+	ROMX_LOAD( "ti92v111e.rom", 0x000000, 0x100000, CRC(4a343833) SHA1(ab4eaacc8c83a861c8d37df5c10e532d0d580460), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS( 5, "v112e", "V 1.12 [e]" )
-	ROMX_LOAD( "ti92v112e.rom", 0x000000, 0x100000, CRC(9a6947a0) SHA1(8bb0538ca98711e9ad46c56e4dfd609d4699be30), ROM_BIOS(6))
+	ROMX_LOAD( "ti92v112e.rom", 0x000000, 0x100000, CRC(9a6947a0) SHA1(8bb0538ca98711e9ad46c56e4dfd609d4699be30), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS( 6, "v21e", "V 2.1 [e]" )
-	ROMX_LOAD( "ti92v21e.rom",  0x000000, 0x200000, CRC(5afb5863) SHA1(bf7b260d37d1502cc4b08dea5e1d55b523f27925), ROM_BIOS(7))
+	ROMX_LOAD( "ti92v21e.rom",  0x000000, 0x200000, CRC(5afb5863) SHA1(bf7b260d37d1502cc4b08dea5e1d55b523f27925), ROM_BIOS(6))
 
 ROM_END
 
 ROM_START( ti92p )
 	ROM_REGION16_BE( 0x200000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v100", "V 1.00 - HW1" )
-	ROMX_LOAD( "ti92pv100.rom", 0x0000, 0x200000, CRC(c651a586) SHA1(fbbf7e053e70eefe517f9aae40c072036bc614ea), ROM_BIOS(1))
+	ROMX_LOAD( "ti92pv100.rom", 0x0000, 0x200000, CRC(c651a586) SHA1(fbbf7e053e70eefe517f9aae40c072036bc614ea), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v101", "V 1.01 - HW1" )
-	ROMX_LOAD( "ti92pv101.rom", 0x0000, 0x200000, CRC(826b1539) SHA1(dd8969511fc6233bf2047f83c3306ac8d2be5644), ROM_BIOS(2))
+	ROMX_LOAD( "ti92pv101.rom", 0x0000, 0x200000, CRC(826b1539) SHA1(dd8969511fc6233bf2047f83c3306ac8d2be5644), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "v101a","V 1.01 [a] - HW1" )
-	ROMX_LOAD( "ti92pv101a.rom", 0x0000, 0x200000, CRC(18f9002f) SHA1(2bf13ba7da0212a8706c5a43853dc2ccb8c2257d), ROM_BIOS(3))
+	ROMX_LOAD( "ti92pv101a.rom", 0x0000, 0x200000, CRC(18f9002f) SHA1(2bf13ba7da0212a8706c5a43853dc2ccb8c2257d), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "v101m", "V 1.01 [m] - HW1" )
-	ROMX_LOAD( "ti92pv101m.rom", 0x0000, 0x200000, CRC(fe2b6e77) SHA1(0e1bb8c677a726ee086c1a4280ab59de95b4abe2), ROM_BIOS(4))
+	ROMX_LOAD( "ti92pv101m.rom", 0x0000, 0x200000, CRC(fe2b6e77) SHA1(0e1bb8c677a726ee086c1a4280ab59de95b4abe2), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 4, "v105", "V 1.05 - HW1" )
-	ROMX_LOAD( "ti92pv105.rom", 0x0000, 0x200000, CRC(cd945824) SHA1(6941aca243c6fd5c8a377253bffc2ffb5a84c41b), ROM_BIOS(5))
+	ROMX_LOAD( "ti92pv105.rom", 0x0000, 0x200000, CRC(cd945824) SHA1(6941aca243c6fd5c8a377253bffc2ffb5a84c41b), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS( 5, "v105-2", "V 1.05 - HW2" )
-	ROMX_LOAD( "ti92pv105-2.rom", 0x0000, 0x200000, CRC(289aa84f) SHA1(c9395750e20d5a201401699d156b62f00530fcdd), ROM_BIOS(6))
+	ROMX_LOAD( "ti92pv105-2.rom", 0x0000, 0x200000, CRC(289aa84f) SHA1(c9395750e20d5a201401699d156b62f00530fcdd), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS( 6, "v203", "V 2.03 - HW2" )
-	ROMX_LOAD( "ti92pv203.rom", 0x0000, 0x200000, CRC(1612213e) SHA1(1715dd5913bed12baedc4912e9abe0cb4e48cd45), ROM_BIOS(7))
+	ROMX_LOAD( "ti92pv203.rom", 0x0000, 0x200000, CRC(1612213e) SHA1(1715dd5913bed12baedc4912e9abe0cb4e48cd45), ROM_BIOS(6))
 	ROM_SYSTEM_BIOS( 7, "v204", "V 2.04 - HW2" )
-	ROMX_LOAD( "ti92pv204.rom", 0x0000, 0x200000, CRC(86819be3) SHA1(78032a0f5f11d1e9a45ffbea91e7f9657fd1a8ae), ROM_BIOS(8))
+	ROMX_LOAD( "ti92pv204.rom", 0x0000, 0x200000, CRC(86819be3) SHA1(78032a0f5f11d1e9a45ffbea91e7f9657fd1a8ae), ROM_BIOS(7))
 	ROM_SYSTEM_BIOS( 8, "v205", "V 2.05 - HW2" )
-	ROMX_LOAD( "ti92pv205.rom",  0x0000, 0x200000, CRC(9509c575) SHA1(703410d8bb98b8ec14277efcd8b7dda45a7cf358), ROM_BIOS(9))
+	ROMX_LOAD( "ti92pv205.rom",  0x0000, 0x200000, CRC(9509c575) SHA1(703410d8bb98b8ec14277efcd8b7dda45a7cf358), ROM_BIOS(8))
 	ROM_SYSTEM_BIOS( 9, "v205m", "V 2.05 [m] - HW2" )
-	ROMX_LOAD( "ti92pv205m.rom",  0x000000, 0x200000, CRC(13ef4d57) SHA1(6ef290bb0dda72f645cd3eca9cc1185f6a2d32dc), ROM_BIOS(10))
+	ROMX_LOAD( "ti92pv205m.rom",  0x000000, 0x200000, CRC(13ef4d57) SHA1(6ef290bb0dda72f645cd3eca9cc1185f6a2d32dc), ROM_BIOS(9))
 	ROM_SYSTEM_BIOS( 10, "v209", "V 2.09 - HW2" )
-	ROMX_LOAD( "ti92pv209.rom",  0x000000, 0x200000, CRC(4851ad52) SHA1(10e6c2cdc60623bf0be7ea72a9ec840259fb37c3), ROM_BIOS(11))
+	ROMX_LOAD( "ti92pv209.rom",  0x000000, 0x200000, CRC(4851ad52) SHA1(10e6c2cdc60623bf0be7ea72a9ec840259fb37c3), ROM_BIOS(10))
 ROM_END
 
 ROM_START( v200 )
 	ROM_REGION16_BE( 0x400000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v209", "V 2.09" )
-	ROMX_LOAD( "voyage200v209.rom", 0x0000, 0x400000, CRC(f805c7a6) SHA1(818b919058ba3bd7d15604f11fff6740010d07fc), ROM_BIOS(1))
+	ROMX_LOAD( "voyage200v209.rom", 0x0000, 0x400000, CRC(f805c7a6) SHA1(818b919058ba3bd7d15604f11fff6740010d07fc), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v310", "V 3.10" )
-	ROMX_LOAD( "voyage200v310.rom", 0x0000, 0x400000, CRC(ed4cbfd2) SHA1(39cdb9932f314ff792b1cc5e3fe041d98b9fd101), ROM_BIOS(2))
+	ROMX_LOAD( "voyage200v310.rom", 0x0000, 0x400000, CRC(ed4cbfd2) SHA1(39cdb9932f314ff792b1cc5e3fe041d98b9fd101), ROM_BIOS(1))
 ROM_END
 
 ROM_START( ti89t )
 	ROM_REGION16_BE( 0x400000, "flash", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v300", "V 3.00" )
-	ROMX_LOAD( "ti89tv300.rom", 0x0000, 0x400000, CRC(55eb4f5a) SHA1(4f919d7752caf2559a79883ec8711a9701d19513), ROM_BIOS(1))
+	ROMX_LOAD( "ti89tv300.rom", 0x0000, 0x400000, CRC(55eb4f5a) SHA1(4f919d7752caf2559a79883ec8711a9701d19513), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v310", "V 3.10" )
-	ROMX_LOAD( "ti89tv310.rom", 0x0000, 0x400000, CRC(b6967cca) SHA1(fb4f09e5c4500dee651b8de537e502ab97cb8328), ROM_BIOS(2))
+	ROMX_LOAD( "ti89tv310.rom", 0x0000, 0x400000, CRC(b6967cca) SHA1(fb4f09e5c4500dee651b8de537e502ab97cb8328), ROM_BIOS(1))
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  STATE        INIT  COMPANY              FULLNAME          FLAGS
-COMP( 1998, ti89,  0,       0,      ti89,    ti8x,  ti68k_state, 0,    "Texas Instruments", "TI-89",          MACHINE_NO_SOUND )
-COMP( 1995, ti92,  0,       0,      ti92,    ti9x,  ti68k_state, 0,    "Texas Instruments", "TI-92",          MACHINE_NO_SOUND )
-COMP( 1999, ti92p, 0,       0,      ti92p,   ti9x,  ti68k_state, 0,    "Texas Instruments", "TI-92 Plus",     MACHINE_NO_SOUND )
-COMP( 2002, v200,  0,       0,      v200,    ti9x,  ti68k_state, 0,    "Texas Instruments", "Voyage 200 PLT", MACHINE_NO_SOUND )
-COMP( 2004, ti89t, 0,       0,      ti89t,   ti8x,  ti68k_state, 0,    "Texas Instruments", "TI-89 Titanium", MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY              FULLNAME          FLAGS
+COMP( 1998, ti89,  0,       0,     ti89,    ti8x,  ti68k_state, empty_init, "Texas Instruments", "TI-89",          MACHINE_NO_SOUND )
+COMP( 1995, ti92,  0,       0,     ti92,    ti9x,  ti68k_state, empty_init, "Texas Instruments", "TI-92",          MACHINE_NO_SOUND )
+COMP( 1999, ti92p, 0,       0,     ti92p,   ti9x,  ti68k_state, empty_init, "Texas Instruments", "TI-92 Plus",     MACHINE_NO_SOUND )
+COMP( 2002, v200,  0,       0,     v200,    ti9x,  ti68k_state, empty_init, "Texas Instruments", "Voyage 200 PLT", MACHINE_NO_SOUND )
+COMP( 2004, ti89t, 0,       0,     ti89t,   ti8x,  ti68k_state, empty_init, "Texas Instruments", "TI-89 Titanium", MACHINE_NO_SOUND )

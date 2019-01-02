@@ -2,7 +2,6 @@
 // copyright-holders:Ryan Holtz
 /*
     SGI "Newport" graphics board used in the Indy and some Indigo2s
-
 */
 
 #ifndef MAME_VIDEO_NEWPORT_H
@@ -10,16 +9,28 @@
 
 #pragma once
 
+#include "cpu/mips/mips3.h"
+#include "machine/hpc3.h"
+
 class newport_video_device : public device_t
 {
 public:
+	template <typename T, typename U>
+	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&hpc3_tag)
+		: newport_video_device(mconfig, tag, owner, (uint32_t)0) // TODO: Use actual pixel clock
+	{
+		m_maincpu.set_tag(std::forward<T>(cpu_tag));
+		m_hpc3.set_tag(std::forward<U>(hpc3_tag));
+	}
+
 	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-
-	DECLARE_READ32_MEMBER( rex3_r );
-	DECLARE_WRITE32_MEMBER( rex3_w );
+	DECLARE_READ32_MEMBER(rex3_r);
+	DECLARE_WRITE32_MEMBER(rex3_w);
 
 	uint32_t screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 protected:
 	// device-level overrides
@@ -27,135 +38,160 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	struct VC2_t
+	enum
 	{
-		uint16_t nRegister[0x21];
-		uint16_t nRAM[0x8000];
-		uint8_t nRegIdx;
-		uint16_t nRegData;
+		DCR_CURSOR_FUNC_ENABLE_BIT = 4,
+		DCR_CURSOR_ENABLE_BIT = 7,
+
+		DCR_CURSOR_MODE_BIT = 8,
+		DCR_CURSOR_MODE_GLYPH = 0,
+		DCR_CURSOR_MODE_CROSSHAIR = 1,
+
+		DCR_CURSOR_SIZE_BIT = 9,
+		DCR_CURSOR_SIZE_32 = 0,
+		DCR_CURSOR_SIZE_64 = 1
+	};
+
+	struct vc2_t
+	{
+		uint16_t m_vid_entry;
+		uint16_t m_cursor_entry;
+		uint16_t m_cursor_x;
+		uint16_t m_cursor_y;
+		uint16_t m_cur_cursor_x;
+		uint16_t m_did_entry;
+		uint16_t m_scanline_len;
+		uint16_t m_ram_addr;
+		uint16_t m_vt_frame_ptr;
+		uint16_t m_vt_line_ptr;
+		uint16_t m_vt_line_run;
+		uint16_t m_vt_line_count;
+		uint16_t m_cursor_table_ptr;
+		uint16_t m_work_cursor_y;
+		uint16_t m_did_frame_ptr;
+		uint16_t m_did_line_ptr;
+		uint16_t m_display_ctrl;
+		uint16_t m_config;
+		uint16_t m_ram[0x8000];
+		uint8_t m_reg_idx;
+		uint16_t m_reg_data;
 	};
 
 
-	struct XMAP_t
+	struct xmap_t
 	{
-		uint32_t nRegister[0x08];
-		uint32_t nModeTable[0x20];
+		uint32_t m_config;
+		uint32_t m_revision;
+		uint32_t m_entries;
+		uint32_t m_cursor_cmap;
+		uint32_t m_popup_cmap;
+		uint32_t m_mode_table_idx;
+		uint32_t m_mode_table[0x20];
 	};
 
-	struct REX3_t
+	struct rex3_t
 	{
-		uint32_t nDrawMode1;
-		uint32_t nDrawMode0;
-		uint32_t nLSMode;
-		uint32_t nLSPattern;
-		uint32_t nLSPatSave;
-		uint32_t nZPattern;
-		uint32_t nColorBack;
-		uint32_t nColorVRAM;
-		uint32_t nAlphaRef;
-		//uint32_t nStall0;
-		uint32_t nSMask0X;
-		uint32_t nSMask0Y;
-		uint32_t nSetup;
-		uint32_t nStepZ;
-		uint32_t nXStart;
-		uint32_t nYStart;
-		uint32_t nXEnd;
-		uint32_t nYEnd;
-		uint32_t nXSave;
-		uint32_t nXYMove;
-		uint32_t nBresD;
-		uint32_t nBresS1;
-		uint32_t nBresOctInc1;
-		uint32_t nBresRndInc2;
-		uint32_t nBresE1;
-		uint32_t nBresS2;
-		uint32_t nAWeight0;
-		uint32_t nAWeight1;
-		uint32_t nXStartF;
-		uint32_t nYStartF;
-		uint32_t nXEndF;
-		uint32_t nYEndF;
-		uint32_t nXStartI;
-		//uint32_t nYEndF1;
-		uint32_t nXYStartI;
-		uint32_t nXYEndI;
-		uint32_t nXStartEndI;
-		uint32_t nColorRed;
-		uint32_t nColorAlpha;
-		uint32_t nColorGreen;
-		uint32_t nColorBlue;
-		uint32_t nSlopeRed;
-		uint32_t nSlopeAlpha;
-		uint32_t nSlopeGreen;
-		uint32_t nSlopeBlue;
-		uint32_t nWriteMask;
-		uint32_t nZeroFract;
-		uint32_t nZeroOverflow;
-		//uint32_t nColorIndex;
-		uint32_t nHostDataPortMSW;
-		uint32_t nHostDataPortLSW;
-		uint32_t nDCBMode;
-		uint32_t nDCBRegSelect;
-		uint32_t nDCBSlvSelect;
-		uint32_t nDCBDataMSW;
-		uint32_t nDCBDataLSW;
-		uint32_t nSMask1X;
-		uint32_t nSMask1Y;
-		uint32_t nSMask2X;
-		uint32_t nSMask2Y;
-		uint32_t nSMask3X;
-		uint32_t nSMask3Y;
-		uint32_t nSMask4X;
-		uint32_t nSMask4Y;
-		uint32_t nTopScanline;
-		uint32_t nXYWin;
-		uint32_t nClipMode;
-		uint32_t nConfig;
-		uint32_t nStatus;
-		uint8_t nXFerWidth;
-#if 0
-		uint32_t nCurrentX;
-		uint32_t nCurrentY;
-#endif
-		uint32_t nKludge_SkipLine;
+		uint32_t m_draw_mode0;
+		uint32_t m_draw_mode1;
+		uint32_t m_ls_mode;
+		uint32_t m_ls_pattern;
+		uint32_t m_ls_pattern_saved;
+		uint32_t m_z_pattern;
+		uint32_t m_color_back;
+		uint32_t m_color_vram;
+		uint32_t m_alpha_ref;
+		uint32_t m_smask0_x;
+		uint32_t m_smask0_y;
+		uint32_t m_setup;
+		uint32_t m_step_z;
+		uint32_t m_x_start;
+		uint32_t m_y_start;
+		uint32_t m_x_end;
+		uint32_t m_y_end;
+		uint32_t m_x_save;
+		uint32_t m_xy_move;
+		uint32_t m_bres_d;
+		uint32_t m_bres_s1;
+		uint32_t m_bres_octant_inc1;
+		uint32_t m_bres_round_inc2;
+		uint32_t m_bres_e1;
+		uint32_t m_bres_s2;
+		uint32_t m_a_weight0;
+		uint32_t m_a_weight1;
+		uint32_t m_x_start_f;
+		uint32_t m_y_start_f;
+		uint32_t m_x_end_f;
+		uint32_t m_y_end_f;
+		uint32_t m_x_start_i;
+		uint32_t m_xy_start_i;
+		uint32_t m_xy_end_i;
+		uint32_t m_x_start_end_i;
+		uint32_t m_color_red;
+		uint32_t m_color_alpha;
+		uint32_t m_color_green;
+		uint32_t m_color_blue;
+		uint32_t m_slope_red;
+		uint32_t m_slope_alpha;
+		uint32_t m_slope_green;
+		uint32_t m_slope_blue;
+		uint32_t m_write_mask;
+		uint32_t m_zero_fract;
+		uint32_t m_zero_overflow;
+		uint32_t m_host_dataport_msw;
+		uint32_t m_host_dataport_lsw;
+		uint32_t m_dcb_mode;
+		uint32_t m_dcb_reg_select;
+		uint32_t m_dcb_slave_select;
+		uint32_t m_dcb_data_msw;
+		uint32_t m_dcb_data_lsw;
+		uint32_t m_s_mask1_x;
+		uint32_t m_s_mask1_y;
+		uint32_t m_s_mask2_x;
+		uint32_t m_s_mask2_y;
+		uint32_t m_s_mask3_x;
+		uint32_t m_s_mask3_y;
+		uint32_t m_s_mask4_x;
+		uint32_t m_s_mask4_y;
+		uint32_t m_top_scanline;
+		uint32_t m_xy_window;
+		uint32_t m_clip_mode;
+		uint32_t m_config;
+		uint32_t m_status;
+		uint8_t m_xfer_width;
+		uint32_t m_skipline_kludge;
 	};
 
 
-	struct CMAP_t
+	struct cmap_t
 	{
-		uint16_t nPaletteIndex;
-		uint32_t nPalette[0x10000];
+		uint16_t m_palette_idx;
+		uint32_t m_palette[0x10000];
 	};
 
+	uint32_t get_cursor_pixel(int x, int y);
 
 	// internal state
 
-	DECLARE_READ32_MEMBER( cmap0_r );
-	DECLARE_WRITE32_MEMBER( cmap0_w );
-	DECLARE_READ32_MEMBER( cmap1_r );
-	DECLARE_READ32_MEMBER( xmap0_r );
-	DECLARE_WRITE32_MEMBER( xmap0_w );
-	DECLARE_READ32_MEMBER( xmap1_r );
-	DECLARE_WRITE32_MEMBER( xmap1_w );
-	DECLARE_READ32_MEMBER( vc2_r );
-	DECLARE_WRITE32_MEMBER( vc2_w );
-	void DoREX3Command();
+	DECLARE_READ32_MEMBER(cmap0_r);
+	DECLARE_WRITE32_MEMBER(cmap0_w);
+	DECLARE_READ32_MEMBER(cmap1_r);
+	DECLARE_READ32_MEMBER(xmap0_r);
+	DECLARE_WRITE32_MEMBER(xmap0_w);
+	DECLARE_READ32_MEMBER(xmap1_r);
+	DECLARE_WRITE32_MEMBER(xmap1_w);
+	DECLARE_READ32_MEMBER(vc2_r);
+	DECLARE_WRITE32_MEMBER(vc2_w);
+	void do_rex3_command();
 
-	VC2_t  m_VC2;
-	XMAP_t m_XMAP0;
-	XMAP_t m_XMAP1;
-	REX3_t m_REX3;
+	required_device<mips3_device> m_maincpu;
+	required_device<hpc3_device> m_hpc3;
+	vc2_t  m_vc2;
+	xmap_t m_xmap0;
+	xmap_t m_xmap1;
+	rex3_t m_rex3;
 	std::unique_ptr<uint32_t[]> m_base;
-	uint8_t  m_nDrawGreen;
-	CMAP_t m_CMAP0;
+	cmap_t m_cmap0;
 };
-
-
-
-#define MCFG_NEWPORT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NEWPORT_VIDEO, 0)
-
 
 DECLARE_DEVICE_TYPE(NEWPORT_VIDEO, newport_video_device)
 

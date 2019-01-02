@@ -46,10 +46,9 @@ TILE_GET_INFO_MEMBER(taitol_state::get_tx_tile_info)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(taitol_state, taito_l)
+void taitol_state::video_start()
 {
 	m_buff_spriteram = make_unique_clear<u8[]>(SPRITERAM_SIZE);
-	int i;
 
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitol_state::get_tile_info<0x8000>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitol_state::get_tile_info<0x9000>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
@@ -58,14 +57,11 @@ VIDEO_START_MEMBER(taitol_state, taito_l)
 	m_bg_tilemap[0]->set_transparent_pen(0);
 	m_tx_tilemap->set_transparent_pen(0);
 
-	for (i = 0; i < 256; i++)
-		m_palette->set_pen_color(i, rgb_t(0, 0, 0));
-
 	m_tx_tilemap->set_scrolldx(-8, -8);
 	m_bg_tilemap[0]->set_scrolldx(28, -11);
 	m_bg_tilemap[1]->set_scrolldx(38, -21);
 
-	save_pointer(NAME(m_buff_spriteram.get()), SPRITERAM_SIZE);
+	save_pointer(NAME(m_buff_spriteram), SPRITERAM_SIZE);
 }
 
 

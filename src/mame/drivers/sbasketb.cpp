@@ -43,7 +43,6 @@ CPU/Video Board Parts:
 #include "emu.h"
 #include "includes/sbasketb.h"
 #include "includes/konamipt.h"
-#include "audio/trackfld.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
@@ -51,9 +50,8 @@ CPU/Video Board Parts:
 #include "machine/gen_latch.h"
 #include "machine/konami1.h"
 #include "machine/watchdog.h"
-#include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "screen.h"
+
 #include "speaker.h"
 
 
@@ -82,23 +80,23 @@ WRITE_LINE_MEMBER(sbasketb_state::irq_mask_w)
 void sbasketb_state::sbasketb_map(address_map &map)
 {
 	map(0x2000, 0x2fff).ram();
-	map(0x3000, 0x33ff).ram().w(this, FUNC(sbasketb_state::sbasketb_colorram_w)).share("colorram");
-	map(0x3400, 0x37ff).ram().w(this, FUNC(sbasketb_state::sbasketb_videoram_w)).share("videoram");
-	map(0x3800, 0x39ff).ram().share("spriteram");
+	map(0x3000, 0x33ff).ram().w(FUNC(sbasketb_state::sbasketb_colorram_w)).share(m_colorram);
+	map(0x3400, 0x37ff).ram().w(FUNC(sbasketb_state::sbasketb_videoram_w)).share(m_videoram);
+	map(0x3800, 0x39ff).ram().share(m_spriteram);
 	map(0x3a00, 0x3bff).ram();           /* Probably unused, but initialized */
 	map(0x3c00, 0x3c00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3c10, 0x3c10).nopr();    /* ???? */
-	map(0x3c20, 0x3c20).writeonly().share("palettebank");
+	map(0x3c20, 0x3c20).writeonly().share(m_palettebank);
 	map(0x3c80, 0x3c87).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x3d00, 0x3d00).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x3d80, 0x3d80).w(this, FUNC(sbasketb_state::sbasketb_sh_irqtrigger_w));
+	map(0x3d80, 0x3d80).w(FUNC(sbasketb_state::sbasketb_sh_irqtrigger_w));
 	map(0x3e00, 0x3e00).portr("SYSTEM");
 	map(0x3e01, 0x3e01).portr("P1");
 	map(0x3e02, 0x3e02).portr("P2");
 	map(0x3e03, 0x3e03).nopr();
 	map(0x3e80, 0x3e80).portr("DSW2");
 	map(0x3f00, 0x3f00).portr("DSW1");
-	map(0x3f80, 0x3f80).writeonly().share("scroll");
+	map(0x3f80, 0x3f80).writeonly().share(m_scroll);
 	map(0x6000, 0xffff).rom();
 }
 
@@ -107,12 +105,12 @@ void sbasketb_state::sbasketb_sound_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).ram();
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x8000, 0x8000).r("trackfld_audio", FUNC(trackfld_audio_device::hyperspt_sh_timer_r));
+	map(0x8000, 0x8000).r(m_soundbrd, FUNC(trackfld_audio_device::hyperspt_sh_timer_r));
 	map(0xa000, 0xa000).w(m_vlm, FUNC(vlm5030_device::data_w)); /* speech data */
-	map(0xc000, 0xdfff).w("trackfld_audio", FUNC(trackfld_audio_device::hyperspt_sound_w));     /* speech and output control */
-	map(0xe000, 0xe000).w("dac", FUNC(dac_byte_interface::write));
-	map(0xe001, 0xe001).w(this, FUNC(sbasketb_state::konami_SN76496_latch_w));  /* Loads the snd command into the snd latch */
-	map(0xe002, 0xe002).w(this, FUNC(sbasketb_state::konami_SN76496_w));      /* This address triggers the SN chip to read the data port. */
+	map(0xc000, 0xdfff).w(m_soundbrd, FUNC(trackfld_audio_device::hyperspt_sound_w));     /* speech and output control */
+	map(0xe000, 0xe000).w(m_dac, FUNC(dac_byte_interface::data_w));
+	map(0xe001, 0xe001).w(FUNC(sbasketb_state::konami_SN76496_latch_w));  /* Loads the snd command into the snd latch */
+	map(0xe002, 0xe002).w(FUNC(sbasketb_state::konami_SN76496_w));      /* This address triggers the SN chip to read the data port. */
 }
 
 
@@ -183,7 +181,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( sbasketb )
+static GFXDECODE_START( gfx_sbasketb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16*16 )
 GFXDECODE_END
@@ -197,61 +195,58 @@ WRITE_LINE_MEMBER(sbasketb_state::vblank_irq)
 MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, 1400000)        /* 1.400 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sbasketb_map)
+	MCFG_DEVICE_ADD(m_maincpu, KONAMI1, 1400000)        /* 1.400 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sbasketb_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181) / 4) /* 3.5795 MHz */
-	MCFG_CPU_PROGRAM_MAP(sbasketb_sound_map)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(14'318'181) / 4) /* 3.5795 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sbasketb_sound_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B3
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sbasketb_state, flipscreen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sbasketb_state, irq_mask_w)) // INTST
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // MUT - not used?
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(sbasketb_state, coin_counter_1_w)) // COIN 1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(sbasketb_state, coin_counter_2_w)) // COIN 2
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(sbasketb_state, spriteram_select_w)) // OBJ CHE
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // END - not used
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // B3
+	mainlatch.q_out_cb<0>().set(FUNC(sbasketb_state::flipscreen_w)); // FLIP
+	mainlatch.q_out_cb<1>().set(FUNC(sbasketb_state::irq_mask_w)); // INTST
+	mainlatch.q_out_cb<2>().set_nop(); // MUT - not used?
+	mainlatch.q_out_cb<3>().set(FUNC(sbasketb_state::coin_counter_1_w)); // COIN 1
+	mainlatch.q_out_cb<4>().set(FUNC(sbasketb_state::coin_counter_2_w)); // COIN 2
+	mainlatch.q_out_cb<5>().set(FUNC(sbasketb_state::spriteram_select_w)); // OBJ CHE
+	mainlatch.q_out_cb<6>().set_nop(); // END - not used
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sbasketb_state, screen_update_sbasketb)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sbasketb_state, vblank_irq))
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sbasketb_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbasketb)
-	MCFG_PALETTE_ADD("palette", 16*16+16*16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(sbasketb_state, sbasketb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sbasketb);
+	PALETTE(config, m_palette, FUNC(sbasketb_state::sbasketb_palette), 16*16+16*16*16, 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
+	MCFG_DEVICE_ADD(m_soundbrd, TRACKFLD_AUDIO, 0, m_audiocpu, m_vlm)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD(m_dac, DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("snsnd", SN76489, XTAL(14'318'181) / 8)
+	MCFG_DEVICE_ADD(m_sn, SN76489, XTAL(14'318'181) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL(3'579'545)) /* Schematics say 3.58MHz, but board uses 3.579545MHz xtal */
+	MCFG_DEVICE_ADD(m_vlm, VLM5030, XTAL(3'579'545)) /* Schematics say 3.58MHz, but board uses 3.579545MHz xtal */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sbasketb_state::sbasketbu)
 	sbasketb(config);
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", MC6809E, 1400000)        /* 6809E at 1.400 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sbasketb_map)
+	MCFG_DEVICE_REPLACE(m_maincpu, MC6809E, 1400000)        /* 6809E at 1.400 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sbasketb_map)
 MACHINE_CONFIG_END
 
 
@@ -428,11 +423,11 @@ ROM_START( sbaskete )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(sbasketb_state,sbasketb)
+void sbasketb_state::init_sbasketb()
 {
 }
 
-GAME( 1984, sbasketb, 0,        sbasketb,  sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version I, encrypted)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sbasketh, sbasketb, sbasketbu, sbasketb, sbasketb_state, 0,        ROT90, "Konami", "Super Basketball (version H, unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sbasketg, sbasketb, sbasketb,  sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version G, encrypted)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sbaskete, sbasketb, sbasketb,  sbasketb, sbasketb_state, sbasketb, ROT90, "Konami", "Super Basketball (version E, encrypted)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbasketb, 0,        sbasketb,  sbasketb, sbasketb_state, init_sbasketb, ROT90, "Konami", "Super Basketball (version I, encrypted)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbasketh, sbasketb, sbasketbu, sbasketb, sbasketb_state, empty_init,    ROT90, "Konami", "Super Basketball (version H, unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbasketg, sbasketb, sbasketb,  sbasketb, sbasketb_state, init_sbasketb, ROT90, "Konami", "Super Basketball (version G, encrypted)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbaskete, sbasketb, sbasketb,  sbasketb, sbasketb_state, init_sbasketb, ROT90, "Konami", "Super Basketball (version E, encrypted)",   MACHINE_SUPPORTS_SAVE )

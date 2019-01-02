@@ -232,7 +232,7 @@ WRITE8_MEMBER(gladiatr_state::gladiator_adpcm_w)
 	// bit 6 = bank offset
 	membank("bank2")->set_entry((data & 0x40) ? 1 : 0);
 
-	m_msm->data_w(data);            // bit 0..3
+	m_msm->write_data(data);        // bit 0..3
 	m_msm->reset_w(BIT(data, 5));   // bit 5
 	m_msm->vclk_w (BIT(data, 4));   // bit 4
 }
@@ -242,7 +242,7 @@ WRITE8_MEMBER(ppking_state::ppking_adpcm_w)
 	// bit 6 = bank offset
 	//membank("bank2")->set_entry((data & 0x40) ? 1 : 0);
 
-	m_msm->data_w(data);            // bit 0..3
+	m_msm->write_data(data);        // bit 0..3
 	m_msm->reset_w(BIT(data, 5));   // bit 5
 	m_msm->vclk_w (BIT(data, 4));   // bit 4
 }
@@ -619,19 +619,19 @@ void ppking_state::ppking_cpu1_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcbff).ram().share("spriteram");
-	map(0xcc00, 0xcfff).w(this, FUNC(ppking_state::ppking_video_registers_w));
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(ppking_state::paletteram_w)).share("paletteram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(ppking_state::videoram_w)).share("videoram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(ppking_state::colorram_w)).share("colorram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(ppking_state::textram_w)).share("textram");
+	map(0xcc00, 0xcfff).w(FUNC(ppking_state::ppking_video_registers_w));
+	map(0xd000, 0xd7ff).ram().w(FUNC(ppking_state::paletteram_w)).share("paletteram");
+	map(0xd800, 0xdfff).ram().w(FUNC(ppking_state::videoram_w)).share("videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(ppking_state::colorram_w)).share("colorram");
+	map(0xe800, 0xefff).ram().w(FUNC(ppking_state::textram_w)).share("textram");
 	map(0xf000, 0xf7ff).ram().share("nvram"); /* battery backed RAM */
 }
 
 
 void ppking_state::ppking_cpu3_map(address_map &map)
 {
-	map(0x1000, 0x1fff).w(this, FUNC(ppking_state::ppking_adpcm_w));
-	map(0x2000, 0x2fff).r(this, FUNC(ppking_state::adpcm_command_r));
+	map(0x1000, 0x1fff).w(FUNC(ppking_state::ppking_adpcm_w));
+	map(0x2000, 0x2fff).r(FUNC(ppking_state::adpcm_command_r));
 	map(0x8000, 0xffff).rom().nopw();
 }
 
@@ -640,19 +640,19 @@ void ppking_state::ppking_cpu1_io(address_map &map)
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	map(0xc000, 0xc007).w("mainlatch", FUNC(ls259_device::write_d0));
 //  map(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
-	map(0xc09e, 0xc09f).r(this, FUNC(ppking_state::ppking_qx0_r)).w(this, FUNC(ppking_state::ppking_qx0_w));
+	map(0xc09e, 0xc09f).r(FUNC(ppking_state::ppking_qx0_r)).w(FUNC(ppking_state::ppking_qx0_w));
 	map(0xc0bf, 0xc0bf).noprw(); // watchdog
-	map(0xc0c0, 0xc0c1).r(this, FUNC(ppking_state::ppking_qxcomu_r)).w(this, FUNC(ppking_state::ppking_qxcomu_w));
+	map(0xc0c0, 0xc0c1).r(FUNC(ppking_state::ppking_qxcomu_r)).w(FUNC(ppking_state::ppking_qxcomu_w));
 }
 
 void ppking_state::ppking_cpu2_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x20, 0x21).r(this, FUNC(ppking_state::ppking_qx1_r)).w(this, FUNC(ppking_state::ppking_qx1_w));
-	map(0x40, 0x40).w(this, FUNC(ppking_state::cpu2_irq_ack_w));
-	map(0x80, 0x81).rw(this, FUNC(ppking_state::ppking_qx3_r), FUNC(ppking_state::ppking_qx3_w));
-	map(0xe0, 0xe0).w(this, FUNC(ppking_state::adpcm_command_w));
+	map(0x20, 0x21).r(FUNC(ppking_state::ppking_qx1_r)).w(FUNC(ppking_state::ppking_qx1_w));
+	map(0x40, 0x40).w(FUNC(ppking_state::cpu2_irq_ack_w));
+	map(0x80, 0x81).rw(FUNC(ppking_state::ppking_qx3_r), FUNC(ppking_state::ppking_qx3_w));
+	map(0xe0, 0xe0).w(FUNC(ppking_state::adpcm_command_w));
 }
 
 
@@ -663,11 +663,11 @@ void gladiatr_state::gladiatr_cpu1_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xcbff).ram().share("spriteram");
-	map(0xcc00, 0xcfff).w(this, FUNC(gladiatr_state::gladiatr_video_registers_w));
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(gladiatr_state::paletteram_w)).share("paletteram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(gladiatr_state::videoram_w)).share("videoram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(gladiatr_state::colorram_w)).share("colorram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(gladiatr_state::textram_w)).share("textram");
+	map(0xcc00, 0xcfff).w(FUNC(gladiatr_state::gladiatr_video_registers_w));
+	map(0xd000, 0xd7ff).ram().w(FUNC(gladiatr_state::paletteram_w)).share("paletteram");
+	map(0xd800, 0xdfff).ram().w(FUNC(gladiatr_state::videoram_w)).share("videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(gladiatr_state::colorram_w)).share("colorram");
+	map(0xe800, 0xefff).ram().w(FUNC(gladiatr_state::textram_w)).share("textram");
 	map(0xf000, 0xf7ff).ram().share("nvram"); /* battery backed RAM */
 }
 
@@ -679,8 +679,8 @@ void gladiatr_state_base::cpu2_map(address_map &map)
 
 void gladiatr_state::gladiatr_cpu3_map(address_map &map)
 {
-	map(0x1000, 0x1fff).w(this, FUNC(gladiatr_state::gladiator_adpcm_w));
-	map(0x2000, 0x2fff).r(this, FUNC(gladiatr_state::adpcm_command_r));
+	map(0x1000, 0x1fff).w(FUNC(gladiatr_state::gladiator_adpcm_w));
+	map(0x2000, 0x2fff).r(FUNC(gladiatr_state::adpcm_command_r));
 	map(0x4000, 0xffff).bankr("bank2").nopw();
 }
 
@@ -688,7 +688,7 @@ void gladiatr_state::gladiatr_cpu3_map(address_map &map)
 void gladiatr_state::gladiatr_cpu1_io(address_map &map)
 {
 	map(0xc000, 0xc007).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xc004, 0xc004).w(this, FUNC(gladiatr_state::gladiatr_irq_patch_w)); /* !!! patch to 2nd CPU IRQ !!! */
+	map(0xc004, 0xc004).w(FUNC(gladiatr_state::gladiatr_irq_patch_w)); /* !!! patch to 2nd CPU IRQ !!! */
 	map(0xc09e, 0xc09f).rw(m_ucpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
 	map(0xc0bf, 0xc0bf).noprw(); // watchdog_reset_w doesn't work
 }
@@ -702,7 +702,7 @@ void gladiatr_state::gladiatr_cpu2_io(address_map &map)
 	map(0x60, 0x61).rw(m_cctl, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
 	map(0x80, 0x81).rw(m_ccpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
 	map(0xa0, 0xa7).w("filtlatch", FUNC(ls259_device::write_d0));
-	map(0xe0, 0xe0).w(this, FUNC(gladiatr_state::adpcm_command_w));
+	map(0xe0, 0xe0).w(FUNC(gladiatr_state::adpcm_command_w));
 }
 
 
@@ -924,13 +924,13 @@ static const gfx_layout spritelayout  =
 	64*8
 };
 
-static GFXDECODE_START( ppking )
+static GFXDECODE_START( gfx_ppking )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x100, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( gladiatr )
+static GFXDECODE_START( gfx_gladiatr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x200, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   0x000, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x100, 32 )
@@ -941,32 +941,32 @@ GFXDECODE_END
 MACHINE_CONFIG_START(ppking_state::ppking)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12_MHz_XTAL/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(ppking_cpu1_map)
-	MCFG_CPU_IO_MAP(ppking_cpu1_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ppking_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 12_MHz_XTAL/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(ppking_cpu1_map)
+	MCFG_DEVICE_IO_MAP(ppking_cpu1_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ppking_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, 12_MHz_XTAL/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_IO_MAP(ppking_cpu2_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ppking_state,  irq0_line_assert, 60)
+	MCFG_DEVICE_ADD("sub", Z80, 12_MHz_XTAL/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_IO_MAP(ppking_cpu2_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(ppking_state,  irq0_line_assert, 60)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(ppking_cpu3_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(ppking_cpu3_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_MACHINE_RESET_OVERRIDE(ppking_state, ppking)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5L on main board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ppking_state, spritebuffer_w))
-//  MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gladiatr_state, spritebank_w))
-//  MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(MEMBANK("bank1"))
-//  MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ppking_state, nmi_mask_w))
-//  MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5L on main board
+	mainlatch.q_out_cb<0>().set(FUNC(ppking_state::spritebuffer_w));
+//  mainlatch.q_out_cb<1>().set(FUNC(gladiatr_state::spritebank_w));
+//  mainlatch.q_out_cb<2>().set_membank("bank1");
+//  mainlatch.q_out_cb<3>().set(FUNC(ppking_state::nmi_mask_w));
+//  mainlatch.q_out_cb<4>().set("sub", INPUT_LINE_RESET); // shadowed by aforementioned hack
 //  Q6 used
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(ppking_state, flipscreen_w))
+	mainlatch.q_out_cb<7>().set(FUNC(ppking_state::flipscreen_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -978,27 +978,27 @@ MACHINE_CONFIG_START(ppking_state::ppking)
 	MCFG_SCREEN_UPDATE_DRIVER(ppking_state, screen_update_ppking)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ppking)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppking)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(ppking_state, ppking)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 12_MHz_XTAL/8) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, ym_irq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(ppking_state, ppking_f1_r))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
-	MCFG_SOUND_ROUTE(0, "mono", 0.60)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)
-	MCFG_SOUND_ROUTE(2, "mono", 0.60)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12_MHz_XTAL/8)); /* verified on pcb */
+	ymsnd.irq_handler().set(FUNC(gladiatr_state_base::ym_irq));
+	ymsnd.port_a_read_callback().set(FUNC(ppking_state::ppking_f1_r));
+	ymsnd.port_b_read_callback().set_ioport("DSW3");
+	ymsnd.add_route(0, "mono", 0.60);
+	ymsnd.add_route(1, "mono", 0.60);
+	ymsnd.add_route(2, "mono", 0.60);
+	ymsnd.add_route(3, "mono", 0.50);
 
-	MCFG_SOUND_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
+	MCFG_DEVICE_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
@@ -1006,60 +1006,60 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12_MHz_XTAL/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu1_map)
-	MCFG_CPU_IO_MAP(gladiatr_cpu1_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gladiatr_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 12_MHz_XTAL/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(gladiatr_cpu1_map)
+	MCFG_DEVICE_IO_MAP(gladiatr_cpu1_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gladiatr_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, 12_MHz_XTAL/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_IO_MAP(gladiatr_cpu2_io)
+	MCFG_DEVICE_ADD("sub", Z80, 12_MHz_XTAL/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_IO_MAP(gladiatr_cpu2_io)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu3_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(gladiatr_cpu3_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)
-	MCFG_NVRAM_ADD_0FILL("nvram") // NEC uPD449 CMOS SRAM
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // NEC uPD449 CMOS SRAM
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5L on main board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gladiatr_state, spritebuffer_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gladiatr_state, spritebank_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(MEMBANK("bank1"))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(gladiatr_state, flipscreen_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5L on main board
+	mainlatch.q_out_cb<0>().set(FUNC(gladiatr_state::spritebuffer_w));
+	mainlatch.q_out_cb<1>().set(FUNC(gladiatr_state::spritebank_w));
+	mainlatch.q_out_cb<2>().set_membank("bank1");
+	mainlatch.q_out_cb<4>().set_inputline("sub", INPUT_LINE_RESET); // shadowed by aforementioned hack
+	mainlatch.q_out_cb<7>().set(FUNC(gladiatr_state::flipscreen_w));
 
-	MCFG_DEVICE_ADD("cctl", I8741, 12_MHz_XTAL/2) /* verified on pcb */
-	MCFG_MCS48_PORT_T0_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(3)
-	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(2)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(gladiatr_state, cctl_p1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(gladiatr_state, cctl_p2_r))
+	I8741(config, m_cctl, 12_MHz_XTAL/2); /* verified on pcb */
+	m_cctl->t0_in_cb().set_ioport("COINS").bit(3);
+	m_cctl->t1_in_cb().set_ioport("COINS").bit(2);
+	m_cctl->p1_in_cb().set(FUNC(gladiatr_state::cctl_p1_r));
+	m_cctl->p2_in_cb().set(FUNC(gladiatr_state::cctl_p2_r));
 
-	MCFG_DEVICE_ADD("ccpu", I8741, 12_MHz_XTAL/2) /* verified on pcb */
-	MCFG_MCS48_PORT_P1_IN_CB(IOPORT("IN0"))
-	MCFG_MCS48_PORT_P2_IN_CB(IOPORT("IN1"))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(gladiatr_state, ccpu_p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(1)
-	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(0)
+	I8741(config, m_ccpu, 12_MHz_XTAL/2); /* verified on pcb */
+	m_ccpu->p1_in_cb().set_ioport("IN0");
+	m_ccpu->p2_in_cb().set_ioport("IN1");
+	m_ccpu->p2_out_cb().set(FUNC(gladiatr_state::ccpu_p2_w));
+	m_ccpu->t0_in_cb().set_ioport("COINS").bit(1);
+	m_ccpu->t1_in_cb().set_ioport("COINS").bit(0);
 
-	MCFG_DEVICE_ADD("ucpu", I8741, 12_MHz_XTAL/2) /* verified on pcb */
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(gladiatr_state, ucpu_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(gladiatr_state, ucpu_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(gladiatr_state, ucpu_p2_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(gladiatr_state, tclk_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(gladiatr_state, ucpu_t1_r))
+	I8741(config, m_ucpu, 12_MHz_XTAL/2); /* verified on pcb */
+	m_ucpu->p1_in_cb().set(FUNC(gladiatr_state::ucpu_p1_r));
+	m_ucpu->p1_out_cb().set(FUNC(gladiatr_state::ucpu_p1_w));
+	m_ucpu->p2_in_cb().set(FUNC(gladiatr_state::ucpu_p2_r));
+	m_ucpu->t0_in_cb().set(FUNC(gladiatr_state::tclk_r));
+	m_ucpu->t1_in_cb().set(FUNC(gladiatr_state::ucpu_t1_r));
 
-	MCFG_DEVICE_ADD("csnd", I8741, 12_MHz_XTAL/2) /* verified on pcb */
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(gladiatr_state, csnd_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(gladiatr_state, csnd_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(gladiatr_state, csnd_p2_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(gladiatr_state, tclk_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(gladiatr_state, csnd_t1_r))
+	I8741(config, m_csnd, 12_MHz_XTAL/2); /* verified on pcb */
+	m_csnd->p1_in_cb().set(FUNC(gladiatr_state::csnd_p1_r));
+	m_csnd->p1_out_cb().set(FUNC(gladiatr_state::csnd_p1_w));
+	m_csnd->p2_in_cb().set(FUNC(gladiatr_state::csnd_p2_r));
+	m_csnd->t0_in_cb().set(FUNC(gladiatr_state::tclk_r));
+	m_csnd->t1_in_cb().set(FUNC(gladiatr_state::csnd_t1_r));
 
 	/* lazy way to make polled serial between MCUs work */
 	MCFG_QUANTUM_PERFECT_CPU("ucpu")
 
 	MCFG_CLOCK_ADD("tclk", 12_MHz_XTAL/8/128/2) /* verified on pcb */
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(gladiatr_state, tclk_w));
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, gladiatr_state, tclk_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1070,26 +1070,26 @@ MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 	MCFG_SCREEN_UPDATE_DRIVER(gladiatr_state, screen_update_gladiatr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gladiatr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gladiatr)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_VIDEO_START_OVERRIDE(gladiatr_state,gladiatr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 12_MHz_XTAL/8) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, ym_irq))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(gladiatr_state, gladiator_int_control_w)) /* port A write */
-	MCFG_SOUND_ROUTE(0, "mono", 0.60)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)
-	MCFG_SOUND_ROUTE(2, "mono", 0.60)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12_MHz_XTAL/8)); /* verified on pcb */
+	ymsnd.irq_handler().set(FUNC(gladiatr_state_base::ym_irq));
+	ymsnd.port_b_read_callback().set_ioport("DSW3");
+	ymsnd.port_a_write_callback().set(FUNC(gladiatr_state::gladiator_int_control_w));
+	ymsnd.add_route(0, "mono", 0.60);
+	ymsnd.add_route(1, "mono", 0.60);
+	ymsnd.add_route(2, "mono", 0.60);
+	ymsnd.add_route(3, "mono", 0.50);
 
-	MCFG_SOUND_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
+	MCFG_DEVICE_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
@@ -1378,16 +1378,13 @@ void gladiatr_state::swap_block(uint8_t *src1,uint8_t *src2,int len)
 	}
 }
 
-DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
+void gladiatr_state::init_gladiatr()
 {
-	uint8_t *rom;
-	int i,j;
-
-	rom = memregion("gfx2")->base();
+	uint8_t *rom = memregion("gfx2")->base();
 	// unpack 3bpp graphics
-	for (j = 3; j >= 0; j--)
+	for (int j = 3; j >= 0; j--)
 	{
-		for (i = 0; i < 0x2000; i++)
+		for (int i = 0; i < 0x2000; i++)
 		{
 			rom[i+(2*j+1)*0x2000] = rom[i+j*0x2000] >> 4;
 			rom[i+2*j*0x2000] = rom[i+j*0x2000];
@@ -1399,9 +1396,9 @@ DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 
 	rom = memregion("gfx3")->base();
 	// unpack 3bpp graphics
-	for (j = 5; j >= 0; j--)
+	for (int j = 5; j >= 0; j--)
 	{
-		for (i = 0; i < 0x2000; i++)
+		for (int i = 0; i < 0x2000; i++)
 		{
 			rom[i+(2*j+1)*0x2000] = rom[i+j*0x2000] >> 4;
 			rom[i+2*j*0x2000] = rom[i+j*0x2000];
@@ -1433,23 +1430,20 @@ DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 }
 
 
-DRIVER_INIT_MEMBER(ppking_state, ppking)
+void ppking_state::init_ppking()
 {
-	uint8_t *rom;
-	int i,j;
-
-	rom = memregion("gfx2")->base();
+	uint8_t *rom = memregion("gfx2")->base();
 	// unpack 3bpp graphics
-	for (i = 0; i < 0x2000; i++)
+	for (int i = 0; i < 0x2000; i++)
 	{
 		rom[i+0x2000] = rom[i] >> 4;
 	}
 
 	rom = memregion("gfx3")->base();
 	// unpack 3bpp graphics
-	for (j = 1; j >= 0; j--)
+	for (int j = 1; j >= 0; j--)
 	{
-		for (i = 0; i < 0x2000; i++)
+		for (int i = 0; i < 0x2000; i++)
 		{
 			rom[i+(2*j+1)*0x2000] = rom[i+j*0x2000] >> 4;
 			rom[i+2*j*0x2000] = rom[i+j*0x2000];
@@ -1472,8 +1466,8 @@ DRIVER_INIT_MEMBER(ppking_state, ppking)
 
 
 
-GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
-GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Golden Castle (prototype?)", MACHINE_SUPPORTS_SAVE ) // incomplete dump
+GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   init_ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
+GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation", "Golden Castle (prototype?)", MACHINE_SUPPORTS_SAVE ) // incomplete dump

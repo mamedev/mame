@@ -273,7 +273,13 @@ void cbm_iec_slot_device::device_start()
 	if (dev) bus->add_device(this, get_card_device());
 }
 
-
+void cbm_iec_slot_device::add_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot)
+{
+	cbm_iec_slot_device &slot(CBM_IEC_SLOT(config, _tag, 0));
+	cbm_iec_devices(slot);
+	slot.set_default_option(_def_slot);
+	slot.set_address(_address);
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -319,8 +325,8 @@ void cbm_iec_device::device_start()
 
 void cbm_iec_device::device_reset()
 {
-	reset_w(0);
-	reset_w(1);
+	host_reset_w(0);
+	host_reset_w(1);
 }
 
 
@@ -497,30 +503,31 @@ int cbm_iec_device::get_signal(int signal)
 #include "vic1520.h"
 #include "c1526.h"
 
-SLOT_INTERFACE_START( cbm_iec_devices )
-	SLOT_INTERFACE("c1540", C1540)
-	SLOT_INTERFACE("c1541", C1541)
-	SLOT_INTERFACE("c1541c", C1541C)
-	SLOT_INTERFACE("c1541ii", C1541II)
-	SLOT_INTERFACE("fsd1", FSD1)
-	SLOT_INTERFACE("fsd2", FSD2)
-	SLOT_INTERFACE("csd1", CSD1)
-	SLOT_INTERFACE("c1541dd", C1541_DOLPHIN_DOS)
-	SLOT_INTERFACE("c1541pd", C1541_PROFESSIONAL_DOS_V1)
-	SLOT_INTERFACE("c1541pdc", C1541_PROLOGIC_DOS_CLASSIC)
-	SLOT_INTERFACE("c1570", C1570)
-	SLOT_INTERFACE("c1571", C1571)
-	SLOT_INTERFACE("c1581", C1581)
-	SLOT_INTERFACE("indusgt", INDUS_GT)
-	SLOT_INTERFACE("cmdhd", CMD_HD)
-	SLOT_INTERFACE("fd2000", FD2000)
-	SLOT_INTERFACE("fd4000", FD4000)
-	SLOT_INTERFACE("interpod", INTERPOD)
-	SLOT_INTERFACE("minichief", MINI_CHIEF)
-	SLOT_INTERFACE("serialbox", SERIAL_BOX)
-	SLOT_INTERFACE("diag264", DIAG264_SERIAL_LOOPBACK)
-	SLOT_INTERFACE("nl10", C64_NL10_INTERFACE)
-	SLOT_INTERFACE("vic1515", VIC1515)
-	SLOT_INTERFACE("vic1520", VIC1520)
-	SLOT_INTERFACE("c1526", C1526)
-SLOT_INTERFACE_END
+void cbm_iec_devices(device_slot_interface &device)
+{
+	device.option_add("c1540", C1540);
+	device.option_add("c1541", C1541);
+	device.option_add("c1541c", C1541C);
+	device.option_add("c1541ii", C1541II);
+	device.option_add("fsd1", FSD1);
+	device.option_add("fsd2", FSD2);
+	device.option_add("csd1", CSD1);
+	device.option_add("c1541dd", C1541_DOLPHIN_DOS);
+	device.option_add("c1541pd", C1541_PROFESSIONAL_DOS_V1);
+	device.option_add("c1541pdc", C1541_PROLOGIC_DOS_CLASSIC);
+	device.option_add("c1570", C1570);
+	device.option_add("c1571", C1571);
+	device.option_add("c1581", C1581);
+	device.option_add("indusgt", INDUS_GT);
+	device.option_add("cmdhd", CMD_HD);
+	device.option_add("fd2000", FD2000);
+	device.option_add("fd4000", FD4000);
+	device.option_add("interpod", INTERPOD);
+	device.option_add("minichief", MINI_CHIEF);
+	device.option_add("serialbox", SERIAL_BOX);
+	device.option_add("diag264", DIAG264_SERIAL_LOOPBACK);
+	device.option_add("nl10", C64_NL10_INTERFACE);
+	device.option_add("vic1515", VIC1515);
+	device.option_add("vic1520", VIC1520);
+	device.option_add("c1526", C1526);
+}

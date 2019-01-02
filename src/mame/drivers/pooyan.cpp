@@ -67,8 +67,8 @@ WRITE_LINE_MEMBER(pooyan_state::coin_counter_2_w)
 void pooyan_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(pooyan_state::colorram_w)).share("colorram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(pooyan_state::videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).ram().w(FUNC(pooyan_state::colorram_w)).share("colorram");
+	map(0x8400, 0x87ff).ram().w(FUNC(pooyan_state::videoram_w)).share("videoram");
 	map(0x8800, 0x8fff).ram();
 	map(0x9000, 0x90ff).mirror(0x0b00).ram().share("spriteram");
 	map(0x9400, 0x94ff).mirror(0x0b00).ram().share("spriteram2");
@@ -174,7 +174,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( pooyan )
+static GFXDECODE_START( gfx_pooyan )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16 )
 GFXDECODE_END
@@ -196,19 +196,19 @@ void pooyan_state::machine_start()
 MACHINE_CONFIG_START(pooyan_state::pooyan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B2
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pooyan_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(pooyan_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pooyan_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // PAY OUT - not used
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pooyan_state, flipscreen_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // B2
+	mainlatch.q_out_cb<0>().set(FUNC(pooyan_state::irq_enable_w));
+	mainlatch.q_out_cb<1>().set("timeplt_audio", FUNC(timeplt_audio_device::sh_irqtrigger_w));
+	mainlatch.q_out_cb<2>().set("timeplt_audio", FUNC(timeplt_audio_device::mute_w));
+	mainlatch.q_out_cb<3>().set(FUNC(pooyan_state::coin_counter_1_w));
+	mainlatch.q_out_cb<4>().set(FUNC(pooyan_state::coin_counter_2_w));
+	mainlatch.q_out_cb<5>().set_nop(); // PAY OUT - not used
+	mainlatch.q_out_cb<7>().set(FUNC(pooyan_state::flipscreen_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -217,17 +217,13 @@ MACHINE_CONFIG_START(pooyan_state::pooyan)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pooyan_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pooyan_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pooyan_state, vblank_irq))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pooyan)
-	MCFG_PALETTE_ADD("palette", 16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(pooyan_state, pooyan)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pooyan);
+	PALETTE(config, m_palette, FUNC(pooyan_state::pooyan_palette), 16*16+16*16, 32);
 
 	/* sound hardware */
-
-	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
-	downcast<timeplt_audio_device *>(device)->timeplt_sound(config);
+	TIMEPLT_AUDIO(config, "timeplt_audio");
 MACHINE_CONFIG_END
 
 
@@ -321,6 +317,6 @@ ROM_END
  *************************************/
 
 //    YEAR, NAME,    PARENT, MACHINE,INPUT,  INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1982, pooyan,  0,      pooyan, pooyan, pooyan_state, 0,   ROT90,  "Konami", "Pooyan", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pooyans, pooyan, pooyan, pooyan, pooyan_state, 0,   ROT90,  "Konami (Stern Electronics license)", "Pooyan (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pootan,  pooyan, pooyan, pooyan, pooyan_state, 0,   ROT90,  "bootleg", "Pootan", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pooyan,  0,      pooyan, pooyan, pooyan_state, empty_init, ROT90,  "Konami", "Pooyan", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pooyans, pooyan, pooyan, pooyan, pooyan_state, empty_init, ROT90,  "Konami (Stern Electronics license)", "Pooyan (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pootan,  pooyan, pooyan, pooyan, pooyan_state, empty_init, ROT90,  "bootleg", "Pootan", MACHINE_SUPPORTS_SAVE )

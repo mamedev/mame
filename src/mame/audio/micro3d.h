@@ -13,7 +13,7 @@
 class micro3d_sound_device : public device_t, public device_sound_interface
 {
 public:
-	micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void dac_w(u8 data) { m_dac_data = data; }
 	void noise_sh_w(u8 data);
@@ -73,6 +73,6 @@ private:
 	sound_stream        *m_stream;
 };
 
-DECLARE_DEVICE_TYPE(MICRO3D, micro3d_sound_device)
+DECLARE_DEVICE_TYPE(MICRO3D_SOUND, micro3d_sound_device)
 
 #endif // MAME_AUDIO_MICRO3D_H

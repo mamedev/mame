@@ -111,33 +111,6 @@ enum
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PSX_DMA_CHANNEL_READ( cputag, channel, handler ) \
-	psxcpu_device::getcpu( *this, cputag )->subdevice<psxdma_device>("dma")->install_read_handler( channel, handler );
-
-#define MCFG_PSX_DMA_CHANNEL_WRITE( cputag, channel, handler ) \
-	psxcpu_device::getcpu( *this, cputag )->subdevice<psxdma_device>("dma")->install_write_handler( channel, handler );
-
-#define MCFG_PSX_GPU_READ_HANDLER(_devcb) \
-	devcb = &downcast<psxcpu_device &>(*device).set_gpu_read_handler(DEVCB_##_devcb);
-#define MCFG_PSX_GPU_WRITE_HANDLER(_devcb) \
-	devcb = &downcast<psxcpu_device &>(*device).set_gpu_write_handler(DEVCB_##_devcb);
-
-#define MCFG_PSX_SPU_READ_HANDLER(_devcb) \
-	devcb = &downcast<psxcpu_device &>(*device).set_spu_read_handler(DEVCB_##_devcb);
-#define MCFG_PSX_SPU_WRITE_HANDLER(_devcb) \
-	devcb = &downcast<psxcpu_device &>(*device).set_spu_write_handler(DEVCB_##_devcb);
-
-#define MCFG_PSX_CD_READ_HANDLER(_devcb) \
-	devcb = &downcast<psxcpu_device &>(*device).set_cd_read_handler(DEVCB_##_devcb);
-#define MCFG_PSX_CD_WRITE_HANDLER(_devcb) \
-	devcb = &downcast<psxcpu_device &>(*device).set_cd_write_handler(DEVCB_##_devcb);
-#define MCFG_PSX_DISABLE_ROM_BERR \
-	downcast<psxcpu_device *>(device)->set_disable_rom_berr(true);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -147,12 +120,12 @@ class psxcpu_device : public cpu_device, psxcpu_disassembler::config
 {
 public:
 	// configuration helpers
-	template <class Object> devcb_base &set_gpu_read_handler(Object &&cb) { return m_gpu_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_gpu_write_handler(Object &&cb) { return m_gpu_write_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_spu_read_handler(Object &&cb) { return m_spu_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_spu_write_handler(Object &&cb) { return m_spu_write_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cd_read_handler(Object &&cb) { return m_cd_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cd_write_handler(Object &&cb) { return m_cd_write_handler.set_callback(std::forward<Object>(cb)); }
+	auto gpu_read() { return m_gpu_read_handler.bind(); }
+	auto gpu_write() { return m_gpu_write_handler.bind(); }
+	auto spu_read() { return m_spu_read_handler.bind(); }
+	auto spu_write() { return m_spu_write_handler.bind(); }
+	auto cd_read() { return m_cd_read_handler.bind(); }
+	auto cd_write() { return m_cd_write_handler.bind(); }
 
 	// public interfaces
 	DECLARE_WRITE32_MEMBER( berr_w );
@@ -235,7 +208,7 @@ protected:
 	// address spaces
 	const address_space_config m_program_config;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_cache;
 
 	// other internal states
 	int m_icount;

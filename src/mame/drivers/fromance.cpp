@@ -162,14 +162,14 @@ WRITE_LINE_MEMBER(fromance_state::fromance_adpcm_int)
 	/* clock the data through */
 	if (m_vclk_left)
 	{
-		m_msm->data_w(m_adpcm_data >> 4);
+		m_msm->write_data(m_adpcm_data >> 4);
 		m_adpcm_data <<= 4;
 		m_vclk_left--;
 	}
 
 	/* generate an NMI if we're out of data */
 	if (!m_vclk_left)
-		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -229,10 +229,10 @@ void fromance_state::nekkyoku_main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram();
-	map(0xf000, 0xf000).portr("SERVICE").w(this, FUNC(fromance_state::fromance_portselect_w));
-	map(0xf001, 0xf001).r(this, FUNC(fromance_state::fromance_keymatrix_r)).nopw();
-	map(0xf002, 0xf002).portr("COIN").w(this, FUNC(fromance_state::fromance_coinctr_w));
-	map(0xf003, 0xf003).r(this, FUNC(fromance_state::fromance_busycheck_main_r)).w(m_sublatch, FUNC(generic_latch_8_device::write));
+	map(0xf000, 0xf000).portr("SERVICE").w(FUNC(fromance_state::fromance_portselect_w));
+	map(0xf001, 0xf001).r(FUNC(fromance_state::fromance_keymatrix_r)).nopw();
+	map(0xf002, 0xf002).portr("COIN").w(FUNC(fromance_state::fromance_coinctr_w));
+	map(0xf003, 0xf003).r(FUNC(fromance_state::fromance_busycheck_main_r)).w(m_sublatch, FUNC(generic_latch_8_device::write));
 	map(0xf004, 0xf004).portr("DSW2");
 	map(0xf005, 0xf005).portr("DSW1");
 }
@@ -242,10 +242,10 @@ void fromance_state::fromance_main_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xdfff).ram();
 	map(0x9e89, 0x9e89).nopr();         // unknown (idolmj)
-	map(0xe000, 0xe000).portr("SERVICE").w(this, FUNC(fromance_state::fromance_portselect_w));
-	map(0xe001, 0xe001).r(this, FUNC(fromance_state::fromance_keymatrix_r));
-	map(0xe002, 0xe002).portr("COIN").w(this, FUNC(fromance_state::fromance_coinctr_w));
-	map(0xe003, 0xe003).r(this, FUNC(fromance_state::fromance_busycheck_main_r)).w(m_sublatch, FUNC(generic_latch_8_device::write));
+	map(0xe000, 0xe000).portr("SERVICE").w(FUNC(fromance_state::fromance_portselect_w));
+	map(0xe001, 0xe001).r(FUNC(fromance_state::fromance_keymatrix_r));
+	map(0xe002, 0xe002).portr("COIN").w(FUNC(fromance_state::fromance_coinctr_w));
+	map(0xe003, 0xe003).r(FUNC(fromance_state::fromance_busycheck_main_r)).w(m_sublatch, FUNC(generic_latch_8_device::write));
 	map(0xe004, 0xe004).portr("DSW2");
 	map(0xe005, 0xe005).portr("DSW1");
 }
@@ -262,9 +262,9 @@ void fromance_state::nekkyoku_sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xefff).rw(this, FUNC(fromance_state::fromance_videoram_r), FUNC(fromance_state::fromance_videoram_w));
+	map(0xc000, 0xefff).rw(FUNC(fromance_state::fromance_videoram_r), FUNC(fromance_state::fromance_videoram_w));
 	map(0xf000, 0xf7ff).ram();
-	map(0xf800, 0xffff).rw(this, FUNC(fromance_state::fromance_paletteram_r), FUNC(fromance_state::fromance_paletteram_w));
+	map(0xf800, 0xffff).rw(FUNC(fromance_state::fromance_paletteram_r), FUNC(fromance_state::fromance_paletteram_w));
 }
 
 void fromance_state::fromance_sub_map(address_map &map)
@@ -272,8 +272,8 @@ void fromance_state::fromance_sub_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc7ff).ram();
-	map(0xc800, 0xcfff).rw(this, FUNC(fromance_state::fromance_paletteram_r), FUNC(fromance_state::fromance_paletteram_w));
-	map(0xd000, 0xffff).rw(this, FUNC(fromance_state::fromance_videoram_r), FUNC(fromance_state::fromance_videoram_w));
+	map(0xc800, 0xcfff).rw(FUNC(fromance_state::fromance_paletteram_r), FUNC(fromance_state::fromance_paletteram_w));
+	map(0xd000, 0xffff).rw(FUNC(fromance_state::fromance_videoram_r), FUNC(fromance_state::fromance_videoram_w));
 }
 
 
@@ -289,12 +289,12 @@ void fromance_state::nekkyoku_sub_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x10, 0x11).w(m_gga, FUNC(vsystem_gga_device::write));
 	map(0x12, 0x12).nopr();             // unknown
-	map(0xe0, 0xe0).w(this, FUNC(fromance_state::fromance_rombank_w));
-	map(0xe1, 0xe1).r(this, FUNC(fromance_state::fromance_busycheck_sub_r)).w(this, FUNC(fromance_state::fromance_gfxreg_w));
-	map(0xe2, 0xe5).w(this, FUNC(fromance_state::fromance_scroll_w));
+	map(0xe0, 0xe0).w(FUNC(fromance_state::fromance_rombank_w));
+	map(0xe1, 0xe1).r(FUNC(fromance_state::fromance_busycheck_sub_r)).w(FUNC(fromance_state::fromance_gfxreg_w));
+	map(0xe2, 0xe5).w(FUNC(fromance_state::fromance_scroll_w));
 	map(0xe6, 0xe6).rw(m_sublatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
-	map(0xe7, 0xe7).w(this, FUNC(fromance_state::fromance_adpcm_reset_w));
-	map(0xe8, 0xe8).w(this, FUNC(fromance_state::fromance_adpcm_w));
+	map(0xe7, 0xe7).w(FUNC(fromance_state::fromance_adpcm_reset_w));
+	map(0xe8, 0xe8).w(FUNC(fromance_state::fromance_adpcm_w));
 	map(0xe9, 0xea).w("aysnd", FUNC(ay8910_device::data_address_w));
 }
 
@@ -303,12 +303,12 @@ void fromance_state::idolmj_sub_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x10, 0x11).w(m_gga, FUNC(vsystem_gga_device::write));
 	map(0x12, 0x12).nopr();             // unknown
-	map(0x20, 0x20).w(this, FUNC(fromance_state::fromance_rombank_w));
-	map(0x21, 0x21).r(this, FUNC(fromance_state::fromance_busycheck_sub_r)).w(this, FUNC(fromance_state::fromance_gfxreg_w));
-	map(0x22, 0x25).w(this, FUNC(fromance_state::fromance_scroll_w));
+	map(0x20, 0x20).w(FUNC(fromance_state::fromance_rombank_w));
+	map(0x21, 0x21).r(FUNC(fromance_state::fromance_busycheck_sub_r)).w(FUNC(fromance_state::fromance_gfxreg_w));
+	map(0x22, 0x25).w(FUNC(fromance_state::fromance_scroll_w));
 	map(0x26, 0x26).rw(m_sublatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
-	map(0x27, 0x27).w(this, FUNC(fromance_state::fromance_adpcm_reset_w));
-	map(0x28, 0x28).w(this, FUNC(fromance_state::fromance_adpcm_w));
+	map(0x27, 0x27).w(FUNC(fromance_state::fromance_adpcm_reset_w));
+	map(0x28, 0x28).w(FUNC(fromance_state::fromance_adpcm_w));
 	map(0x29, 0x2a).w("aysnd", FUNC(ym2149_device::data_address_w));
 }
 
@@ -317,12 +317,12 @@ void fromance_state::fromance_sub_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x10, 0x11).w(m_gga, FUNC(vsystem_gga_device::write));
 	map(0x12, 0x12).nopr();             // unknown
-	map(0x20, 0x20).w(this, FUNC(fromance_state::fromance_rombank_w));
-	map(0x21, 0x21).r(this, FUNC(fromance_state::fromance_busycheck_sub_r)).w(this, FUNC(fromance_state::fromance_gfxreg_w));
-	map(0x22, 0x25).w(this, FUNC(fromance_state::fromance_scroll_w));
+	map(0x20, 0x20).w(FUNC(fromance_state::fromance_rombank_w));
+	map(0x21, 0x21).r(FUNC(fromance_state::fromance_busycheck_sub_r)).w(FUNC(fromance_state::fromance_gfxreg_w));
+	map(0x22, 0x25).w(FUNC(fromance_state::fromance_scroll_w));
 	map(0x26, 0x26).rw(m_sublatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
-	map(0x27, 0x27).w(this, FUNC(fromance_state::fromance_adpcm_reset_w));
-	map(0x28, 0x28).w(this, FUNC(fromance_state::fromance_adpcm_w));
+	map(0x27, 0x27).w(FUNC(fromance_state::fromance_adpcm_reset_w));
+	map(0x28, 0x28).w(FUNC(fromance_state::fromance_adpcm_w));
 	map(0x2a, 0x2b).w("ymsnd", FUNC(ym2413_device::write));
 }
 
@@ -852,7 +852,7 @@ static const gfx_layout bglayout =
 };
 
 
-static GFXDECODE_START( fromance )
+static GFXDECODE_START( gfx_fromance )
 	GFXDECODE_ENTRY( "gfx1", 0, bglayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,   0, 128 )
 GFXDECODE_END
@@ -903,16 +903,16 @@ MACHINE_RESET_MEMBER(fromance_state,fromance)
 MACHINE_CONFIG_START(fromance_state::nekkyoku)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 Mhz ? */
-	MCFG_CPU_PROGRAM_MAP(nekkyoku_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)     /* 6.00 Mhz ? */
+	MCFG_DEVICE_PROGRAM_MAP(nekkyoku_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80,12000000/2)     /* 6.00 Mhz ? */
-	MCFG_CPU_PROGRAM_MAP(nekkyoku_sub_map)
-	MCFG_CPU_IO_MAP(nekkyoku_sub_io_map)
+	MCFG_DEVICE_ADD("sub", Z80,12000000/2)     /* 6.00 Mhz ? */
+	MCFG_DEVICE_PROGRAM_MAP(nekkyoku_sub_map)
+	MCFG_DEVICE_IO_MAP(nekkyoku_sub_io_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("sublatch")
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_sublatch);
+	m_sublatch->set_separate_acknowledge(true);
 
 	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
 	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
@@ -925,22 +925,21 @@ MACHINE_CONFIG_START(fromance_state::nekkyoku)
 	MCFG_SCREEN_UPDATE_DRIVER(fromance_state, screen_update_fromance)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 14318180 / 2) // clock not verified
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, 14318181 / 2); // clock not verified
+	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,nekkyoku)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/6) // type not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	AY8910(config, "aysnd", 12000000/6).add_route(ALL_OUTPUTS, "mono", 0.15); // type not verified
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(fromance_state, fromance_adpcm_int)) /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fromance_state, fromance_adpcm_int)) /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -949,16 +948,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fromance_state::idolmj)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
-	MCFG_CPU_PROGRAM_MAP(fromance_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
+	MCFG_DEVICE_PROGRAM_MAP(fromance_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
-	MCFG_CPU_PROGRAM_MAP(fromance_sub_map)
-	MCFG_CPU_IO_MAP(idolmj_sub_io_map)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
+	MCFG_DEVICE_PROGRAM_MAP(fromance_sub_map)
+	MCFG_DEVICE_IO_MAP(idolmj_sub_io_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("sublatch")
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_sublatch);
+	m_sublatch->set_separate_acknowledge(true);
 
 	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
 	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
@@ -971,22 +970,21 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 	MCFG_SCREEN_UPDATE_DRIVER(fromance_state, screen_update_fromance)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
+	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL(12'000'000) / 6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	YM2149(config, "aysnd", 12000000/6).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(fromance_state, fromance_adpcm_int)) /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fromance_state, fromance_adpcm_int)) /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -995,16 +993,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fromance_state::fromance)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
-	MCFG_CPU_PROGRAM_MAP(fromance_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
+	MCFG_DEVICE_PROGRAM_MAP(fromance_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
-	MCFG_CPU_PROGRAM_MAP(fromance_sub_map)
-	MCFG_CPU_IO_MAP(fromance_sub_io_map)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
+	MCFG_DEVICE_PROGRAM_MAP(fromance_sub_map)
+	MCFG_DEVICE_IO_MAP(fromance_sub_io_map)
 
-	MCFG_GENERIC_LATCH_8_ADD("sublatch")
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_sublatch);
+	m_sublatch->set_separate_acknowledge(true);
 
 	MCFG_MACHINE_START_OVERRIDE(fromance_state,fromance)
 	MCFG_MACHINE_RESET_OVERRIDE(fromance_state,fromance)
@@ -1017,22 +1015,22 @@ MACHINE_CONFIG_START(fromance_state::fromance)
 	MCFG_SCREEN_UPDATE_DRIVER(fromance_state, screen_update_fromance)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fromance)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
+	VSYSTEM_GGA(config, m_gga, XTAL(14'318'181) / 2); // divider not verified
+	m_gga->write_cb().set(FUNC(fromance_state::fromance_gga_data_w));
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(fromance_state, fromance_adpcm_int)) /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fromance_state, fromance_adpcm_int)) /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -1257,11 +1255,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, fromance_state, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, idolmj,    0,       idolmj,   idolmj,   fromance_state, 0, ROT0, "System Service",   "Idol-Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjnatsu,   0,       fromance, mjnatsu,  fromance_state, 0, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, natsuiro,  mjnatsu, fromance, mjnatsu,  fromance_state, 0, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mfunclub,  0,       fromance, mjnatsu,  fromance_state, 0, ROT0, "Video System Co.", "Mahjong Fun Club - Idol Saizensen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, daiyogen,  0,       fromance, daiyogen, fromance_state, 0, ROT0, "Video System Co.", "Mahjong Daiyogen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, nmsengen,  0,       fromance, nmsengen, fromance_state, 0, ROT0, "Video System Co.", "Nekketsu Mahjong Sengen! AFTER 5 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, fromance,  0,       fromance, fromance, fromance_state, 0, ROT0, "Video System Co.", "Idol-Mahjong Final Romance (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nekkyoku, 0,       nekkyoku, nekkyoku, fromance_state, empty_init, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, idolmj,   0,       idolmj,   idolmj,   fromance_state, empty_init, ROT0, "System Service",   "Idol-Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjnatsu,  0,       fromance, mjnatsu,  fromance_state, empty_init, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, natsuiro, mjnatsu, fromance, mjnatsu,  fromance_state, empty_init, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mfunclub, 0,       fromance, mjnatsu,  fromance_state, empty_init, ROT0, "Video System Co.", "Mahjong Fun Club - Idol Saizensen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, daiyogen, 0,       fromance, daiyogen, fromance_state, empty_init, ROT0, "Video System Co.", "Mahjong Daiyogen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, nmsengen, 0,       fromance, nmsengen, fromance_state, empty_init, ROT0, "Video System Co.", "Nekketsu Mahjong Sengen! AFTER 5 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, fromance, 0,       fromance, fromance, fromance_state, empty_init, ROT0, "Video System Co.", "Idol-Mahjong Final Romance (Japan)", MACHINE_SUPPORTS_SAVE )

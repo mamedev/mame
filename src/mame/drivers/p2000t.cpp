@@ -39,15 +39,15 @@ Philips P2000 1 Memory map
 void p2000t_state::p2000t_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).r(this, FUNC(p2000t_state::p2000t_port_000f_r));
-	map(0x10, 0x1f).w(this, FUNC(p2000t_state::p2000t_port_101f_w));
-	map(0x20, 0x2f).r(this, FUNC(p2000t_state::p2000t_port_202f_r));
-	map(0x30, 0x3f).w(this, FUNC(p2000t_state::p2000t_port_303f_w));
-	map(0x50, 0x5f).w(this, FUNC(p2000t_state::p2000t_port_505f_w));
-	map(0x70, 0x7f).w(this, FUNC(p2000t_state::p2000t_port_707f_w));
-	map(0x88, 0x8b).w(this, FUNC(p2000t_state::p2000t_port_888b_w));
-	map(0x8c, 0x90).w(this, FUNC(p2000t_state::p2000t_port_8c90_w));
-	map(0x94, 0x94).w(this, FUNC(p2000t_state::p2000t_port_9494_w));
+	map(0x00, 0x0f).r(FUNC(p2000t_state::p2000t_port_000f_r));
+	map(0x10, 0x1f).w(FUNC(p2000t_state::p2000t_port_101f_w));
+	map(0x20, 0x2f).r(FUNC(p2000t_state::p2000t_port_202f_r));
+	map(0x30, 0x3f).w(FUNC(p2000t_state::p2000t_port_303f_w));
+	map(0x50, 0x5f).w(FUNC(p2000t_state::p2000t_port_505f_w));
+	map(0x70, 0x7f).w(FUNC(p2000t_state::p2000t_port_707f_w));
+	map(0x88, 0x8b).w(FUNC(p2000t_state::p2000t_port_888b_w));
+	map(0x8c, 0x90).w(FUNC(p2000t_state::p2000t_port_8c90_w));
+	map(0x94, 0x94).w(FUNC(p2000t_state::p2000t_port_9494_w));
 }
 
 /* Memory w/r functions */
@@ -83,15 +83,15 @@ static const gfx_layout p2000m_charlayout =
 	8 * 10
 };
 
-PALETTE_INIT_MEMBER(p2000m_state,p2000m)
+void p2000m_state::p2000m_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0,rgb_t::white()); /* white */
-	palette.set_pen_color(1,rgb_t::black()); /* black */
-	palette.set_pen_color(2,rgb_t::black()); /* black */
-	palette.set_pen_color(3,rgb_t::white()); /* white */
+	palette.set_pen_color(0, rgb_t::white()); // white
+	palette.set_pen_color(1, rgb_t::black()); // black
+	palette.set_pen_color(2, rgb_t::black()); // black
+	palette.set_pen_color(3, rgb_t::white()); // white
 }
 
-static GFXDECODE_START( p2000m )
+static GFXDECODE_START( gfx_p2000m )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, p2000m_charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -103,7 +103,6 @@ Also, notice that pictures of p2000 units shows slightly different key mappings,
 many different .chr roms could exist
 
 Small note about natural keyboard support: currently,
-- "Keypad ," is mapped to keypad '.'
 - "Code" is mapped to 'F1'
 - "Clrln" is mapped to 'F2'
 */
@@ -130,7 +129,7 @@ static INPUT_PORTS_START (p2000t)
 	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)           PORT_CHAR('f') PORT_CHAR('F')
 
 	PORT_START("KEY.2")
-	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad ,")  PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)   PORT_CHAR(UCHAR_MAMEKEY(COMMA_PAD))
 	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)       PORT_CHAR(' ')
 	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)     PORT_CHAR(UCHAR_MAMEKEY(00_PAD))
 	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)       PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
@@ -224,10 +223,10 @@ READ8_MEMBER( p2000t_state::videoram_r )
 /* Machine definition */
 MACHINE_CONFIG_START(p2000t_state::p2000t)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(p2000t_mem)
-	MCFG_CPU_IO_MAP(p2000t_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", p2000t_state,  p2000_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(p2000t_mem)
+	MCFG_DEVICE_IO_MAP(p2000t_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", p2000t_state,  p2000_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -238,12 +237,12 @@ MACHINE_CONFIG_START(p2000t_state::p2000t)
 	MCFG_SCREEN_UPDATE_DEVICE("saa5050", saa5050_device, screen_update)
 
 	MCFG_DEVICE_ADD("saa5050", SAA5050, 6000000)
-	MCFG_SAA5050_D_CALLBACK(READ8(p2000t_state, videoram_r))
+	MCFG_SAA5050_D_CALLBACK(READ8(*this, p2000t_state, videoram_r))
 	MCFG_SAA5050_SCREEN_SIZE(40, 24, 80)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -251,10 +250,10 @@ MACHINE_CONFIG_END
 /* Machine definition */
 MACHINE_CONFIG_START(p2000m_state::p2000m)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(p2000m_mem)
-	MCFG_CPU_IO_MAP(p2000t_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", p2000m_state,  p2000_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(p2000m_mem)
+	MCFG_DEVICE_IO_MAP(p2000t_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", p2000m_state,  p2000_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -264,16 +263,14 @@ MACHINE_CONFIG_START(p2000m_state::p2000m)
 	MCFG_SCREEN_SIZE(80 * 12, 24 * 20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80 * 12 - 1, 0, 24 * 20 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(p2000m_state, screen_update_p2000m)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", p2000m)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(p2000m_state,p2000m)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_p2000m);
+	PALETTE(config, m_palette, FUNC(p2000m_state::p2000m_palette), 4);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 
@@ -292,6 +289,6 @@ ROM_START(p2000m)
 	ROM_LOAD("p2000.chr", 0x0140, 0x08c0, BAD_DUMP CRC(78c17e3e) SHA1(4e1c59dc484505de1dc0b1ba7e5f70a54b0d4ccc))
 ROM_END
 
-//      YEAR    NAME    PARENT  COMPAT  MACHINE     INPUT   STATE         INIT  COMPANY    FULLNAME          FLAGS
-COMP ( 1980,    p2000t, 0,      0,      p2000t,     p2000t, p2000t_state, 0,    "Philips", "Philips P2000T", 0 )
-COMP ( 1980,    p2000m, p2000t, 0,      p2000m,     p2000t, p2000m_state, 0,    "Philips", "Philips P2000M", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME          FLAGS
+COMP( 1980, p2000t, 0,      0,      p2000t,  p2000t, p2000t_state, empty_init, "Philips", "Philips P2000T", 0 )
+COMP( 1980, p2000m, p2000t, 0,      p2000m,  p2000t, p2000m_state, empty_init, "Philips", "Philips P2000M", 0 )

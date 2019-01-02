@@ -66,8 +66,9 @@ public:
 	{ }
 
 	void msbc1(machine_config &config);
-	void msbc1_mem(address_map &map);
+
 private:
+	void msbc1_mem(address_map &map);
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
@@ -95,8 +96,8 @@ void msbc1_state::machine_reset()
 
 MACHINE_CONFIG_START(msbc1_state::msbc1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MC68000R12_TAG, M68000, XTAL(12'500'000))
-	MCFG_CPU_PROGRAM_MAP(msbc1_mem)
+	MCFG_DEVICE_ADD(MC68000R12_TAG, M68000, XTAL(12'500'000))
+	MCFG_DEVICE_PROGRAM_MAP(msbc1_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -122,5 +123,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY     FULLNAME  FLAGS
-COMP( 1985, msbc1,  0,      0,       msbc1,     msbc1, msbc1_state, 0,    "Omnibyte", "MSBC-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
+COMP( 1985, msbc1, 0,      0,      msbc1,   msbc1, msbc1_state, empty_init, "Omnibyte", "MSBC-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "mips3fe.h"
 #include "mips3com.h"
+#include "ps2vu.h"
 
 
 //**************************************************************************
@@ -49,7 +50,7 @@ bool mips3_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 	// fetch the opcode
 	assert((desc.physpc & 3) == 0);
-	op = desc.opptr.l[0] = m_mips3->m_direct->read_dword(desc.physpc);
+	op = desc.opptr.l[0] = m_mips3->m_pr32(desc.physpc);
 
 	// all instructions are 4 bytes and default to a single cycle each
 	desc.length = 4;

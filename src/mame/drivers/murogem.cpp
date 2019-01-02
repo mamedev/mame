@@ -111,6 +111,7 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -118,14 +119,18 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 class murogem_state : public driver_device
 {
 public:
-	murogem_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	murogem_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
+	void murogem(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -134,10 +139,9 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	DECLARE_WRITE8_MEMBER(outport_w);
-	DECLARE_PALETTE_INIT(murogem);
+	void murogem_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void murogem(machine_config &config);
 	void murogem_map(address_map &map);
 };
 
@@ -162,7 +166,7 @@ void murogem_state::murogem_map(address_map &map)
 	map(0x4001, 0x4001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x5000, 0x5000).portr("IN0");
 	map(0x5800, 0x5800).portr("IN1");
-	map(0x7000, 0x7000).w(this, FUNC(murogem_state::outport_w));    /* output port */
+	map(0x7000, 0x7000).w(FUNC(murogem_state::outport_w));    /* output port */
 	map(0x8000, 0x87ff).ram().share("videoram");
 	map(0xf000, 0xffff).rom();
 }
@@ -214,34 +218,31 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-static GFXDECODE_START( murogem )
+static GFXDECODE_START( gfx_murogem )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(murogem_state, murogem)
-{}
+void murogem_state::murogem_palette(palette_device &palette) const
+{
+}
 
 uint32_t murogem_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int xx,yy,count;
-	count = 0x000;
-
 	bitmap.fill(0, cliprect);
 
-	for (yy=0;yy<32;yy++)
+	int count = 0x000;
+	for (int yy = 0; yy < 32; yy++)
 	{
-		for(xx=0;xx<32;xx++)
+		for (int xx = 0; xx < 32; xx++)
 		{
-			int tileno = m_videoram[count]&0x3f;
-			int attr = m_videoram[count+0x400]&0x0f;
+			int const tileno = m_videoram[count] & 0x3f;
+			int const attr = m_videoram[count + 0x400] & 0x0f;
 
 			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,tileno,attr,0,0,xx*8,yy*8,0);
 
 			count++;
-
 		}
-
 	}
 
 	return 0;
@@ -250,9 +251,9 @@ uint32_t murogem_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 MACHINE_CONFIG_START(murogem_state::murogem)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, 8000000)      /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(murogem_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", murogem_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M6802, 8000000)      /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(murogem_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", murogem_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -261,21 +262,21 @@ MACHINE_CONFIG_START(murogem_state::murogem)
 	MCFG_SCREEN_SIZE((39+1)*8, (38+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(murogem_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", murogem)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(murogem_state, murogem)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_murogem);
+	PALETTE(config, m_palette, FUNC(murogem_state::murogem_palette), 0x100);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 750000) /* ? MHz */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", 750000)); /* ? MHz */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -335,7 +336,7 @@ ROM_START( lasvegas )
 	ROM_LOAD( "a3.1b", 0x0000, 0x0020, CRC(abddfb6b) SHA1(ed78b93701b5a3bf2053d2584e9a354fb6cec203) )   /* 74s288 at 1B */
 ROM_END
 
-GAME( 198?, murogem,  0,       murogem, murogem, murogem_state, 0, ROT0, "<unknown>", "Muroge Monaco (set 1)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, murogema, murogem, murogem, murogem, murogem_state, 0, ROT0, "<unknown>", "Muroge Monaco (set 2)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, murogemb, murogem, murogem, murogem, murogem_state, 0, ROT0, "<unknown>", "Muroge Monaco (set 3)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, lasvegas, murogem, murogem, murogem, murogem_state, 0, ROT0, "hack",      "Las Vegas, Nevada",     MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, murogem,  0,       murogem, murogem, murogem_state, empty_init, ROT0, "<unknown>", "Muroge Monaco (set 1)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, murogema, murogem, murogem, murogem, murogem_state, empty_init, ROT0, "<unknown>", "Muroge Monaco (set 2)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, murogemb, murogem, murogem, murogem, murogem_state, empty_init, ROT0, "<unknown>", "Muroge Monaco (set 3)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, lasvegas, murogem, murogem, murogem, murogem_state, empty_init, ROT0, "hack",      "Las Vegas, Nevada",     MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

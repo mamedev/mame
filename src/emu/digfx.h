@@ -102,9 +102,7 @@ const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, {
 
 
 // these macros are used for declaring gfx_decode_entry info arrays
-#define GFXDECODE_NAME( name ) gfxdecodeinfo_##name
-#define GFXDECODE_EXTERN( name ) extern const gfx_decode_entry GFXDECODE_NAME(name)[]
-#define GFXDECODE_START( name ) const gfx_decode_entry GFXDECODE_NAME(name)[] = {
+#define GFXDECODE_START( name ) const gfx_decode_entry name[] = {
 #define GFXDECODE_END { 0 } };
 
 // use these to declare a gfx_decode_entry array as a member of a device class
@@ -131,18 +129,13 @@ const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, {
 	dynamic_cast<device_gfx_interface &>(*device).set_palette(_palette_tag);
 
 #define MCFG_GFX_INFO(_info) \
-	dynamic_cast<device_gfx_interface &>(*device).set_info(GFXDECODE_NAME(_info));
+	dynamic_cast<device_gfx_interface &>(*device).set_info(_info);
 
 
 
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
-
-#define MCFG_GFXDECODE_ADD(_tag, _palette_tag, _info) \
-	MCFG_DEVICE_ADD(_tag, GFXDECODE, 0) \
-	MCFG_GFX_PALETTE(_palette_tag) \
-	MCFG_GFX_INFO(_info)
 
 #define MCFG_GFXDECODE_MODIFY(_tag, _info) \
 	MCFG_DEVICE_MODIFY(_tag) \
@@ -186,19 +179,21 @@ struct gfx_decode_entry
 class device_gfx_interface : public device_interface
 {
 public:
+	static const gfx_decode_entry empty[];
+
 	// construction/destruction
 	device_gfx_interface(const machine_config &mconfig, device_t &device,
-						const gfx_decode_entry *gfxinfo = nullptr, const char *palette_tag = nullptr);
+						const gfx_decode_entry *gfxinfo = nullptr, const char *palette_tag = finder_base::DUMMY_TAG);
 	virtual ~device_gfx_interface();
 
 	// configuration
 	void set_info(const gfx_decode_entry *gfxinfo) { m_gfxdecodeinfo = gfxinfo; }
-	void set_palette(const char *tag) { m_palette_tag = tag; m_palette_is_sibling = true; }
+	template <typename T> void set_palette(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 
 	void set_palette_disable(bool disable);
 
 	// getters
-	device_palette_interface &palette() const { assert(m_palette != nullptr); return *m_palette; }
+	device_palette_interface &palette() const { assert(m_palette); return *m_palette; }
 	gfx_element *gfx(u8 index) const { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index].get(); }
 
 	// decoding
@@ -214,13 +209,11 @@ protected:
 	virtual void interface_post_start() override;
 
 private:
-	device_palette_interface *  m_palette;                  // pointer to the palette device interface
+	optional_device<device_palette_interface> m_palette; // configured tag for palette device
 	std::unique_ptr<gfx_element>  m_gfx[MAX_GFX_ELEMENTS];    // array of pointers to graphic sets
 
 	// configuration
 	const gfx_decode_entry *    m_gfxdecodeinfo;        // pointer to array of gfx decode information
-	const char *                m_palette_tag;          // configured tag for palette device
-	bool                        m_palette_is_sibling;   // is palette a sibling or a subdevice?
 	bool                        m_palette_is_disabled;  // no palette associated with this gfx decode
 
 	// internal state

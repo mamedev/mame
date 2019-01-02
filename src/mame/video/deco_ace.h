@@ -6,7 +6,7 @@
 
     Data East 99 "ACE" Chip Emulation
 
-    Original source (from deco32.cpp) by Bryan McPhail, Splited by cam900.
+    Original source (from deco32.cpp) by Bryan McPhail, split by cam900.
 
 **************************************************************************/
 #ifndef MAME_VIDEO_DECO_ACE_H
@@ -20,14 +20,10 @@
 ***************************************************************************/
 
 
-class deco_ace_device : public device_t,
-						public device_video_interface
+class deco_ace_device : public device_t, public device_video_interface, public device_palette_interface
 {
 public:
 	deco_ace_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// configuration
-	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
 
 	DECLARE_READ32_MEMBER( buffered_palette_r );
 	DECLARE_READ16_MEMBER( buffered_palette16_r );
@@ -47,11 +43,13 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 2048; }
+
 private:
 	// internal state
 	uint32_t m_palette_effect_min;
 	uint32_t m_palette_effect_max;
-	required_device<palette_device> m_palette;
 	std::unique_ptr<uint32_t[]> m_paletteram;
 	std::unique_ptr<uint32_t[]> m_paletteram_buffered;
 	std::unique_ptr<uint16_t[]> m_ace_ram;
@@ -59,16 +57,5 @@ private:
 
 DECLARE_DEVICE_TYPE(DECO_ACE, deco_ace_device)
 
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_DECO_ACE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DECO_ACE, 0)
-
-#define MCFG_DECO_ACE_PALETTE(_palette_tag) \
-	downcast<deco_ace_device &>(*device).set_palette_tag("^" _palette_tag);
 
 #endif // MAME_VIDEO_DECO_ACE_H

@@ -16,6 +16,7 @@
 #include "cpu/nec/nec.h"
 #include "machine/cxd1095.h"
 //#include "sound/ay8910.h"
+#include "emupal.h"
 
 #define MAIN_CLOCK XTAL(16'000'000) // Unknown clock
 
@@ -148,7 +149,7 @@ static const gfx_layout charlayout =
 };
 #endif
 
-static GFXDECODE_START( korgm1 )
+static GFXDECODE_START( gfx_korgm1 )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -169,9 +170,9 @@ PALETTE_INIT_MEMBER(korgm1_state, korgm1)
 MACHINE_CONFIG_START(korgm1_state::korgm1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",V30,MAIN_CLOCK) // V50 actually
-	MCFG_CPU_PROGRAM_MAP(korgm1_map)
-	MCFG_CPU_IO_MAP(korgm1_io)
+	MCFG_DEVICE_ADD("maincpu",V30,MAIN_CLOCK) // V50 actually
+	MCFG_DEVICE_PROGRAM_MAP(korgm1_map)
+	MCFG_DEVICE_IO_MAP(korgm1_io)
 
 	MCFG_DEVICE_ADD("pio", CXD1095, 0)
 
@@ -184,14 +185,13 @@ MACHINE_CONFIG_START(korgm1_state::korgm1)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", korgm1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_korgm1)
 
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	SPEAKER(config, "mono").front_center();
+//  AY8910(config, "aysnd", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 
@@ -211,4 +211,4 @@ ROM_START( korgm1 )
 //  ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 1988, korgm1,  0,   korgm1,  korgm1,  0,       ROT0, "Korg",      "M1", MACHINE_IS_SKELETON )
+GAME( 1988, korgm1,  0,   korgm1,  korgm1,  empty_init, ROT0, "Korg",      "M1", MACHINE_IS_SKELETON )

@@ -8,10 +8,10 @@
 #include "machine/nscsi_bus.h"
 
 #define MCFG_NCR5390_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<ncr5390_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<ncr5390_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_NCR5390_DRQ_HANDLER(_devcb) \
-	devcb = &downcast<ncr5390_device &>(*device).set_drq_handler(DEVCB_##_devcb);
+	downcast<ncr5390_device &>(*device).set_drq_handler(DEVCB_##_devcb);
 
 class ncr5390_device : public nscsi_device
 {
@@ -21,6 +21,9 @@ public:
 	// configuration helpers
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
+
+	auto irq_handler_cb() { return m_irq_handler.bind(); }
+	auto drq_handler_cb() { return m_drq_handler.bind(); }
 
 	virtual void map(address_map &map);
 
@@ -32,7 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fifo_w);
 	DECLARE_READ8_MEMBER(command_r);
 	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_READ8_MEMBER(status_r);
+	virtual DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(bus_id_w);
 	DECLARE_READ8_MEMBER(istatus_r);
 	DECLARE_WRITE8_MEMBER(timeout_w);
@@ -44,6 +47,9 @@ public:
 	DECLARE_WRITE8_MEMBER(conf_w);
 	DECLARE_WRITE8_MEMBER(test_w);
 	DECLARE_WRITE8_MEMBER(clock_w);
+
+	virtual DECLARE_READ8_MEMBER(read);
+	virtual DECLARE_WRITE8_MEMBER(write);
 
 	virtual void scsi_ctrl_changed() override;
 
@@ -79,6 +85,7 @@ protected:
 		BUSRESET_RESET_BOARD,
 
 		// Disconnected state commands
+		DISC_SEL_ARBITRATION_INIT,
 		DISC_SEL_ARBITRATION,
 		DISC_SEL_ATN_WAIT_REQ,
 		DISC_SEL_ATN_SEND_BYTE,
@@ -172,6 +179,7 @@ protected:
 		CD_SELECT_ATN_STOP = 0x43,
 		CD_ENABLE_SEL      = 0x44,
 		CD_DISABLE_SEL     = 0x45,
+		CD_SELECT_ATN3     = 0x46, // 53c90a
 		CT_SEND_MSG        = 0x20,
 		CT_SEND_STATUS     = 0x21,
 		CT_SEND_DATA       = 0x22,
@@ -183,11 +191,13 @@ protected:
 		CT_RECV_CMD        = 0x29,
 		CT_RECV_DATA       = 0x2a,
 		CT_RECV_CMD_SEQ    = 0x2b,
+		CT_ABORT_DMA       = 0x04, // 53c90a
 		CI_XFER            = 0x10,
 		CI_COMPLETE        = 0x11,
 		CI_MSG_ACCEPT      = 0x12,
 		CI_PAD             = 0x18,
-		CI_SET_ATN         = 0x1a
+		CI_SET_ATN         = 0x1a,
+		CI_RESET_ATN       = 0x1b, // 53c90a
 	};
 
 	enum { DMA_NONE, DMA_IN, DMA_OUT };
@@ -215,7 +225,7 @@ protected:
 
 	void start_command();
 	void step(bool timeout);
-	bool check_valid_command(uint8_t cmd);
+	virtual bool check_valid_command(uint8_t cmd);
 	int derive_msg_size(uint8_t msg_id);
 	void function_complete();
 	void function_bus_complete();
@@ -226,7 +236,7 @@ protected:
 	void check_irq();
 
 protected:
-	void reset_soft();
+	virtual void reset_soft();
 
 private:
 	void reset_disconnect();
@@ -252,16 +262,21 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	DECLARE_READ8_MEMBER(status_r);
+	virtual DECLARE_READ8_MEMBER(status_r) override;
 
 	DECLARE_READ8_MEMBER(conf2_r) { return config2; };
 	DECLARE_WRITE8_MEMBER(conf2_w) { config2 = data; };
+
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
 
 protected:
 	ncr53c90a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
-	void reset_soft();
+	virtual void reset_soft() override;
+
+	virtual bool check_valid_command(uint8_t cmd) override;
 
 	// 53c90a uses a previously reserved bit as an interrupt flag
 	enum {
@@ -283,9 +298,12 @@ public:
 	DECLARE_WRITE8_MEMBER(conf3_w) { config3 = data; };
 	DECLARE_WRITE8_MEMBER(fifo_align_w) { fifo_align = data; };
 
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
+
 protected:
 	virtual void device_start() override;
-	void reset_soft();
+	virtual void reset_soft() override;
 
 private:
 	u8 config3;

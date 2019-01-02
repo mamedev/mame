@@ -60,7 +60,7 @@
 
 
 #define MCFG_VIDEOBRAIN_EXPANSION_SLOT_EXTRES_CALLBACK(_write) \
-	devcb = &downcast<videobrain_expansion_slot_device &>(*device).set_extres_wr_callback(DEVCB_##_write);
+	downcast<videobrain_expansion_slot_device &>(*device).set_extres_wr_callback(DEVCB_##_write);
 
 
 
@@ -159,6 +159,6 @@ protected:
 DECLARE_DEVICE_TYPE(VIDEOBRAIN_EXPANSION_SLOT, videobrain_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( vidbrain_expansion_cards );
+void vidbrain_expansion_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_VIDBRAIN_EXP_H

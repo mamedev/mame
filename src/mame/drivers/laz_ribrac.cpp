@@ -26,10 +26,12 @@ public:
 	//  ,m_maincpu(*this, "maincpu")
 	{ }
 
+	void laz_ribrac(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void laz_ribrac(machine_config &config);
 //  required_device<mcs51_cpu_device> m_maincpu;
 };
 
@@ -50,14 +52,14 @@ void laz_ribrac_state::machine_reset()
 MACHINE_CONFIG_START(laz_ribrac_state::laz_ribrac)
 
 	/* basic machine hardware */
-//  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
-//  MCFG_CPU_PROGRAM_MAP(laz_ribrac_map)
-//  MCFG_CPU_IO_MAP(laz_ribrac_io)
+//  MCFG_DEVICE_ADD("maincpu", ??, 8000000) // unknown
+//  MCFG_DEVICE_PROGRAM_MAP(laz_ribrac_map)
+//  MCFG_DEVICE_IO_MAP(laz_ribrac_io)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // maybe
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // maybe
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -80,4 +82,4 @@ ROM_START( ribrac )
 	ROM_LOAD( "ribbitr_snd.u11", 0x30000, 0x10000, NO_DUMP )
 ROM_END
 
-GAME( 1993, ribrac,  0,    laz_ribrac, laz_ribrac, laz_ribrac_state,  0, ROT0, "Lazer-tron", "Ribbit Racing (Lazer-tron)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1993, ribrac, 0, laz_ribrac, laz_ribrac, laz_ribrac_state, empty_init, ROT0, "Lazer-tron", "Ribbit Racing (Lazer-tron)", MACHINE_IS_SKELETON_MECHANICAL )

@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "includes/starwars.h"
-#include "machine/x2212.h"
 
 
 /* Constants for matrix processor operations */
@@ -45,14 +44,14 @@ TIMER_CALLBACK_MEMBER(starwars_state::math_run_clear)
 
 WRITE8_MEMBER(starwars_state::starwars_nstore_w)
 {
-	machine().device<x2212_device>("x2212")->store(0);
-	machine().device<x2212_device>("x2212")->store(1);
-	machine().device<x2212_device>("x2212")->store(0);
+	m_novram->store(0);
+	m_novram->store(1);
+	m_novram->store(0);
 }
 
 WRITE_LINE_MEMBER(starwars_state::recall_w)
 {
-	machine().device<x2212_device>("x2212")->recall(!state);
+	m_novram->recall(!state);
 }
 
 /*************************************
@@ -69,21 +68,6 @@ WRITE_LINE_MEMBER(starwars_state::coin1_counter_w)
 WRITE_LINE_MEMBER(starwars_state::coin2_counter_w)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
-}
-
-WRITE_LINE_MEMBER(starwars_state::led1_w)
-{
-	output().set_led_value(0, !state);
-}
-
-WRITE_LINE_MEMBER(starwars_state::led2_w)
-{
-	output().set_led_value(1, !state);
-}
-
-WRITE_LINE_MEMBER(starwars_state::led3_w)
-{
-	output().set_led_value(2, !state);
 }
 
 
@@ -165,8 +149,6 @@ void starwars_state::run_mproc()
 	int MA;
 	int IP15_8, IP7, IP6_0; /* Instruction PROM values */
 	int mptime;
-
-	logerror("Running Matrix Processor...\n");
 
 	mptime = 0;
 	m_math_run = 1;

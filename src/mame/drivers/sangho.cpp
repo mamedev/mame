@@ -49,6 +49,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "video/v9938.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -58,53 +59,68 @@ class sangho_state : public driver_device
 public:
 	sangho_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_v9958(*this, "v9958")
 		, m_maincpu(*this, "maincpu")
 		, m_region_user1(*this, "user1")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_bank5(*this, "bank5")
-		, m_bank6(*this, "bank6")
-		, m_bank7(*this, "bank7")
-		, m_bank8(*this, "bank8")
+		, m_banks(*this, "bank%u", 1U)
 	{ }
 
+protected:
+	virtual void machine_start() override;
+
+	void sangho_map(address_map &map);
+
 	std::unique_ptr<uint8_t[]> m_ram;
-	uint8_t m_sexyboom_bank[8];
-	uint8_t m_pzlestar_mem_bank;
-	uint8_t m_pzlestar_rom_bank;
-	required_device<v9958_device> m_v9958;
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_region_user1;
-	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
-	required_memory_bank m_bank3;
-	required_memory_bank m_bank4;
-	required_memory_bank m_bank5;
-	required_memory_bank m_bank6;
-	required_memory_bank m_bank7;
-	required_memory_bank m_bank8;
-	uint8_t m_sec_slot[4];
+	required_memory_bank_array<8> m_banks;
+};
 
+class pzlestar_state : public sangho_state
+{
+public:
+	using sangho_state::sangho_state;
+
+	void init_pzlestar();
+
+	void pzlestar(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(pzlestar_bank_w);
 	DECLARE_WRITE8_MEMBER(pzlestar_mem_bank_w);
 	DECLARE_READ8_MEMBER(pzlestar_mem_bank_r);
-	DECLARE_WRITE8_MEMBER(sexyboom_bank_w);
-	DECLARE_DRIVER_INIT(pzlestar);
-	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(pzlestar);
-	DECLARE_MACHINE_RESET(sexyboom);
-	void pzlestar_map_banks();
-	void sexyboom_map_bank(int bank);
 	DECLARE_READ8_MEMBER(sec_slot_r);
 	DECLARE_WRITE8_MEMBER(sec_slot_w);
-	void pzlestar(machine_config &config);
-	void sexyboom(machine_config &config);
+
+	virtual void machine_reset() override;
+
+	void pzlestar_map_banks();
+
 	void pzlestar_io_map(address_map &map);
-	void sangho_map(address_map &map);
+
+private:
+	uint8_t m_pzlestar_mem_bank;
+	uint8_t m_pzlestar_rom_bank;
+	uint8_t m_sec_slot[4];
+};
+
+class sexyboom_state : public sangho_state
+{
+public:
+	using sangho_state::sangho_state;
+
+	void sexyboom(machine_config &config);
+
+protected:
+	DECLARE_WRITE8_MEMBER(sexyboom_bank_w);
+
+	virtual void machine_reset() override;
+
+	void sexyboom_map_bank(int bank);
+
 	void sexyboom_io_map(address_map &map);
+
+private:
+	uint8_t m_sexyboom_bank[8];
 };
 
 /*
@@ -113,7 +129,7 @@ public:
     slot 2 selects code ROMs
     slot 3 selects data ROMs
 */
-void sangho_state::pzlestar_map_banks()
+void pzlestar_state::pzlestar_map_banks()
 {
 	int slot_select;
 
@@ -121,117 +137,114 @@ void sangho_state::pzlestar_map_banks()
 	slot_select = (m_pzlestar_mem_bank >> 0) & 0x03;
 	switch(slot_select)
 	{
-		case 0:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, m_bank1);
-			m_maincpu->space(AS_PROGRAM).install_write_bank(0x0000, 0x3fff, m_bank5);
-			m_bank1->set_base(m_ram.get());
-			m_bank5->set_base(m_ram.get());
-			break;
-		case 2:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, m_bank1);
-			m_maincpu->space(AS_PROGRAM).unmap_write(0x0000, 0x3fff);
-			m_bank1->set_base(m_region_user1->base()+ 0x10000);
-			break;
-		case 1:
-		case 3:
-			m_maincpu->space(AS_PROGRAM).unmap_read(0x0000, 0x3fff);
-			m_maincpu->space(AS_PROGRAM).unmap_write(0x0000, 0x3fff);
-			break;
+	case 0:
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, m_banks[0]);
+		m_maincpu->space(AS_PROGRAM).install_write_bank(0x0000, 0x3fff, m_banks[4]);
+		m_banks[0]->set_base(m_ram.get());
+		m_banks[4]->set_base(m_ram.get());
+		break;
+	case 2:
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, m_banks[0]);
+		m_maincpu->space(AS_PROGRAM).unmap_write(0x0000, 0x3fff);
+		m_banks[0]->set_base(m_region_user1->base()+ 0x10000);
+		break;
+	case 1:
+	case 3:
+		m_maincpu->space(AS_PROGRAM).unmap_read(0x0000, 0x3fff);
+		m_maincpu->space(AS_PROGRAM).unmap_write(0x0000, 0x3fff);
+		break;
 	}
 
 	// page 1
 	slot_select = (m_pzlestar_mem_bank >> 2) & 0x03;
 	switch(slot_select)
 	{
-		case 0:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, m_bank2);
-			m_maincpu->space(AS_PROGRAM).install_write_bank(0x4000, 0x7fff, m_bank6);
-			m_bank2->set_base(m_ram.get() + 0x4000);
-			m_bank6->set_base(m_ram.get() + 0x4000);
-			break;
-		case 2:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, m_bank2);
-			m_maincpu->space(AS_PROGRAM).unmap_write(0x4000, 0x7fff);
-			m_bank2->set_base(m_region_user1->base()+ 0x18000);
-			break;
-		case 3:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, m_bank2);
-			m_maincpu->space(AS_PROGRAM).unmap_write(0x4000, 0x7fff);
-			m_bank2->set_base(m_region_user1->base()+ 0x20000 + (m_pzlestar_rom_bank*0x8000) + 0x4000);
-			break;
-		case 1:
-			m_maincpu->space(AS_PROGRAM).unmap_read(0x4000, 0x7fff);
-			m_maincpu->space(AS_PROGRAM).unmap_write(0x4000, 0x7fff);
-			break;
+	case 0:
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, m_banks[1]);
+		m_maincpu->space(AS_PROGRAM).install_write_bank(0x4000, 0x7fff, m_banks[5]);
+		m_banks[1]->set_base(m_ram.get() + 0x4000);
+		m_banks[5]->set_base(m_ram.get() + 0x4000);
+		break;
+	case 2:
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, m_banks[1]);
+		m_maincpu->space(AS_PROGRAM).unmap_write(0x4000, 0x7fff);
+		m_banks[1]->set_base(m_region_user1->base()+ 0x18000);
+		break;
+	case 3:
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, m_banks[1]);
+		m_maincpu->space(AS_PROGRAM).unmap_write(0x4000, 0x7fff);
+		m_banks[1]->set_base(m_region_user1->base()+ 0x20000 + (m_pzlestar_rom_bank*0x8000) + 0x4000);
+		break;
+	case 1:
+		m_maincpu->space(AS_PROGRAM).unmap_read(0x4000, 0x7fff);
+		m_maincpu->space(AS_PROGRAM).unmap_write(0x4000, 0x7fff);
+		break;
 	}
 
 	// page 2
 	slot_select = (m_pzlestar_mem_bank >> 4) & 0x03;
 	switch(slot_select)
 	{
-		case 0:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, m_bank3);
-			m_maincpu->space(AS_PROGRAM).install_write_bank(0x8000, 0xbfff, m_bank7);
-			m_bank3->set_base(m_ram.get() + 0x8000);
-			m_bank7->set_base(m_ram.get() + 0x8000);
-			break;
-		case 3:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, m_bank3);
-			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
-			m_bank3->set_base(m_region_user1->base()+ 0x20000 + (m_pzlestar_rom_bank*0x8000));
-			break;
-		case 1:
-		case 2:
-			m_maincpu->space(AS_PROGRAM).unmap_read(0x8000, 0xbfff);
-			m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
-			break;
+	case 0:
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, m_banks[2]);
+		m_maincpu->space(AS_PROGRAM).install_write_bank(0x8000, 0xbfff, m_banks[6]);
+		m_banks[2]->set_base(m_ram.get() + 0x8000);
+		m_banks[6]->set_base(m_ram.get() + 0x8000);
+		break;
+	case 3:
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, m_banks[2]);
+		m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
+		m_banks[2]->set_base(m_region_user1->base()+ 0x20000 + (m_pzlestar_rom_bank*0x8000));
+		break;
+	case 1:
+	case 2:
+		m_maincpu->space(AS_PROGRAM).unmap_read(0x8000, 0xbfff);
+		m_maincpu->space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
+		break;
 	}
 
 	// page 3
 	slot_select = (m_pzlestar_mem_bank >> 6) & 0x03;
 	switch(slot_select)
 	{
-		case 0:
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0xc000, 0xffff, m_bank4);
-			m_maincpu->space(AS_PROGRAM).install_write_bank(0xc000, 0xffff, m_bank8);
-			m_bank4->set_base(m_ram.get() + 0xc000);
-			m_bank8->set_base(m_ram.get() + 0xc000);
-			break;
-		case 1:
-		case 2:
-		case 3:
-			m_maincpu->space(AS_PROGRAM).unmap_read(0xc000, 0xffff);
-			m_maincpu->space(AS_PROGRAM).unmap_write(0xc000, 0xffff);
-			break;
+	case 0:
+		m_maincpu->space(AS_PROGRAM).install_read_bank(0xc000, 0xffff, m_banks[3]);
+		m_maincpu->space(AS_PROGRAM).install_write_bank(0xc000, 0xffff, m_banks[7]);
+		m_banks[3]->set_base(m_ram.get() + 0xc000);
+		m_banks[7]->set_base(m_ram.get() + 0xc000);
+		break;
+	case 1:
+	case 2:
+	case 3:
+		m_maincpu->space(AS_PROGRAM).unmap_read(0xc000, 0xffff);
+		m_maincpu->space(AS_PROGRAM).unmap_write(0xc000, 0xffff);
+		break;
 	}
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xffff, 0xffff, read8_delegate(FUNC(sangho_state::sec_slot_r),this), write8_delegate(FUNC(sangho_state::sec_slot_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xffff, 0xffff, read8_delegate(FUNC(pzlestar_state::sec_slot_r),this), write8_delegate(FUNC(pzlestar_state::sec_slot_w),this));
 }
 
-WRITE8_MEMBER(sangho_state::pzlestar_bank_w)
+WRITE8_MEMBER(pzlestar_state::pzlestar_bank_w)
 {
 	logerror("rom bank %02x\n", data);
 	m_pzlestar_rom_bank = data;
 	pzlestar_map_banks();
 }
 
-WRITE8_MEMBER(sangho_state::pzlestar_mem_bank_w)
+WRITE8_MEMBER(pzlestar_state::pzlestar_mem_bank_w)
 {
 	logerror("mem bank %02x\n", data);
 	m_pzlestar_mem_bank = data;
 	pzlestar_map_banks();
 }
 
-READ8_MEMBER(sangho_state::pzlestar_mem_bank_r)
+READ8_MEMBER(pzlestar_state::pzlestar_mem_bank_r)
 {
 	return m_pzlestar_mem_bank;
 }
 
-void sangho_state::sexyboom_map_bank(int bank)
+void sexyboom_state::sexyboom_map_bank(int bank)
 {
-	memory_bank *read_bank[4] = { m_bank1, m_bank2, m_bank3, m_bank4 };
-	memory_bank *write_bank[4] = { m_bank5, m_bank6, m_bank7, m_bank8 };
-
 	uint8_t banknum = m_sexyboom_bank[bank*2];
 	uint8_t banktype = m_sexyboom_bank[bank*2 + 1];
 
@@ -240,25 +253,25 @@ void sangho_state::sexyboom_map_bank(int bank)
 		if (banknum & 0x80)
 		{
 			// ram
-			read_bank[bank]->set_base(&m_ram[(banknum & 0x7f) * 0x4000]);
-			m_maincpu->space(AS_PROGRAM).install_write_bank(bank*0x4000, (bank+1)*0x4000 - 1, write_bank[bank] );
-			write_bank[bank]->set_base(&m_ram[(banknum & 0x7f) * 0x4000]);
+			m_banks[bank]->set_base(&m_ram[(banknum & 0x7f) * 0x4000]);
+			m_maincpu->space(AS_PROGRAM).install_write_bank(bank*0x4000, (bank+1)*0x4000 - 1, m_banks[4 + bank] );
+			m_banks[4 + bank]->set_base(&m_ram[(banknum & 0x7f) * 0x4000]);
 		}
 		else
 		{
 			// rom 0
-			read_bank[bank]->set_base(m_region_user1->base()+0x4000*banknum);
+			m_banks[bank]->set_base(m_region_user1->base()+0x4000*banknum);
 			m_maincpu->space(AS_PROGRAM).unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 		}
 	}
 	else if (banktype == 0x82)
 	{
-		read_bank[bank]->set_base(m_region_user1->base()+0x20000+banknum*0x4000);
+		m_banks[bank]->set_base(m_region_user1->base()+0x20000+banknum*0x4000);
 		m_maincpu->space(AS_PROGRAM).unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 	}
 	else if (banktype == 0x80)
 	{
-		read_bank[bank]->set_base(m_region_user1->base()+0x120000+banknum*0x4000);
+		m_banks[bank]->set_base(m_region_user1->base()+0x120000+banknum*0x4000);
 		m_maincpu->space(AS_PROGRAM).unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 	}
 	else
@@ -267,19 +280,19 @@ void sangho_state::sexyboom_map_bank(int bank)
 	}
 }
 
-WRITE8_MEMBER(sangho_state::sexyboom_bank_w)
+WRITE8_MEMBER(sexyboom_state::sexyboom_bank_w)
 {
 	m_sexyboom_bank[offset] = data;
 	sexyboom_map_bank(offset>>1);
 }
 
 /* secondary slot R/Ws from current primary slot number (see also mess/machine/msx.c) */
-READ8_MEMBER(sangho_state::sec_slot_r)
+READ8_MEMBER(pzlestar_state::sec_slot_r)
 {
 	return m_sec_slot[m_pzlestar_mem_bank >> 6] ^ 0xff;
 }
 
-WRITE8_MEMBER(sangho_state::sec_slot_w)
+WRITE8_MEMBER(pzlestar_state::sec_slot_w)
 {
 	m_sec_slot[m_pzlestar_mem_bank >> 6] = data;
 }
@@ -295,29 +308,29 @@ void sangho_state::sangho_map(address_map &map)
 
 /* Puzzle Star Ports */
 
-void sangho_state::pzlestar_io_map(address_map &map)
+void pzlestar_state::pzlestar_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x7c, 0x7d).w("ymsnd", FUNC(ym2413_device::write));
-	map(0x91, 0x91).w(this, FUNC(sangho_state::pzlestar_bank_w));
-	map(0x98, 0x9b).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
+	map(0x91, 0x91).w(FUNC(pzlestar_state::pzlestar_bank_w));
+	map(0x98, 0x9b).rw("v9958", FUNC(v9958_device::read), FUNC(v9958_device::write));
 	map(0xa0, 0xa0).portr("P1");
 	map(0xa1, 0xa1).portr("P2");
-	map(0xa8, 0xa8).rw(this, FUNC(sangho_state::pzlestar_mem_bank_r), FUNC(sangho_state::pzlestar_mem_bank_w));
+	map(0xa8, 0xa8).rw(FUNC(pzlestar_state::pzlestar_mem_bank_r), FUNC(pzlestar_state::pzlestar_mem_bank_w));
 	map(0xf7, 0xf7).portr("DSW");
 }
 
 /* Sexy Boom Ports */
 
-void sangho_state::sexyboom_io_map(address_map &map)
+void sexyboom_state::sexyboom_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x7c, 0x7d).w("ymsnd", FUNC(ym2413_device::write));
 	map(0xa0, 0xa0).portr("P1");
 	map(0xa1, 0xa1).portr("P2");
-	map(0xf0, 0xf3).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
+	map(0xf0, 0xf3).rw("v9958", FUNC(v9958_device::read), FUNC(v9958_device::write));
 	map(0xf7, 0xf7).portr("DSW");
-	map(0xf8, 0xff).w(this, FUNC(sangho_state::sexyboom_bank_w));
+	map(0xf8, 0xff).w(FUNC(sexyboom_state::sexyboom_bank_w));
 }
 
 static INPUT_PORTS_START( sexyboom )
@@ -437,14 +450,18 @@ void sangho_state::machine_start()
 	m_ram = std::make_unique<uint8_t[]>(0x20000); // TODO: define how much RAM these ones have (MSX2+ can potentially go up to 4MB)
 }
 
-MACHINE_RESET_MEMBER(sangho_state,pzlestar)
+void pzlestar_state::machine_reset()
 {
+	sangho_state::machine_reset();
+
 	m_pzlestar_mem_bank = 2;
 	pzlestar_map_banks();
 }
 
-MACHINE_RESET_MEMBER(sangho_state,sexyboom)
+void sexyboom_state::machine_reset()
 {
+	sangho_state::machine_reset();
+
 	m_sexyboom_bank[0] = 0x00;
 	m_sexyboom_bank[1] = 0x00;
 	m_sexyboom_bank[2] = 0x01;
@@ -460,41 +477,39 @@ MACHINE_RESET_MEMBER(sangho_state,sexyboom)
 }
 
 
-MACHINE_CONFIG_START(sangho_state::pzlestar)
+MACHINE_CONFIG_START(pzlestar_state::pzlestar)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6) // ?
+	MCFG_DEVICE_PROGRAM_MAP(sangho_map)
+	MCFG_DEVICE_IO_MAP(pzlestar_io_map)
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272)/6) // ?
-	MCFG_CPU_PROGRAM_MAP(sangho_map)
-	MCFG_CPU_IO_MAP(pzlestar_io_map)
+	v9958_device &v9958(V9958(config, "v9958", XTAL(21'477'272))); // typical 9958 clock, not verified
+	v9958.set_screen_ntsc("screen");
+	v9958.set_vram_size(0x20000);
+	v9958.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272)) // typical 9958 clock, not verified
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
-
-	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,pzlestar)
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413,  XTAL(21'477'272)/6)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ymsnd", YM2413,  XTAL(21'477'272)/6)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(sangho_state::sexyboom)
+MACHINE_CONFIG_START(sexyboom_state::sexyboom)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6)
+	MCFG_DEVICE_PROGRAM_MAP(sangho_map)
+	MCFG_DEVICE_IO_MAP(sexyboom_io_map)
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272)/6)
-	MCFG_CPU_PROGRAM_MAP(sangho_map)
-	MCFG_CPU_IO_MAP(sexyboom_io_map)
-
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272))
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
-
-	MCFG_MACHINE_RESET_OVERRIDE(sangho_state,sexyboom)
+	v9958_device &v9958(V9958(config, "v9958", XTAL(21'477'272)));
+	v9958.set_screen_ntsc("screen");
+	v9958.set_vram_size(0x20000);
+	v9958.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	MCFG_PALETTE_ADD("palette", 19780)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(21'477'272)/6)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(21'477'272)/6)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -537,7 +552,7 @@ ROM_START( sexyboom )
 	/* 15 empty */
 ROM_END
 
-DRIVER_INIT_MEMBER(sangho_state,pzlestar)
+void pzlestar_state::init_pzlestar()
 {
 	uint8_t *ROM = m_region_user1->base();
 
@@ -546,5 +561,5 @@ DRIVER_INIT_MEMBER(sangho_state,pzlestar)
 	ROM[0x12ca8] = 0x00;
 }
 
-GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho_state,  pzlestar,   ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
-GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, sangho_state,  0,          ROT270, "Sang Ho Soft", "Sexy Boom", 0 )
+GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, pzlestar_state, init_pzlestar, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, sexyboom_state, empty_init,    ROT270, "Sang Ho Soft", "Sexy Boom", 0 )

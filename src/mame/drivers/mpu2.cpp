@@ -51,10 +51,9 @@ public:
 
 	void mpu2(machine_config &config);
 
-protected:
+private:
 	void mpu2_basemap(address_map &map);
 
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 };
@@ -76,8 +75,8 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(mpu2_state::mpu2)
-	MCFG_CPU_ADD("maincpu", M6800, 2000000) // ?
-	MCFG_CPU_PROGRAM_MAP(mpu2_basemap)
+	MCFG_DEVICE_ADD("maincpu", M6800, 2000000) // ?
+	MCFG_DEVICE_PROGRAM_MAP(mpu2_basemap)
 MACHINE_CONFIG_END
 
 // technically not a 'bios' because they're all on the same board.
@@ -106,5 +105,5 @@ ROM_START( m2svlite )
 	ROM_LOAD( "sl1.bin", 0x0000, 0x0800, CRC(afe04b5a) SHA1(3b3385a9b039992279fda5b87926b5089a448581) )
 ROM_END
 
-GAME(198?,  m2hilite,  0, mpu2,  mpu2, mpu2_state,  0,  ROT0,  "Barcrest",    "Hi-Lights (Barcrest) (MPU2)",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?,  m2svlite,  0, mpu2,  mpu2, mpu2_state,  0,  ROT0,  "Barcrest",    "Silver Lights (Barcrest) (MPU2)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  m2hilite,  0, mpu2,  mpu2, mpu2_state, empty_init, ROT0,  "Barcrest",    "Hi-Lights (Barcrest) (MPU2)",         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  m2svlite,  0, mpu2,  mpu2, mpu2_state, empty_init, ROT0,  "Barcrest",    "Silver Lights (Barcrest) (MPU2)",     MACHINE_IS_SKELETON_MECHANICAL)

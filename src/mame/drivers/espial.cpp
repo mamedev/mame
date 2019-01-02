@@ -80,7 +80,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(espial_state::espial_scanline)
 	int scanline = param;
 
 	if(scanline == 240 && m_main_nmi_enabled) // vblank-out irq
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	if(scanline == 16) // timer irq, checks soundlatch port then updates some sound related work RAM buffers
 		m_maincpu->set_input_line(0, HOLD_LINE);
@@ -109,18 +109,18 @@ void espial_state::espial_map(address_map &map)
 	map(0x6082, 0x6082).portr("DSW1");
 	map(0x6083, 0x6083).portr("IN1");
 	map(0x6084, 0x6084).portr("IN2");
-	map(0x6090, 0x6090).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(this, FUNC(espial_state::espial_master_soundlatch_w));
+	map(0x6090, 0x6090).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(FUNC(espial_state::espial_master_soundlatch_w));
 	map(0x7000, 0x7000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
-	map(0x7100, 0x7100).w(this, FUNC(espial_state::espial_master_interrupt_mask_w));
-	map(0x7200, 0x7200).w(this, FUNC(espial_state::espial_flipscreen_w));
+	map(0x7100, 0x7100).w(FUNC(espial_state::espial_master_interrupt_mask_w));
+	map(0x7200, 0x7200).w(FUNC(espial_state::espial_flipscreen_w));
 	map(0x8000, 0x801f).ram().share("spriteram_1");
 	map(0x8020, 0x803f).readonly();
-	map(0x8400, 0x87ff).ram().w(this, FUNC(espial_state::espial_videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(espial_state::espial_videoram_w)).share("videoram");
 	map(0x8800, 0x880f).writeonly().share("spriteram_3");
-	map(0x8c00, 0x8fff).ram().w(this, FUNC(espial_state::espial_attributeram_w)).share("attributeram");
+	map(0x8c00, 0x8fff).ram().w(FUNC(espial_state::espial_attributeram_w)).share("attributeram");
 	map(0x9000, 0x901f).ram().share("spriteram_2");
-	map(0x9020, 0x903f).ram().w(this, FUNC(espial_state::espial_scrollram_w)).share("scrollram");
-	map(0x9400, 0x97ff).ram().w(this, FUNC(espial_state::espial_colorram_w)).share("colorram");
+	map(0x9020, 0x903f).ram().w(FUNC(espial_state::espial_scrollram_w)).share("scrollram");
+	map(0x9400, 0x97ff).ram().w(FUNC(espial_state::espial_colorram_w)).share("colorram");
 	map(0xc000, 0xcfff).rom();
 }
 
@@ -135,17 +135,17 @@ void espial_state::netwars_map(address_map &map)
 	map(0x6082, 0x6082).portr("DSW1");
 	map(0x6083, 0x6083).portr("IN1");
 	map(0x6084, 0x6084).portr("IN2");
-	map(0x6090, 0x6090).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(this, FUNC(espial_state::espial_master_soundlatch_w));
+	map(0x6090, 0x6090).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(FUNC(espial_state::espial_master_soundlatch_w));
 	map(0x7000, 0x7000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
-	map(0x7100, 0x7100).w(this, FUNC(espial_state::espial_master_interrupt_mask_w));
-	map(0x7200, 0x7200).w(this, FUNC(espial_state::espial_flipscreen_w));
-	map(0x8000, 0x87ff).ram().w(this, FUNC(espial_state::espial_videoram_w)).share("videoram");
+	map(0x7100, 0x7100).w(FUNC(espial_state::espial_master_interrupt_mask_w));
+	map(0x7200, 0x7200).w(FUNC(espial_state::espial_flipscreen_w));
+	map(0x8000, 0x87ff).ram().w(FUNC(espial_state::espial_videoram_w)).share("videoram");
 	map(0x8000, 0x801f).ram().share("spriteram_1");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(espial_state::espial_attributeram_w)).share("attributeram");
+	map(0x8800, 0x8fff).ram().w(FUNC(espial_state::espial_attributeram_w)).share("attributeram");
 	map(0x8800, 0x880f).ram().share("spriteram_3");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(espial_state::espial_colorram_w)).share("colorram");
+	map(0x9000, 0x97ff).ram().w(FUNC(espial_state::espial_colorram_w)).share("colorram");
 	map(0x9000, 0x901f).ram().share("spriteram_2");
-	map(0x9020, 0x903f).ram().w(this, FUNC(espial_state::espial_scrollram_w)).share("scrollram");
+	map(0x9020, 0x903f).ram().w(FUNC(espial_state::espial_scrollram_w)).share("scrollram");
 }
 
 
@@ -153,7 +153,7 @@ void espial_state::espial_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x4000, 0x4000).w(this, FUNC(espial_state::espial_sound_nmi_mask_w));
+	map(0x4000, 0x4000).w(FUNC(espial_state::espial_sound_nmi_mask_w));
 	map(0x6000, 0x6000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
 
@@ -311,7 +311,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( espial )
+static GFXDECODE_START( gfx_espial )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  0, 64 )
 GFXDECODE_END
@@ -322,16 +322,16 @@ GFXDECODE_END
 MACHINE_CONFIG_START(espial_state::espial)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(espial_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(espial_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", espial_state, espial_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000)  /* 2 MHz?????? */
-	MCFG_CPU_PROGRAM_MAP(espial_sound_map)
-	MCFG_CPU_IO_MAP(espial_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(espial_state, espial_sound_nmi_gen, 4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000)  /* 2 MHz?????? */
+	MCFG_DEVICE_PROGRAM_MAP(espial_sound_map)
+	MCFG_DEVICE_IO_MAP(espial_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(espial_state, espial_sound_nmi_gen, 4*60)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -340,20 +340,18 @@ MACHINE_CONFIG_START(espial_state::espial)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(espial_state, screen_update_espial)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", espial)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(espial_state, espial)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_espial);
+	PALETTE(config, m_palette, FUNC(espial_state::espial_palette), 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, "aysnd", 1500000).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(espial_state::netwars)
@@ -361,8 +359,8 @@ MACHINE_CONFIG_START(espial_state::netwars)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(netwars_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(netwars_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -451,6 +449,6 @@ ROM_END
 
 
 
-GAME( 1983, espial,  0,      espial,  espial,  espial_state, 0, ROT0,  "Orca / Thunderbolt", "Espial (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, espialu, espial, espial,  espial,  espial_state, 0, ROT0,  "Orca / Thunderbolt", "Espial (US?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, netwars, 0,      netwars, netwars, espial_state, 0, ROT90, "Orca (Esco Trading Co license)", "Net Wars", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, espial,  0,      espial,  espial,  espial_state, empty_init, ROT0,  "Orca / Thunderbolt", "Espial (Europe)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, espialu, espial, espial,  espial,  espial_state, empty_init, ROT0,  "Orca / Thunderbolt", "Espial (US?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, netwars, 0,      netwars, netwars, espial_state, empty_init, ROT90, "Orca (Esco Trading Co license)", "Net Wars", MACHINE_SUPPORTS_SAVE )

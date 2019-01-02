@@ -8,21 +8,13 @@
 #include "sound/mas3507d.h"
 #include "machine/ds2401.h"
 
-#define MCFG_KONAMI_573_DIGITAL_IO_BOARD_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, KONAMI_573_DIGITAL_IO_BOARD, _clock)
-
-#define MCFG_KONAMI_573_DIGITAL_IO_BOARD_OUTPUT_CALLBACK( _output_cb )  \
-	downcast<k573dio_device *>(device)->set_output_cb(DEVCB_##_output_cb);
 
 class k573dio_device : public device_t
 {
 public:
 	k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _write> void set_output_cb(_write _output_cb)
-	{
-		output_cb.set_callback(_output_cb);
-	}
+	auto output_callback() { return output_cb.bind(); }
 
 	required_device<mas3507d_device> mas3507d;
 	required_device<ds2401_device> digital_id;

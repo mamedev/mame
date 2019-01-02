@@ -21,7 +21,6 @@
 #include "emu.h"
 #include "bootleg.h"
 
-#include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 #include "screen.h"
 
@@ -214,7 +213,7 @@ void nes_mbaby_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->reset();
-	timer_freq = machine().device<cpu_device>("maincpu")->cycles_to_attotime(24576);
+	timer_freq = clocks_to_attotime(24576);
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_latch));
@@ -249,7 +248,7 @@ void nes_smb3p_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -303,7 +302,7 @@ void nes_smb2j_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -326,7 +325,7 @@ void nes_smb2ja_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -349,7 +348,7 @@ void nes_smb2jb_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -435,7 +434,7 @@ void nes_lh53_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -516,7 +515,7 @@ void nes_shuiguan_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	// always running and checking for IRQ every 114 cycles? or resetting every frame?
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(114));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(114));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -647,7 +646,7 @@ void nes_sc127_device::hblank_irq(int scanline, int vblank, int blanked)
 		if (!blanked && (m_irq_count == 0))
 		{
 			LOG_MMC(("irq fired, scanline: %d\n", scanline));
-			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			hold_irq_line();
 			m_irq_enable = 0;
 		}
 	}
@@ -711,7 +710,7 @@ void nes_mbaby_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 {
 	if (id == TIMER_IRQ)
 	{
-		m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+		hold_irq_line();
 		irq_timer->adjust(attotime::never);
 	}
 }
@@ -803,7 +802,7 @@ void nes_smb3p_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		{
 			if (m_irq_count == 0xffff)
 			{
-				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				hold_irq_line();
 				m_irq_enable = 0;
 			}
 			else
@@ -877,7 +876,7 @@ void nes_btl_dn_device::hblank_irq(int scanline, int vblank, int blanked )
 		return;
 
 	m_irq_count = 0;
-	m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+	hold_irq_line();
 }
 
 WRITE8_MEMBER(nes_btl_dn_device::write_h)
@@ -966,7 +965,7 @@ void nes_smb2j_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		{
 			if (m_irq_count == 0xfff)
 			{
-				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				hold_irq_line();
 				m_irq_enable = 0;
 				m_irq_count = 0;
 			}
@@ -1048,7 +1047,7 @@ void nes_smb2ja_device::device_timer(emu_timer &timer, device_timer_id id, int p
 		{
 			if (m_irq_count == 0xfff)
 			{
-				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				hold_irq_line();
 				m_irq_enable = 0;
 				m_irq_count = 0;
 			}
@@ -1105,7 +1104,7 @@ void nes_smb2jb_device::device_timer(emu_timer &timer, device_timer_id id, int p
 		{
 			if (m_irq_count == 0xfff)
 			{
-				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				hold_irq_line();
 				m_irq_enable = 0;
 				m_irq_count = 0;
 			}
@@ -1349,7 +1348,7 @@ void nes_lh53_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			if (m_irq_count > 7560)//value from FCEUMM...
 			{
 				m_irq_count = 0;
-				m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+				set_irq_line(ASSERT_LINE);
 			}
 		}
 	}
@@ -1386,7 +1385,7 @@ WRITE8_MEMBER(nes_lh53_device::write_h)
 				m_irq_enable = BIT(data, 1);
 				m_irq_count = 0;
 				if (!m_irq_enable)
-					m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+					set_irq_line(CLEAR_LINE);
 				break;
 			case 0x7000:
 				m_reg = data & 0x0f;
@@ -1591,7 +1590,7 @@ void nes_shuiguan_device::device_timer(emu_timer &timer, device_timer_id id, int
 		m_irq_count &= 0xff;
 
 		if (m_irq_enable && !m_irq_count)
-			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			hold_irq_line();
 	}
 }
 

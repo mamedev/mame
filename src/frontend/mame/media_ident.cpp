@@ -382,10 +382,11 @@ void media_identifier::match_hashes(std::vector<file_info> &info)
 
 	// iterator over devices
 	machine_config config(GAME_NAME(___empty), m_drivlist.options());
+	machine_config::token const tok(config.begin_configuration(config.root_device()));
 	for (device_type type : registered_device_types)
 	{
 		// iterate over regions and files within the region
-		device_t *const device = config.device_add(&config.root_device(), "_tmp", type, 0);
+		device_t *const device = config.device_add("_tmp", type, 0);
 		for (romload::region const &region : romload::entries(device->rom_region()).get_regions())
 		{
 			for (romload::file const &rom : region.get_files())
@@ -398,7 +399,7 @@ void media_identifier::match_hashes(std::vector<file_info> &info)
 				}
 			}
 		}
-		config.device_remove(&config.root_device(), "_tmp");
+		config.device_remove("_tmp");
 	}
 }
 

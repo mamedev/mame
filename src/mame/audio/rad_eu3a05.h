@@ -4,8 +4,6 @@
 #ifndef MAME_AUDIO_RAD_EU3A05_H
 #define MAME_AUDIO_RAD_EU3A05_H
 
-#define MCFG_RADICA6502_SOUND_SPACE_READ_CB(_devcb) \
-	devcb = &downcast<radica6502_sound_device &>(*device).set_space_read_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -18,7 +16,7 @@ class radica6502_sound_device : public device_t, public device_sound_interface
 public:
 	radica6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_space_read_callback(Object &&cb) { return m_space_read_cb.set_callback(std::forward<Object>(cb)); }
+	auto space_read_callback() { return m_space_read_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER(radicasi_sound_addr_w);
 	DECLARE_READ8_MEMBER(radicasi_sound_addr_r);

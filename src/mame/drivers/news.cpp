@@ -20,6 +20,7 @@ driver by David Haywood
 
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -27,13 +28,13 @@ driver by David Haywood
 void news_state::news_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();     /* 4000-7fff is written to during startup, probably leftover code */
-	map(0x8000, 0x87ff).ram().w(this, FUNC(news_state::news_fgram_w)).share("fgram");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(news_state::news_bgram_w)).share("bgram");
+	map(0x8000, 0x87ff).ram().w(FUNC(news_state::news_fgram_w)).share("fgram");
+	map(0x8800, 0x8fff).ram().w(FUNC(news_state::news_bgram_w)).share("bgram");
 	map(0x9000, 0x91ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0xc000, 0xc000).portr("DSW");
 	map(0xc001, 0xc001).portr("INPUTS");
 	map(0xc002, 0xc002).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xc003, 0xc003).w(this, FUNC(news_state::news_bgpic_w));
+	map(0xc003, 0xc003).w(FUNC(news_state::news_bgpic_w));
 	map(0xe000, 0xffff).ram();
 }
 
@@ -113,7 +114,7 @@ static const gfx_layout tiles8x8_layout =
 	32*8
 };
 
-static GFXDECODE_START( news )
+static GFXDECODE_START( gfx_news )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
@@ -132,9 +133,9 @@ void news_state::machine_reset()
 MACHINE_CONFIG_START(news_state::news)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(news_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", news_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,8000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(news_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", news_state,  irq0_line_hold)
 
 
 	/* video hardware */
@@ -146,15 +147,13 @@ MACHINE_CONFIG_START(news_state::news)
 	MCFG_SCREEN_UPDATE_DRIVER(news_state, screen_update_news)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", news)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_news);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x100).set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -184,5 +183,5 @@ ROM_START( newsa )
 	ROM_LOAD( "virus.1", 0x00000, 0x40000, CRC(41f5935a) SHA1(1566d243f165019660cd4dd69df9f049e0130f15) )
 ROM_END
 
-GAME( 1993, news,  0,    news, news,  news_state, 0, ROT0, "Poby / Virus", "News (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, newsa, news, news, newsa, news_state, 0, ROT0, "Poby",         "News (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, news,  0,    news, news,  news_state, empty_init, ROT0, "Poby / Virus", "News (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, newsa, news, news, newsa, news_state, empty_init, ROT0, "Poby",         "News (set 2)", MACHINE_SUPPORTS_SAVE )

@@ -33,6 +33,7 @@
 #include "machine/keyboard.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -52,7 +53,11 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(phunsy);
+	void phunsy(machine_config &config);
+
+	void init_phunsy();
+
+private:
 	DECLARE_READ8_MEMBER(phunsy_data_r);
 	DECLARE_WRITE8_MEMBER(phunsy_ctrl_w);
 	DECLARE_WRITE8_MEMBER(phunsy_data_w);
@@ -60,18 +65,17 @@ public:
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(phunsy);
-	DECLARE_PALETTE_INIT(phunsy);
+	void phunsy_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void phunsy(machine_config &config);
 	void phunsy_data(address_map &map);
 	void phunsy_io(address_map &map);
 	void phunsy_mem(address_map &map);
-private:
+
 	uint8_t       m_data_out;
 	uint8_t       m_keyboard_input;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -107,8 +111,8 @@ void phunsy_state::phunsy_io(address_map &map)
 void phunsy_state::phunsy_data(address_map &map)
 {
 	map.unmap_value_high();
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(this, FUNC(phunsy_state::phunsy_ctrl_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(phunsy_state::phunsy_data_r), FUNC(phunsy_state::phunsy_data_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(FUNC(phunsy_state::phunsy_ctrl_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(phunsy_state::phunsy_data_r), FUNC(phunsy_state::phunsy_data_w));
 }
 
 
@@ -206,14 +210,10 @@ void phunsy_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(phunsy_state, phunsy)
+void phunsy_state::phunsy_palette(palette_device &palette) const
 {
-	for ( int i = 0; i < 8; i++ )
-	{
-		int j = ( i << 5 ) | ( i << 2 ) | ( i >> 1 );
-
-		palette.set_pen_color( i, j, j, j );
-	}
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(i, pal3bit(i), pal3bit(i), pal3bit(i));
 }
 
 
@@ -277,7 +277,7 @@ static const gfx_layout phunsy_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( phunsy )
+static GFXDECODE_START( gfx_phunsy )
 	GFXDECODE_ENTRY( "chargen", 0x0000, phunsy_charlayout, 1, 3 )
 GFXDECODE_END
 
@@ -321,7 +321,7 @@ QUICKLOAD_LOAD_MEMBER( phunsy_state, phunsy )
 	return result;
 }
 
-DRIVER_INIT_MEMBER( phunsy_state, phunsy )
+void phunsy_state::init_phunsy()
 {
 	uint8_t *main = memregion("maincpu")->base();
 	uint8_t *roms = memregion("roms")->base();
@@ -337,46 +337,45 @@ DRIVER_INIT_MEMBER( phunsy_state, phunsy )
 	membank("bankq")->set_entry(0);
 }
 
-MACHINE_CONFIG_START(phunsy_state::phunsy)
+void phunsy_state::phunsy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(phunsy_mem)
-	MCFG_CPU_IO_MAP(phunsy_io)
-	MCFG_CPU_DATA_MAP(phunsy_data)
-	MCFG_S2650_SENSE_INPUT(READLINE(phunsy_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(phunsy_state, cass_w))
+	S2650(config, m_maincpu, XTAL(1'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &phunsy_state::phunsy_mem);
+	m_maincpu->set_addrmap(AS_IO, &phunsy_state::phunsy_io);
+	m_maincpu->set_addrmap(AS_DATA, &phunsy_state::phunsy_data);
+	m_maincpu->sense_handler().set(FUNC(phunsy_state::cass_r));
+	m_maincpu->flag_handler().set(FUNC(phunsy_state::cass_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	/* Display (page 12 of pdf)
 	   - 8Mhz clock
 	   - 64 6 pixel characters on a line.
 	   - 16us not active, 48us active: ( 64 * 6 ) * 60 / 48 => 480 pixels wide
 	   - 313 line display of which 256 are displayed.
 	*/
-	MCFG_SCREEN_RAW_PARAMS(XTAL(8'000'000), 480, 0, 64*6, 313, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(phunsy_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_raw(XTAL(8'000'000), 480, 0, 64*6, 313, 0, 256);
+	screen.set_screen_update(FUNC(phunsy_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", phunsy)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(phunsy_state, phunsy)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_phunsy);
+	PALETTE(config, "palette", FUNC(phunsy_state::phunsy_palette), 8);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(phunsy_state, kbd_put))
-	MCFG_CASSETTE_ADD( "cassette" )
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(phunsy_state::kbd_put));
+	CASSETTE(config, m_cass);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", phunsy_state, phunsy, "bin", 2)
-MACHINE_CONFIG_END
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(phunsy_state, phunsy), this), "bin", 2);
+}
 
 
 /* ROM definition */
@@ -401,5 +400,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT    COMPANY            FULLNAME  FLAGS */
-COMP( 1980, phunsy, 0,      0,       phunsy,    phunsy, phunsy_state,  phunsy, "J.F.P. Philipse", "PHUNSY", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY            FULLNAME  FLAGS */
+COMP( 1980, phunsy, 0,      0,      phunsy,  phunsy, phunsy_state, init_phunsy, "J.F.P. Philipse", "PHUNSY", MACHINE_NOT_WORKING )

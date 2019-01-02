@@ -23,8 +23,9 @@ public:
 	{ }
 
 	void ampscarp(machine_config &config);
-	void mem_map(address_map &map);
+
 private:
+	void mem_map(address_map &map);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -37,8 +38,8 @@ static INPUT_PORTS_START( ampscarp )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(ampscarp_state::ampscarp)
-	MCFG_CPU_ADD("maincpu", MC68HC11, 8'000'000) // type and clock unknown
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", MC68HC11, 8'000'000) // type and clock unknown
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 ROM_START( ampscarp )
@@ -46,4 +47,4 @@ ROM_START( ampscarp )
 	ROM_LOAD( "motorola_amps_car_phone_dump.bin", 0x0000, 0x20000, CRC(677ec85e) SHA1(219611b6c4b16461705e2df61d79a0f7ac8f529f) )
 ROM_END
 
-COMP( 1998, ampscarp, 0, 0, ampscarp, ampscarp, ampscarp_state, 0, "Motorola", "AMPS Car Phone", MACHINE_IS_SKELETON )
+COMP( 1998, ampscarp, 0, 0, ampscarp, ampscarp, ampscarp_state, empty_init, "Motorola", "AMPS Car Phone", MACHINE_IS_SKELETON )

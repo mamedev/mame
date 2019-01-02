@@ -56,7 +56,7 @@ Setting it up:
     Fire button. SPLAT would normally require 4 joysticks, but since the WMG only has 2, it is
     limited to a one-player game. Cocktail mode is not supported, WMG must be played on an upright
     only. After playing a game, returning to the menu will return to the place you left from. You
-    can force a return to the Setup by holding F1 and pressing F3. You can also clear out the
+    can force a return to the Setup by Auto Up and pressing F3. You can also clear out the
     menu's NVRAM (not the game's NVRAM), by holding down L and pressing F3.
 
 ToDo:
@@ -72,6 +72,7 @@ of save-state is also needed.
 #include "includes/williams.h"
 
 #include "cpu/m6800/m6800.h"
+#include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -88,24 +89,33 @@ public:
 		: williams_state(mconfig, type, tag)
 		, m_p_ram(*this, "nvram")
 		, m_keyboard(*this, "X%d", 0)
+		, m_codebank(*this, "codebank")
+		, m_soundbank(*this, "soundbank")
 	{ }
 
-	DECLARE_MACHINE_RESET(wmg);
-	DECLARE_DRIVER_INIT(wmg);
+	void wmg(machine_config &config);
+
+	void init_wmg();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
+
+private:
 	DECLARE_READ8_MEMBER(wmg_nvram_r);
 	DECLARE_WRITE8_MEMBER(wmg_nvram_w);
 	DECLARE_READ8_MEMBER(wmg_pia_0_r);
 	DECLARE_WRITE8_MEMBER(wmg_c400_w);
 	DECLARE_WRITE8_MEMBER(wmg_d000_w);
+	DECLARE_WRITE8_MEMBER(wmg_blitter_w);
 	DECLARE_WRITE_LINE_MEMBER(wmg_port_select_w);
 	DECLARE_WRITE8_MEMBER(wmg_sound_reset_w);
 	DECLARE_WRITE8_MEMBER(wmg_vram_select_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
 
-	void wmg(machine_config &config);
 	void wmg_cpu1(address_map &map);
 	void wmg_cpu2(address_map &map);
-private:
+	void wmg_banked_map(address_map &map);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	uint8_t m_wmg_c400;
 	uint8_t m_wmg_d000;
@@ -113,6 +123,8 @@ private:
 	uint8_t m_wmg_vram_bank;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_ioport_array<17> m_keyboard;
+	required_memory_bank m_codebank;
+	required_memory_bank m_soundbank;
 };
 
 
@@ -124,22 +136,37 @@ private:
  *************************************/
 void wmg_state::wmg_cpu1(address_map &map)
 {
-	map(0x0000, 0x8fff).bankr("bank1").writeonly().share("videoram");
+	map(0x0000, 0x8fff).bankr("mainbank").writeonly().share("videoram");
 	map(0x9000, 0xbfff).ram();
-	map(0xc000, 0xcfff).bankr("bank7");
-	map(0xd000, 0xffff).bankr("bank5");
-	map(0xd000, 0xd000).w(this, FUNC(wmg_state::wmg_d000_w));
+	map(0xc000, 0xcfff).m(m_bankc000, FUNC(address_map_bank_device::amap8));
+	map(0xd000, 0xffff).bankr("codebank");
+	map(0xd000, 0xd000).w(FUNC(wmg_state::wmg_d000_w));
 }
 
 void wmg_state::wmg_cpu2(address_map &map)
 {
 	map(0x0000, 0x007f).ram();     /* internal RAM */
 	map(0x0080, 0x00ff).ram();     /* MC6810 RAM */
-	map(0x0400, 0x0403).mirror(0x8000).rw(m_pia_2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-/* These next 2 are actually banked in CPU 1, but its not something Mame can handle very well. Placed here instead. */
-	map(0xc000, 0xc00f).mirror(0x03f0).writeonly().share("paletteram");
+	map(0x0400, 0x0403).mirror(0x8000).rw(m_pia[2], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xf000, 0xffff).bankr("soundbank");
+}
+
+void wmg_state::wmg_banked_map(address_map &map)
+{
+	map(0x0000, 0x000f).mirror(0x03e0).writeonly().share("paletteram");
+	map(0x0010, 0x001f).mirror(0x03e0).w(FUNC(williams_state::defender_video_control_w));
+	map(0x0400, 0x0400).w(FUNC(wmg_state::wmg_c400_w));
+	map(0x0401, 0x0401).w(FUNC(wmg_state::wmg_sound_reset_w));
+	map(0x0804, 0x0807).r(FUNC(wmg_state::wmg_pia_0_r)).w(m_pia[0], FUNC(pia6821_device::write));
+	map(0x080c, 0x080f).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0900, 0x09ff).w(FUNC(wmg_state::wmg_vram_select_w));
+	map(0x0a00, 0x0a07).w(FUNC(wmg_state::wmg_blitter_w));
+	map(0x0b00, 0x0bff).r(FUNC(williams_state::williams_video_counter_r));
+	map(0x0bff, 0x0bff).w(FUNC(williams_state::williams_watchdog_reset_w));
+	map(0x0c00, 0x0fff).rw(FUNC(wmg_state::wmg_nvram_r), FUNC(wmg_state::wmg_nvram_w));
+	map(0x1000, 0x4fff).rom().region("maincpu", 0x68000); // Defender roms
+/* These next one is actually banked in CPU 1, but its not something Mame can handle very well. Placed here instead. */
 	map(0xd000, 0xefff).ram().share("nvram");
-	map(0xf000, 0xffff).bankr("bank6");
 }
 
 /***************************************************************
@@ -158,10 +185,10 @@ static INPUT_PORTS_START( wmg )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wmg_state, wmg_mux_r, "1")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Advance")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("High Score Reset") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) PORT_NAME("High Score Reset")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
@@ -310,6 +337,17 @@ WRITE8_MEMBER( wmg_state::wmg_nvram_w )
 
 /*************************************
  *
+ *  Blitter
+ *
+ *************************************/
+
+WRITE8_MEMBER( wmg_state::wmg_blitter_w )
+{
+	williams_blitter_w(m_maincpu->space(AS_PROGRAM), offset, data, mem_mask);
+}
+
+/*************************************
+ *
  *  Bankswitching
  *
  *************************************/
@@ -327,10 +365,9 @@ WRITE8_MEMBER( wmg_state::wmg_c400_w )
 	{
 		m_wmg_c400 = data;
 		wmg_d000_w( space, 0, 0); // select i/o
-		uint8_t *cpu = memregion("maincpu")->base();
-		memcpy( &cpu[0x10000], &cpu[(data << 16) + 0x20000], 0x9000 );      // Gfx etc
-		membank("bank5")->set_entry(data);      // Code
-		membank("bank6")->set_entry(data);      // Sound
+		m_mainbank->set_entry(m_wmg_vram_bank ? (1+m_wmg_c400) : 0);      // Gfx etc
+		m_codebank->set_entry(data);      // Code
+		m_soundbank->set_entry(data);      // Sound
 		m_soundcpu->reset();
 	}
 }
@@ -345,7 +382,7 @@ WRITE8_MEMBER( wmg_state::wmg_vram_select_w )
 {
 	/* VRAM/ROM banking from bit 0 */
 	m_wmg_vram_bank = BIT(data, 0);
-	membank("bank1")->set_entry(m_wmg_vram_bank);
+	m_mainbank->set_entry(m_wmg_vram_bank ? (1+m_wmg_c400) : 0);
 
 	/* cocktail flip from bit 1 */
 	m_cocktail = BIT(data, 1);
@@ -363,23 +400,17 @@ WRITE8_MEMBER( wmg_state::wmg_d000_w )
 	if ((m_wmg_c400 == 5) && (data))
 	{
 		// replace i/o with defender roms
-		if (m_wmg_d000 == 0) // was i/o?
-		{
-			space.install_read_bank(0xc000, 0xcfff, "bank7");
-			space.unmap_write(0xc000, 0xcfff);
-		}
-
 		switch (data)
 		{
 			/* pages 1,2,3,7 map to ROM banks */
 			case 1:
 			case 2:
 			case 3:
-				membank("bank7")->set_entry(data);
+				m_bankc000->set_bank(data);
 				break;
 
 			case 7:
-				membank("bank7")->set_entry(4);
+				m_bankc000->set_bank(4);
 				break;
 
 			default:
@@ -391,29 +422,29 @@ WRITE8_MEMBER( wmg_state::wmg_d000_w )
 	if (data == 0)
 	{
 		/* install the i/o devices into c000-cfff */
-		pia6821_device *pia0 = m_pia_0;
-		pia6821_device *pia1 = m_pia_1;
-
-		space.unmap_read(0xc000, 0xcfff); // throw out bank7
-		space.install_write_bank       (0xc000, 0xc00f, "bank4");
-		membank("bank4")->set_base(m_generic_paletteram_8);
-		space.install_write_handler    (0xc010, 0xc01f, write8_delegate(FUNC(williams_state::defender_video_control_w),this));
-		space.install_write_handler    (0xc400, 0xc400, write8_delegate(FUNC(wmg_state::wmg_c400_w),this));
-		space.install_write_handler    (0xc401, 0xc401, write8_delegate(FUNC(wmg_state::wmg_sound_reset_w),this));
-		space.install_readwrite_handler(0xc804, 0xc807, read8_delegate(FUNC(wmg_state::wmg_pia_0_r),this), write8_delegate(FUNC(pia6821_device::write), pia0));
-		space.install_readwrite_handler(0xc80c, 0xc80f, read8_delegate(FUNC(pia6821_device::read), pia1), write8_delegate(FUNC(pia6821_device::write), pia1));
-		space.install_write_handler    (0xc900, 0xc9ff, write8_delegate(FUNC(wmg_state::wmg_vram_select_w),this));
-		space.install_write_handler    (0xca00, 0xca07, write8_delegate(FUNC(williams_state::williams_blitter_w),this));
-		space.install_write_handler    (0xcbff, 0xcbff, write8_delegate(FUNC(williams_state::williams_watchdog_reset_w),this));
-		space.install_read_handler     (0xcb00, 0xcbff, read8_delegate(FUNC(williams_state::williams_video_counter_r),this));
-		space.install_readwrite_handler(0xcc00, 0xcfff, read8_delegate(FUNC(wmg_state::wmg_nvram_r), this), write8_delegate(FUNC(wmg_state::wmg_nvram_w),this));
+		m_bankc000->set_bank(0);
 	}
 
 	m_wmg_d000 = data;
 }
 
 
-MACHINE_RESET_MEMBER( wmg_state, wmg )
+void wmg_state::machine_start()
+{
+	uint8_t *cpu = memregion("maincpu")->base();
+	uint8_t *snd = memregion("soundcpu")->base();
+	m_mainbank->configure_entry(0, m_videoram);
+	m_mainbank->configure_entries(1, 8, &cpu[0x10000], 0x10000);  // Gfx etc
+	m_codebank->configure_entries(0, 8, &cpu[0x1d000], 0x10000);  // Code
+	m_soundbank->configure_entries(0, 8, &snd[0x10000], 0x1000);  // Sound
+
+	save_item(NAME(m_wmg_c400));
+	save_item(NAME(m_wmg_d000));
+	save_item(NAME(m_wmg_port_select));
+	save_item(NAME(m_wmg_vram_bank));
+}
+
+void wmg_state::machine_reset()
 {
 	address_space &space1 = m_maincpu->space(AS_PROGRAM);
 	m_wmg_c400=0xff;
@@ -421,7 +452,6 @@ MACHINE_RESET_MEMBER( wmg_state, wmg )
 	m_wmg_port_select=0;
 	m_wmg_vram_bank=0;
 	wmg_c400_w( space1, 0, 0);
-	MACHINE_RESET_CALL_MEMBER(williams_common);
 	m_maincpu->reset();
 }
 
@@ -458,7 +488,7 @@ READ8_MEMBER( wmg_state::wmg_pia_0_r )
     Since there is no code in rom to handle this, it must be a hardware feature
     which probably just resets the cpu. */
 
-	uint8_t data = m_pia_0->read(space, offset);
+	uint8_t data = m_pia[0]->read(space, offset);
 
 	if ((m_wmg_c400) && (offset == 0) && ((data & 0x30) == 0x30))   // P1 and P2 pressed
 	{
@@ -474,13 +504,8 @@ READ8_MEMBER( wmg_state::wmg_pia_0_r )
  *  Driver Initialisation
  *
  *************************************/
-DRIVER_INIT_MEMBER( wmg_state, wmg )
+void wmg_state::init_wmg()
 {
-	uint8_t *cpu = memregion("maincpu")->base();
-	uint8_t *snd = memregion("soundcpu")->base();
-	membank("bank5")->configure_entries(0, 8, &cpu[0x2d000], 0x10000);  // Code
-	membank("bank6")->configure_entries(0, 8, &snd[0x10000], 0x1000);   // Sound
-	membank("bank7")->configure_entries(1, 4, &cpu[0x78000], 0x1000);   // Defender roms
 	m_blitter_config = WILLIAMS_BLITTER_SC1;
 	m_blitter_clip_address = 0xc000;
 }
@@ -493,20 +518,23 @@ DRIVER_INIT_MEMBER( wmg_state, wmg )
 MACHINE_CONFIG_START(wmg_state::wmg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
-	MCFG_CPU_PROGRAM_MAP(wmg_cpu1)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
+	MCFG_DEVICE_PROGRAM_MAP(wmg_cpu1)
 
-	MCFG_CPU_ADD("soundcpu", M6808, SOUND_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(wmg_cpu2)
+	MCFG_DEVICE_ADD("soundcpu", M6808, SOUND_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(wmg_cpu2)
 
-	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
-	MCFG_MACHINE_RESET_OVERRIDE(wmg_state, wmg)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams_va11_callback)
-	MCFG_TIMER_DRIVER_ADD("240_timer", williams_state, williams_count240_callback)
+	ADDRESS_MAP_BANK(config, "bankc000").set_map(&wmg_state::wmg_banked_map).set_options(ENDIANNESS_BIG, 8, 16, 0x1000);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams_state, williams_va11_callback, "screen", 0, 32)
+
+	// also set a timer to go off on scanline 240
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("240_timer", williams_state, williams_count240_callback, "screen", 0, 240)
+
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -516,29 +544,37 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	PALETTE(config, m_palette, FUNC(williams_state::williams_palette), 256);
 
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
+
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
-	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(wmg_state, wmg_port_select_w))
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_state, williams_snd_cmd_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state, williams_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state, williams_main_irq))
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", M6808_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
+	pia6821_device &pia0(PIA6821(config, "pia_0", 0));
+	pia0.readpa_handler().set_ioport("IN0");
+	pia0.readpb_handler().set_ioport("IN1");
+	pia0.cb2_handler().set(FUNC(wmg_state::wmg_port_select_w));
+
+	pia6821_device &pia1(PIA6821(config, "pia_1", 0));
+	pia1.readpa_handler().set_ioport("IN2");
+	pia1.writepb_handler().set(FUNC(williams_state::williams_snd_cmd_w));
+	pia1.irqa_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
+	pia1.irqb_handler().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
+
+	pia6821_device &pia2(PIA6821(config, "pia_2", 0));
+	pia2.writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	pia2.irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
+	pia2.irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
 MACHINE_CONFIG_END
 
 /*************************************
@@ -547,20 +583,20 @@ MACHINE_CONFIG_END
  *
  *************************************/
 ROM_START( wmg )
-	ROM_REGION( 0xa0000, "maincpu", 0 )
-	ROM_LOAD( "wmg.cpu", 0x20000, 0x80000, CRC(975516ec) SHA1(571aaf9bff8ebfc36448cd9394b47bcfae7d1b83) )
+	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_LOAD( "wmg.cpu", 0x10000, 0x80000, CRC(975516ec) SHA1(571aaf9bff8ebfc36448cd9394b47bcfae7d1b83) )
 
 	/* This little HACK! lets the menu boot up.
 	It patches a jump to some new code, which sets a few memory locations, and sets the stack pointer.
 	Then it jumps back to continue the main run. */
 
-	ROM_COPY( "maincpu", 0x2e0da, 0x2f800, 0x0001b )
-	ROM_FILL( 0x2f81b, 1, 0x7e )
-	ROM_FILL( 0x2f81c, 1, 0xe0 )
-	ROM_FILL( 0x2f81d, 1, 0xba )
-	ROM_FILL( 0x2e0b7, 1, 0x7e )
-	ROM_FILL( 0x2e0b8, 1, 0xf8 )
-	ROM_FILL( 0x2e0b9, 1, 0x00 )
+	ROM_COPY( "maincpu", 0x1e0da, 0x1f800, 0x0001b )
+	ROM_FILL( 0x1f81b, 1, 0x7e )
+	ROM_FILL( 0x1f81c, 1, 0xe0 )
+	ROM_FILL( 0x1f81d, 1, 0xba )
+	ROM_FILL( 0x1e0b7, 1, 0x7e )
+	ROM_FILL( 0x1e0b8, 1, 0xf8 )
+	ROM_FILL( 0x1e0b9, 1, 0x00 )
 
 	ROM_REGION( 0x18000, "soundcpu", 0 )
 	ROM_LOAD( "wmg.snd",         0x10000, 0x8000, CRC(1d08990e) SHA1(7bfb29426b3876f113e6ec3bc6c2fce9d2d1eb0c) )
@@ -577,4 +613,4 @@ ROM_END
  *
  *******************************************************/
 
-GAME( 2001, wmg, 0, wmg, wmg, wmg_state, wmg, ROT0, "hack (Clay Cowgill)", "Williams Multigame", 0 )
+GAME( 2001, wmg, 0, wmg, wmg, wmg_state, init_wmg, ROT0, "hack (Clay Cowgill)", "Williams Multigame", 0 )

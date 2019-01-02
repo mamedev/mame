@@ -39,6 +39,7 @@ TODO:
 #include "sound/msm5232.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -46,8 +47,8 @@ TODO:
 class wyvernf0_state : public driver_device
 {
 public:
-	wyvernf0_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wyvernf0_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bgram(*this,"bgram"),
 		m_fgram(*this,"fgram"),
 		m_scrollram(*this,"scrollram"),
@@ -57,8 +58,17 @@ public:
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
+	void wyvernf0(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	// memory pointers
 	required_shared_ptr<uint8_t> m_bgram;
 	required_shared_ptr<uint8_t> m_fgram;
@@ -74,7 +84,6 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_WRITE8_MEMBER(bgram_w);
 	DECLARE_WRITE8_MEMBER(fgram_w);
-	DECLARE_VIDEO_START(wyvernf0);
 	uint32_t screen_update_wyvernf0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bool is_foreground );
 
@@ -89,8 +98,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_MACHINE_START(wyvernf0);
-	DECLARE_MACHINE_RESET(wyvernf0);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 
 	// MCU
@@ -107,7 +114,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void wyvernf0(machine_config &config);
+
 	void sound_map(address_map &map);
 	void wyvernf0_map(address_map &map);
 };
@@ -157,7 +164,7 @@ TILE_GET_INFO_MEMBER(wyvernf0_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, TILE_FLIPXY(code >> 14));
 }
 
-VIDEO_START_MEMBER(wyvernf0_state,wyvernf0)
+void wyvernf0_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wyvernf0_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wyvernf0_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -359,7 +366,7 @@ WRITE8_MEMBER(wyvernf0_state::rombank_w)
 TIMER_CALLBACK_MEMBER(wyvernf0_state::nmi_callback)
 {
 	if (m_sound_nmi_enable)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		m_pending_nmi = 1;
 }
@@ -380,7 +387,7 @@ WRITE8_MEMBER(wyvernf0_state::nmi_enable_w)
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
 	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		m_pending_nmi = 0;
 	}
 }
@@ -394,17 +401,17 @@ void wyvernf0_state::wyvernf0_map(address_map &map)
 
 	map(0xa000, 0xbfff).bankr("rombank");
 
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(wyvernf0_state::fgram_w)).share("fgram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(wyvernf0_state::bgram_w)).share("bgram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(wyvernf0_state::fgram_w)).share("fgram");
+	map(0xc800, 0xcfff).ram().w(FUNC(wyvernf0_state::bgram_w)).share("bgram");
 
 	map(0xd000, 0xd000).nopw(); // d000 write (02)
-	map(0xd100, 0xd100).w(this, FUNC(wyvernf0_state::rambank_w));
-	map(0xd200, 0xd200).w(this, FUNC(wyvernf0_state::rombank_w));
+	map(0xd100, 0xd100).w(FUNC(wyvernf0_state::rambank_w));
+	map(0xd200, 0xd200).w(FUNC(wyvernf0_state::rombank_w));
 
 	map(0xd300, 0xd303).ram().share("scrollram");
 
-	map(0xd400, 0xd400).rw(this, FUNC(wyvernf0_state::fake_mcu_r), FUNC(wyvernf0_state::fake_mcu_w));
-	map(0xd401, 0xd401).r(this, FUNC(wyvernf0_state::fake_status_r));
+	map(0xd400, 0xd400).rw(FUNC(wyvernf0_state::fake_mcu_r), FUNC(wyvernf0_state::fake_mcu_w));
+	map(0xd401, 0xd401).r(FUNC(wyvernf0_state::fake_status_r));
 
 	map(0xd500, 0xd5ff).ram().share("spriteram");
 
@@ -417,7 +424,7 @@ void wyvernf0_state::wyvernf0_map(address_map &map)
 	map(0xd606, 0xd606).portr("JOY2");
 	map(0xd607, 0xd607).portr("FIRE2");
 
-	map(0xd610, 0xd610).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(wyvernf0_state::sound_command_w));
+	map(0xd610, 0xd610).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(wyvernf0_state::sound_command_w));
 	// d613 write (FF -> 00 at boot)
 
 	map(0xd800, 0xdbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -436,9 +443,9 @@ void wyvernf0_state::sound_map(address_map &map)
 	// cb00 write
 	// cc00 write
 	map(0xd000, 0xd000).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
-	map(0xd200, 0xd200).w(this, FUNC(wyvernf0_state::nmi_enable_w));
-	map(0xd400, 0xd400).w(this, FUNC(wyvernf0_state::nmi_disable_w));
-	map(0xd600, 0xd600).w("dac", FUNC(dac_byte_interface::write));
+	map(0xd200, 0xd200).w(FUNC(wyvernf0_state::nmi_enable_w));
+	map(0xd400, 0xd400).w(FUNC(wyvernf0_state::nmi_disable_w));
+	map(0xd600, 0xd600).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe000, 0xefff).rom(); // space for diagnostics ROM
 }
 
@@ -601,7 +608,7 @@ static const gfx_layout layout_8x8x4 =
 	8*8
 };
 
-static GFXDECODE_START( wyvernf0 )
+static GFXDECODE_START( gfx_wyvernf0 )
 	GFXDECODE_ENTRY( "sprites", 0, layout_8x8x4, 0, 32 ) // [0] sprites
 	GFXDECODE_ENTRY( "tiles",   0, layout_8x8x4, 0, 32 ) // [1] tilemaps
 GFXDECODE_END
@@ -613,14 +620,14 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
+void wyvernf0_state::machine_start()
 {
 	uint8_t *ROM = memregion("rombank")->base();
 	membank("rombank")->configure_entries(0, 8, ROM, 0x2000);
 
 	// sprite codes lookup in banked RAM
 	m_objram = std::make_unique<uint8_t[]>(0x1000 * 2);
-	save_pointer(NAME(m_objram.get()), 0x1000 * 2);
+	save_pointer(NAME(m_objram), 0x1000 * 2);
 	membank("rambank")->configure_entries(0, 2, m_objram.get(), 0x1000);
 
 	save_item(NAME(m_sound_nmi_enable));
@@ -631,7 +638,7 @@ MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
 	save_item(NAME(m_mcu_ready));
 }
 
-MACHINE_RESET_MEMBER(wyvernf0_state,wyvernf0)
+void wyvernf0_state::machine_reset()
 {
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;
@@ -641,72 +648,66 @@ MACHINE_RESET_MEMBER(wyvernf0_state,wyvernf0)
 	m_mcu_ready = 0;
 }
 
-MACHINE_CONFIG_START(wyvernf0_state::wyvernf0)
-
+void wyvernf0_state::wyvernf0(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 6000000) // ?
-	MCFG_CPU_PROGRAM_MAP(wyvernf0_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wyvernf0_state, irq0_line_hold)
+	Z80(config, m_maincpu, 6000000); // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &wyvernf0_state::wyvernf0_map);
+	m_maincpu->set_vblank_int("screen", FUNC(wyvernf0_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // ?
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(wyvernf0_state, irq0_line_hold, 60*2)  // IRQ generated by ??? (drives music tempo), NMI by main cpu
+	Z80(config, m_audiocpu, 4000000); // ?
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wyvernf0_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(wyvernf0_state::irq0_line_hold), attotime::from_hz(60*2)); // IRQ generated by ??? (drives music tempo), NMI by main cpu
 
-//  MCFG_CPU_ADD("mcu", M68705P5, 4000000) // ?
+//  MCFG_DEVICE_ADD("mcu", M68705P5, 4000000) // ?
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
-	MCFG_MACHINE_START_OVERRIDE(wyvernf0_state,wyvernf0)
-	MCFG_MACHINE_RESET_OVERRIDE(wyvernf0_state,wyvernf0)
-
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wyvernf0_state, screen_update_wyvernf0)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(wyvernf0_state::screen_update_wyvernf0));
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wyvernf0)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
-
-	MCFG_VIDEO_START_OVERRIDE(wyvernf0_state,wyvernf0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wyvernf0);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 512);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	// coin, fire, lift-off
-	MCFG_SOUND_ADD("ay1", YM2149, 3000000) // YM2149 clock ??, pin 26 ??
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	YM2149(config, "ay1", 3000000).add_route(ALL_OUTPUTS, "mono", 0.25); // YM2149 clock ??, pin 26 ??
 
 	// lift-off, explosion (saucers), boss alarm
-	MCFG_SOUND_ADD("ay2", YM2149, 3000000) // YM2149 clock ??, pin 26 ??
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	YM2149(config, "ay2", 3000000).add_route(ALL_OUTPUTS, "mono", 0.25); // YM2149 clock ??, pin 26 ??
 
 	// music
-	MCFG_SOUND_ADD("msm", MSM5232, 2000000) // ?
-	MCFG_MSM5232_SET_CAPACITORS(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6) /* default 0.39 uF capacitors (not verified) */
-	MCFG_SOUND_ROUTE(0, "mono", 0.5)    // pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 0.5)    // pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 0.5)    // pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 0.5)    // pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 0.5)    // pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 0.5)    // pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 0.5)    // pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 0.5)    // pin 33 16'-2
+	msm5232_device &msm(MSM5232(config, "msm", 2000000)); // ?
+	msm.set_capacitors(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6); /* default 0.39 uF capacitors (not verified) */
+	msm.add_route(0, "mono", 0.5);   // pin 28  2'-1
+	msm.add_route(1, "mono", 0.5);   // pin 29  4'-1
+	msm.add_route(2, "mono", 0.5);   // pin 30  8'-1
+	msm.add_route(3, "mono", 0.5);   // pin 31 16'-1
+	msm.add_route(4, "mono", 0.5);   // pin 36  2'-2
+	msm.add_route(5, "mono", 0.5);   // pin 35  4'-2
+	msm.add_route(6, "mono", 0.5);   // pin 34  8'-2
+	msm.add_route(7, "mono", 0.5);   // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 /***************************************************************************
 
@@ -745,4 +746,4 @@ ROM_START( wyvernf0 )
 	ROM_LOAD( "a39_12.ic74",  0x6000, 0x2000, CRC(1cc389de) SHA1(4213484d3a82688f312811e7a5c4d128e40584c3) )
 ROM_END
 
-GAME( 1985, wyvernf0, 0, wyvernf0, wyvernf0, wyvernf0_state, 0, ROT270, "Taito", "Wyvern F-0", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)
+GAME( 1985, wyvernf0, 0, wyvernf0, wyvernf0, wyvernf0_state, empty_init, ROT270, "Taito", "Wyvern F-0", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)

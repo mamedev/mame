@@ -8,6 +8,7 @@
 #include "emu.h"
 #include "cpu/alto2/alto2cpu.h"
 #include "machine/diablo_hd.h"
+#include "emupal.h"
 #include "screen.h"
 #include "rendlay.h"
 #include "speaker.h"
@@ -30,7 +31,7 @@ public:
 		m_io_config(*this, "CONFIG")
 	{ }
 
-	DECLARE_DRIVER_INIT(alto2);
+	void init_alto2();
 	DECLARE_MACHINE_RESET(alto2);
 
 	void alto2(machine_config &config);
@@ -283,28 +284,25 @@ MACHINE_CONFIG_START(alto2_state::alto2)
 	// Basic machine hardware
 	// SYSCLK is Display Control part A51 (tagged 29.4MHz) divided by 5(?)
 	// 5.8MHz according to de.wikipedia.org/wiki/Xerox_Alto
-	MCFG_CPU_ADD("maincpu", ALTO2, XTAL(29'491'200)/5)
-	MCFG_CPU_PROGRAM_MAP(alto2_ucode_map)
-	MCFG_CPU_DATA_MAP(alto2_const_map)
-	MCFG_CPU_IO_MAP(alto2_iomem_map)
+	MCFG_DEVICE_ADD("maincpu", ALTO2, XTAL(29'491'200)/5)
+	MCFG_DEVICE_PROGRAM_MAP(alto2_ucode_map)
+	MCFG_DEVICE_DATA_MAP(alto2_const_map)
+	MCFG_DEVICE_IO_MAP(alto2_iomem_map)
 
 	// Video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(20'160'000),
-			 A2_DISP_TOTAL_WIDTH, 0, A2_DISP_WIDTH,
-			 A2_DISP_TOTAL_HEIGHT, 0, A2_DISP_HEIGHT)
-	// Two interlaced fields at 60Hz => 30Hz frame rate
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", alto2_cpu_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::white());
+	screen.set_physical_aspect(3, 4); // Portrait CRT
+	screen.set_raw(XTAL(20'160'000), A2_DISP_TOTAL_WIDTH, 0, A2_DISP_WIDTH, A2_DISP_TOTAL_HEIGHT, 0, A2_DISP_HEIGHT);
+	screen.set_refresh_hz(30); // Two interlaced fields at 60Hz => 30Hz frame rate
+	screen.set_screen_update("maincpu", FUNC(alto2_cpu_device::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEFAULT_LAYOUT( layout_vertical )
-
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// Sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_DIABLO_DRIVES_ADD()
@@ -312,7 +310,7 @@ MACHINE_CONFIG_END
 
 /* Driver Init */
 
-DRIVER_INIT_MEMBER( alto2_state, alto2 )
+void alto2_state::init_alto2()
 {
 	// Make the diablo drives known to the CPU core
 	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
@@ -336,5 +334,5 @@ void alto2_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 /* Game Drivers */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT   COMPANY  FULLNAME   FLAGS
-COMP( 1977, alto2,  0,      0,      alto2,   alto2, alto2_state, alto2, "Xerox", "Alto-II", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1977, alto2, 0,      0,      alto2,   alto2, alto2_state, init_alto2, "Xerox", "Alto-II", 0 )

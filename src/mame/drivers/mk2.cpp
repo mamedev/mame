@@ -69,22 +69,27 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_miot(*this, "miot")
 		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void mk2(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(mk2_read_a);
 	DECLARE_WRITE8_MEMBER(mk2_write_a);
 	DECLARE_READ8_MEMBER(mk2_read_b);
 	DECLARE_WRITE8_MEMBER(mk2_write_b);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_leds);
-	void mk2(machine_config &config);
 	void mk2_mem(address_map &map);
-private:
-	uint8_t m_led[5];
+
 	virtual void machine_start() override;
+
+	uint8_t m_led_data[5];
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mos6530_device> m_miot;
 	output_finder<6> m_digits;
+	output_finder<4> m_leds;
 };
 
 
@@ -129,25 +134,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk2_state::update_leds)
 	int i;
 
 	for (i=0; i<4; i++)
-		m_digits[i] = m_led[i];
+		m_digits[i] = m_led_data[i];
 
-	output().set_led_value(0, BIT(m_led[4], 3));
-	output().set_led_value(1, BIT(m_led[4], 5));
-	output().set_led_value(2, BIT(m_led[4], 4));
-	output().set_led_value(3, BIT(m_led[4], 4) ? 0 : 1);
+	m_leds[0] = BIT(m_led_data[4], 3);
+	m_leds[1] = BIT(m_led_data[4], 5);
+	m_leds[2] = BIT(m_led_data[4], 4);
+	m_leds[3] = BIT(~m_led_data[4], 4);
 
-	m_led[0]= m_led[1]= m_led[2]= m_led[3]= m_led[4]= 0;
+	m_led_data[0] = m_led_data[1] = m_led_data[2] = m_led_data[3] = m_led_data[4] = 0;
 }
 
 void mk2_state::machine_start()
 {
 	m_digits.resolve();
+	m_leds.resolve();
 }
 
 READ8_MEMBER( mk2_state::mk2_read_a )
 {
-	int data=0xff;
-	int help=ioport("BLACK")->read() | ioport("WHITE")->read(); // looks like white and black keys are the same!
+	int data = 0xff;
+	int help = ioport("BLACK")->read() | ioport("WHITE")->read(); // looks like white and black keys are the same!
 
 	switch (m_miot->portb_out_get()&0x7)
 	{
@@ -173,7 +179,7 @@ WRITE8_MEMBER( mk2_state::mk2_write_a )
 {
 	uint8_t temp = m_miot->portb_out_get();
 
-	m_led[temp & 3] |= data;
+	m_led_data[temp & 3] |= data;
 }
 
 
@@ -188,7 +194,7 @@ WRITE8_MEMBER( mk2_state::mk2_write_b )
 	if ((data & 0x06) == 0x06)
 			m_speaker->level_w(BIT(data, 0));
 
-	m_led[4]|=data;
+	m_led_data[4] |= data;
 
 	m_maincpu->set_input_line(M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE );
 }
@@ -196,22 +202,22 @@ WRITE8_MEMBER( mk2_state::mk2_write_b )
 
 MACHINE_CONFIG_START(mk2_state::mk2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6504, 1000000)
-	MCFG_CPU_PROGRAM_MAP(mk2_mem)
+	MCFG_DEVICE_ADD("maincpu", M6504, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(mk2_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mk2)
+	config.set_default_layout(layout_mk2);
 
 	MCFG_DEVICE_ADD("miot", MOS6530, 1000000)
-	MCFG_MOS6530_IN_PA_CB(READ8(mk2_state, mk2_read_a))
-	MCFG_MOS6530_OUT_PA_CB(WRITE8(mk2_state, mk2_write_a))
-	MCFG_MOS6530_IN_PB_CB(READ8(mk2_state, mk2_read_b))
-	MCFG_MOS6530_OUT_PB_CB(WRITE8(mk2_state, mk2_write_b))
+	MCFG_MOS6530_IN_PA_CB(READ8(*this, mk2_state, mk2_read_a))
+	MCFG_MOS6530_OUT_PA_CB(WRITE8(*this, mk2_state, mk2_write_a))
+	MCFG_MOS6530_IN_PB_CB(READ8(*this, mk2_state, mk2_read_b))
+	MCFG_MOS6530_OUT_PB_CB(WRITE8(*this, mk2_state, mk2_write_b))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", mk2_state, update_leds, attotime::from_hz(60))
@@ -231,6 +237,6 @@ ROM_END
 ***************************************************************************/
 
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT  COMPANY  FULLNAME                 FLAGS
-CONS( 1979, ccmk2,  0,      0,      mk2,     mk2,   mk2_state, 0,    "Novag", "Chess Champion: MK II", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                 FLAGS
+CONS( 1979, ccmk2, 0,      0,      mk2,     mk2,   mk2_state, empty_init, "Novag", "Chess Champion: MK II", 0 )
 // second design sold (same computer/program?)

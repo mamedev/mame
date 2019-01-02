@@ -34,9 +34,9 @@ DEFINE_DEVICE_TYPE(COMX_PRN, comx_prn_device, "comx_prn", "COMX-35 Printer Card"
 ROM_START( comx_prn )
 	ROM_REGION( 0x2000, "c000", 0 )
 	ROM_SYSTEM_BIOS( 0, "comx", "COMX" )
-	ROMX_LOAD( "printer.bin",           0x0000, 0x0800, CRC(3bbc2b2e) SHA1(08bf7ea4174713ab24969c553affd5c1401876b8), ROM_BIOS(1) )
+	ROMX_LOAD( "printer.bin",           0x0000, 0x0800, CRC(3bbc2b2e) SHA1(08bf7ea4174713ab24969c553affd5c1401876b8), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "fm12", "F&M v1.2" )
-	ROMX_LOAD( "f+m.printer.1.2.bin",   0x0000, 0x1000, CRC(2feb997d) SHA1(ee9cb91042696c88ff5f2f44d2f702dc93369ba0), ROM_BIOS(2) )
+	ROMX_LOAD( "f+m.printer.1.2.bin",   0x0000, 0x1000, CRC(2feb997d) SHA1(ee9cb91042696c88ff5f2f44d2f702dc93369ba0), ROM_BIOS(1) )
 	ROM_LOAD( "rs232.bin",              0x1000, 0x0800, CRC(926ff2d1) SHA1(be02bd388bba0211ea72d4868264a63308e4318d) )
 ROM_END
 
@@ -56,11 +56,11 @@ const tiny_rom_entry *comx_prn_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(comx_prn_device::device_add_mconfig)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit0))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))
-	MCFG_CENTRONICS_PERROR_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit2))
-	MCFG_CENTRONICS_SELECT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit3))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit0))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit2))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit3))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
@@ -177,5 +177,5 @@ void comx_prn_device::comx_io_w(address_space &space, offs_t offset, uint8_t dat
 	    OUT 2 is used to send a bit to the printer
 	*/
 
-	m_cent_data_out->write(space, 0, data);
+	m_cent_data_out->write(data);
 }

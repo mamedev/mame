@@ -37,7 +37,7 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 	, m_program_config("program", ENDIANNESS_BIG, 16, addrbits, 0)
 	, m_io_config("io", ENDIANNESS_BIG, iobits, 16, 0)
 	, m_mo_out(*this)
-	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_program(nullptr), m_data(nullptr), m_direct(nullptr), m_io(nullptr), m_icount(0)
+	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_program(nullptr), m_data(nullptr), m_cache(nullptr), m_io(nullptr), m_icount(0)
 	, m_vector_mult(vecmult)
 {
 }
@@ -285,6 +285,7 @@ uint16_t z8002_device::RDPORT_W(int mode, uint16_t addr)
 {
 	if(mode == 0)
 	{
+		// FIXME: this should perform a 16-bit big-endian word read
 		return m_io->read_byte((uint16_t)(addr)) +
 			(m_io->read_byte((uint16_t)(addr+1)) << 8);
 	}
@@ -325,6 +326,7 @@ void z8002_device::WRPORT_W(int mode, uint16_t addr, uint16_t value)
 {
 	if(mode == 0)
 	{
+		// FIXME: this should perform a 16-bit big-endian word write
 		m_io->write_byte((uint16_t)(addr),value & 0xff);
 		m_io->write_byte((uint16_t)(addr+1),(value >> 8) & 0xff);
 	}
@@ -663,7 +665,7 @@ void z8001_device::device_start()
 		m_data = &space(AS_DATA);
 	else
 		m_data = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<1, 0, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	init_tables();
@@ -686,7 +688,7 @@ void z8002_device::device_start()
 		m_data = &space(AS_DATA);
 	else
 		m_data = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<1, 0, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	init_tables();

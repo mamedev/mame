@@ -166,9 +166,9 @@ void s1410_device::s1410_io(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(s1410_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL(16'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(s1410_mem)
-	MCFG_CPU_IO_MAP(s1410_io)
+	MCFG_DEVICE_ADD(Z8400A_TAG, Z80, XTAL(16'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(s1410_mem)
+	MCFG_DEVICE_IO_MAP(s1410_io)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_HARDDISK_ADD("image")

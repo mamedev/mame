@@ -92,7 +92,7 @@ private:
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_device<pc_joy_device> m_joy;
-	required_device<cpu_device> m_cpu;
+	required_device<i80c52_device> m_cpu;
 
 	// internal state
 	bool m_data_in;
@@ -117,6 +117,6 @@ private:
 
 // device type definition
 
-extern const device_type ISA16_SB16;
+DECLARE_DEVICE_TYPE(ISA16_SB16, sb16_lle_device)
 
 #endif // MAME_BUS_ISA_SB16_H

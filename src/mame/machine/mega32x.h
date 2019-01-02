@@ -6,9 +6,12 @@
 
 #pragma once
 
+#include "cpu/m68000/m68000.h"
 #include "cpu/sh/sh2.h"
 #include "cpu/sh/sh2comn.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
+#include "emupal.h"
 
 class sega_32x_device : public device_t
 {
@@ -28,7 +31,7 @@ public:
 	}
 
 	// configuration
-	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_READ32_MEMBER( _32x_sh2_master_4000_common_4002_r );
 	DECLARE_READ32_MEMBER( _32x_sh2_slave_4000_common_4002_r );
@@ -107,6 +110,7 @@ public:
 
 	void sh2_main_map(address_map &map);
 	void sh2_slave_map(address_map &map);
+
 protected:
 	sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -114,14 +118,17 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }  // this gets set at each EOF
 
 	/* our main vblank handler resets this */
+	required_device<m68000_base_device> m_main_cpu;
 	required_device<sh2_device> m_master_cpu;
 	required_device<sh2_device> m_slave_cpu;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
+	required_device<timer_device> m_scan_timer;
 
 	int m_32x_hcount_compare_val;
 	int m_32x_vblank_flag;
@@ -132,12 +139,15 @@ protected:
 	TIMER_CALLBACK_MEMBER(handle_pwm_callback);
 	void calculate_pwm_timer();
 	uint16_t m_pwm_ctrl, m_pwm_cycle, m_pwm_tm_reg;
-	uint16_t m_cur_lch[0x10],m_cur_rch[0x10];
+	static constexpr int PWM_FIFO_SIZE = 3;
+	uint16_t m_cur_lch[PWM_FIFO_SIZE],m_cur_rch[PWM_FIFO_SIZE];
 	uint16_t m_pwm_cycle_reg; //used for latching
 	uint8_t m_pwm_timer_tick;
-	uint8_t m_lch_index_r, m_rch_index_r, m_lch_index_w, m_rch_index_w;
+	uint8_t m_lch_size, m_rch_size;
 	uint16_t m_lch_fifo_state, m_rch_fifo_state;
 
+	void lch_pop();
+	void rch_pop();
 
 	uint16_t get_hposition(void);
 
@@ -202,6 +212,14 @@ private:
 class sega_32x_ntsc_device : public sega_32x_device
 {
 public:
+	template <typename T, typename U>
+	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&main_cpu_tag, U &&timer_tag)
+		: sega_32x_ntsc_device(mconfig, tag, owner, clock)
+	{
+		m_main_cpu.set_tag(std::forward<T>(main_cpu_tag));
+		m_scan_timer.set_tag(std::forward<U>(timer_tag));
+	}
+
 	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -212,6 +230,14 @@ protected:
 class sega_32x_pal_device : public sega_32x_device
 {
 public:
+	template <typename T, typename U>
+	sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&main_cpu_tag, U &&timer_tag)
+		: sega_32x_pal_device(mconfig, tag, owner, clock)
+	{
+		m_main_cpu.set_tag(std::forward<T>(main_cpu_tag));
+		m_scan_timer.set_tag(std::forward<U>(timer_tag));
+	}
+
 	sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -221,8 +247,5 @@ protected:
 
 DECLARE_DEVICE_TYPE(SEGA_32X_NTSC, sega_32x_ntsc_device)
 DECLARE_DEVICE_TYPE(SEGA_32X_PAL,  sega_32x_pal_device)
-
-#define MCFG_SEGA_32X_PALETTE(_palette_tag) \
-	downcast<sega_32x_device &>(*device).set_palette_tag("^" _palette_tag);
 
 #endif // MAME_MACHINE_MEGA32X_H

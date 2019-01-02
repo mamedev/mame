@@ -90,7 +90,7 @@ enum
 
 #define IBM8514_LINE_LENGTH (m_vga->offset())
 
-#define CHAR_WIDTH ((vga.sequencer.data[1]&1)?8:9)
+#define VGA_CH_WIDTH ((vga.sequencer.data[1]&1)?8:9)
 
 #define TEXT_COLUMNS (vga.crtc.horz_disp_end+1)
 #define TEXT_START_ADDRESS (vga.crtc.start_addr<<3)
@@ -184,6 +184,7 @@ ibm8514a_device::ibm8514a_device(const machine_config &mconfig, const char *tag,
 
 ibm8514a_device::ibm8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_vga(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -313,6 +314,7 @@ void vga_device::device_start()
 	save_item(NAME(vga.crtc.map13));
 	save_item(NAME(vga.crtc.irq_clear));
 	save_item(NAME(vga.crtc.irq_disable));
+	save_item(NAME(vga.crtc.no_wrap));
 
 	save_item(NAME(vga.gc.index));
 	save_item(NAME(vga.gc.latch));
@@ -358,6 +360,7 @@ void svga_device::device_start()
 
 	save_item(NAME(svga.bank_r));
 	save_item(NAME(svga.bank_w));
+	save_item(NAME(svga.rgb8_en));
 	save_item(NAME(svga.rgb15_en));
 	save_item(NAME(svga.rgb16_en));
 	save_item(NAME(svga.rgb24_en));
@@ -415,14 +418,6 @@ void ibm8514a_device::device_start()
 	ibm8514.write_mask = 0xffffffff;
 }
 
-void ibm8514a_device::device_config_complete()
-{
-	if(m_vga_tag.length() != 0)
-	{
-		m_vga = machine().device<svga_device>(m_vga_tag.c_str());
-	}
-}
-
 void mach8_device::device_start()
 {
 	ibm8514a_device::device_start();
@@ -457,7 +452,7 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	uint8_t bits;
 	uint32_t font_base;
 	uint32_t *bitmapline;
-	int width=CHAR_WIDTH, height = (vga.crtc.maximum_scan_line) * (vga.crtc.scan_doubling + 1);
+	int width=VGA_CH_WIDTH, height = (vga.crtc.maximum_scan_line) * (vga.crtc.scan_doubling + 1);
 	int pos, line, column, mask, w, h, addr;
 	uint8_t blink_en,fore_col,back_col;
 	pen_t pen;
@@ -582,6 +577,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int yi;
 	int xi;
 	int pel_shift = (vga.attribute.pel_shift & 6);
+	int addrmask = vga.crtc.no_wrap ? -1 : 0xffff;
 
 	/* line compare is screen sensitive */
 	mask_comp = 0x3ff; //| (LINES & 0x300);
@@ -612,7 +608,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					{
 						if(!screen().visible_area().contains(c+xi-(pel_shift), line + yi))
 							continue;
-						bitmapline[c+xi-(pel_shift)] = pen(vga.memory[(pos & 0xffff)+((xi >> 1)*0x10000)]);
+						bitmapline[c+xi-(pel_shift)] = pen(vga.memory[(pos & addrmask)+((xi >> 1)*0x10000)]);
 					}
 				}
 			}
@@ -639,7 +635,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					{
 						if(!screen().visible_area().contains(c+xi-(pel_shift), line + yi))
 							continue;
-						bitmapline[c+xi-pel_shift] = pen(vga.memory[(pos+(xi >> 1)) & 0xffff]);
+						bitmapline[c+xi-pel_shift] = pen(vga.memory[(pos+(xi >> 1)) & addrmask]);
 					}
 				}
 			}
@@ -1396,7 +1392,7 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 {
 	int vblank_period,hblank_period;
 	attoseconds_t refresh;
-	uint8_t hclock_m = (!GRAPHIC_MODE) ? CHAR_WIDTH : 8;
+	uint8_t hclock_m = (!GRAPHIC_MODE) ? VGA_CH_WIDTH : 8;
 	int pixel_clock;
 
 	/* safety check */
@@ -2226,7 +2222,7 @@ WRITE8_MEMBER(vga_device::mem_linear_w)
 
 MACHINE_CONFIG_START(ati_vga_device::device_add_mconfig)
 	MCFG_MACH8_ADD_OWNER("8514a")
-	MCFG_EEPROM_SERIAL_93C46_ADD("ati_eeprom")
+	EEPROM_93C46_16BIT(config, "ati_eeprom");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(s3_vga_device::device_add_mconfig)
@@ -3311,7 +3307,7 @@ READ8_MEMBER(ati_vga_device::port_03c0_r)
 
 void ibm8514a_device::ibm8514_write_fg(uint32_t offset)
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().dummy_space();
 	offset %= m_vga->vga.svga_intf.vram_size;
 	uint8_t dst = m_vga->mem_linear_r(space,offset,0xff);
 	uint8_t src = 0;
@@ -3400,7 +3396,7 @@ void ibm8514a_device::ibm8514_write_fg(uint32_t offset)
 
 void ibm8514a_device::ibm8514_write_bg(uint32_t offset)
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().dummy_space();
 	offset %= m_vga->vga.svga_intf.vram_size;
 	uint8_t dst = m_vga->mem_linear_r(space,offset,0xff);
 	uint8_t src = 0;
@@ -3530,8 +3526,7 @@ void ibm8514a_device::ibm8514_write(uint32_t offset, uint32_t src)
 			ibm8514.src_x = 0;
 		break;
 	case 0x00c0:  // use source plane
-		address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-		if(m_vga->mem_linear_r(space,src,0xff) != 0x00)
+		if (m_vga->mem_linear_r(machine().dummy_space(), src, 0xff) != 0x00)
 			ibm8514_write_fg(offset);
 		else
 			ibm8514_write_bg(offset);

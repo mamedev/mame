@@ -13,14 +13,16 @@
 
 #pragma once
 
+#include "emupal.h"
+
 #define MCFG_EF9364_PALETTE(_palette_tag) \
-	downcast<ef9364_device &>(*device).set_palette_tag("^" _palette_tag);
+	downcast<ef9364_device &>(*device).set_palette_tag(_palette_tag);
 
 #define MCFG_EF9364_PAGES_CNT(_pages_number) \
 	downcast<ef9364_device &>(*device).set_nb_of_pages(_pages_number);
 
 #define MCFG_EF9364_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<ef9364_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	downcast<ef9364_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -43,7 +45,7 @@ public:
 	ef9364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	void set_nb_of_pages(int nb_bitplanes) {
 		if (nb_bitplanes > 0 && nb_bitplanes <= 8)
 		{

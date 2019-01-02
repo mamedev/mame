@@ -96,7 +96,7 @@ DEFINE_DEVICE_TYPE(COP446C, cop446c_cpu_device, "cop446c", "National Semiconduct
     MACROS
 ***************************************************************************/
 
-#define ROM(a)          m_direct->read_byte(a)
+#define ROM(a)          m_cache->read_byte(a)
 #define RAM_R(a)        m_data->read_byte(a)
 #define RAM_W(a, v)     m_data->write_byte(a, v)
 
@@ -1074,7 +1074,7 @@ void cop400_cpu_device::device_start()
 {
 	/* find address spaces */
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_data = &space(AS_DATA);
 
 	/* find i/o handlers */

@@ -17,10 +17,10 @@ public:
 	sm510_common_disassembler() = default;
 	virtual ~sm510_common_disassembler() = default;
 
-	virtual u32 opcode_alignment() const override;
-	virtual u32 interface_flags() const override;
-	virtual u32 page_address_bits() const override;
-	virtual u32 page2_address_bits() const override;
+	virtual u32 opcode_alignment() const override { return 1; }
+	virtual u32 interface_flags() const override { return NONLINEAR_PC | PAGED2LEVEL; }
+	virtual u32 page_address_bits() const override { return 6; }
+	virtual u32 page2_address_bits() const override { return 4; }
 	virtual offs_t pc_linear_to_real(offs_t pc) const override;
 	virtual offs_t pc_real_to_linear(offs_t pc) const override;
 
@@ -46,10 +46,16 @@ protected:
 		mRMF, mSMF, mCOMCN,
 		mTA, mTM2, mTG,
 
+		// SM530 common
+		mSABM, mSABL, mEXBL,
+		mTG2, mTBA,
+		mKETA, mATF, mSDS, mRDS,
+		mINIS,
+
 		// SM590 aliases
 		mNOP, mCCTRL, mINBL, mDEBL, mXBLA, mADCS, mTR7,
 		// SM590 uniques
-		mTAX, mLBLX, mMTR, mSTR, mINBM, mDEBM, mRTA, mBLTA, mEXAX, mTBA, mADS, mADC, mLBMX, mTLS
+		mTAX, mLBLX, mMTR, mSTR, mINBM, mDEBM, mRTA, mBLTA, mEXAX, mTBA2, mADS, mADC, mLBMX, mTLS
 	};
 
 	static const char *const s_mnemonics[];
@@ -111,6 +117,18 @@ private:
 	static const u8 sm5a_extended[0x10];
 };
 
+class sm530_disassembler : public sm510_common_disassembler
+{
+public:
+	sm530_disassembler() = default;
+	virtual ~sm530_disassembler() = default;
+
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	static const u8 sm530_mnemonic[0x100];
+};
+
 class sm590_disassembler : public sm510_common_disassembler
 {
 public:
@@ -119,8 +137,8 @@ public:
 
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
-	virtual u32 page_address_bits() const override;
-	virtual u32 page2_address_bits() const override;
+	virtual u32 page_address_bits() const override { return 7; }
+	virtual u32 page2_address_bits() const override { return 2; }
 	virtual offs_t pc_linear_to_real(offs_t pc) const override;
 	virtual offs_t pc_real_to_linear(offs_t pc) const override;
 

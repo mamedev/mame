@@ -19,14 +19,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> multimax_t
+// ======================> vic10_multimax_device
 
-class multimax_t :  public device_t,
-					public device_vic10_expansion_card_interface
+class vic10_multimax_device : public device_t, public device_vic10_expansion_card_interface
 {
 public:
 	// construction/destruction
-	multimax_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vic10_multimax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -43,6 +42,6 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(MULTIMAX, multimax_t)
+DECLARE_DEVICE_TYPE(VIC10_MULTIMAX, vic10_multimax_device)
 
 #endif // MAME_BUS_VIC10_MULTIMAX_H

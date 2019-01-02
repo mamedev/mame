@@ -16,6 +16,7 @@
 
   TODO:
   - external module support (no dumps yet)
+  - make MM5445N a device
 
 ***************************************************************************/
 
@@ -47,8 +48,13 @@ public:
 		m_display_maxx(0)
 	{ }
 
+	void k28(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(power_on);
+
+private:
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<i8021_device> m_maincpu;
 	required_device<tms6100_device> m_tms6100;
 	required_device<votrax_sc01_device> m_speech;
 	required_device<timer_device> m_onbutton_timer;
@@ -89,12 +95,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_p2_w);
 	DECLARE_WRITE_LINE_MEMBER(mcu_prog_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(power_on);
 	void power_off();
 
-	void k28(machine_config &config);
-
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
@@ -447,29 +449,27 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(k28_state::k28)
-
+void k28_state::k28(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8021, 3.579545_MHz_XTAL)
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(k28_state, mcu_p0_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(k28_state, mcu_p1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(k28_state, mcu_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(k28_state, mcu_p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(k28_state, mcu_prog_w))
-	MCFG_MCS48_PORT_T1_IN_CB(DEVREADLINE("speech", votrax_sc01_device, request)) // SC-01 A/R pin
+	I8021(config, m_maincpu, 3.579545_MHz_XTAL);
+	m_maincpu->bus_out_cb().set(FUNC(k28_state::mcu_p0_w));
+	m_maincpu->p1_in_cb().set(FUNC(k28_state::mcu_p1_r));
+	m_maincpu->p2_in_cb().set(FUNC(k28_state::mcu_p2_r));
+	m_maincpu->p2_out_cb().set(FUNC(k28_state::mcu_p2_w));
+	m_maincpu->prog_out_cb().set(FUNC(k28_state::mcu_prog_w));
+	m_maincpu->t1_in_cb().set("speech", FUNC(votrax_sc01_device::request)); // SC-01 A/R pin
 
-	MCFG_DEVICE_ADD("tms6100", TMS6100, 3.579545_MHz_XTAL) // CLK tied to 8021 ALE pin
+	TMS6100(config, m_tms6100, 3.579545_MHz_XTAL); // CLK tied to 8021 ALE pin
 
-	MCFG_TIMER_ADD_NONE("on_button")
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", k28_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_k28)
+	TIMER(config, "on_button").configure_generic(timer_device::expired_delegate());
+	TIMER(config, "display_decay").configure_periodic(FUNC(k28_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_k28);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DEVICE_ADD("speech", VOTRAX_SC01, 760000) // measured 760kHz on its RC pin
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	VOTRAX_SC01(config, "speech", 760000).add_route(ALL_OUTPUTS, "mono", 0.5); // measured 760kHz on its RC pin
+}
 
 
 
@@ -490,5 +490,5 @@ ROM_END
 
 
 
-//    YEAR  NAME  PARENT CMP MACHINE INPUT STATE   INIT  COMPANY, FULLNAME, FLAGS
-COMP( 1981, k28,  0,      0, k28,    k28,  k28_state, 0, "Tiger Electronics", "K28: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS      INIT        COMPANY              FULLNAME                                        FLAGS
+COMP( 1981, k28,  0,      0, k28,     k28,   k28_state, empty_init, "Tiger Electronics", "K28: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE )

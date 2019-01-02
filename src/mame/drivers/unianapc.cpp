@@ -35,13 +35,15 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void unianapc(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void unianapc(machine_config &config);
 	void unianapc_map(address_map &map);
 };
 
@@ -73,8 +75,8 @@ void unianapc_state::machine_reset()
 MACHINE_CONFIG_START(unianapc_state::unianapc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 1.70 GHz
-	MCFG_CPU_PROGRAM_MAP(unianapc_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 1.70 GHz
+	MCFG_DEVICE_PROGRAM_MAP(unianapc_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -116,5 +118,5 @@ ROM_START( hogwild )
 	DISK_IMAGE( "hog wild", 0, SHA1(f05b7f64830d995db2e2a2f7f95ae0100de5dab1) )
 ROM_END
 
-GAME( 2002, dhunting,  0,   unianapc, unianapc, unianapc_state,  0, ROT0, "Game Box Entertainment", "Dream Hunting (US)",  MACHINE_IS_SKELETON ) // Ver 1007?
-GAME( 2003, hogwild,   0,   unianapc, unianapc, unianapc_state,  0, ROT0, "Uniana",                 "Hog Wild (US)",       MACHINE_IS_SKELETON ) // Ver.00.26.b?
+GAME( 2002, dhunting,  0,   unianapc, unianapc, unianapc_state, empty_init, ROT0, "Game Box Entertainment", "Dream Hunting (US)",  MACHINE_IS_SKELETON ) // Ver 1007?
+GAME( 2003, hogwild,   0,   unianapc, unianapc, unianapc_state, empty_init, ROT0, "Uniana",                 "Hog Wild (US)",       MACHINE_IS_SKELETON ) // Ver.00.26.b?

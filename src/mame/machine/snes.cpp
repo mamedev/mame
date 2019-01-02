@@ -1069,7 +1069,7 @@ void snes_state::snes_init_ram()
 	SNES_CPU_REG(WRIO) = 0xff;
 
 	// init frame counter so first line is 0
-	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds()) >= 59)
+	if (m_screen->frame_period().as_hz() >= 59.0)
 		m_ppu->set_current_vert(SNES_VTOTAL_NTSC);
 	else
 		m_ppu->set_current_vert(SNES_VTOTAL_PAL);
@@ -1171,7 +1171,7 @@ void snes_state::rom_map_setup(uint32_t size)
 }
 
 /* for mame we use an init, maybe we will need more for the different games */
-DRIVER_INIT_MEMBER(snes_state,snes)
+void snes_state::init_snes()
 {
 	m_cart.m_rom_size = memregion("user3")->bytes();
 	m_cart.m_rom = memregion("user3")->base();
@@ -1192,7 +1192,7 @@ DRIVER_INIT_MEMBER(snes_state,snes)
 	m_cart.mode = SNES_MODE_20;
 }
 
-DRIVER_INIT_MEMBER(snes_state,snes_hirom)
+void snes_state::init_snes_hirom()
 {
 	m_cart.m_rom_size = memregion("user3")->bytes();
 	m_cart.m_rom = memregion("user3")->base();

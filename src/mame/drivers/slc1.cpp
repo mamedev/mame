@@ -68,7 +68,7 @@ public:
 
 	void slc1(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
 
@@ -78,7 +78,6 @@ protected:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-private:
 	uint8_t m_digit = 0;
 	bool m_kbd_type = false;
 
@@ -205,7 +204,7 @@ void slc1_state::mem_map(address_map &map)
 void slc1_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(slc1_state::io_r), FUNC(slc1_state::io_w));
+	map(0x0000, 0xffff).rw(FUNC(slc1_state::io_r), FUNC(slc1_state::io_w));
 }
 
 
@@ -270,16 +269,16 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(slc1_state::slc1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_slc1)
+	config.set_default_layout(layout_slc1);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -293,11 +292,11 @@ MACHINE_CONFIG_END
 ROM_START(slc1)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "bios0", "SLC-1")
-	ROMX_LOAD("slc1_0000.bin",   0x0000, 0x1000, CRC(06d32967) SHA1(f25eac66a4fca9383964d509c671a7ad2e020e7e), ROM_BIOS(1) )
+	ROMX_LOAD("slc1_0000.bin",   0x0000, 0x1000, CRC(06d32967) SHA1(f25eac66a4fca9383964d509c671a7ad2e020e7e), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "bios1", "SC-1 v2")
-	ROMX_LOAD("sc1-v2.bin",      0x0000, 0x1000, CRC(1f122a85) SHA1(d60f89f8b59d04f4cecd6e3ecfe0a24152462a36), ROM_BIOS(2) )
+	ROMX_LOAD("sc1-v2.bin",      0x0000, 0x1000, CRC(1f122a85) SHA1(d60f89f8b59d04f4cecd6e3ecfe0a24152462a36), ROM_BIOS(1))
 ROM_END
 
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT  STATE          INIT  COMPANY                   FULLNAME */
-COMP( 1989, slc1,     0,      0,      slc1,       slc1,  slc1_state,    0,    "Dr. Dieter Scheuschner", "SLC-1" , 0 )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                   FULLNAME */
+COMP( 1989, slc1, 0,      0,      slc1,    slc1,  slc1_state, empty_init, "Dr. Dieter Scheuschner", "SLC-1" , 0 )

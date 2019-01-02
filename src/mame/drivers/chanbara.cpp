@@ -53,6 +53,7 @@ ToDo:
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -60,8 +61,8 @@ ToDo:
 class chanbara_state : public driver_device
 {
 public:
-	chanbara_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	chanbara_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
@@ -69,7 +70,31 @@ public:
 		m_colorram2(*this, "colorram2"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"){ }
+		m_palette(*this, "palette")
+	{ }
+
+	void init_chanbara();
+
+	void chanbara(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	DECLARE_WRITE8_MEMBER(chanbara_videoram_w);
+	DECLARE_WRITE8_MEMBER(chanbara_colorram_w);
+	DECLARE_WRITE8_MEMBER(chanbara_videoram2_w);
+	DECLARE_WRITE8_MEMBER(chanbara_colorram2_w);
+	DECLARE_WRITE8_MEMBER(chanbara_ay_out_0_w);
+	DECLARE_WRITE8_MEMBER(chanbara_ay_out_1_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	void chanbara_palette(palette_device &palette) const;
+	uint32_t screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void chanbara_map(address_map &map);
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -88,37 +113,18 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-
-	DECLARE_WRITE8_MEMBER(chanbara_videoram_w);
-	DECLARE_WRITE8_MEMBER(chanbara_colorram_w);
-	DECLARE_WRITE8_MEMBER(chanbara_videoram2_w);
-	DECLARE_WRITE8_MEMBER(chanbara_colorram2_w);
-	DECLARE_WRITE8_MEMBER(chanbara_ay_out_0_w);
-	DECLARE_WRITE8_MEMBER(chanbara_ay_out_1_w);
-	DECLARE_DRIVER_INIT(chanbara);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(chanbara);
-	uint32_t screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void chanbara(machine_config &config);
-	void chanbara_map(address_map &map);
 };
 
 
-PALETTE_INIT_MEMBER(chanbara_state, chanbara)
+void chanbara_state::chanbara_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i, red, green, blue;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		red = color_prom[i];
-		green = color_prom[palette.entries() + i];
-		blue = color_prom[2 * palette.entries() + i];
+		int const red = color_prom[i];
+		int const green = color_prom[palette.entries() + i];
+		int const blue = color_prom[2 * palette.entries() + i];
 
 		palette.set_pen_color(i, pal4bit(red << 1), pal4bit(green << 1), pal4bit(blue << 1));
 	}
@@ -231,11 +237,11 @@ uint32_t chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_in
 void chanbara_state::chanbara_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0bff).ram().w(this, FUNC(chanbara_state::chanbara_videoram_w)).share("videoram");
-	map(0x0c00, 0x0fff).ram().w(this, FUNC(chanbara_state::chanbara_colorram_w)).share("colorram");
+	map(0x0800, 0x0bff).ram().w(FUNC(chanbara_state::chanbara_videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(chanbara_state::chanbara_colorram_w)).share("colorram");
 	map(0x1000, 0x10ff).ram().share("spriteram");
-	map(0x1800, 0x19ff).ram().w(this, FUNC(chanbara_state::chanbara_videoram2_w)).share("videoram2");
-	map(0x1a00, 0x1bff).ram().w(this, FUNC(chanbara_state::chanbara_colorram2_w)).share("colorram2");
+	map(0x1800, 0x19ff).ram().w(FUNC(chanbara_state::chanbara_videoram2_w)).share("videoram2");
+	map(0x1a00, 0x1bff).ram().w(FUNC(chanbara_state::chanbara_colorram2_w)).share("colorram2");
 	map(0x2000, 0x2000).portr("DSW1");
 	map(0x2001, 0x2001).portr("SYSTEM");
 	map(0x2002, 0x2002).portr("P2");
@@ -347,7 +353,7 @@ static const gfx_layout spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( chanbara )
+static GFXDECODE_START( gfx_chanbara )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,   0x40, 32 )
 	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout, 0x80, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, tile16layout, 0, 32 )
@@ -390,8 +396,8 @@ void chanbara_state::machine_reset()
 
 MACHINE_CONFIG_START(chanbara_state::chanbara)
 
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(12'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(chanbara_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(12'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(chanbara_map)
 
 
 	/* video hardware */
@@ -403,20 +409,19 @@ MACHINE_CONFIG_START(chanbara_state::chanbara)
 	// DECO video CRTC
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,16,240)
 	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", chanbara)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_chanbara)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(chanbara_state, chanbara)
+	PALETTE(config, m_palette, FUNC(chanbara_state::chanbara_palette), 256);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000/8)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(chanbara_state, chanbara_ay_out_0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(chanbara_state, chanbara_ay_out_1_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 12000000/8));
+	ymsnd.irq_handler().set_inputline(m_maincpu, 0);
+	ymsnd.port_a_write_callback().set(FUNC(chanbara_state::chanbara_ay_out_0_w));
+	ymsnd.port_b_write_callback().set(FUNC(chanbara_state::chanbara_ay_out_1_w));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -458,14 +463,13 @@ ROM_START( chanbara )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(chanbara_state,chanbara)
+void chanbara_state::init_chanbara()
 {
-	uint8_t   *src = memregion("gfx4")->base();
-	uint8_t   *dst = memregion("gfx3")->base() + 0x4000;
-	uint8_t   *bg = memregion("user1")->base();
+	uint8_t *src = memregion("gfx4")->base();
+	uint8_t *dst = memregion("gfx3")->base() + 0x4000;
+	uint8_t *bg = memregion("user1")->base();
 
-	int i;
-	for (i = 0; i < 0x1000; i++)
+	for (int i = 0; i < 0x1000; i++)
 	{
 		dst[i + 0x1000] = src[i] & 0xf0;
 		dst[i + 0x0000] = (src[i] & 0x0f) << 4;
@@ -476,4 +480,4 @@ DRIVER_INIT_MEMBER(chanbara_state,chanbara)
 	membank("bank1")->configure_entries(0, 2, &bg[0x0000], 0x4000);
 }
 
-GAME( 1985, chanbara, 0,  chanbara, chanbara, chanbara_state, chanbara, ROT270, "Data East", "Chanbara", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1985, chanbara, 0, chanbara, chanbara, chanbara_state, init_chanbara, ROT270, "Data East", "Chanbara", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

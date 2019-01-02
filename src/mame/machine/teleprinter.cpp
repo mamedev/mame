@@ -218,11 +218,11 @@ MACHINE_CONFIG_START(teleprinter_device::device_add_mconfig)
 	MCFG_SCREEN_SIZE(teleprinter_device::WIDTH*8, teleprinter_device::HEIGHT*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, teleprinter_device::WIDTH*8-1, 0, teleprinter_device::HEIGHT*8-1)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, teleprinter_device, tp_update)
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(generic_terminal_device, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(generic_terminal_device::kbd_put));
 
-	MCFG_SPEAKER_STANDARD_MONO("bell")
-	MCFG_SOUND_ADD("beeper", BEEP, 2'000)
+	SPEAKER(config, "bell").front_center();
+	MCFG_DEVICE_ADD("beeper", BEEP, 2'000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 0.50)
 MACHINE_CONFIG_END
 

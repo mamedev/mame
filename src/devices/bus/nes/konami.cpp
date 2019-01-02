@@ -27,7 +27,6 @@
 #include "emu.h"
 #include "konami.h"
 
-#include "cpu/m6502/m6502.h"
 #include "speaker.h"
 
 
@@ -126,7 +125,7 @@ void nes_konami_vrc3_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_mode));
 	save_item(NAME(m_irq_enable));
@@ -154,7 +153,7 @@ void nes_konami_vrc4_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_mode));
 	save_item(NAME(m_irq_prescale));
@@ -195,7 +194,7 @@ void nes_konami_vrc7_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_mode));
 	save_item(NAME(m_irq_prescale));
@@ -366,7 +365,7 @@ void nes_konami_vrc3_device::device_timer(emu_timer &timer, device_timer_id id, 
 			{
 				if ((m_irq_count & 0x00ff) == 0xff)
 				{
-					m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+					set_irq_line(ASSERT_LINE);
 					m_irq_count = m_irq_count_latch;
 				}
 				else
@@ -376,7 +375,7 @@ void nes_konami_vrc3_device::device_timer(emu_timer &timer, device_timer_id id, 
 			{
 				if (m_irq_count == 0xffff)
 				{
-					m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+					set_irq_line(ASSERT_LINE);
 					m_irq_count = m_irq_count_latch;
 				}
 				else
@@ -410,11 +409,11 @@ WRITE8_MEMBER(nes_konami_vrc3_device::write_h)
 			m_irq_enable_latch = data & 0x01;
 			if (data & 0x02)
 				m_irq_count = m_irq_count_latch;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x5000:
 			m_irq_enable = m_irq_enable_latch;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x7000:
 			prg16_89ab(data);
@@ -438,7 +437,7 @@ void nes_konami_vrc4_device::irq_tick()
 	if (m_irq_count == 0xff)
 	{
 		m_irq_count = m_irq_count_latch;
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		set_irq_line(ASSERT_LINE);
 	}
 	else
 		m_irq_count++;
@@ -540,11 +539,11 @@ WRITE8_MEMBER(nes_konami_vrc4_device::write_h)
 					m_irq_enable_latch = data & 0x01;
 					if (data & 0x02)
 						m_irq_count = m_irq_count_latch;
-					m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+					set_irq_line(CLEAR_LINE);
 					break;
 				case 0x300:
 					m_irq_enable = m_irq_enable_latch;
-					m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+					set_irq_line(CLEAR_LINE);
 					break;
 			}
 			break;
@@ -616,11 +615,11 @@ WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
 					m_irq_enable_latch = data & 0x01;
 					if (data & 0x02)
 						m_irq_count = m_irq_count_latch;
-					m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+					set_irq_line(CLEAR_LINE);
 					break;
 				case 0x200:
 					m_irq_enable = m_irq_enable_latch;
-					m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+					set_irq_line(CLEAR_LINE);
 					break;
 				default:
 					logerror("VRC-6 write_h uncaught write, addr: %04x value: %02x\n", ((offset & 0x7000) | add_lines) + 0x8000, data);
@@ -641,11 +640,11 @@ WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
 MACHINE_CONFIG_START(nes_konami_vrc6_device::device_add_mconfig)
 
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
 	// TODO: this is not how VRC6 clock signaling works!
 	// The board uses the CLK pin in reality, not hardcoded NTSC values!
-	MCFG_SOUND_ADD("vrc6snd", VRC6, XTAL(21'477'272)/12)
+	MCFG_DEVICE_ADD("vrc6snd", VRC6, XTAL(21'477'272)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.5)
 MACHINE_CONFIG_END
 
@@ -728,11 +727,11 @@ WRITE8_MEMBER(nes_konami_vrc7_device::write_h)
 			m_irq_enable_latch = data & 0x01;
 			if (data & 0x02)
 				m_irq_count = m_irq_count_latch;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x7008: case 0x7010: case 0x7018:
 			m_irq_enable = m_irq_enable_latch;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 
 		default:
@@ -765,10 +764,10 @@ WRITE8_MEMBER(nes_konami_vrc7_device::write_h)
 MACHINE_CONFIG_START(nes_konami_vrc7_device::device_add_mconfig)
 
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
 	// TODO: this is not how VRC7 clock signaling works!
 	// The board uses the CLK pin in reality, not hardcoded NTSC values!
-	MCFG_SOUND_ADD("ym", YM2413, XTAL(21'477'272)/12)
+	MCFG_DEVICE_ADD("ym", YM2413, XTAL(21'477'272)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.5)
 MACHINE_CONFIG_END

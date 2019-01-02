@@ -110,7 +110,7 @@ ROM usage -                                                   CRC (from ROM test
            Game       Sega Part No.     ROM Type              Byte   Word
            --------------------------------------------------------------
            Air Trix -
-                      MPR-23573.IC37    128M TSOP48 MASKROM   B9A5   9E67
+                      MPR-23573.IC37    128M TSOP48 mask ROM  B9A5   9E67
                       MPR-23577.IC38    "                     A52A   BCE0
                       MPR-23574.IC41    "                     DABB   B621
                       MPR-23578.IC42    "                     4BD4   5E6B
@@ -133,7 +133,7 @@ ROM usage -                                                   CRC (from ROM test
            Game       Sega Part No.     ROM Type              Byte   Word
            --------------------------------------------------------------
            Planet Harriers -
-                      MPR-23549.IC37    128M TSOP48 MASKROM   7F16   2C37
+                      MPR-23549.IC37    128M TSOP48 mask ROM  7F16   2C37
                       MPR-23553.IC38    "                     1F9F   AAE5
                       MPR-23550.IC41    "                     986C   8D7A
                       MPR-23554.IC42    "                     BD1D   5304
@@ -186,7 +186,7 @@ ROM usage -                                                   CRC (from ROM test
            Game       Sega Part No.     ROM Type              Byte   Word
            --------------------------------------------------------------
            Star Wars Racer Arcade
-                      MPR-23086.IC37    64M SOP44 MASKROM     7993  8E18
+                      MPR-23086.IC37    64M SOP44 mask ROM    7993  8E18
                       MPR-23087.IC38    "                     4D44  D239
                       MPR-23088.IC39    "                     4135  BEAB
                       MPR-23089.IC40    "                     F0C8  04E2
@@ -383,6 +383,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/sh/sh4.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -392,14 +393,23 @@ class hikaru_state : public driver_device
 {
 public:
 	hikaru_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
-	virtual void video_start() override;
-	uint32_t screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_slave(*this, "slave")
+	{ }
+
 	void hikaru(machine_config &config);
+
+private:
+	virtual void video_start() override;
+
 	void hikaru_map(address_map &map);
 	void hikaru_map_slave(address_map &map);
+
+	uint32_t screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	required_device<sh4_device> m_maincpu;
+	required_device<sh4_device> m_slave;
 };
 
 void hikaru_state::video_start()
@@ -486,54 +496,56 @@ void hikaru_state::hikaru_map_slave(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(hikaru_state::hikaru)
+void hikaru_state::hikaru(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
-//  MCFG_SH4_MD0(1)
-//  MCFG_SH4_MD1(0)
-//  MCFG_SH4_MD2(1)
-//  MCFG_SH4_MD3(0)
-//  MCFG_SH4_MD4(0)
-//  MCFG_SH4_MD5(1)
-//  MCFG_SH4_MD6(0)
-//  MCFG_SH4_MD7(1)
-//  MCFG_SH4_MD8(0)
-//  MCFG_SH4_CLOCK(CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(hikaru_map)
-//  MCFG_CPU_IO_MAP(hikaru_port)
-	MCFG_CPU_FORCE_NO_DRC()
-//  MCFG_CPU_VBLANK_INT("screen", hikaru,vblank)
+	SH4LE(config, m_maincpu, CPU_CLOCK);
+//  m_maincpu->set_md(0, 1);
+//  m_maincpu->set_md(1, 0);
+//  m_maincpu->set_md(2, 1);
+//  m_maincpu->set_md(3, 0);
+//  m_maincpu->set_md(4, 0);
+//  m_maincpu->set_md(5, 1);
+//  m_maincpu->set_md(6, 0);
+//  m_maincpu->set_md(7, 1);
+//  m_maincpu->set_md(8, 0);
+//  m_maincpu->set_sh4_clock(CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hikaru_state::hikaru_map);
+//  m_maincpu->set_addrmap(AS_IO, &hikaru_state::hikaru_port);
+	m_maincpu->set_force_no_drc(true);
+//  m_maincpu->set_vblank_int("screen", FUNC(hikaru_state::vblank));
 
-	MCFG_CPU_ADD("slave", SH4LE, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(hikaru_map_slave)
-	MCFG_CPU_FORCE_NO_DRC()
-
-
-//  MCFG_MACHINE_START_OVERRIDE(hikaru_state, hikaru )
-//  MCFG_MACHINE_RESET_OVERRIDE(hikaru_state, hikaru )
+	SH4LE(config, m_slave, CPU_CLOCK);
+	m_slave->set_addrmap(AS_PROGRAM, &hikaru_state::hikaru_map_slave);
+	m_slave->set_force_no_drc(true);
 
 //  MCFG_NVRAM_HANDLER(hikaru_eeproms)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hikaru_state, screen_update_hikaru)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(hikaru_state::screen_update_hikaru));
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
+	PALETTE(config, "palette").set_entries(0x1000);
 
+//  SPEAKER(config, "lspeaker").front_left();
+//  SPEAKER(config, "rspeaker").front_right();
 
-//  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-//  MCFG_SOUND_ADD("aica", AICA, 0)
+//  MCFG_DEVICE_ADD("aica", AICA, (XTAL(33'868'800)*2)/3) // 67.7376MHz(2*33.8688MHz), div 3 for audio block // 33.8688MHz on Board
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-//  MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
-MACHINE_CONFIG_END
+//  MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+
+//  MCFG_DEVICE_ADD("aica_pcb", AICA, (XTAL(33'868'800)*2)/3) // AICA PCB
+//  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
+//  MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+}
 
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
 
 
 #define HIKARU_BIOS \
@@ -542,10 +554,13 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( 1, "bios1", "epr23400" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-23400.ic94",   0x000000, 0x200000, CRC(3d557104) SHA1(d39879f5a1acbd54ad8ee4fbd412f870c9ff4aa5) ) \
 	ROM_SYSTEM_BIOS( 2, "bios2", "epr21904" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21904.ic94",   0x000000, 0x200000, CRC(d96298b6) SHA1(d10d837bc7d68eb7125c34beffe21a91305627b0) )
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21904.ic94",   0x000000, 0x200000, CRC(d96298b6) SHA1(d10d837bc7d68eb7125c34beffe21a91305627b0) ) \
+	ROM_SYSTEM_BIOS( 3, "bios3", "Development / prototype" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "prot_bot.ic94",    0x000000, 0x200000, CRC(7cbf2fb6) SHA1(7384e3c9314add7d61f93c9edd9fb7788d08f423) )
 // bios 0 is SAMURAI boot rom 0.96 / 2000/8/10
 // bios 1 is SAMURAI boot rom 0.92 / 1999/7/2
 // bios 2 is SAMURAI boot rom 0.84 / 1999/7/22
+// bios 3 is SAMURAI boot rom 0.74 / 1999/5/01 Development version, have options to change country, SCSI ID, boot into debugger mode (will wait for commands from host via SCSI).
 
 
 ROM_START( hikaru )
@@ -570,7 +585,7 @@ ROM_START( airtrix )
 	/* ic35 unpopulated */
 	/* ic36 unpopulated */
 
-	/* ROM board using 128M TSOP48 MASKROMs */
+	/* ROM board using 128M TSOP48 mask ROMs */
 	ROM_REGION( 0x10000000, "user2", 0)
 	ROM_LOAD32_WORD( "mpr-23573.ic37" , 0x0000000, 0x1000000, CRC(e22a0734) SHA1(fc06d5972d285d09473874aaeb1efed2d19c8f36) )
 	ROM_LOAD32_WORD( "mpr-23577.ic38" , 0x0000002, 0x1000000, CRC(d007680d) SHA1(a795057c40b1851adb0e19e5dfb39e16206215bf) )
@@ -601,7 +616,7 @@ ROM_START( airtrixo )
 	ROM_LOAD32_WORD( "epr-23601.ic29", 0x0000000, 0x0400000, CRC(e0c642cb) SHA1(f04f8e13cc46d462c79ecebcded7dee9b3500bdc) )
 	ROM_LOAD32_WORD( "epr-23602.ic30", 0x0000002, 0x0400000, CRC(fac11d21) SHA1(70b48a7e1ac4268fc09d96d6845c5a5099d4e301) )
 
-	/* ROM board using 128M TSOP48 MASKROMs */
+	/* ROM board using 128M TSOP48 mask ROMs */
 	ROM_REGION( 0x10000000, "user2", 0)
 	ROM_LOAD32_WORD( "mpr-23573.ic37" , 0x0000000, 0x1000000, CRC(e22a0734) SHA1(fc06d5972d285d09473874aaeb1efed2d19c8f36) )
 	ROM_LOAD32_WORD( "mpr-23577.ic38" , 0x0000002, 0x1000000, CRC(d007680d) SHA1(a795057c40b1851adb0e19e5dfb39e16206215bf) )
@@ -631,7 +646,7 @@ ROM_START( pharrier )
 	ROM_LOAD32_WORD("epr-23571.ic35",  0x1800000, 0x0400000, CRC(5a75fa92) SHA1(b5e0c8c995ecc954b74d5eb36f3ae2a732a5986b) )
 	ROM_LOAD32_WORD("epr-23572.ic36",  0x1800002, 0x0400000, CRC(46054067) SHA1(449800bdc2c40c76aed9bc5e7e8831d8f03ef286) )
 
-	/* ROM board using 128M TSOP48 MASKROMs */
+	/* ROM board using 128M TSOP48 mask ROMs */
 	ROM_REGION( 0x10000000, "user2", 0)
 	ROM_LOAD32_WORD( "mpr-23549.ic37", 0x0000000, 0x1000000, CRC(ed764200) SHA1(ad840a40347345f72a443f284b1bb0ae2b37f7ac) )
 	ROM_LOAD32_WORD( "mpr-23553.ic38", 0x0000002, 0x1000000, CRC(5e70ae78) SHA1(2ae6bdb5aa1434bb60b2b9bca7af12d6476cd35f) )
@@ -668,7 +683,7 @@ ROM_START( swracer )
 	/* ic35 unpopulated */
 	/* ic36 unpopulated */
 
-	/* ROM board using 64M SOP44 MASKROM */
+	/* ROM board using 64M SOP44 mask ROM */
 	ROM_REGION( 0x10000000, "user2", 0)
 	ROM_LOAD32_WORD("mpr-23086.ic37" ,  0x0000000, 0x0800000, CRC(ef6f20f1) SHA1(11fb66bf71223b4c6650d3adaea21e8709b8d67b))
 	ROM_LOAD32_WORD("mpr-23087.ic38" ,  0x0000002, 0x0800000, CRC(54389822) SHA1(6357f0aa77ef0a5a08a751e085fa026d26ba47d1))
@@ -721,7 +736,7 @@ ROM_START( braveff )
 	/* ic35 unpopulated */
 	/* ic36 unpopulated */
 
-	/* ROM board using 64M SOP44 MASKROM */
+	/* ROM board using 64M SOP44 mask ROM */
 	ROM_REGION( 0xc000000, "user2", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "mpr-22000.ic37",  0x0000000, 0x800000, CRC(53d641d6) SHA1(f47d7c77d0e36c4ec3b7171fd7a017f9f58ca5a0) )
 	ROM_LOAD32_WORD( "mpr-22001.ic38",  0x0000002, 0x800000, CRC(234bc48f) SHA1(177c46884de0ba4bac1f9b778f99c905410a9345) )
@@ -759,7 +774,7 @@ ROM_START( sgnascar )
 	ROM_LOAD32_WORD( "epr-23485a.ic35", 0x000000, 0x400000, CRC(1072f531) SHA1(ca07a8bfb7247e4aec57e18cb091d24dcef666c1) )
 	ROM_LOAD32_WORD( "epr-23486a.ic36", 0x000002, 0x400000, CRC(02d4aab6) SHA1(b1b0e07dc71dc124177e27dfd8b459444e8ae4d3) )
 
-	/* ROM board using 128M TSOP48 MASKROMs */
+	/* ROM board using 128M TSOP48 mask ROMs */
 	ROM_REGION( 0x10000000, "user2", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "mpr-23469.ic19", 0x0000000, 0x1000000, CRC(89cbad8d) SHA1(e4f103b96a3a842a90182172ddcf3bc5dfe6cca8) )
 	ROM_LOAD32_WORD( "mpr-23473.ic20", 0x0000002, 0x1000000, CRC(977b87d6) SHA1(079eeebc6f9c60d0a016a46386bbe846d8a354da) )
@@ -791,7 +806,7 @@ ROM_START( sgnascaro )
 	ROM_LOAD32_WORD( "epr-23485.ic35", 0x000000, 0x400000, CRC(13b44fbf) SHA1(73416fa7b671ec5c96f0b084a427ff701bf6c399) )
 	ROM_LOAD32_WORD( "epr-23486.ic36", 0x000002, 0x400000, CRC(ac3acd19) SHA1(1ec96be0bfceb2f1f808d78b07425d32056fbde0) )
 
-	/* ROM board using 128M TSOP48 MASKROMs */
+	/* ROM board using 128M TSOP48 mask ROMs */
 	ROM_REGION( 0x10000000, "user2", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "mpr-23469.ic19", 0x0000000, 0x1000000, CRC(89cbad8d) SHA1(e4f103b96a3a842a90182172ddcf3bc5dfe6cca8) )
 	ROM_LOAD32_WORD( "mpr-23473.ic20", 0x0000002, 0x1000000, CRC(977b87d6) SHA1(079eeebc6f9c60d0a016a46386bbe846d8a354da) )
@@ -815,11 +830,45 @@ ROM_START( sgnascaro )
 	ROM_PARAMETER( ":rom_board:key", "56dedf33" )
 ROM_END
 
-GAME( 2000, hikaru,   0,        hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Hikaru Bios", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
-GAME( 1999, braveff,  hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Brave Firefighters", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, airtrix,  hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Air Trix (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, airtrixo, airtrix,  hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Air Trix (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, sgnascar, hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega / Electronic Arts", "NASCAR Racing (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, sgnascaro,sgnascar, hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega / Electronic Arts", "NASCAR Racing (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, pharrier, hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Planet Harriers (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, swracer,  hikaru,   hikaru,   hikaru, hikaru_state,   0, ROT0, "Sega",            "Star Wars: Racer Arcade", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+// HIKARU CHECK ROM BD, 837-13766
+// Development ROM board type, looks same as Type 2/837-13403/171-7640B but have ZIF sockets instead of Mask ROMs and socketed 315-5881 chip.
+ROM_START( hikcheck )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	HIKARU_BIOS
+
+	ROM_REGION( 0x2000000, "user1", 0)
+	// Flash ROM module, label:
+	// SEGA HIKARU
+	// Manufacturer Test Use Program (Japanese)
+	// 2000/5/19 IC 29 3199
+	ROM_LOAD32_WORD("romc0.ic29", 0x0000000, 0x0400000, CRC(cb2b5b6c) SHA1(390807bc3a2c4832577abaf470eaa85168d68e51) )
+	// Flash ROM module, label:
+	// SEGA HIKARU
+	// Manufacturer Test Use Program (Japanese)
+	// 2000/5/19 IC 30 C750
+	ROM_LOAD32_WORD("romc1.ic30", 0x0000002, 0x0400000, CRC(891c6b2b) SHA1(7cb2e40525dfb7c421c45fdd20f27f4e84ab0977) )
+	// ic31 unpopulated
+	// ic32 unpopulated
+	// ic33 unpopulated
+	// ic34 unpopulated
+	// ic35 socket connected to "RTC BD HIKARU ROM IC35" PCB with M48T35Y Timekeeper
+	ROM_LOAD32_WORD("m48t35y.ic35", 0x1800000, 0x0008000, CRC(1c25150c) SHA1(5ca4fee1515ade91677fe2c8ad7a4d5bc70a9958) )
+	// ic36 unpopulated
+
+	// SOP44 sockets, no ROMs populated
+	ROM_REGION( 0x10000000, "user2", ROMREGION_ERASE00)
+
+	// 315-5881 populated, have no 317-xxxx stamp, key is unknown.
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1" )
+ROM_END
+
+
+GAME( 2000, hikaru,    0,        hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Hikaru Bios", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
+GAME( 1999, braveff,   hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Brave Firefighters", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, airtrix,   hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Air Trix (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, airtrixo,  airtrix,  hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Air Trix (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, hikcheck,  hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Hikaru Check ROM Board", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, sgnascar,  hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega / Electronic Arts", "NASCAR Racing (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, sgnascaro, sgnascar, hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega / Electronic Arts", "NASCAR Racing (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, pharrier,  hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Planet Harriers (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, swracer,   hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Star Wars: Racer Arcade", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

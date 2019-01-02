@@ -35,10 +35,12 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "imagedev/floppy.h"
 #include "machine/keyboard.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -56,6 +58,9 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void dim68k(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER( dim68k_duart_r );
 	DECLARE_READ16_MEMBER( dim68k_fdc_r );
 	DECLARE_READ16_MEMBER( dim68k_game_switches_r );
@@ -72,9 +77,8 @@ public:
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void dim68k(machine_config &config);
 	void dim68k_mem(address_map &map);
-private:
+
 	bool m_speaker_bit;
 	u8 m_video_control;
 	u8 m_term_data;
@@ -192,9 +196,9 @@ void dim68k_state::dim68k_mem(address_map &map)
 	map(0x00ff2000, 0x00ff7fff).ram(); // Graphics Video RAM
 	map(0x00ff8001, 0x00ff8001).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x00ff8003, 0x00ff8003).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x00ff8004, 0x00ff8005).w(this, FUNC(dim68k_state::dim68k_video_high_w));
-	map(0x00ff8008, 0x00ff8009).w(this, FUNC(dim68k_state::dim68k_video_control_w));
-	map(0x00ff800a, 0x00ff800b).w(this, FUNC(dim68k_state::dim68k_video_reset_w));
+	map(0x00ff8004, 0x00ff8005).w(FUNC(dim68k_state::dim68k_video_high_w));
+	map(0x00ff8008, 0x00ff8009).w(FUNC(dim68k_state::dim68k_video_control_w));
+	map(0x00ff800a, 0x00ff800b).w(FUNC(dim68k_state::dim68k_video_reset_w));
 	map(0x00ff8800, 0x00ff8fff).rom().region("cop6512", 0); // slot 1 controller rom
 	map(0x00ff9000, 0x00ff97ff).rom().region("copz80", 0); // slot 2 controller rom
 	map(0x00ff9800, 0x00ff9fff).rom().region("cop8086", 0); // slot 3 controller rom
@@ -203,14 +207,14 @@ void dim68k_state::dim68k_mem(address_map &map)
 	map(0x00ffa800, 0x00ffafff).rom(); // slot 5 controller rom
 	map(0x00ffb000, 0x00ffb7ff).rom(); // slot 6 controller rom
 #endif
-	map(0x00ffc400, 0x00ffc41f).rw(this, FUNC(dim68k_state::dim68k_duart_r), FUNC(dim68k_state::dim68k_duart_w)); // Signetics SCN2681AC1N40 Dual UART
-	map(0x00ffc800, 0x00ffc801).rw(this, FUNC(dim68k_state::dim68k_speaker_r), FUNC(dim68k_state::dim68k_speaker_w));
-	map(0x00ffcc00, 0x00ffcc1f).rw(this, FUNC(dim68k_state::dim68k_game_switches_r), FUNC(dim68k_state::dim68k_reset_timers_w));
+	map(0x00ffc400, 0x00ffc41f).rw(FUNC(dim68k_state::dim68k_duart_r), FUNC(dim68k_state::dim68k_duart_w)); // Signetics SCN2681AC1N40 Dual UART
+	map(0x00ffc800, 0x00ffc801).rw(FUNC(dim68k_state::dim68k_speaker_r), FUNC(dim68k_state::dim68k_speaker_w));
+	map(0x00ffcc00, 0x00ffcc1f).rw(FUNC(dim68k_state::dim68k_game_switches_r), FUNC(dim68k_state::dim68k_reset_timers_w));
 	map(0x00ffd000, 0x00ffd003).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff); // NEC uPD765A
-	map(0x00ffd004, 0x00ffd005).rw(this, FUNC(dim68k_state::dim68k_fdc_r), FUNC(dim68k_state::dim68k_fdc_w));
+	map(0x00ffd004, 0x00ffd005).rw(FUNC(dim68k_state::dim68k_fdc_r), FUNC(dim68k_state::dim68k_fdc_w));
 	//AM_RANGE(0x00ffd400, 0x00ffd403) emulation trap control
-	map(0x00ffd800, 0x00ffd801).w(this, FUNC(dim68k_state::dim68k_printer_strobe_w));
-	map(0x00ffdc00, 0x00ffdc01).w(this, FUNC(dim68k_state::dim68k_banksw_w));
+	map(0x00ffd800, 0x00ffd801).w(FUNC(dim68k_state::dim68k_printer_strobe_w));
+	map(0x00ffdc00, 0x00ffdc01).w(FUNC(dim68k_state::dim68k_banksw_w));
 }
 
 /* Input ports */
@@ -293,13 +297,14 @@ static const gfx_layout dim68k_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( dim68k )
+static GFXDECODE_START( gfx_dim68k )
 	GFXDECODE_ENTRY( "chargen", 0x0000, dim68k_charlayout, 0, 1 )
 GFXDECODE_END
 
-static SLOT_INTERFACE_START( dim68k_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void dim68k_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 void dim68k_state::kbd_put(u8 data)
 {
@@ -308,8 +313,8 @@ void dim68k_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(dim68k_state::dim68k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(dim68k_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(dim68k_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -318,26 +323,27 @@ MACHINE_CONFIG_START(dim68k_state::dim68k)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 250-1)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dim68k)
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dim68k)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_UPD765A_ADD("fdc", true, true) // these options unknown
+	UPD765A(config, "fdc", 8'000'000, true, true); // these options unknown
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1790000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(dim68k_state, crtc_update_row)
+	MC6845(config, m_crtc, 1790000);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(dim68k_state::crtc_update_row), this);
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(dim68k_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(dim68k_state::kbd_put));
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "dim68k")
@@ -400,5 +406,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY        FULLNAME           FLAGS
-COMP( 1984, dim68k, 0,      0,      dim68k,   dim68k, dim68k_state, 0,    "Micro Craft", "Dimension 68000", MACHINE_NOT_WORKING)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME           FLAGS
+COMP( 1984, dim68k, 0,      0,      dim68k,  dim68k, dim68k_state, empty_init, "Micro Craft", "Dimension 68000", MACHINE_NOT_WORKING)

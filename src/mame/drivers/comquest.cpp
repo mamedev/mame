@@ -39,12 +39,13 @@ team concepts
 icq3250a-d
 1f71lctctab973
 
- */
+*/
 
 #include "emu.h"
 #include "includes/comquest.h"
 
 #include "cpu/m6805/m6805.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -201,7 +202,7 @@ static const gfx_layout comquest_charlayout =
 		8*8
 };
 
-static GFXDECODE_START( comquest )
+static GFXDECODE_START( gfx_comquest )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, comquest_charlayout, 0, 2 )
 GFXDECODE_END
 
@@ -215,9 +216,9 @@ void comquest_state::machine_reset()
 
 MACHINE_CONFIG_START(comquest_state::comquest)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6805, 4000000)     /* 4000000? */
-	/*MCFG_CPU_ADD("maincpu", HD63705, 4000000)    instruction set looks like m6805/m6808 */
-	/*MCFG_CPU_ADD("maincpu", M68705, 4000000) instruction set looks like m6805/m6808 */
+	MCFG_DEVICE_ADD("maincpu", M6805, 4000000)     /* 4000000? */
+	/*MCFG_DEVICE_ADD("maincpu", HD63705, 4000000)    instruction set looks like m6805/m6808 */
+	/*MCFG_DEVICE_ADD("maincpu", M68705, 4000000) instruction set looks like m6805/m6808 */
 
 /*
     8 bit bus, integrated io, serial io?,
@@ -243,20 +244,20 @@ MACHINE_CONFIG_START(comquest_state::comquest)
     not epson e0c88
 */
 
-	MCFG_CPU_PROGRAM_MAP(comquest_mem)
+	MCFG_DEVICE_PROGRAM_MAP(comquest_mem)
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(LCD_FRAMES_PER_SECOND)
+	MCFG_SCREEN_REFRESH_RATE(30)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(64*4, 128) /* 160 x 102 */
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*4-1, 0, 128-1)
 	MCFG_SCREEN_UPDATE_DRIVER(comquest_state, screen_update_comquest)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", comquest )
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_comquest )
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
 	/* sound hardware */
@@ -305,5 +306,5 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY          FULLNAME                  FLAGS
-CONS( 1995, comquest, 0,        0,      comquest, comquest, comquest_state, 0,    "Data Concepts", "ComQuest Plus (German)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY          FULLNAME                  FLAGS
+CONS( 1995, comquest, 0,      0,      comquest, comquest, comquest_state, empty_init, "Data Concepts", "ComQuest Plus (German)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

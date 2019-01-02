@@ -28,6 +28,7 @@ Other stuff: NEC D4992 (RTC?) and xtal possibly 32.768kHz, 3V coin battery, 93L4
 
 #include "emu.h"
 #include "cpu/sh/sh2.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -41,14 +42,19 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(hideseek);
+	void hideseek(machine_config &config);
+
+	void init_hideseek();
+
+protected:
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(hideseek);
+
+private:
+	void hideseek_palette(palette_device &palette) const;
 	uint32_t screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void hideseek(machine_config &config);
 	void mem_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -84,17 +90,15 @@ INPUT_PORTS_END
 
 static GFXLAYOUT_RAW( hideseek, 2048, 1, 2048*8, 2048*8 )
 
-static GFXDECODE_START( hideseek )
+static GFXDECODE_START( gfx_hideseek )
 	GFXDECODE_ENTRY( "blit_data", 0, hideseek,     0x0000, 0x1 )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(hideseek_state, hideseek)
+void hideseek_state::hideseek_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 0x8000; i++)
-		palette.set_pen_color(i, rgb_t( pal5bit((i >> 10)&0x1f), pal5bit(((i >> 5))&0x1f), pal5bit((i >> 0)&0x1f)));
+	for (int i = 0; i < 0x8000; i++)
+		palette.set_pen_color(i, rgb_t(pal5bit((i >> 10)&0x1f), pal5bit((i >> 5)&0x1f), pal5bit((i >> 0)&0x1f)));
 }
 
 
@@ -102,8 +106,8 @@ PALETTE_INIT_MEMBER(hideseek_state, hideseek)
 MACHINE_CONFIG_START(hideseek_state::hideseek)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2, 7372800 * 4 )
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", SH2, 7372800 * 4 )
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 //  MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hideseek_state, hideseek_scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -115,11 +119,11 @@ MACHINE_CONFIG_START(hideseek_state::hideseek)
 	MCFG_SCREEN_UPDATE_DRIVER(hideseek_state, screen_update_hideseek)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x10000)
-	MCFG_PALETTE_INIT_OWNER(hideseek_state, hideseek)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hideseek)
+	PALETTE(config, "palette", FUNC(hideseek_state::hideseek_palette), 0x10000);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_hideseek);
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
 	/* sound : M9810 */
 MACHINE_CONFIG_END
@@ -154,9 +158,9 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(hideseek_state,hideseek)
+void hideseek_state::init_hideseek()
 {
 }
 
 
-GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, hideseek,    ROT0, "<unknown>", "Hide & Seek",MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, init_hideseek, ROT0, "<unknown>", "Hide & Seek", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

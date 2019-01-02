@@ -12,31 +12,27 @@
 #pragma once
 
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-#define SVISION_SND_IRQ_MEMBER(_name)   void _name(void)
-
-#define SVISION_SND_IRQ_CB(_class, _method) \
-	downcast<svision_sound_device &>(*device).set_irq_callback(svision_sound_device::irq_delegate(&_class::_method, #_class "::" #_method, this));
-
 // ======================> svision_sound_device
 
 class svision_sound_device : public device_t, public device_sound_interface
 {
 public:
-	typedef device_delegate<void ()> irq_delegate;
+	template <typename T, typename U>
+	svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&region_tag)
+		: svision_sound_device(mconfig, tag, owner, clock)
+	{
+		m_maincpu.set_tag(std::forward<T>(cpu_tag));
+		m_cartrom.set_tag(std::forward<U>(region_tag));
+	}
 
 	svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template<typename Object> void set_irq_callback(Object &&callback) { m_irq_cb = std::forward<Object>(callback); }
+	auto irq_cb() { return m_irq_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER( sounddma_w );
 	DECLARE_WRITE8_MEMBER( noise_w );
 
-	int *dma_finished();
 	void sound_decrement();
 	void soundport_w(int which, int offset, int data);
 
@@ -92,7 +88,10 @@ private:
 		int count = 0;
 	};
 
-	irq_delegate m_irq_cb;
+	devcb_write_line m_irq_cb;
+
+	required_device<cpu_device> m_maincpu;
+	required_memory_bank m_cartrom;
 
 	sound_stream *m_mixer_channel;
 	DMA m_dma;

@@ -25,6 +25,7 @@ Todo:
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/ldv1000.h"
+#include "emupal.h"
 #include "render.h"
 #include "speaker.h"
 
@@ -34,7 +35,7 @@ class istellar_state : public driver_device
 public:
 	istellar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc") ,
+		m_laserdisc(*this, "laserdisc") ,
 		m_tile_ram(*this, "tile_ram"),
 		m_tile_control_ram(*this, "tile_ctrl_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
@@ -43,7 +44,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	DECLARE_DRIVER_INIT(istellar);
+	void init_istellar();
 	void istellar(machine_config &config);
 private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
@@ -154,7 +155,7 @@ void istellar_state::z80_2_mem(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
 	map(0x1800, 0x1fff).ram();
-	map(0xc000, 0xc000).r(this, FUNC(istellar_state::z80_2_unknown_read));     /* Seems to be thrown away every time it's read - maybe interrupt related? */
+	map(0xc000, 0xc000).r(FUNC(istellar_state::z80_2_unknown_read));     /* Seems to be thrown away every time it's read - maybe interrupt related? */
 }
 
 
@@ -180,7 +181,7 @@ void istellar_state::z80_1_io(address_map &map)
 void istellar_state::z80_2_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(istellar_state::z80_2_ldp_read), FUNC(istellar_state::z80_2_ldp_write));
+	map(0x00, 0x00).rw(FUNC(istellar_state::z80_2_ldp_read), FUNC(istellar_state::z80_2_ldp_write));
 	map(0x01, 0x01).r("latch2", FUNC(generic_latch_8_device::read)).w("latch1", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).r("latch2", FUNC(generic_latch_8_device::acknowledge_r));
 /*  AM_RANGE(0x03,0x03) AM_WRITE(z80_2_ldtrans_write)*/
@@ -254,7 +255,7 @@ static const gfx_layout istellar_gfx_layout =
 	8*8
 };
 
-static GFXDECODE_START( istellar )
+static GFXDECODE_START( gfx_istellar )
 	GFXDECODE_ENTRY( "gfx1", 0, istellar_gfx_layout, 0x0, 0x20 )
 GFXDECODE_END
 
@@ -274,43 +275,44 @@ WRITE_LINE_MEMBER(istellar_state::vblank_irq)
 /* DRIVER */
 MACHINE_CONFIG_START(istellar_state::istellar)
 	/* main cpu */
-	MCFG_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(z80_0_mem)
-	MCFG_CPU_IO_MAP(z80_0_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, GUESSED_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(z80_0_mem)
+	MCFG_DEVICE_IO_MAP(z80_0_io)
 
 	/* sound cpu */
-	MCFG_CPU_ADD("audiocpu", Z80, GUESSED_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(z80_1_mem)
-	MCFG_CPU_IO_MAP(z80_1_io)
+	MCFG_DEVICE_ADD("audiocpu", Z80, GUESSED_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(z80_1_mem)
+	MCFG_DEVICE_IO_MAP(z80_1_io)
 
 	/* ldp comm cpu */
-	MCFG_CPU_ADD("sub", Z80, GUESSED_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(z80_2_mem)
-	MCFG_CPU_IO_MAP(z80_2_io)
+	MCFG_DEVICE_ADD("sub", Z80, GUESSED_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(z80_2_mem)
+	MCFG_DEVICE_IO_MAP(z80_2_io)
 
-	MCFG_GENERIC_LATCH_8_ADD("latch1")
+	GENERIC_LATCH_8(config, "latch1");
 
-	MCFG_GENERIC_LATCH_8_ADD("latch2")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &latch2(GENERIC_LATCH_8(config, "latch2"));
+	latch2.data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
+	latch2.set_separate_acknowledge(true);
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, istellar_state, screen_update_istellar)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
+	MCFG_LASERDISC_OVERLAY_PALETTE(m_palette)
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(istellar_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, istellar_state, vblank_irq))
 
 	// Daphne says "TODO: get the real interstellar resistor values"
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", istellar)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_istellar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -351,7 +353,7 @@ ROM_START( istellar )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(istellar_state,istellar)
+void istellar_state::init_istellar()
 {
 	//m_z80_2_nmi_enable = 0;
 
@@ -372,5 +374,5 @@ DRIVER_INIT_MEMBER(istellar_state,istellar)
 	#endif
 }
 
-//    YEAR  NAME      PARENT   MACHINE    INPUT     STATE            INIT      MONITOR  COMPANY          FULLNAME                       FLAGS)
-GAME( 1983, istellar, 0,       istellar,  istellar, istellar_state,  istellar, ROT0,    "Funai/Gakken",  "Interstellar Laser Fantasy",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT   MACHINE    INPUT     STATE            INIT           MONITOR  COMPANY          FULLNAME                       FLAGS)
+GAME( 1983, istellar, 0,       istellar,  istellar, istellar_state,  init_istellar, ROT0,    "Funai/Gakken",  "Interstellar Laser Fantasy",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

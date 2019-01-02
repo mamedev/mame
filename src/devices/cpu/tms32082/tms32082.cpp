@@ -30,7 +30,7 @@ void tms32082_mp_device::mp_internal_map(address_map &map)
 	map(0x00009000, 0x00009fff).ram().share("pp1_data1");
 	map(0x01000000, 0x01000fff).ram().share("pp0_param");
 	map(0x01001000, 0x01001fff).ram().share("pp1_param");
-	map(0x01010000, 0x010107ff).rw(this, FUNC(tms32082_mp_device::mp_param_r), FUNC(tms32082_mp_device::mp_param_w));
+	map(0x01010000, 0x010107ff).rw(FUNC(tms32082_mp_device::mp_param_r), FUNC(tms32082_mp_device::mp_param_w));
 }
 
 const uint32_t tms32082_mp_device::SHIFT_MASK[] =
@@ -222,7 +222,7 @@ void tms32082_mp_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
 
 	set_icountptr(m_icount);
 }
@@ -439,7 +439,7 @@ void tms32082_mp_device::execute_set_input(int inputnum, int state)
 
 uint32_t tms32082_mp_device::fetch()
 {
-	uint32_t w = m_direct->read_dword(m_fetchpc);
+	uint32_t w = m_cache->read_dword(m_fetchpc);
 	m_fetchpc += 4;
 	return w;
 }
@@ -521,7 +521,7 @@ void tms32082_pp_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
 
 	set_icountptr(m_icount);
 }

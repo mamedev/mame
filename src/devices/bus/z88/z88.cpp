@@ -55,20 +55,13 @@ device_z88cart_interface::~device_z88cart_interface()
 //-------------------------------------------------
 //  z88cart_slot_device - constructor
 //-------------------------------------------------
-z88cart_slot_device::z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, Z88CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
-	m_out_flp_cb(*this),
-	m_cart(nullptr), m_flp_timer(nullptr)
-{
-}
-
-//-------------------------------------------------
-//  z88cart_slot_device - destructor
-//-------------------------------------------------
-
-z88cart_slot_device::~z88cart_slot_device()
+z88cart_slot_device::z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, Z88CART_SLOT, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, device_slot_interface(mconfig, *this)
+	, m_out_flp_cb(*this)
+	, m_cart(nullptr)
+	, m_flp_timer(nullptr)
 {
 }
 
@@ -109,24 +102,25 @@ image_init_result z88cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		offs_t read_length;
 		uint8_t *cart_base = m_cart->get_cart_base();
 
 		if (cart_base != nullptr)
 		{
 			if (!loaded_through_softlist())
 			{
-				read_length = length();
+				offs_t read_length = length();
 				fread(cart_base + (m_cart->get_cart_size() - read_length), read_length);
 			}
 			else
 			{
-				read_length = get_software_region_length("rom");
+				offs_t read_length = get_software_region_length("rom");
 				memcpy(cart_base + (m_cart->get_cart_size() - read_length), get_software_region("rom"), read_length);
 			}
 		}
 		else
+		{
 			return image_init_result::FAIL;
+		}
 	}
 
 	// open the flap
@@ -147,9 +141,11 @@ void z88cart_slot_device::call_unload()
 {
 	if (m_cart)
 	{
-		auto cart_size = m_cart->get_cart_size();
-		if (cart_size>0)
+		size_t cart_size = m_cart->get_cart_size();
+		if (cart_size > 0)
+		{
 			memset(m_cart->get_cart_base(), 0xff, cart_size);
+		}
 	}
 
 	// open the flap

@@ -15,7 +15,8 @@
 
 class ygv608_device : public device_t,
 					  public device_gfx_interface,
-					  public device_memory_interface
+					  public device_memory_interface,
+					  public device_video_interface
 {
 public:
 	// construction/destruction
@@ -88,24 +89,22 @@ public:
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 
-	template <class Object> devcb_base &set_vblank_callback(Object &&cb)
-	{
-		return m_vblank_handler.set_callback(std::forward<Object>(cb));
-	}
-	template <class Object> devcb_base &set_raster_callback(Object &&cb)
-	{
-		return m_raster_handler.set_callback(std::forward<Object>(cb));
-	}
+	auto vblank_callback() { return m_vblank_handler.bind(); }
+
+	auto raster_callback() { return m_raster_handler.bind(); }
 
 	void regs_map(address_map &map);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_post_load() override;
 
 	virtual space_config_vector memory_space_config() const override;
 
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	address_space *m_iospace;
+
 private:
 	const address_space_config m_io_space_config;
 	static constexpr unsigned SPRITE_ATTR_TABLE_SIZE = 256;
@@ -124,7 +123,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_B_8);
 	TILE_GET_INFO_MEMBER(get_tile_info_A_16);
 	TILE_GET_INFO_MEMBER(get_tile_info_B_16);
-	void postload();
+
 	void register_state_save();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_layer_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *source_tilemap);
@@ -173,14 +172,14 @@ private:
 	uint32_t m_base_addr[2][8];
 	uint32_t m_base_y_shift;    // for extracting pattern y coord 'base'
 
-	uint8_t m_screen_resize;  // screen requires resize
-	uint8_t m_tilemap_resize; // tilemap requires resize
+	bool m_screen_resize;  // screen requires resize
+	bool m_tilemap_resize; // tilemap requires resize
 
 	/* These were statically allocated in the r/w routines */
 	int m_color_state_r;
 	int m_color_state_w;
-	int p0_state;
-	int pattern_name_base_r,pattern_name_base_w;     /* pattern name table base address */
+	int m_p0_state;
+	int m_pattern_name_base_r,m_pattern_name_base_w;     /* pattern name table base address */
 
 	// === new variable handling starts here ===
 	uint8_t m_screen_status;    /**< port #6: status port r/w */
@@ -251,7 +250,6 @@ private:
 	// screen section
 	devcb_write_line            m_vblank_handler;
 	devcb_write_line            m_raster_handler;
-	screen_device               *m_screen;
 	emu_timer                   *m_vblank_timer;
 	emu_timer                   *m_raster_timer;
 
@@ -308,23 +306,6 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(YGV608, ygv608_device)
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_YGV608_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, YGV608, 0)
-
-#define MCFG_YGV608_PALETTE(_palette_tag) \
-	MCFG_GFX_PALETTE(_palette_tag)
-
-#define MCFG_YGV608_VBLANK_HANDLER( _intcallb ) \
-	devcb = &downcast<ygv608_device &>(*device).set_vblank_callback(DEVCB_##_intcallb);
-
-#define MCFG_YGV608_RASTER_HANDLER( _intcallb ) \
-	devcb = &downcast<ygv608_device &>(*device).set_raster_callback(DEVCB_##_intcallb);
 
 
 #endif

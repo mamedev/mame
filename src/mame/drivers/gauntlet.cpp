@@ -129,6 +129,7 @@
 #include "sound/tms5220.h"
 #include "sound/ym2151.h"
 #include "sound/pokey.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -289,7 +290,7 @@ void gauntlet_state::main_map(address_map &map)
 	map(0x80300f, 0x80300f).mirror(0x2fcef0).r(m_soundcomm, FUNC(atari_sound_comm_device::main_response_r));
 	map(0x803100, 0x803101).mirror(0x2fce8e).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x803120, 0x803121).mirror(0x2fce8e).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_reset_w));
-	map(0x803140, 0x803141).mirror(0x2fce8e).w(this, FUNC(gauntlet_state::video_int_ack_w));
+	map(0x803140, 0x803141).mirror(0x2fce8e).w(FUNC(gauntlet_state::video_int_ack_w));
 	map(0x803150, 0x803151).mirror(0x2fce8e).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x803171, 0x803171).mirror(0x2fce8e).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w));
 
@@ -298,10 +299,10 @@ void gauntlet_state::main_map(address_map &map)
 	map(0x902000, 0x903fff).mirror(0x2c8000).ram().share("mob");
 	map(0x904000, 0x904fff).mirror(0x2c8000).ram();
 	map(0x905000, 0x905f7f).mirror(0x2c8000).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
-	map(0x905f6e, 0x905f6f).mirror(0x2c8000).ram().w(this, FUNC(gauntlet_state::gauntlet_yscroll_w)).share("yscroll");
+	map(0x905f6e, 0x905f6f).mirror(0x2c8000).ram().w(FUNC(gauntlet_state::gauntlet_yscroll_w)).share("yscroll");
 	map(0x905f80, 0x905fff).mirror(0x2c8000).ram().share("mob:slip");
-	map(0x910000, 0x9107ff).mirror(0x2cf800).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x930000, 0x930001).mirror(0x2cfffe).w(this, FUNC(gauntlet_state::gauntlet_xscroll_w)).share("xscroll");
+	map(0x910000, 0x9107ff).mirror(0x2cf800).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x930000, 0x930001).mirror(0x2cfffe).w(FUNC(gauntlet_state::gauntlet_xscroll_w)).share("xscroll");
 }
 
 
@@ -319,8 +320,8 @@ void gauntlet_state::sound_map(address_map &map)
 	map(0x0000, 0x0fff).mirror(0x2000).ram();
 	map(0x1000, 0x100f).mirror(0x27c0).w(m_soundcomm, FUNC(atari_sound_comm_device::sound_response_w));
 	map(0x1010, 0x101f).mirror(0x27c0).r(m_soundcomm, FUNC(atari_sound_comm_device::sound_command_r));
-	map(0x1020, 0x102f).mirror(0x27c0).portr("COIN").w(this, FUNC(gauntlet_state::mixer_w));
-	map(0x1030, 0x1030).mirror(0x27cf).r(this, FUNC(gauntlet_state::switch_6502_r));
+	map(0x1020, 0x102f).mirror(0x27c0).portr("COIN").w(FUNC(gauntlet_state::mixer_w));
+	map(0x1030, 0x1030).mirror(0x27cf).r(FUNC(gauntlet_state::switch_6502_r));
 	map(0x1030, 0x1037).mirror(0x27c8).w(m_soundctl, FUNC(ls259_device::write_d7));
 	map(0x1800, 0x180f).mirror(0x27c0).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1810, 0x1811).mirror(0x27ce).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
@@ -474,7 +475,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( gauntlet )
+static GFXDECODE_START( gfx_gauntlet )
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,  256, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, anlayout,      0, 64 )
 GFXDECODE_END
@@ -490,27 +491,26 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gauntlet)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_gauntlet);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
+	PALETTE(config, "palette").set_format(palette_device::IRGB_4444, 1024);
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, gauntlet_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, gauntlet_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", gauntlet_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, gauntlet_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -519,58 +519,62 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(gauntlet_state, screen_update_gauntlet)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(gauntlet_state, video_int_write_line))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gauntlet_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_6))
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	ATARI_SOUND_COMM(config, "soundcomm", "audiocpu")
+		.int_callback().set_inputline("maincpu", M68K_IRQ_6);
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.48)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.48)
+	YM2151(config, m_ym2151, ATARI_CLOCK_14MHz/4);
+	m_ym2151->add_route(1, "lspeaker", 0.48);
+	m_ym2151->add_route(0, "rspeaker", 0.48);
 
-	MCFG_SOUND_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
+	MCFG_DEVICE_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.32)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.32)
 
-	MCFG_SOUND_ADD("tms", TMS5220C, ATARI_CLOCK_14MHz/2/11) /* potentially ATARI_CLOCK_14MHz/2/9 as well */
+	MCFG_DEVICE_ADD("tms", TMS5220C, ATARI_CLOCK_14MHz/2/11) /* potentially ATARI_CLOCK_14MHz/2/9 as well */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
-	MCFG_DEVICE_ADD("soundctl", LS259, 0) // 16T/U
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("ymsnd", ym2151_device, reset_w)) // music reset, low reset
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("tms", tms5220_device, wsq_w)) // speech write, active low
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("tms", tms5220_device, rsq_w)) // speech reset, active low
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gauntlet_state, speech_squeak_w)) // speech squeak, low = 650 Hz
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(gauntlet_state, coin_counter_right_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(gauntlet_state, coin_counter_left_w))
+	LS259(config, m_soundctl); // 16T/U
+	m_soundctl->q_out_cb<0>().set("ymsnd", FUNC(ym2151_device::reset_w)); // music reset, low reset
+	m_soundctl->q_out_cb<1>().set("tms", FUNC(tms5220_device::wsq_w)); // speech write, active low
+	m_soundctl->q_out_cb<2>().set("tms", FUNC(tms5220_device::rsq_w)); // speech reset, active low
+	m_soundctl->q_out_cb<3>().set(FUNC(gauntlet_state::speech_squeak_w)); // speech squeak, low = 650 Hz
+	m_soundctl->q_out_cb<4>().set(FUNC(gauntlet_state::coin_counter_right_w));
+	m_soundctl->q_out_cb<5>().set(FUNC(gauntlet_state::coin_counter_left_w));
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(gauntlet_state::gauntlet)
+void gauntlet_state::gauntlet(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 104)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic_device, 104, true);
+}
 
 
-MACHINE_CONFIG_START(gauntlet_state::gaunt2p)
+void gauntlet_state::gaunt2p(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 107)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic_device, 107, true);
+}
 
 
-MACHINE_CONFIG_START(gauntlet_state::gauntlet2)
+void gauntlet_state::gauntlet2(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 106)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic_device, 106, true);
+}
 
 
-MACHINE_CONFIG_START(gauntlet_state::vindctr2)
+void gauntlet_state::vindctr2(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 118)
-MACHINE_CONFIG_END
-
-
+	SLAPSTIC(config, m_slapstic_device, 118, true);
+}
 
 
 /*************************************
@@ -1668,17 +1672,16 @@ void gauntlet_state::common_init(int vindctr2)
 }
 
 
-DRIVER_INIT_MEMBER(gauntlet_state,gauntlet)
+void gauntlet_state::init_gauntlet()
 {
 	common_init(0);
 }
 
 
-DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
+void gauntlet_state::init_vindctr2()
 {
 	uint8_t *gfx2_base = memregion("gfx2")->base();
 	std::vector<uint8_t> data(0x8000);
-	int i;
 
 	common_init(1);
 
@@ -1686,7 +1689,7 @@ DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
 	   chip) are scrambled -- this is verified on the schematics! */
 
 	memcpy(&data[0], &gfx2_base[0x88000], 0x8000);
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 		int srcoffs = (i & 0x4000) | ((i << 11) & 0x3800) | ((i >> 3) & 0x07ff);
 		gfx2_base[0x88000 + i] = data[srcoffs];
@@ -1701,35 +1704,35 @@ DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
  *
  *************************************/
 
-GAME( 1985, gauntlet,     0,        gauntlet,  gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 14)", 0 )
-GAME( 1985, gauntlets,    gauntlet, gauntlet,  gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (Spanish, rev 15)", 0 )
-GAME( 1985, gauntletj,    gauntlet, gauntlet,  gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (Japanese, rev 13)", 0 )
-GAME( 1985, gauntletg,    gauntlet, gauntlet,  gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (German, rev 10)", 0 )
-GAME( 1985, gauntletj12,  gauntlet, gauntlet,  gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (Japanese, rev 12)", 0 )
-GAME( 1985, gauntletr9,   gauntlet, gauntlet,  gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 9)", 0 )
-GAME( 1985, gauntletgr8,  gauntlet, gauntlet,  gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (German, rev 8)", 0 )
-GAME( 1985, gauntletr7,   gauntlet, gauntlet,  gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 7)", 0 )
-GAME( 1985, gauntletgr6,  gauntlet, gauntlet,  gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (German, rev 6)", 0 )
-GAME( 1985, gauntletr5,   gauntlet, gauntlet,  gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 5)", 0 )
-GAME( 1985, gauntletr4,   gauntlet, gauntlet,  gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 4)", 0 )
-GAME( 1985, gauntletgr3,  gauntlet, gauntlet,  gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (German, rev 3)", 0 )
-GAME( 1985, gauntletr2,   gauntlet, gauntlet,  gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 2)", 0 )
-GAME( 1985, gauntletr1,   gauntlet, gauntlet,  gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (rev 1)", 0 )
+GAME( 1985, gauntlet,     0,        gauntlet,  gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (rev 14)", 0 )
+GAME( 1985, gauntlets,    gauntlet, gauntlet,  gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (Spanish, rev 15)", 0 )
+GAME( 1985, gauntletj,    gauntlet, gauntlet,  gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (Japanese, rev 13)", 0 )
+GAME( 1985, gauntletg,    gauntlet, gauntlet,  gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (German, rev 10)", 0 )
+GAME( 1985, gauntletj12,  gauntlet, gauntlet,  gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (Japanese, rev 12)", 0 )
+GAME( 1985, gauntletr9,   gauntlet, gauntlet,  gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (rev 9)", 0 )
+GAME( 1985, gauntletgr8,  gauntlet, gauntlet,  gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (German, rev 8)", 0 )
+GAME( 1985, gauntletr7,   gauntlet, gauntlet,  gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (rev 7)", 0 )
+GAME( 1985, gauntletgr6,  gauntlet, gauntlet,  gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (German, rev 6)", 0 )
+GAME( 1985, gauntletr5,   gauntlet, gauntlet,  gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (rev 5)", 0 )
+GAME( 1985, gauntletr4,   gauntlet, gauntlet,  gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (rev 4)", 0 )
+GAME( 1985, gauntletgr3,  gauntlet, gauntlet,  gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (German, rev 3)", 0 )
+GAME( 1985, gauntletr2,   gauntlet, gauntlet,  gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (rev 2)", 0 )
+GAME( 1985, gauntletr1,   gauntlet, gauntlet,  gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (rev 1)", 0 )
 
-GAME( 1985, gauntlet2p,   gauntlet, gaunt2p,   gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (2 Players, rev 6)", 0 )
-GAME( 1985, gauntlet2pj,  gauntlet, gaunt2p,   gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (2 Players, Japanese, rev 5)", 0 )
-GAME( 1985, gauntlet2pg,  gauntlet, gaunt2p,   gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (2 Players, German, rev 4)", 0 )
-GAME( 1985, gauntlet2pr3, gauntlet, gaunt2p,   gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (2 Players, rev 3)", 0 )
-GAME( 1985, gauntlet2pj2, gauntlet, gaunt2p,   gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (2 Players, Japanese, rev 2)", 0 )
-GAME( 1985, gauntlet2pg1, gauntlet, gaunt2p,   gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet (2 Players, German, rev 1)", 0 )
+GAME( 1985, gauntlet2p,   gauntlet, gaunt2p,   gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (2 Players, rev 6)", 0 )
+GAME( 1985, gauntlet2pj,  gauntlet, gaunt2p,   gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (2 Players, Japanese, rev 5)", 0 )
+GAME( 1985, gauntlet2pg,  gauntlet, gaunt2p,   gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (2 Players, German, rev 4)", 0 )
+GAME( 1985, gauntlet2pr3, gauntlet, gaunt2p,   gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (2 Players, rev 3)", 0 )
+GAME( 1985, gauntlet2pj2, gauntlet, gaunt2p,   gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (2 Players, Japanese, rev 2)", 0 )
+GAME( 1985, gauntlet2pg1, gauntlet, gaunt2p,   gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet (2 Players, German, rev 1)", 0 )
 
-GAME( 1986, gaunt2,       0,        gauntlet2, gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet II", 0 )
-GAME( 1986, gaunt2g,      gaunt2,   gauntlet2, gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet II (German)", 0 )
+GAME( 1986, gaunt2,       0,        gauntlet2, gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet II", 0 )
+GAME( 1986, gaunt2g,      gaunt2,   gauntlet2, gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet II (German)", 0 )
 
-GAME( 1986, gaunt22p,     gaunt2,   gauntlet2, gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet II (2 Players, rev 2)", 0 )
-GAME( 1986, gaunt22p1,    gaunt2,   gauntlet2, gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet II (2 Players, rev 1)", 0 )
-GAME( 1986, gaunt22pg,    gaunt2,   gauntlet2, gauntlet, gauntlet_state, gauntlet,  ROT0, "Atari Games", "Gauntlet II (2 Players, German)", 0 )
+GAME( 1986, gaunt22p,     gaunt2,   gauntlet2, gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet II (2 Players, rev 2)", 0 )
+GAME( 1986, gaunt22p1,    gaunt2,   gauntlet2, gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet II (2 Players, rev 1)", 0 )
+GAME( 1986, gaunt22pg,    gaunt2,   gauntlet2, gauntlet, gauntlet_state, init_gauntlet, ROT0, "Atari Games", "Gauntlet II (2 Players, German)", 0 )
 
-GAME( 1988, vindctr2,     0,        vindctr2,  vindctr2, gauntlet_state, vindctr2,  ROT0, "Atari Games", "Vindicators Part II (rev 3)", 0 )
-GAME( 1988, vindctr2r2,   vindctr2, vindctr2,  vindctr2, gauntlet_state, vindctr2,  ROT0, "Atari Games", "Vindicators Part II (rev 2)", 0 )
-GAME( 1988, vindctr2r1,   vindctr2, vindctr2,  vindctr2, gauntlet_state, vindctr2,  ROT0, "Atari Games", "Vindicators Part II (rev 1)", 0 )
+GAME( 1988, vindctr2,     0,        vindctr2,  vindctr2, gauntlet_state, init_vindctr2, ROT0, "Atari Games", "Vindicators Part II (rev 3)", 0 )
+GAME( 1988, vindctr2r2,   vindctr2, vindctr2,  vindctr2, gauntlet_state, init_vindctr2, ROT0, "Atari Games", "Vindicators Part II (rev 2)", 0 )
+GAME( 1988, vindctr2r1,   vindctr2, vindctr2,  vindctr2, gauntlet_state, init_vindctr2, ROT0, "Atari Games", "Vindicators Part II (rev 1)", 0 )

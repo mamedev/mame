@@ -53,7 +53,7 @@ private:
 	uint8_t m_count_key;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_ioport m_line0;
 	required_ioport m_line1;
@@ -157,8 +157,8 @@ void bob85_state::bob85_mem(address_map &map)
 void bob85_state::bob85_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0a, 0x0a).r(this, FUNC(bob85_state::bob85_keyboard_r));
-	map(0x0a, 0x0f).w(this, FUNC(bob85_state::bob85_7seg_w));
+	map(0x0a, 0x0a).r(FUNC(bob85_state::bob85_keyboard_r));
+	map(0x0a, 0x0f).w(FUNC(bob85_state::bob85_7seg_w));
 }
 
 /* Input ports */
@@ -207,21 +207,21 @@ READ_LINE_MEMBER( bob85_state::sid_r )
 	return m_cass->input() > 0.0;
 }
 
-MACHINE_CONFIG_START(bob85_state::bob85)
+void bob85_state::bob85(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(bob85_mem)
-	MCFG_CPU_IO_MAP(bob85_io)
-	MCFG_I8085A_SID(READLINE(bob85_state, sid_r))
-	MCFG_I8085A_SOD(WRITELINE(bob85_state, sod_w))
+	I8085A(config, m_maincpu, XTAL(5'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &bob85_state::bob85_mem);
+	m_maincpu->set_addrmap(AS_IO, &bob85_state::bob85_io);
+	m_maincpu->in_sid_func().set(FUNC(bob85_state::sid_r));
+	m_maincpu->out_sod_func().set(FUNC(bob85_state::sod_w));
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_bob85)
+	config.set_default_layout(layout_bob85);
 
 	// devices
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass).set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED));
+}
 
 /* ROM definition */
 ROM_START( bob85 )
@@ -231,5 +231,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT  COMPANY             FULLNAME  FLAGS
-COMP( 1984, bob85,  0,      0,      bob85,   bob85, bob85_state,  0,    "Josef Kratochvil", "BOB-85", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY             FULLNAME  FLAGS
+COMP( 1984, bob85, 0,      0,      bob85,   bob85, bob85_state, empty_init, "Josef Kratochvil", "BOB-85", MACHINE_NO_SOUND_HW)

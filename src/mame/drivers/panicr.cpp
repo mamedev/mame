@@ -66,6 +66,7 @@ D.9B         [f99cac4b] /
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -73,8 +74,8 @@ D.9B         [f99cac4b] /
 class panicr_state : public driver_device
 {
 public:
-	panicr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	panicr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_t5182(*this, "t5182"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -83,8 +84,14 @@ public:
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
 		m_textram(*this, "textram"),
-		m_spritebank(*this, "spritebank") { }
+		m_spritebank(*this, "spritebank")
+	{ }
 
+	void panicr(machine_config &config);
+
+	void init_panicr();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<t5182_device> m_t5182;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -116,15 +123,13 @@ public:
 	TILE_GET_INFO_MEMBER(get_infotile_info_2);
 	TILE_GET_INFO_MEMBER(get_txttile_info);
 
-	DECLARE_DRIVER_INIT(panicr);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(panicr);
+	void panicr_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	void panicr(machine_config &config);
 	void panicr_map(address_map &map);
 };
 
@@ -140,57 +145,45 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(panicr_state, panicr)
+void panicr_state::panicr_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(color_prom[i + 0x000]);
-		int g = pal4bit(color_prom[i + 0x100]);
-		int b = pal4bit(color_prom[i + 0x200]);
+		int const r = pal4bit(color_prom[i + 0x000]);
+		int const g = pal4bit(color_prom[i + 0x100]);
+		int const b = pal4bit(color_prom[i + 0x200]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x300;
 
 	// txt lookup table
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry;
-
-		if (color_prom[i] & 0x40)
-			ctabentry = 0;
-		else
-			ctabentry = (color_prom[i] & 0x3f) | 0x80;
-
+		uint8_t const ctabentry = (color_prom[i] & 0x40) ? 0 : ((color_prom[i] & 0x3f) | 0x80);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	// tile lookup table
-	for (i = 0x000; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry = (color_prom[i+0x100] & 0x3f) | 0x00;
+		uint8_t const ctabentry = (color_prom[i + 0x100] & 0x3f) | 0x00;
 
-		palette.set_pen_indirect(((i&0x0f) + ((i&0xf0)<<1))  +0x200, ctabentry);
-		palette.set_pen_indirect(((i&0x0f) + ((i&0xf0)<<1))  +0x210, ctabentry);
+		palette.set_pen_indirect(((i & 0x0f) + ((i & 0xf0) << 1)) + 0x200, ctabentry);
+		palette.set_pen_indirect(((i & 0x0f) + ((i & 0xf0) << 1)) + 0x210, ctabentry);
 	}
 
 	// sprite lookup table
-	for (i = 0x000; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry;
+		uint8_t const ctabentry = (color_prom[i + 0x200] & 0x40) ? 0 : ((color_prom[i + 0x200] & 0x3f) | 0x40);
 
-		if (color_prom[i+0x200] & 0x40)
-			ctabentry = 0;
-		else
-			ctabentry = (color_prom[i+0x200] & 0x3f) | 0x40;
-
-		palette.set_pen_indirect(i+0x100, ctabentry);
+		palette.set_pen_indirect(i + 0x100, ctabentry);
 	}
 }
 
@@ -433,21 +426,21 @@ void panicr_state::panicr_map(address_map &map)
 	map(0x00000, 0x01fff).ram().share("mainram");
 	map(0x02000, 0x03cff).ram().share("spriteram"); // how big is sprite ram, some places definitely have sprites at 3000+
 	map(0x03d00, 0x03fff).ram();
-	map(0x08000, 0x0bfff).r(this, FUNC(panicr_state::collision_r));
+	map(0x08000, 0x0bfff).r(FUNC(panicr_state::collision_r));
 	map(0x0c000, 0x0cfff).ram().share("textram");
 	map(0x0d000, 0x0d000).w(m_t5182, FUNC(t5182_device::sound_irq_w));
 	map(0x0d002, 0x0d002).w(m_t5182, FUNC(t5182_device::sharedram_semaphore_main_acquire_w));
 	map(0x0d004, 0x0d004).r(m_t5182, FUNC(t5182_device::sharedram_semaphore_snd_r));
 	map(0x0d006, 0x0d006).w(m_t5182, FUNC(t5182_device::sharedram_semaphore_main_release_w));
-	map(0x0d200, 0x0d2ff).rw(this, FUNC(panicr_state::t5182shared_r), FUNC(panicr_state::t5182shared_w));
+	map(0x0d200, 0x0d2ff).rw(FUNC(panicr_state::t5182shared_r), FUNC(panicr_state::t5182shared_w));
 	map(0x0d400, 0x0d400).portr("P1");
 	map(0x0d402, 0x0d402).portr("P2");
 	map(0x0d404, 0x0d404).portr("START");
 	map(0x0d406, 0x0d406).portr("DSW1");
 	map(0x0d407, 0x0d407).portr("DSW2");
-	map(0x0d802, 0x0d802).w(this, FUNC(panicr_state::scrollx_hi_w));
-	map(0x0d804, 0x0d804).w(this, FUNC(panicr_state::scrollx_lo_w));
-	map(0x0d80a, 0x0d80a).w(this, FUNC(panicr_state::output_w));
+	map(0x0d802, 0x0d802).w(FUNC(panicr_state::scrollx_hi_w));
+	map(0x0d804, 0x0d804).w(FUNC(panicr_state::scrollx_lo_w));
+	map(0x0d80a, 0x0d80a).w(FUNC(panicr_state::output_w));
 	map(0x0d80c, 0x0d80c).writeonly().share("spritebank");
 	map(0x0d818, 0x0d818).nopw(); // watchdog?
 	map(0xf0000, 0xfffff).rom();
@@ -589,7 +582,7 @@ static const gfx_layout spritelayout =
 	32*16
 };
 
-static GFXDECODE_START( panicr )
+static GFXDECODE_START( gfx_panicr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0x000,  8 )
 	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout,   0x200, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0x100, 16 )
@@ -610,8 +603,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::scanline)
 }
 
 MACHINE_CONFIG_START(panicr_state::panicr)
-	MCFG_CPU_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
-	MCFG_CPU_PROGRAM_MAP(panicr_map)
+	MCFG_DEVICE_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
+	MCFG_DEVICE_PROGRAM_MAP(panicr_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", panicr_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
@@ -624,21 +617,18 @@ MACHINE_CONFIG_START(panicr_state::panicr)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(panicr_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", panicr)
-	MCFG_PALETTE_ADD("palette", 256*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(panicr_state, panicr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_panicr);
+	PALETTE(config, m_palette, FUNC(panicr_state::panicr_palette), 256 * 4, 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4) /* 3.579545 MHz */
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("t5182", t5182_device, ym2151_irq_handler))
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/4)); /* 3.579545 MHz */
+	ymsnd.irq_handler().set(m_t5182, FUNC(t5182_device::ym2151_irq_handler));
+	ymsnd.add_route(0, "mono", 1.0);
+	ymsnd.add_route(1, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -719,23 +709,17 @@ ROM_START( panicrg ) /* Distributed by TV-Tuning Videospiele GMBH */
 ROM_END
 
 
-DRIVER_INIT_MEMBER(panicr_state,panicr)
+void panicr_state::init_panicr()
 {
 	std::vector<uint8_t> buf(0x80000);
-	uint8_t *rom;
-	int size;
-	int i,j;
 
-	rom = memregion("gfx1")->base();
-	size = memregion("gfx1")->bytes();
+	uint8_t *rom = memregion("gfx1")->base();
+	int size = memregion("gfx1")->bytes();
 
 	// text data lines
-	for (i = 0;i < size/2;i++)
+	for (int i = 0; i < size / 2; i++)
 	{
-		int w1;
-
-		w1 = (rom[i + 0*size/2] << 8) + rom[i + 1*size/2];
-
+		int w1 = (rom[i + 0*size/2] << 8) + rom[i + 1*size/2];
 		w1 = bitswap<16>(w1,  9,12,7,3,  8,13,6,2, 11,14,1,5, 10,15,4,0);
 
 		buf[i + 0*size/2] = w1 >> 8;
@@ -743,22 +727,19 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 	}
 
 	// text address lines
-	for (i = 0;i < size;i++)
+	for (int i = 0; i < size; i++)
 	{
 		rom[i] = buf[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6, 2,3,1,0,5,4)];
 	}
-
 
 	rom = memregion("gfx2")->base();
 	size = memregion("gfx2")->bytes();
 
 	// tiles data lines
-	for (i = 0;i < size/4;i++)
+	for (int i = 0; i < size / 4; i++)
 	{
-		int w1,w2;
-
-		w1 = (rom[i + 0*size/4] << 8) + rom[i + 3*size/4];
-		w2 = (rom[i + 1*size/4] << 8) + rom[i + 2*size/4];
+		int w1 = (rom[i + 0*size/4] << 8) + rom[i + 3*size/4];
+		int w2 = (rom[i + 1*size/4] << 8) + rom[i + 2*size/4];
 
 		w1 = bitswap<16>(w1, 14,12,11,9,   3,2,1,0, 10,15,13,8,   7,6,5,4);
 		w2 = bitswap<16>(w2,  3,13,15,4, 12,2,5,11, 14,6,1,10,    8,7,9,0);
@@ -770,32 +751,26 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 	}
 
 	// tiles address lines
-	for (i = 0;i < size;i++)
+	for (int i = 0; i < size; i++)
 	{
 		rom[i] = buf[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12, 5,4,3,2, 11,10,9,8,7,6, 0,1)];
 	}
-
 
 	rom = memregion("gfx3")->base();
 	size = memregion("gfx3")->bytes();
 
 	// sprites data lines
-	for (i = 0;i < size/2;i++)
+	for (int i = 0; i < size / 2; i++)
 	{
-		int w1;
-
-		w1 = (rom[i + 0*size/2] << 8) + rom[i + 1*size/2];
-
-
+		int w1 = (rom[i + 0*size/2] << 8) + rom[i + 1*size/2];
 		w1 = bitswap<16>(w1, 11,5,7,12, 4,10,13,3, 6,14,9,2, 0,15,1,8);
-
 
 		buf[i + 0*size/2] = w1 >> 8;
 		buf[i + 1*size/2] = w1 & 0xff;
 	}
 
 	// sprites address lines
-	for (i = 0;i < size;i++)
+	for (int i = 0; i < size; i++)
 	{
 		rom[i] = buf[i];
 	}
@@ -803,30 +778,30 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 	//rearrange  bg tilemaps a bit....
 	rom = memregion("user1")->base();
 	size = memregion("user1")->bytes();
-	memcpy(&buf[0],rom, size);
+	memcpy(&buf[0], rom, size);
 
-	for(j=0;j<16;j++)
+	for (int j = 0; j < 16; j++)
 	{
-		for (i = 0;i < size/16;i+=8)
+		for (int i = 0; i < size / 16; i += 8)
 		{
-			memcpy(&rom[i+(size/16)*j],&buf[i*16+8*j],8);
+			memcpy(&rom[i + (size / 16) * j], &buf[i * 16 + 8 * j], 8);
 		}
 	}
 
 	rom = memregion("user2")->base();
 	size = memregion("user2")->bytes();
-	memcpy(&buf[0],rom, size);
+	memcpy(&buf[0], rom, size);
 
-	for(j=0;j<16;j++)
+	for (int j = 0; j < 16; j++)
 	{
-		for (i = 0;i < size/16;i+=8)
+		for (int i = 0; i < size / 16; i += 8)
 		{
-			memcpy(&rom[i+(size/16)*j],&buf[i*16+8*j],8);
+			memcpy(&rom[i + (size / 16) * j], &buf[i * 16 + 8 * j], 8);
 		}
 	}
 
-	m_tempbitmap_1 = std::make_unique<bitmap_ind16>(256,256);
-	m_temprender = std::make_unique<bitmap_ind16>(256,256);
+	m_tempbitmap_1 = std::make_unique<bitmap_ind16>(256, 256);
+	m_temprender = std::make_unique<bitmap_ind16>(256, 256);
 	m_tempbitmap_clip.set(0, 256-1, 0, 256-1);
 
 	m_tempbitmap_1->fill(0, m_tempbitmap_clip);
@@ -834,5 +809,5 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 }
 
 
-GAME( 1986, panicr,  0,      panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Taito license)", "Panic Road (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1986, panicrg, panicr, panicr,  panicr, panicr_state,  panicr, ROT270, "Seibu Kaihatsu (Tuning license)", "Panic Road (Germany)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1986, panicr,  0,      panicr,  panicr, panicr_state, init_panicr, ROT270, "Seibu Kaihatsu (Taito license)", "Panic Road (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1986, panicrg, panicr, panicr,  panicr, panicr_state, init_panicr, ROT270, "Seibu Kaihatsu (Tuning license)", "Panic Road (Germany)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

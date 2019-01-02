@@ -308,24 +308,6 @@ READ16_MEMBER(cgc7900_state::unmapped_r)
 	return rand();
 }
 
-WRITE8_MEMBER(cgc7900_state::baud_write)
-{
-	m_dbrg->str_w(data >> 0);
-	m_dbrg->stt_w(data >> 4);
-}
-
-WRITE_LINE_MEMBER(cgc7900_state::write_rs232_clock)
-{
-	m_i8251_0->write_txc(state);
-	m_i8251_0->write_rxc(state);
-}
-
-WRITE_LINE_MEMBER(cgc7900_state::write_rs449_clock)
-{
-	m_i8251_1->write_txc(state);
-	m_i8251_1->write_rxc(state);
-}
-
 /***************************************************************************
     MEMORY MAPS
 ***************************************************************************/
@@ -339,10 +321,10 @@ void cgc7900_state::cgc7900_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).ram().share("chrom_ram");
 	map(0x800000, 0x80ffff).rom().region(M68000_TAG, 0);
-	map(0x810000, 0x9fffff).r(this, FUNC(cgc7900_state::unmapped_r));
-	map(0xa00000, 0xbfffff).rw(this, FUNC(cgc7900_state::z_mode_r), FUNC(cgc7900_state::z_mode_w));
+	map(0x810000, 0x9fffff).r(FUNC(cgc7900_state::unmapped_r));
+	map(0xa00000, 0xbfffff).rw(FUNC(cgc7900_state::z_mode_r), FUNC(cgc7900_state::z_mode_w));
 	map(0xc00000, 0xdfffff).ram().share("plane_ram");
-	map(0xe00000, 0xe1ffff).w(this, FUNC(cgc7900_state::color_status_w));
+	map(0xe00000, 0xe1ffff).w(FUNC(cgc7900_state::color_status_w));
 //  AM_RANGE(0xe20000, 0xe23fff) Raster Processor
 	map(0xe30000, 0xe303ff).ram().share("clut_ram");
 	map(0xe38000, 0xe3bfff).ram().share("overlay_ram");
@@ -365,26 +347,24 @@ void cgc7900_state::cgc7900_mem(address_map &map)
 //  AM_RANGE(0xefc446, 0xefc447) HVG Load dY
 //  AM_RANGE(0xefc448, 0xefc449) HVG Load Pixel Color
 //  AM_RANGE(0xefc44a, 0xefc44b) HVG Load Trip
-	map(0xff8001, 0xff8001).rw(m_i8251_0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xff8003, 0xff8003).rw(m_i8251_0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xff8041, 0xff8041).rw(m_i8251_1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xff8043, 0xff8043).rw(m_i8251_1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xff8080, 0xff8081).rw(this, FUNC(cgc7900_state::keyboard_r), FUNC(cgc7900_state::keyboard_w));
+	map(0xff8000, 0xff8003).rw(m_i8251_0, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xff8040, 0xff8043).rw(m_i8251_1, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xff8080, 0xff8081).rw(FUNC(cgc7900_state::keyboard_r), FUNC(cgc7900_state::keyboard_w));
 //  AM_RANGE(0xff80c6, 0xff80c7) Joystick X axis
 //  AM_RANGE(0xff80ca, 0xff80cb) Joystick Y axis
 //  AM_RANGE(0xff80cc, 0xff80cd) Joystick Z axis
-	map(0xff8100, 0xff8101).rw(this, FUNC(cgc7900_state::disk_data_r), FUNC(cgc7900_state::disk_data_w));
-	map(0xff8120, 0xff8121).rw(this, FUNC(cgc7900_state::disk_status_r), FUNC(cgc7900_state::disk_command_w));
+	map(0xff8100, 0xff8101).rw(FUNC(cgc7900_state::disk_data_r), FUNC(cgc7900_state::disk_data_w));
+	map(0xff8120, 0xff8121).rw(FUNC(cgc7900_state::disk_status_r), FUNC(cgc7900_state::disk_command_w));
 	map(0xff8140, 0xff8141).portr("BEZEL");
-	map(0xff8180, 0xff8180).w(this, FUNC(cgc7900_state::baud_write));
+	map(0xff8180, 0xff8180).w(K1135A_TAG, FUNC(com8116_device::stt_str_w));
 	map(0xff81c0, 0xff81ff).rw(MM58167_TAG, FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
-	map(0xff8200, 0xff8201).w(this, FUNC(cgc7900_state::interrupt_mask_w));
+	map(0xff8200, 0xff8201).w(FUNC(cgc7900_state::interrupt_mask_w));
 //  AM_RANGE(0xff8240, 0xff8241) Light Pen enable
 //  AM_RANGE(0xff8242, 0xff8243) Light Pen X value
 //  AM_RANGE(0xff8244, 0xff8245) Light Pen Y value
 //  AM_RANGE(0xff8246, 0xff8247) Buffer memory parity check
 //  AM_RANGE(0xff8248, 0xff8249) Buffer memory parity set/reset
-	map(0xff824a, 0xff824b).r(this, FUNC(cgc7900_state::sync_r));
+	map(0xff824a, 0xff824b).r(FUNC(cgc7900_state::sync_r));
 	map(0xff83c0, 0xff83c0).w(AY8910_TAG, FUNC(ay8910_device::address_w));
 	map(0xff83c2, 0xff83c2).r(AY8910_TAG, FUNC(ay8910_device::data_r));
 	map(0xff83c4, 0xff83c4).w(AY8910_TAG, FUNC(ay8910_device::data_w));
@@ -480,63 +460,57 @@ void cgc7900_state::machine_reset()
 
 MACHINE_CONFIG_START(cgc7900_state::cgc7900)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M68000_TAG, M68000, XTAL(28'480'000)/4)
-	MCFG_CPU_PROGRAM_MAP(cgc7900_mem)
+	MCFG_DEVICE_ADD(M68000_TAG, M68000, XTAL(28'480'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(cgc7900_mem)
 
-	MCFG_CPU_ADD(I8035_TAG, I8035, 1000000)
-	MCFG_CPU_PROGRAM_MAP(keyboard_mem)
-	//MCFG_MCS48_PORT_P1_IN_CB(READ8())
-	//MCFG_MCS48_PORT_P1_OUT_CB(WRITE8())
-	//MCFG_MCS48_PORT_P2_IN_CB(READ8())
-	//MCFG_MCS48_PORT_P2_OUT_CB(WRITE8())
-	//MCFG_MCS48_PORT_T1_IN_CB(READLINE())
-	//MCFG_MCS48_PORT_BUS_IN_CB(READ8())
-	//MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8())
-	MCFG_DEVICE_DISABLE()
+	i8035_device &kbmcu(I8035(config, I8035_TAG, 1000000));
+	kbmcu.set_addrmap(AS_PROGRAM, &cgc7900_state::keyboard_mem);
+	kbmcu.set_disable();
 
-/*  MCFG_CPU_ADD(AM2910_TAG, AM2910, XTAL(17'360'000))
-    MCFG_CPU_PROGRAM_MAP(omti10_mem)*/
+/*  MCFG_DEVICE_ADD(AM2910_TAG, AM2910, XTAL(17'360'000))
+    MCFG_DEVICE_PROGRAM_MAP(omti10_mem)*/
 
 	/* video hardware */
 	cgc7900_video(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(AY8910_TAG, AY8910, XTAL(28'480'000)/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, AY8910_TAG, XTAL(28'480'000)/16).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(cgc7900_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(cgc7900_state::kbd_put));
 
 	MCFG_DEVICE_ADD(MM58167_TAG, MM58167, XTAL(32'768))
-	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(cgc7900_state, irq<0x0>))
+	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, cgc7900_state, irq<0x0>))
 
-	MCFG_DEVICE_ADD(K1135A_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(cgc7900_state, write_rs232_clock))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(cgc7900_state, write_rs449_clock))
+	com8116_device &k1135a(COM8116(config, K1135A_TAG, XTAL(5'068'800)));
+	k1135a.fr_handler().set(m_i8251_0, FUNC(i8251_device::write_txc));
+	k1135a.fr_handler().append(m_i8251_0, FUNC(i8251_device::write_rxc));
+	k1135a.ft_handler().set(m_i8251_1, FUNC(i8251_device::write_txc));
+	k1135a.ft_handler().append(m_i8251_1, FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD(INS8251_0_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(cgc7900_state, irq<0xf>))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(cgc7900_state, irq<0x3>))
+	I8251(config, m_i8251_0, 0);
+	m_i8251_0->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_i8251_0->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_i8251_0->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_i8251_0->rxrdy_handler().set(FUNC(cgc7900_state::irq<0xf>));
+	m_i8251_0->txrdy_handler().set(FUNC(cgc7900_state::irq<0x3>));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INS8251_0_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(INS8251_0_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "null_modem"));
+	rs232.rxd_handler().set(m_i8251_0, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(m_i8251_0, FUNC(i8251_device::write_dsr));
 
-	MCFG_DEVICE_ADD(INS8251_1_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs449", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs449", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs449", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(cgc7900_state, irq<0x8>))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(cgc7900_state, irq<0x1>))
+	I8251(config, m_i8251_1, 0);
+	m_i8251_1->txd_handler().set("rs449", FUNC(rs232_port_device::write_txd));
+	m_i8251_1->dtr_handler().set("rs449", FUNC(rs232_port_device::write_dtr));
+	m_i8251_1->rts_handler().set("rs449", FUNC(rs232_port_device::write_rts));
+	m_i8251_1->rxrdy_handler().set(FUNC(cgc7900_state::irq<0x8>));
+	m_i8251_1->txrdy_handler().set(FUNC(cgc7900_state::irq<0x1>));
 
-	MCFG_RS232_PORT_ADD("rs449", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(INS8251_1_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(INS8251_1_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs449(RS232_PORT(config, "rs449", default_rs232_devices, nullptr));
+	rs449.rxd_handler().set(m_i8251_1, FUNC(i8251_device::write_rxd));
+	rs449.dsr_handler().set(m_i8251_1, FUNC(i8251_device::write_dsr));
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -590,5 +564,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT    STATE          INIT    COMPANY         FULLNAME    FLAGS */
-COMP( 1980, cgc7900,    0,      0,      cgc7900,    cgc7900, cgc7900_state, 0,      "Chromatics",   "CGC 7900", MACHINE_NOT_WORKING)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY       FULLNAME    FLAGS */
+COMP( 1980, cgc7900, 0,      0,      cgc7900, cgc7900, cgc7900_state, empty_init, "Chromatics", "CGC 7900", MACHINE_NOT_WORKING)

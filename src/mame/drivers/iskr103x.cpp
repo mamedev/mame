@@ -35,9 +35,11 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
 	void iskr1030m(machine_config &config);
 	void iskr1031(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
 	void iskr1031_io(address_map &map);
 	void iskr1031_map(address_map &map);
 };
@@ -68,27 +70,25 @@ DEVICE_INPUT_DEFAULTS_END
 // XXX
 MACHINE_CONFIG_START(iskr103x_state::iskr1030m)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",  I8086, 4772720)
-	MCFG_CPU_PROGRAM_MAP(iskr1031_map)
-	MCFG_CPU_IO_MAP(iskr1031_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu",  I8086, 4772720)
+	MCFG_DEVICE_PROGRAM_MAP(iskr1031_map)
+	MCFG_DEVICE_IO_MAP(iskr1031_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
 	MCFG_DEVICE_INPUT_DEFAULTS(iskr1030m)
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", iskr103x_isa8_cards, "cga_iskr1030m", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", iskr103x_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", iskr103x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", iskr103x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", iskr103x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", iskr103x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, "cga_iskr1030m", false) // FIXME: determine IS bus clock
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", iskr103x_isa8_cards, nullptr, false)
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
 //  MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_ISKR_1030)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iskr103x_state::iskr1031)
@@ -108,11 +108,11 @@ ROM_END
 ROM_START( iskr1031 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
 	ROM_SYSTEM_BIOS(0, "v1", "v1")
-	ROMX_LOAD( "150-02.bin", 0xc000, 0x2000, CRC(e33fb974) SHA1(f5f3ece67c025c0033716ff516e1a34fbeb32749), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "150-03.bin", 0xc001, 0x2000, CRC(8c482258) SHA1(90ef48955e0df556dc06a000a797ef42ccf430c5), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "150-02.bin", 0xc000, 0x2000, CRC(e33fb974) SHA1(f5f3ece67c025c0033716ff516e1a34fbeb32749), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "150-03.bin", 0xc001, 0x2000, CRC(8c482258) SHA1(90ef48955e0df556dc06a000a797ef42ccf430c5), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v2", "v2")
-	ROMX_LOAD( "150-06.bin", 0xc000, 0x2000, CRC(1adbf969) SHA1(08c0a0fc50a75e6207b1987bae389cca60893eac), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "150-07.bin", 0xc001, 0x2000, CRC(0dc4b65a) SHA1(c96f066251a7343eac8113ea9dcb2cb12d0334d5), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "150-06.bin", 0xc000, 0x2000, CRC(1adbf969) SHA1(08c0a0fc50a75e6207b1987bae389cca60893eac), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "150-07.bin", 0xc001, 0x2000, CRC(0dc4b65a) SHA1(c96f066251a7343eac8113ea9dcb2cb12d0334d5), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 /***************************************************************************
@@ -121,6 +121,6 @@ ROM_END
 
 ***************************************************************************/
 
-//     YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT  STATE           INIT  COMPANY       FULLNAME      FLAGS
-COMP ( 1989, iskr1030m, ibm5150, 0,      iskr1030m,  0,     iskr103x_state, 0,    "Schetmash", "Iskra 1030M", MACHINE_NOT_WORKING )
-COMP ( 1989, iskr1031,  ibm5150, 0,      iskr1031,   0,     iskr103x_state, 0,    "<unknown>", "Iskra 1031",  0 )
+//     YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS           INIT        COMPANY      FULLNAME       FLAGS
+COMP ( 1989, iskr1030m, ibm5150, 0,      iskr1030m, 0,     iskr103x_state, empty_init, "Schetmash", "Iskra 1030M", MACHINE_NOT_WORKING )
+COMP ( 1989, iskr1031,  ibm5150, 0,      iskr1031,  0,     iskr103x_state, empty_init, "<unknown>", "Iskra 1031",  0 )

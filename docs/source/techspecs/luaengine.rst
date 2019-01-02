@@ -55,11 +55,11 @@ Let's first run MAME in a terminal to reach the LUA console:
     _/      _/  _/    _/  _/      _/  _/_/_/_/
     mame v0.195
     Copyright (C) Nicola Salmoria and the MAME team
-    
+
     Lua 5.3
     Copyright (C) Lua.org, PUC-Rio
 
-    [MAME]> 
+    [MAME]>
 
 At this point, your game is probably running in demo mode, let's pause it:
 
@@ -153,6 +153,6 @@ On some of them, you can also inspect and manipulate memory and state:
     [MAME]> -- inspect memory
     [MAME]> for k,v in pairs(cpu.spaces) do print(k) end
     program
-    [MAME]> mem = cpu.spaces["program"] 
+    [MAME]> mem = cpu.spaces["program"]
     [MAME]> print(mem:read_i8(0xC000))
     41

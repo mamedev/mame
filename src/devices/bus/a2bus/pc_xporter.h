@@ -31,8 +31,8 @@
 //**************************************************************************
 
 class a2bus_pcxporter_device:
-	public device_t,
-	public device_a2bus_card_interface
+		public device_t,
+		public device_a2bus_card_interface
 {
 public:
 	// construction/destruction
@@ -121,6 +121,6 @@ private:
 };
 
 // device type definition
-extern const device_type A2BUS_PCXPORTER;
+DECLARE_DEVICE_TYPE(A2BUS_PCXPORTER, a2bus_pcxporter_device)
 
 #endif // MAME_BUS_A2BUS_PC_XPORTER_H

@@ -52,14 +52,15 @@ modified by Hau
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class safarir_state : public driver_device
 {
 public:
-	safarir_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	safarir_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_ram(*this, "ram"),
@@ -67,6 +68,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void safarir(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_shared_ptr<uint8_t> m_ram;
@@ -89,9 +93,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(safarir);
+	void safarir_palette(palette_device &palette) const;
 	uint32_t screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void safarir(machine_config &config);
 	void safarir_audio(machine_config &config);
 	void main_map(address_map &map);
 };
@@ -147,20 +150,18 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( safarir )
+static GFXDECODE_START( gfx_safarir )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 8 )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(safarir_state, safarir)
+void safarir_state::safarir_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < palette.entries() / 2; i++)
+	for (int i = 0; i < palette.entries() >> 1; i++)
 	{
-		palette.set_pen_color((i * 2) + 0, rgb_t::black());
-		palette.set_pen_color((i * 2) + 1, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
+		palette.set_pen_color((i << 1) | 0, rgb_t::black());
+		palette.set_pen_color((i << 1) | 1, rgb_t(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
 	}
 }
 
@@ -303,13 +304,14 @@ static const char *const safarir_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START(safarir_state::safarir_audio)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(6)
-	MCFG_SAMPLES_NAMES(safarir_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+void safarir_state::safarir_audio(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(safarir_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -327,8 +329,8 @@ void safarir_state::machine_start()
 	m_port_last2 = 0;
 
 	/* setup for save states */
-	save_pointer(NAME(m_ram_1.get()), m_ram.bytes());
-	save_pointer(NAME(m_ram_2.get()), m_ram.bytes());
+	save_pointer(NAME(m_ram_1), m_ram.bytes());
+	save_pointer(NAME(m_ram_2), m_ram.bytes());
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_port_last));
 	save_item(NAME(m_port_last2));
@@ -345,10 +347,10 @@ void safarir_state::machine_start()
 void safarir_state::main_map(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
-	map(0x2000, 0x27ff).rw(this, FUNC(safarir_state::ram_r), FUNC(safarir_state::ram_w)).share("ram");
-	map(0x2800, 0x2800).mirror(0x03ff).nopr().w(this, FUNC(safarir_state::ram_bank_w));
+	map(0x2000, 0x27ff).rw(FUNC(safarir_state::ram_r), FUNC(safarir_state::ram_w)).share("ram");
+	map(0x2800, 0x2800).mirror(0x03ff).nopr().w(FUNC(safarir_state::ram_bank_w));
 	map(0x2c00, 0x2c00).mirror(0x03ff).nopr().writeonly().share("bg_scroll");
-	map(0x3000, 0x3000).mirror(0x03ff).w(this, FUNC(safarir_state::safarir_audio_w));    /* goes to SN76477 */
+	map(0x3000, 0x3000).mirror(0x03ff).w(FUNC(safarir_state::safarir_audio_w));    /* goes to SN76477 */
 	map(0x3400, 0x3400).mirror(0x03ff).nopw();  /* cleared at the beginning */
 	map(0x3800, 0x3800).mirror(0x03ff).portr("INPUTS").nopw();
 	map(0x3c00, 0x3c00).mirror(0x03ff).portr("DSW").nopw();
@@ -403,28 +405,26 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(safarir_state::safarir)
-
+void safarir_state::safarir(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'000'000)/12)  /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	I8080A(config, m_maincpu, XTAL(18'000'000)/12);  /* 1.5 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &safarir_state::main_map);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 2*8)
-	MCFG_PALETTE_INIT_OWNER(safarir_state, safarir)
+	PALETTE(config, "palette", FUNC(safarir_state::safarir_palette), 2 * 8);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_safarir);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", safarir)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 26*8-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(safarir_state, screen_update_safarir)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 26*8-1);
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(safarir_state::screen_update_safarir));
+	screen.set_palette("palette");
 
 	/* audio hardware */
 	safarir_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -504,5 +504,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, safarir, 0,        safarir, safarir, safarir_state, 0, ROT90, "SNK (Taito license)", "Safari Rally (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1979, safarirj, safarir, safarir, safarir, safarir_state, 0, ROT90, "SNK",                 "Safari Rally (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, safarir, 0,        safarir, safarir, safarir_state, empty_init, ROT90, "SNK (Taito license)", "Safari Rally (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, safarirj, safarir, safarir, safarir, safarir_state, empty_init, ROT90, "SNK",                 "Safari Rally (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

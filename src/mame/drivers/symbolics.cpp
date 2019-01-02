@@ -26,7 +26,7 @@
     TODO:
     The entire lispcpu half (more like 3/4) of the machine
     Framebuffer 1152x864? 1150x900? (lives on the i/o card)
-    I8274 MPSC (z80dart.cpp) x2
+    I8274 MPSC (z80sio.cpp) x2
     1024x4bit SRAM AM2148-50 x6 @F22-F27
     2048x8bit SRAM @F7 and @G7
     keyboard/mouse (a 68k based console dedicated to this machine; talks through one of the MPSC chips)
@@ -93,8 +93,12 @@ public:
 	{
 	}
 
+	void symbolics(machine_config &config);
+
+	void init_symbolics();
+
+private:
 	required_device<m68000_base_device> m_maincpu;
-	DECLARE_DRIVER_INIT(symbolics);
 	DECLARE_READ16_MEMBER(buserror_r);
 	DECLARE_READ16_MEMBER(fep_paddle_id_prom_r);
 	//DECLARE_READ16_MEMBER(ram_parity_hack_r);
@@ -105,10 +109,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void symbolics(machine_config &config);
 	void m68k_mem(address_map &map);
-//protected:
-//  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	//  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 READ16_MEMBER(symbolics_state::buserror_r)
@@ -297,7 +300,7 @@ TIMER_CALLBACK_MEMBER(symbolics_state::outfifo_read_cb)
 */
 
 /* Driver init: stuff that needs setting up which isn't directly affected by reset */
-DRIVER_INIT_MEMBER(symbolics_state,symbolics)
+void symbolics_state::init_symbolics()
 {
 }
 
@@ -321,8 +324,8 @@ MACHINE_CONFIG_START(symbolics_state::symbolics)
 	//XTALS: 16MHz @H11 (68k CPU clock)
 	//       4.9152MHz @J5 (driving the two MPSCs serial clocks)
 	//       66.67MHz @J10 (main lispcpu/system clock)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
-	MCFG_CPU_PROGRAM_MAP(m68k_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
+	MCFG_DEVICE_PROGRAM_MAP(m68k_mem)
 
 	//ADD ME:
 	// Framebuffer
@@ -340,17 +343,17 @@ ROM_START( s3670 )
 	ROM_REGION16_BE(0x40000,"maincpu", 0)
 	// the older 'FEP V24' has similar roms but a different hw layout and memory map
 	ROM_SYSTEM_BIOS( 0, "v127", "Symbolics 3600 L-Machine 'NFEP V127'")
-	ROMX_LOAD("00h.127.27c128.d13", 0x00000, 0x2000, CRC(b8d7c8da) SHA1(663a09359f5db63beeac00e5c2783ccc25b94250), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "00H.127" @D13
+	ROMX_LOAD("00h.127.27c128.d13", 0x00000, 0x2000, CRC(b8d7c8da) SHA1(663a09359f5db63beeac00e5c2783ccc25b94250), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "00H.127" @D13
 	ROM_CONTINUE( 0x10000, 0x2000 )
-	ROMX_LOAD("00l.127.27128.d7", 0x00001, 0x2000, CRC(cc7bae9a) SHA1(057538eb821c4d00dde19cfe5136ccc0aee43800), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "00L.127" @D7
+	ROMX_LOAD("00l.127.27128.d7", 0x00001, 0x2000, CRC(cc7bae9a) SHA1(057538eb821c4d00dde19cfe5136ccc0aee43800), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "00L.127" @D7
 	ROM_CONTINUE( 0x10001, 0x2000 )
-	ROMX_LOAD("04h.127.27128.d14", 0x04000, 0x2000, CRC(e01a717b) SHA1(b87a670f7be13553485ce88fad5fcf90f01473c4), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "04H.127" @D14
+	ROMX_LOAD("04h.127.27128.d14", 0x04000, 0x2000, CRC(e01a717b) SHA1(b87a670f7be13553485ce88fad5fcf90f01473c4), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "04H.127" @D14
 	ROM_CONTINUE( 0x14000, 0x2000 )
-	ROMX_LOAD("04l.127.27128.d8", 0x04001, 0x2000, CRC(68d169fa) SHA1(d6fab3132fca332a9bedb174fddf5fc8c69d05b6), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "04L.127" @D8
+	ROMX_LOAD("04l.127.27128.d8", 0x04001, 0x2000, CRC(68d169fa) SHA1(d6fab3132fca332a9bedb174fddf5fc8c69d05b6), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "04L.127" @D8
 	ROM_CONTINUE( 0x14001, 0x2000 )
-	ROMX_LOAD("10h.127.27128.d16", 0x08000, 0x2000, CRC(2ea7a70d) SHA1(61cc97aada028612c24d788d946d77e82116cf30), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "10H.127" @D16
+	ROMX_LOAD("10h.127.27128.d16", 0x08000, 0x2000, CRC(2ea7a70d) SHA1(61cc97aada028612c24d788d946d77e82116cf30), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "10H.127" @D16
 	ROM_CONTINUE( 0x18000, 0x2000 )
-	ROMX_LOAD("10l.127.27c128.d10", 0x08001, 0x2000, CRC(b8ddb3c8) SHA1(e6c3b96340c5c767ef18abf48b73fa8e5d7353b9), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "10L.127" @D10
+	ROMX_LOAD("10l.127.27c128.d10", 0x08001, 0x2000, CRC(b8ddb3c8) SHA1(e6c3b96340c5c767ef18abf48b73fa8e5d7353b9), ROM_SKIP(1) | ROM_BIOS(0)) // Label: "10L.127" @D10
 	ROM_CONTINUE( 0x18001, 0x2000 )
 	// D17, D11 are empty sockets; these would map to 0x0c000-0ffff and 0x1c000-0x1ffff
 	ROM_REGION16_BE( 0x20,"fep_paddle_prom", 0)
@@ -397,5 +400,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       STATE            INIT        COMPANY      FULLNAME  FLAGS
-COMP( 1984, s3670,      0,      0,      symbolics,  symbolics,  symbolics_state, symbolics,  "Symbolics", "3670",   MACHINE_IS_SKELETON )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT            COMPANY      FULLNAME  FLAGS
+COMP( 1984, s3670, 0,      0,      symbolics, symbolics, symbolics_state, init_symbolics, "Symbolics", "3670",   MACHINE_IS_SKELETON )

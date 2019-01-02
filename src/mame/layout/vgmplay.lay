@@ -1,0 +1,241 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<!--
+	Activity LEDs:
+	 0: SN76496
+	 1: YM2413
+	 2: YM2612
+	 3: YM2151
+	 4: Sega PCM
+	 5: RF5C68
+	 6: YM2203
+	 7: YM2608
+	 8: YM2610
+	 9: YM3812
+	10: YM3526
+	11: Y8950
+	12: YMF262
+	13: YMF278B
+	14: YMF271
+	15: YMZ280B
+	16: RF5C164
+	17: Sega 32X PWM
+	18: AY-3-8910
+	19: Game Boy APU
+	20: NES APU
+	21: YMW-258-F (MultiPCM)
+	22: uPD7759
+	23: Oki M6258
+	24: Oki M6295
+	25: K051649
+	26: K054539
+	27: HuC6280
+	28: C-140
+	29: K053260
+	30: POKEY
+	31: QSound
+	32: SCSP
+	33: WonderSwan
+	34: VSU-VUE
+	35: SAA1099
+	36: ES5503
+	37: ES5505
+	38: X1-010
+	39: C352
+	40: GA20
+	-->
+
+	<element name="backdrop"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+
+	<element name="act_led">
+		<disk state="1"><color red="1.0" green="0.0" blue="0.0" /></disk>
+		<disk state="0"><color red="0.15" green="0.0" blue="0.0" /></disk>
+	</element>
+
+	<element name="act_label_sn76496"><text string="SN76496" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ym2413"><text string="YM2413" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ym2612"><text string="YM2612" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ym2151"><text string="YM2151" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_segapcm"><text string="Sega PCM" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_rf5c68"><text string="RF5C68" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ym2203"><text string="YM2203" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ym2608"><text string="YM2608" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ym2610"><text string="YM2610" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ym3812"><text string="YM3812" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ym3526"><text string="YM3526" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_y8950"><text string="Y8950" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ymf262"><text string="YMF262" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ymf278b"><text string="YMF278B" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ymf271"><text string="YMF271" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ymz280b"><text string="YMZ280B" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_rf5c164"><text string="RF5C164" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_pwm"><text string="32X PWM" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ay8910"><text string="AY-3-8910" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_gameboy"><text string="Game Boy™" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_nesapu"><text string="NES™ APU" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_multipcm"><text string="YMW-258-F" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_upd7759"><text string="uPD7759" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_okim6258"><text string="M6258" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_okim6295"><text string="M6295" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_k051649"><text string="K051649" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_k054539"><text string="K054539" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_c6280"><text string="HuC6280" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_c140"><text string="C140" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_k053260"><text string="K053260" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_pokey"><text string="POKEY" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_qsound"><text string="QSound™" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_scsp"><text string="SCSP" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_wswan"><text string="WonderSwan" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_vsu_vue"><text string="VSU-VUE" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_saa1099"><text string="SAA1099" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_es5503"><text string="ES5503" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_es5505"><text string="ES5505" align="1"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="act_label_x1_010"><text string="X1-010" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_c352"><text string="C352" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_ga20"><text string="GA20" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+
+	<element name="static_black2"><rect><color red="0.2" green="0.21" blue="0.23" /></rect></element>
+
+	<element name="hl1" defstate="0">
+		<text string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+	</element>
+	<element name="text_l1">
+		<rect><color red="0.2" green="0.21" blue="0.23" /></rect>
+		<text string="&#x25A0;"><color red="0.9" green="0.9" blue="0.2" /></text>
+	</element>
+	<element name="text_l2">
+		<rect><color red="0.2" green="0.21" blue="0.23" /></rect>
+		<text string="&#x25EB;"><color red="0.9" green="0.9" blue="0.2" /></text>
+	</element>
+	<element name="text_l3">
+		<rect><color red="0.2" green="0.21" blue="0.23" /></rect>
+		<text string="&#x25B6;"><color red="0.9" green="0.9" blue="0.2" /></text>
+	</element>
+	<element name="text_l4">
+		<rect><color red="0.2" green="0.21" blue="0.23" /></rect>
+		<text string="&#x25C4;"><color red="0.9" green="0.9" blue="0.2" /></text>
+	</element>
+	<element name="text_l5">
+		<rect><color red="0.2" green="0.21" blue="0.23" /></rect>
+		<text string="&#x25CE;"><color red="0.9" green="0.9" blue="0.2" /></text>
+	</element>
+
+	<group name="activity">
+		<cpanel element="backdrop"><bounds x="0" y="0" width="60" height="34" /></cpanel>
+
+		<cpanel name="led_act_0" element="act_led"><bounds x="1" y="1" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_1" element="act_led"><bounds x="1" y="4" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_2" element="act_led"><bounds x="1" y="7" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_3" element="act_led"><bounds x="1" y="10" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_4" element="act_led"><bounds x="1" y="13" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_5" element="act_led"><bounds x="1" y="16" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_6" element="act_led"><bounds x="1" y="19" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_7" element="act_led"><bounds x="1" y="22" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_8" element="act_led"><bounds x="1" y="25" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_9" element="act_led"><bounds x="1" y="28" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_10" element="act_led"><bounds x="1" y="31" width="2" height="2" /></cpanel>
+
+		<cpanel name="led_act_11" element="act_led"><bounds x="16" y="1" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_12" element="act_led"><bounds x="16" y="4" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_13" element="act_led"><bounds x="16" y="7" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_14" element="act_led"><bounds x="16" y="10" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_15" element="act_led"><bounds x="16" y="13" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_16" element="act_led"><bounds x="16" y="16" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_17" element="act_led"><bounds x="16" y="19" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_18" element="act_led"><bounds x="16" y="22" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_19" element="act_led"><bounds x="16" y="25" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_20" element="act_led"><bounds x="16" y="28" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_21" element="act_led"><bounds x="16" y="31" width="2" height="2" /></cpanel>
+
+		<cpanel name="led_act_22" element="act_led"><bounds x="31" y="1" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_23" element="act_led"><bounds x="31" y="4" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_24" element="act_led"><bounds x="31" y="7" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_25" element="act_led"><bounds x="31" y="10" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_26" element="act_led"><bounds x="31" y="13" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_27" element="act_led"><bounds x="31" y="16" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_28" element="act_led"><bounds x="31" y="19" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_29" element="act_led"><bounds x="31" y="22" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_30" element="act_led"><bounds x="31" y="25" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_31" element="act_led"><bounds x="31" y="28" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_32" element="act_led"><bounds x="31" y="31" width="2" height="2" /></cpanel>
+
+		<cpanel name="led_act_33" element="act_led"><bounds x="46" y="1" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_34" element="act_led"><bounds x="46" y="4" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_35" element="act_led"><bounds x="46" y="7" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_36" element="act_led"><bounds x="46" y="10" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_37" element="act_led"><bounds x="46" y="13" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_38" element="act_led"><bounds x="46" y="16" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_39" element="act_led"><bounds x="46" y="19" width="2" height="2" /></cpanel>
+		<cpanel name="led_act_40" element="act_led"><bounds x="46" y="22" width="2" height="2" /></cpanel>
+
+		<cpanel element="act_label_sn76496"><bounds x="4" y="1.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ym2413"><bounds x="4" y="4.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ym2612"><bounds x="4" y="7.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ym2151"><bounds x="4" y="10.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_segapcm"><bounds x="4" y="13.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_rf5c68"><bounds x="4" y="16.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ym2203"><bounds x="4" y="19.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ym2608"><bounds x="4" y="22.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ym2610"><bounds x="4" y="25.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ym3812"><bounds x="4" y="28.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ym3526"><bounds x="4" y="31.2" width="10" height="1.6" /></cpanel>
+
+		<cpanel element="act_label_y8950"><bounds x="19" y="1.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ymf262"><bounds x="19" y="4.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ymf278b"><bounds x="19" y="7.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ymf271"><bounds x="19" y="10.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ymz280b"><bounds x="19" y="13.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_rf5c164"><bounds x="19" y="16.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_pwm"><bounds x="19" y="19.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ay8910"><bounds x="19" y="22.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_gameboy"><bounds x="19" y="25.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_nesapu"><bounds x="19" y="28.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_multipcm"><bounds x="19" y="31.2" width="10" height="1.6" /></cpanel>
+
+		<cpanel element="act_label_upd7759"><bounds x="34" y="1.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_okim6258"><bounds x="34" y="4.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_okim6295"><bounds x="34" y="7.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_k051649"><bounds x="34" y="10.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_k054539"><bounds x="34" y="13.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_c6280"><bounds x="34" y="16.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_c140"><bounds x="34" y="19.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_k053260"><bounds x="34" y="22.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_pokey"><bounds x="34" y="25.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_qsound"><bounds x="34" y="28.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_scsp"><bounds x="34" y="31.2" width="10" height="1.6" /></cpanel>
+
+		<cpanel element="act_label_wswan"><bounds x="49" y="1.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_vsu_vue"><bounds x="49" y="4.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_saa1099"><bounds x="49" y="7.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_es5503"><bounds x="49" y="10.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_es5505"><bounds x="49" y="13.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_x1_010"><bounds x="49" y="16.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_c352"><bounds x="49" y="19.2" width="10" height="1.6" /></cpanel>
+		<cpanel element="act_label_ga20"><bounds x="49" y="22.2" width="10" height="1.6" /></cpanel>
+	</group>
+
+	<view name="Internal Layout">
+		<bounds left="0" right="60" top="0" bottom="55" />
+
+		<cpanel element="static_black2"><bounds x="0"  y="4" width="11" height="5" /></cpanel>
+		<cpanel element="static_black2"><bounds x="12" y="4" width="11" height="5" /></cpanel>
+		<cpanel element="static_black2"><bounds x="24" y="4" width="11" height="5" /></cpanel>
+		<cpanel element="static_black2"><bounds x="36" y="4" width="11" height="5" /></cpanel>
+		<cpanel element="static_black2"><bounds x="48" y="4" width="11" height="5" /></cpanel>
+
+		<cpanel element="text_l1"><bounds x="0"  y="5" width="11" height="3.5" /></cpanel>
+		<cpanel element="text_l2"><bounds x="12" y="5" width="11" height="3.5" /></cpanel>
+		<cpanel element="text_l3"><bounds x="24" y="5" width="11" height="3.5" /></cpanel>
+		<cpanel element="text_l4"><bounds x="36" y="5" width="11" height="3.5" /></cpanel>
+		<cpanel element="text_l5"><bounds x="48" y="5" width="11" height="3.5" /></cpanel>
+
+		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0001"><bounds x="0"  y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
+		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0002"><bounds x="12" y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
+		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0004"><bounds x="24" y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
+		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0008"><bounds x="36" y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
+		<cpanel element="hl1" inputtag="CONTROLS" inputmask="0x0010"><bounds x="48" y="4" width="11" height="5" /><color alpha="0.15" /></cpanel>
+
+		<group ref="activity"><bounds x="0" y="21" width="60" height="34" /></group>
+	</view>
+</mamelayout>

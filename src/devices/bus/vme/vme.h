@@ -59,10 +59,10 @@
 
 // Callbacks to the board from the VME bus comes through here
 #define MCFG_VME_J1_CB(_devcb) \
-	devcb = &downcast<vme_slot_device &>(*device).set_vme_j1_callback(DEVCB_##_devcb);
+	downcast<vme_slot_device &>(*device).set_vme_j1_callback(DEVCB_##_devcb);
 
-//SLOT_INTERFACE_EXTERN(vme_slot1); // Disabled until we know how to combine a board driver and a slot device.
-SLOT_INTERFACE_EXTERN(vme_slots);
+//void vme_slot1(device_slot_interface &device); // Disabled until we know how to combine a board driver and a slot device.
+void vme_slots(device_slot_interface &device);
 
 class device_vme_card_interface; // This interface is standardized
 

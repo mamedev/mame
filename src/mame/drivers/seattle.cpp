@@ -223,6 +223,10 @@
 
 #define SYSTEM_CLOCK            50000000
 
+#define PCI_ID_GALILEO  ":pci:00.0"
+#define PCI_ID_VIDEO    ":pci:08.0"
+#define PCI_ID_IDE      ":pci:09.0"
+
 /* various board configurations */
 #define PHOENIX_CONFIG          (0)
 #define SEATTLE_CONFIG          (1)
@@ -276,22 +280,77 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_maincpu(*this, "maincpu"),
+		m_galileo(*this, PCI_ID_GALILEO),
+		m_voodoo(*this, PCI_ID_VIDEO),
 		m_cage(*this, "cage"),
 		m_dcs(*this, "dcs"),
+		m_screen(*this, "screen"),
 		m_ethernet(*this, "ethernet"),
 		m_ioasic(*this, "ioasic"),
-		m_io_analog(*this, "AN%u", 0),
+		m_io_analog(*this, "AN%u", 0U),
+		m_io_gun_x(*this, "LIGHT%u_X", 0U),
+		m_io_gun_y(*this, "LIGHT%u_Y", 0U),
+		m_io_fake(*this, "FAKE"),
+		m_io_gearshift(*this, "GEAR"),
+		m_io_system(*this, "SYSTEM"),
+		m_wheel_driver(*this, "wheel"),
 		m_lamps(*this, "lamp%u", 0U),
 		m_leds(*this, "led%u", 0U)
 		{}
 
+	void seattle_common(machine_config &config);
+	void phoenixsa(machine_config &config);
+	void seattle150(machine_config &config);
+	void seattle150_widget(machine_config &config);
+	void seattle200(machine_config &config);
+	void seattle200_widget(machine_config &config);
+	void flagstaff(machine_config &config);
+	void wg3dh(machine_config &config);
+	void sfrush(machine_config &config);
+	void hyprdriv(machine_config &config);
+	void carnevil(machine_config &config);
+	void blitz99(machine_config &config);
+	void blitz2k(machine_config &config);
+	void blitz(machine_config &config);
+	void biofreak(machine_config &config);
+	void sfrushrkw(machine_config &config);
+	void calspeed(machine_config &config);
+	void mace(machine_config &config);
+	void vaportrx(machine_config &config);
+	void sfrushrk(machine_config &config);
+
+	void init_sfrush();
+	void init_blitz2k();
+	void init_carnevil();
+	void init_biofreak();
+	void init_calspeed();
+	void init_sfrushrk();
+	void init_vaportrx();
+	void init_hyprdriv();
+	void init_blitz();
+	void init_wg3dh();
+	void init_mace();
+	void init_blitz99();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
+
+private:
 	required_device<nvram_device> m_nvram;
 	required_device<mips3_device> m_maincpu;
+	required_device<gt64010_device> m_galileo;
+	required_device<voodoo_1_pci_device> m_voodoo;
 	optional_device<atari_cage_seattle_device> m_cage;
 	optional_device<dcs_audio_device> m_dcs;
+	required_device<screen_device> m_screen;
 	optional_device<smc91c94_device> m_ethernet;
 	required_device<midway_ioasic_device> m_ioasic;
 	optional_ioport_array<8> m_io_analog;
+	optional_ioport_array<2> m_io_gun_x;
+	optional_ioport_array<2> m_io_gun_y;
+	optional_ioport m_io_fake;
+	optional_ioport m_io_gearshift;
+	optional_ioport m_io_system;
+	output_finder<1> m_wheel_driver;
 	output_finder<16> m_lamps;
 	output_finder<24> m_leds;
 
@@ -343,24 +402,11 @@ public:
 	DECLARE_READ32_MEMBER(widget_r);
 	DECLARE_WRITE32_MEMBER(widget_w);
 	DECLARE_WRITE32_MEMBER(wheel_board_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
 
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 
-	DECLARE_DRIVER_INIT(sfrush);
-	DECLARE_DRIVER_INIT(blitz2k);
-	DECLARE_DRIVER_INIT(carnevil);
-	DECLARE_DRIVER_INIT(biofreak);
-	DECLARE_DRIVER_INIT(calspeed);
-	DECLARE_DRIVER_INIT(sfrushrk);
-	DECLARE_DRIVER_INIT(vaportrx);
-	DECLARE_DRIVER_INIT(hyprdriv);
-	DECLARE_DRIVER_INIT(blitz);
-	DECLARE_DRIVER_INIT(wg3dh);
-	DECLARE_DRIVER_INIT(mace);
-	DECLARE_DRIVER_INIT(blitz99);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -372,26 +418,6 @@ public:
 	void update_widget_irq();
 	void init_common(int config);
 
-	void seattle_common(machine_config &config);
-	void phoenixsa(machine_config &config);
-	void seattle150(machine_config &config);
-	void seattle150_widget(machine_config &config);
-	void seattle200(machine_config &config);
-	void seattle200_widget(machine_config &config);
-	void flagstaff(machine_config &config);
-	void wg3dh(machine_config &config);
-	void sfrush(machine_config &config);
-	void hyprdriv(machine_config &config);
-	void carnevil(machine_config &config);
-	void blitz99(machine_config &config);
-	void blitz2k(machine_config &config);
-	void blitz(machine_config &config);
-	void biofreak(machine_config &config);
-	void sfrushrkw(machine_config &config);
-	void calspeed(machine_config &config);
-	void mace(machine_config &config);
-	void vaportrx(machine_config &config);
-	void sfrushrk(machine_config &config);
 	void seattle_cs0_map(address_map &map);
 	void seattle_cs1_map(address_map &map);
 	void seattle_cs2_map(address_map &map);
@@ -435,6 +461,7 @@ void seattle_state::machine_start()
 	save_item(NAME(m_gear));
 	save_item(NAME(m_wheel_calibrated));
 
+	m_wheel_driver.resolve();
 	m_lamps.resolve();
 	m_leds.resolve();
 }
@@ -451,12 +478,12 @@ void seattle_state::machine_reset()
 	m_wheel_offset = 0;
 	m_wheel_calibrated = false;
 	/* reset either the DCS2 board or the CAGE board */
-	if (machine().device("dcs") != nullptr)
+	if (m_dcs != nullptr)
 	{
 		m_dcs->reset_w(1);
 		m_dcs->reset_w(0);
 	}
-	else if (machine().device("cage") != nullptr)
+	else if (m_cage != nullptr)
 	{
 		m_cage->control_w(0);
 		m_cage->control_w(3);
@@ -665,7 +692,7 @@ WRITE32_MEMBER(seattle_state::analog_port_w)
 		m_pending_analog_read = currValue;
 	}
 	// Declare calibration finished as soon as a SYSTEM button is hit
-	if (!m_wheel_calibrated && ((~ioport("SYSTEM")->read()) & 0xffff)) {
+	if (!m_wheel_calibrated && ((~m_io_system->read()) & 0xffff)) {
 		m_wheel_calibrated = true;
 		//osd_printf_info("wheel calibration comlete wheel: %02x\n", currValue);
 	}
@@ -695,7 +722,7 @@ WRITE32_MEMBER(seattle_state::wheel_board_w)
 		}
 		else
 		{
-			output().set_value("wheel", arg); // target wheel angle. signed byte.
+			m_wheel_driver[0] = arg; // target wheel angle. signed byte.
 			m_wheel_force = int8_t(arg);
 		}
 	}
@@ -710,7 +737,7 @@ WRITE32_MEMBER(seattle_state::wheel_board_w)
 DECLARE_CUSTOM_INPUT_MEMBER(seattle_state::gearshift_r)
 {
 	// Check for gear change and save gear selection
-	uint32_t gear = ioport("GEAR")->read();
+	uint32_t gear = m_io_gearshift->read();
 	for (int i = 0; i < 4; i++)
 	{
 		if (gear & (1 << i))
@@ -732,39 +759,39 @@ READ32_MEMBER(seattle_state::carnevil_gun_r)
 	switch (offset)
 	{
 		case 0:     /* low 8 bits of X */
-			result = (ioport("LIGHT0_X")->read() << 4) & 0xff;
+			result = (m_io_gun_x[0]->read() << 4) & 0xff;
 			break;
 
 		case 1:     /* upper 4 bits of X */
-			result = (ioport("LIGHT0_X")->read() >> 4) & 0x0f;
-			result |= (ioport("FAKE")->read() & 0x03) << 4;
+			result = (m_io_gun_x[0]->read() >> 4) & 0x0f;
+			result |= (m_io_fake->read() & 0x03) << 4;
 			result |= 0x40;
 			break;
 
 		case 2:     /* low 8 bits of Y */
-			result = (ioport("LIGHT0_Y")->read() << 2) & 0xff;
+			result = (m_io_gun_y[0]->read() << 2) & 0xff;
 			break;
 
 		case 3:     /* upper 4 bits of Y */
-			result = (ioport("LIGHT0_Y")->read() >> 6) & 0x03;
+			result = (m_io_gun_y[0]->read() >> 6) & 0x03;
 			break;
 
 		case 4:     /* low 8 bits of X */
-			result = (ioport("LIGHT1_X")->read() << 4) & 0xff;
+			result = (m_io_gun_x[1]->read() << 4) & 0xff;
 			break;
 
 		case 5:     /* upper 4 bits of X */
-			result = (ioport("LIGHT1_X")->read() >> 4) & 0x0f;
-			result |= (ioport("FAKE")->read() & 0x30);
+			result = (m_io_gun_x[1]->read() >> 4) & 0x0f;
+			result |= (m_io_fake->read() & 0x30);
 			result |= 0x40;
 			break;
 
 		case 6:     /* low 8 bits of Y */
-			result = (ioport("LIGHT1_Y")->read() << 2) & 0xff;
+			result = (m_io_gun_y[1]->read() << 2) & 0xff;
 			break;
 
 		case 7:     /* upper 4 bits of Y */
-			result = (ioport("LIGHT1_Y")->read() >> 6) & 0x03;
+			result = (m_io_gun_y[1]->read() >> 6) & 0x03;
 			break;
 	}
 	return result;
@@ -1109,48 +1136,48 @@ void seattle_state::seattle_cs0_map(address_map &map)
 
 void seattle_state::seattle_cs1_map(address_map &map)
 {
-	map(0x01000000, 0x01000003).w(this, FUNC(seattle_state::asic_fifo_w));
+	map(0x01000000, 0x01000003).w(FUNC(seattle_state::asic_fifo_w));
 }
 
 void seattle_state::seattle_cs2_map(address_map &map)
 {
-	map(0x00000000, 0x00000003).rw(this, FUNC(seattle_state::analog_port_r), FUNC(seattle_state::analog_port_w));  // Flagstaff only
+	map(0x00000000, 0x00000003).rw(FUNC(seattle_state::analog_port_r), FUNC(seattle_state::analog_port_w));  // Flagstaff only
 }
 
 // This map shares the PHOENIX, SEATTLE, and SEATTLE_WIDGET calls
 void seattle_state::seattle_cs3_map(address_map &map)
 {
 	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
-	map(0x00100000, 0x0011ffff).rw(this, FUNC(seattle_state::cmos_r), FUNC(seattle_state::cmos_w));
-	map(0x00800000, 0x0080001f).rw(this, FUNC(seattle_state::carnevil_gun_r), FUNC(seattle_state::carnevil_gun_w)); // Carnevil driver only
-	map(0x00c00000, 0x00c0001f).rw(this, FUNC(seattle_state::widget_r), FUNC(seattle_state::widget_w)); // Seattle widget only
-	map(0x01000000, 0x01000003).rw(this, FUNC(seattle_state::cmos_protect_r), FUNC(seattle_state::cmos_protect_w));
-	map(0x01100000, 0x01100003).w(this, FUNC(seattle_state::seattle_watchdog_w));
-	map(0x01300000, 0x01300003).rw(this, FUNC(seattle_state::seattle_interrupt_enable_r), FUNC(seattle_state::seattle_interrupt_enable_w));
-	map(0x01400000, 0x01400003).rw(this, FUNC(seattle_state::interrupt_config_r), FUNC(seattle_state::interrupt_config_w));
-	map(0x01500000, 0x01500003).r(this, FUNC(seattle_state::interrupt_state_r));
-	map(0x01600000, 0x01600003).r(this, FUNC(seattle_state::interrupt_state2_r));
-	map(0x01700000, 0x01700003).w(this, FUNC(seattle_state::vblank_clear_w));
+	map(0x00100000, 0x0011ffff).rw(FUNC(seattle_state::cmos_r), FUNC(seattle_state::cmos_w));
+	map(0x00800000, 0x0080001f).rw(FUNC(seattle_state::carnevil_gun_r), FUNC(seattle_state::carnevil_gun_w)); // Carnevil driver only
+	map(0x00c00000, 0x00c0001f).rw(FUNC(seattle_state::widget_r), FUNC(seattle_state::widget_w)); // Seattle widget only
+	map(0x01000000, 0x01000003).rw(FUNC(seattle_state::cmos_protect_r), FUNC(seattle_state::cmos_protect_w));
+	map(0x01100000, 0x01100003).w(FUNC(seattle_state::seattle_watchdog_w));
+	map(0x01300000, 0x01300003).rw(FUNC(seattle_state::seattle_interrupt_enable_r), FUNC(seattle_state::seattle_interrupt_enable_w));
+	map(0x01400000, 0x01400003).rw(FUNC(seattle_state::interrupt_config_r), FUNC(seattle_state::interrupt_config_w));
+	map(0x01500000, 0x01500003).r(FUNC(seattle_state::interrupt_state_r));
+	map(0x01600000, 0x01600003).r(FUNC(seattle_state::interrupt_state2_r));
+	map(0x01700000, 0x01700003).w(FUNC(seattle_state::vblank_clear_w));
 	map(0x01800000, 0x01800003).noprw();
-	map(0x01900000, 0x01900003).rw(this, FUNC(seattle_state::status_leds_r), FUNC(seattle_state::status_leds_w));
-	map(0x01f00000, 0x01f00003).rw(this, FUNC(seattle_state::asic_reset_r), FUNC(seattle_state::asic_reset_w));
+	map(0x01900000, 0x01900003).rw(FUNC(seattle_state::status_leds_r), FUNC(seattle_state::status_leds_w));
+	map(0x01f00000, 0x01f00003).rw(FUNC(seattle_state::asic_reset_r), FUNC(seattle_state::asic_reset_w));
 }
 
 void seattle_state::seattle_flagstaff_cs3_map(address_map &map)
 {
 	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
-	map(0x00100000, 0x0011ffff).rw(this, FUNC(seattle_state::cmos_r), FUNC(seattle_state::cmos_w));
-	map(0x00c00000, 0x00c0003f).rw(this, FUNC(seattle_state::ethernet_r), FUNC(seattle_state::ethernet_w));
-	map(0x01000000, 0x01000003).rw(this, FUNC(seattle_state::cmos_protect_r), FUNC(seattle_state::cmos_protect_w));
-	map(0x01100000, 0x01100003).w(this, FUNC(seattle_state::seattle_watchdog_w));
-	map(0x01300000, 0x01300003).rw(this, FUNC(seattle_state::seattle_interrupt_enable_r), FUNC(seattle_state::seattle_interrupt_enable_w));
-	map(0x01400000, 0x01400003).rw(this, FUNC(seattle_state::interrupt_config_r), FUNC(seattle_state::interrupt_config_w));
-	map(0x01500000, 0x01500003).r(this, FUNC(seattle_state::interrupt_state_r));
-	map(0x01600000, 0x01600003).r(this, FUNC(seattle_state::interrupt_state2_r));
-	map(0x01700000, 0x01700003).w(this, FUNC(seattle_state::vblank_clear_w));
+	map(0x00100000, 0x0011ffff).rw(FUNC(seattle_state::cmos_r), FUNC(seattle_state::cmos_w));
+	map(0x00c00000, 0x00c0003f).rw(FUNC(seattle_state::ethernet_r), FUNC(seattle_state::ethernet_w));
+	map(0x01000000, 0x01000003).rw(FUNC(seattle_state::cmos_protect_r), FUNC(seattle_state::cmos_protect_w));
+	map(0x01100000, 0x01100003).w(FUNC(seattle_state::seattle_watchdog_w));
+	map(0x01300000, 0x01300003).rw(FUNC(seattle_state::seattle_interrupt_enable_r), FUNC(seattle_state::seattle_interrupt_enable_w));
+	map(0x01400000, 0x01400003).rw(FUNC(seattle_state::interrupt_config_r), FUNC(seattle_state::interrupt_config_w));
+	map(0x01500000, 0x01500003).r(FUNC(seattle_state::interrupt_state_r));
+	map(0x01600000, 0x01600003).r(FUNC(seattle_state::interrupt_state2_r));
+	map(0x01700000, 0x01700003).w(FUNC(seattle_state::vblank_clear_w));
 	map(0x01800000, 0x01800003).noprw();
-	map(0x01900000, 0x01900003).rw(this, FUNC(seattle_state::status_leds_r), FUNC(seattle_state::status_leds_w));
-	map(0x01f00000, 0x01f00003).rw(this, FUNC(seattle_state::asic_reset_r), FUNC(seattle_state::asic_reset_w));
+	map(0x01900000, 0x01900003).rw(FUNC(seattle_state::status_leds_r), FUNC(seattle_state::status_leds_w));
+	map(0x01f00000, 0x01f00003).rw(FUNC(seattle_state::asic_reset_r), FUNC(seattle_state::asic_reset_w));
 }
 
 /*************************************
@@ -1864,281 +1891,287 @@ INPUT_PORTS_END
  *  Machine drivers
  *
  *************************************/
-#define PCI_ID_GALILEO  ":pci:00.0"
-#define PCI_ID_VIDEO    ":pci:08.0"
-#define PCI_ID_IDE      ":pci:09.0"
-
-MACHINE_CONFIG_START(seattle_state::seattle_common)
+void seattle_state::seattle_common(machine_config &config)
+{
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*3)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
+	R5000LE(config, m_maincpu, SYSTEM_CLOCK * 3);
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_system_clock(SYSTEM_CLOCK);
 
 	// PCI Bus Devices
-	MCFG_PCI_ROOT_ADD(":pci")
+	PCI_ROOT(config, ":pci", 0);
 
-	MCFG_GT64010_ADD(PCI_ID_GALILEO, ":maincpu", SYSTEM_CLOCK, GALILEO_IRQ_NUM)
-	MCFG_GT64XXX_SET_CS(0, seattle_state::seattle_cs0_map)
-	MCFG_GT64XXX_SET_CS(1, seattle_state::seattle_cs1_map)
-	MCFG_GT64XXX_SET_CS(2, seattle_state::seattle_cs2_map)
-	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_cs3_map)
-	MCFG_GT64XX_SET_SIMM0(0x00800000)
+	GT64010(config, m_galileo, SYSTEM_CLOCK, m_maincpu, GALILEO_IRQ_NUM);
+	m_galileo->set_map(0, address_map_constructor(&seattle_state::seattle_cs0_map, "seattle_cs0_map", this), this);
+	m_galileo->set_map(1, address_map_constructor(&seattle_state::seattle_cs1_map, "seattle_cs1_map", this), this);
+	m_galileo->set_map(2, address_map_constructor(&seattle_state::seattle_cs2_map, "seattle_cs2_map", this), this);
+	m_galileo->set_map(3, address_map_constructor(&seattle_state::seattle_cs3_map, "seattle_cs3_map", this), this);
+	m_galileo->set_simm0_size(0x00800000);
 
-	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x100b0002, 0x01, 0x0)
-	MCFG_IDE_PCI_IRQ_ADD(":maincpu", IDE_IRQ_NUM)
-	MCFG_IDE_PCI_SET_LEGACY_TOP(0x0a0)
-
-	MCFG_VOODOO_PCI_ADD(PCI_ID_VIDEO, TYPE_VOODOO_1, ":maincpu")
-	MCFG_VOODOO_PCI_FBMEM(2)
-	MCFG_VOODOO_PCI_TMUMEM(4, 0)
-	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO":voodoo")
-	MCFG_VOODOO_VBLANK_CB(DEVWRITELINE(":", seattle_state, vblank_assert))
-	MCFG_VOODOO_STALL_CB(DEVWRITELINE(PCI_ID_GALILEO, gt64xxx_device, pci_stall))
-
-
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x100b0002, 0x01, 0x0));
+	ide.irq_handler().set_inputline(m_maincpu, IDE_IRQ_NUM);
+	ide.set_legacy_top(0x0a0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DEVICE(PCI_ID_VIDEO, voodoo_pci_device, screen_update)
-	/* sound hardware */
-MACHINE_CONFIG_END
+	VOODOO_1_PCI(config, m_voodoo, 0, m_maincpu, m_screen);
+	m_voodoo->set_fbmem(2);
+	m_voodoo->set_tmumem(4, 0);
+
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(seattle_state::vblank_assert));
+	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->stall_callback().set(m_galileo, FUNC(gt64xxx_device::pci_stall));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	/* screen */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// Screeen size and timing is re-calculated later in voodoo card
+	m_screen->set_refresh_hz(57);
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
+	m_screen->set_screen_update(PCI_ID_VIDEO, FUNC(voodoo_1_pci_device::screen_update));
+}
 
 
-MACHINE_CONFIG_START(seattle_state::phoenixsa)
+void seattle_state::phoenixsa(machine_config &config)
+{
 	seattle_common(config);
-	MCFG_CPU_REPLACE("maincpu", R4700LE, SYSTEM_CLOCK*2)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
+	R4700LE(config.replace(), m_maincpu, SYSTEM_CLOCK * 2);
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_system_clock(SYSTEM_CLOCK);
 
-	MCFG_DEVICE_MODIFY(PCI_ID_GALILEO)
-	MCFG_GT64XX_SET_SIMM0(0x00200000)
-	MCFG_GT64XX_SET_SIMM1(0x00200000)
-MACHINE_CONFIG_END
+	m_galileo->set_simm0_size(0x00200000);
+	m_galileo->set_simm1_size(0x00200000);
+}
 
 
-MACHINE_CONFIG_START(seattle_state::seattle150)
+void seattle_state::seattle150(machine_config &config)
+{
 	seattle_common(config);
-	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*3)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
-MACHINE_CONFIG_END
+	R5000LE(config.replace(), m_maincpu, SYSTEM_CLOCK * 3);
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_system_clock(SYSTEM_CLOCK);
+}
 
 
-MACHINE_CONFIG_START(seattle_state::seattle150_widget)
+void seattle_state::seattle150_widget(machine_config &config)
+{
 	seattle150(config);
-	MCFG_SMC91C94_ADD("ethernet")
-	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
-MACHINE_CONFIG_END
+	SMC91C94(config, m_ethernet, 0);
+	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
+}
 
 
-MACHINE_CONFIG_START(seattle_state::seattle200)
-	seattle_common(config);
-	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
-MACHINE_CONFIG_END
+void seattle_state::seattle200(machine_config &config)
+{
+	seattle150(config);
+	m_maincpu->set_clock(SYSTEM_CLOCK * 4);
+}
 
 
-MACHINE_CONFIG_START(seattle_state::seattle200_widget)
+void seattle_state::seattle200_widget(machine_config &config)
+{
 	seattle200(config);
-	MCFG_SMC91C94_ADD("ethernet")
-	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
-MACHINE_CONFIG_END
+	SMC91C94(config, m_ethernet, 0);
+	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
+}
 
-MACHINE_CONFIG_START(seattle_state::flagstaff)
-	seattle_common(config);
-	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
+void seattle_state::flagstaff(machine_config &config)
+{
+	seattle150(config);
+	m_maincpu->set_clock(SYSTEM_CLOCK * 4);
 
-	MCFG_DEVICE_MODIFY(PCI_ID_GALILEO)
-	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_flagstaff_cs3_map)
+	m_galileo->set_map(3, address_map_constructor(&seattle_state::seattle_flagstaff_cs3_map, "seattle_flagstaff_cs3_map", this), this);
 
-	MCFG_SMC91C94_ADD("ethernet")
-	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
+	SMC91C94(config, m_ethernet, 0);
+	m_ethernet->irq_handler().set(FUNC(seattle_state::ethernet_interrupt));
 
-	MCFG_DEVICE_MODIFY(PCI_ID_VIDEO)
-	MCFG_VOODOO_PCI_FBMEM(2)
-	MCFG_VOODOO_PCI_TMUMEM(4, 4)
-MACHINE_CONFIG_END
+	m_voodoo->set_fbmem(2);
+	m_voodoo->set_tmumem(4, 4);
+}
 
 // Per game configurations
 
-MACHINE_CONFIG_START(seattle_state::wg3dh)
+void seattle_state::wg3dh(machine_config &config)
+{
 	phoenixsa(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x3839);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
-	MCFG_MIDWAY_IOASIC_UPPER(310/* others? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->set_upper(310/* others? */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
 
-MACHINE_CONFIG_START(seattle_state::mace)
+void seattle_state::mace(machine_config &config)
+{
 	seattle150(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x3839);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_MACE)
-	MCFG_MIDWAY_IOASIC_UPPER(319/* others? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_MACE);
+	m_ioasic->set_upper(319/* others? */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
-MACHINE_CONFIG_START(seattle_state::sfrush)
+void seattle_state::sfrush(machine_config &config)
+{
 	flagstaff(config);
-	MCFG_DEVICE_ADD("cage", ATARI_CAGE_SEATTLE, 0)
-	MCFG_ATARI_CAGE_SPEEDUP(0x5236)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(DEVWRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
+	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage", 0));
+	cage.set_speedup(0x5236);
+	cage.irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
-	MCFG_MIDWAY_IOASIC_UPPER(315/* no alternates */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(seattle_state, wheel_board_w))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->set_upper(315/* no alternates */);
+	m_ioasic->set_yearoffs(100);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+	m_ioasic->aux_output_handler().set(FUNC(seattle_state::wheel_board_w));
+}
 
-MACHINE_CONFIG_START(seattle_state::sfrushrk)
+void seattle_state::sfrushrk(machine_config &config)
+{
 	flagstaff(config);
-	MCFG_DEVICE_ADD("cage", ATARI_CAGE_SEATTLE, 0)
-	MCFG_ATARI_CAGE_SPEEDUP(0x5329)
-	MCFG_ATARI_CAGE_IRQ_CALLBACK(DEVWRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
+	atari_cage_seattle_device &cage(ATARI_CAGE_SEATTLE(config, "cage", 0));
+	cage.set_speedup(0x5329);
+	cage.irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_SFRUSHRK)
-	MCFG_MIDWAY_IOASIC_UPPER(331/* unknown */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(seattle_state, wheel_board_w))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_SFRUSHRK);
+	m_ioasic->set_upper(331/* unknown */);
+	m_ioasic->set_yearoffs(100);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+	m_ioasic->aux_output_handler().set(FUNC(seattle_state::wheel_board_w));
+}
 
-MACHINE_CONFIG_START(seattle_state::sfrushrkw)
+void seattle_state::sfrushrkw(machine_config &config)
+{
 	sfrushrk(config);
-	MCFG_DEVICE_MODIFY("ioasic")
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
-MACHINE_CONFIG_END
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+}
 
-MACHINE_CONFIG_START(seattle_state::calspeed)
+void seattle_state::calspeed(machine_config &config)
+{
 	seattle150_widget(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x39c0)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x39c0);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CALSPEED)
-	MCFG_MIDWAY_IOASIC_UPPER(328/* others? */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_CALSPEED);
+	m_ioasic->set_upper(328/* others? */);
+	m_ioasic->set_yearoffs(100);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+	m_ioasic->set_auto_ack(1);
+}
 
-MACHINE_CONFIG_START(seattle_state::vaportrx)
+void seattle_state::vaportrx(machine_config &config)
+{
 	seattle200_widget(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x39c2)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x39c2);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_VAPORTRX)
-	MCFG_MIDWAY_IOASIC_UPPER(324/* 334? unknown */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(100)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_VAPORTRX);
+	m_ioasic->set_upper(324/* 334? unknown */);
+	m_ioasic->set_yearoffs(100);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
-MACHINE_CONFIG_START(seattle_state::biofreak)
+void seattle_state::biofreak(machine_config &config)
+{
 	seattle150(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3835)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x3835);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
-	MCFG_MIDWAY_IOASIC_UPPER(231/* no alternates */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_STANDARD);
+	m_ioasic->set_upper(231/* no alternates */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
-MACHINE_CONFIG_START(seattle_state::blitz)
+void seattle_state::blitz(machine_config &config)
+{
 	seattle150(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x39c2)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x39c2);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
-	MCFG_MIDWAY_IOASIC_UPPER(444/* or 528 */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
+	m_ioasic->set_upper(444/* or 528 */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
-MACHINE_CONFIG_START(seattle_state::blitz99)
+void seattle_state::blitz99(machine_config &config)
+{
 	seattle150(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x0afb);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
-	MCFG_MIDWAY_IOASIC_UPPER(481/* or 484 or 520 */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
+	m_ioasic->set_upper(481/* or 484 or 520 */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
-MACHINE_CONFIG_START(seattle_state::blitz2k)
+void seattle_state::blitz2k(machine_config &config)
+{
 	seattle150(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x0b5d);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_BLITZ99)
-	MCFG_MIDWAY_IOASIC_UPPER(494/* or 498 */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_BLITZ99);
+	m_ioasic->set_upper(494/* or 498 */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
-MACHINE_CONFIG_START(seattle_state::carnevil)
+void seattle_state::carnevil(machine_config &config)
+{
 	seattle150(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0af7)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x0af7);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CARNEVIL)
-	MCFG_MIDWAY_IOASIC_UPPER(469/* 469 or 486 or 528 */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_CARNEVIL);
+	m_ioasic->set_upper(469/* 469 or 486 or 528 */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
-MACHINE_CONFIG_START(seattle_state::hyprdriv)
+void seattle_state::hyprdriv(machine_config &config)
+{
 	seattle200_widget(config);
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0af7)
+	dcs2_audio_2115_device &dcs(DCS2_AUDIO_2115(config, "dcs", 0));
+	dcs.set_dram_in_mb(2);
+	dcs.set_polling_offset(0x0af7);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_HYPRDRIV)
-	MCFG_MIDWAY_IOASIC_UPPER(469/* unknown */)
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(80)
-	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
-MACHINE_CONFIG_END
+	MIDWAY_IOASIC(config, m_ioasic, 0);
+	m_ioasic->set_shuffle(MIDWAY_IOASIC_HYPRDRIV);
+	m_ioasic->set_upper(469/* unknown */);
+	m_ioasic->set_yearoffs(80);
+	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
+}
 
 /*************************************
  *
@@ -2194,7 +2227,7 @@ ROM_START( sfrush )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM  Version L1.0 */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM  Version L1.0 */
 	ROM_LOAD32_BYTE( "sndboot.u69", 0x000000, 0x080000, CRC(7e52cdc7) SHA1(f735063e19d2ca672cef6d761a2a47df272e8c59) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -2213,7 +2246,7 @@ ROM_START( sfrusha )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM  Version L1.0 */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM  Version L1.0 */
 	ROM_LOAD32_BYTE( "sndboot.u69", 0x000000, 0x080000, CRC(7e52cdc7) SHA1(f735063e19d2ca672cef6d761a2a47df272e8c59) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -2234,7 +2267,7 @@ ROM_START( sfrushrk )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "audboot.bin",    0x000000, 0x080000, CRC(c70c060d) SHA1(dd014bd13efdf5adc5450836bd4650351abefc46) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -2254,7 +2287,7 @@ ROM_START( sfrushrkw )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "audboot.bin",    0x000000, 0x080000, CRC(c70c060d) SHA1(dd014bd13efdf5adc5450836bd4650351abefc46) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -2273,7 +2306,7 @@ ROM_START( sfrushrkwo )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )  /* TMS320C31 boot ROM */
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )  /* TMS320C31 boot ROM */
 	ROM_LOAD32_BYTE( "audboot.bin",    0x000000, 0x080000, CRC(c70c060d) SHA1(dd014bd13efdf5adc5450836bd4650351abefc46) )
 
 	ROM_REGION32_LE( 0x1000000, "cage", 0 ) /* TMS320C31 sound ROMs */
@@ -2310,11 +2343,11 @@ ROM_START( calspeeda )
 	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
 
 	ROM_SYSTEM_BIOS( 1, "up16_1",       "Disk Update 1.0x to 2.1a (1.25) Step 1 of 3" )
-	ROMX_LOAD("eprom @1 2.1a 90a7", 0x000000, 0x100000, CRC(bc0f373e) SHA1(bf53f1953ccab8da9ce784e4d20dd2ec0d0eff6a), ROM_BIOS(2))
+	ROMX_LOAD("eprom @1 2.1a 90a7", 0x000000, 0x100000, CRC(bc0f373e) SHA1(bf53f1953ccab8da9ce784e4d20dd2ec0d0eff6a), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "up16_2",       "Disk Update 1.0x to 2.1a (1.25) Step 2 of 3" )
-	ROMX_LOAD("eprom @2 2.1a 9f84", 0x000000, 0x100000, CRC(5782da30) SHA1(eaeea3655bc9c1cedefdfb0088d4716584788669), ROM_BIOS(3))
+	ROMX_LOAD("eprom @2 2.1a 9f84", 0x000000, 0x100000, CRC(5782da30) SHA1(eaeea3655bc9c1cedefdfb0088d4716584788669), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "up16_3",       "Disk Update 1.0x to 2.1a (1.25) Step 3 of 3" )
-	ROMX_LOAD("eprom @3 2.1a 3286", 0x000000, 0x100000, CRC(e7d8c88f) SHA1(06c11241ac439527b361826784aef4c58689892e), ROM_BIOS(4))
+	ROMX_LOAD("eprom @3 2.1a 3286", 0x000000, 0x100000, CRC(e7d8c88f) SHA1(06c11241ac439527b361826784aef4c58689892e), ROM_BIOS(3))
 
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )    /* Release version 1.0r8a (4/10/98) (Guts 4/10/98, Main 4/10/98) */
@@ -2430,7 +2463,7 @@ ROM_START( blitz99a )
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF ) // to use this rom run with -bios up130 and go into TEST mode to update.
 	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
 	ROM_SYSTEM_BIOS( 1, "up130",       "Update to 1.30" )
-	ROMX_LOAD( "rev.-1.3.u33", 0x000000, 0x100000, CRC(0a0fde5a) SHA1(1edb671c66819f634a9f1daa35331a99b2bda01a), ROM_BIOS(2) )
+	ROMX_LOAD( "rev.-1.3.u33", 0x000000, 0x100000, CRC(0a0fde5a) SHA1(1edb671c66819f634a9f1daa35331a99b2bda01a), ROM_BIOS(1) )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )    /* Hard Drive Version 1.30 */
 	DISK_IMAGE( "blitz99a", 0, SHA1(43f834727ce01d7a63b482fc28cbf292477fc6f2) )
@@ -2486,7 +2519,7 @@ ROM_START( hyprdriv )
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
 	ROM_SYSTEM_BIOS( 1, "update",       "Unknown Update" )
-	ROMX_LOAD( "hyperdrive1.2.u33", 0x000000, 0x100000, CRC(fcc922fb) SHA1(7bfa4f0614f561ba77ad2dc7d776af2c3e84b7e7), ROM_BIOS(2) )
+	ROMX_LOAD( "hyperdrive1.2.u33", 0x000000, 0x100000, CRC(fcc922fb) SHA1(7bfa4f0614f561ba77ad2dc7d776af2c3e84b7e7), ROM_BIOS(1) )
 	/*  it's either an update to 1.40, or an older version, either way we can't use it with the drive we have, it reports the following
 
 	    'Valid Update Rom Detected'
@@ -2543,7 +2576,7 @@ void seattle_state::init_common(int config)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,wg3dh)
+void seattle_state::init_wg3dh()
 {
 	init_common(PHOENIX_CONFIG);
 
@@ -2554,7 +2587,7 @@ DRIVER_INIT_MEMBER(seattle_state,wg3dh)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,mace)
+void seattle_state::init_mace()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -2563,7 +2596,7 @@ DRIVER_INIT_MEMBER(seattle_state,mace)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,sfrush)
+void seattle_state::init_sfrush()
 {
 	init_common(FLAGSTAFF_CONFIG);
 
@@ -2574,7 +2607,7 @@ DRIVER_INIT_MEMBER(seattle_state,sfrush)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,sfrushrk)
+void seattle_state::init_sfrushrk()
 {
 	init_common(FLAGSTAFF_CONFIG);
 
@@ -2586,7 +2619,7 @@ DRIVER_INIT_MEMBER(seattle_state,sfrushrk)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,calspeed)
+void seattle_state::init_calspeed()
 {
 	init_common(SEATTLE_WIDGET_CONFIG);
 
@@ -2596,7 +2629,7 @@ DRIVER_INIT_MEMBER(seattle_state,calspeed)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,vaportrx)
+void seattle_state::init_vaportrx()
 {
 	init_common(SEATTLE_WIDGET_CONFIG);
 
@@ -2607,13 +2640,13 @@ DRIVER_INIT_MEMBER(seattle_state,vaportrx)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,biofreak)
+void seattle_state::init_biofreak()
 {
 	init_common(SEATTLE_CONFIG);
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,blitz)
+void seattle_state::init_blitz()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -2626,7 +2659,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,blitz99)
+void seattle_state::init_blitz99()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -2636,7 +2669,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz99)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,blitz2k)
+void seattle_state::init_blitz2k()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -2646,7 +2679,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz2k)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,carnevil)
+void seattle_state::init_carnevil()
 {
 	init_common(SEATTLE_CONFIG);
 
@@ -2659,7 +2692,7 @@ DRIVER_INIT_MEMBER(seattle_state,carnevil)
 }
 
 
-DRIVER_INIT_MEMBER(seattle_state,hyprdriv)
+void seattle_state::init_hyprdriv()
 {
 	init_common(SEATTLE_WIDGET_CONFIG);
 
@@ -2678,30 +2711,30 @@ DRIVER_INIT_MEMBER(seattle_state,hyprdriv)
  *************************************/
 
 /* Atari */
-GAME(  1996, wg3dh,      0,        wg3dh,     wg3dh,    seattle_state, wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey", MACHINE_SUPPORTS_SAVE )
-GAME(  1996, mace,       0,        mace,      mace,     seattle_state, mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", MACHINE_SUPPORTS_SAVE )
-GAME(  1997, macea,      mace,     mace,      mace,     seattle_state, mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", MACHINE_SUPPORTS_SAVE )
-GAMEL( 1996, sfrush,     0,        sfrush,    sfrush,   seattle_state, sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.0)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1996, sfrusha,    sfrush,   sfrush,    sfrush,   seattle_state, sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.06A)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1997, sfrushrk,   0,        sfrushrk,  sfrushrk, seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (boot rom L 1.0, GUTS Oct 6 1997 / MAIN Oct 16 1997)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1997, sfrushrkw,  sfrushrk, sfrushrkw, sfrush,   seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 19 1997 / MAIN Aug 19 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1997, sfrushrkwo, sfrushrk, sfrushrkw, sfrush,   seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 6 1997 / MAIN Aug 5 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1998, calspeed,   0,        calspeed,  calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a Apr 17 1998, GUTS 1.25 Apr 17 1998 / MAIN Apr 17 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
-GAMEL( 1998, calspeeda,  calspeed, calspeed,  calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r8 Mar 10 1998, GUTS Mar 10 1998 / MAIN Mar 10 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
-GAMEL( 1998, calspeedb,  calspeed, calspeed,  calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a Mar 4 1998, GUTS Mar 3 1998 / MAIN Jan 19 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
+GAME(  1996, wg3dh,      0,        wg3dh,     wg3dh,    seattle_state, init_wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey", MACHINE_SUPPORTS_SAVE )
+GAME(  1996, mace,       0,        mace,      mace,     seattle_state, init_mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", MACHINE_SUPPORTS_SAVE )
+GAME(  1997, macea,      mace,     mace,      mace,     seattle_state, init_mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1996, sfrush,     0,        sfrush,    sfrush,   seattle_state, init_sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.0)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1996, sfrusha,    sfrush,   sfrush,    sfrush,   seattle_state, init_sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.06A)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1997, sfrushrk,   0,        sfrushrk,  sfrushrk, seattle_state, init_sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (boot rom L 1.0, GUTS Oct 6 1997 / MAIN Oct 16 1997)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1997, sfrushrkw,  sfrushrk, sfrushrkw, sfrush,   seattle_state, init_sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 19 1997 / MAIN Aug 19 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1997, sfrushrkwo, sfrushrk, sfrushrkw, sfrush,   seattle_state, init_sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 6 1997 / MAIN Aug 5 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1998, calspeed,   0,        calspeed,  calspeed, seattle_state, init_calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a Apr 17 1998, GUTS 1.25 Apr 17 1998 / MAIN Apr 17 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
+GAMEL( 1998, calspeeda,  calspeed, calspeed,  calspeed, seattle_state, init_calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r8 Mar 10 1998, GUTS Mar 10 1998 / MAIN Mar 10 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
+GAMEL( 1998, calspeedb,  calspeed, calspeed,  calspeed, seattle_state, init_calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a Mar 4 1998, GUTS Mar 3 1998 / MAIN Jan 19 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
 
 
 
-GAMEL( 1998, vaportrx,   0,        vaportrx,  vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
-GAMEL( 1998, vaportrxp,  vaportrx, vaportrx,  vaportrx, seattle_state, vaportrx, ROT0, "Atari Games",  "Vapor TRX (prototype)", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
+GAMEL( 1998, vaportrx,   0,        vaportrx,  vaportrx, seattle_state, init_vaportrx, ROT0, "Atari Games",  "Vapor TRX", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
+GAMEL( 1998, vaportrxp,  vaportrx, vaportrx,  vaportrx, seattle_state, init_vaportrx, ROT0, "Atari Games",  "Vapor TRX (prototype)", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
 
 /* Midway */
-GAME(  1997, biofreak,   0,        biofreak,  biofreak, seattle_state, biofreak, ROT0, "Midway Games", "BioFreaks (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME(  1997, blitz,      0,        blitz,     blitz,    seattle_state, blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.2)", MACHINE_SUPPORTS_SAVE )
-GAME(  1997, blitz11,    blitz,    blitz,     blitz,    seattle_state, blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME(  1998, blitz99,    0,        blitz99,   blitz99,  seattle_state, blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.30, Sep 22 1998)", MACHINE_SUPPORTS_SAVE )
-GAME(  1998, blitz99a,   blitz99,  blitz99,   blitz99,  seattle_state, blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.2, Aug 28 1998)", MACHINE_SUPPORTS_SAVE )
-GAME(  1999, blitz2k,    0,        blitz2k,   blitz99,  seattle_state, blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition (ver 1.2, Sep 22 1999)", MACHINE_SUPPORTS_SAVE )
-GAME(  1998, carnevil,   0,        carnevil,  carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", MACHINE_SUPPORTS_SAVE )
-GAME(  1998, carnevil1,  carnevil, carnevil,  carnevil, seattle_state, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", MACHINE_SUPPORTS_SAVE )
-GAMEL( 1998, hyprdriv,   0,        hyprdriv,  hyprdriv, seattle_state, hyprdriv, ROT0, "Midway Games", "Hyperdrive", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )
+GAME(  1997, biofreak,   0,        biofreak,  biofreak, seattle_state, init_biofreak, ROT0, "Midway Games", "BioFreaks (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME(  1997, blitz,      0,        blitz,     blitz,    seattle_state, init_blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME(  1997, blitz11,    blitz,    blitz,     blitz,    seattle_state, init_blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, blitz99,    0,        blitz99,   blitz99,  seattle_state, init_blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.30, Sep 22 1998)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, blitz99a,   blitz99,  blitz99,   blitz99,  seattle_state, init_blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.2, Aug 28 1998)", MACHINE_SUPPORTS_SAVE )
+GAME(  1999, blitz2k,    0,        blitz2k,   blitz99,  seattle_state, init_blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition (ver 1.2, Sep 22 1999)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, carnevil,   0,        carnevil,  carnevil, seattle_state, init_carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, carnevil1,  carnevil, carnevil,  carnevil, seattle_state, init_carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1998, hyprdriv,   0,        hyprdriv,  hyprdriv, seattle_state, init_hyprdriv, ROT0, "Midway Games", "Hyperdrive", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )

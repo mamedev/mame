@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER(appoooh_state::adpcm_int)
 			uint8_t *RAM = memregion("adpcm")->base();
 
 			m_adpcm_data = RAM[m_adpcm_address++];
-			m_msm->data_w(m_adpcm_data >> 4);
+			m_msm->write_data(m_adpcm_data >> 4);
 
 			if (m_adpcm_data == 0x70)
 			{
@@ -192,7 +192,7 @@ WRITE_LINE_MEMBER(appoooh_state::adpcm_int)
 		}
 		else
 		{
-			m_msm->data_w(m_adpcm_data & 0x0f);
+			m_msm->write_data(m_adpcm_data & 0x0f);
 			m_adpcm_data = -1;
 		}
 	}
@@ -223,11 +223,11 @@ void appoooh_state::main_map(address_map &map)
 
 	map(0xf000, 0xffff).ram();
 	map(0xf000, 0xf01f).share("spriteram");
-	map(0xf020, 0xf3ff).w(this, FUNC(appoooh_state::fg_videoram_w)).share("fg_videoram");
-	map(0xf420, 0xf7ff).w(this, FUNC(appoooh_state::fg_colorram_w)).share("fg_colorram");
+	map(0xf020, 0xf3ff).w(FUNC(appoooh_state::fg_videoram_w)).share("fg_videoram");
+	map(0xf420, 0xf7ff).w(FUNC(appoooh_state::fg_colorram_w)).share("fg_colorram");
 	map(0xf800, 0xf81f).share("spriteram_2");
-	map(0xf820, 0xfbff).w(this, FUNC(appoooh_state::bg_videoram_w)).share("bg_videoram");
-	map(0xfc20, 0xffff).w(this, FUNC(appoooh_state::bg_colorram_w)).share("bg_colorram");
+	map(0xf820, 0xfbff).w(FUNC(appoooh_state::bg_videoram_w)).share("bg_videoram");
+	map(0xfc20, 0xffff).w(FUNC(appoooh_state::bg_colorram_w)).share("bg_colorram");
 }
 
 void appoooh_state::decrypted_opcodes_map(address_map &map)
@@ -240,12 +240,12 @@ void appoooh_state::decrypted_opcodes_map(address_map &map)
 void appoooh_state::main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489_device::write));
-	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489_device::write));
-	map(0x02, 0x02).w("sn3", FUNC(sn76489_device::write));
-	map(0x03, 0x03).portr("DSW1").w(this, FUNC(appoooh_state::adpcm_w));
-	map(0x04, 0x04).portr("BUTTON3").w(this, FUNC(appoooh_state::out_w));
-	map(0x05, 0x05).w(this, FUNC(appoooh_state::scroll_w)); /* unknown */
+	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489_device::command_w));
+	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489_device::command_w));
+	map(0x02, 0x02).w("sn3", FUNC(sn76489_device::command_w));
+	map(0x03, 0x03).portr("DSW1").w(FUNC(appoooh_state::adpcm_w));
+	map(0x04, 0x04).portr("BUTTON3").w(FUNC(appoooh_state::out_w));
+	map(0x05, 0x05).w(FUNC(appoooh_state::scroll_w)); /* unknown */
 }
 
 
@@ -349,7 +349,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( appoooh )
+static GFXDECODE_START( gfx_appoooh )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     32*8, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,      0, 32 )
@@ -382,7 +382,7 @@ static const gfx_layout robowres_spritelayout =
 };
 
 
-static GFXDECODE_START( robowres )
+static GFXDECODE_START( gfx_robowres )
 	GFXDECODE_ENTRY( "gfx1", 0, robowres_charlayout,        0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, robowres_charlayout,         0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, robowres_spritelayout,      0, 32 )
@@ -416,32 +416,32 @@ void appoooh_state::machine_reset()
 INTERRUPT_GEN_MEMBER(appoooh_state::vblank_irq)
 {
 	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 MACHINE_CONFIG_START(appoooh_state::appoooh_common)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* ??? the main xtal is 18.432 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80,18432000/6) /* ??? the main xtal is 18.432 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76489, 18432000/6)
+	MCFG_DEVICE_ADD("sn1", SN76489, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("sn2", SN76489, 18432000/6)
+	MCFG_DEVICE_ADD("sn2", SN76489, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("sn3", SN76489, 18432000/6)
+	MCFG_DEVICE_ADD("sn3", SN76489, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(appoooh_state, adpcm_int)) /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, appoooh_state, adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -457,12 +457,10 @@ MACHINE_CONFIG_START(appoooh_state::appoooh)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_appoooh)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", appoooh)
-	MCFG_PALETTE_ADD("palette", 32*8+32*8)
-
-	MCFG_PALETTE_INIT_OWNER(appoooh_state,appoooh)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_appoooh);
+	PALETTE(config, m_palette, FUNC(appoooh_state::appoooh_palette), 32*8+32*8);
 MACHINE_CONFIG_END
 
 
@@ -470,7 +468,7 @@ MACHINE_CONFIG_START(appoooh_state::robowres)
 	appoooh_common(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -479,24 +477,23 @@ MACHINE_CONFIG_START(appoooh_state::robowres)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_robowres)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", robowres)
-	MCFG_PALETTE_ADD("palette", 32*8+32*8)
-
-	MCFG_PALETTE_INIT_OWNER(appoooh_state,robowres)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_robowres);
+	PALETTE(config, m_palette, FUNC(appoooh_state::robowres_palette), 32*8+32*8);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(appoooh_state::robowrese)
+void appoooh_state::robowrese(machine_config &config)
+{
 	robowres(config);
 
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5179,18432000/6) /* ??? the main xtal is 18.432 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5179_device &maincpu(SEGA_315_5179(config.replace(), m_maincpu, 18432000/6)); /* ??? the main xtal is 18.432 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &appoooh_state::main_map);
+	maincpu.set_addrmap(AS_IO, &appoooh_state::main_portmap);
+	maincpu.set_vblank_int("screen", FUNC(appoooh_state::vblank_irq));
+	maincpu.set_addrmap(AS_OPCODES, &appoooh_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(m_decrypted_opcodes);
+}
 
 /*************************************
  *
@@ -603,7 +600,7 @@ ROM_END
  *************************************/
 
 
-DRIVER_INIT_MEMBER(appoooh_state,robowresb)
+void appoooh_state::init_robowresb()
 {
 	memcpy(m_decrypted_opcodes, memregion("maincpu")->base() + 0x1c000, 0x8000);
 }
@@ -615,6 +612,6 @@ DRIVER_INIT_MEMBER(appoooh_state,robowresb)
  *
  *************************************/
 
-GAME( 1984, appoooh,   0,        appoooh,  appoooh,  appoooh_state, 0,         ROT0, "Sanritsu / Sega", "Appoooh",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, robowres,  0,        robowrese,robowres, appoooh_state, 0,         ROT0, "Sanritsu / Sega", "Robo Wres 2001",           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, robowresb, robowres, robowres, robowres, appoooh_state, robowresb, ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, appoooh,   0,        appoooh,   appoooh,  appoooh_state, empty_init,     ROT0, "Sanritsu / Sega", "Appoooh",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, robowres,  0,        robowrese, robowres, appoooh_state, empty_init,     ROT0, "Sanritsu / Sega", "Robo Wres 2001",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, robowresb, robowres, robowres,  robowres, appoooh_state, init_robowresb, ROT0, "bootleg",         "Robo Wres 2001 (bootleg)", MACHINE_SUPPORTS_SAVE )

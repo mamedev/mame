@@ -12,6 +12,7 @@
 #include "video/hd61830.h"
 #include "video/i8275.h"
 #include "sound/beep.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -266,9 +267,9 @@ void magnum_state::magnum_io(address_map &map)
 	map(0x001a, 0x001b).rw("lcdc2", FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
 	map(0x001c, 0x001d).rw("lcdc1", FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
 	map(0x001e, 0x001f).rw("lcdc1", FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
-	map(0x0040, 0x004f).rw(this, FUNC(magnum_state::sysctl_r), FUNC(magnum_state::sysctl_w));
-	map(0x0050, 0x0051).rw(this, FUNC(magnum_state::irqstat_r), FUNC(magnum_state::port50_w));
-	map(0x0056, 0x0056).w(this, FUNC(magnum_state::beep_w));
+	map(0x0040, 0x004f).rw(FUNC(magnum_state::sysctl_r), FUNC(magnum_state::sysctl_w));
+	map(0x0050, 0x0051).rw(FUNC(magnum_state::irqstat_r), FUNC(magnum_state::port50_w));
+	map(0x0056, 0x0056).w(FUNC(magnum_state::beep_w));
 	map(0x0080, 0x008f).rw("rtc", FUNC(cdp1879_device::read), FUNC(cdp1879_device::write)).umask16(0x00ff);
 	//map(0x0100, 0x0107).rw("fdc", FUNC(wd1793_device::read), FUNC(wd1793_device::write)).umask16(0x00ff);
 }
@@ -279,12 +280,11 @@ void magnum_state::magnum_lcdc(address_map &map)
 }
 
 MACHINE_CONFIG_START(magnum_state::magnum)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL(12'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(magnum_map)
-	MCFG_CPU_IO_MAP(magnum_io)
+	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(magnum_map)
+	MCFG_DEVICE_IO_MAP(magnum_io)
 
-	MCFG_DEVICE_ADD("rtc", CDP1879, XTAL(32'768))
-	MCFG_CDP1879_IRQ_CALLBACK(WRITELINE(magnum_state, rtcirq_w))
+	CDP1879(config, "rtc", XTAL(32'768)).irq_callback().set(FUNC(magnum_state::rtcirq_w));
 
 	MCFG_SCREEN_ADD("screen1", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -310,12 +310,12 @@ MACHINE_CONFIG_START(magnum_state::magnum)
 
 	//MCFG_DEVICE_ADD("crtc", I8275, 3000000) // unknown clock
 
-	//MCFG_WD1793_ADD("fdc", 1000000) // nothing known, type or if any disks even exist, port 0x44 is possibly motor control
+	//WD1793(config, "fdc", 1000000); // nothing known, type or if any disks even exist, port 0x44 is possibly motor control
 
-	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("beep", BEEP, 500) /// frequency is guessed
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("beep", BEEP, 500) /// frequency is guessed
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.50)
 MACHINE_CONFIG_END
 
@@ -334,4 +334,4 @@ ROM_START( magnum )
 	ROM_LOAD("dulmontcharrom.bin", 0x0000, 0x1000, CRC(9dff89bf) SHA1(d359aeba7f0b0c81accf3bca25e7da636c033721))
 ROM_END
 
-COMP( 1983, magnum, 0, 0, magnum, magnum, magnum_state, 0, "Dulmont", "Magnum", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1983, magnum, 0, 0, magnum, magnum, magnum_state, empty_init, "Dulmont", "Magnum", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

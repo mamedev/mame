@@ -5,7 +5,7 @@
     Sound handler
 ****************************************************************************/
 #include "emu.h"
-#include "includes/polepos.h"
+#include "polepos.h"
 
 #include "namco52.h"
 #include "namco54.h"
@@ -71,25 +71,81 @@ struct filter_state
 
 #define Q_TO_DAMP(q)    (1.0/q)
 
+
 /* Setup the filter context based on the passed filter type info.
  * type - 1 of the 3 defined filter types
  * fc   - center frequency
  * d    - damp = 1/Q
  * gain - overall filter gain. Set to 1 if not needed.
  */
-static void filter2_setup(device_t *device, int type, double fc, double d, double gain,
-					filter2_context *filter2);
+void polepos_sound_device::filter2_context::setup(device_t *device, int type, double fc, double d, double gain)
+{
+	int const sample_rate = device->machine().sample_rate();
+	double const two_over_T = 2*sample_rate;
+	double const two_over_T_squared = two_over_T * two_over_T;
+
+	/* calculate digital filter coefficents */
+	/* cutoff freq, in radians/sec */
+	/*w = 2.0*M_PI*fc; no pre-warping */
+	double const w = sample_rate*2.0*tan(M_PI*fc/sample_rate); /* pre-warping */
+	double const w_squared = w*w;
+
+	/* temp variable */
+	double const den = two_over_T_squared + d*w*two_over_T + w_squared;
+
+	a1 = 2.0*(-two_over_T_squared + w_squared)/den;
+	a2 = (two_over_T_squared - d*w*two_over_T + w_squared)/den;
+
+	switch (type)
+	{
+	case FILTER_LOWPASS:
+		b0 = b2 = w_squared/den;
+		b1 = 2.0*(b0);
+		break;
+	case FILTER_BANDPASS:
+		b0 = d*w*two_over_T/den;
+		b1 = 0.0;
+		b2 = -(b0);
+		break;
+	case FILTER_HIGHPASS:
+		b0 = b2 = two_over_T_squared/den;
+		b1 = -2.0*(b0);
+		break;
+	default:
+		device->logerror("filter2_setup() - Invalid filter type for 2nd order filter.");
+		break;
+	}
+
+	b0 *= gain;
+	b1 *= gain;
+	b2 *= gain;
+}
 
 
 /* Reset the input/output voltages to 0. */
-static void filter2_reset(filter2_context *filter2);
+void polepos_sound_device::filter2_context::reset()
+{
+	x0 = 0;
+	x1 = 0;
+	x2 = 0;
+	y0 = 0;
+	y1 = 0;
+	y2 = 0;
+}
 
 
 /* Step the filter.
  * x0 is the new input, which needs to be set before stepping.
  * y0 is the new filter output.
  */
-static void filter2_step(filter2_context *filter2);
+void polepos_sound_device::filter2_context::step()
+{
+	y0 = -a1 * y1 - a2 * y2 + b0 * x0 + b1 * x1 + b2 * x2;
+	x2 = x1;
+	x1 = x0;
+	y2 = y1;
+	y1 = y0;
+}
 
 
 /* Setup a filter2 structure based on an op-amp multipole bandpass circuit.
@@ -110,91 +166,15 @@ static void filter2_step(filter2_context *filter2);
  *                  gnd        vRef >---'  |/
  *
  */
-static void filter_opamp_m_bandpass_setup(device_t *device, double r1, double r2, double r3, double c1, double c2,
-					filter2_context *filter2);
-
-
-static void filter2_setup(device_t *device, int type, double fc, double d, double gain,
-					filter2_context *filter2)
+void polepos_sound_device::filter2_context::opamp_m_bandpass_setup(device_t *device, double r1, double r2, double r3, double c1, double c2)
 {
-	int sample_rate = device->machine().sample_rate();
-	double w;   /* cutoff freq, in radians/sec */
-	double w_squared;
-	double den; /* temp variable */
-	double two_over_T = 2*sample_rate;
-	double two_over_T_squared = two_over_T * two_over_T;
-
-	/* calculate digital filter coefficents */
-	/*w = 2.0*M_PI*fc; no pre-warping */
-	w = sample_rate*2.0*tan(M_PI*fc/sample_rate); /* pre-warping */
-	w_squared = w*w;
-
-	den = two_over_T_squared + d*w*two_over_T + w_squared;
-
-	filter2->a1 = 2.0*(-two_over_T_squared + w_squared)/den;
-	filter2->a2 = (two_over_T_squared - d*w*two_over_T + w_squared)/den;
-
-	switch (type)
-	{
-		case FILTER_LOWPASS:
-			filter2->b0 = filter2->b2 = w_squared/den;
-			filter2->b1 = 2.0*(filter2->b0);
-			break;
-		case FILTER_BANDPASS:
-			filter2->b0 = d*w*two_over_T/den;
-			filter2->b1 = 0.0;
-			filter2->b2 = -(filter2->b0);
-			break;
-		case FILTER_HIGHPASS:
-			filter2->b0 = filter2->b2 = two_over_T_squared/den;
-			filter2->b1 = -2.0*(filter2->b0);
-			break;
-		default:
-			device->logerror("filter2_setup() - Invalid filter type for 2nd order filter.");
-			break;
-	}
-
-	filter2->b0 *= gain;
-	filter2->b1 *= gain;
-	filter2->b2 *= gain;
-}
-
-
-/* Reset the input/output voltages to 0. */
-static void filter2_reset(filter2_context *filter2)
-{
-	filter2->x0 = 0;
-	filter2->x1 = 0;
-	filter2->x2 = 0;
-	filter2->y0 = 0;
-	filter2->y1 = 0;
-	filter2->y2 = 0;
-}
-
-
-/* Step the filter. */
-static void filter2_step(filter2_context *filter2)
-{
-	filter2->y0 = -filter2->a1 * filter2->y1 - filter2->a2 * filter2->y2 +
-					filter2->b0 * filter2->x0 + filter2->b1 * filter2->x1 + filter2->b2 * filter2->x2;
-	filter2->x2 = filter2->x1;
-	filter2->x1 = filter2->x0;
-	filter2->y2 = filter2->y1;
-	filter2->y1 = filter2->y0;
-}
-
-
-/* Setup a filter2 structure based on an op-amp multipole bandpass circuit. */
-static void filter_opamp_m_bandpass_setup(device_t *device, double r1, double r2, double r3, double c1, double c2,
-					filter2_context *filter2)
-{
-	double  r_in, fc, d, gain;
-
 	if (r1 == 0)
 	{
 		device->logerror("filter_opamp_m_bandpass_setup() - r1 can not be 0");
 		return; /* Filter can not be setup.  Undefined results. */
 	}
+
+	double  r_in, gain;
 
 	if (r2 == 0)
 	{
@@ -207,16 +187,16 @@ static void filter_opamp_m_bandpass_setup(device_t *device, double r1, double r2
 		r_in = 1.0 / (1.0/r1 + 1.0/r2);
 	}
 
-	fc = 1.0 / (2 * M_PI * sqrt(r_in * r3 * c1 * c2));
-	d = (c1 + c2) / sqrt(r3 / r_in * c1 * c2);
+	double const fc = 1.0 / (2 * M_PI * sqrt(r_in * r3 * c1 * c2));
+	double const d = (c1 + c2) / sqrt(r3 / r_in * c1 * c2);
 	gain *= -r3 / r_in * c2 / (c1 + c2);
 
-	filter2_setup(device, FILTER_BANDPASS, fc, d, gain, filter2);
+	setup(device, FILTER_BANDPASS, fc, d, gain);
 }
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(POLEPOS, polepos_sound_device, "polepos_sound", "Pole Position Custom Sound")
+DEFINE_DEVICE_TYPE(POLEPOS_SOUND, polepos_sound_device, "polepos_sound", "Pole Position Custom Sound")
 
 
 //**************************************************************************
@@ -228,7 +208,7 @@ DEFINE_DEVICE_TYPE(POLEPOS, polepos_sound_device, "polepos_sound", "Pole Positio
 //-------------------------------------------------
 
 polepos_sound_device::polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, POLEPOS, tag, owner, clock),
+	: device_t(mconfig, POLEPOS_SOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_current_position(0),
 		m_sample_msb(0),
@@ -250,13 +230,11 @@ void polepos_sound_device::device_start()
 	m_sample_enable = 0;
 
 	/* setup the filters */
-	filter_opamp_m_bandpass_setup(this, RES_K(220), RES_K(33), RES_K(390), CAP_U(.01),  CAP_U(.01),
-									&m_filter_engine[0]);
-	filter_opamp_m_bandpass_setup(this, RES_K(150), RES_K(22), RES_K(330), CAP_U(.0047),  CAP_U(.0047),
-									&m_filter_engine[1]);
+	m_filter_engine[0].opamp_m_bandpass_setup(this, RES_K(220), RES_K(33), RES_K(390), CAP_U(.01),  CAP_U(.01));
+	m_filter_engine[1].opamp_m_bandpass_setup(this, RES_K(150), RES_K(22), RES_K(330), CAP_U(.0047),  CAP_U(.0047));
 	/* Filter 3 is a little different.  Because of the input capacitor, it is
 	 * a high pass filter. */
-	filter2_setup(this, FILTER_HIGHPASS, 950, Q_TO_DAMP(.707), 1, &m_filter_engine[2]);
+	m_filter_engine[2].setup(this, FILTER_HIGHPASS, 950, Q_TO_DAMP(.707), 1);
 }
 
 
@@ -268,7 +246,7 @@ void polepos_sound_device::device_reset()
 {
 	int loop;
 	for (loop = 0; loop < 3; loop++)
-		filter2_reset(&m_filter_engine[loop]);
+		m_filter_engine[loop].reset();
 }
 
 
@@ -292,7 +270,7 @@ void polepos_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 	}
 
 	/* determine the effective clock rate */
-	clock = (machine().device("maincpu")->unscaled_clock() / 16) * ((m_sample_msb + 1) * 64 + m_sample_lsb + 1) / (64*64);
+	clock = (unscaled_clock() / 16) * ((m_sample_msb + 1) * 64 + m_sample_lsb + 1) / (64*64);
 	step = (clock << 12) / OUTPUT_RATE;
 
 	/* determine the volume */
@@ -310,7 +288,7 @@ void polepos_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 		i_total = 0;
 		for (loop = 0; loop < 3; loop++)
 		{
-			filter2_step(&m_filter_engine[loop]);
+			m_filter_engine[loop].step();
 			/* The op-amp powered @ 5V will clip to 0V & 3.5V.
 			 * Adjusted to vRef of 2V, we will clip as follows: */
 			if (m_filter_engine[loop].y0 > 1.5) m_filter_engine[loop].y0 = 1.5;
@@ -326,10 +304,20 @@ void polepos_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 }
 
 
+WRITE_LINE_MEMBER(polepos_sound_device::clson_w)
+{
+	if (!state)
+	{
+		polepos_engine_sound_lsb_w(machine().dummy_space(), 0, 0);
+		polepos_engine_sound_msb_w(machine().dummy_space(), 0, 0);
+	}
+}
+
+
 /************************************/
 /* Write LSB of engine sound        */
 /************************************/
-WRITE8_MEMBER( polepos_sound_device::polepos_engine_sound_lsb_w )
+WRITE8_MEMBER(polepos_sound_device::polepos_engine_sound_lsb_w)
 {
 	/* Update stream first so all samples at old frequency are updated. */
 	m_stream->update();
@@ -340,7 +328,7 @@ WRITE8_MEMBER( polepos_sound_device::polepos_engine_sound_lsb_w )
 /************************************/
 /* Write MSB of engine sound        */
 /************************************/
-WRITE8_MEMBER( polepos_sound_device::polepos_engine_sound_msb_w )
+WRITE8_MEMBER(polepos_sound_device::polepos_engine_sound_msb_w)
 {
 	m_stream->update();
 	m_sample_msb = data & 63;
@@ -433,7 +421,7 @@ static const discrete_op_amp_filt_info polepos_chanl3_filt =
 };
 
 
-DISCRETE_SOUND_START(polepos)
+DISCRETE_SOUND_START(polepos_discrete)
 
 	/************************************************
 	 * Input register mapping

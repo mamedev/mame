@@ -11,30 +11,30 @@
 	downcast<msm5205_device &>(*device).set_prescaler_selector((msm5205_device::select));
 
 #define MCFG_MSM5205_VCK_CALLBACK(cb) \
-	devcb = &downcast<msm5205_device &>(*device).set_vck_callback((DEVCB_##cb));
+	downcast<msm5205_device &>(*device).set_vck_callback((DEVCB_##cb));
 
 #define MCFG_MSM5205_VCLK_CB(cb) \
-	devcb = &downcast<msm5205_device &>(*device).set_vck_legacy_callback((DEVCB_##cb));
+	downcast<msm5205_device &>(*device).set_vck_legacy_callback((DEVCB_##cb));
 
 #define MCFG_MSM6585_PRESCALER_SELECTOR(select) \
 	downcast<msm5205_device &>(*device).set_prescaler_selector((msm6585_device::select));
 
 #define MCFG_MSM6585_VCK_CALLBACK(cb) \
-	devcb = &downcast<msm5205_device &>(*device).set_vck_callback((DEVCB_##cb));
+	downcast<msm5205_device &>(*device).set_vck_callback((DEVCB_##cb));
 
 
 class msm5205_device : public device_t, public device_sound_interface
 {
 public:
-	/* MSM5205 default master clock is 384KHz */
-	static constexpr int S96_3B = 0;     /* prescaler 1/96(4KHz) , data 3bit */
-	static constexpr int S48_3B = 1;     /* prescaler 1/48(8KHz) , data 3bit */
-	static constexpr int S64_3B = 2;     /* prescaler 1/64(6KHz) , data 3bit */
-	static constexpr int SEX_3B = 3;     /* VCK slave mode       , data 3bit */
-	static constexpr int S96_4B = 4;     /* prescaler 1/96(4KHz) , data 4bit */
-	static constexpr int S48_4B = 5;     /* prescaler 1/48(8KHz) , data 4bit */
-	static constexpr int S64_4B = 6;     /* prescaler 1/64(6KHz) , data 4bit */
-	static constexpr int SEX_4B = 7;     /* VCK slave mode       , data 4bit */
+	// MSM5205 default master clock is 384KHz
+	static constexpr int S96_3B = 0;     // prescaler 1/96(4KHz) , data 3bit
+	static constexpr int S48_3B = 1;     // prescaler 1/48(8KHz) , data 3bit
+	static constexpr int S64_3B = 2;     // prescaler 1/64(6KHz) , data 3bit
+	static constexpr int SEX_3B = 3;     // VCK slave mode       , data 3bit
+	static constexpr int S96_4B = 4;     // prescaler 1/96(4KHz) , data 4bit
+	static constexpr int S48_4B = 5;     // prescaler 1/48(8KHz) , data 4bit
+	static constexpr int S64_4B = 6;     // prescaler 1/64(6KHz) , data 4bit
+	static constexpr int SEX_4B = 7;     // VCK slave mode       , data 4bit
 
 	msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -46,13 +46,15 @@ public:
 	}
 	template <class Object> devcb_base &set_vck_callback(Object &&cb) { return m_vck_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_vck_legacy_callback(Object &&cb) { return m_vck_legacy_cb.set_callback(std::forward<Object>(cb)); }
+	auto vck_callback() { return m_vck_cb.bind(); }
+	auto vck_legacy_callback() { return m_vck_legacy_cb.bind(); }
 
 	// reset signal should keep for 2cycle of VCLK
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 	// adpcmata is latched after vclk_interrupt callback
-	void data_w(int data);
-	DECLARE_WRITE8_MEMBER(data_w);
+	void write_data(int data);
+	DECLARE_WRITE8_MEMBER(data_w) { write_data(data); }
 
 	// VCLK slave mode option
 	// if VCLK and reset or data is changed at the same time,

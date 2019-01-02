@@ -41,11 +41,11 @@ void higemaru_state::higemaru_map(address_map &map)
 	map(0xc002, 0xc002).portr("SYSTEM");
 	map(0xc003, 0xc003).portr("DSW1");
 	map(0xc004, 0xc004).portr("DSW2");
-	map(0xc800, 0xc800).w(this, FUNC(higemaru_state::higemaru_c800_w));
+	map(0xc800, 0xc800).w(FUNC(higemaru_state::higemaru_c800_w));
 	map(0xc801, 0xc802).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0xc803, 0xc804).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(higemaru_state::higemaru_videoram_w)).share("videoram");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(higemaru_state::higemaru_colorram_w)).share("colorram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(higemaru_state::higemaru_videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).ram().w(FUNC(higemaru_state::higemaru_colorram_w)).share("colorram");
 	map(0xd880, 0xd9ff).ram().share("spriteram");
 	map(0xe000, 0xefff).ram();
 }
@@ -157,7 +157,7 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( higemaru )
+static GFXDECODE_START( gfx_higemaru )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,  32*4, 16 )
 GFXDECODE_END
@@ -166,8 +166,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(higemaru_state::higemaru)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 3 MHz Sharp LH0080A Z80A-CPU-D */
-	MCFG_CPU_PROGRAM_MAP(higemaru_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 3 MHz Sharp LH0080A Z80A-CPU-D */
+	MCFG_DEVICE_PROGRAM_MAP(higemaru_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", higemaru_state, higemaru_scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -177,22 +177,18 @@ MACHINE_CONFIG_START(higemaru_state::higemaru)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(higemaru_state, screen_update_higemaru)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", higemaru)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_higemaru)
 
-	MCFG_PALETTE_ADD("palette", 32*4+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(higemaru_state, higemaru)
+	PALETTE(config, m_palette, FUNC(higemaru_state::higemaru_palette), 32*4+16*16, 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -224,4 +220,4 @@ ROM_START( higemaru )
 ROM_END
 
 
-GAME( 1984, higemaru, 0, higemaru, higemaru, higemaru_state, 0, ROT0, "Capcom", "Pirate Ship Higemaru", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, higemaru, 0, higemaru, higemaru, higemaru_state, empty_init, ROT0, "Capcom", "Pirate Ship Higemaru", MACHINE_SUPPORTS_SAVE )

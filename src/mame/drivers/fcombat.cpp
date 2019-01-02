@@ -119,18 +119,18 @@ void fcombat_state::main_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xd000, 0xd7ff).ram().share("videoram");
 	map(0xd800, 0xd8ff).ram().share("spriteram");
-	map(0xe000, 0xe000).r(this, FUNC(fcombat_state::fcombat_port01_r));
+	map(0xe000, 0xe000).r(FUNC(fcombat_state::fcombat_port01_r));
 	map(0xe100, 0xe100).portr("DSW0");
 	map(0xe200, 0xe200).portr("DSW1");
-	map(0xe300, 0xe300).r(this, FUNC(fcombat_state::e300_r));
-	map(0xe400, 0xe400).r(this, FUNC(fcombat_state::fcombat_protection_r)); // protection?
-	map(0xe800, 0xe800).w(this, FUNC(fcombat_state::fcombat_videoreg_w));   // at least bit 0 for flip screen and joystick input multiplexor
-	map(0xe900, 0xe900).w(this, FUNC(fcombat_state::e900_w));
-	map(0xea00, 0xea00).w(this, FUNC(fcombat_state::ea00_w));
-	map(0xeb00, 0xeb00).w(this, FUNC(fcombat_state::eb00_w));
-	map(0xec00, 0xec00).w(this, FUNC(fcombat_state::ec00_w));
-	map(0xed00, 0xed00).w(this, FUNC(fcombat_state::ed00_w));
-	map(0xee00, 0xee00).w(this, FUNC(fcombat_state::ee00_w));   // related to protection ? - doesn't seem to have any effect
+	map(0xe300, 0xe300).r(FUNC(fcombat_state::e300_r));
+	map(0xe400, 0xe400).r(FUNC(fcombat_state::fcombat_protection_r)); // protection?
+	map(0xe800, 0xe800).w(FUNC(fcombat_state::fcombat_videoreg_w));   // at least bit 0 for flip screen and joystick input multiplexor
+	map(0xe900, 0xe900).w(FUNC(fcombat_state::e900_w));
+	map(0xea00, 0xea00).w(FUNC(fcombat_state::ea00_w));
+	map(0xeb00, 0xeb00).w(FUNC(fcombat_state::eb00_w));
+	map(0xec00, 0xec00).w(FUNC(fcombat_state::ec00_w));
+	map(0xed00, 0xed00).w(FUNC(fcombat_state::ed00_w));
+	map(0xee00, 0xee00).w(FUNC(fcombat_state::ee00_w));   // related to protection ? - doesn't seem to have any effect
 	map(0xef00, 0xef00).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -140,12 +140,12 @@ void fcombat_state::audio_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x8001, 0x8001).r("ay1", FUNC(ay8910_device::data_r));
-	map(0x8002, 0x8003).w("ay1", FUNC(ay8910_device::data_address_w));
-	map(0xa001, 0xa001).r("ay2", FUNC(ay8910_device::data_r));
-	map(0xa002, 0xa003).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0xc001, 0xc001).r("ay3", FUNC(ay8910_device::data_r));
-	map(0xc002, 0xc003).w("ay3", FUNC(ay8910_device::data_address_w));
+	map(0x8001, 0x8001).r("ay1", FUNC(ym2149_device::data_r));
+	map(0x8002, 0x8003).w("ay1", FUNC(ym2149_device::data_address_w));
+	map(0xa001, 0xa001).r("ay2", FUNC(ym2149_device::data_r));
+	map(0xa002, 0xa003).w("ay2", FUNC(ym2149_device::data_address_w));
+	map(0xc001, 0xc001).r("ay3", FUNC(ym2149_device::data_r));
+	map(0xc002, 0xc003).w("ay3", FUNC(ym2149_device::data_address_w));
 }
 
 
@@ -250,7 +250,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( fcombat )
+static GFXDECODE_START( gfx_fcombat )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     256, 64 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,     512, 64 )
@@ -291,37 +291,31 @@ void fcombat_state::machine_reset()
 MACHINE_CONFIG_START(fcombat_state::fcombat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 10000000/3)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 10000000/3)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 10000000/3)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-
+	MCFG_DEVICE_ADD("audiocpu", Z80, 10000000/3)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(FCOMBAT_PIXEL_CLOCK, FCOMBAT_HTOTAL, FCOMBAT_HBEND, FCOMBAT_HBSTART, FCOMBAT_VTOTAL, FCOMBAT_VBEND, FCOMBAT_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(fcombat_state, screen_update_fcombat)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fcombat)
-	MCFG_PALETTE_ADD("palette", 256*3)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(fcombat_state, fcombat)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fcombat);
+	PALETTE(config, m_palette, FUNC(fcombat_state::fcombat_palette), 256*3, 32);
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
 
-	MCFG_SOUND_ADD("ay3", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	YM2149(config, "ay3", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
 MACHINE_CONFIG_END
 
 /*************************************
@@ -330,29 +324,26 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(fcombat_state,fcombat)
+void fcombat_state::init_fcombat()
 {
-	uint32_t oldaddr, newaddr, length;
-	uint8_t *src, *dst;
-
 	/* allocate some temporary space */
 	std::vector<uint8_t> temp(0x10000);
 
 	/* make a temporary copy of the character data */
-	src = &temp[0];
-	dst = memregion("gfx1")->base();
-	length = memregion("gfx1")->bytes();
+	uint8_t *src = &temp[0];
+	uint8_t *dst = memregion("gfx1")->base();
+	uint32_t length = memregion("gfx1")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
 	/* the bits in the ROM are ordered: n8-n7 n6 n5 n4-v2 v1 v0 n3-n2 n1 n0 h2 */
 	/* we want them ordered like this:  n8-n7 n6 n5 n4-n3 n2 n1 n0-v2 v1 v0 h2 */
-	for (oldaddr = 0; oldaddr < length; oldaddr++)
+	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
-		newaddr = ((oldaddr     ) & 0x1f00) |       /* keep n8-n4 */
-					((oldaddr << 3) & 0x00f0) |       /* move n3-n0 */
-					((oldaddr >> 4) & 0x000e) |       /* move v2-v0 */
-					((oldaddr     ) & 0x0001);        /* keep h2 */
+		uint32_t newaddr = ((oldaddr     ) & 0x1f00) |       /* keep n8-n4 */
+						   ((oldaddr << 3) & 0x00f0) |       /* move n3-n0 */
+						   ((oldaddr >> 4) & 0x000e) |       /* move v2-v0 */
+						   ((oldaddr     ) & 0x0001);        /* keep h2 */
 		dst[newaddr] = src[oldaddr];
 	}
 
@@ -366,13 +357,13 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 	/* the bits in the ROMs are ordered: n9 n8 n3 n7-n6 n5 n4 v3-v2 v1 v0 n2-n1 n0 h3 h2 */
 	/* we want them ordered like this:   n9 n8 n7 n6-n5 n4 n3 n2-n1 n0 v3 v2-v1 v0 h3 h2 */
 
-	for (oldaddr = 0; oldaddr < length; oldaddr++)
+	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
-		newaddr = ((oldaddr << 1) & 0x3c00) |       /* move n7-n4 */
-					((oldaddr >> 4) & 0x0200) |       /* move n3 */
-					((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
-					((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
-					((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
+		uint32_t newaddr = ((oldaddr << 1) & 0x3c00) |       /* move n7-n4 */
+						   ((oldaddr >> 4) & 0x0200) |       /* move n3 */
+						   ((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
+						   ((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
+						   ((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
 
 		dst[newaddr] = src[oldaddr];
 	}
@@ -387,13 +378,13 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 	/* the bits in the ROM are ordered: n8-n7 n6 n5 n4-v2 v1 v0 n3-n2 n1 n0 h2 */
 	/* we want them ordered like this:  n8-n7 n6 n5 n4-n3 n2 n1 n0-v2 v1 v0 h2 */
 
-	for (oldaddr = 0; oldaddr < length; oldaddr++)
+	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
-		newaddr = ((oldaddr << 1) & 0x3c00) |       /* move n7-n4 */
-					((oldaddr >> 4) & 0x0200) |       /* move n3 */
-					((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
-					((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
-					((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
+		uint32_t newaddr = ((oldaddr << 1) & 0x3c00) |       /* move n7-n4 */
+						   ((oldaddr >> 4) & 0x0200) |       /* move n3 */
+						   ((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
+						   ((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
+						   ((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
 		dst[newaddr] = src[oldaddr];
 	}
 
@@ -402,7 +393,7 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 	length = memregion("user1")->bytes();
 	memcpy(src, dst, length);
 
-	for (oldaddr = 0; oldaddr < 32; oldaddr++)
+	for (uint32_t oldaddr = 0; oldaddr < 32; oldaddr++)
 	{
 		memcpy(&dst[oldaddr * 32 * 8 * 2], &src[oldaddr * 32 * 8], 32 * 8);
 		memcpy(&dst[oldaddr * 32 * 8 * 2 + 32 * 8], &src[oldaddr * 32 * 8 + 0x2000], 32 * 8);
@@ -414,7 +405,7 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 	length = memregion("user2")->bytes();
 	memcpy(src, dst, length);
 
-	for (oldaddr = 0; oldaddr < 32; oldaddr++)
+	for (uint32_t oldaddr = 0; oldaddr < 32; oldaddr++)
 	{
 		memcpy(&dst[oldaddr * 32 * 8 * 2], &src[oldaddr * 32 * 8], 32 * 8);
 		memcpy(&dst[oldaddr * 32 * 8 * 2 + 32 * 8], &src[oldaddr * 32 * 8 + 0x2000], 32 * 8);
@@ -453,4 +444,4 @@ ROM_START( fcombat )
 	ROM_LOAD( "fcprom_c.a9",  0x0220, 0x0100, CRC(768ac120) SHA1(ceede1d6cbeae08da96ef52bdca2718a839d88ab) ) /* bg char mixer */
 ROM_END
 
-GAME( 1985, fcombat,  0,       fcombat, fcombat, fcombat_state, fcombat,  ROT90, "Jaleco", "Field Combat", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, fcombat, 0, fcombat, fcombat, fcombat_state, init_fcombat, ROT90, "Jaleco", "Field Combat", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "sstrangr.lh"
@@ -17,12 +18,17 @@
 class sstrangr_state : public driver_device
 {
 public:
-	sstrangr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sstrangr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
-		m_ram(*this, "ram") { }
+		m_ram(*this, "ram")
+	{ }
 
+	void sstrngr2(machine_config &config);
+	void sstrangr(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_ram;
@@ -35,8 +41,6 @@ public:
 
 	uint32_t screen_update_sstrangr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void sstrngr2(machine_config &config);
-	void sstrangr(machine_config &config);
 	void sstrangr_io_map(address_map &map);
 	void sstrangr_map(address_map &map);
 };
@@ -149,7 +153,7 @@ void sstrangr_state::sstrangr_io_map(address_map &map)
 {
 	map(0x41, 0x41).portr("DSW");
 	map(0x42, 0x42).portr("INPUTS");
-	map(0x44, 0x44).portr("EXT").w(this, FUNC(sstrangr_state::port_w));
+	map(0x44, 0x44).portr("EXT").w(FUNC(sstrangr_state::port_w));
 }
 
 
@@ -193,10 +197,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(sstrangr_state::sstrangr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080,1996800)   /* clock is a guess, taken from mw8080bw */
-	MCFG_CPU_PROGRAM_MAP(sstrangr_map)
-	MCFG_CPU_IO_MAP(sstrangr_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(sstrangr_state, irq0_line_hold, 2*60)
+	MCFG_DEVICE_ADD("maincpu",I8080,1996800)   /* clock is a guess, taken from mw8080bw */
+	MCFG_DEVICE_PROGRAM_MAP(sstrangr_map)
+	MCFG_DEVICE_IO_MAP(sstrangr_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(sstrangr_state, irq0_line_hold, 2*60)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -269,7 +273,7 @@ MACHINE_CONFIG_START(sstrangr_state::sstrngr2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(sstrangr_state, screen_update_sstrngr2)
 
-	MCFG_PALETTE_ADD_3BIT_RBG("palette")
+	PALETTE(config, m_palette, palette_device::RBG_3BIT);
 MACHINE_CONFIG_END
 
 
@@ -296,5 +300,5 @@ ROM_START( sstrangr2 )
 ROM_END
 
 
-GAMEL( 1978, sstrangr,  0,        sstrangr, sstrangr, sstrangr_state, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger",   MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_sstrangr )
-GAME(  1979, sstrangr2, sstrangr, sstrngr2, sstrngr2, sstrangr_state, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1978, sstrangr,  0,        sstrangr, sstrangr, sstrangr_state, empty_init, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger",   MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_sstrangr )
+GAME(  1979, sstrangr2, sstrangr, sstrngr2, sstrngr2, sstrangr_state, empty_init, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

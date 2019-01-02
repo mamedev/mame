@@ -148,6 +148,9 @@ public:
 #endif
 	{ }
 
+	void prodigy(machine_config &config);
+
+private:
 	NETDEV_LOGIC_CALLBACK_MEMBER(bcd_bit0_cb);
 	NETDEV_LOGIC_CALLBACK_MEMBER(bcd_bit1_cb);
 	NETDEV_LOGIC_CALLBACK_MEMBER(bcd_bit2_cb);
@@ -165,10 +168,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);
 
-	void prodigy(machine_config &config);
 	void maincpu_map(address_map &map);
-private:
-	required_device<cpu_device> m_maincpu;
+
+	required_device<m6502_device> m_maincpu;
 	required_device<ttl74145_device> m_74145;
 	uint8_t m_segments;
 	uint8_t m_digit_cache[4];
@@ -639,37 +641,39 @@ static INPUT_PORTS_START( prodigy )
 	PORT_BIT(0xc00, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(prodigy_state::prodigy)
+void prodigy_state::prodigy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_DEFAULT_LAYOUT(layout_prodigy)
+	M6502(config, m_maincpu, XTAL(2'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &prodigy_state::maincpu_map);
+	config.set_default_layout(layout_prodigy);
 
-	MCFG_DEVICE_ADD("io_74145", TTL74145, 0)
+	TTL74145(config, m_74145, 0);
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL(2'000'000))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(prodigy_state, irq_handler));
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(prodigy_state, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(prodigy_state, via_pb_w))
-	MCFG_VIA6522_READPA_HANDLER(READ8(prodigy_state, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(prodigy_state, via_pb_r))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(prodigy_state, via_cb1_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(prodigy_state, via_cb2_w))
+	VIA6522(config, m_via, XTAL(2'000'000));
+	m_via->irq_handler().set(FUNC(prodigy_state::irq_handler));
+	m_via->writepa_handler().set(FUNC(prodigy_state::via_pa_w));
+	m_via->writepb_handler().set(FUNC(prodigy_state::via_pb_w));
+	m_via->readpa_handler().set(FUNC(prodigy_state::via_pa_r));
+	m_via->readpb_handler().set(FUNC(prodigy_state::via_pb_r));
+	m_via->cb1_handler().set(FUNC(prodigy_state::via_cb1_w));
+	m_via->cb2_handler().set(FUNC(prodigy_state::via_cb2_w));
 
-	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, XTAL(2'000'000) * 30)
-	MCFG_NETLIST_SETUP(prodigy)
+	NETLIST_CPU(config, m_bcd, XTAL(2'000'000) * 30);
+	m_bcd->set_constructor(netlist_prodigy);
 
-	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cb1", "cb1.IN", 0)
-	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cb2", "cb2.IN", 0)
-	MCFG_NETLIST_LOGIC_OUTPUT(NETLIST_TAG, "bcd_bit0",  "bcd_bit0",  prodigy_state, bcd_bit0_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT(NETLIST_TAG, "bcd_bit1",  "bcd_bit1",  prodigy_state, bcd_bit1_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT(NETLIST_TAG, "bcd_bit2",  "bcd_bit2",  prodigy_state, bcd_bit2_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT(NETLIST_TAG, "bcd_bit3",  "bcd_bit3",  prodigy_state, bcd_bit3_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT(NETLIST_TAG, "bcd_bit4",  "bcd_bit4",  prodigy_state, bcd_bit4_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT(NETLIST_TAG, "bcd_bit5",  "bcd_bit5",  prodigy_state, bcd_bit5_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT(NETLIST_TAG, "bcd_bit6",  "bcd_bit6",  prodigy_state, bcd_bit6_cb, "")
-	MCFG_NETLIST_LOGIC_OUTPUT(NETLIST_TAG, "bcd_bit7",  "bcd_bit7",  prodigy_state, bcd_bit7_cb, "")
-MACHINE_CONFIG_END
+	NETLIST_LOGIC_INPUT(config, m_cb1); m_cb1->set_params("cb1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_cb2); m_cb2->set_params("cb2.IN", 0);
+
+	NETLIST_LOGIC_OUTPUT(config, "bcd:bcd_bit0").set_params("bcd_bit0", FUNC(prodigy_state::bcd_bit0_cb));
+	NETLIST_LOGIC_OUTPUT(config, "bcd:bcd_bit1").set_params("bcd_bit1", FUNC(prodigy_state::bcd_bit1_cb));
+	NETLIST_LOGIC_OUTPUT(config, "bcd:bcd_bit2").set_params("bcd_bit2", FUNC(prodigy_state::bcd_bit2_cb));
+	NETLIST_LOGIC_OUTPUT(config, "bcd:bcd_bit3").set_params("bcd_bit3", FUNC(prodigy_state::bcd_bit3_cb));
+	NETLIST_LOGIC_OUTPUT(config, "bcd:bcd_bit4").set_params("bcd_bit4", FUNC(prodigy_state::bcd_bit4_cb));
+	NETLIST_LOGIC_OUTPUT(config, "bcd:bcd_bit5").set_params("bcd_bit5", FUNC(prodigy_state::bcd_bit5_cb));
+	NETLIST_LOGIC_OUTPUT(config, "bcd:bcd_bit6").set_params("bcd_bit6", FUNC(prodigy_state::bcd_bit6_cb));
+	NETLIST_LOGIC_OUTPUT(config, "bcd:bcd_bit7").set_params("bcd_bit7", FUNC(prodigy_state::bcd_bit7_cb));
+}
 
 /*
  * 6522 VIA init sequence
@@ -717,5 +721,5 @@ ROM_START(prodigy)
 	ROM_LOAD("0x2000.bin",  0x0000, 0x02000, CRC(8d60345a) SHA1(fff18ff12e1b1be91f8eac1178605a682564eff2))
 ROM_END
 
-//    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      STATE          INIT  COMPANY,                FULLNAME,              FLAGS
-CONS( 1981, prodigy,    0,        0,      prodigy,   prodigy,   prodigy_state, 0,    "Applied Concepts Inc", "ACI Destiny Prodigy", MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT        COMPANY                 FULLNAME               FLAGS
+CONS( 1981, prodigy, 0,      0,      prodigy, prodigy, prodigy_state, empty_init, "Applied Concepts Inc", "ACI Destiny Prodigy", MACHINE_NO_SOUND )

@@ -132,6 +132,7 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -154,8 +155,8 @@ nevada TYPE2 :  64       45      51       06       32      02        31     31  
 class nevada_state : public driver_device
 {
 public:
-	nevada_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	nevada_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_duart(*this, {"duart18", "duart40", "duart39"}),
 		m_rtc(*this, "rtc"),
 		m_maincpu(*this, "maincpu"),
@@ -165,8 +166,16 @@ public:
 		m_backup(*this, "backup"),
 		m_vram(*this, "vram"),
 		m_gfxdecode(*this, "gfxdecode")
-		{ }
+	{ }
 
+	void nevada(machine_config &config);
+
+	void init_nevada();
+
+protected:
+	virtual void video_start() override;
+
+private:
 	required_device_array<mc68681_device, 3> m_duart;
 	required_device<msm6242_device> m_rtc;
 
@@ -179,20 +188,19 @@ public:
 	required_shared_ptr<uint16_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
-	uint16_t  m_datA40000;
-
-		//uint8_t* m_videoram;
-		//uint8_t* m_colorram;
+	//uint8_t* m_videoram;
+	//uint8_t* m_colorram;
 
 	tilemap_t *m_tilemap;
-	virtual void video_start() override;
-	uint32_t screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(nevada);
+	uint16_t  m_datA40000;
 
-	template<int N> DECLARE_READ8_MEMBER(duart_r);
-	template<int N> DECLARE_WRITE8_MEMBER(duart_w);
+	void nvram_init(nvram_device &nvram, void *data, size_t size);
+	uint32_t screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void nevada_palette(palette_device &palette) const;
+
+	template<int N> uint8_t duart_r(offs_t offset);
+	template<int N> void duart_w(offs_t offset, uint8_t data);
 	DECLARE_READ8_MEMBER(rtc_r);
 	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_READ16_MEMBER(io_board_r);
@@ -203,11 +211,9 @@ public:
 	DECLARE_WRITE16_MEMBER( vram_w );
 
 	DECLARE_MACHINE_START(nevada);
-	DECLARE_DRIVER_INIT(nevada);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void nevada(machine_config &config);
 	void nevada_map(address_map &map);
 };
 
@@ -224,23 +230,22 @@ funny thing , the DOOR ACCESS Switch is connected on the CLEAR  PIN of this 4bit
 so when D3..D0 are LOW , DOOR is OPEN
 */
 static const uint8_t pal35[256] = {
-0x11, 0x42, 0x5B, 0xCA, 0x19, 0x42, 0x5B, 0xCA, 0x38, 0x63, 0x3A, 0x63, 0x3A, 0x63, 0x3A, 0x63,
-0xD3, 0x08, 0x5B, 0xCA, 0x19, 0xCA, 0x19, 0xCA, 0x18, 0xEB, 0x18, 0xEB, 0x18, 0xEB, 0x18, 0xEB,
-0xD3, 0xCA, 0x5B, 0xCC, 0x5B, 0xCC, 0x5B, 0xCC, 0xBA, 0x63, 0x38, 0x65, 0x38, 0x65, 0x38, 0x65,
-0xD1, 0xCA, 0x5B, 0xC8, 0x5B, 0xC8, 0x5B, 0xC8, 0x9A, 0xEB, 0x1A, 0xED, 0x1A, 0xED, 0x1A, 0xED,
-0x0C, 0x65, 0xF0, 0x00, 0x64, 0xF5, 0x04, 0x65, 0xB8, 0x25, 0x20, 0x20, 0x24, 0x24, 0x24, 0x24,
-0xF0, 0x00, 0xF8, 0x00, 0xFC, 0x00, 0xFC, 0x00, 0xB8, 0x3D, 0xFC, 0x19, 0xFC, 0x19, 0xFC, 0x19,
-0x44, 0xF9, 0xC4, 0xF9, 0xC4, 0xFD, 0xC4, 0xFD, 0xFC, 0xFD, 0xFC, 0xFD, 0xFC, 0xFD, 0xFC, 0xFD,
-0xC0, 0xD9, 0xC8, 0xD9, 0xC8, 0xD9, 0xC8, 0xD9, 0xD8, 0xD9, 0xD8, 0xD9, 0xD8, 0xD9, 0xD8, 0xD9,
-0x0C, 0x44, 0xFB, 0x04, 0x67, 0xD4, 0x0C, 0x44, 0xBA, 0x24, 0x22, 0x02, 0x26, 0x06, 0x26, 0x06,
-0xFB, 0x00, 0xFB, 0x00, 0xEF, 0x10, 0xCE, 0x18, 0xEF, 0x18, 0xEF, 0x18, 0xFF, 0x18, 0xFF, 0x18,
-0x44, 0xF8, 0xC6, 0xD8, 0xCE, 0xDC, 0xCE, 0xDC, 0xEF, 0x9E, 0x67, 0xB8, 0x67, 0xBC, 0x67, 0xBC,
-0xC6, 0xD8, 0xCA, 0xD8, 0xCA, 0xD8, 0xCA, 0xD8, 0xCB, 0x9A, 0xEF, 0x9A, 0xFF, 0xD8, 0xDB, 0xD8,
-0x66, 0xF4, 0x00, 0x64, 0xBA, 0x25, 0x22, 0x22, 0x26, 0x26, 0x26, 0x26, 0xF2, 0x00, 0xFA, 0x00,
-0xFA, 0x00, 0xFA, 0x00, 0xBA, 0x3D, 0xFA, 0x19, 0xFA, 0x19, 0xFA, 0x19, 0x44, 0xF9, 0xC2, 0xF0,
-0xC2, 0xF4, 0xC2, 0xF4, 0xFA, 0xF4, 0xFA, 0xF4, 0xFA, 0xF4, 0xFA, 0xF4, 0xC2, 0xD0, 0xCA, 0xD0,
-0xCA, 0xD0, 0xCA, 0xD0, 0xDA, 0xD0, 0xDA, 0xD0, 0xDA, 0xD0, 0xDA, 0xD0, 0x08, 0x63, 0xD3, 0x08
-};
+	0x11, 0x42, 0x5b, 0xca, 0x19, 0x42, 0x5b, 0xca, 0x38, 0x63, 0x3a, 0x63, 0x3a, 0x63, 0x3a, 0x63,
+	0xd3, 0x08, 0x5b, 0xca, 0x19, 0xca, 0x19, 0xca, 0x18, 0xeb, 0x18, 0xeb, 0x18, 0xeb, 0x18, 0xeb,
+	0xd3, 0xca, 0x5b, 0xcc, 0x5b, 0xcc, 0x5b, 0xcc, 0xba, 0x63, 0x38, 0x65, 0x38, 0x65, 0x38, 0x65,
+	0xd1, 0xca, 0x5b, 0xc8, 0x5b, 0xc8, 0x5b, 0xc8, 0x9a, 0xeb, 0x1a, 0xed, 0x1a, 0xed, 0x1a, 0xed,
+	0x0c, 0x65, 0xf0, 0x00, 0x64, 0xf5, 0x04, 0x65, 0xb8, 0x25, 0x20, 0x20, 0x24, 0x24, 0x24, 0x24,
+	0xf0, 0x00, 0xf8, 0x00, 0xfc, 0x00, 0xfc, 0x00, 0xb8, 0x3d, 0xfc, 0x19, 0xfc, 0x19, 0xfc, 0x19,
+	0x44, 0xf9, 0xc4, 0xf9, 0xc4, 0xfd, 0xc4, 0xfd, 0xfc, 0xfd, 0xfc, 0xfd, 0xfc, 0xfd, 0xfc, 0xfd,
+	0xc0, 0xd9, 0xc8, 0xd9, 0xc8, 0xd9, 0xc8, 0xd9, 0xd8, 0xd9, 0xd8, 0xd9, 0xd8, 0xd9, 0xd8, 0xd9,
+	0x0c, 0x44, 0xfb, 0x04, 0x67, 0xd4, 0x0c, 0x44, 0xba, 0x24, 0x22, 0x02, 0x26, 0x06, 0x26, 0x06,
+	0xfb, 0x00, 0xfb, 0x00, 0xef, 0x10, 0xce, 0x18, 0xef, 0x18, 0xef, 0x18, 0xff, 0x18, 0xff, 0x18,
+	0x44, 0xf8, 0xc6, 0xd8, 0xce, 0xdc, 0xce, 0xdc, 0xef, 0x9e, 0x67, 0xb8, 0x67, 0xbc, 0x67, 0xbc,
+	0xc6, 0xd8, 0xca, 0xd8, 0xca, 0xd8, 0xca, 0xd8, 0xcb, 0x9a, 0xef, 0x9a, 0xff, 0xd8, 0xdb, 0xd8,
+	0x66, 0xf4, 0x00, 0x64, 0xba, 0x25, 0x22, 0x22, 0x26, 0x26, 0x26, 0x26, 0xf2, 0x00, 0xfa, 0x00,
+	0xfa, 0x00, 0xfa, 0x00, 0xba, 0x3d, 0xfa, 0x19, 0xfa, 0x19, 0xfa, 0x19, 0x44, 0xf9, 0xc2, 0xf0,
+	0xc2, 0xf4, 0xc2, 0xf4, 0xfa, 0xf4, 0xfa, 0xf4, 0xfa, 0xf4, 0xfa, 0xf4, 0xc2, 0xd0, 0xca, 0xd0,
+	0xca, 0xd0, 0xca, 0xd0, 0xda, 0xd0, 0xda, 0xd0, 0xda, 0xd0, 0xda, 0xd0, 0x08, 0x63, 0xd3, 0x08 };
 
 
 /***************************************************************************/
@@ -272,7 +277,7 @@ WRITE16_MEMBER( nevada_state::vram_w )
 }
 
 /***************************************************************************/
-static GFXDECODE_START( nevada )
+static GFXDECODE_START( gfx_nevada )
 	/* Todo  , just for sample */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   0, 8 )
 GFXDECODE_END
@@ -306,7 +311,7 @@ uint32_t nevada_state::screen_update_nevada(screen_device &screen, bitmap_ind16 
 }
 
 /***************************************************************************/
-PALETTE_INIT_MEMBER(nevada_state, nevada)
+void nevada_state::nevada_palette(palette_device &palette) const
 {
 	// Palette init
 }
@@ -340,15 +345,15 @@ void nevada_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 ***************************************************************************/
 
 template<int N>
-READ8_MEMBER(nevada_state::duart_r)
+uint8_t nevada_state::duart_r(offs_t offset)
 {
-	return m_duart[N]->read(space, offset >> 3);
+	return m_duart[N]->read(offset >> 3);
 }
 
 template<int N>
-WRITE8_MEMBER(nevada_state::duart_w)
+void nevada_state::duart_w(offs_t offset, uint8_t data)
 {
-	m_duart[N]->write(space, offset >> 3, data);
+	m_duart[N]->write(offset >> 3, data);
 }
 
 /***************************************************************************/
@@ -365,22 +370,6 @@ WRITE8_MEMBER(nevada_state::rtc_w)
 	m_rtc->write(space, offset >> 3, data);
 }
 
-/***************************************************************************/
-/*********************    SOUND SECTION     ********************************/
-/***************************************************************************/
-#if 0
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-//  DEVCB_INPUT_PORT("DSW1"),  /* not used */
-//  DEVCB_INPUT_PORT("DSW2"),  /* not used */
-	DEVCB_NOOP, /* callback for display state changes */
-	DEVCB_NOOP, /* callback for cursor state changes */
-	DEVCB_NOOP,
-	DEVCB_NOOP
-};
-#endif
 
 /***************************************************************************/
 READ16_MEMBER(nevada_state::io_board_r)
@@ -507,17 +496,17 @@ void nevada_state::nevada_map(address_map &map)
 	map(0x00010000, 0x00021fff).ram().share("backup");
 	map(0x00900001, 0x00900001).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x00908001, 0x00908001).w("crtc", FUNC(mc6845_device::register_w));
-	map(0x00a00000, 0x00a00001).rw(this, FUNC(nevada_state::io_board_r), FUNC(nevada_state::io_board_w));
-	map(0x00a08000, 0x00a08001).w(this, FUNC(nevada_state::io_board_x));
+	map(0x00a00000, 0x00a00001).rw(FUNC(nevada_state::io_board_r), FUNC(nevada_state::io_board_w));
+	map(0x00a08000, 0x00a08001).w(FUNC(nevada_state::io_board_x));
 	map(0x00a10000, 0x00a10001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x00a20001, 0x00a20001).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x00a28001, 0x00a28001).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x00a30000, 0x00a30001).select(0xf0).rw(this, FUNC(nevada_state::rtc_r), FUNC(nevada_state::rtc_w)).umask16(0x00ff);
-	map(0x00a40000, 0x00a40001).rw(this, FUNC(nevada_state::nevada_sec_r), FUNC(nevada_state::nevada_sec_w));
-	map(0x00b00000, 0x00b03fff).ram().w(this, FUNC(nevada_state::vram_w)).share("vram");
-	map(0x00b10000, 0x00b10001).select(0xf0).rw(this, FUNC(nevada_state::duart_r<1>), FUNC(nevada_state::duart_w<1>)).umask16(0x00ff); // Lower byte
-	map(0x00b20000, 0x00b20001).select(0xf0).rw(this, FUNC(nevada_state::duart_r<2>), FUNC(nevada_state::duart_w<2>)).umask16(0x00ff); // Lower byte
-	map(0x00e00000, 0x00e00001).select(0xf0).rw(this, FUNC(nevada_state::duart_r<0>), FUNC(nevada_state::duart_w<0>)).umask16(0xff00); // Upper byte
+	map(0x00a30000, 0x00a30001).select(0xf0).rw(FUNC(nevada_state::rtc_r), FUNC(nevada_state::rtc_w)).umask16(0x00ff);
+	map(0x00a40000, 0x00a40001).rw(FUNC(nevada_state::nevada_sec_r), FUNC(nevada_state::nevada_sec_w));
+	map(0x00b00000, 0x00b03fff).ram().w(FUNC(nevada_state::vram_w)).share("vram");
+	map(0x00b10000, 0x00b10001).select(0xf0).rw(FUNC(nevada_state::duart_r<1>), FUNC(nevada_state::duart_w<1>)).umask16(0x00ff); // Lower byte
+	map(0x00b20000, 0x00b20001).select(0xf0).rw(FUNC(nevada_state::duart_r<2>), FUNC(nevada_state::duart_w<2>)).umask16(0x00ff); // Lower byte
+	map(0x00e00000, 0x00e00001).select(0xf0).rw(FUNC(nevada_state::duart_r<0>), FUNC(nevada_state::duart_w<0>)).umask16(0xff00); // Upper byte
 	map(0x00fa0000, 0x00fbffff).ram();  // not used
 	map(0x00fc0000, 0x00ffffff).rom();  // ROM ext + ROM boot
 }
@@ -583,15 +572,14 @@ MACHINE_START_MEMBER(nevada_state, nevada)
 
 MACHINE_CONFIG_START(nevada_state::nevada)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CPU)
-	MCFG_CPU_PROGRAM_MAP(nevada_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CPU)
+	MCFG_DEVICE_PROGRAM_MAP(nevada_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(150))   /* 150ms Ds1232 TD to Ground */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(150));   /* 150ms Ds1232 TD to Ground */
 
 	MCFG_MACHINE_START_OVERRIDE(nevada_state, nevada)
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", nevada_state, nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(nevada_state::nvram_init));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -602,19 +590,18 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 	MCFG_SCREEN_UPDATE_DRIVER(nevada_state, screen_update_nevada)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nevada)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(nevada_state, nevada)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_nevada);
+	PALETTE(config, "palette", FUNC(nevada_state::nevada_palette), 256);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MC6845_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", MC6845_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, SOUND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	AY8912(config, "aysnd", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	MCFG_DEVICE_ADD("duart18", MC68681, XTAL(3'686'400))  // UARTA = Modem 1200Baud
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
@@ -626,10 +613,10 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 
 	MCFG_DEVICE_ADD("duart40", MC68681, XTAL(3'686'400))  // UARTA = Touch , UARTB = Bill Acceptor
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_5))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_device, rx))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("microtouch", microtouch_device, rx))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW3"))
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("duart40", mc68681_device, rx_a_w) )
+	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("duart40", mc68681_device, rx_a_w) )
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
@@ -663,7 +650,7 @@ ROM_END
 /*************************
 *      Driver Init       *
 *************************/
-DRIVER_INIT_MEMBER(nevada_state,nevada)
+void nevada_state::init_nevada()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -690,5 +677,5 @@ DRIVER_INIT_MEMBER(nevada_state,nevada)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME     PARENT MACHINE INPUT   STATE         INIT    ROT   COMPANY     FULLNAME             FLAGS
-GAME( 1995, nevada,  0,     nevada, nevada, nevada_state, nevada, ROT0, "VLC Inc.", "VLC Nevada",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT MACHINE INPUT   STATE         INIT         ROT   COMPANY     FULLNAME             FLAGS
+GAME( 1995, nevada,  0,     nevada, nevada, nevada_state, init_nevada, ROT0, "VLC Inc.", "VLC Nevada",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

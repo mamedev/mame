@@ -160,9 +160,9 @@ Notes:
 
       ROMs
       ----
-         PGM_M01S.U18 - 16MBit MASKROM (TSOP48)
-         PGM_P01S.U20 - 1MBit  MASKROM (DIP40, socketed, equivalent to 27C1024 EPROM)
-         PGM_T01S.U29 - 16MBit MASKROM (SOP44)
+         PGM_M01S.U18 - 16MBit mask ROM (TSOP48)
+         PGM_P01S.U20 - 1MBit  mask ROM (DIP40, socketed, equivalent to 27C1024 EPROM)
+         PGM_T01S.U29 - 16MBit mask ROM (SOP44)
 
       CUSTOM IC's
       -----------
@@ -260,7 +260,7 @@ WRITE16_MEMBER(pgm_state::z80_reset_w)
 	{
 		m_ics->reset();
 		m_soundcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_soundcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_soundcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 	else
 	{
@@ -283,7 +283,7 @@ WRITE16_MEMBER(pgm_state::m68k_l1_w)
 		if (PGMLOGERROR)
 			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, m_maincpu->pc());
 		m_soundlatch->write(space, 0, data);
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -307,7 +307,7 @@ void pgm_state::pgm_z80_mem(address_map &map)
 void pgm_state::pgm_z80_io(address_map &map)
 {
 	map(0x8000, 0x8003).rw("ics", FUNC(ics2115_device::read), FUNC(ics2115_device::write));
-	map(0x8100, 0x81ff).r(m_soundlatch3, FUNC(generic_latch_8_device::read)).w(this, FUNC(pgm_state::z80_l3_w));
+	map(0x8100, 0x81ff).r(m_soundlatch3, FUNC(generic_latch_8_device::read)).w(FUNC(pgm_state::z80_l3_w));
 	map(0x8200, 0x82ff).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 	map(0x8400, 0x84ff).rw("soundlatch2", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 }
@@ -320,24 +320,24 @@ void pgm_state::pgm_base_mem(address_map &map)
 
 	map(0x800000, 0x81ffff).ram().mirror(0x0e0000).share("sram"); /* Main Ram */
 
-	map(0x900000, 0x907fff).mirror(0x0f8000).rw(this, FUNC(pgm_state::pgm_videoram_r), FUNC(pgm_state::pgm_videoram_w)).share("videoram"); /* IGS023 VIDEO CHIP */
+	map(0x900000, 0x907fff).mirror(0x0f8000).rw(FUNC(pgm_state::pgm_videoram_r), FUNC(pgm_state::pgm_videoram_w)).share("videoram"); /* IGS023 VIDEO CHIP */
 	map(0xa00000, 0xa011ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xb00000, 0xb0ffff).ram().share("videoregs"); /* Video Regs inc. Zoom Table */
 
 	map(0xc00003, 0xc00003).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xc00002, 0xc00003).w(this, FUNC(pgm_state::m68k_l1_w));
+	map(0xc00002, 0xc00003).w(FUNC(pgm_state::m68k_l1_w));
 	map(0xc00005, 0xc00005).rw("soundlatch2", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 	map(0xc00007, 0xc00007).rw("rtc", FUNC(v3021_device::read), FUNC(v3021_device::write));
-	map(0xc00008, 0xc00009).w(this, FUNC(pgm_state::z80_reset_w));
-	map(0xc0000a, 0xc0000b).w(this, FUNC(pgm_state::z80_ctrl_w));
+	map(0xc00008, 0xc00009).w(FUNC(pgm_state::z80_reset_w));
+	map(0xc0000a, 0xc0000b).w(FUNC(pgm_state::z80_ctrl_w));
 	map(0xc0000d, 0xc0000d).rw(m_soundlatch3, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
 
 	map(0xc08000, 0xc08001).portr("P1P2");
 	map(0xc08002, 0xc08003).portr("P3P4");
 	map(0xc08004, 0xc08005).portr("Service");
-	map(0xc08006, 0xc08007).portr("DSW").w(this, FUNC(pgm_state::pgm_coin_counter_w));
+	map(0xc08006, 0xc08007).portr("DSW").w(FUNC(pgm_state::pgm_coin_counter_w));
 
-	map(0xc10000, 0xc1ffff).rw(this, FUNC(pgm_state::z80_ram_r), FUNC(pgm_state::z80_ram_w)); /* Z80 Program */
+	map(0xc10000, 0xc1ffff).rw(FUNC(pgm_state::z80_ram_r), FUNC(pgm_state::z80_ram_w)); /* Z80 Program */
 }
 
 void pgm_state::pgm_mem(address_map &map)
@@ -477,7 +477,7 @@ static const gfx_layout pgm32_charlayout =
 		32*160
 };
 
-GFXDECODE_START( pgm )
+GFXDECODE_START( gfx_pgm )
 	GFXDECODE_REVERSEBITS( "tiles", 0, pgm8_charlayout,    0x800, 32  ) /* 8x8x4 Tiles */
 	GFXDECODE_REVERSEBITS( "tiles", 0, pgm32_charlayout,   0x400, 32  ) /* 32x32x5 Tiles */
 GFXDECODE_END
@@ -490,7 +490,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::pgm_interrupt)
 {
 	int scanline = param;
 
-// already being generated  by MCFG_CPU_VBLANK_INT_DRIVER("screen", pgm_state,  irq6_line_hold)
+// already being generated  by MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pgm_state,  irq6_line_hold)
 //  if(scanline == 224)
 //      m_maincpu->set_input_line(6, HOLD_LINE);
 
@@ -508,54 +508,56 @@ MACHINE_RESET_MEMBER(pgm_state,pgm)
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(pgm_state::pgmbase)
+void pgm_state::pgmbase(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 20000000) /* 20 mhz! verified on real board */
-	MCFG_CPU_PROGRAM_MAP(pgm_basic_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pgm_state,  irq6_line_hold)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pgm_state, pgm_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, 20000000); /* 20 mhz! verified on real board */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_state::pgm_basic_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(pgm_state::irq6_line_hold));
+	TIMER(config, "scantimer").configure_scanline(FUNC(pgm_state::pgm_interrupt), "screen", 0, 1);
 
-	MCFG_CPU_ADD("soundcpu", Z80, 33868800/4)
-	MCFG_CPU_PROGRAM_MAP(pgm_z80_mem)
-	MCFG_CPU_IO_MAP(pgm_z80_io)
+	Z80(config, m_soundcpu, 33868800/4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &pgm_state::pgm_z80_mem);
+	m_soundcpu->set_addrmap(AS_IO, &pgm_state::pgm_z80_io);
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_state, pgm )
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_state, pgm )
-	MCFG_NVRAM_ADD_0FILL("sram")
 
-	MCFG_V3021_ADD("rtc")
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
+
+	V3021(config, "rtc");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60) // killing blade won't boot (just displays 'error') if this is lower than 59.9 or higher than 60.1 .. are actual PGM boards different to the Cave one?
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pgm_state, screen_update_pgm)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm_state, screen_vblank_pgm))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60); // killing blade won't boot (just displays 'error') if this is lower than 59.9 or higher than 60.1 .. are actual PGM boards different to the Cave one?
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 56*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(pgm_state::screen_update_pgm));
+	screen.screen_vblank().set(FUNC(pgm_state::screen_vblank_pgm));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgm)
-	MCFG_PALETTE_ADD("palette", 0x1200/2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pgm);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1200/2);
 
 	MCFG_VIDEO_START_OVERRIDE(pgm_state,pgm)
 
 	/*sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch2");
+	GENERIC_LATCH_8(config, m_soundlatch3);
 
-	MCFG_ICS2115_ADD("ics", 0)
-	MCFG_ICS2115_IRQ_CB(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
-MACHINE_CONFIG_END
+	ICS2115(config, m_ics, 0);
+	m_ics->irq().set_inputline("soundcpu", 0);
+	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
+}
 
-MACHINE_CONFIG_START(pgm_state::pgm)
+void pgm_state::pgm(machine_config &config)
+{
 	pgmbase(config);
-MACHINE_CONFIG_END
+}
 
 
 /*** Rom Loading *************************************************************/
@@ -563,7 +565,7 @@ MACHINE_CONFIG_END
 /* take note of "sprmask" needed for expanding the Sprite Colour Data */
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 #define PGM_68K_BIOS \
 	ROM_SYSTEM_BIOS( 0, "v2",     "PGM Bios V2" ) \
@@ -922,8 +924,8 @@ Notes:
       V-110X.U2    - AM27C4096 4MBit EPROM (DIP42, labelled "DRAGON II V-100C")
 
       PALs         - x3, labelled "CZ U3", "CZ U4", "CZ U6"
-      *1           - Unpopulated position for MX23C4100 SOP40 MASKROM
-      *2           - Unpopulated position for MX23C4100 DIP40 EPROM/MASKROM
+      *1           - Unpopulated position for MX23C4100 SOP40 mask ROM
+      *2           - Unpopulated position for MX23C4100 DIP40 EPROM/mask ROM
 
 
 IGS PCB NO-0135
@@ -941,7 +943,7 @@ IGS PCB NO-0135
   |--------------------||---------------------|
 
 Notes:
-      This PCB contains only SOP44 MASKROMS and 2 logic IC's
+      This PCB contains only SOP44 mask ROMS and 2 logic IC's
       Only U5 and U9 are populated
 
       glitch on select screen exists on real board.
@@ -1151,10 +1153,10 @@ IGS025 ASIC
 1x PAL
 2x 27C040 EPROMs (main 68k program)
 1x 27C512 EPROM (protection code?)
-1x 32MBit smt MASKROM (T0400)
+1x 32MBit smt mask ROM (T0400)
 
 Bottom board contains.....
-4x 32MBit smt MASKROMs (A0400, A0401, B0400, M0400)
+4x 32MBit smt mask ROMs (A0400, A0401, B0400, M0400)
 
 */
 
@@ -1711,7 +1713,7 @@ ROM_END
 ROM_START( kovqhsgs )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "qhsg_c51.rom", 0x100000, 0x400000, CRC(e5cbac85) SHA1(4b424206387057863990b04f6d5bd0b6f754814f) )
+	ROM_LOAD16_WORD_SWAP( "qhsg_c51.rom", 0x100000, 0x400000, CRC(e5cbac85) SHA1(4b424206387057863990b04f6d5bd0b6f754814f) ) // V300CN V303CN Nov 21 2008 19:03:49
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "qhsg_prot.c51", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
@@ -1752,7 +1754,7 @@ C994746
 ROM_START( photoy2k )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "p0701_v105.u2",     0x100000, 0x200000, CRC(fab142e0) SHA1(8dc7e53b740ed68bac98c0ef7ca4943c517e6f5d) )
+	ROM_LOAD16_WORD_SWAP( "p0701_v105.u2",     0x100000, 0x200000, CRC(fab142e0) SHA1(8dc7e53b740ed68bac98c0ef7ca4943c517e6f5d) ) // 10/12/99 21:07:53
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "igs027a_photoy2k_v100_china.asic", 0x000000, 0x04000, CRC(1a0b68f6) SHA1(290441ed652f54b26ace8f59a26220881fb62084) ) // 3 bytes differ from the read in the other sets.  I think this one is GOOD and the other is bad.  This always gives the same read, so unless the actual chips is bad... TBC
@@ -1782,7 +1784,7 @@ ROM_END
 ROM_START( photoy2k104 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "v104.16m",     0x100000, 0x200000, CRC(e051070f) SHA1(a5a1a8dd7542a30632501af8d02fda07475fd9aa) )
+	ROM_LOAD16_WORD_SWAP( "v104.16m",     0x100000, 0x200000, CRC(e051070f) SHA1(a5a1a8dd7542a30632501af8d02fda07475fd9aa) ) // 06/10/99 17:28:34
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "igs027a_photoy2k_v100_china_alt.asic", 0x000000, 0x04000,  CRC(6dd7f257) SHA1(1984f98a282d8b3264674f231c3b7def1757cf72) )
@@ -1841,7 +1843,7 @@ CG_V101.U6
 ROM_START( photoy2k102 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_BYTE( "v102.u4",     0x100001, 0x080000, CRC(a65eda9f) SHA1(6307cacf4a262e781753eff14700a0455837780c) )
+	ROM_LOAD16_BYTE( "v102.u4",     0x100001, 0x080000, CRC(a65eda9f) SHA1(6307cacf4a262e781753eff14700a0455837780c) ) // 05/03/99 16:06:33
 	ROM_LOAD16_BYTE( "v102.u6",     0x100000, 0x080000, CRC(b9ca5504) SHA1(058cf01316f233236ca9861349f515935283b75e) )
 	ROM_LOAD16_BYTE( "v102.u5",     0x200001, 0x080000, CRC(9201621b) SHA1(1ca3ebe7eec40614bfa8b911657fa2b51f2c51a4) )
 	ROM_LOAD16_BYTE( "v102.u8",     0x200000, 0x080000, CRC(3be22b8f) SHA1(03634fbd6a8a8369c6cb1fd6694a3784dac5bf59) )
@@ -1893,7 +1895,7 @@ PCB Number: IGS PCB-0314-00
 ROM_START( py2k2 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "y2k2_m-101xx.u1",     0x100000, 0x200000, CRC(c47795f1) SHA1(5be4af4275571932d7740c3ea0857a1f58a3f6d9) ) // 68k (encrypted) 2nd half empty...
+	ROM_LOAD16_WORD_SWAP( "y2k2_m-101xx.u1",     0x100000, 0x200000, CRC(c47795f1) SHA1(5be4af4275571932d7740c3ea0857a1f58a3f6d9) ) // 68k (encrypted) 2nd half empty...; 05/25/01 11:02:54
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "igs027a_photoy2k2.asic", 0x000000, 0x04000, NO_DUMP )
@@ -1921,7 +1923,7 @@ ROM_END
 ROM_START( pgm3in1 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "v-100cn.u3",     0x100000, 0x200000, CRC(a39f59b4) SHA1(4eb53fb9f173cb470e16dc8f193c8909cf045e3d)) // 68k (encrypted)
+	ROM_LOAD16_WORD_SWAP( "v-100cn.u3",     0x100000, 0x200000, CRC(a39f59b4) SHA1(4eb53fb9f173cb470e16dc8f193c8909cf045e3d)) // M68K V100 07/13/04 12:09:20 (encrypted)
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "igs027a_pgm3in1.asic", 0x000000, 0x04000, NO_DUMP )
@@ -1987,7 +1989,7 @@ Notes:
       U5           - 27C4000 4MBit EPROM (DIP32, labelled "KB U5 V104")
       U6           - 27C4000 4MBit EPROM (DIP32, labelled "KB U6 V104")
       PALs         - x3, labelled "DH U8", "DH U1", "DH U7"
-      *            - Unpopulated position for DIP42 EPROM/MASKROM (labelled "P0300")
+      *            - Unpopulated position for DIP42 EPROM/mask ROM (labelled "P0300")
 
 
 IGS PCB NO-0178
@@ -2005,19 +2007,19 @@ IGS PCB NO-0178
   |--------------------||---------------------|
 
 Notes:
-      U1           - 32MBit MASKROM (SOP44, labelled "M0300")
-      U2           - 32MBit MASKROM (SOP44, labelled "A0307")
-      U3           - 16MBit MASKROM (DIP42, labelled "A0302")
-      U4           - 16MBit MASKROM (DIP42, labelled "A0304")
-      U5           - 16MBit MASKROM (DIP42, labelled "A0305")
-      U8           - 16MBit MASKROM (DIP42, labelled "B0301")
-      U9           - 32MBit MASKROM (SOP44, labelled "A0300")
-      U10          - 32MBit MASKROM (SOP44, labelled "A0301")
-      U11          - 32MBit MASKROM (SOP44, labelled "A0303")
-      U12          - 32MBit MASKROM (SOP44, labelled "A0306")
-      U13          - 32MBit MASKROM (SOP44, labelled "B0300")
-      U14          - 32MBit MASKROM (SOP44, labelled "B0302")
-      U15          - 32MBit MASKROM (SOP44, labelled "B0303")
+      U1           - 32MBit mask ROM (SOP44, labelled "M0300")
+      U2           - 32MBit mask ROM (SOP44, labelled "A0307")
+      U3           - 16MBit mask ROM (DIP42, labelled "A0302")
+      U4           - 16MBit mask ROM (DIP42, labelled "A0304")
+      U5           - 16MBit mask ROM (DIP42, labelled "A0305")
+      U8           - 16MBit mask ROM (DIP42, labelled "B0301")
+      U9           - 32MBit mask ROM (SOP44, labelled "A0300")
+      U10          - 32MBit mask ROM (SOP44, labelled "A0301")
+      U11          - 32MBit mask ROM (SOP44, labelled "A0303")
+      U12          - 32MBit mask ROM (SOP44, labelled "A0306")
+      U13          - 32MBit mask ROM (SOP44, labelled "B0300")
+      U14          - 32MBit mask ROM (SOP44, labelled "B0302")
+      U15          - 32MBit mask ROM (SOP44, labelled "B0303")
 
 */
 
@@ -2102,6 +2104,42 @@ ROM_START( killbld104 )
 	ROM_LOAD( "m0300.u1",     0x400000, 0x400000, CRC(93159695) SHA1(50c5976c9b681bd3d1ebefa3bfa9fe6e72dcb96f) )
 ROM_END
 
+ROM_START( killbld106 )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_BYTE( "kb_u3_v106.u3",     0x100001, 0x080000, CRC(33b9111a) SHA1(26875a9e502af9a36d13077cb7b07f9d28773d72) )
+	ROM_LOAD16_BYTE( "kb_u6_v106.u6",     0x100000, 0x080000, CRC(1c957bd7) SHA1(2bb54915166b4a62148de043b2c2088d39b91f14) )
+	ROM_LOAD16_BYTE( "kb_u4_v106.u4",     0x200001, 0x080000, CRC(169bbaaf) SHA1(a1833d3fd024c43ba7642f13e83a5b7b66631136) )
+	ROM_LOAD16_BYTE( "kb_u5_v106.u5",     0x200000, 0x080000, CRC(df85abd4) SHA1(f9e37f76c7af8a8492bd1fd22d8b3fbda194ed03) )
+
+	ROM_REGION( 0x010000, "igs022data", 0 ) /* Protection Data */
+	ROM_LOAD( "kb_u2_v106.u2", 0x000000, 0x010000,  CRC(5df8cf51) SHA1(d82e281a43015da653fc37e97f52943e03a07112) )
+
+	ROM_REGION( 0x800000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "t0300.u14",    0x180000, 0x400000, CRC(0922f7d9) SHA1(4302b4b7369e13f315fad14f7d6cad1321101d24) )
+
+	ROM_REGION( 0x2000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a0300.u9",   0x0000000, 0x0400000,  CRC(3f9455d3) SHA1(3718ce00ad93975383aafc14e5a74dc297b011a1) )
+	ROM_LOAD( "a0301.u10",  0x0400000, 0x0400000,  CRC(92776889) SHA1(6d677837fefff47bfd1c6166322f69f89989a5e2) )
+	ROM_LOAD( "a0303.u11",  0x0800000, 0x0400000,  CRC(33f5cc69) SHA1(9cacd5058d4bb25b77f71658bbbbd4b38d0a6b6a) )
+	ROM_LOAD( "a0306.u12",  0x0c00000, 0x0400000,  CRC(cc018a8e) SHA1(37752d46f238fb57c0ab5a4f96b1e013f2077347) )
+	ROM_LOAD( "a0307.u2",   0x1000000, 0x0400000,  CRC(bc772e39) SHA1(079cc42a190cb916f02b59bca8fa90e524acefe9) )
+//  ROM_LOAD( "a0302.u3",   0x1400000, 0x0200000,  CRC(a4810e38) SHA1(c31fe641feab2c93795fc35bf71d4f37af1056d4) ) // from lord of gun! unused..
+//  ROM_LOAD( "a0304.u4",   0x1600000, 0x0200000,  CRC(3096de1c) SHA1(d010990d21cfda9cb8ab5b4bc0e329c23b7719f5) ) // from lord of gun! unused..
+//  ROM_LOAD( "a0305.u5",   0x1800000, 0x0200000,  CRC(2234531e) SHA1(58a82e31a1c0c1a4dd026576319f4e7ecffd140e) ) // from lord of gun! unused..
+
+	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b0300.u13",    0x0000000, 0x0400000, CRC(7f876981) SHA1(43555a200929ad5ecc42137fc9aeb42dc4f50d20) )
+	ROM_LOAD( "b0302.u14",    0x0400000, 0x0400000, CRC(eea9c502) SHA1(04b3972c7111ea59a3cceab6ad124080c4ce3520) )
+	ROM_LOAD( "b0303.u15",    0x0800000, 0x0200000, CRC(77a9652e) SHA1(2342f643d37945fbda224a5034c013796e5134ca) )
+//  ROM_LOAD( "b0301.u8",     0x0a00000, 0x0200000, CRC(400abe33) SHA1(20de1eb626424ea41bd55eb3cecd6b50be744ee0) ) // from lord of gun! unused..
+
+	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "m0300.u1",     0x400000, 0x400000, CRC(93159695) SHA1(50c5976c9b681bd3d1ebefa3bfa9fe6e72dcb96f) )
+ROM_END
+
 
 
 
@@ -2133,7 +2171,7 @@ Notes:
       U1_V100MG.U1  - MX27C4000 512K x8 EPROM (DIP32, labelled 'PuzzleStar U1 V100MG')
       U2_V100MG.U2  - MX27C4000 512K x8 EPROM (DIP32, labelled 'PuzzleStar U2 V100MG')
       PAL           - Atmel ATF22V10B PAL (DIP24, labelled 'EA U4')
-      U3            - Unpopulated position for 32MBit MASKROM (DIP42)
+      U3            - Unpopulated position for 32MBit mask ROM (DIP42)
       U6, U7        - Unpopulated position for 74LS245 logic chip (x2)
 
 
@@ -2212,7 +2250,7 @@ Notes:
       V101.U2/3/4/5- MX27C4000 4MBit EPROM (DIP32)
       PALs         - x2, labelled "CW-2 U8", "CW-2 U7"
       6264         - 8K x8 SRAM
-      *1           - Unpopulated position for SOP44 MASKROM labelled "P0500"
+      *1           - Unpopulated position for SOP44 mask ROM labelled "P0500"
 
 
 IGS PCB NO-0135
@@ -2396,7 +2434,7 @@ ROM_END
 ROM_START( kov2 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "u18.107",      0x100000, 0x400000, CRC(661a5b2c) SHA1(125054fabc93d4f4cba869c3e6adf863650d30cf) )
+	ROM_LOAD16_WORD_SWAP( "u18.107",      0x100000, 0x400000, CRC(661a5b2c) SHA1(125054fabc93d4f4cba869c3e6adf863650d30cf) ) // 05/10/01 14:24:08 V107
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2_v100_hongkong.asic", 0x000000, 0x04000,  CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) )
@@ -2426,7 +2464,7 @@ ROM_END
 ROM_START( kov2106 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "u18.106",    0x100000, 0x400000, CRC(40051ad9) SHA1(ba2ddf267fe688d5dfed575aeeccbab10135b37b) )
+	ROM_LOAD16_WORD_SWAP( "u18.106",    0x100000, 0x400000, CRC(40051ad9) SHA1(ba2ddf267fe688d5dfed575aeeccbab10135b37b) ) // 02/27/01 13:26:46 V106
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2_v100_hongkong.asic", 0x000000, 0x04000,  CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) )
@@ -2457,7 +2495,7 @@ ROM_END
 ROM_START( kov2104 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "u18.104",    0x100000, 0x400000, CRC(0fdb050b) SHA1(8ac704459e1a17d0956dd3529e81b6bcd8abf361) )
+	ROM_LOAD16_WORD_SWAP( "u18.104",    0x100000, 0x400000, CRC(0fdb050b) SHA1(8ac704459e1a17d0956dd3529e81b6bcd8abf361) ) // 01/19/01 10:19:38 V104
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2_v100_hongkong.asic", 0x000000, 0x04000,  CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) )
@@ -2488,7 +2526,7 @@ ROM_END
 ROM_START( kov2103 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "u18.103",    0x100000, 0x400000, CRC(98c32f76) SHA1(ec7e35e8071bb7097e415493be4e40be0ca19fd6) )
+	ROM_LOAD16_WORD_SWAP( "u18.103",    0x100000, 0x400000, CRC(98c32f76) SHA1(ec7e35e8071bb7097e415493be4e40be0ca19fd6) ) // 12/28/00 15:09:31 V103
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2_v100_hongkong.asic", 0x000000, 0x04000,  CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) )
@@ -2519,7 +2557,7 @@ ROM_END
 ROM_START( kov2102 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "u18.102",    0x100000, 0x400000, CRC(a2489c37) SHA1(77ea7cdec211848296dafd45bee1d042133ea2a6) )
+	ROM_LOAD16_WORD_SWAP( "u18.102",    0x100000, 0x400000, CRC(a2489c37) SHA1(77ea7cdec211848296dafd45bee1d042133ea2a6) ) // 12/14/00 10:33:36 V102
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2_v100_hongkong.asic", 0x000000, 0x04000,  CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) )
@@ -2550,7 +2588,7 @@ ROM_END
 ROM_START( kov2101 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "u18.101",    0x100000, 0x400000, CRC(c9926f35) SHA1(a9c72d0c5d239164107894c7d3fffe4af29ed201) )
+	ROM_LOAD16_WORD_SWAP( "u18.101",    0x100000, 0x400000, CRC(c9926f35) SHA1(a9c72d0c5d239164107894c7d3fffe4af29ed201) ) // 12/07/00 16:40:30 V101
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2_v100_hongkong.asic", 0x000000, 0x04000,  CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) )
@@ -2581,7 +2619,7 @@ ROM_END
 ROM_START( kov2100 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "igs_u18.rom",    0x100000, 0x400000, CRC(86205879) SHA1(f73d5b70b41d39be1cac75e474b025de2cce0b01) )
+	ROM_LOAD16_WORD_SWAP( "igs_u18.rom",    0x100000, 0x400000, CRC(86205879) SHA1(f73d5b70b41d39be1cac75e474b025de2cce0b01) ) // 11/29/00 11:03:08 V100
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2_v100_hongkong.asic", 0x000000, 0x04000,  CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) )
@@ -2613,7 +2651,7 @@ ROM_END
 ROM_START( kov2p )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "u8-27322.rom",    0x100000, 0x400000, CRC(3a2cc0de) SHA1(d7511478b34bfb03b2fb5b8268b60502d05b9414) )
+	ROM_LOAD16_WORD_SWAP( "u8-27322.rom",    0x100000, 0x400000, CRC(3a2cc0de) SHA1(d7511478b34bfb03b2fb5b8268b60502d05b9414) ) // 04/25/02 17:48:27 M205XX
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2p_igs027a_china.bin", 0x000000, 0x04000, CRC(19a0bd95) SHA1(83e9f22512832a51d41c588debe8be7adb3b1df7) )
@@ -2644,7 +2682,7 @@ ROM_END
 ROM_START( kov2p204 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "v204-32m.rom",    0x100000, 0x400000, CRC(583e0650) SHA1(2e5656dd9c6cba9f84af9baa3f5f70cdccf9db47) )
+	ROM_LOAD16_WORD_SWAP( "v204-32m.rom",    0x100000, 0x400000, CRC(583e0650) SHA1(2e5656dd9c6cba9f84af9baa3f5f70cdccf9db47) ) // 08/28/01 09:11:49 M204XX
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2p_igs027a_china.bin", 0x000000, 0x04000, CRC(19a0bd95) SHA1(83e9f22512832a51d41c588debe8be7adb3b1df7) )
@@ -2675,7 +2713,38 @@ ROM_END
 ROM_START( kov2p202 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "v202.bin",    0x100000, 0x400000, CRC(e9b5aa0c) SHA1(39a776c8501e8557d305cfa56c997f9adeb6bcd2) )
+	ROM_LOAD16_WORD_SWAP( "v202.bin",    0x100000, 0x400000, CRC(e9b5aa0c) SHA1(39a776c8501e8557d305cfa56c997f9adeb6bcd2) ) // 07/09/01 11:03:50 M202XX
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "kov2p_igs027a_china.bin", 0x000000, 0x04000, CRC(19a0bd95) SHA1(83e9f22512832a51d41c588debe8be7adb3b1df7) )
+
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
+	ROM_LOAD( "v200-16.rom", 0x000000, 0x200000,  CRC(16a0c11f) SHA1(ce449cef76ebd5657d49b57951e2eb0f132e203e) )
+
+	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "t1200.rom",    0x180000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
+
+	ROM_REGION( 0x2800000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a1200.rom",    0x0000000, 0x0800000, CRC(ceeb81d8) SHA1(5476729443fc1bc9593ae10fbf7cbc5d7290b017) )
+	ROM_LOAD( "a1201.rom",    0x0800000, 0x0800000, CRC(21063ca7) SHA1(cf561b44902425a920d5cbea5bf65dd9530b2289) )
+	ROM_LOAD( "a1202.rom",    0x1000000, 0x0800000, CRC(4bb92fae) SHA1(f0b6d72ed425de1c69dc8f8d5795ea760a4a59b0) )
+	ROM_LOAD( "a1203.rom",    0x1800000, 0x0800000, CRC(e73cb627) SHA1(4c6e48b845a5d1e8f9899010fbf273d54c2b8899) )
+	ROM_LOAD( "a1204.rom",    0x2000000, 0x0200000, CRC(14b4b5bb) SHA1(d7db5740eec971f2782fb2885ee3af8f2a796550) )
+
+	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b1200.rom",   0x0000000, 0x0800000,  CRC(bed7d994) SHA1(019dfba8154256d64cd249eb0fa4c451edce34b8) )
+	ROM_LOAD( "b1201.rom",   0x0800000, 0x0800000,  CRC(f251eb57) SHA1(56a5fc14ab7822f83379cecb26638e5bb266349a) )
+
+	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "m1200.rom",    0x800000, 0x800000, CRC(b0d88720) SHA1(44ab137e3f8e15b7cb5697ffbd9b1143d8210c4f) )
+ROM_END
+
+ROM_START( kov2p200 )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "v200_32m.ic8",    0x100000, 0x400000, CRC(9a09fd61) SHA1(690a0b323e1f275a08ba84febf93bf8edc2d0802) ) // 06/18/01  22:59:12 M200XX
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov2p_igs027a_china.bin", 0x000000, 0x04000, CRC(19a0bd95) SHA1(83e9f22512832a51d41c588debe8be7adb3b1df7) )
@@ -2706,7 +2775,7 @@ ROM_END
 /*
 
 Do Donpachi II
-Cave, 2001
+IGS (Cave license), 2001
 
 This is a PGM cart containing not a lot....
 5x SOP44 mask ROMs (4x 64M, 1x 32M)
@@ -2765,15 +2834,15 @@ Some logic IC's, resistors, caps etc.
 #define DDP2_PROGRAM_102 \
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */ \
 	PGM_68K_BIOS \
-	ROM_LOAD16_WORD_SWAP( "v102.u8", 0x100000, 0x200000, CRC(5a9ea040) SHA1(51eaec46c368f7cfc5245e64896092f52b1193e0) )
+	ROM_LOAD16_WORD_SWAP( "v102.u8", 0x100000, 0x200000, CRC(5a9ea040) SHA1(51eaec46c368f7cfc5245e64896092f52b1193e0) ) // 09/10/01
 #define DDP2_PROGRAM_101 \
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */ \
 	PGM_68K_BIOS \
-	ROM_LOAD16_WORD_SWAP( "v101_16m.u8", 0x100000, 0x200000, CRC(5e5786fd) SHA1(c6fc2956b5dc6a97c0d7d808a8c58aa21fa023b9) )
+	ROM_LOAD16_WORD_SWAP( "v101_16m.u8", 0x100000, 0x200000, CRC(5e5786fd) SHA1(c6fc2956b5dc6a97c0d7d808a8c58aa21fa023b9) ) // 07/10/01
 #define DDP2_PROGRAM_100 \
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */ \
 	PGM_68K_BIOS \
-	ROM_LOAD16_WORD_SWAP( "v100.u8", 0x100000, 0x200000, CRC(0c8aa8ea) SHA1(57e33224622607a1df8daabf26ba063cf8a6d3fc) )
+	ROM_LOAD16_WORD_SWAP( "v100.u8", 0x100000, 0x200000, CRC(0c8aa8ea) SHA1(57e33224622607a1df8daabf26ba063cf8a6d3fc) ) // 05/21/01
 
 
 ROM_START( ddp2 )
@@ -2913,7 +2982,7 @@ PCB Number: IGS PCB-0350-00T-FL-A
 ROM_START( dw2001 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "2001.u22", 0x100000, 0x80000, CRC(5cabed92) SHA1(d513e353c5c4695b16228e0bda9388c396aa4a81) )
+	ROM_LOAD16_WORD_SWAP( "2001.u22", 0x100000, 0x80000, CRC(5cabed92) SHA1(d513e353c5c4695b16228e0bda9388c396aa4a81) ) // 02/21/01 16:05:16
 
 	ROM_REGION( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "dw2001_igs027a_japan.bin", 0x000000, 0x04000, CRC(3a79159b) SHA1(0d693c798ce24c6a749669be8c7b1e4633409e49) )
@@ -2941,7 +3010,7 @@ ROM_END
 ROM_START( dwpc )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "dwpc_v101jp.u22", 0x100000, 0x80000, CRC(b93027c0) SHA1(602e5f651ccb63e6465ebd7762d8d2dcf7d54077) )
+	ROM_LOAD16_WORD_SWAP( "dwpc_v101jp.u22", 0x100000, 0x80000, CRC(b93027c0) SHA1(602e5f651ccb63e6465ebd7762d8d2dcf7d54077) ) // 09/26/01 10:23:26
 
 	ROM_REGION( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "dw2001_igs027a_japan.bin", 0x000000, 0x04000, CRC(3a79159b) SHA1(0d693c798ce24c6a749669be8c7b1e4633409e49) )
@@ -3469,14 +3538,14 @@ ROM_END
 ROM_START( theglad )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "v101.u6",      0x100000, 0x080000, CRC(f799e866) SHA1(dccc3c903357c40c3cf85ac0ae8fc12fb0f853a6) )
+	ROM_LOAD16_WORD_SWAP( "v101.u6",      0x100000, 0x080000, CRC(f799e866) SHA1(dccc3c903357c40c3cf85ac0ae8fc12fb0f853a6) ) // V101 05/15/03 09:00:32
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "theglad_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "theglad_igs027a_v100_overseas.bin", 0x0188, 0x3e78, CRC(02fe6f52) SHA1(0b0ddf4507856cfc5b7d4ef7e4c5375254c2a024) )
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
-	ROM_LOAD( "v107.u26", 0x000000, 0x200000,  CRC(f7c61357) SHA1(52d31c464dfc83c5371b078cb6b73c0d0e0d57e3) )
+	ROM_LOAD( "v107.u26", 0x000000, 0x200000,  CRC(f7c61357) SHA1(52d31c464dfc83c5371b078cb6b73c0d0e0d57e3) ) // 06/06/03 16:17:27 V107
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
@@ -3499,14 +3568,14 @@ ROM_END
 ROM_START( theglad100 ) // is this actually a pre-v100 proto?
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "u6.rom",       0x100000, 0x080000, CRC(14c85212) SHA1(8d2489708e176a2c460498a13173be01f645b79e) )
+	ROM_LOAD16_WORD_SWAP( "u6.rom",       0x100000, 0x080000, CRC(14c85212) SHA1(8d2489708e176a2c460498a13173be01f645b79e) ) // 01/06/03 09:27:02
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "theglad_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "theglad_igs027a_older.bin", 0x0188, 0x3e78, BAD_DUMP CRC(02fe6f52) SHA1(0b0ddf4507856cfc5b7d4ef7e4c5375254c2a024) ) // this is wrong for this set, we patch it to work
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
-	ROM_LOAD( "u2.rom", 0x000000, 0x200000,  CRC(c7bcf2ae) SHA1(10bc012c83987f594d5375a51bc4be2e17568a81) )
+	ROM_LOAD( "u2.rom", 0x000000, 0x200000,  CRC(c7bcf2ae) SHA1(10bc012c83987f594d5375a51bc4be2e17568a81) ) // 01/16/03 10:39:25 V100
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
@@ -3530,14 +3599,14 @@ ROM_END
 ROM_START( theglad101 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "v100.u6",       0x100000, 0x080000, CRC(bcf3b172) SHA1(df7e2808c0341be0a59eefa852c857a3a919223e) )
+	ROM_LOAD16_WORD_SWAP( "v100.u6",       0x100000, 0x080000, CRC(bcf3b172) SHA1(df7e2808c0341be0a59eefa852c857a3a919223e) ) // 02/25/03 17:42:51
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "theglad_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "theglad_igs027a_v100_overseas.bin", 0x0188, 0x3e78, CRC(02fe6f52) SHA1(0b0ddf4507856cfc5b7d4ef7e4c5375254c2a024) )
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
-	ROM_LOAD( "v101.u26", 0x000000, 0x200000, CRC(23faec02) SHA1(9065d55c2a14e6889e735a452bbc32530056645a) )
+	ROM_LOAD( "v101.u26", 0x000000, 0x200000, CRC(23faec02) SHA1(9065d55c2a14e6889e735a452bbc32530056645a) ) // 03/13/03 14:06:44 V101
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
@@ -3560,15 +3629,15 @@ ROM_END
 
 ROM_START( thegladpcb )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_WORD_SWAP( "bios.42",    0x000000, 0x020000, CRC(517cf7a2) SHA1(f5720b29e3be6ec22be03a768618cb2a1aa4ade7) )
-	ROM_LOAD16_WORD_SWAP( "glad_v100.43",  0x100000, 0x080000, CRC(bcf3b172) SHA1(df7e2808c0341be0a59eefa852c857a3a919223e) )
+	ROM_LOAD16_WORD_SWAP( "bios.42",    0x000000, 0x020000, CRC(517cf7a2) SHA1(f5720b29e3be6ec22be03a768618cb2a1aa4ade7) ) // V0001-001J
+	ROM_LOAD16_WORD_SWAP( "glad_v100.43",  0x100000, 0x080000, CRC(bcf3b172) SHA1(df7e2808c0341be0a59eefa852c857a3a919223e) ) // 02/25/03 17:42:51
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "thegladpcb_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "thegladpcb_igs027a_v100_japan.bin", 0x0188, 0x3e78, CRC(d7f06e2d) SHA1(9c3aca7a487f5329d84731e2c63d5ed591bf9d24) )    // from 'thegladpcb set'
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
-	ROM_LOAD( "igs_v100.62", 0x000000, 0x200000, CRC(0f3f511e) SHA1(28dd8d27495cec86e968a3ea549c5b30513dbb6e) )
+	ROM_LOAD( "igs_v100.62", 0x000000, 0x200000, CRC(0f3f511e) SHA1(28dd8d27495cec86e968a3ea549c5b30513dbb6e) ) // 02/25/03 16:32:21 V100
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.u72", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // standard PGM tx bios
@@ -3704,7 +3773,7 @@ ROM_END
 ROM_START( kovshxas )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "de_p0609.322",   0x100000, 0x400000, CRC(3b7b627f) SHA1(b331148501f9349fbd5882fb3f184f6304e58646) )
+	ROM_LOAD16_WORD_SWAP( "de_p0609.322",   0x100000, 0x400000, CRC(3b7b627f) SHA1(b331148501f9349fbd5882fb3f184f6304e58646) ) // V202CN Oct 6 2008 09:59:26
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // this is the kovsh ARM rom, we intercept and modify protection calls
@@ -3850,7 +3919,7 @@ ROM_END
 ROM_START( killbldp )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "v300x.u6",     0x100000, 0x080000, CRC(b7fb8ec9) SHA1(e71b2d74269a82c7155b9818821156e128b68b28) )
+	ROM_LOAD16_WORD_SWAP( "v300x.u6",     0x100000, 0x080000, CRC(b7fb8ec9) SHA1(e71b2d74269a82c7155b9818821156e128b68b28) ) // V300 05-09-16 11:58:20
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	/* the first 0x268 bytes of this are EXECUTE ONLY in the original chip, attempting to read them even via the original CPU just returns what is on the bus */
@@ -3861,7 +3930,7 @@ ROM_START( killbldp )
 
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
-	ROM_LOAD( "v300x.u26", 0x000000, 0x200000,  CRC(144388c8) SHA1(d7469df077c1a674129f18210584ba4d05a61888) )
+	ROM_LOAD( "v300x.u26", 0x000000, 0x200000,  CRC(144388c8) SHA1(d7469df077c1a674129f18210584ba4d05a61888) ) // 05-09-16 23:52:32 V300
 
 	ROM_REGION( 0x800000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
@@ -3884,14 +3953,14 @@ ROM_END
 ROM_START( svg )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "u30.bin",      0x100000, 0x080000, CRC(34c18f3f) SHA1(42d1edd0dcfaa5e44861c6a1d4cb24f51ba23de8) )
+	ROM_LOAD16_WORD_SWAP( "u30.bin",      0x100000, 0x080000, CRC(34c18f3f) SHA1(42d1edd0dcfaa5e44861c6a1d4cb24f51ba23de8) ) // V200 09/12/05 16:42:51
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "svg_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "svg_igs027a_v200_china.bin", 0x0188, 0x3e78, CRC(72b73169) SHA1(ffc0caea855ab4b01beb3aebd0bf17187c66c22c) )
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
-	ROM_LOAD( "u26.bin", 0x000000, 0x400000, CRC(46826ec8) SHA1(ad1daf6f615fb8d748ce7f98f19dd3bf22f79fba) )
+	ROM_LOAD( "u26.bin", 0x000000, 0x400000, CRC(46826ec8) SHA1(ad1daf6f615fb8d748ce7f98f19dd3bf22f79fba) ) // 10/11/05 10:07:20 V201
 	ROM_LOAD( "u29.bin", 0x400000, 0x400000, CRC(fa5f3901) SHA1(8ab7c6763df4f752b50ed2197063f58046b32ddb) )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3917,14 +3986,14 @@ ROM_END
 ROM_START( svgtw )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "v101tw.u30",      0x100000, 0x080000, CRC(8d0405e4) SHA1(b6175c9ffeaac531d28e7845cb34c673476e286a) )
+	ROM_LOAD16_WORD_SWAP( "v101tw.u30",      0x100000, 0x080000, CRC(8d0405e4) SHA1(b6175c9ffeaac531d28e7845cb34c673476e286a) ) // V100 03/14/05 20:04:08
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */ // marked H1
 	ROM_LOAD( "svgpcb_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
 	ROM_LOAD( "svgcpb_igs027a_v100_japan.bin", 0x0188, 0x3e78, CRC(7a59da5d) SHA1(d67ba465db40ca716b4b901b1c8e762716fb954e) ) // this is from the Japan set, the cart this came from was Taiwan
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
-	ROM_LOAD( "v101tw.u26", 0x000000, 0x400000, CRC(cc24f542) SHA1(623ed398d2eeea229833d92eb4fb6492133202b3) )
+	ROM_LOAD( "v101tw.u26", 0x000000, 0x400000, CRC(cc24f542) SHA1(623ed398d2eeea229833d92eb4fb6492133202b3) ) // 06/20/05 11:36:15 V100
 	ROM_LOAD( "v101tw.u36", 0x400000, 0x400000, CRC(f18283e2) SHA1(15323c5f816a0bf6f510311eb49d485ccf713cf7) )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3951,7 +4020,7 @@ ROM_END
 ROM_START( svgpcb )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "svg_bios.u49",    0x000000, 0x020000, CRC(3346401f) SHA1(28bd730b6026c1e521c95072d33c7bdcd19c1460) )
-	ROM_LOAD16_WORD_SWAP( "svg_v100jp.u50",  0x100000, 0x080000, CRC(8d0405e4) SHA1(b6175c9ffeaac531d28e7845cb34c673476e286a) )
+	ROM_LOAD16_WORD_SWAP( "svg_v100jp.u50",  0x100000, 0x080000, CRC(8d0405e4) SHA1(b6175c9ffeaac531d28e7845cb34c673476e286a) ) // V100 03/14/05 20:04:08
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "svgpcb_igs027a_execute_only_area", 0x0000, 0x00188, NO_DUMP )
@@ -3959,7 +4028,7 @@ ROM_START( svgpcb )
 
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
-	ROM_LOAD( "svg_v100jp.u64", 0x000000, 0x400000, CRC(399d4a8b) SHA1(b120e8386a259e6fd7941acf3c33cf288eda616c) )
+	ROM_LOAD( "svg_v100jp.u64", 0x000000, 0x400000, CRC(399d4a8b) SHA1(b120e8386a259e6fd7941acf3c33cf288eda616c) ) // 05/12/05 15:31:35 V100
 	ROM_LOAD( "svg_v100jp.u65", 0x400000, 0x400000, CRC(6e1c33b1) SHA1(66f26b2f4c0b3dcf6d1bb1df48e2ddbcc9d9432d) )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3986,7 +4055,7 @@ ROM_END
 ROM_START( happy6 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "v101cn.u5",      0x100000, 0x080000, CRC(aa4646e3) SHA1(e6772cc480ddd3e1d199364b1f2ff93b973e6842) )
+	ROM_LOAD16_WORD_SWAP( "v101cn.u5",      0x100000, 0x080000, CRC(aa4646e3) SHA1(e6772cc480ddd3e1d199364b1f2ff93b973e6842) ) // V101 03/17/04 11:26:48
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	// data before 0x188 is read-protected and cannot be read even with a trojan (as with most 2001/2+ IGS titles)
@@ -3996,7 +4065,7 @@ ROM_START( happy6 )
 
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
-	ROM_LOAD( "v102cn.u26", 0x000000, 0x400000, CRC(310510fb) SHA1(e0e80a04e9f7bf27e6581a8935c960bad33bb6de) )
+	ROM_LOAD( "v102cn.u26", 0x000000, 0x400000, CRC(310510fb) SHA1(e0e80a04e9f7bf27e6581a8935c960bad33bb6de) ) // 03/16/04 14:29:17 V102
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
@@ -4406,7 +4475,7 @@ ROM_START( espgal )
 	ROM_LOAD( "b04801w064.u1",    0x0000000, 0x0800000, CRC(98dce13a) SHA1(61d48b7117459f7babc022b68231f6928177a71d) ) //bitmap-1
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
-	/* there is a position for the PGM audio bios rom, but it's unpopulated, and the M of PGM has been scratched off the PCB */
+	/* there is a position for the PGM audio bios rom, but it's unpopulated, same as ketsui but not "PGM" string on PCB */
 	ROM_LOAD( "w04801b032.u17",    0x400000, 0x400000, CRC(60298536) SHA1(6b7333f16cce778c5725dbdf75a5446f0906397a) ) //music-1
 ROM_END
 
@@ -4442,7 +4511,7 @@ ROM_END
 ROM_START( ddp3 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
-	ROM_LOAD16_WORD_SWAP( "ddp3_v101_16m.u36",  0x100000, 0x200000,CRC(fba2180e) SHA1(59c1a76243e587c07215c8a76649401ef0bff7c7) ) // marked (chinese text) 3 V101 16M
+	ROM_LOAD16_WORD_SWAP( "ddp3_v101_16m.u36",  0x100000, 0x200000,CRC(fba2180e) SHA1(59c1a76243e587c07215c8a76649401ef0bff7c7) ) // marked 怒首領蜂(dodonpachi) 3 V101 16M
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
@@ -4672,7 +4741,7 @@ void pgm_state::pgm_basic_init( bool set_bank)
 	m_rowscrollram = &m_videoram[0x7000/2];
 }
 
-DRIVER_INIT_MEMBER(pgm_state,pgm)
+void pgm_state::init_pgm()
 {
 	pgm_basic_init();
 }
@@ -4680,225 +4749,288 @@ DRIVER_INIT_MEMBER(pgm_state,pgm)
 
 /*** GAME ********************************************************************/
 
-GAME( 1997, pgm,          0,         pgm,     pgm, pgm_state,      pgm,        ROT0,   "IGS", "PGM (Polygame Master) System BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1997, pgm,          0,         pgm,                   pgm,       pgm_state,       init_pgm,         ROT0,   "IGS", "PGM (Polygame Master) System BIOS", MACHINE_IS_BIOS_ROOT )
 
 /* -----------------------------------------------------------------------------------------------------------------------
    Working (at least one set of the game is fully working)
    -----------------------------------------------------------------------------------------------------------------------*/
 
+//西游释厄传/Xīyóu shì è chuán (China; Simplified Chinese)
+//西遊釋厄傳/Xīyóu shì è chuán (Taiwan; Traditional Chinese)
 // the version numbering on these is a mess... date strings from ROM (and in some cases even those are missing..)
-GAME( 1997, orlegend,     pgm,       pgm_asic3,     orlegend, pgm_asic3_state, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 126)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )                 // V0001 01/14/98 18:16:38 - runs as World
-GAME( 1997, orlegende,    orlegend,  pgm_asic3,     orlegend, pgm_asic3_state, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 112)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )                 // V0001 07/14/97 11:19:45 - runs as World
-GAME( 1997, orlegendc,    orlegend,  pgm_asic3,     orlegend, pgm_asic3_state, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 112, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // V0001 05/05/97 10:08:21 - runs as World, Korea, China
-GAME( 1997, orlegendca,   orlegend,  pgm_asic3,     orlegend, pgm_asic3_state, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. ???, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // V0001 04/02/97 13:35:43 - runs as HongKong, China, China
-GAME( 1997, orlegend111c, orlegend,  pgm_asic3,     orlegend, pgm_asic3_state, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 111, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // V0001 no date!          - runs as HongKong, China, China
-GAME( 1997, orlegend111t, orlegend,  pgm_asic3,     orlegendt,pgm_asic3_state, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 111, Taiwanese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )// V0001 no date! - needs a different protection sequence
-GAME( 1997, orlegend111k, orlegend,  pgm_asic3,     orlegendk,pgm_asic3_state, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 111, Korean Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )   // not checked
-GAME( 1997, orlegend105k, orlegend,  pgm_asic3,     orlegendk,pgm_asic3_state, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 105, Korean Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  //  V0000 no date!          - runs as Korea
+GAME( 1997, orlegend,     pgm,       pgm_asic3,           orlegend,  pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 126)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )                 // V0001 01/14/98 18:16:38 - runs as World
+GAME( 1997, orlegende,    orlegend,  pgm_asic3,           orlegend,  pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 112)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )                 // V0001 07/14/97 11:19:45 - runs as World
+GAME( 1997, orlegendc,    orlegend,  pgm_asic3,           orlegend,  pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 112, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // V0001 05/05/97 10:08:21 - runs as World, Korea, China
+GAME( 1997, orlegendca,   orlegend,  pgm_asic3,           orlegend,  pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. ???, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // V0001 04/02/97 13:35:43 - runs as HongKong, China, China
+GAME( 1997, orlegend111c, orlegend,  pgm_asic3,           orlegend,  pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 111, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // V0001 no date!          - runs as HongKong, China, China
+GAME( 1997, orlegend111t, orlegend,  pgm_asic3,           orlegendt, pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 111, Taiwanese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )// V0001 no date! - needs a different protection sequence
+GAME( 1997, orlegend111k, orlegend,  pgm_asic3,           orlegendk, pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 111, Korean Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )   // not checked
+GAME( 1997, orlegend105k, orlegend,  pgm_asic3,           orlegendk, pgm_asic3_state,   init_orlegend, ROT0,   "IGS", "Oriental Legend / Xiyou Shi E Chuan (ver. 105, Korean Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  //  V0000 no date!          - runs as Korea
 
-GAME( 1997, drgw2,        pgm,       pgm_012_025_drgw2,     pgm, pgm_012_025_state,      drgw2,      ROT0,   "IGS", "Dragon World II (ver. 110X, Export)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, dw2v100x,     drgw2,     pgm_012_025_drgw2,     pgm, pgm_012_025_state,      dw2v100x,   ROT0,   "IGS", "Dragon World II (ver. 100X, Export)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, drgw2j,       drgw2,     pgm_012_025_drgw2,     pgm, pgm_012_025_state,      drgw2j,     ROT0,   "IGS", "Chuugokuryuu II (ver. 100J, Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, drgw2c,       drgw2,     pgm_012_025_drgw2,     pgm, pgm_012_025_state,      drgw2c,     ROT0,   "IGS", "Zhong Guo Long II (ver. 100C, China)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, drgw2hk,      drgw2,     pgm_012_025_drgw2,     pgm, pgm_012_025_state,      drgw2hk,    ROT0,   "IGS", "Dragon World II (ver. 100H, Hong Kong)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // correct title? (region is shown as Hokg Kong, Dragon World 3 is the same)
+//Dragon World II
+//中國龍II/Zhōngguó lóng II (China, Taiwan, Japan; Traditional Chinese only in title screen)
+//東方之珠II/Dung1Fong1 Zi1 Zyu1 II (Hong Kong)/dongbang jiju II (Korea(undumped))
+GAME( 1997, drgw2,        pgm,       pgm_012_025_drgw2,   pgm,       pgm_012_025_state, init_drgw2,    ROT0,   "IGS", "Dragon World II (ver. 110X, Export)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, dw2v100x,     drgw2,     pgm_012_025_drgw2,   pgm,       pgm_012_025_state, init_dw2v100x, ROT0,   "IGS", "Dragon World II (ver. 100X, Export)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, drgw2j,       drgw2,     pgm_012_025_drgw2,   pgm,       pgm_012_025_state, init_drgw2j,   ROT0,   "IGS (Alta license)", "Chuugokuryuu II (ver. 100J, Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, drgw2c,       drgw2,     pgm_012_025_drgw2,   pgm,       pgm_012_025_state, init_drgw2c,   ROT0,   "IGS", "Zhongguo Long II (ver. 100C, China)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, drgw2hk,      drgw2,     pgm_012_025_drgw2,   pgm,       pgm_012_025_state, init_drgw2hk,  ROT0,   "IGS", "Dungfong Zi Zyu II (ver. 100H, Hong Kong)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // (region is shown as Hokg Kong, Dragon World 3 is the same)
 
-GAME( 1998, killbld,      pgm,       pgm_022_025_killbld, killbld, pgm_022_025_state,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 109, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
-GAME( 1998, killbld104,   killbld,   pgm_022_025_killbld, killbld, pgm_022_025_state,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 104)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+//The Killing Blade
+//傲剑狂刀/Ào jiàn kuáng dāo (China, Hong Kong; Simplified Chinese)
+//傲劍狂刀/Ào jiàn kuáng dāo (Taiwan; Traditional Chinese)
+GAME( 1998, killbld,      pgm,       pgm_022_025_killbld, killbld,   pgm_022_025_state, init_killbld,  ROT0,   "IGS", "The Killing Blade / Ao Jian Kuang Dao (ver. 109, Chinese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1998, killbld104,   killbld,   pgm_022_025_killbld, killbld,   pgm_022_025_state, init_killbld,  ROT0,   "IGS", "The Killing Blade / Ao Jian Kuang Dao (ver. 104)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1998, killbld106,   killbld,   pgm_022_025_killbld, killbld,   pgm_022_025_state, init_killbld,  ROT0,   "IGS", "The Killing Blade / Ao Jian Kuang Dao (ver. 106)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
 
+//中國龍3/Zhōngguó lóng 3 (China, Taiwan, Japan; Traditional chinese only in title screen)
+//東方之珠3/Dung1Fong1 Zi1 Zyu1 3 (Hong Kong)/dongbang jiju 3 (Korea)
 // these seem playable but the DMA mode transfering 68k code to RAM is not emulated so there could still be problems
 // when set to Japan it has the extra subtitle and so gets referred to as Dragon World 3 Special / Chuugokuryuu 3 Special.  The earliest versions seem to only contain the code for the Japanese region, presumably the support for other regions was added later.
-GAME( 1998, drgw3,        pgm,       pgm_022_025_dw3,     dw3, pgm_022_025_state,      drgw3,      ROT0,   "IGS", "Dragon World 3 / Chuugokuryuu 3 Special (ver. 106)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
-GAME( 1998, drgw3105,     drgw3,     pgm_022_025_dw3,     dw3, pgm_022_025_state,      drgw3,      ROT0,   "IGS", "Dragon World 3 / Chuugokuryuu 3 Special (ver. 105)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
-GAME( 1998, drgw3103,     drgw3,     pgm_022_025_dw3,     dw3, pgm_022_025_state,      drgw3,      ROT0,   "IGS", "Chuugokuryuu 3 Special (Japan, ver. 103)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Japan only, has an extra game mode option!
-GAME( 1998, drgw3100,     drgw3,     pgm_022_025_dw3,     dw3j,pgm_022_025_state,      drgw3,      ROT0,   "IGS", "Chuugokuryuu 3 Special (Japan, ver. 100)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ^
+GAME( 1998, drgw3,        pgm,       pgm_022_025_dw3,     dw3,       pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Dragon World 3 / Zhongguo Long 3 / Dungfong Zi Zyu 3 / Chuugokuryuu 3 Special (ver. 106)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1998, drgw3105,     drgw3,     pgm_022_025_dw3,     dw3,       pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Dragon World 3 / Zhongguo Long 3 / Dungfong Zi Zyu 3 / Chuugokuryuu 3 Special (ver. 105)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1998, drgw3103,     drgw3,     pgm_022_025_dw3,     dw3,       pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Chuugokuryuu 3 Special (Japan, ver. 103)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Japan only, has an extra game mode option!
+GAME( 1998, drgw3100,     drgw3,     pgm_022_025_dw3,     dw3j,      pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Chuugokuryuu 3 Special (Japan, ver. 100)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ^
 
-GAME( 1998, dwex,         pgm,       pgm_022_025_dw3,     dw3, pgm_022_025_state,      drgw3,      ROT0,   "IGS", "Dragon World 3 EX (ver. 100)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1998, dwex,         pgm,       pgm_022_025_dw3,     dw3,       pgm_022_025_state, init_drgw3,    ROT0,   "IGS", "Dragon World 3 EX (ver. 100)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
 
+//超級比一比/Chāojí bǐ yī bǐ (Taiwan)
+//大家来找碴/Dàjiā lái zhǎo chá/Daai6gaa1 Loi4 Zaau2 Caa4 (China, Hong Kong)
+//リアルアンドフェイク/Riaruandofeiku(Real and Fake) (Japan)
 // region provided by internal ARM rom
-GAME( 1999, photoy2k,     pgm,       pgm_arm_type1,     photoy2k, pgm_arm_type1_state, photoy2k,   ROT0,   "IGS", "Photo Y2K (ver. 105)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
-GAME( 1999, photoy2k104,  photoy2k,  pgm_arm_type1,     photoy2k, pgm_arm_type1_state, photoy2k,   ROT0,   "IGS", "Photo Y2K (ver. 104)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
-GAME( 1999, photoy2k102,  photoy2k,  pgm_arm_type1,     photoy2k, pgm_arm_type1_state, photoy2k,   ROT0,   "IGS", "Photo Y2K (ver. 102, Japanese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1999, photoy2k,     pgm,       pgm_arm_type1,       photoy2k,  pgm_arm_type1_state, init_photoy2k, ROT0,   "IGS", "Photo Y2K / Chaoji Bi Yi Bi / Dajia Lai Zhao Cha / Real and Fake (ver. 105)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1999, photoy2k104,  photoy2k,  pgm_arm_type1,       photoy2k,  pgm_arm_type1_state, init_photoy2k, ROT0,   "IGS", "Photo Y2K / Chaoji Bi Yi Bi / Dajia Lai Zhao Cha / Real and Fake (ver. 104)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1999, photoy2k102,  photoy2k,  pgm_arm_type1,       photoy2k,  pgm_arm_type1_state, init_photoy2k, ROT0,   "IGS", "Photo Y2K / Chaoji Bi Yi Bi / Dajia Lai Zhao Cha / Real and Fake (ver. 102, Japanese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
 
+//三国战纪风云再起/Sānguó zhàn jì Fēngyún zàiqǐ (China, Hong Kong; Simplified Chinese)
+//三國戰紀風雲再起/Sānguó zhàn jì Fēngyún zàiqǐ (Taiwan; Traditional Chinese)
+//三國戰紀 Superheroes/Sangoku-Senki Superheroes (Japan; Traditional Chinese)
 // region provided by internal ARM rom
-GAME( 1999, kovsh,        pgm,       pgm_arm_type1,     kovsh, pgm_arm_type1_state,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 104, CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k: SANGO EX V104 03/24/00 11:15:25, ARM: China internal ROM
-GAME( 1999, kovsh103,     kovsh,     pgm_arm_type1,     kovsh, pgm_arm_type1_state,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 103, CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k: SANGO EX V103 01/18/00 17:37:12, ARM: China internal ROM
-GAME( 1999, kovsh102,     kovsh,     pgm_arm_type1,     kovsh, pgm_arm_type1_state,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 102, CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k: SANGO EX V102 12/23/99 15:17:57, ARM: China internal ROM
-GAME( 1999, kovsh101,     kovsh,     pgm_arm_type1,     kovsh, pgm_arm_type1_state,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 101, CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k: SANGO EX V101 12/20/99 10:59:05, ARM: China internal ROM
-GAME( 1999, kovsh100,     kovsh,     pgm_arm_type1,     kovsh, pgm_arm_type1_state,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 100, CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k: SANGO EX V100 12/06/99 13:36:04, ARM: China internal ROM
+GAME( 1999, kovsh,        pgm,       pgm_arm_type1,     kovsh,   pgm_arm_type1_state, init_kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sanguo Zhan Ji Fengyun Zaiqi / Sangoku Senki Super Heroes (ver. 104, CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k: SANGO EX V104 03/24/00 11:15:25, ARM: China internal ROM
+GAME( 1999, kovsh103,     kovsh,     pgm_arm_type1,     kovsh,   pgm_arm_type1_state, init_kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sanguo Zhan Ji Fengyun Zaiqi / Sangoku Senki Super Heroes (ver. 103, CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k: SANGO EX V103 01/18/00 17:37:12, ARM: China internal ROM
+GAME( 1999, kovsh102,     kovsh,     pgm_arm_type1,     kovsh,   pgm_arm_type1_state, init_kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sanguo Zhan Ji Fengyun Zaiqi / Sangoku Senki Super Heroes (ver. 102, CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k: SANGO EX V102 12/23/99 15:17:57, ARM: China internal ROM
+GAME( 1999, kovsh101,     kovsh,     pgm_arm_type1,     kovsh,   pgm_arm_type1_state, init_kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sanguo Zhan Ji Fengyun Zaiqi / Sangoku Senki Super Heroes (ver. 101, CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k: SANGO EX V101 12/20/99 10:59:05, ARM: China internal ROM
+GAME( 1999, kovsh100,     kovsh,     pgm_arm_type1,     kovsh,   pgm_arm_type1_state, init_kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sanguo Zhan Ji Fengyun Zaiqi / Sangoku Senki Super Heroes (ver. 100, CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k: SANGO EX V100 12/06/99 13:36:04, ARM: China internal ROM
+// 拳皇三国特別版/Quánhuáng sānguó Tèbié bǎn
 // nasty modern asian bootleg of Knights of Valour Super Heroes with characters ripped from SNK's The King of Fighters series!
-GAME( 1999, kovqhsgs,     kovsh,     pgm_arm_type1,     kovsh, pgm_arm_type1_state, kovqhsgs,   ROT0,   "bootleg", "Knights of Valour: Quan Huang San Guo Special / Sangoku Senki: Quan Huang San Guo Special (ver. 303CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kovqhsgs,     kovsh,     pgm_arm_type1,     kovsh,   pgm_arm_type1_state, init_kovqhsgs,   ROT0,   "bootleg", "Quanhuang Sanguo Tebie Ban (bootleg of Knights of Valour Super Heroes, V303CN, Nov 21 2008 19:03:49)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
+//三國戰紀2/Sānguó zhàn jì 2 (Traditional Chinese only in title screen)
 // region provided by internal ARM rom
-GAME( 2000, kov2,         pgm,       pgm_arm_type2,    kov2, pgm_arm_type2_state,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 107, 102, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 05/10/01 14:24:08 V107 (Ext. Arm V102, Int. Arm V100HK)
-GAME( 2000, kov2106,      kov2,      pgm_arm_type2,    kov2, pgm_arm_type2_state,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 106, 102, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 02/27/01 13:26:46 V106 (Ext. Arm V102, Int. Arm V100HK)
-GAME( 2000, kov2104,      kov2,      pgm_arm_type2,    kov2, pgm_arm_type2_state,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 104, 102, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 01/19/01 10:19:38 V104 (Ext. Arm V102, Int. Arm V100HK)
-GAME( 2000, kov2103,      kov2,      pgm_arm_type2,    kov2, pgm_arm_type2_state,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 103, 101, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 12/28/00 15:09:31 V103 (Ext. Arm V101, Int. Arm V100HK)
-GAME( 2000, kov2102,      kov2,      pgm_arm_type2,    kov2, pgm_arm_type2_state,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 102, 101, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 12/14/00 10:33:36 V102 (Ext. Arm V101, Int. Arm V100HK)
-GAME( 2000, kov2101,      kov2,      pgm_arm_type2,    kov2, pgm_arm_type2_state,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 101, 101, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
-GAME( 2000, kov2100,      kov2,      pgm_arm_type2,    kov2, pgm_arm_type2_state,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 100, 100, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
+GAME( 2000, kov2,         pgm,       pgm_arm_type2,    kov2,     pgm_arm_type2_state, init_kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sanguo Zhan Ji 2 / Sangoku Senki 2 (ver. 107, 102, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 05/10/01 14:24:08 V107 (Ext. Arm V102, Int. Arm V100HK)
+GAME( 2000, kov2106,      kov2,      pgm_arm_type2,    kov2,     pgm_arm_type2_state, init_kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sanguo Zhan Ji 2 / Sangoku Senki 2 (ver. 106, 102, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 02/27/01 13:26:46 V106 (Ext. Arm V102, Int. Arm V100HK)
+GAME( 2000, kov2104,      kov2,      pgm_arm_type2,    kov2,     pgm_arm_type2_state, init_kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sanguo Zhan Ji 2 / Sangoku Senki 2 (ver. 104, 102, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 01/19/01 10:19:38 V104 (Ext. Arm V102, Int. Arm V100HK)
+GAME( 2000, kov2103,      kov2,      pgm_arm_type2,    kov2,     pgm_arm_type2_state, init_kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sanguo Zhan Ji 2 / Sangoku Senki 2 (ver. 103, 101, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 12/28/00 15:09:31 V103 (Ext. Arm V101, Int. Arm V100HK)
+GAME( 2000, kov2102,      kov2,      pgm_arm_type2,    kov2,     pgm_arm_type2_state, init_kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sanguo Zhan Ji 2 / Sangoku Senki 2 (ver. 102, 101, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 12/14/00 10:33:36 V102 (Ext. Arm V101, Int. Arm V100HK)
+GAME( 2000, kov2101,      kov2,      pgm_arm_type2,    kov2,     pgm_arm_type2_state, init_kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sanguo Zhan Ji 2 / Sangoku Senki 2 (ver. 101, 101, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
+GAME( 2000, kov2100,      kov2,      pgm_arm_type2,    kov2,     pgm_arm_type2_state, init_kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sanguo Zhan Ji 2 / Sangoku Senki 2 (ver. 100, 100, 100HK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
 
+//三國戰紀2 Nine Dragons/Sānguó zhàn jì 2 Nine Dragons (Overseas)
+//三國戰紀2群雄争霸/Sānguó zhàn jì 2 Qúnxióng zhēngbà/Saam1Qwok3 Zin3 Gei2 2 Kwan4Hung4 Zang1Baa3 (China/Hong Kong; Mixed Traditional and Simplified Chinese)
+//三國戰紀2飛龍在天/Sānguó zhàn jì 2 Fēilóng zài tiān (Taiwan; Traditional Chinese)
+//三國戰紀武将争霸/Sangoku-Senki Bushō Souha (Japan; Mixed Traditional and Simplified Chinese, Busyou Souha in title screen)
 // region provided by internal ARM rom (we only have a China internal ROM)
-GAME( 2001, kov2p,        pgm,       pgm_arm_type2,    kov2, pgm_arm_type2_state,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M205XX, 200, 100CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 04/25/02  17:48:27 M205XX
-GAME( 2001, kov2p204,     kov2p,     pgm_arm_type2,    kov2, pgm_arm_type2_state,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M204XX, 200, 100CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 08/28/01  09:11:49 M204XX
-GAME( 2001, kov2p202,     kov2p,     pgm_arm_type2,    kov2, pgm_arm_type2_state,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M202XX, 200, 100CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 07/09/01  11:03:50 M202XX
+GAME( 2001, kov2p,        pgm,       pgm_arm_type2,    kov2,     pgm_arm_type2_state, init_kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sanguo Zhan Ji 2 Qunxiong Zhengba / Sanguo Zhan Ji 2 Feilong Zai Tian / Sangoku Senki Busyou Souha (ver. M205XX, 200, 100CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 04/25/02  17:48:27 M205XX
+GAME( 2001, kov2p204,     kov2p,     pgm_arm_type2,    kov2,     pgm_arm_type2_state, init_kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sanguo Zhan Ji 2 Qunxiong Zhengba / Sanguo Zhan Ji 2 Feilong Zai Tian / Sangoku Senki Busyou Souha (ver. M204XX, 200, 100CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 08/28/01  09:11:49 M204XX
+GAME( 2001, kov2p202,     kov2p,     pgm_arm_type2,    kov2,     pgm_arm_type2_state, init_kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sanguo Zhan Ji 2 Qunxiong Zhengba / Sanguo Zhan Ji 2 Feilong Zai Tian / Sangoku Senki Busyou Souha (ver. M202XX, 200, 100CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 07/09/01  11:03:50 M202XX
+GAME( 2001, kov2p200,     kov2p,     pgm_arm_type2,    kov2,     pgm_arm_type2_state, init_kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sanguo Zhan Ji 2 Qunxiong Zhengba / Sanguo Zhan Ji 2 Feilong Zai Tian / Sangoku Senki Busyou Souha (ver. M200XX, 200, 100CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 06/18/01  22:59:12 M200XX
 
+//形意拳/Xíng yì quán/Sin ī ken(Japanese label)
 // region provided by internal ARM rom
-GAME( 2001, martmast,     pgm,       pgm_arm_type2,    martmast, pgm_arm_type2_state,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 104, 102, 102US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 102US
-GAME( 2001, martmastc,    martmast,  pgm_arm_type2,    martmast, pgm_arm_type2_state,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 104, 102, 101CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 101CN
-GAME( 2001, martmastc103, martmast,  pgm_arm_type2,    martmast, pgm_arm_type2_state,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 103, 102, 101CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k V103, Ext Arm 102, Int Arm 101CN (actually 102 CN on the PCB, needs to be dumped)
-GAME( 2001, martmastc102, martmast,  pgm_arm_type2,    martmast, pgm_arm_type2_state,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 102, 101, 101CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k V102, Ext Arm 101, Int Arm 101CN
-GAME( 2001, martmasttw,   martmast,  pgm_arm_type2,    martmast, pgm_arm_type2_state,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 102, 101, 101TW)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 68k V102, Ext Arm 101, Int Arm 101TW
+GAME( 2001, martmast,     pgm,       pgm_arm_type2,    martmast, pgm_arm_type2_state, init_martmast,   ROT0,   "IGS", "Martial Masters / Xing Yi Quan (ver. 104, 102, 102US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 102US
+GAME( 2001, martmastc,    martmast,  pgm_arm_type2,    martmast, pgm_arm_type2_state, init_martmast,   ROT0,   "IGS", "Martial Masters / Xing Yi Quan (ver. 104, 102, 101CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 101CN
+GAME( 2001, martmastc103, martmast,  pgm_arm_type2,    martmast, pgm_arm_type2_state, init_martmast,   ROT0,   "IGS", "Martial Masters / Xing Yi Quan (ver. 103, 102, 101CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k V103, Ext Arm 102, Int Arm 101CN (actually 102 CN on the PCB, needs to be dumped)
+GAME( 2001, martmastc102, martmast,  pgm_arm_type2,    martmast, pgm_arm_type2_state, init_martmast,   ROT0,   "IGS", "Martial Masters / Xing Yi Quan (ver. 102, 101, 101CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k V102, Ext Arm 101, Int Arm 101CN
+GAME( 2001, martmasttw,   martmast,  pgm_arm_type2,    martmast, pgm_arm_type2_state, init_martmast,   ROT0,   "IGS", "Martial Masters / Xing Yi Quan (ver. 102, 101, 101TW)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 68k V102, Ext Arm 101, Int Arm 101TW
 
+//蜂暴/Fēng bào (Chinese, Title call excepting Japan)/Fung1 Bou6 (Hong Kong, Jyutping)
 // region provided by internal ARM rom
-GAME( 2001, ddp2,         pgm,       pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (World, ver. 102)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2101,      ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (World, ver. 101)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2100,      ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (World, ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2hk,       ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Hong Kong, ver. 102)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2101hk,    ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Hong Kong, ver. 101)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2100hk,    ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Hong Kong, ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2k,        ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Korea, ver. 102)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2101k,     ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Korea, ver. 101)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2100k,     ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Korea, ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2j,        ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 102)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2101j,     ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 101)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2100j,     ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2t,        ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Taiwan, ver. 102)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2101t,     ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Taiwan, ver. 101)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2100t,     ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Taiwan, ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2c,        ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (China, ver. 102)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2101c,     ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (China, ver. 101)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ddp2100c,     ddp2,      pgm_arm_type2,    pgm, pgm_arm_type2_state,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (China, ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2,         pgm,       pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (World, ver. 102)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2101,      ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (World, ver. 101)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2100,      ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (World, ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2hk,       ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS", "DoDonPachi II - Fung Bou (Hong Kong, ver. 102)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2101hk,    ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS", "DoDonPachi II - Fung Bou (Hong Kong, ver. 101)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2100hk,    ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS", "DoDonPachi II - Fung Bou (Hong Kong, ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2k,        ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Korea, ver. 102)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2101k,     ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Korea, ver. 101)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2100k,     ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Korea, ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2j,        ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS (Cave license)", "DoDonPachi II (Japan, ver. 102)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2101j,     ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS (Cave license)", "DoDonPachi II (Japan, ver. 101)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2100j,     ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS (Cave license)", "DoDonPachi II (Japan, ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2t,        ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS", "DoDonPachi - Feng Bao (Taiwan, ver. 102)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2101t,     ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS", "DoDonPachi - Feng Bao (Taiwan, ver. 101)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2100t,     ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS", "DoDonPachi - Feng Bao (Taiwan, ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2c,        ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS", "DoDonPachi - Feng Bao (China, ver. 102)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2101c,     ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS", "DoDonPachi - Feng Bao (China, ver. 101)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, ddp2100c,     ddp2,      pgm_arm_type2,    pgm,      pgm_arm_type2_state, init_ddp2,       ROT270, "IGS", "DoDonPachi - Feng Bao (China, ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 
 // japan region only? service mode calls it Dragon World 2001 so I'm leaving that title in the description
-GAME( 2001, dw2001,       pgm,       pgm_arm_type2,     dw2001, pgm_arm_type2_state,   dw2001,    ROT0,   "IGS", "Chuugokuryuu 2001 [Dragon World 2001] (V100?, Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 02/21/01 16:05:16
+GAME( 2001, dw2001,       pgm,       pgm_arm_type2,    dw2001,   pgm_arm_type2_state, init_dw2001,     ROT0,   "IGS", "Chuugokuryuu 2001 [Dragon World 2001] (V100 02/21/01 16:05:16, Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 02/21/01 16:05:16
 
 // japan region only? service mode calls it Dragon World Pretty Chance so I'm leaving that title in the description
-GAME( 2001, dwpc,         pgm,       pgm_arm_type2,     dw2001, pgm_arm_type2_state,   dwpc,      ROT0,   "IGS", "Chuugokuryuu Pretty Chance [Dragon World Pretty Chance] (V101, Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 09/26/01 10:23:26
+// english version also exists
+GAME( 2001, dwpc,         pgm,       pgm_arm_type2,    dw2001,   pgm_arm_type2_state, init_dwpc,       ROT0,   "IGS", "Chuugokuryuu Pretty Chance [Dragon World Pretty Chance] (V101 09/26/01 10:23:26, Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 09/26/01 10:23:26
 
+//魔域戰線/Móyù zhànxiàn (Traditional Chinese)
+//魔域战线/Móyù zhànxiàn (Simplified Chinese)
 // we bypass the internal ARM rom on these, ideally it should still be dumped tho! the region screens show a blank string where the internal ROM revision would otherwise be displayed
 // ARM version strings don't match 100% with labels... for 68k ROMs I'm using the build time / date stamp from near the start of the rom, there are some slightly different time stamps later
-GAME( 2002, dmnfrnt,      pgm,       pgm_arm_type3,     pgm, pgm_arm_type3_state,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V105, ROM M105XX 08/05/02) (ARM label V105, ROM 08/05/02 S105XX)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k time: 10:24:11 ARM time: 10:33:23
-GAME( 2002, dmnfrntb,     dmnfrnt,   pgm_arm_type3,     pgm, pgm_arm_type3_state,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V103, ROM M103XX 07/05/02) (ARM label V103, ROM 07/05/02 S103XX)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k time: 14:43:13 ARM time: 11:04:24
-GAME( 2002, dmnfrnta,     dmnfrnt,   pgm_arm_type3,     pgm, pgm_arm_type3_state,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V102, ROM M102XX 06/19/02) (ARM label V102, ROM 05/24/02 S101XX)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k time: 13:44:08 ARM time: 13:04:31  (from the strings it looks like V102 only upgraded the 68k ROM)
-GAME( 2002, dmnfrntpcb,   dmnfrnt,   pgm_arm_type3,     pgm, pgm_arm_type3_state,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V107KR, ROM M107KR 11/03/03) (ARM label V106KR, ROM 10/16/03 S106KR) (JAMMA PCB)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // works but reports version mismatch (wants internal rom version and region to match external?)
+GAME( 2002, dmnfrnt,      pgm,       pgm_arm_type3,    pgm,      pgm_arm_type3_state, init_dmnfrnt,    ROT0,   "IGS", "Demon Front / Moyu Zhanxian (68k label V105, ROM M105XX 08/05/02) (ARM label V105, ROM 08/05/02 S105XX)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k time: 10:24:11 ARM time: 10:33:23
+GAME( 2002, dmnfrntb,     dmnfrnt,   pgm_arm_type3,    pgm,      pgm_arm_type3_state, init_dmnfrnt,    ROT0,   "IGS", "Demon Front / Moyu Zhanxian (68k label V103, ROM M103XX 07/05/02) (ARM label V103, ROM 07/05/02 S103XX)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k time: 14:43:13 ARM time: 11:04:24
+GAME( 2002, dmnfrnta,     dmnfrnt,   pgm_arm_type3,    pgm,      pgm_arm_type3_state, init_dmnfrnt,    ROT0,   "IGS", "Demon Front / Moyu Zhanxian (68k label V102, ROM M102XX 06/19/02) (ARM label V102, ROM 05/24/02 S101XX)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 68k time: 13:44:08 ARM time: 13:04:31  (from the strings it looks like V102 only upgraded the 68k ROM)
+GAME( 2002, dmnfrntpcb,   dmnfrnt,   pgm_arm_type3,    pgm,      pgm_arm_type3_state, init_dmnfrnt,    ROT0,   "IGS", "Demon Front V1.1 / Moyu Zhanxian V1.1 (68k label V107KR, ROM M107KR 11/03/03) (ARM label V106KR, ROM 10/16/03 S106KR) (JAMMA PCB)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // works but reports version mismatch (wants internal rom version and region to match external?)
 
 
 /* these don't use an External ARM rom, and don't have any weak internal functions which would allow the internal ROM to be read out */
-GAME( 2002, ddp3,       0,           pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi III (World, 2002.05.15 Master Ver)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ddpdoj,     ddp3,        pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V101 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
-GAME( 2002, ddpdoja,    ddp3,        pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V100 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ddpdojb,    ddp3,        pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05 Master Ver)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ddpdojblk,  ddp3,        pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07.Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07.Black Ver" (new)
-GAME( 2002, ddpdojblka, ddp3,        pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ddp3,      ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07 Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
-GAME( 2012, ddpdojblkbl,ddp3,        pgm_arm_type1,         pgm, pgm_arm_type1_state,     kovsh,     ROT270, "bootleg",            "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07 Black Ver., bootleg Knights of Valour Super Heroes conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // the extra . in the revision has been added by bootlegger
+GAME( 2002, ddp3,       0,           pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi III (World, 2002.05.15 Master Ver)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ddpdoj,     ddp3,        pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V101 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
+GAME( 2002, ddpdoja,    ddp3,        pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou V100 (Japan, 2002.04.05.Master Ver)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ddpdojb,    ddp3,        pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.04.05 Master Ver)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ddpdojblk,  ddp3,        pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07.Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07.Black Ver" (new)
+GAME( 2002, ddpdojblka, ddp3,        pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ddp3,     ROT270, "Cave (AMI license)", "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07 Black Ver)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
+GAME( 2012, ddpdojblkbl,ddp3,        pgm_arm_type1,         pgm,     pgm_arm_type1_state, init_kovsh,    ROT270, "bootleg",            "DoDonPachi Dai-Ou-Jou (Japan, 2002.10.07 Black Ver., bootleg Knights of Valour Super Heroes conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // the extra . in the revision has been added by bootlegger
 
 
 // the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
 // the only difference between 'ket' and 'ket1' is the ROM fill at 0x1443bc-0x1c88cd, on ket1 it seems to be randomized / garbage data, on ket it's all 0xff, both have been seen on more than one PCB.
-GAME( 2002, ket,          0,         pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ket,       ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ket1,         ket,       pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ket,       ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.) (alt rom fill)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, keta,         ket,       pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ket,       ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver.)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ketb,         ket,       pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     ket,       ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, ketbl,        ket,       pgm_arm_type2,         pgm, pgm_arm_type2_state,     ddp2,      ROT270, "bootleg",            "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver., bootleg cartridge conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ket,          0,         pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ket1,         ket,       pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.) (alt rom fill)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, keta,         ket,       pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver.)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ketb,         ket,       pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_ket,      ROT270, "Cave (AMI license)", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ketbl,        ket,       pgm_arm_type2,         pgm,     pgm_arm_type2_state, init_ddp2,     ROT270, "bootleg",            "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver., bootleg cartridge conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 
 // these are modern hacks, some of them have been seen on original PCBs, also reportedly on a bootleg PCB with mostly original components but the ARM replaced with a custom chip.
 // this is a significantly reworked version of the game
-GAME( 2014, ketarr,    ket,       pgm_arm_type1_cave, pgm,      pgm_arm_type1_state, ket,        ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2014/07/16 ARRANGE 1.7 VER) (hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 2012, ketarr151, ket,       pgm_arm_type1_cave, pgm,      pgm_arm_type1_state, ket,        ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.51 VER) (hack)", MACHINE_SUPPORTS_SAVE ) // this apparently crashes on an original PGM PCB when displaying the text after starting a game, find out why and reproduce the issue in MAME.
-GAME( 2012, ketarr15,  ket,       pgm_arm_type1_cave, pgm,      pgm_arm_type1_state, ket,        ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.5 VER) (hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 2012, ketarr10,  ket,       pgm_arm_type1_cave, pgm,      pgm_arm_type1_state, ket,        ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 ARRANGE VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2014, ketarr,    ket,       pgm_arm_type1_cave,       pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2014/07/16 ARRANGE 1.7 VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarr151, ket,       pgm_arm_type1_cave,       pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.51 VER) (hack)", MACHINE_SUPPORTS_SAVE ) // this apparently crashes on an original PGM PCB when displaying the text after starting a game, find out why and reproduce the issue in MAME.
+GAME( 2012, ketarr15,  ket,       pgm_arm_type1_cave,       pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/26 ARRANGE 1.5 VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarr10,  ket,       pgm_arm_type1_cave,       pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 ARRANGE VER) (hack)", MACHINE_SUPPORTS_SAVE )
 
 // these simplify the scoring system
-GAME( 2012, ketarrs151, ket,       pgm_arm_type1_cave, pgm,      pgm_arm_type1_state, ket,        ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/27 MR.STOIC 1.51 VER) (hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 2012, ketarrs15,  ket,       pgm_arm_type1_cave, pgm,      pgm_arm_type1_state, ket,        ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/27 MR.STOIC 1.5 VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarrs151, ket,       pgm_arm_type1_cave,      pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/27 MR.STOIC 1.51 VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarrs15,  ket,       pgm_arm_type1_cave,      pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/06/27 MR.STOIC 1.5 VER) (hack)", MACHINE_SUPPORTS_SAVE )
 
 // this has the 'programmed slowdown' removed.
-GAME( 2012, ketarrf,    ket,       pgm_arm_type1_cave, pgm,      pgm_arm_type1_state, ket,        ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 FAST. VER) (hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 2012, ketarrf,    ket,       pgm_arm_type1_cave,      pgm,     pgm_arm_type1_state, init_ket,      ROT270, "hack (trap15)", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 FAST. VER) (hack)", MACHINE_SUPPORTS_SAVE )
 
 // this version is stupid, it just simulates what happens if the protection chip isn't returning proper values
 // ROM_LOAD16_WORD_SWAP( "ketarrb_v100.u38", 0x000000, 0x200000, CRC(ec7a4f92) SHA1(6351fb386586956fbdb5f0730c481fb539cc267a) )
-// GAME( 2002, ketarrb,    ket,       pgm_arm_type1_cave, pgm,      pgm_arm_type1_state, ket,        ROT270, "trap15", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 BACK. VER)", MACHINE_SUPPORTS_SAVE )
+// GAME( 2002, ketarrb,    ket,       pgm_arm_type1_cave,   pgm,     pgm_arm_type1_state, init_ket,      ROT270, "trap15", "Ketsui: Kizuna Jigoku Tachi (2012/04/17 BACK. VER)", MACHINE_SUPPORTS_SAVE )
 
 
-GAME( 2003, espgal,       0,         pgm_arm_type1_cave,    pgm, pgm_arm_type1_state,     espgal,    ROT270, "Cave (AMI license)", "Espgaluda (2003/10/15 Master Ver)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, espgalbl,     espgal,    pgm_arm_type2,         pgm, pgm_arm_type2_state,     ddp2,      ROT270, "bootleg",            "Espgaluda (2003/10/15 Master Ver, bootleg cartridge conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, espgal,       0,         pgm_arm_type1_cave,    pgm,     pgm_arm_type1_state, init_espgal,   ROT270, "Cave (AMI license)", "Espgaluda (2003/10/15 Master Ver)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, espgalbl,     espgal,    pgm_arm_type2,         pgm,     pgm_arm_type2_state, init_ddp2,     ROT270, "bootleg",            "Espgaluda (2003/10/15 Master Ver, bootleg cartridge conversion)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
+//泡泡鱼/Pào pào yú (China)
+//(i can't found any similar Traditional Chinese characters on Taiwan region title screen)
 // protection simulated, but should be correct
-GAME( 1999, puzzli2,      pgm,       pgm_arm_type1_sim,  puzzli2, pgm_arm_type1_state,    puzzli2,    ROT0,   "IGS", "Puzzli 2 (ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROM label is V100 ( V0001, 11/22/99 09:27:58 in program ROM )
-GAME( 2001, puzzli2s,     puzzli2,   pgm_arm_type1_sim,  puzzli2, pgm_arm_type1_state,    puzzli2,    ROT0,   "IGS", "Puzzli 2 Super (ver. 200)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // ( V200, 12/28/01 12:53:34 in program ROM )
+GAME( 1999, puzzli2,      pgm,       pgm_arm_type1_sim,     puzzli2, pgm_arm_type1_state, init_puzzli2,  ROT0,   "IGS (Metro license)", "Puzzli 2 / Pao Pao Yu (ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROM label is V100 ( V0001, 11/22/99 09:27:58 in program ROM )
+GAME( 2001, puzzli2s,     puzzli2,   pgm_arm_type1_sim,     puzzli2, pgm_arm_type1_state, init_puzzli2,  ROT0,   "IGS (Metro license)", "Puzzli 2 Super / Pao Pao Yu Super (ver. 200)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // ( V200, 12/28/01 12:53:34 in program ROM )
 
-GAME( 2005, killbldp,     pgm,       pgm_arm_type3,      pgm,     pgm_arm_type3_state,    killbldp,   ROT0,   "IGS", "The Killing Blade Plus (China, ver. 300)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* using internal rom from bootleg */
+//傲劍狂刀加强版/Ào jiàn kuáng dāo Jiāqiáng bǎn
+GAME( 2005, killbldp,     pgm,       pgm_arm_type3,         pgm,     pgm_arm_type3_state, init_killbldp, ROT0,   "IGS", "The Killing Blade Plus / Ao Jian Kuang Dao Jiaqiang Ban (China, ver. 300)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* using internal rom from bootleg */
 
+//神劍伏魔录/Shén jiàn fú mó lù/San4 Gim3 Fuk6 Mo1 Luk6 (China, Hong Kong; Mixed Traditional and Simplified Chinese)
+//神劍風雲/Shén jiàn fēngyún (Taiwan and Title call; Traditional Chinese)
+//신검의 풍운/singeom-ui pung-un (Korea)
+//闘幻狂 Road of the Sword/Tōgenkyō Road of the Sword (Japan)
 // we're using a partial dump of the internal rom (sans the execute only area) with handcrafted startup code..
 // all 3 68k roms still have V100 strings, but are clearly different builds, there don't appear to be build string dates in them.  Two of the external ARM roms are marked V100 but are different builds, the single PCB v100 appears to be a later revision than the cart V100 as it shares the internal ROM with the V107 cart version, the v100 cart has a different internal ROM
-GAME( 2003, theglad,      pgm,       pgm_arm_type3,     theglad, pgm_arm_type3_state,    theglad,    ROT0,   "IGS", "The Gladiator / Road of the Sword / Shen Jian (M68k label V101) (ARM label V107, ROM 06/06/03 SHEN JIAN V107)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ARM time: 16:17:27
-GAME( 2003, theglad101,   theglad,   pgm_arm_type3,     theglad, pgm_arm_type3_state,    theglad,    ROT0,   "IGS", "The Gladiator / Road of the Sword / Shen Jian (M68k label V100) (ARM label V101, ROM 03/13/03 SHEN JIAN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ARM time: 14:06:44
+GAME( 2003, theglad,      pgm,       pgm_arm_type3,         theglad, pgm_arm_type3_state, init_theglad,  ROT0,   "IGS", "The Gladiator / Shen Jian Fu Mo Lu / Shen Jian Fengyun (M68k label V101) (ARM label V107, ROM 06/06/03 SHEN JIAN V107)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ARM time: 16:17:27
+GAME( 2003, theglad101,   theglad,   pgm_arm_type3,         theglad, pgm_arm_type3_state, init_theglad,  ROT0,   "IGS", "The Gladiator / Shen Jian Fu Mo Lu / Shen Jian Fengyun (M68k label V100) (ARM label V101, ROM 03/13/03 SHEN JIAN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ARM time: 14:06:44
 // the v100 68k ROM on this is older than the v101 set, this set also uses a different internal ROM to everything else, must be a very early release, maybe pre v100 proto with v100 strings?
-GAME( 2003, theglad100,   theglad,   pgm_arm_type3,     theglad, pgm_arm_type3_state,    theglada,   ROT0,   "IGS", "The Gladiator / Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 01/16/03 SHEN JIAN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* need correct internal rom of IGS027A - we currently patch the one we have */ // ARM time: 10:39:25
+GAME( 2003, theglad100,   theglad,   pgm_arm_type3,         theglad, pgm_arm_type3_state, init_theglada, ROT0,   "IGS", "The Gladiator / Shen Jian Fu Mo Lu / Shen Jian Fengyun (M68k label V100) (ARM label V100, ROM 01/16/03 SHEN JIAN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) /* need correct internal rom of IGS027A - we currently patch the one we have */ // ARM time: 10:39:25
 // newer than ARM V100 Cart, older than ARM V101 Cart, same 68k rom as V101 Cart.
-GAME( 2003, thegladpcb,   theglad,   pgm_arm_type3,     pgm,    pgm_arm_type3_state,    theglad,    ROT0,   "IGS", "The Gladiator / Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 02/25/03 SHEN JIAN) (Japan, JAMMA PCB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )// ARM time: 16:32:21 // PCB version only released in Japan?
+GAME( 2003, thegladpcb,   theglad,   pgm_arm_type3,         pgm,     pgm_arm_type3_state, init_theglad,  ROT0,   "IGS (Alta/AMI license)", "Tougenkyou - Road of the Sword (M68k label V100) (ARM label V100, ROM 02/25/03 SHEN JIAN) (Japan, JAMMA PCB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )// ARM time: 16:32:21 // PCB version only released in Japan?
 
-GAME( 2005, svg,          pgm,       pgm_arm_type3,     svg, pgm_arm_type3_state,    svg,        ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V200) (ARM label V200, ROM 10/11/05 S.V.G V201)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ARM label was 200, but it's code rev 201? // ARM time: 10:07:20
-GAME( 2005, svgtw,        svg,       pgm_arm_type3,     svgtw,pgm_arm_type3_state,   svgpcb,     ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V101TW) (ARM label V101TW, ROM 06/20/05 S.V.G V100)", MACHINE_NOT_WORKING ) // 68k label was 101 but it's same as v100
-GAME( 2005, svgpcb,       svg,       pgm_arm_type3,     svg, pgm_arm_type3_state,    svgpcb,     ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V100JP) (ARM label V100JP, ROM 05/12/05 S.V.G V100) (Japan, JAMMA PCB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )// ARM time: 15:31:35 // PCB version only released in Japan?
+//圣魔世纪/Shèng mó shìjì (China)
+//聖魔世紀/Shèng mó shìjì (Taiwan, Hong Kong)
+GAME( 2005, svg,          pgm,       pgm_arm_type3,         svg,     pgm_arm_type3_state,  init_svg,     ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation / Sheng Mo Shiji (M68k label V200) (ARM label V200, ROM 10/11/05 S.V.G V201)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ARM label was 200, but it's code rev 201? // ARM time: 10:07:20
+GAME( 2005, svgtw,        svg,       pgm_arm_type3,         svgtw,   pgm_arm_type3_state,  init_svgpcb,  ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation / Sheng Mo Shiji (M68k label V101TW) (ARM label V101TW, ROM 06/20/05 S.V.G V100)", MACHINE_NOT_WORKING ) // 68k label was 101 but it's same as v100
+GAME( 2005, svgpcb,       svg,       pgm_arm_type3,         svgpcb,  pgm_arm_type3_state,  init_svgpcb,  ROT0,   "IGS / Idea Factory (AMI license)", "S.V.G. - Spectral vs Generation / Sheng Mo Shiji (M68k label V100JP) (ARM label V100JP, ROM 05/12/05 S.V.G V100) (Japan, JAMMA PCB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )// ARM time: 15:31:35 // PCB version only released in Japan?
 
-GAME( 2004, happy6,       pgm,       pgm_arm_type3,     happy6, pgm_arm_type3_state,    happy6,     ROT0,   "IGS", "Happy 6-in-1 (ver. 102CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2004, happy6101,    happy6,    pgm_arm_type3,     happy6, pgm_arm_type3_state,    happy6,     ROT0,   "IGS", "Happy 6-in-1 (ver. 101CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//欢乐六合一/Huānlè liùhé yī (China, Singapore)
+//歡樂六合一/Huānlè liùhé yī (Taiwan, Hong Kong, Oversea)
+GAME( 2004, happy6,       pgm,       pgm_arm_type3,         happy6,  pgm_arm_type3_state,  init_happy6,  ROT0,   "IGS", "Huanle Liuhe Yi (Happy 6-in-1) (M68K ver. V101, ARM ver. V102CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2004, happy6101,    happy6,    pgm_arm_type3,         happy6,  pgm_arm_type3_state,  init_happy6,  ROT0,   "IGS", "Huanle Liuhe Yi (Happy 6-in-1) (M68K ver. V100, ARM ver. V101CN)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* -----------------------------------------------------------------------------------------------------------------------
    Partially Working, playable, but some imperfections
    -----------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1998, olds,         pgm,       pgm_028_025_ol,    olds, pgm_028_025_state,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 101, Korean Board)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
-GAME( 1998, olds100,      olds,      pgm_028_025_ol,    olds, pgm_028_025_state,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 100, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
-GAME( 1998, olds100a,     olds,      pgm_028_025_ol,    olds, pgm_028_025_state,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 100, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+//西游释厄传Super/Xīyóu shì è chuán Super (China; Simplified Chinese)
+//西遊釋厄傳Super/Xīyóu shì è chuán Super (Taiwan; Traditional Chinese)
+GAME( 1998, olds,         pgm,       pgm_028_025_ol,        olds,    pgm_028_025_state,    init_olds,    ROT0,   "IGS", "Oriental Legend Super / Xiyou Shi E Chuan Super (ver. 101, Korean Board)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1998, olds100,      olds,      pgm_028_025_ol,        olds,    pgm_028_025_state,    init_olds,    ROT0,   "IGS", "Oriental Legend Special / Xiyou Shi E Chuan Super (ver. 100, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1998, olds100a,     olds,      pgm_028_025_ol,        olds,    pgm_028_025_state,    init_olds,    ROT0,   "IGS", "Oriental Legend Special / Xiyou Shi E Chuan Super (ver. 100, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* region provided by protection device; OPCODE 1111 error at startup */
 // This version was specially made for a Chinese online gaming company. While it may not be entirely suitable for MAME, it can give some insight into how protection should work.
-GAME( 1998, olds103t,     olds,      pgm,               pgm,  pgm_state,             pgm,        ROT0,   "bootleg", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 103, China, Tencent) (unprotected)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, olds103t,     olds,      pgm,                   pgm,     pgm_state,            init_pgm,     ROT0,   "bootleg", "Xiyou Shi E Chuan Super (ver. 103, China, Tencent) (unprotected)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // without overseas region
 
-GAME( 1999, kov,          pgm,       pgm_arm_type1_sim,     sango, pgm_arm_type1_state,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 117)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0008 04/27/99 10:33:33
-GAME( 1999, kov115,       kov,       pgm_arm_type1_sim,     sango, pgm_arm_type1_state,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 115)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0006 02/22/99 11:53:18
-GAME( 1999, kov100,       kov,       pgm_arm_type1_sim,     sango, pgm_arm_type1_state,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 100, Japanese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // V0002 01/31/99 01:54:16
-GAME( 1999, kov100hk,     kov,       pgm_arm_type1_sim,     sango, pgm_arm_type1_state,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 100, Hong Kong)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+//三国战纪/Sānguó zhàn jì (China, Hong Kong; Simplified Chinese)
+//三國戰紀/Sānguó zhàn jì (Taiwan, Japan; Traditional Chinese)
+GAME( 1999, kov,          pgm,       pgm_arm_type1_sim,     sango,   pgm_arm_type1_state,  init_kov,     ROT0,   "IGS", "Knights of Valour / Sanguo Zhan Ji / Sangoku Senki (ver. 117)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0008 04/27/99 10:33:33
+GAME( 1999, kov115,       kov,       pgm_arm_type1_sim,     sango,   pgm_arm_type1_state,  init_kov,     ROT0,   "IGS", "Knights of Valour / Sanguo Zhan Ji / Sangoku Senki (ver. 115)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0006 02/22/99 11:53:18
+GAME( 1999, kov100,       kov,       pgm_arm_type1_sim,     sango,   pgm_arm_type1_state,  init_kov,     ROT0,   "IGS", "Knights of Valour / Sanguo Zhan Ji / Sangoku Senki (ver. 100, Japanese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // V0002 01/31/99 01:54:16
+GAME( 1999, kov100hk,     kov,       pgm_arm_type1_sim,     sango,   pgm_arm_type1_state,  init_kov,     ROT0,   "IGS", "Knights of Valour / Sanguo Zhan Ji / Sangoku Senki (ver. 100, Hong Kong)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 1999, kovplus,      pgm,       pgm_arm_type1_sim,     sango, pgm_arm_type1_state,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (ver. 119, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 1999, kovplusa,     kovplus,   pgm_arm_type1_sim,     sango, pgm_arm_type1_state,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (ver. 119, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+//三国战纪正宗Plus/Sānguó zhàn jì Zhèngzōng Plus (China/Hong Kong; Simplified Chinese)
+//三國戰紀正宗Plus/Sānguó zhàn jì Zhèngzōng Plus (Taiwan, Japan; Traditional Chinese)
+GAME( 1999, kovplus,      pgm,       pgm_arm_type1_sim,     sango,   pgm_arm_type1_state,  init_kov,     ROT0,   "IGS", "Knights of Valour Plus / Sanguo Zhan Ji Zhengzong Plus / Sangoku Senki Masamune Plus (ver. 119, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kovplusa,     kovplus,   pgm_arm_type1_sim,     sango,   pgm_arm_type1_state,  init_kov,     ROT0,   "IGS", "Knights of Valour Plus / Sanguo Zhan Ji Zhengzong Plus / Sangoku Senki Masamune Plus (ver. 119, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
+//三國群英传正宗Plus/Sānguó qúnyīng chuán Zhèngzōng Plus (Mixed Simplified and Traditional Chinese in title screen)
 // modified title screen is only visible for china region, so use that by default.  Character select portraits don't seem quite right (different protection?)
-GAME( 1999, kovsgqyz,     kovplus,   pgm_arm_type1_sim,     sango_ch, pgm_arm_type1_state,    kovboot,    ROT0,   "bootleg", "Knights of Valour: SanGuo QunYingZhuan / Sangoku Senki: SanGuo QunYingZhuan (bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 1999, kovsgqyza,    kovplus,   pgm_arm_type1_sim,     sango_ch, pgm_arm_type1_state,    kovboot,    ROT0,   "bootleg", "Knights of Valour: SanGuo QunYingZhuan / Sangoku Senki: SanGuo QunYingZhuan (bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 1999, kovsgqyzb,    kovplus,   pgm_arm_type1_sim,     sango_ch, pgm_arm_type1_state,    kovboot,    ROT0,   "bootleg", "Knights of Valour: SanGuo QunYingZhuan / Sangoku Senki: SanGuo QunYingZhuan (bootleg, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kovsgqyz,     kovplus,   pgm_arm_type1_sim,     sango_ch, pgm_arm_type1_state, init_kovboot, ROT0,   "bootleg", "Sanguo Qunying Chuan Zhengzong Plus (bootleg of Knights of Valour Plus, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kovsgqyza,    kovplus,   pgm_arm_type1_sim,     sango_ch, pgm_arm_type1_state, init_kovboot, ROT0,   "bootleg", "Sanguo Qunying Chuan Zhengzong Plus (bootleg of Knights of Valour Plus, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kovsgqyzb,    kovplus,   pgm_arm_type1_sim,     sango_ch, pgm_arm_type1_state, init_kovboot, ROT0,   "bootleg", "Sanguo Qunying Chuan Zhengzong Plus (bootleg of Knights of Valour Plus, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 
 /* -----------------------------------------------------------------------------------------------------------------------
    NOT Working (mostly due to needing internal protection roms dumped)
    -----------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1999, puzlstar,     pgm,       pgm_arm_type1_sim,    pstar, pgm_arm_type1_state,    pstar,      ROT0,   "IGS", "Puzzle Star (ver. 100MG)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+//魔幻星座/Móhuàn xīngzuò
+GAME( 1999, puzlstar,     pgm,       pgm_arm_type1_sim,     pstar,   pgm_arm_type1_state,  init_pstar,    ROT0,   "IGS (Metro license)", "Puzzle Star / Mohuan Xingzuo (ver. 100MG)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2001, py2k2,        pgm,       pgm_arm_type1_sim,    py2k2, pgm_arm_type1_state,    py2k2,      ROT0,   "IGS", "Photo Y2K 2", MACHINE_NOT_WORKING )  /* need internal rom of IGS027A */
-GAME( 2004, pgm3in1,      pgm,       pgm_arm_type1_sim,    py2k2, pgm_arm_type1_state,    pgm3in1,      ROT0,   "IGS", "Photo Y2K 2 (Flash 3-in-1)", MACHINE_NOT_WORKING )  /* need internal rom of IGS027A */
+//超級比一比2/Chāojí bǐ yī bǐ 2 (Taiwan)
+//大家来找碴2/Dàjiā lái zhǎo chá 2/Daai6gaa1 Loi4 Zaau2 Caa4 2 (China, Hong Kong)
+//リアルアンドフェイク 2 Photo Y2K/Riaruandofeiku(Real and Fake) 2 Photo Y2K (Japan)
+GAME( 2001, py2k2,        pgm,       pgm_arm_type1_sim,     py2k2,   pgm_arm_type1_state,  init_py2k2,    ROT0,   "IGS", "Photo Y2K 2 / Chaoji Bi Yi Bi 2 / Dajia Lai Zhao Cha 2 / Real and Fake 2 Photo Y2K (M101XX 05/25/01 11:02:54)", MACHINE_NOT_WORKING )  /* need internal rom of IGS027A */
+
+//閃亮三合一/Shǎn liàng sān hé yī (Taiwan, Hong Kong, Oversea)
+//闪亮三合一/Shǎn liàng sān hé yī (China)
+GAME( 2004, pgm3in1,      pgm,       pgm_arm_type1_sim,     pgm3in1, pgm_arm_type1_state,  init_pgm3in1,  ROT0,   "IGS", "Shan Liang San He Yi (Flash 3-in-1) (V100 07/13/04 12:09:20)", MACHINE_NOT_WORKING )  /* need internal rom of IGS027A */
 
 
 /* Games below this point are known to have an 'execute only' internal ROM area covering an area at the start of the internal ROM.  This can't be read when running code from either internal or external ROM space. */
 
-
+//西游释厄传群魔乱舞/Xīyóu shì è chuán Qúnmóluànwǔ (China, Japan; Simplified Chinese)
+//西遊釋厄傳群魔亂舞/Xīyóu shì è chuán Qúnmóluànwǔ (Hong Kong, World, Taiwan; Traditional Chinese)
+//Oriental Legend 2/손오공 2/Son Ogong 2 (Korea)
 // Simulation doesn't seem 100% so marked as NOT WORKING.  Probably wasn't released in all specified regions (protection device intenral ROM supplies the region)  "Oriental Ex" is the identifier string used in test mode.
-GAME( 2004, oldsplus,     pgm,       pgm_arm_type1_sim, oldsplus, pgm_arm_type1_state,     oldsplus,   ROT0,   "IGS", "Oriental Legend 2 (Korea) / Xi You Shi E Zhuan Super Plus (World, China, Japan, Hong Kong, Taiwan) (ver. 205) [Oriental Ex]", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, oldsplus,     pgm,       pgm_arm_type1_sim,     oldsplus, pgm_arm_type1_state, init_oldsplus, ROT0,   "IGS", "Oriental Legend 2 (Korea) / Xiyou Shi E Chuan Qunmoluanwu (World, China, Japan, Hong Kong, Taiwan) (ver. 205) [Oriental Ex]", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 // we use the kovsh ARM rom for this, itercepting commands and changing them to match it, doesn't seem 100% correct tho so I'm leaving it as NOT WORKING; for example the ARM rom supplies addresses of Z80 music data sections, which have moved causing incorrect music, some damage rates could be different too.
 // the game logo remains stuck on the screen during gameplay, but videos of the original board suggest this happens on real hardware as well
 // if the internal ROM can't be extracted (likely case, execute only area and NO chance of custom code execution at all due to lack of external ROM) then a reference simulator should probably be written based on the actual
 // kovsh code, tweaked based on tests done with this specific board to catch any different behaviors.  These all seem to be for China only, they don't work as expected when set to other regions.
-GAME( 2004, kovshp,       pgm,       pgm_arm_type1,     kovsh, pgm_arm_type1_state,    kovshp,     ROT0,   "IGS", "Knights of Valour Super Heroes Plus / Sangoku Senki Super Heroes Plus (ver. 101)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2004, kovshpa,      kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state,    kovshp,     ROT0,   "IGS", "Knights of Valour Super Heroes Plus / Sangoku Senki Super Heroes Plus (ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-// Seems to be an earlier version, uses same PCB as kovsh.
-GAME( 1999, kovytzy,      pgm,       pgm_arm_type1,     kovsh, pgm_arm_type1_state,    kovshp,     ROT0,   "IGS", "Knights of Valour: Yi Tong Zhong Yuan / Sangoku Senki: Yi Tong Zhong Yuan (ver. 201, China)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+
+//三国战记乱世枭雄/Sānguó zhàn jì Luànshì xiāoxióng (China; Simplified Chinese, Official?)
+//三國戰記亂世梟雄/Sānguó zhàn jì Luànshì xiāoxióng (Traditional Chinese, Official?)
+GAME( 2004, kovshp,       pgm,       pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovshp,   ROT0,   "IGS", "Knights of Valour Super Heroes Plus / Sanguo Zhan Ji Luanshi Xiaoxiong (ver. 101)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovshpa,      kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovshp,   ROT0,   "IGS", "Knights of Valour Super Heroes Plus / Sanguo Zhan Ji Luanshi Xiaoxiong (ver. 100)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+// First(possibly) major updated version of kovsh with 3 game modes and new characters, Version is V201 and identification string is "SANGO EX+" instead "SANGO EX".
+// 一统中原/Yītǒng zhōngyuán is game mode(this mode is similar as kovsh), and ROM labels too?
+GAME( 1999, kovytzy,      pgm,       pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovshp,   ROT0,   "IGS", "Knights of Valour Super Heroes / Sanguo Zhan Ji Fengyun Zaiqi / Sangoku Senki Super Heroes (SANGO EX+) (ver. 201 'Yitong Zhongyuan', China)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+//傲世三国/Àoshì sānguó
 // this bootleg is very close to kovshp
-GAME( 2004, kovshxas,     kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state, kovshxas,   ROT0,   "bootleg", "Knights of Valour: Aoshi Sanguo / Sangoku Senki: Aoshi Sanguo (ver. 202CN)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2008, kovshxas,     kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovshxas, ROT0,   "bootleg", "Aoshi Sanguo (bootleg of Knights of Valour Super Heroes Plus, V202CN, Oct 6 2008 09:59:26)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 // these should be bootlegs of kovshp, but have further command changes in their ARMs and have a lot of code shuffled around, bootlegs of a different revision?
-GAME( 2004, kovlsqh,      kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state, kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang / Sangoku Senki: Luan Shi Quan Huang (ver. 200CN)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2004, kovlsqh2,     kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state, kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang 2 / Sangoku Senki: Luan Shi Quan Huang 2 (ver. 200CN)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2004, kovlsjb,      kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state, kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (ver. 200CN, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2004, kovlsjba,     kovshp,    pgm_arm_type1,     kovsh, pgm_arm_type1_state, kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (ver. 200CN, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+//乱世拳皇/Luànshì quánhuáng
+GAME( 200?, kovlsqh,      kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Quanhuang (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 200?, kovlsqh2,     kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Quanhuang 2 (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+//乱世街霸/Luànshì jiē b�
+GAME( 200?, kovlsjb,      kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 200?, kovlsjba,     kovshp,    pgm_arm_type1,         kovsh,    pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */

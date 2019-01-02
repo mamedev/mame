@@ -71,7 +71,8 @@ DEFINE_DEVICE_TYPE(SNS_BSX_CART_SLOT,    sns_bsx_cart_slot_device,    "sns_bsx_c
 device_sns_cart_interface::device_sns_cart_interface(const machine_config &mconfig, device_t &device) :
 	device_slot_card_interface(mconfig, device),
 	m_rom(nullptr),
-	m_rom_size(0)
+	m_rom_size(0),
+	m_slot(nullptr)
 {
 }
 
@@ -165,6 +166,17 @@ void device_sns_cart_interface::rom_map_setup(uint32_t size)
 //  }
 }
 
+
+//-------------------------------------------------
+//  write_irq - set the cart IRQ output
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(device_sns_cart_interface::write_irq)
+{
+	if (m_slot != nullptr)
+		m_slot->write_irq(state);
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -178,7 +190,8 @@ base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconf
 	device_slot_interface(mconfig, *this),
 	m_addon(ADDON_NONE),
 	m_type(SNES_MODE20),
-	m_cart(nullptr)
+	m_cart(nullptr),
+	m_irq_callback(*this)
 {
 }
 
@@ -212,6 +225,9 @@ base_sns_cart_slot_device::~base_sns_cart_slot_device()
 void base_sns_cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_sns_cart_interface *>(get_card_device());
+	m_cart->m_slot = this;
+
+	m_irq_callback.resolve_safe();
 }
 
 

@@ -134,7 +134,7 @@ const jaguar_cpu_device::op_func jaguar_cpu_device::dsp_op_table[64] =
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)           (m_direct->read_word(pc, WORD_XOR_BE(0)))
+#define ROPCODE(pc)           (m_cache->read_word(pc))
 
 // SC414200AT
 DEFINE_DEVICE_TYPE(JAGUARGPU, jaguargpu_cpu_device, "jaguargpu", "Motorola Atari Jaguar GPU \"Tom\"")
@@ -339,7 +339,7 @@ void jaguar_cpu_device::device_start()
 	init_tables();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_BIG>();
 	m_cpu_interrupt.resolve_safe();
 
 	save_item(NAME(m_r));

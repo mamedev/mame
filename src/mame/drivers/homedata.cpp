@@ -251,11 +251,6 @@ INTERRUPT_GEN_MEMBER(homedata_state::homedata_irq)
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(homedata_state::upd7807_irq)
-{
-	device.execute().pulse_input_line(UPD7810_INTF1, device.execute().minimum_quantum_time());
-}
-
 
 /********************************************************************************
 
@@ -505,7 +500,7 @@ WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
 	machine().bookkeeping().coin_counter_w(0, ~data & 0x80);
 
 	if (BIT(m_upd7807_portc, 5) && !BIT(data, 5))   /* clock 1->0 */
-		m_sn->write(space, 0, m_upd7807_porta);
+		m_sn->write(m_upd7807_porta);
 
 	m_upd7807_portc = data;
 }
@@ -530,23 +525,23 @@ WRITE8_MEMBER(homedata_state::bankswitch_w)
 
 void homedata_state::mrokumei_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().w(this, FUNC(homedata_state::mrokumei_videoram_w)).share("videoram");
+	map(0x0000, 0x3fff).ram().w(FUNC(homedata_state::mrokumei_videoram_w)).share("videoram");
 	map(0x4000, 0x5fff).ram();
 	map(0x6000, 0x6fff).ram(); /* work ram */
 	map(0x7000, 0x77ff).ram(); /* hourouki expects this to act as RAM */
 	map(0x7800, 0x7800).ram(); /* only used to store the result of the ROM check */
-	map(0x7801, 0x7802).r(this, FUNC(homedata_state::mrokumei_keyboard_r));   // also vblank and active page
+	map(0x7801, 0x7802).r(FUNC(homedata_state::mrokumei_keyboard_r));   // also vblank and active page
 	map(0x7803, 0x7803).portr("IN0");            // coin, service
 	map(0x7804, 0x7804).portr("DSW1");           // DSW1
 	map(0x7805, 0x7805).portr("DSW2");           // DSW2
 	map(0x7ff0, 0x7ffd).writeonly().share("vreg");
 	map(0x7ffe, 0x7ffe).nopr(); // ??? read every vblank, value discarded
-	map(0x8000, 0x8000).w(this, FUNC(homedata_state::mrokumei_blitter_start_w)); // in some games also ROM bank switch to access service ROM
-	map(0x8001, 0x8001).w(this, FUNC(homedata_state::mrokumei_keyboard_select_w));
-	map(0x8002, 0x8002).w(this, FUNC(homedata_state::mrokumei_sound_cmd_w));
-	map(0x8003, 0x8003).w(m_sn, FUNC(sn76489a_device::write));
-	map(0x8006, 0x8006).w(this, FUNC(homedata_state::homedata_blitter_param_w));
-	map(0x8007, 0x8007).w(this, FUNC(homedata_state::mrokumei_blitter_bank_w));
+	map(0x8000, 0x8000).w(FUNC(homedata_state::mrokumei_blitter_start_w)); // in some games also ROM bank switch to access service ROM
+	map(0x8001, 0x8001).w(FUNC(homedata_state::mrokumei_keyboard_select_w));
+	map(0x8002, 0x8002).w(FUNC(homedata_state::mrokumei_sound_cmd_w));
+	map(0x8003, 0x8003).w(m_sn, FUNC(sn76489a_device::command_w));
+	map(0x8006, 0x8006).w(FUNC(homedata_state::homedata_blitter_param_w));
+	map(0x8007, 0x8007).w(FUNC(homedata_state::mrokumei_blitter_bank_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -555,36 +550,36 @@ void homedata_state::mrokumei_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	// TODO: might be that the entire area is sound_bank_w
 	map(0xfffc, 0xfffd).nopw();    /* stack writes happen here, but there's no RAM */
-	map(0x8080, 0x8080).w(this, FUNC(homedata_state::mrokumei_sound_bank_w));
-	map(0xffbf, 0xffbf).w(this, FUNC(homedata_state::mrokumei_sound_bank_w)); // hourouki mirror
+	map(0x8080, 0x8080).w(FUNC(homedata_state::mrokumei_sound_bank_w));
+	map(0xffbf, 0xffbf).w(FUNC(homedata_state::mrokumei_sound_bank_w)); // hourouki mirror
 }
 
 void homedata_state::mrokumei_sound_io_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(homedata_state::mrokumei_sound_io_r)); /* read address is 16-bit */
-	map(0x0040, 0x0040).mirror(0xff00).w("dac", FUNC(dac_byte_interface::write)); /* write address is only 8-bit */
+	map(0x0000, 0xffff).r(FUNC(homedata_state::mrokumei_sound_io_r)); /* read address is 16-bit */
+	map(0x0040, 0x0040).mirror(0xff00).w("dac", FUNC(dac_byte_interface::data_w)); /* write address is only 8-bit */
 	// hourouki mirror...
-	map(0x007f, 0x007f).mirror(0xff00).w("dac", FUNC(dac_byte_interface::write)); /* write address is only 8-bit */
+	map(0x007f, 0x007f).mirror(0xff00).w("dac", FUNC(dac_byte_interface::data_w)); /* write address is only 8-bit */
 }
 
 /********************************************************************************/
 
 void homedata_state::reikaids_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().w(this, FUNC(homedata_state::reikaids_videoram_w)).share("videoram");
+	map(0x0000, 0x3fff).ram().w(FUNC(homedata_state::reikaids_videoram_w)).share("videoram");
 	map(0x4000, 0x5fff).ram();
 	map(0x6000, 0x6fff).ram(); /* work RAM */
 	map(0x7800, 0x7800).ram(); /* behaves as normal RAM */
 	map(0x7801, 0x7801).portr("IN0");
 	map(0x7802, 0x7802).portr("IN1");
-	map(0x7803, 0x7803).r(this, FUNC(homedata_state::reikaids_io_r)); // coin, blitter, upd7807
+	map(0x7803, 0x7803).r(FUNC(homedata_state::reikaids_io_r)); // coin, blitter, upd7807
 	map(0x7ff0, 0x7ffd).writeonly().share("vreg");
-	map(0x7ffe, 0x7ffe).w(this, FUNC(homedata_state::reikaids_blitter_bank_w));
-	map(0x7fff, 0x7fff).w(this, FUNC(homedata_state::reikaids_blitter_start_w));
-	map(0x8000, 0x8000).w(this, FUNC(homedata_state::bankswitch_w));
-	map(0x8002, 0x8002).w(this, FUNC(homedata_state::reikaids_snd_command_w));
-	map(0x8005, 0x8005).w(this, FUNC(homedata_state::reikaids_gfx_bank_w));
-	map(0x8006, 0x8006).w(this, FUNC(homedata_state::homedata_blitter_param_w));
+	map(0x7ffe, 0x7ffe).w(FUNC(homedata_state::reikaids_blitter_bank_w));
+	map(0x7fff, 0x7fff).w(FUNC(homedata_state::reikaids_blitter_start_w));
+	map(0x8000, 0x8000).w(FUNC(homedata_state::bankswitch_w));
+	map(0x8002, 0x8002).w(FUNC(homedata_state::reikaids_snd_command_w));
+	map(0x8005, 0x8005).w(FUNC(homedata_state::reikaids_gfx_bank_w));
+	map(0x8006, 0x8006).w(FUNC(homedata_state::homedata_blitter_param_w));
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).rom();
 }
@@ -599,27 +594,27 @@ void homedata_state::reikaids_upd7807_map(address_map &map)
 
 void homedata_state::pteacher_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().w(this, FUNC(homedata_state::mrokumei_videoram_w)).share("videoram");
+	map(0x0000, 0x3fff).ram().w(FUNC(homedata_state::mrokumei_videoram_w)).share("videoram");
 	map(0x4000, 0x5eff).ram();
 	map(0x5f00, 0x5fff).ram();
 	map(0x6000, 0x6fff).ram(); /* work ram */
 	map(0x7800, 0x7800).ram(); /* behaves as normal RAM */
-	map(0x7801, 0x7801).r(this, FUNC(homedata_state::pteacher_io_r)); // vblank, visible page
-	map(0x7ff2, 0x7ff2).r(this, FUNC(homedata_state::pteacher_snd_r));
+	map(0x7801, 0x7801).r(FUNC(homedata_state::pteacher_io_r)); // vblank, visible page
+	map(0x7ff2, 0x7ff2).r(FUNC(homedata_state::pteacher_snd_r));
 	map(0x7ff0, 0x7ffd).writeonly().share("vreg");
-	map(0x7fff, 0x7fff).w(this, FUNC(homedata_state::pteacher_blitter_start_w));
-	map(0x8000, 0x8000).w(this, FUNC(homedata_state::bankswitch_w));
-	map(0x8002, 0x8002).w(this, FUNC(homedata_state::pteacher_snd_command_w));
-	map(0x8005, 0x8005).w(this, FUNC(homedata_state::pteacher_blitter_bank_w));
-	map(0x8006, 0x8006).w(this, FUNC(homedata_state::homedata_blitter_param_w));
-	map(0x8007, 0x8007).w(this, FUNC(homedata_state::pteacher_gfx_bank_w));
+	map(0x7fff, 0x7fff).w(FUNC(homedata_state::pteacher_blitter_start_w));
+	map(0x8000, 0x8000).w(FUNC(homedata_state::bankswitch_w));
+	map(0x8002, 0x8002).w(FUNC(homedata_state::pteacher_snd_command_w));
+	map(0x8005, 0x8005).w(FUNC(homedata_state::pteacher_blitter_bank_w));
+	map(0x8006, 0x8006).w(FUNC(homedata_state::homedata_blitter_param_w));
+	map(0x8007, 0x8007).w(FUNC(homedata_state::pteacher_gfx_bank_w));
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).rom();
 }
 
 void homedata_state::pteacher_upd7807_map(address_map &map)
 {
-	map(0x0000, 0x0000).w(this, FUNC(homedata_state::pteacher_snd_answer_w));
+	map(0x0000, 0x0000).w(FUNC(homedata_state::pteacher_snd_answer_w));
 	map(0x0000, 0xfeff).bankr("bank2");    /* External ROM (Banked) */
 }
 
@@ -1067,7 +1062,7 @@ static const gfx_layout char_layout =
 	32*8
 };
 
-static GFXDECODE_START( mrokumei )
+static GFXDECODE_START( gfx_mrokumei )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0x6000, 0x100 )
 	GFXDECODE_ENTRY( "gfx2", 0, char_layout, 0x7000, 0x100 )
 GFXDECODE_END
@@ -1083,14 +1078,14 @@ static const gfx_layout tile_layout =
 	64*8
 };
 
-static GFXDECODE_START( reikaids )
+static GFXDECODE_START( gfx_reikaids )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0x6000, 0x20 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 0x4000, 0x20 )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 0x2000, 0x20 )
 	GFXDECODE_ENTRY( "gfx4", 0, tile_layout, 0x0000, 0x20 )
 GFXDECODE_END
 
-static GFXDECODE_START( pteacher )
+static GFXDECODE_START( gfx_pteacher )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout, 0x0000, 0x40 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 0x4000, 0x40 )
 GFXDECODE_END
@@ -1117,7 +1112,7 @@ static const gfx_layout tile_layout_4bpp_lo =
 	64*8
 };
 
-static GFXDECODE_START( lemnangl )
+static GFXDECODE_START( gfx_lemnangl )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_4bpp_hi, 0x0000, 0x200 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_4bpp_lo, 0x2000, 0x200 )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout_4bpp_lo, 0x4000, 0x200 )
@@ -1221,13 +1216,13 @@ MACHINE_RESET_MEMBER(homedata_state,reikaids)
 MACHINE_CONFIG_START(homedata_state::mrokumei)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 16000000/4)  /* 4MHz ? */
-	MCFG_CPU_PROGRAM_MAP(mrokumei_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 16000000/4)  /* 4MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(mrokumei_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)   /* 4MHz ? */
-	MCFG_CPU_PROGRAM_MAP(mrokumei_sound_map)
-	MCFG_CPU_IO_MAP(mrokumei_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)   /* 4MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(mrokumei_sound_map)
+	MCFG_DEVICE_IO_MAP(mrokumei_sound_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(homedata_state,homedata)
 	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,homedata)
@@ -1240,26 +1235,25 @@ MACHINE_CONFIG_START(homedata_state::mrokumei)
 	// visible area can be changed at runtime
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_mrokumei)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(homedata_state, screen_vblank_homedata))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, homedata_state, screen_vblank_homedata))
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrokumei)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrokumei);
+	PALETTE(config, m_palette, FUNC(homedata_state::mrokumei_palette), 0x8000);
 
-	MCFG_PALETTE_INIT_OWNER(homedata_state,mrokumei)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,mrokumei)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
+	MCFG_DEVICE_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1268,18 +1262,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(homedata_state::reikaids)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 16000000/4)  /* 4MHz ? */
-	MCFG_CPU_PROGRAM_MAP(reikaids_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 16000000/4)  /* 4MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(reikaids_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
-	MCFG_CPU_ADD("audiocpu", UPD7807, 8000000)  /* ??? MHz (max speed for the 7807 is 12MHz) */
-	MCFG_CPU_PROGRAM_MAP(reikaids_upd7807_map)
-	MCFG_UPD7807_PORTA_READ_CB(READ8(homedata_state, reikaids_upd7807_porta_r))
-	MCFG_UPD7807_PORTA_WRITE_CB(WRITE8(homedata_state, reikaids_upd7807_porta_w))
-	MCFG_UPD7807_PORTB_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_UPD7807_PORTC_WRITE_CB(WRITE8(homedata_state, reikaids_upd7807_portc_w))
-	MCFG_UPD7807_PORTT_READ_CB(READ8(homedata_state, reikaids_snd_command_r))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
+	upd7807_device &audiocpu(UPD7807(config, m_audiocpu, 8000000));  /* ??? MHz (max speed for the 7807 is 12MHz) */
+	audiocpu.set_addrmap(AS_PROGRAM, &homedata_state::reikaids_upd7807_map);
+	audiocpu.pa_in_cb().set(FUNC(homedata_state::reikaids_upd7807_porta_r));
+	audiocpu.pa_out_cb().set(FUNC(homedata_state::reikaids_upd7807_porta_w));
+	audiocpu.pb_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	audiocpu.pc_out_cb().set(FUNC(homedata_state::reikaids_upd7807_portc_w));
+	audiocpu.pt_in_cb().set(FUNC(homedata_state::reikaids_snd_command_r));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) // very high interleave required to sync for startup tests
 
@@ -1287,35 +1280,35 @@ MACHINE_CONFIG_START(homedata_state::reikaids)
 	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,reikaids)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 256-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_reikaids)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(homedata_state, screen_vblank_homedata))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 255, 16, 256-1-16);
+	screen.set_screen_update(FUNC(homedata_state::screen_update_reikaids));
+	screen.screen_vblank().set(FUNC(homedata_state::screen_vblank_homedata));
+	screen.screen_vblank().append([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF1, m_audiocpu->minimum_quantum_time()); });
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", reikaids)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_reikaids);
+	PALETTE(config, m_palette, FUNC(homedata_state::reikaids_palette), 0x8000);
 
-	MCFG_PALETTE_INIT_OWNER(homedata_state,reikaids)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,reikaids)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(3, "speaker", 1.0)
+	YM2203(config, m_ymsnd, 3000000);
+	m_ymsnd->port_a_read_callback().set_ioport("DSW1");
+	m_ymsnd->port_b_read_callback().set_ioport("DSW2");
+	m_ymsnd->add_route(0, "speaker", 0.25);
+	m_ymsnd->add_route(1, "speaker", 0.25);
+	m_ymsnd->add_route(2, "speaker", 0.25);
+	m_ymsnd->add_route(3, "speaker", 1.0);
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1324,19 +1317,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(homedata_state::pteacher)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 16000000/4)  /* 4MHz ? */
-	MCFG_CPU_PROGRAM_MAP(pteacher_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 16000000/4)  /* 4MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(pteacher_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homedata_state,  homedata_irq) /* also triggered by the blitter */
 
-	MCFG_CPU_ADD("audiocpu", UPD7807, 9000000)  /* 9MHz ? */
-	MCFG_CPU_PROGRAM_MAP(pteacher_upd7807_map)
-	MCFG_UPD7807_PORTA_READ_CB(READ8(homedata_state, pteacher_upd7807_porta_r))
-	MCFG_UPD7807_PORTA_WRITE_CB(WRITE8(homedata_state, pteacher_upd7807_porta_w))
-	MCFG_UPD7807_PORTB_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_UPD7807_PORTC_READ_CB(IOPORT("COIN"))
-	MCFG_UPD7807_PORTC_WRITE_CB(WRITE8(homedata_state, pteacher_upd7807_portc_w))
-	MCFG_UPD7807_PORTT_READ_CB(READ8(homedata_state, pteacher_keyboard_r))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", homedata_state,  upd7807_irq)
+	upd7807_device &audiocpu(UPD7807(config, m_audiocpu, 9000000));  /* 9MHz ? */
+	audiocpu.set_addrmap(AS_PROGRAM, &homedata_state::pteacher_upd7807_map);
+	audiocpu.pa_in_cb().set(FUNC(homedata_state::pteacher_upd7807_porta_r));
+	audiocpu.pa_out_cb().set(FUNC(homedata_state::pteacher_upd7807_porta_w));
+	audiocpu.pb_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	audiocpu.pc_in_cb().set_ioport("COIN");
+	audiocpu.pc_out_cb().set(FUNC(homedata_state::pteacher_upd7807_portc_w));
+	audiocpu.pt_in_cb().set(FUNC(homedata_state::pteacher_keyboard_r));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  // should be enough
 
@@ -1344,45 +1336,45 @@ MACHINE_CONFIG_START(homedata_state::pteacher)
 	MCFG_MACHINE_RESET_OVERRIDE(homedata_state,pteacher)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
 	// visible area can be changed at runtime
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_pteacher)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(homedata_state, screen_vblank_homedata))
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_visarea(0*8, 54*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(homedata_state::screen_update_pteacher));
+	screen.screen_vblank().set(FUNC(homedata_state::screen_vblank_homedata));
+	screen.screen_vblank().append([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF1, m_audiocpu->minimum_quantum_time()); });
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pteacher)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pteacher);
+	PALETTE(config, m_palette, FUNC(homedata_state::pteacher_palette), 0x8000);
 
-	MCFG_PALETTE_INIT_OWNER(homedata_state,pteacher)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,pteacher)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
+	MCFG_DEVICE_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homedata_state::mjkinjas)
 	pteacher(config);
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_CLOCK(11000000)    /* 11MHz ? */
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_CLOCK(11000000)    /* 11MHz ? */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homedata_state::lemnangl)
 	pteacher(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", lemnangl)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lemnangl)
 
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,lemnangl)
 MACHINE_CONFIG_END
@@ -1422,11 +1414,11 @@ WRITE8_MEMBER(homedata_state::mirderby_prot_w)
 
 void homedata_state::cpu2_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().w(this, FUNC(homedata_state::mrokumei_videoram_w)).share("videoram");
+	map(0x0000, 0x3fff).ram().w(FUNC(homedata_state::mrokumei_videoram_w)).share("videoram");
 	map(0x4000, 0x5fff).ram();
 	map(0x6000, 0x6fff).ram(); /* work ram */
 	map(0x7000, 0x77ff).ram();
-	map(0x7800, 0x7800).rw(this, FUNC(homedata_state::mirderby_prot_r), FUNC(homedata_state::mirderby_prot_w)); // protection check? (or sound comms?)
+	map(0x7800, 0x7800).rw(FUNC(homedata_state::mirderby_prot_r), FUNC(homedata_state::mirderby_prot_w)); // protection check? (or sound comms?)
 	map(0x7ffe, 0x7ffe).nopr(); //watchdog
 	map(0x8000, 0xffff).rom();
 }
@@ -1446,7 +1438,7 @@ static const gfx_layout mirderbychar_layout =
 	32*8
 };
 
-static GFXDECODE_START( mirderby )
+static GFXDECODE_START( gfx_mirderby )
 	GFXDECODE_ENTRY( "gfx1", 0, mirderbychar_layout, 0x0000, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, mirderbychar_layout, 0x0000, 0x10 )
 GFXDECODE_END
@@ -1497,17 +1489,17 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(homedata_state::mirderby)
 
-	MCFG_CPU_ADD("maincpu", MC6809E, 16000000/8)  /* 2 Mhz */
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 16000000/8)  /* 2 Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
 
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu0", Z80, 16000000/4)   /* 4 Mhz */
+	MCFG_DEVICE_ADD("cpu0", Z80, 16000000/4)   /* 4 Mhz */
 	MCFG_DEVICE_DISABLE()
-	MCFG_CPU_PROGRAM_MAP(cpu0_map)
+	MCFG_DEVICE_PROGRAM_MAP(cpu0_map)
 
-	MCFG_CPU_ADD("cpu1", MC6809E, 16000000/8) /* 2 Mhz */
-	MCFG_CPU_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_ADD("cpu1", MC6809E, 16000000/8) /* 2 Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
 	MCFG_DEVICE_DISABLE()
 	//MCFG_CPU_VBLANK_INT("screen", mirderby_irq)
 
@@ -1521,22 +1513,21 @@ MACHINE_CONFIG_START(homedata_state::mirderby)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(homedata_state, screen_update_mirderby)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirderby)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mirderby);
+	PALETTE(config, m_palette, FUNC(homedata_state::mirderby_palette), 0x8000);
 
-	MCFG_PALETTE_INIT_OWNER(homedata_state,mirderby)
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,mirderby)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 2000000)
-	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "speaker", 0.25)
-	MCFG_SOUND_ROUTE(3, "speaker", 1.0)
+	YM2203(config, m_ymsnd, 2000000);
+	m_ymsnd->add_route(0, "speaker", 0.25);
+	m_ymsnd->add_route(1, "speaker", 0.25);
+	m_ymsnd->add_route(2, "speaker", 0.25);
+	m_ymsnd->add_route(3, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 /**************************************************************************/
@@ -2142,7 +2133,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(homedata_state,jogakuen)
+void homedata_state::init_jogakuen()
 {
 	/* it seems that Mahjong Jogakuen runs on the same board as the others,
 	   but with just these two addresses swapped. Instead of creating a new
@@ -2151,49 +2142,49 @@ DRIVER_INIT_MEMBER(homedata_state,jogakuen)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8005, 0x8005, write8_delegate(FUNC(homedata_state::pteacher_gfx_bank_w),this));
 }
 
-DRIVER_INIT_MEMBER(homedata_state,mjikaga)
+void homedata_state::init_mjikaga()
 {
 	/* Mahjong Ikagadesuka is different as well. */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7802, 0x7802, read8_delegate(FUNC(homedata_state::pteacher_snd_r),this));
 	m_audiocpu->space(AS_PROGRAM).install_write_handler(0x0123, 0x0123, write8_delegate(FUNC(homedata_state::pteacher_snd_answer_w),this));
 }
 
-DRIVER_INIT_MEMBER(homedata_state,reikaids)
+void homedata_state::init_reikaids()
 {
 	m_priority = 0;
 }
 
-DRIVER_INIT_MEMBER(homedata_state,battlcry)
+void homedata_state::init_battlcry()
 {
 	m_priority = 1; /* priority and initial value for bank write */
 }
 
-DRIVER_INIT_MEMBER(homedata_state,mirderby)
+void homedata_state::init_mirderby()
 {
 }
 
 
-GAME( 1987, hourouki,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Hourouki Part 1 - Seisyun Hen (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mhgaiden,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Hourouki Gaiden (Japan)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mjhokite,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Hourouki Okite (Japan)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mjclinic,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Clinic (Japan, set 1)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mjclinica, mjclinic, mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Clinic (Japan, set 2)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mrokumei,  0,        mrokumei, mjhokite, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Rokumeikan (Japan)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hourouki,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Hourouki Part 1 - Seisyun Hen (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mhgaiden,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Hourouki Gaiden (Japan)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mjhokite,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Hourouki Okite (Japan)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mjclinic,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Clinic (Japan, set 1)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mjclinica, mjclinic, mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Clinic (Japan, set 2)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mrokumei,  0,        mrokumei, mjhokite, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Rokumeikan (Japan)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, reikaids,  0,        reikaids, reikaids, homedata_state, reikaids,   ROT0, "Home Data",  "Reikai Doushi (Japan)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, battlcry,  0,        reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data",  "Battlecry (Version E)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, battlcryc, battlcry, reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data",  "Battlecry (Version C)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, battlcryp, battlcry, reikaids, battlcry, homedata_state, battlcry,   ROT0, "Home Data",  "Battlecry (Prototype)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjkojink,  0,        pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Kojinkyouju (Private Teacher) (Japan)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mjjoship,  0,        pteacher, mjjoship, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Joshi Pro-wres -Give up 5 byou mae- (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, vitaminc,  0,        pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Vitamin C (Japan)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjyougo,   0,        pteacher, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong-yougo no Kisotairyoku (Japan)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjkinjas,  0,        mjkinjas, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Kinjirareta Asobi (Japan)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1992?,jogakuen,  0,        pteacher, jogakuen, homedata_state, jogakuen,   ROT0, "Windom",     "Mahjong Jogakuen (Japan)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, reikaids,  0,        reikaids, reikaids, homedata_state, init_reikaids, ROT0, "Home Data",  "Reikai Doushi (Japan)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1991, battlcry,  0,        reikaids, battlcry, homedata_state, init_battlcry, ROT0, "Home Data",  "Battlecry (Version E)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, battlcryc, battlcry, reikaids, battlcry, homedata_state, init_battlcry, ROT0, "Home Data",  "Battlecry (Version C)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, battlcryp, battlcry, reikaids, battlcry, homedata_state, init_battlcry, ROT0, "Home Data",  "Battlecry (Prototype)",                               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjkojink,  0,        pteacher, pteacher, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Kojinkyouju (Private Teacher) (Japan)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mjjoship,  0,        pteacher, mjjoship, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Joshi Pro-wres -Give up 5 byou mae- (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vitaminc,  0,        pteacher, pteacher, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Vitamin C (Japan)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjyougo,   0,        pteacher, pteacher, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong-yougo no Kisotairyoku (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjkinjas,  0,        mjkinjas, pteacher, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Kinjirareta Asobi (Japan)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1992?,jogakuen,  0,        pteacher, jogakuen, homedata_state, init_jogakuen, ROT0, "Windom",     "Mahjong Jogakuen (Japan)",                            MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, lemnangl,  0,        lemnangl, pteacher, homedata_state, 0,          ROT0, "Home Data",  "Mahjong Lemon Angel (Japan)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjprivat,  0,        lemnangl, pteacher, homedata_state, 0,          ROT0, "Matoba",     "Mahjong Private (Japan)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lemnangl,  0,        lemnangl, pteacher, homedata_state, empty_init,    ROT0, "Home Data",  "Mahjong Lemon Angel (Japan)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjprivat,  0,        lemnangl, pteacher, homedata_state, empty_init,    ROT0, "Matoba",     "Mahjong Private (Japan)",                             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991?,mjikaga,   0,        lemnangl, mjikaga,  homedata_state, mjikaga,    ROT0, "Mitchell",   "Mahjong Ikaga Desu ka (Japan)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991?,mjikaga,   0,        lemnangl, mjikaga,  homedata_state, init_mjikaga,  ROT0, "Mitchell",   "Mahjong Ikaga Desu ka (Japan)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, mirderby,  0,        mirderby, mirderby, homedata_state, mirderby,   ROT0, "Home Data?", "Miracle Derby - Ascot",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1988, mirderby,  0,        mirderby, mirderby, homedata_state, init_mirderby, ROT0, "Home Data?", "Miracle Derby - Ascot",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

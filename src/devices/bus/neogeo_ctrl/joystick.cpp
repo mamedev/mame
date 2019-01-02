@@ -144,6 +144,11 @@ static INPUT_PORTS_START( neogeo_joy_ac )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+
+	PORT_START("START")
+	PORT_BIT( 0xfa, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 INPUT_PORTS_END
 
 
@@ -167,8 +172,8 @@ ioport_constructor neogeo_joy_ac_device::device_input_ports() const
 neogeo_joy_ac_device::neogeo_joy_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NEOGEO_JOY_AC, tag, owner, clock),
 	device_neogeo_ctrl_edge_interface(mconfig, *this),
-	m_joy1(*this, "JOY1"),
-	m_joy2(*this, "JOY2")
+	m_joy(*this, "JOY%u", 1U),
+	m_ss(*this, "START")
 {
 }
 
@@ -182,21 +187,12 @@ void neogeo_joy_ac_device::device_start()
 
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void neogeo_joy_ac_device::device_reset()
-{
-}
-
-
-//-------------------------------------------------
 //  in0_r
 //-------------------------------------------------
 
 READ8_MEMBER(neogeo_joy_ac_device::in0_r)
 {
-	return m_joy1->read();
+	return m_joy[0]->read();
 }
 
 //-------------------------------------------------
@@ -205,5 +201,14 @@ READ8_MEMBER(neogeo_joy_ac_device::in0_r)
 
 READ8_MEMBER(neogeo_joy_ac_device::in1_r)
 {
-	return m_joy2->read();
+	return m_joy[1]->read();
+}
+
+//-------------------------------------------------
+//  read_start_sel
+//-------------------------------------------------
+
+uint8_t neogeo_joy_ac_device::read_start_sel()
+{
+	return m_ss->read();
 }

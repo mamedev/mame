@@ -124,8 +124,8 @@ void interpod_device::interpod_mem(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(interpod_device::device_add_mconfig)
-	MCFG_CPU_ADD(R6502_TAG, M6502, 1000000)
-	MCFG_CPU_PROGRAM_MAP(interpod_mem)
+	MCFG_DEVICE_ADD(R6502_TAG, M6502, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(interpod_mem)
 
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, 1000000)
 	MCFG_DEVICE_ADD(R6532_TAG, MOS6532_NEW, 1000000)

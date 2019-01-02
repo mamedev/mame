@@ -128,6 +128,7 @@ Notes:
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/i2cmem.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -229,6 +230,15 @@ public:
 		m_flashrom(*this, "flash"),
 		m_io_ps7500(*this, "PS7500") { }
 
+	void ssfindo(machine_config &config);
+	void ppcar(machine_config &config);
+	void tetfight(machine_config &config);
+
+	void init_ssfindo();
+	void init_ppcar();
+	void init_tetfight();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	optional_device<i2cmem_device> m_i2cmem;
@@ -276,10 +286,7 @@ public:
 	DECLARE_READ32_MEMBER(tetfight_unk_r);
 	DECLARE_WRITE32_MEMBER(tetfight_unk_w);
 
-	DECLARE_DRIVER_INIT(common);
-	DECLARE_DRIVER_INIT(ssfindo);
-	DECLARE_DRIVER_INIT(ppcar);
-	DECLARE_DRIVER_INIT(tetfight);
+	void init_common();
 	virtual void machine_reset() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -296,9 +303,7 @@ public:
 	void PS7500_reset();
 	void ssfindo_speedups();
 	void ppcar_speedups();
-	void ssfindo(machine_config &config);
-	void ppcar(machine_config &config);
-	void tetfight(machine_config &config);
+
 	void ppcar_map(address_map &map);
 	void ssfindo_map(address_map &map);
 	void tetfight_map(address_map &map);
@@ -604,34 +609,34 @@ READ32_MEMBER(ssfindo_state::randomized_r)
 void ssfindo_state::ssfindo_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom();
-	map(0x03200000, 0x032001ff).rw(this, FUNC(ssfindo_state::PS7500_IO_r), FUNC(ssfindo_state::PS7500_IO_w));
+	map(0x03200000, 0x032001ff).rw(FUNC(ssfindo_state::PS7500_IO_r), FUNC(ssfindo_state::PS7500_IO_w));
 	map(0x03012e60, 0x03012e67).noprw();
-	map(0x03012fe0, 0x03012fe3).w(this, FUNC(ssfindo_state::debug_w));
+	map(0x03012fe0, 0x03012fe3).w(FUNC(ssfindo_state::debug_w));
 	map(0x03012ff0, 0x03012ff3).noprw();
-	map(0x03012ff4, 0x03012ff7).nopw().r(this, FUNC(ssfindo_state::ff4_r)); //status flag ?
+	map(0x03012ff4, 0x03012ff7).nopw().r(FUNC(ssfindo_state::ff4_r)); //status flag ?
 	map(0x03012ff8, 0x03012fff).noprw();
 	map(0x03240000, 0x03240003).portr("IN0").nopw();
 	map(0x03241000, 0x03241003).portr("IN1").nopw();
-	map(0x03242000, 0x03242003).r(this, FUNC(ssfindo_state::io_r)).w(this, FUNC(ssfindo_state::io_w));
+	map(0x03242000, 0x03242003).r(FUNC(ssfindo_state::io_r)).w(FUNC(ssfindo_state::io_w));
 	map(0x03243000, 0x03243003).portr("DSW").nopw();
-	map(0x0324f000, 0x0324f003).r(this, FUNC(ssfindo_state::SIMPLEIO_r));
+	map(0x0324f000, 0x0324f003).r(FUNC(ssfindo_state::SIMPLEIO_r));
 	map(0x03245000, 0x03245003).nopw(); /* sound ? */
-	map(0x03400000, 0x03400003).w(this, FUNC(ssfindo_state::FIFO_w));
+	map(0x03400000, 0x03400003).w(FUNC(ssfindo_state::FIFO_w));
 	map(0x10000000, 0x11ffffff).ram().share("vram");
 }
 
 void ssfindo_state::ppcar_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom();
-	map(0x03200000, 0x032001ff).rw(this, FUNC(ssfindo_state::PS7500_IO_r), FUNC(ssfindo_state::PS7500_IO_w));
-	map(0x03012b00, 0x03012bff).r(this, FUNC(ssfindo_state::randomized_r)).nopw();
+	map(0x03200000, 0x032001ff).rw(FUNC(ssfindo_state::PS7500_IO_r), FUNC(ssfindo_state::PS7500_IO_w));
+	map(0x03012b00, 0x03012bff).r(FUNC(ssfindo_state::randomized_r)).nopw();
 	map(0x03012e60, 0x03012e67).nopw();
 	map(0x03012ff8, 0x03012ffb).portr("IN0").nopw();
 	map(0x032c0000, 0x032c0003).portr("IN1").nopw();
 	map(0x03340000, 0x03340007).nopw();
 	map(0x03341000, 0x0334101f).nopw();
-	map(0x033c0000, 0x033c0003).r(this, FUNC(ssfindo_state::io_r)).w(this, FUNC(ssfindo_state::io_w));
-	map(0x03400000, 0x03400003).w(this, FUNC(ssfindo_state::FIFO_w));
+	map(0x033c0000, 0x033c0003).r(FUNC(ssfindo_state::io_r)).w(FUNC(ssfindo_state::io_w));
+	map(0x03400000, 0x03400003).w(FUNC(ssfindo_state::FIFO_w));
 	map(0x08000000, 0x08ffffff).ram();
 	map(0x10000000, 0x10ffffff).ram().share("vram");
 }
@@ -650,12 +655,12 @@ WRITE32_MEMBER(ssfindo_state::tetfight_unk_w)
 void ssfindo_state::tetfight_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom();
-	map(0x03200000, 0x032001ff).rw(this, FUNC(ssfindo_state::PS7500_IO_r), FUNC(ssfindo_state::PS7500_IO_w));
-	map(0x03400000, 0x03400003).w(this, FUNC(ssfindo_state::FIFO_w));
+	map(0x03200000, 0x032001ff).rw(FUNC(ssfindo_state::PS7500_IO_r), FUNC(ssfindo_state::PS7500_IO_w));
+	map(0x03400000, 0x03400003).w(FUNC(ssfindo_state::FIFO_w));
 	map(0x03240000, 0x03240003).portr("IN0");
 	map(0x03240004, 0x03240007).portr("IN1");
 	map(0x03240008, 0x0324000b).portr("DSW2");
-	map(0x03240020, 0x03240023).rw(this, FUNC(ssfindo_state::tetfight_unk_r), FUNC(ssfindo_state::tetfight_unk_w));
+	map(0x03240020, 0x03240023).rw(FUNC(ssfindo_state::tetfight_unk_r), FUNC(ssfindo_state::tetfight_unk_w));
 	map(0x10000000, 0x14ffffff).ram().share("vram");
 }
 
@@ -794,10 +799,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ssfindo_state::ssfindo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7, 54000000) // guess...
-	MCFG_CPU_PROGRAM_MAP(ssfindo_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 54000000) // guess...
+	MCFG_DEVICE_PROGRAM_MAP(ssfindo_map)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssfindo_state,  interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ssfindo_state,  interrupt)
 
 	MCFG_24C01_ADD("i2cmem")
 
@@ -816,8 +821,8 @@ MACHINE_CONFIG_START(ssfindo_state::ppcar)
 	ssfindo(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ppcar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ppcar_map)
 
 	MCFG_DEVICE_REMOVE("i2cmem")
 MACHINE_CONFIG_END
@@ -826,8 +831,8 @@ MACHINE_CONFIG_START(ssfindo_state::tetfight)
 	ppcar(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tetfight_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tetfight_map)
 
 	MCFG_24C02_ADD("i2cmem")
 MACHINE_CONFIG_END
@@ -902,7 +907,7 @@ ROM_START( tetfight )
 	ROM_LOAD( "u15",        0x080000, 0x80000, CRC(477f8089) SHA1(8084facb254d60da7983d628d5945d27b9494e65) ) // 27c040
 ROM_END
 
-DRIVER_INIT_MEMBER(ssfindo_state,common)
+void ssfindo_state::init_common()
 {
 	m_speedup = nullptr;
 	m_PS7500timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ssfindo_state::PS7500_Timer0_callback),this));
@@ -912,12 +917,12 @@ DRIVER_INIT_MEMBER(ssfindo_state,common)
 	save_item(NAME(m_PS7500_FIFO));
 }
 
-DRIVER_INIT_MEMBER(ssfindo_state,ssfindo)
+void ssfindo_state::init_ssfindo()
 {
-	DRIVER_INIT_CALL(common);
-	m_flashType=0;
+	init_common();
+	m_flashType = 0;
 	m_speedup = &ssfindo_state::ssfindo_speedups;
-	m_iocr_hack=0;
+	m_iocr_hack = 0;
 
 	save_item(NAME(m_flashAdr));
 	save_item(NAME(m_flashOffset));
@@ -925,20 +930,20 @@ DRIVER_INIT_MEMBER(ssfindo_state,ssfindo)
 	save_item(NAME(m_flashN));
 }
 
-DRIVER_INIT_MEMBER(ssfindo_state,ppcar)
+void ssfindo_state::init_ppcar()
 {
-	DRIVER_INIT_CALL(ssfindo);
-	m_flashType=1;
+	init_ssfindo();
+	m_flashType = 1;
 	m_speedup = &ssfindo_state::ppcar_speedups;
 }
 
-DRIVER_INIT_MEMBER(ssfindo_state,tetfight)
+void ssfindo_state::init_tetfight()
 {
-	DRIVER_INIT_CALL(common);
-	m_flashType=0;
-	m_iocr_hack=1;
+	init_common();
+	m_flashType = 0;
+	m_iocr_hack = 1;
 }
 
-GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo,  ssfindo_state, ssfindo,  ROT0, "Icarus", "See See Find Out", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, ppcar,   0,        ppcar,    ppcar,    ssfindo_state, ppcar,    ROT0, "Icarus", "Pang Pang Car",    MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, tetfight,0,        tetfight, tetfight, ssfindo_state, tetfight, ROT0, "Sego",   "Tetris Fighters",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo,  ssfindo_state, init_ssfindo,  ROT0, "Icarus", "See See Find Out", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, ppcar,   0,        ppcar,    ppcar,    ssfindo_state, init_ppcar,    ROT0, "Icarus", "Pang Pang Car",    MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, tetfight,0,        tetfight, tetfight, ssfindo_state, init_tetfight, ROT0, "Sego",   "Tetris Fighters",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -14,6 +14,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -28,12 +29,14 @@ public:
 		, m_p_videoram(*this, "videoram")
 	{ }
 
+	void tvgame(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tvgame(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -100,9 +103,9 @@ uint32_t tvgame_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 MACHINE_CONFIG_START(tvgame_state::tvgame)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -112,17 +115,17 @@ MACHINE_CONFIG_START(tvgame_state::tvgame)
 	MCFG_SCREEN_SIZE(216, 213)
 	MCFG_SCREEN_VISIBLE_AREA(0, 215, 0, 212)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// Devices
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("LINE0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(tvgame_state, speaker_w))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("LINE0");
+	ppi.out_pc_callback().set(FUNC(tvgame_state::speaker_w));
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -136,5 +139,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT  COMPANY      FULLNAME              FLAGS
-CONS( 2011, tvgame, 0,      0,       tvgame,    tvgame,  tvgame_state, 0,    "Mr. Isizu", "Z80 TV Game System", 0 )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT        COMPANY      FULLNAME              FLAGS
+CONS( 2011, tvgame, 0,      0,       tvgame,    tvgame,  tvgame_state, empty_init, "Mr. Isizu", "Z80 TV Game System", 0 )

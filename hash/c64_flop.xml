@@ -51,6 +51,18 @@
 		</part>
 	</software>
 
+	<software name="bbudge">
+		<description>Bill Budge: Pinball Construction Set</description>
+		<year>1983</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<!-- something special about the last sector -->
+				<rom name="bill_budge.d64" size="174848" crc="d42c40b4" sha1="75b0a166b29e9ed3834c95acc1f263a084062f5f" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bionicco">
 		<description>Bionic Commando</description>
 		<year>1988</year>
@@ -170,6 +182,21 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="jack_the_nipper[gremlin_1986](cyan1)(pal).g64" size="333744" crc="14c6f53d" sha1="6427cc16ed360890034f84182a9db02b2e568f0a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Flippy disk. The other side is for Apple II. -->
+	<software name="jingldsk">
+		<description>JingleDisk - Holiday Musical Story with Computer Animation</description>
+		<year>1985</year>
+		<publisher>Thoughtware</publisher>
+		<info name="usage" value="Commodore: Load &quot;JINGLE&quot;,8,1 / Apple IIc and e: Self boots" />
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Operates on Commodore"/>
+			<dataarea name="flop" size="174848">
+				<rom name="jingledisk (commodore).d64" size="174848" crc="2fc6663a" sha1="e81dab6d22df694f9f38ef6c03aa2305a62df140" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -874,7 +901,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="magicvoicedemo.d64 " size="174848" crc="e33213bf" sha1="e46300be955d64266d20c614aa1549f4c5640517" offset="0" />
+				<rom name="magicvoicedemo.d64" size="174848" crc="e33213bf" sha1="e46300be955d64266d20c614aa1549f4c5640517" offset="0" />
 			</dataarea>
 		</part>
 	</software>

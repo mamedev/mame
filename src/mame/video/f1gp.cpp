@@ -6,34 +6,31 @@
 #include "screen.h"
 
 
-#define TOTAL_CHARS 0x800
-
-
 /***************************************************************************
 
   Callbacks for the TileMap code
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(f1gp_state::f1gp_get_roz_tile_info)
+TILE_GET_INFO_MEMBER(f1gp_state::get_fg_tile_info)
+{
+	int code = m_fgvideoram[tile_index];
+
+	SET_TILE_INFO_MEMBER(0, code & 0x7fff, 0, (code & 0x8000) ? TILE_FLIPY : 0);
+}
+
+TILE_GET_INFO_MEMBER(f1gp_state::get_roz_tile_info)
 {
 	int code = m_rozvideoram[tile_index];
 
 	SET_TILE_INFO_MEMBER(3, code & 0x7ff, code >> 12, 0);
 }
 
-TILE_GET_INFO_MEMBER(f1gp_state::f1gp2_get_roz_tile_info)
+TILE_GET_INFO_MEMBER(f1gp2_state::get_roz_tile_info)
 {
 	int code = m_rozvideoram[tile_index];
 
 	SET_TILE_INFO_MEMBER(2, (code & 0x7ff) + (m_roz_bank << 11), code >> 12, 0);
-}
-
-TILE_GET_INFO_MEMBER(f1gp_state::get_fg_tile_info)
-{
-	int code = m_fgvideoram[tile_index];
-
-	SET_TILE_INFO_MEMBER(0, code & 0x7fff, 0, (code & 0x8000) ? TILE_FLIPY : 0);
 }
 
 
@@ -44,58 +41,23 @@ TILE_GET_INFO_MEMBER(f1gp_state::get_fg_tile_info)
 ***************************************************************************/
 
 
-
-
-VIDEO_START_MEMBER(f1gp_state,f1gp)
+void f1gp_state::video_start()
 {
-	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::f1gp_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0xff);
 
-	m_zoomdata = (uint16_t *)memregion("gfx4")->base();
-	m_gfxdecode->gfx(3)->set_source((uint8_t *)m_zoomdata);
-
-	save_pointer(NAME(m_zoomdata), memregion("gfx4")->bytes()/2);
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_gfxctrl));
+	save_item(NAME(m_scroll));
 }
 
 
-VIDEO_START_MEMBER(f1gp_state,f1gpb)
+void f1gp2_state::video_start()
 {
-	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::f1gp_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-
-	m_fg_tilemap->set_transparent_pen(0xff);
-
-	m_zoomdata = (uint16_t *)memregion("gfx4")->base();
-	m_gfxdecode->gfx(3)->set_source((uint8_t *)m_zoomdata);
-
-	save_pointer(NAME(m_zoomdata), memregion("gfx4")->bytes()/2);
-}
-
-/* new hw type */
-uint32_t f1gp_state::f1gp2_tile_callback( uint32_t code )
-{
-	return m_sprcgram[code&0x3fff];
-}
-
-/* old hw type */
-uint32_t f1gp_state::f1gp_old_tile_callback( uint32_t code )
-{
-	return m_spr1cgram[code % (m_spr1cgram.bytes()/2)];
-}
-
-uint32_t f1gp_state::f1gp_ol2_tile_callback( uint32_t code )
-{
-	return m_spr2cgram[code % (m_spr2cgram.bytes()/2)];
-}
-
-
-
-VIDEO_START_MEMBER(f1gp_state,f1gp2)
-{
-	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::f1gp2_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp2_state::get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(f1gp2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0xff);
 	m_roz_tilemap->set_transparent_pen(0x0f);
@@ -103,6 +65,10 @@ VIDEO_START_MEMBER(f1gp_state,f1gp2)
 	m_fg_tilemap->set_scrolldx(-80, 0);
 	m_fg_tilemap->set_scrolldy(-26, 0);
 
+	save_item(NAME(m_roz_bank));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_gfxctrl));
+	save_item(NAME(m_scroll));
 }
 
 
@@ -112,35 +78,25 @@ VIDEO_START_MEMBER(f1gp_state,f1gp2)
 
 ***************************************************************************/
 
-READ16_MEMBER(f1gp_state::f1gp_zoomdata_r)
+WRITE16_MEMBER(f1gp_state::rozgfxram_w)
 {
-	return m_zoomdata[offset];
-}
-
-WRITE16_MEMBER(f1gp_state::f1gp_zoomdata_w)
-{
-	COMBINE_DATA(&m_zoomdata[offset]);
+	COMBINE_DATA(&m_rozgfxram[offset]);
 	m_gfxdecode->gfx(3)->mark_dirty(offset / 64);
 }
 
-READ16_MEMBER(f1gp_state::f1gp_rozvideoram_r)
-{
-	return m_rozvideoram[offset];
-}
-
-WRITE16_MEMBER(f1gp_state::f1gp_rozvideoram_w)
+WRITE16_MEMBER(f1gp_state::rozvideoram_w)
 {
 	COMBINE_DATA(&m_rozvideoram[offset]);
 	m_roz_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp_fgvideoram_w)
+WRITE16_MEMBER(f1gp_state::fgvideoram_w)
 {
 	COMBINE_DATA(&m_fgvideoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp_fgscroll_w)
+WRITE16_MEMBER(f1gp_state::fgscroll_w)
 {
 	COMBINE_DATA(&m_scroll[offset]);
 
@@ -148,34 +104,18 @@ WRITE16_MEMBER(f1gp_state::f1gp_fgscroll_w)
 	m_fg_tilemap->set_scrolly(0, m_scroll[1]);
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp_gfxctrl_w)
+WRITE8_MEMBER(f1gp_state::gfxctrl_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_flipscreen = data & 0x20;
-		m_gfxctrl = data & 0xdf;
-	}
+	m_flipscreen = data & 0x20;
+	m_gfxctrl = data & 0xdf;
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp2_gfxctrl_w)
+WRITE8_MEMBER(f1gp2_state::rozbank_w)
 {
-	if (ACCESSING_BITS_0_7)
+	if (m_roz_bank != data)
 	{
-		m_flipscreen = data & 0x20;
-
-		/* bit 0/1 = fg/sprite/roz priority */
-		/* bit 2 = blank screen */
-
-		m_gfxctrl = data & 0xdf;
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-		if (m_roz_bank != (data >> 8))
-		{
-			m_roz_bank = (data >> 8);
-			m_roz_tilemap->mark_all_dirty();
-		}
+		m_roz_bank = data;
+		m_roz_tilemap->mark_all_dirty();
 	}
 }
 
@@ -198,19 +138,19 @@ uint32_t f1gp_state::screen_update_f1gp(screen_device &screen, bitmap_ind16 &bit
 	/* quick kludge for "continue" screen priority */
 	if (m_gfxctrl == 0x00)
 	{
-		m_spr_old->turbofrc_draw_sprites(m_spr1vram, m_spr1vram.bytes(),  0, bitmap, cliprect, screen.priority(), 0x02);
-		m_spr_old2->turbofrc_draw_sprites(m_spr2vram, m_spr2vram.bytes(), 0, bitmap, cliprect, screen.priority(), 0x02);
+		m_spr_old[0]->turbofrc_draw_sprites(m_sprvram[0], m_sprvram[0].bytes(),  0, bitmap, cliprect, screen.priority(), 0x02);
+		m_spr_old[1]->turbofrc_draw_sprites(m_sprvram[1], m_sprvram[1].bytes(), 0, bitmap, cliprect, screen.priority(), 0x02);
 	}
 	else
 	{
-		m_spr_old->turbofrc_draw_sprites(m_spr1vram, m_spr1vram.bytes(), 0, bitmap, cliprect, screen.priority(), 0x00);
-		m_spr_old2->turbofrc_draw_sprites(m_spr2vram, m_spr2vram.bytes(), 0, bitmap, cliprect, screen.priority(), 0x02);
+		m_spr_old[0]->turbofrc_draw_sprites(m_sprvram[0], m_sprvram[0].bytes(), 0, bitmap, cliprect, screen.priority(), 0x00);
+		m_spr_old[1]->turbofrc_draw_sprites(m_sprvram[1], m_sprvram[1].bytes(), 0, bitmap, cliprect, screen.priority(), 0x02);
 	}
 	return 0;
 }
 
 
-uint32_t f1gp_state::screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t f1gp2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_gfxctrl & 4)  /* blank screen */
 		bitmap.fill(m_palette->black_pen(), cliprect);
@@ -220,18 +160,18 @@ uint32_t f1gp_state::screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bi
 		{
 			case 0:
 				m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, TILEMAP_DRAW_OPAQUE, 0, 1);
-				m_spr->draw_sprites(m_spritelist, 0x2000, screen, bitmap, cliprect);
+				m_spr->draw_sprites(m_sprvram[0], 0x2000, screen, bitmap, cliprect);
 				m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 				break;
 			case 1:
 				m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, TILEMAP_DRAW_OPAQUE, 0, 1);
 				m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-				m_spr->draw_sprites(m_spritelist, 0x2000, screen, bitmap, cliprect);
+				m_spr->draw_sprites(m_sprvram[0], 0x2000, screen, bitmap, cliprect);
 				break;
 			case 2:
 				m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 				m_k053936->zoom_draw(screen, bitmap, cliprect, m_roz_tilemap, 0, 0, 1);
-				m_spr->draw_sprites(m_spritelist, 0x2000, screen, bitmap, cliprect);
+				m_spr->draw_sprites(m_sprvram[0], 0x2000, screen, bitmap, cliprect);
 				break;
 #ifdef MAME_DEBUG
 			case 3:

@@ -11,7 +11,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_MIDI_RX_HANDLER(_devcb) \
-	devcb = &downcast<midi_port_device &>(*device).set_rx_handler(DEVCB_##_devcb);
+	downcast<midi_port_device &>(*device).set_rx_handler(DEVCB_##_devcb);
 
 class device_midi_port_interface;
 
@@ -21,11 +21,21 @@ class midi_port_device : public device_t,
 	friend class device_midi_port_interface;
 
 public:
-	midi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	midi_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: midi_port_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	midi_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~midi_port_device();
 
 	// static configuration helpers
 	template <class Object> devcb_base &set_rx_handler(Object &&cb) { return m_rxd_handler.set_callback(std::forward<Object>(cb)); }
+	auto rxd_handler() { return m_rxd_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_txd );
 
@@ -34,6 +44,8 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
+
+	void common(machine_config &config);
 
 	int m_rxd;
 
@@ -61,7 +73,7 @@ protected:
 
 DECLARE_DEVICE_TYPE(MIDI_PORT, midi_port_device)
 
-SLOT_INTERFACE_EXTERN(midiin_slot);
-SLOT_INTERFACE_EXTERN(midiout_slot);
+device_slot_interface &midiin_slot(device_slot_interface &device);
+device_slot_interface &midiout_slot(device_slot_interface &device);
 
 #endif // MAME_BUS_MIDI_MIDI_H

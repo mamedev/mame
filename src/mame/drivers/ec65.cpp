@@ -17,6 +17,7 @@ EC-65 (also known as Octopus)
 #include "machine/mos6551.h"
 #include "machine/6850acia.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define PIA6821_TAG "pia6821"
@@ -166,15 +167,15 @@ static const gfx_layout ec65_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( ec65 )
+static GFXDECODE_START( gfx_ec65 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ec65_charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(ec65_state::ec65)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502, XTAL(4'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(ec65_mem)
+	MCFG_DEVICE_ADD("maincpu",M6502, XTAL(4'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(ec65_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -184,35 +185,36 @@ MACHINE_CONFIG_START(ec65_state::ec65)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ec65)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ec65)
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL(16'000'000) / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
-	MCFG_MC6845_UPDATE_ROW_CB(ec65_state, crtc_update_row)
+	mc6845_device &crtc(MC6845(config, MC6845_TAG, XTAL(16'000'000) / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8); /*?*/
+	crtc.set_update_row_callback(FUNC(ec65_state::crtc_update_row), this);
 
 	/* devices */
-	MCFG_DEVICE_ADD(PIA6821_TAG, PIA6821, 0)
+	PIA6821(config, PIA6821_TAG, 0);
 
-	MCFG_DEVICE_ADD(ACIA6850_TAG, ACIA6850, 0)
+	ACIA6850(config, ACIA6850_TAG, 0);
 
-	MCFG_DEVICE_ADD(VIA6522_0_TAG, VIA6522, XTAL(4'000'000) / 4)
+	VIA6522(config, m_via_0, XTAL(4'000'000) / 4);
 
-	MCFG_DEVICE_ADD(VIA6522_1_TAG, VIA6522, XTAL(4'000'000) / 4)
+	VIA6522(config, m_via_1, XTAL(4'000'000) / 4);
 
-	MCFG_DEVICE_ADD(ACIA6551_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	mos6551_device &acia(MOS6551(config, ACIA6551_TAG, 0));
+	acia.set_xtal(XTAL(1'843'200));
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(ec65_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+	keyboard.set_keyboard_callback(FUNC(ec65_state::kbd_put));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ec65k_state::ec65k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",G65816, XTAL(4'000'000)) // can use 4,2 or 1 MHz
-	MCFG_CPU_PROGRAM_MAP(ec65k_mem)
+	MCFG_DEVICE_ADD("maincpu",G65816, XTAL(4'000'000)) // can use 4,2 or 1 MHz
+	MCFG_DEVICE_PROGRAM_MAP(ec65k_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -222,12 +224,13 @@ MACHINE_CONFIG_START(ec65k_state::ec65k)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ec65)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ec65)
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL(16'000'000) / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
+	mc6845_device &crtc(MC6845(config, MC6845_TAG, XTAL(16'000'000) / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8); /*?*/
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -248,6 +251,6 @@ ROM_START( ec65k )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE         INIT  COMPANY                FULLNAME  FLAGS */
-COMP( 1985, ec65,   0,      0,      ec65,    ec65,  ec65_state,   0,    "Elektor Electronics", "EC-65",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1985, ec65k,  ec65,   0,      ec65k,   ec65,  ec65k_state,  0,    "Elektor Electronics", "EC-65K", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                FULLNAME  FLAGS */
+COMP( 1985, ec65,  0,      0,      ec65,    ec65,  ec65_state,  empty_init, "Elektor Electronics", "EC-65",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1985, ec65k, ec65,   0,      ec65k,   ec65,  ec65k_state, empty_init, "Elektor Electronics", "EC-65K", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

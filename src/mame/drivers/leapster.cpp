@@ -223,13 +223,16 @@ public:
 		m_cart(*this, "cartslot")
 		{ }
 
+	void leapster(machine_config &config);
 
+	void init_leapster();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(leapster_cart);
-	DECLARE_DRIVER_INIT(leapster);
 
 	DECLARE_READ32_MEMBER(leapster_random_r)
 	{
@@ -241,10 +244,9 @@ public:
 		printf("leapster_aux004b_w %04x\n", data);
 	}
 
-	void leapster(machine_config &config);
 	void leapster_aux(address_map &map);
 	void leapster_map(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 
@@ -295,7 +297,7 @@ void leapster_state::machine_reset()
 void leapster_state::leapster_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).rom().mirror(0x40000000); // pointers in the bios region seem to be to the 40xxxxxx region, either we mirror there or something (real bios?) is acutally missing
-	map(0x0180D800, 0x0180D803).r(this, FUNC(leapster_state::leapster_random_r));
+	map(0x0180D800, 0x0180D803).r(FUNC(leapster_state::leapster_random_r));
 	map(0x03000000, 0x030007ff).ram(); // puts stack here, writes a pointer @ 0x03000000 on startup
 	map(0x3c000000, 0x3c1fffff).ram(); // really ram, or has our code execution gone wrong?
 //  AM_RANGE(0x80000000, 0x807fffff) AM_ROMBANK("cartrom") // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
@@ -303,15 +305,15 @@ void leapster_state::leapster_map(address_map &map)
 
 void leapster_state::leapster_aux(address_map &map)
 {
-	map(0x00000004b, 0x00000004b).w(this, FUNC(leapster_state::leapster_aux004b_w)); // this address isn't used by ARC internal stuff afaik, so probably leapster specific
+	map(0x00000004b, 0x00000004b).w(FUNC(leapster_state::leapster_aux004b_w)); // this address isn't used by ARC internal stuff afaik, so probably leapster specific
 }
 
 MACHINE_CONFIG_START(leapster_state::leapster)
 	/* basic machine hardware */
 	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
-	MCFG_CPU_ADD("maincpu", ARCA5, 96000000/10)
-	MCFG_CPU_PROGRAM_MAP(leapster_map)
-	MCFG_CPU_IO_MAP(leapster_aux)
+	MCFG_DEVICE_ADD("maincpu", ARCA5, 96000000/10)
+	MCFG_DEVICE_PROGRAM_MAP(leapster_map)
+	MCFG_DEVICE_IO_MAP(leapster_aux)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -330,7 +332,7 @@ MACHINE_CONFIG_START(leapster_state::leapster)
 MACHINE_CONFIG_END
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 /* There are various build dates and revisions for different parts of the code, the date listed is the newest on in each rom.
    This is always in the same place relative to the rest of the data
@@ -354,9 +356,9 @@ ROM_START(leapstertv)
 	ROM_LOAD_BIOS( 0, "am29pl160cb-90sf.bin", 0x00000, 0x200000, CRC(194cc724) SHA1(000a79d75c19f2e43532ce0b31f0dca0bed49eab) )
 ROM_END
 
-DRIVER_INIT_MEMBER(leapster_state,leapster)
+void leapster_state::init_leapster()
 {
 }
 
-CONS( 2003,  leapster,    0,         0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster",    MACHINE_IS_SKELETON )
-CONS( 2005,  leapstertv,  leapster,  0,  leapster,    leapster, leapster_state, leapster,    "LeapFrog",   "Leapster TV", MACHINE_IS_SKELETON )
+CONS( 2003, leapster,   0,        0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster",    MACHINE_IS_SKELETON )
+CONS( 2005, leapstertv, leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster TV", MACHINE_IS_SKELETON )

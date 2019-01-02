@@ -171,6 +171,10 @@ public:
 	{
 	}
 
+	void fccpu1_eprom_sockets(machine_config &config);
+	void fccpu1(machine_config &config);
+
+private:
 	DECLARE_READ16_MEMBER (bootvect_r);
 	DECLARE_READ16_MEMBER (vme_a24_r);
 	DECLARE_WRITE16_MEMBER (vme_a24_w);
@@ -202,10 +206,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
 	DECLARE_READ16_MEMBER (read16_rom);
 
-	void fccpu1_eprom_sockets(machine_config &config);
-	void fccpu1(machine_config &config);
 	void force68k_mem(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<mm58167_device> m_rtc;
 	required_device<pit68230_device> m_pit;
@@ -236,7 +238,7 @@ private:
 void force68k_state::force68k_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x000007).rom().r(this, FUNC(force68k_state::bootvect_r));       /* Vectors mapped from System EPROM */
+	map(0x000000, 0x000007).rom().r(FUNC(force68k_state::bootvect_r));       /* Vectors mapped from System EPROM */
 	map(0x000008, 0x01ffff).ram(); /* DRAM CPU-1B */
 //AM_RANGE (0x020000, 0x07ffff) AM_RAM /* Additional DRAM CPU-1D */
 	map(0x080000, 0x083fff).rom(); /* System EPROM Area 16Kb DEBUGGER supplied as default on CPU-1B/D     */
@@ -248,8 +250,8 @@ void force68k_state::force68k_mem(address_map &map)
 	map(0x0c0400, 0x0c042f).rw(m_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0e0035).rw(m_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
 //AM_RANGE(0x0e0200, 0x0e0380) AM_READWRITE(fpu_r, fpu_w) /* optional FPCP 68881 FPU interface */
-	map(0x100000, 0xfeffff).rw(this, FUNC(force68k_state::vme_a24_r), FUNC(force68k_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) */
-	map(0xff0000, 0xffffff).rw(this, FUNC(force68k_state::vme_a16_r), FUNC(force68k_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) */
+	map(0x100000, 0xfeffff).rw(FUNC(force68k_state::vme_a24_r), FUNC(force68k_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) */
+	map(0xff0000, 0xffffff).rw(FUNC(force68k_state::vme_a16_r), FUNC(force68k_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) */
 }
 
 /* Input ports */
@@ -441,22 +443,26 @@ READ16_MEMBER (force68k_state::bootvect_r){
  */
 
 /* Dummy VME access methods until the VME bus device is ready for use */
-READ16_MEMBER (force68k_state::vme_a24_r){
-		LOG("%s\n", FUNCNAME);
-		return (uint16_t) 0;
+READ16_MEMBER (force68k_state::vme_a24_r)
+{
+	LOG("%s\n", FUNCNAME);
+	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a24_w){
-		LOG("%s\n", FUNCNAME);
+WRITE16_MEMBER (force68k_state::vme_a24_w)
+{
+	LOG("%s\n", FUNCNAME);
 }
 
-READ16_MEMBER (force68k_state::vme_a16_r){
-		LOG("%s\n", FUNCNAME);
-		return (uint16_t) 0;
+READ16_MEMBER (force68k_state::vme_a16_r)
+{
+	LOG("%s\n", FUNCNAME);
+	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a16_w){
-		LOG("%s\n", FUNCNAME);
+WRITE16_MEMBER (force68k_state::vme_a16_w)
+{
+	LOG("%s\n", FUNCNAME);
 }
 
 /*
@@ -528,18 +534,19 @@ image_init_result force68k_state::force68k_load_cart(device_image_interface &ima
 }
 
 
-static SLOT_INTERFACE_START(fccpu1_vme_cards)
-	SLOT_INTERFACE("fcisio", VME_FCISIO1)
-	SLOT_INTERFACE("fcscsi", VME_FCSCSI1)
-SLOT_INTERFACE_END
+static void fccpu1_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fcisio", VME_FCISIO1);
+	device.option_add("fcscsi", VME_FCSCSI1);
+}
 
 /*
  * Machine configuration
  */
 MACHINE_CONFIG_START(force68k_state::fccpu1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68000, XTAL(16'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP (force68k_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(force68k_mem)
 
 	/* P3/Host Port config
 	 * LO command causes ROM monitor to expect S-records on HOST port by default
@@ -547,62 +554,60 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 	 * the ROM momitor is over-run while checking for checksums etc if used with
 	 * UI mount <file> feature.
 	 */
-	MCFG_DEVICE_ADD ("aciahost", ACIA6850, 0)
+	ACIA6850(config, m_aciahost, 0);
+	m_aciahost->txd_handler().set("rs232host", FUNC(rs232_port_device::write_txd));
+	m_aciahost->rts_handler().set("rs232host", FUNC(rs232_port_device::write_rts));
 
-	MCFG_ACIA6850_TXD_HANDLER (DEVWRITELINE ("rs232host", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER (DEVWRITELINE ("rs232host", rs232_port_device, write_rts))
-
-	MCFG_RS232_PORT_ADD ("rs232host", default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("aciahost", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("aciahost", acia6850_device, write_cts))
+	rs232_port_device &rs232host(RS232_PORT(config, "rs232host", default_rs232_devices, "null_modem"));
+	rs232host.rxd_handler().set(m_aciahost, FUNC(acia6850_device::write_rxd));
+	rs232host.cts_handler().set(m_aciahost, FUNC(acia6850_device::write_cts));
 
 	/* P4/Terminal Port config */
-	MCFG_DEVICE_ADD ("aciaterm", ACIA6850, 0)
+	ACIA6850(config, m_aciaterm, 0);
+	m_aciaterm->txd_handler().set("rs232trm", FUNC(rs232_port_device::write_txd));
+	m_aciaterm->rts_handler().set("rs232trm", FUNC(rs232_port_device::write_rts));
 
-	MCFG_ACIA6850_TXD_HANDLER (DEVWRITELINE ("rs232trm", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER (DEVWRITELINE ("rs232trm", rs232_port_device, write_rts))
-
-	MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("aciaterm", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("aciaterm", acia6850_device, write_cts))
+	rs232_port_device &rs232trm(RS232_PORT(config, "rs232trm", default_rs232_devices, "terminal"));
+	rs232trm.rxd_handler().set(m_aciaterm, FUNC(acia6850_device::write_rxd));
+	rs232trm.cts_handler().set(m_aciaterm, FUNC(acia6850_device::write_cts));
 
 	/* P5/Remote Port config */
-	MCFG_DEVICE_ADD ("aciaremt", ACIA6850, 0)
+	ACIA6850(config, m_aciaremt, 0);
 
 	/* Bit Rate Generator */
-	MCFG_MC14411_ADD ("brg", XTAL(1'843'200))
-	MCFG_MC14411_F1_CB(WRITELINE (force68k_state, write_f1_clock))
-	MCFG_MC14411_F3_CB(WRITELINE (force68k_state, write_f3_clock))
-	MCFG_MC14411_F5_CB(WRITELINE (force68k_state, write_f5_clock))
-	MCFG_MC14411_F7_CB(WRITELINE (force68k_state, write_f7_clock))
-	MCFG_MC14411_F8_CB(WRITELINE (force68k_state, write_f8_clock))
-	MCFG_MC14411_F9_CB(WRITELINE (force68k_state, write_f9_clock))
-	MCFG_MC14411_F11_CB(WRITELINE (force68k_state, write_f11_clock))
-	MCFG_MC14411_F13_CB(WRITELINE (force68k_state, write_f13_clock))
-	MCFG_MC14411_F15_CB(WRITELINE (force68k_state, write_f15_clock))
+	MC14411(config, m_brg, XTAL(1'843'200));
+	m_brg->out_f<1>().set(FUNC(force68k_state::write_f1_clock));
+	m_brg->out_f<3>().set(FUNC(force68k_state::write_f3_clock));
+	m_brg->out_f<5>().set(FUNC(force68k_state::write_f5_clock));
+	m_brg->out_f<7>().set(FUNC(force68k_state::write_f7_clock));
+	m_brg->out_f<8>().set(FUNC(force68k_state::write_f8_clock));
+	m_brg->out_f<9>().set(FUNC(force68k_state::write_f9_clock));
+	m_brg->out_f<11>().set(FUNC(force68k_state::write_f11_clock));
+	m_brg->out_f<13>().set(FUNC(force68k_state::write_f13_clock));
+	m_brg->out_f<15>().set(FUNC(force68k_state::write_f15_clock));
 
 	/* RTC Real Time Clock device */
-	MCFG_DEVICE_ADD ("rtc", MM58167, XTAL(32'768))
+	MM58167(config, m_rtc, XTAL(32'768));
 
 	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
-	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL(16'000'000) / 2)
-	MCFG_PIT68230_PA_OUTPUT_CB (DEVWRITE8 ("cent_data_out", output_latch_device, write))
-	MCFG_PIT68230_H2_CB (DEVWRITELINE ("centronics", centronics_device, write_strobe))
+	PIT68230(config, m_pit, XTAL(16'000'000) / 2);
+	m_pit->pa_out_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pit->h2_out_callback().set(m_centronics, FUNC(centronics_device::write_strobe));
 
 	// Centronics
-	MCFG_CENTRONICS_ADD ("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER (WRITELINE (force68k_state, centronics_ack_w))
-	MCFG_CENTRONICS_BUSY_HANDLER (WRITELINE (force68k_state, centronics_busy_w))
-	MCFG_CENTRONICS_PERROR_HANDLER (WRITELINE (force68k_state, centronics_perror_w))
-	MCFG_CENTRONICS_SELECT_HANDLER (WRITELINE (force68k_state, centronics_select_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD ("cent_data_out", "centronics")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE (*this, force68k_state, centronics_ack_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE (*this, force68k_state, centronics_busy_w))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE (*this, force68k_state, centronics_perror_w))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE (*this, force68k_state, centronics_select_w))
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// EPROM sockets
 	fccpu1_eprom_sockets(config);
 
 	// VME interface
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, fccpu1_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD("vme", 1, fccpu1_vme_cards, nullptr)
 MACHINE_CONFIG_END
 
 #if 0 /*
@@ -610,43 +615,43 @@ MACHINE_CONFIG_END
        * such as an optional 68881 FPU
        */
 MACHINE_CONFIG_START (force68k_state::fccpu6)
-	MCFG_CPU_ADD ("maincpu", M68000, XTAL(8'000'000))         /* Jumper B10 Mode B */
-	MCFG_CPU_PROGRAM_MAP (force68k_mem)
+	MCFG_DEVICE_ADD ("maincpu", M68000, XTAL(8'000'000))         /* Jumper B10 Mode B */
+	MCFG_DEVICE_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START (force68k_state::fccpu6a)
-	MCFG_CPU_ADD ("maincpu", M68000, XTAL(12'500'000))        /* Jumper B10 Mode A */
-	MCFG_CPU_PROGRAM_MAP (force68k_mem)
+	MCFG_DEVICE_ADD ("maincpu", M68000, XTAL(12'500'000))        /* Jumper B10 Mode A */
+	MCFG_DEVICE_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START (force68k_state::fccpu6v)
-	MCFG_CPU_ADD ("maincpu", M68010, XTAL(8'000'000))         /* Jumper B10 Mode B */
-	MCFG_CPU_PROGRAM_MAP (force68k_mem)
+	MCFG_DEVICE_ADD ("maincpu", M68010, XTAL(8'000'000))         /* Jumper B10 Mode B */
+	MCFG_DEVICE_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START (force68k_state::fccpu6va)
-	MCFG_CPU_ADD ("maincpu", M68010, XTAL(12'500'000))        /* Jumper B10 Mode A */
-	MCFG_CPU_PROGRAM_MAP (force68k_mem)
+	MCFG_DEVICE_ADD ("maincpu", M68010, XTAL(12'500'000))        /* Jumper B10 Mode A */
+	MCFG_DEVICE_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START (force68k_state::fccpu6vb)
-	MCFG_CPU_ADD ("maincpu", M68010, XTAL(12'500'000))        /* Jumper B10 Mode A */
-	MCFG_CPU_PROGRAM_MAP (force68k_mem)
+	MCFG_DEVICE_ADD ("maincpu", M68010, XTAL(12'500'000))        /* Jumper B10 Mode A */
+	MCFG_DEVICE_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 #endif
 
 /* ROM definitions */
 ROM_START (fccpu1)
-ROM_REGION (0x1000000, "maincpu", 0)
-ROM_DEFAULT_BIOS("forcemon-1.0l")
+	ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_DEFAULT_BIOS("forcemon-1.0l")
 
-ROM_SYSTEM_BIOS(0, "forcemon-1.0l", "Force Computers SYS68K/CPU-1 Force Monitor 1.0L")
-ROMX_LOAD ("fccpu1v1.0l.j8.bin", 0x080001, 0x2000, CRC (3ac6f08f) SHA1 (502f6547b508d8732bd68bbbb2402d8c30fefc3b), ROM_SKIP(1) | ROM_BIOS(1))
-ROMX_LOAD ("fccpu1v1.0l.j9.bin", 0x080000, 0x2000, CRC (035315fb) SHA1 (90dc44d9c25d28428233e6846da6edce2d69e440), ROM_SKIP(1) | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(0, "forcemon-1.0l", "Force Computers SYS68K/CPU-1 Force Monitor 1.0L")
+	ROMX_LOAD ("fccpu1v1.0l.j8.bin", 0x080001, 0x2000, CRC (3ac6f08f) SHA1 (502f6547b508d8732bd68bbbb2402d8c30fefc3b), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD ("fccpu1v1.0l.j9.bin", 0x080000, 0x2000, CRC (035315fb) SHA1 (90dc44d9c25d28428233e6846da6edce2d69e440), ROM_SKIP(1) | ROM_BIOS(0))
 
-ROM_SYSTEM_BIOS(1, "forcebug-1.1", "Force Computers SYS68K/CPU-1 Force Debugger 1.1")
-ROMX_LOAD ("fccpu1v1.1.j8.bin", 0x080001, 0x4000, CRC (116dcbf0) SHA1 (6870b71606933f84afe27ad031c651d201b93f99), ROM_SKIP(1) | ROM_BIOS(2))
-ROMX_LOAD ("fccpu1v1.1.j9.bin", 0x080000, 0x4000, CRC (aefd5b0b) SHA1 (1e24530a6d5dc4fb77fde67acae08d371e59fc0f), ROM_SKIP(1) | ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(1, "forcebug-1.1", "Force Computers SYS68K/CPU-1 Force Debugger 1.1")
+	ROMX_LOAD ("fccpu1v1.1.j8.bin", 0x080001, 0x4000, CRC (116dcbf0) SHA1 (6870b71606933f84afe27ad031c651d201b93f99), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD ("fccpu1v1.1.j9.bin", 0x080000, 0x4000, CRC (aefd5b0b) SHA1 (1e24530a6d5dc4fb77fde67acae08d371e59fc0f), ROM_SKIP(1) | ROM_BIOS(1))
 
 /*
  * System ROM terminal commands
@@ -703,31 +708,31 @@ ROM_END
  */
 #if 0
 ROM_START (fccpu6)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 
 ROM_START (fccpu6a)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 
 ROM_START (fccpu6v)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 
 ROM_START (fccpu6va)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 
 ROM_START (fccpu6vb)
-ROM_REGION (0x1000000, "maincpu", 0)
+	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 #endif
 
 /* Driver */
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE      INPUT     CLASS            INIT  COMPANY                  FULLNAME          FLAGS */
-COMP( 1983, fccpu1,   0,      0,      fccpu1,      force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-1",   MACHINE_NO_SOUND_HW )
-//COMP( 1989, fccpu6,   0,      0,      fccpu6,      force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6",   MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6a,  0,      0,      fccpu6a,     force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6a",  MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6v,  0,      0,      fccpu6v,     force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6v",  MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6va, 0,      0,      fccpu6va,    force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6va", MACHINE_IS_SKELETON )
-//COMP( 1989, fccpu6vb, 0,      0,      fccpu6vb,    force68k, force68k_state,  0,    "Force Computers GmbH",  "SYS68K/CPU-6vb", MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME          FLAGS */
+COMP( 1983, fccpu1,   0,      0,      fccpu1,   force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-1",   MACHINE_NO_SOUND_HW )
+//COMP( 1989, fccpu6,   0,      0,      fccpu6,   force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-6",   MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6a,  0,      0,      fccpu6a,  force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-6a",  MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6v,  0,      0,      fccpu6v,  force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-6v",  MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6va, 0,      0,      fccpu6va, force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-6va", MACHINE_IS_SKELETON )
+//COMP( 1989, fccpu6vb, 0,      0,      fccpu6vb, force68k, force68k_state, empty_init, "Force Computers GmbH", "SYS68K/CPU-6vb", MACHINE_IS_SKELETON )

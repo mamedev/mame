@@ -26,8 +26,9 @@
 
 #pragma once
 
-#include <queue>
+#include "diserial.h"
 
+#include <queue>
 
 
 //**************************************************************************
@@ -41,16 +42,16 @@
 	downcast<mc6852_device &>(*device).set_tx_clock(_clock);
 
 #define MCFG_MC6852_TX_DATA_CALLBACK(_write) \
-	devcb = &downcast<mc6852_device &>(*device).set_tx_data_wr_callback(DEVCB_##_write);
+	downcast<mc6852_device &>(*device).set_tx_data_wr_callback(DEVCB_##_write);
 
 #define MCFG_MC6852_IRQ_CALLBACK(_write) \
-	devcb = &downcast<mc6852_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<mc6852_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_MC6852_SM_DTR_CALLBACK(_write) \
-	devcb = &downcast<mc6852_device &>(*device).set_sm_dtr_wr_callback(DEVCB_##_write);
+	downcast<mc6852_device &>(*device).set_sm_dtr_wr_callback(DEVCB_##_write);
 
 #define MCFG_MC6852_TUF_CALLBACK(_write) \
-	devcb = &downcast<mc6852_device &>(*device).set_tuf_wr_callback(DEVCB_##_write);
+	downcast<mc6852_device &>(*device).set_tuf_wr_callback(DEVCB_##_write);
 
 
 
@@ -73,6 +74,11 @@ public:
 	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_sm_dtr_wr_callback(Object &&cb) { return m_write_sm_dtr.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_tuf_wr_callback(Object &&cb) { return m_write_tuf.set_callback(std::forward<Object>(cb)); }
+
+	auto tx_data_callback() { return m_write_tx_data.bind(); }
+	auto irq_callback() { return m_write_irq.bind(); }
+	auto sm_dtr_callback() { return m_write_sm_dtr.bind(); }
+	auto tuf_callback() { return m_write_tuf.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

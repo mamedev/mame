@@ -305,6 +305,7 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -324,21 +325,26 @@
 class corona_state : public driver_device
 {
 public:
-	corona_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	corona_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
-	uint8_t m_blitter_x_reg;
-	uint8_t m_blitter_y_reg;
-	uint8_t m_blitter_aux_reg;
-	uint8_t m_blitter_unk_reg;
-	std::unique_ptr<uint8_t[]> m_videobuf;
-	uint8_t m_lamp;
-	uint8_t m_lamp_old;
-	int m_input_selector;
+	void winner81(machine_config &config);
+	void winner82(machine_config &config);
+	void rcirulet(machine_config &config);
+	void luckyrlt(machine_config &config);
+	void re800(machine_config &config);
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(blitter_y_w);
 	DECLARE_WRITE8_MEMBER(blitter_unk_w);
 	DECLARE_WRITE8_MEMBER(blitter_x_w);
@@ -352,19 +358,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mux_port_w);
 	DECLARE_WRITE8_MEMBER(wc_meters_w);
 	void blitter_execute(int x, int y, int color, int width, int flag);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(corona);
+	void corona_palette(palette_device &palette) const;
 	uint32_t screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
-	required_device<screen_device> m_screen;
-	required_device<generic_latch_8_device> m_soundlatch;
-	void winner81(machine_config &config);
-	void winner82(machine_config &config);
-	void rcirulet(machine_config &config);
-	void luckyrlt(machine_config &config);
-	void re800(machine_config &config);
 	void luckyrlt_cpu_io_map(address_map &map);
 	void luckyrlt_map(address_map &map);
 	void luckyrlt_sound_cpu_io_map(address_map &map);
@@ -381,6 +377,20 @@ public:
 	void winner82_map(address_map &map);
 	void winner82_sound_cpu_io_map(address_map &map);
 	void winner82_sound_map(address_map &map);
+
+	uint8_t m_blitter_x_reg;
+	uint8_t m_blitter_y_reg;
+	uint8_t m_blitter_aux_reg;
+	uint8_t m_blitter_unk_reg;
+	std::unique_ptr<uint8_t[]> m_videobuf;
+	uint8_t m_lamp;
+	uint8_t m_lamp_old;
+	int m_input_selector;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+	output_finder<256> m_lamps;
 };
 
 
@@ -388,31 +398,29 @@ public:
 *               Video Hardware               *
 *********************************************/
 
-PALETTE_INIT_MEMBER(corona_state, corona)
+void corona_state::corona_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int bit6, bit7, bit0, bit1, r, g, b;
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < 0x20; ++i)
+	for (int i = 0; i < 0x20; ++i)
 	{
-		bit7 = (color_prom[0] >> 7) & 0x01;
-		bit6 = (color_prom[0] >> 6) & 0x01;
+		int bit0, bit1;
+		int const bit7 = BIT(color_prom[i], 7);
+		int const bit6 = BIT(color_prom[i], 6);
 
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		b = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		int const b = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 
-		bit0 = (color_prom[0] >> 2) & 0x01;
-		bit1 = (color_prom[0] >> 3) & 0x01;
-		g = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i], 3);
+		int const g = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 
-		bit0 = (color_prom[0] >> 4) & 0x01;
-		bit1 = (color_prom[0] >> 5) & 0x01;
-		r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
+		bit0 = BIT(color_prom[i], 4);
+		bit1 = BIT(color_prom[i], 5);
+		int const r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
-		color_prom++;
 	}
 }
 
@@ -450,29 +458,26 @@ READ8_MEMBER(corona_state::blitter_status_r)
 
 void corona_state::blitter_execute(int x, int y, int color, int width, int flag)
 {
-	int i;
-	int xdir = (flag & 0x10)    ? -1 : 1;
-	int ydir = (!(flag & 0x20)) ? -1 : 1;
+	int const xdir = (flag & 0x10)    ? -1 : 1;
+	int const ydir = (!(flag & 0x20)) ? -1 : 1;
 
 	if(width == 0) //ignored
 		return;
 
 	if((flag & 0xc0) == 0) /* square shape / layer clearance */
 	{
-		int xp, yp;
-
 		if(x != 128 || y != 128 || width != 8)
 			printf("%02x %02x %02x %02x %02x\n", x, y, color, width, flag);
 
-		for(yp = 0; yp < 0x100; yp++)
-			for(xp = 0; xp < 0x100; xp++)
+		for(int yp = 0; yp < 0x100; yp++)
+			for(int xp = 0; xp < 0x100; xp++)
 				m_videobuf[(yp & 0x1ff) * 512 + (xp & 0x1ff)] = color;
 	}
 	else /* line shape */
 	{
 		//printf("%02x %02x %02x %02x %02x\n",x,y,color,width,flag);
 
-		for(i = 0; i < width; i++)
+		for(int i = 0; i < width; i++)
 		{
 			m_videobuf[(y & 0x1ff) * 512 + (x & 0x1ff)] = color;
 
@@ -536,8 +541,8 @@ WRITE8_MEMBER(corona_state::ball_w)
 {
 	m_lamp = data;
 
-	output().set_lamp_value(data, 1);
-	output().set_lamp_value(m_lamp_old, 0);
+	m_lamps[data] = 1;
+	m_lamps[m_lamp_old] = 0;
 	m_lamp_old = m_lamp;
 }
 
@@ -637,15 +642,15 @@ void corona_state::winner81_map(address_map &map)
 void corona_state::winner81_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x70, 0x70).w(this, FUNC(corona_state::blitter_x_w));
-	map(0x71, 0x71).w(this, FUNC(corona_state::blitter_unk_w));
-	map(0x72, 0x72).w(this, FUNC(corona_state::blitter_trig_wdht_w));
-	map(0x74, 0x74).w(this, FUNC(corona_state::blitter_y_w));
-	map(0x75, 0x75).r(this, FUNC(corona_state::blitter_status_r));
-	map(0x76, 0x76).w(this, FUNC(corona_state::blitter_aux_w));
+	map(0x70, 0x70).w(FUNC(corona_state::blitter_x_w));
+	map(0x71, 0x71).w(FUNC(corona_state::blitter_unk_w));
+	map(0x72, 0x72).w(FUNC(corona_state::blitter_trig_wdht_w));
+	map(0x74, 0x74).w(FUNC(corona_state::blitter_y_w));
+	map(0x75, 0x75).r(FUNC(corona_state::blitter_status_r));
+	map(0x76, 0x76).w(FUNC(corona_state::blitter_aux_w));
 
 	map(0xd8, 0xd8).nopw();            /* dunno, but is writing 0's very often */
-	map(0xdf, 0xdf).w(this, FUNC(corona_state::sound_latch_w));
+	map(0xdf, 0xdf).w(FUNC(corona_state::sound_latch_w));
 
 	map(0xe8, 0xe8).portr("IN0");    /* credits for players A, B, C, D */
 	map(0xe9, 0xe9).portr("IN3");
@@ -654,7 +659,7 @@ void corona_state::winner81_cpu_io_map(address_map &map)
 	map(0xec, 0xec).portr("IN4");
 	map(0xed, 0xed).portr("DSW1");   /* DIP switches bank 1 */
 	map(0xee, 0xee).portr("DSW2");
-	map(0xef, 0xef).w(this, FUNC(corona_state::wc_meters_w));  /* meters: coin1 = bit0, coin2 = bit1, coinout = bit2 */
+	map(0xef, 0xef).w(FUNC(corona_state::wc_meters_w));  /* meters: coin1 = bit0, coin2 = bit1, coinout = bit2 */
 }
 
 void corona_state::winner81_sound_map(address_map &map)
@@ -666,7 +671,7 @@ void corona_state::winner81_sound_map(address_map &map)
 void corona_state::winner81_sound_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x00).r(FUNC(corona_state::sound_latch_r));
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
 }
 
@@ -698,20 +703,20 @@ void corona_state::winner82_map(address_map &map)
 void corona_state::winner82_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(this, FUNC(corona_state::blitter_x_w));
-	map(0xf1, 0xf1).w(this, FUNC(corona_state::blitter_y_w));
-	map(0xf2, 0xf2).w(this, FUNC(corona_state::blitter_trig_wdht_w));
-	map(0xf3, 0xf3).w(this, FUNC(corona_state::blitter_aux_w));
-	map(0xf4, 0xf4).w(this, FUNC(corona_state::blitter_unk_w));
-	map(0xf5, 0xf5).r(this, FUNC(corona_state::blitter_status_r));
+	map(0xf0, 0xf0).w(FUNC(corona_state::blitter_x_w));
+	map(0xf1, 0xf1).w(FUNC(corona_state::blitter_y_w));
+	map(0xf2, 0xf2).w(FUNC(corona_state::blitter_trig_wdht_w));
+	map(0xf3, 0xf3).w(FUNC(corona_state::blitter_aux_w));
+	map(0xf4, 0xf4).w(FUNC(corona_state::blitter_unk_w));
+	map(0xf5, 0xf5).r(FUNC(corona_state::blitter_status_r));
 
 	map(0xf8, 0xf8).portr("DSW1");   /* coinage DIP SW */
 	map(0xf9, 0xf9).portr("IN0");    /* controls for players A & B */
 	map(0xfa, 0xfa).portr("IN1");    /* credits for players A, B, C, D */
 	map(0xfb, 0xfb).portr("IN3");    /* single credits for players A, B, C, D, + fix bits 3, 4, 5, 6 in meters */
-	map(0xfc, 0xfc).w(this, FUNC(corona_state::wc_meters_w));
+	map(0xfc, 0xfc).w(FUNC(corona_state::wc_meters_w));
 	map(0xfd, 0xfd).portr("IN2");    /* controls for players C & D */
-	map(0xfe, 0xfe).w(this, FUNC(corona_state::sound_latch_w));
+	map(0xfe, 0xfe).w(FUNC(corona_state::sound_latch_w));
 	map(0xff, 0xff).portr("DSW2");   /* no idea */
 }
 
@@ -724,7 +729,7 @@ void corona_state::winner82_sound_map(address_map &map)
 void corona_state::winner82_sound_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x00).r(FUNC(corona_state::sound_latch_r));
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x02, 0x03).nopw();    /* socket for another ay, inited but never played */
 }
@@ -766,18 +771,18 @@ void corona_state::re800_map(address_map &map)
 void corona_state::re800_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(this, FUNC(corona_state::blitter_x_w));
-	map(0xf1, 0xf1).w(this, FUNC(corona_state::blitter_y_w));
-	map(0xf2, 0xf2).w(this, FUNC(corona_state::blitter_trig_wdht_w));
-	map(0xf3, 0xf3).w(this, FUNC(corona_state::blitter_aux_w));
-	map(0xf4, 0xf4).w(this, FUNC(corona_state::blitter_unk_w));
-	map(0xf5, 0xf5).r(this, FUNC(corona_state::blitter_status_r));
+	map(0xf0, 0xf0).w(FUNC(corona_state::blitter_x_w));
+	map(0xf1, 0xf1).w(FUNC(corona_state::blitter_y_w));
+	map(0xf2, 0xf2).w(FUNC(corona_state::blitter_trig_wdht_w));
+	map(0xf3, 0xf3).w(FUNC(corona_state::blitter_aux_w));
+	map(0xf4, 0xf4).w(FUNC(corona_state::blitter_unk_w));
+	map(0xf5, 0xf5).r(FUNC(corona_state::blitter_status_r));
 	map(0xf8, 0xf8).portr("IN1");
 	map(0xf9, 0xf9).portr("DSW1");
-	map(0xfc, 0xfc).w(this, FUNC(corona_state::mux_port_w));
-	map(0xfd, 0xfd).r(this, FUNC(corona_state::mux_port_r));
-	map(0xfe, 0xfe).w(this, FUNC(corona_state::sound_latch_w));
-	map(0xff, 0xff).w(this, FUNC(corona_state::ball_w));
+	map(0xfc, 0xfc).w(FUNC(corona_state::mux_port_w));
+	map(0xfd, 0xfd).r(FUNC(corona_state::mux_port_r));
+	map(0xfe, 0xfe).w(FUNC(corona_state::sound_latch_w));
+	map(0xff, 0xff).w(FUNC(corona_state::ball_w));
 }
 
 void corona_state::re800_sound_map(address_map &map)
@@ -789,7 +794,7 @@ void corona_state::re800_sound_map(address_map &map)
 void corona_state::re800_sound_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x00).r(FUNC(corona_state::sound_latch_r));
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
 }
 
@@ -829,19 +834,19 @@ void corona_state::luckyrlt_map(address_map &map)
 void corona_state::luckyrlt_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(this, FUNC(corona_state::blitter_x_w));
-	map(0xf1, 0xf1).w(this, FUNC(corona_state::blitter_y_w));
-	map(0xf2, 0xf2).w(this, FUNC(corona_state::blitter_trig_wdht_w));
-	map(0xf3, 0xf3).w(this, FUNC(corona_state::blitter_aux_w));
-	map(0xf4, 0xf4).w(this, FUNC(corona_state::blitter_unk_w));
-	map(0xf5, 0xf5).r(this, FUNC(corona_state::blitter_status_r));
+	map(0xf0, 0xf0).w(FUNC(corona_state::blitter_x_w));
+	map(0xf1, 0xf1).w(FUNC(corona_state::blitter_y_w));
+	map(0xf2, 0xf2).w(FUNC(corona_state::blitter_trig_wdht_w));
+	map(0xf3, 0xf3).w(FUNC(corona_state::blitter_aux_w));
+	map(0xf4, 0xf4).w(FUNC(corona_state::blitter_unk_w));
+	map(0xf5, 0xf5).r(FUNC(corona_state::blitter_status_r));
 
 	map(0xf8, 0xf8).portr("DSW2");
-	map(0xf9, 0xf9).w(this, FUNC(corona_state::ball_w));
+	map(0xf9, 0xf9).w(FUNC(corona_state::ball_w));
 	map(0xfa, 0xfa).portr("DSW1");
-	map(0xfc, 0xfc).w(this, FUNC(corona_state::mux_port_w));
-	map(0xfd, 0xfd).r(this, FUNC(corona_state::mux_port_r));
-	map(0xfe, 0xfe).w(this, FUNC(corona_state::sound_latch_w));
+	map(0xfc, 0xfc).w(FUNC(corona_state::mux_port_w));
+	map(0xfd, 0xfd).r(FUNC(corona_state::mux_port_r));
+	map(0xfe, 0xfe).w(FUNC(corona_state::sound_latch_w));
 }
 
 void corona_state::luckyrlt_sound_map(address_map &map)
@@ -853,7 +858,7 @@ void corona_state::luckyrlt_sound_map(address_map &map)
 void corona_state::luckyrlt_sound_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x00).r(FUNC(corona_state::sound_latch_r));
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
 }
 
@@ -1382,16 +1387,16 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(corona_state::winner81)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, WC81_MAIN_XTAL/8)  /* measured */
-	MCFG_CPU_PROGRAM_MAP(winner81_map)
-	MCFG_CPU_IO_MAP(winner81_cpu_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, WC81_MAIN_XTAL/8)  /* measured */
+	MCFG_DEVICE_PROGRAM_MAP(winner81_map)
+	MCFG_DEVICE_IO_MAP(winner81_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, WC81_MAIN_XTAL/10)    /* measured */
-	MCFG_CPU_PROGRAM_MAP(winner81_sound_map)
-	MCFG_CPU_IO_MAP(winner81_sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
+	MCFG_DEVICE_ADD("soundcpu", Z80, WC81_MAIN_XTAL/10)    /* measured */
+	MCFG_DEVICE_PROGRAM_MAP(winner81_sound_map)
+	MCFG_DEVICE_IO_MAP(winner81_sound_cpu_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1403,29 +1408,27 @@ MACHINE_CONFIG_START(corona_state::winner81)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
+	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)    /* measured */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8912(config, "aysnd", AY_CLK1).add_route(ALL_OUTPUTS, "mono", 1.0);    /* measured */
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(corona_state::winner82)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, WC82_MAIN_XTAL/8)  /* measured */
-	MCFG_CPU_PROGRAM_MAP(winner82_map)
-	MCFG_CPU_IO_MAP(winner82_cpu_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, WC82_MAIN_XTAL/8)  /* measured */
+	MCFG_DEVICE_PROGRAM_MAP(winner82_map)
+	MCFG_DEVICE_IO_MAP(winner82_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, WC82_MAIN_XTAL/8) /* measured */
-	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
-	MCFG_CPU_IO_MAP(winner82_sound_cpu_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, WC82_MAIN_XTAL/8) /* measured */
+	MCFG_DEVICE_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
+	MCFG_DEVICE_IO_MAP(winner82_sound_cpu_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1437,30 +1440,28 @@ MACHINE_CONFIG_START(corona_state::winner82)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
+	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLK2)    /* measured */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8910(config, "aysnd", AY_CLK2).add_route(ALL_OUTPUTS, "mono", 1.0);    /* measured */
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(corona_state::re800)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(re800_map)
-	MCFG_CPU_IO_MAP(re800_cpu_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(re800_map)
+	MCFG_DEVICE_IO_MAP(re800_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(re800_sound_map)
-	MCFG_CPU_IO_MAP(re800_sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
+	MCFG_DEVICE_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(re800_sound_map)
+	MCFG_DEVICE_IO_MAP(re800_sound_cpu_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1472,29 +1473,27 @@ MACHINE_CONFIG_START(corona_state::re800)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
+	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8912(config, "aysnd", AY_CLK2).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(corona_state::rcirulet)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(re800_map)
-	MCFG_CPU_IO_MAP(re800_cpu_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(re800_map)
+	MCFG_DEVICE_IO_MAP(re800_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
-	MCFG_CPU_IO_MAP(winner82_sound_cpu_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
+	MCFG_DEVICE_IO_MAP(winner82_sound_cpu_io_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1506,30 +1505,28 @@ MACHINE_CONFIG_START(corona_state::rcirulet)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
+	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8912(config, "aysnd", AY_CLK2).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(corona_state::luckyrlt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(luckyrlt_map)
-	MCFG_CPU_IO_MAP(luckyrlt_cpu_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(luckyrlt_map)
+	MCFG_DEVICE_IO_MAP(luckyrlt_cpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
-	MCFG_CPU_PROGRAM_MAP(luckyrlt_sound_map)
-	MCFG_CPU_IO_MAP(luckyrlt_sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
+	MCFG_DEVICE_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(luckyrlt_sound_map)
+	MCFG_DEVICE_IO_MAP(luckyrlt_sound_cpu_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1541,15 +1538,13 @@ MACHINE_CONFIG_START(corona_state::luckyrlt)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
+	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8912(config, "aysnd", AY_CLK1).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -1751,13 +1746,13 @@ ROM_END
 *              Game Drivers               *
 ******************************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE         INIT      ROT      COMPANY                     FULLNAME                                   FLAGS                     LAYOUT
-GAME(  1981, winner81,  winner82, winner81, winner81, corona_state, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           MACHINE_IMPERFECT_SOUND )
-GAME(  1981, winner81b, winner82, winner82, winner82, corona_state, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
-GAME(  1982, winner82,  0,        winner82, winner82, corona_state, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
-GAME(  198?, legrandc,  winner82, winner82, winner82, corona_state, 0,        ROT0,   "Isermatic France S.A.",    "Le Grandchamps",                           MACHINE_IMPERFECT_COLORS )
-GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                        layout_re800 )
-GAMEL( 1991, re800v1,   0,        re800,    re800,    corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                        layout_re800 )
-GAMEL( 1991, re800v3,   0,        re800,    re800v3,  corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     MACHINE_IMPERFECT_COLORS, layout_re800 )
-GAMEL( 199?, rcirulet,  0,        rcirulet, re800,    corona_state, 0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                        layout_re800 )
-GAMEL( 1990, luckyrlt,  0,        luckyrlt, luckyrlt, corona_state, 0,        ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish)", 0,                        layout_luckyrlt )
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE         INIT        ROT     COMPANY                     FULLNAME                                   FLAGS                     LAYOUT
+GAME(  1981, winner81,  winner82, winner81, winner81, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           MACHINE_IMPERFECT_SOUND )
+GAME(  1981, winner81b, winner82, winner82, winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
+GAME(  1982, winner82,  0,        winner82, winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
+GAME(  198?, legrandc,  winner82, winner82, winner82, corona_state, empty_init, ROT0,   "Isermatic France S.A.",    "Le Grandchamps",                           MACHINE_IMPERFECT_COLORS )
+GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                        layout_re800 )
+GAMEL( 1991, re800v1,   0,        re800,    re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                        layout_re800 )
+GAMEL( 1991, re800v3,   0,        re800,    re800v3,  corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     MACHINE_IMPERFECT_COLORS, layout_re800 )
+GAMEL( 199?, rcirulet,  0,        rcirulet, re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                        layout_re800 )
+GAMEL( 1990, luckyrlt,  0,        luckyrlt, luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish)", 0,                        layout_luckyrlt )

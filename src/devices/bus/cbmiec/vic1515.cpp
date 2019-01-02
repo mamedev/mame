@@ -62,9 +62,9 @@ void vic1515_device::vic1515_io(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(vic1515_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", I8039, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(vic1515_mem)
-	MCFG_CPU_IO_MAP(vic1515_io)
+	MCFG_DEVICE_ADD("maincpu", I8039, XTAL(6'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vic1515_mem)
+	MCFG_DEVICE_IO_MAP(vic1515_io)
 MACHINE_CONFIG_END
 
 

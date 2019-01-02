@@ -34,6 +34,7 @@
 #include "sound/ym2413.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -41,16 +42,33 @@
 class spoker_state : public driver_device
 {
 public:
-	spoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	spoker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_bg_tile_ram(*this, "bg_tile_ram"),
 		m_fg_tile_ram(*this, "fg_tile_ram"),
-		m_fg_color_ram(*this, "fg_color_ram") { }
+		m_fg_color_ram(*this, "fg_color_ram"),
+		m_leds(*this, "led%u", 0U)
+	{ }
 
+	void spoker(machine_config &config);
+	void _3super8(machine_config &config);
+
+	void init_spkleftover();
+	void init_spk116it();
+	void init_3super8();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -62,6 +80,8 @@ public:
 	required_shared_ptr<uint8_t> m_fg_tile_ram;
 	required_shared_ptr<uint8_t> m_fg_color_ram;
 	tilemap_t *m_fg_tilemap;
+
+	output_finder<7> m_leds;
 
 	// common
 	int m_nmi_ack;
@@ -84,21 +104,10 @@ public:
 	DECLARE_WRITE8_MEMBER(magic_w);
 	DECLARE_READ8_MEMBER(magic_r);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
-
-	DECLARE_DRIVER_INIT(spkleftover);
-	DECLARE_DRIVER_INIT(spk116it);
-	DECLARE_DRIVER_INIT(3super8);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void spoker(machine_config &config);
-	void _3super8(machine_config &config);
 	void _3super8_portmap(address_map &map);
 	void spoker_map(address_map &map);
 	void spoker_portmap(address_map &map);
@@ -185,7 +194,7 @@ WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
 	machine().bookkeeping().coin_counter_w(2, data & 0x08);   // key in
 	machine().bookkeeping().coin_counter_w(3, data & 0x10);   // coin out mech
 
-	output().set_led_value(6, data & 0x40);   // led for coin out / hopper active
+	m_leds[6] = BIT(data, 6);   // led for coin out / hopper active
 
 	if(((m_nmi_ack & 0x80) == 0) && data & 0x80)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -198,8 +207,8 @@ WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
 
 WRITE8_MEMBER(spoker_state::video_and_leds_w)
 {
-	output().set_led_value(4, data & 0x01); // start?
-	output().set_led_value(5, data & 0x04); // l_bet?
+	m_leds[4] = BIT(data, 0); // start?
+	m_leds[5] = BIT(data, 2); // l_bet?
 
 	m_video_enable = data & 0x40;
 	m_hopper = (~data)& 0x80;
@@ -210,10 +219,10 @@ WRITE8_MEMBER(spoker_state::video_and_leds_w)
 
 WRITE8_MEMBER(spoker_state::leds_w)
 {
-	output().set_led_value(0, data & 0x01);  // stop_1
-	output().set_led_value(1, data & 0x02);  // stop_2
-	output().set_led_value(2, data & 0x04);  // stop_3
-	output().set_led_value(3, data & 0x08);  // stop
+	m_leds[0] = BIT(data, 0);  // stop_1
+	m_leds[1] = BIT(data, 1);  // stop_2
+	m_leds[2] = BIT(data, 2);  // stop_3
+	m_leds[3] = BIT(data, 3);  // stop
 	// data & 0x10?
 
 	m_out[2] = data;
@@ -274,15 +283,15 @@ void spoker_state::spoker_portmap(address_map &map)
 	map(0x0000, 0x003f).ram(); // Z180 internal regs
 	map(0x2000, 0x23ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0x3000, 0x33ff).ram().w(this, FUNC(spoker_state::bg_tile_w)).share("bg_tile_ram");
-	map(0x5000, 0x5fff).ram().w(this, FUNC(spoker_state::fg_tile_w)).share("fg_tile_ram");
+	map(0x3000, 0x33ff).ram().w(FUNC(spoker_state::bg_tile_w)).share(m_bg_tile_ram);
+	map(0x5000, 0x5fff).ram().w(FUNC(spoker_state::fg_tile_w)).share(m_fg_tile_ram);
 	map(0x6480, 0x6483).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* NMI and coins (w), service (r), coins (r) */
 	map(0x6490, 0x6493).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* buttons 1 (r), video and leds (w), leds (w) */
 	map(0x64a0, 0x64a0).portr("BUTTONS2");
 	map(0x64b0, 0x64b1).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x64c0, 0x64c0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x64d0, 0x64d1).rw(this, FUNC(spoker_state::magic_r), FUNC(spoker_state::magic_w));    // DSW1-5
-	map(0x7000, 0x7fff).ram().w(this, FUNC(spoker_state::fg_color_w)).share("fg_color_ram");
+	map(0x64d0, 0x64d1).rw(FUNC(spoker_state::magic_r), FUNC(spoker_state::magic_w));    // DSW1-5
+	map(0x7000, 0x7fff).ram().w(FUNC(spoker_state::fg_color_w)).share(m_fg_color_ram);
 }
 
 void spoker_state::_3super8_portmap(address_map &map)
@@ -290,14 +299,14 @@ void spoker_state::_3super8_portmap(address_map &map)
 //  AM_RANGE(0x1000, 0x1fff) AM_WRITENOP
 	map(0x2000, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2800, 0x2fff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0x3000, 0x33ff).ram().w(this, FUNC(spoker_state::bg_tile_w)).share("bg_tile_ram");
+	map(0x3000, 0x33ff).ram().w(FUNC(spoker_state::bg_tile_w)).share(m_bg_tile_ram);
 	map(0x4000, 0x4000).portr("DSW1");
 	map(0x4001, 0x4001).portr("DSW2");
 	map(0x4002, 0x4002).portr("DSW3");
 	map(0x4003, 0x4003).portr("DSW4");
 	map(0x4004, 0x4004).portr("DSW5");
 //  AM_RANGE(0x4000, 0x40ff) AM_WRITENOP
-	map(0x5000, 0x5fff).ram().w(this, FUNC(spoker_state::fg_tile_w)).share("fg_tile_ram");
+	map(0x5000, 0x5fff).ram().w(FUNC(spoker_state::fg_tile_w)).share(m_fg_tile_ram);
 
 //  The following one (0x6480) should be output. At beginning of code, there is a PPI initialization
 //  setting O-I-I for ports ABC. Except these routines are just a leftover from the original game,
@@ -307,10 +316,10 @@ void spoker_state::_3super8_portmap(address_map &map)
 
 	map(0x6491, 0x6491).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x64a0, 0x64a0).portr("IN2");
-	map(0x64b0, 0x64b0).w(this, FUNC(spoker_state::leds_w));
+	map(0x64b0, 0x64b0).w(FUNC(spoker_state::leds_w));
 	map(0x64c0, 0x64c0).nopr(); //irq ack?
-	map(0x64f0, 0x64f0).w(this, FUNC(spoker_state::nmi_and_coins_w));
-	map(0x7000, 0x7fff).ram().w(this, FUNC(spoker_state::fg_color_w)).share("fg_color_ram");
+	map(0x64f0, 0x64f0).w(FUNC(spoker_state::nmi_and_coins_w));
+	map(0x7000, 0x7fff).ram().w(FUNC(spoker_state::fg_color_w)).share(m_fg_color_ram);
 }
 
 
@@ -555,7 +564,7 @@ static const gfx_layout layout3s8_8x8x6 =
 	16*8
 };
 
-static GFXDECODE_START( spoker )
+static GFXDECODE_START( gfx_spoker )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, layout_8x8x6,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, layout_8x32x6, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, layout_8x32x6, 0, 16 )
@@ -563,7 +572,7 @@ static GFXDECODE_START( spoker )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, layout_8x32x6, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( 3super8 )
+static GFXDECODE_START( gfx_3super8 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, layout3s8_8x8x6, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, layout_8x32x6,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, layout_8x32x6,   0, 16 )
@@ -578,6 +587,8 @@ GFXDECODE_END
 
 void spoker_state::machine_start()
 {
+	m_leds.resolve();
+
 	save_item(NAME(m_nmi_ack));
 	save_item(NAME(m_out));
 	save_item(NAME(m_video_enable));
@@ -597,66 +608,64 @@ void spoker_state::machine_reset()
                               Machine Drivers
 ***************************************************************************/
 
-MACHINE_CONFIG_START(spoker_state::spoker)
-
+void spoker_state::spoker(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 2)   /* HD64180RP8, 8 MHz? */
-	MCFG_CPU_PROGRAM_MAP(spoker_map)
-	MCFG_CPU_IO_MAP(spoker_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spoker_state, nmi_line_assert)
+	Z180(config, m_maincpu, XTAL(12'000'000) / 2);   /* HD64180RP8, 8 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &spoker_state::spoker_map);
+	m_maincpu->set_addrmap(AS_IO, &spoker_state::spoker_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(spoker_state::nmi_line_assert));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)  // Control 0x8b --> A:out; B:input; C:input.
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(spoker_state, nmi_and_coins_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));  // Control 0x8b --> A:out; B:input; C:input.
+	ppi0.out_pa_callback().set(FUNC(spoker_state::nmi_and_coins_w));
+	ppi0.in_pb_callback().set_ioport("SERVICE");
+	ppi0.in_pc_callback().set_ioport("COINS");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)  // Control 0x90 --> A:input; B:out; C:out.
-	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(spoker_state, video_and_leds_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(spoker_state, leds_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));  // Control 0x90 --> A:input; B:out; C:out.
+	ppi1.in_pa_callback().set_ioport("BUTTONS1");
+	ppi1.out_pb_callback().set(FUNC(spoker_state::video_and_leds_w));
+	ppi1.out_pc_callback().set(FUNC(spoker_state::leds_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(spoker_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
+	m_screen->set_screen_update(FUNC(spoker_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", spoker)
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spoker);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
+	SPEAKER(config, "mono").front_center();
+	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.4);
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000) / 12, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", XTAL(12'000'000) / 12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(spoker_state::_3super8)
+void spoker_state::_3super8(machine_config &config)
+{
 	spoker(config);
 
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(24'000'000) / 4)    /* z840006, 24/4 MHz? */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spoker_map)
-	MCFG_CPU_IO_MAP(_3super8_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spoker_state, nmi_line_assert)
-	MCFG_CPU_PERIODIC_INT_DRIVER(spoker_state, irq0_line_hold, 120) // this signal comes from the PIC
+	Z80(config.replace(), m_maincpu, XTAL(24'000'000) / 4);    /* z840006, 24/4 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &spoker_state::spoker_map);
+	m_maincpu->set_addrmap(AS_IO, &spoker_state::_3super8_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(spoker_state::nmi_line_assert));
+	m_maincpu->set_periodic_int(FUNC(spoker_state::irq0_line_hold), attotime::from_hz(120)); // this signal comes from the PIC
 
-	MCFG_DEVICE_REMOVE("ppi8255_0")
-	MCFG_DEVICE_REMOVE("ppi8255_1")
+	config.device_remove("ppi8255_0");
+	config.device_remove("ppi8255_1");
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", 3super8)
+	m_gfxdecode->set_info(gfx_3super8);
+	m_palette->set_entries(0x800);
 
-	MCFG_DEVICE_REMOVE("ymsnd")
-MACHINE_CONFIG_END
+	config.device_remove("ymsnd");
+}
 
 
 /***************************************************************************
@@ -896,27 +905,23 @@ ROM_END
                               Driver Init
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(spoker_state, spkleftover)
+void spoker_state::init_spkleftover()
 {
 /*  The last 4K have the scheme/table for the whole encryption.
     Maybe a leftover...
 */
-	int A, B;
 	uint8_t *rom = memregion("maincpu")->base();
-
-	for (A = 0; A < 0x10000; A++)
+	for (int A = 0; A < 0x10000; A++)
 	{
-		B = ((A & 0x0fff) | 0xf000);
+		int B = ((A & 0x0fff) | 0xf000);
 		rom[A] = rom[A] ^ rom[B];
 	}
 }
 
-DRIVER_INIT_MEMBER(spoker_state, spk116it)
+void spoker_state::init_spk116it()
 {
-	int A;
 	uint8_t *rom = memregion("maincpu")->base();
-
-	for (A = 0; A < 0x10000; A++)
+	for (int A = 0; A < 0x10000; A++)
 	{
 		rom[A] ^= 0x02;
 		if ((A & 0x0208) == 0x0208) rom[A] ^= 0x20;
@@ -926,33 +931,34 @@ DRIVER_INIT_MEMBER(spoker_state, spk116it)
 	}
 }
 
-DRIVER_INIT_MEMBER(spoker_state, 3super8)
+void spoker_state::init_3super8()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	int i;
 
 	/* Decryption is probably done using one macrocell/output on an address decoding pal which we do not have a dump of */
 	/* The encryption is quite awful actually, especially since the program rom is entirely blank/0xFF but encrypted on its second half, exposing the entire function in plaintext */
 	/* Input: A6, A7, A8, A9, A11; Output: D5 XOR */
 	/* function: (A6&A8)&((!A7&A11)|(A9&!A11)); */
 	/* nor-reduced: !(!(!(!A6|!A8))|!(!(A7|!A11)|!(!A9|A11))); */
-	for(i=0;i<0x20000;i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
-		uint8_t a6, a7, a8, a9, a11, d5 = 0;
-		a6 = BIT(i,6); a7 = BIT(i,7); a8 = BIT(i,8); a9 = BIT(i,9); a11 = BIT(i,11);
-		d5 = (a6 & a8) & ((~a7 & a11) | (a9 & ~a11));
-		ROM[i] ^= d5*0x20;
+		uint8_t a6  = BIT(i, 6);
+		uint8_t a7  = BIT(i, 7);
+		uint8_t a8  = BIT(i, 8);
+		uint8_t a9  = BIT(i, 9);
+		uint8_t a11 = BIT(i, 11);
+		uint8_t d5 = (a6 & a8) & ((~a7 & a11) | (a9 & ~a11));
+		ROM[i] ^= d5 * 0x20;
 	}
 
 	/* cheesy hack: take gfx roms from spk116it and rearrange them for this game needs */
 	{
 		uint8_t *src = memregion("rep_gfx")->base();
 		uint8_t *dst = memregion("gfx1")->base();
-		uint8_t x;
 
-		for(x=0;x<3;x++)
+		for (uint8_t x = 0; x < 3; x++)
 		{
-			for(i=0;i<0x20000;i+=4)
+			for (int i = 0; i < 0x20000; i += 4)
 			{
 				dst[i+0+x*0x40000] = src[i+0+x*0x40000];
 				dst[i+1+x*0x40000] = src[i+2+x*0x40000];
@@ -969,13 +975,13 @@ DRIVER_INIT_MEMBER(spoker_state, 3super8)
 ***************************************************************************/
 
 /*    YEAR   NAME        PARENT    MACHINE  INPUT    STATE          INIT         ROT     COMPANY      FULLNAME                   FLAGS  */
-GAME( 1996,  spk306us,   0,        spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v306US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk205us,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v205US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk203us,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk200ua,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1993?, spk116it,   spk306us, spoker,  spoker,  spoker_state,  spk116it,    ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk116itmx, spk306us, spoker,  spoker,  spoker_state,  0,           ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1993?, spk115it,   spk306us, spoker,  spoker,  spoker_state,  spk116it,    ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993?, spk114it,   spk306us, spoker,  spoker,  spoker_state,  0,           ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1996,  spk102ua,   spk306us, spoker,  spoker,  spoker_state,  spkleftover, ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
-GAME( 1993?, 3super8,    0,        _3super8,3super8, spoker_state,  3super8,     ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped
+GAME( 1996,  spk306us,   0,        spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v306US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk205us,   spk306us, spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v205US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk203us,   spk306us, spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v203US)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk200ua,   spk306us, spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v200UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1993?, spk116it,   spk306us, spoker,  spoker,  spoker_state,  init_spk116it,    ROT0,  "IGS",       "Super Poker (v116IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk116itmx, spk306us, spoker,  spoker,  spoker_state,  empty_init,       ROT0,  "IGS",       "Super Poker (v116IT-MX)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1993?, spk115it,   spk306us, spoker,  spoker,  spoker_state,  init_spk116it,    ROT0,  "IGS",       "Super Poker (v115IT)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993?, spk114it,   spk306us, spoker,  spoker,  spoker_state,  empty_init,       ROT0,  "IGS",       "Super Poker (v114IT)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1996,  spk102ua,   spk306us, spoker,  spoker,  spoker_state,  init_spkleftover, ROT0,  "IGS",       "Super Poker (v102UA)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // needs proper machine driver
+GAME( 1993?, 3super8,    0,        _3super8,3super8, spoker_state,  init_3super8,     ROT0,  "<unknown>", "3 Super 8 (Italy)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) //roms are badly dumped

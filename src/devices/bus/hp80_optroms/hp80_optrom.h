@@ -72,6 +72,6 @@ protected:
 DECLARE_DEVICE_TYPE(HP80_OPTROM_SLOT, hp80_optrom_slot_device)
 DECLARE_DEVICE_TYPE(HP80_OPTROM_CART, hp80_optrom_cart_device)
 
-SLOT_INTERFACE_EXTERN(hp80_optrom_slot_device);
+void hp80_optrom_slot_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_HP80_OPTROMS_HP80_OPTROM_H

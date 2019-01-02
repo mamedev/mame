@@ -47,11 +47,13 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu") { }
 
+	void minivadr(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	uint32_t screen_update_minivadr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void minivadr(machine_config &config);
 	void minivadr_map(address_map &map);
 };
 
@@ -111,9 +113,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(minivadr_state::minivadr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000) / 6)
-	MCFG_CPU_PROGRAM_MAP(minivadr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", minivadr_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000) / 6)
+	MCFG_DEVICE_PROGRAM_MAP(minivadr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", minivadr_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -139,4 +141,4 @@ ROM_START( minivadr )
 ROM_END
 
 
-GAME( 1990, minivadr, 0, minivadr, minivadr, minivadr_state, 0, ROT0, "Taito Corporation", "Mini Vaders", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+GAME( 1990, minivadr, 0, minivadr, minivadr, minivadr_state, empty_init, ROT0, "Taito Corporation", "Mini Vaders", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

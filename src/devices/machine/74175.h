@@ -48,61 +48,13 @@
 #pragma once
 
 
-#define MCFG_74174_Q1_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q1_cb(DEVCB_##_devcb);
-
-#define MCFG_74174_Q2_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q2_cb(DEVCB_##_devcb);
-
-#define MCFG_74174_Q3_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q3_cb(DEVCB_##_devcb);
-
-#define MCFG_74174_Q4_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q4_cb(DEVCB_##_devcb);
-
-#define MCFG_74175_Q1_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q1_cb(DEVCB_##_devcb);
-
-#define MCFG_74175_Q2_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q2_cb(DEVCB_##_devcb);
-
-#define MCFG_74175_Q3_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q3_cb(DEVCB_##_devcb);
-
-#define MCFG_74175_Q4_CB(_devcb) \
-	devcb = &downcast<ttl741745_device &>(*device).set_q4_cb(DEVCB_##_devcb);
-
-#define MCFG_74174_Q5_CB(_devcb) \
-	devcb = &downcast<ttl74174_device &>(*device).set_q5_cb(DEVCB_##_devcb);
-
-#define MCFG_74174_Q6_CB(_devcb) \
-	devcb = &downcast<ttl74174_device &>(*device).set_q6_cb(DEVCB_##_devcb);
-
-#define MCFG_74175_NOT_Q1_CB(_devcb) \
-	devcb = &downcast<ttl74175_device &>(*device).set_not_q1_cb(DEVCB_##_devcb);
-
-#define MCFG_74175_NOT_Q2_CB(_devcb) \
-	devcb = &downcast<ttl74175_device &>(*device).set_not_q2_cb(DEVCB_##_devcb);
-
-#define MCFG_74175_NOT_Q3_CB(_devcb) \
-	devcb = &downcast<ttl74175_device &>(*device).set_not_q3_cb(DEVCB_##_devcb);
-
-#define MCFG_74175_NOT_Q4_CB(_devcb) \
-	devcb = &downcast<ttl74175_device &>(*device).set_not_q1_cb(DEVCB_##_devcb);
-
-#define MCFG_74174_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TTL74174, 0)
-
-#define MCFG_74175_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TTL74175, 0)
-
 class ttl741745_device : public device_t
 {
 public:
-	template <class Object> devcb_base &set_q1_cb(Object &&cb) { return m_q1_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_q2_cb(Object &&cb) { return m_q2_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_q3_cb(Object &&cb) { return m_q3_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_q4_cb(Object &&cb) { return m_q4_func.set_callback(std::forward<Object>(cb)); }
+	auto q1_callback() { return m_q1_func.bind(); }
+	auto q2_callback() { return m_q2_func.bind(); }
+	auto q3_callback() { return m_q3_func.bind(); }
+	auto q4_callback() { return m_q4_func.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( clear_w );
 	DECLARE_WRITE_LINE_MEMBER( d1_w );
@@ -144,7 +96,7 @@ protected:
 class ttl74174_device : public ttl741745_device
 {
 public:
-	ttl74174_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl74174_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <class Object> devcb_base &set_q5_cb(Object &&cb) { return m_q5_func.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_q6_cb(Object &&cb) { return m_q6_func.set_callback(std::forward<Object>(cb)); }
@@ -172,7 +124,7 @@ private:
 class ttl74175_device : public ttl741745_device
 {
 public:
-	ttl74175_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl74175_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <class Object> devcb_base &set_not_q1_cb(Object &&cb) { return m_not_q1_func.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_not_q2_cb(Object &&cb) { return m_not_q2_func.set_callback(std::forward<Object>(cb)); }

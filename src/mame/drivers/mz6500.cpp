@@ -10,8 +10,10 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mz6500_state : public driver_device
@@ -25,6 +27,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette") { }
 
+	void mz6500(machine_config &config);
+
+private:
 	required_device<upd7220_device> m_hgdc;
 	required_device<upd765a_device> m_fdc;
 	DECLARE_READ8_MEMBER(mz6500_vram_r);
@@ -37,7 +42,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	void mz6500(machine_config &config);
 	void mz6500_io(address_map &map);
 	void mz6500_map(address_map &map);
 	void upd7220_map(address_map &map);
@@ -85,7 +89,7 @@ void mz6500_state::mz6500_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000, 0x9ffff).ram();
 //  AM_RANGE(0xa0000,0xbffff) kanji/dictionary ROM
-	map(0xc0000, 0xeffff).rw(this, FUNC(mz6500_state::mz6500_vram_r), FUNC(mz6500_state::mz6500_vram_w));
+	map(0xc0000, 0xeffff).rw(FUNC(mz6500_state::mz6500_vram_r), FUNC(mz6500_state::mz6500_vram_w));
 	map(0xfc000, 0xfffff).rom().region("ipl", 0);
 }
 
@@ -134,9 +138,10 @@ void mz6500_state::fdc_drq(bool state)
 	//printf("%02x DRQ\n",state);
 }
 
-static SLOT_INTERFACE_START( mz6500_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void mz6500_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 void mz6500_state::upd7220_map(address_map &map)
 {
@@ -146,9 +151,9 @@ void mz6500_state::upd7220_map(address_map &map)
 
 MACHINE_CONFIG_START(mz6500_state::mz6500)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 8000000) //unk clock
-	MCFG_CPU_PROGRAM_MAP(mz6500_map)
-	MCFG_CPU_IO_MAP(mz6500_io)
+	MCFG_DEVICE_ADD("maincpu", I8086, 8000000) //unk clock
+	MCFG_DEVICE_PROGRAM_MAP(mz6500_map)
+	MCFG_DEVICE_IO_MAP(mz6500_io)
 
 
 	/* video hardware */
@@ -161,11 +166,11 @@ MACHINE_CONFIG_START(mz6500_state::mz6500)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("upd7220", UPD7220, 8000000/6) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mz6500_state, hgdc_display_pixels)
+	UPD7220(config, m_hgdc, 8000000/6); // unk clock
+	m_hgdc->set_addrmap(0, &mz6500_state::upd7220_map);
+	m_hgdc->set_display_pixels_callback(FUNC(mz6500_state::hgdc_display_pixels), this);
 
-	MCFG_UPD765A_ADD("upd765", true, true)
+	UPD765A(config, m_fdc, 8000000, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", mz6500_floppies, "525hd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
@@ -184,5 +189,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT   STATE            INIT   COMPANY    FULLNAME   FLAGS
-COMP( 198?, mz6500,  0,      0,       mz6500,    mz6500, mz6500_state,    0,     "Sharp",   "MZ-6500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
+COMP( 198?, mz6500, 0,      0,      mz6500,  mz6500, mz6500_state, empty_init, "Sharp", "MZ-6500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -1,214 +1,405 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Vas Crabb
 /***************************************************************************
 
-    IBM PC AT compatibles 8042 keyboard controller
+    IBM PC/AT and PS/2 keyboard controllers
+
+    IBM used Intel UPI-41 microcontrollers to implement bidirectional
+    keyboard communication from the PC/AT and PS/2.  On the PS/2, the
+    microcontroller also handles mouse communication.  The PS/2 host
+    interface to the keyboard/mouse controller is backwards-compatible
+    for documented commands.  However a number of undocumented commands
+    are no longer implemented, the pin assignments are different, and
+    interrupt outputs are latched externally using a 74ALS74 at ZM87.
+
+    PC/AT I/O pin assignments:
+    P10:    NC              no connection
+    P11:    NC              no connection
+    P12:    NC              no connection
+    P13:    NC              no connection
+    P14:    -RAM SEL        enable external RAM         low disables
+    P15:                    manufacturing setting       low disables
+    P16:    SW1             CRT adapter switch          low for CGA
+    P17:    +KBD INH        inhibit keyboard            active low
+    P20:    RC              reset CPU                   active low
+    P21:    A20 GATE        enable A20 line             active high
+    P22:    NC              no connection
+    P23:    NC              no connection
+    P24:    +OPT BUF FULL   output buffer full          active high
+    P25:    NC              no connection
+    P26:                    open collector KBD CLK      inverted
+    P27:                    open collector KBD DATA     not inverted
+    TEST0:  KBD CLK                                     not inverted
+    TEST1:  KBD DATA                                    not inverted
+
+    PS/2 I/O pin assignments
+    P10:    KYBD DATA                                   not inverted
+    P11:    MOUSE DATA                                  not inverted
+    P12:                    keyboard/mouse power fuse   low if blown
+    P13:                    no connection
+    P14:                    no connection
+    P15:                    no connection
+    P16:                    no connection
+    P17:                    no connection
+    P20:    +HOT RES        reset CPU                   inverted
+    P21:    A20 PASS        enable A20 line             not inverted
+    P22:                    open collector MOUSE DATA   inverted
+    P23:                    open collector MOUSE CLK    inverted
+    P24:                    latched as BIRQ1            rising trigger
+    P25:                    latched as IRQ12            rising trigger
+    P26:                    open collector KYBD CLK     inverted
+    P27:                    open collector KYBD DATA    inverted
+    TEST0:  KYBD CLK                                    not inverted
+    TEST1:  MOUSE CLK                                   not inverted
+
+    Notes:
+    * PS/2 BIRQ1 and IRQ12 are cleard by reading data.
+    * PS/2 BIRQ1 and IRQ12 are active low, but we use ASSERT_LINE here.
+    * PS/2 IRQ12 is open collector for sharing with cards.
+
+    TODO:
+    * Move display type and key lock controls to drivers.
+    * Expose power fuse failure.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "at_keybc.h"
 
+namespace {
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(AT_KEYBOARD_CONTROLLER, at_keyboard_controller_device, "at_keybc", "AT Keyboard Controller")
-
-static INPUT_PORTS_START( at_keybc )
-	PORT_START("DSW")
-	PORT_BIT(     0xbf, 0xbf, IPT_UNUSED )
-	PORT_DIPNAME( 0x40, 0x00, "Display switch")
-	PORT_DIPSETTING(    0x40, "Monochrome adapter" )
-	PORT_DIPSETTING(    0x00, "Color/Graphics adapter" )
-INPUT_PORTS_END
-
-// rom definition for the 8042 internal rom
-ROM_START( at_keybc )
-	ROM_REGION(0x800, "at_keybc", 0)
-
-	// unknown controller bios, (c) 1985, 1986 PTL
-	ROM_LOAD("yan25d05.bin", 0x000, 0x800, CRC(70c798f1) SHA1(ae9a79c7184a17331b70a50035ff63c757df094c))
-
-	// 1983 ibm controller bios
-	ROM_LOAD("1503033.bin", 0x000, 0x800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
+ROM_START(at_kbc)
+	ROM_REGION(0x0800, "mcu", 0)
+	ROM_SYSTEM_BIOS(0, "ibm", "IBM 1983") // 1983 IBM controller BIOS
+	ROMX_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "ptl", "PTL 1986") // unknown controller BIOS, (c) 1985, 1986 PTL
+	ROMX_LOAD("yan25d05.bin", 0x0000, 0x0800, CRC(70c798f1) SHA1(ae9a79c7184a17331b70a50035ff63c757df094c), ROM_BIOS(1))
 ROM_END
 
+ROM_START(ps2_kbc)
+	ROM_REGION(0x0800, "mcu", 0)
+	ROM_LOAD("72x8455.zm82", 0x0000, 0x0800, CRC(7da223d3) SHA1(54c52ff6c6a2310f79b2c7e6d1259be9de868f0e))
+ROM_END
+
+INPUT_PORTS_START(at_kbc)
+	PORT_START("P1")
+	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_CONFNAME(0x40, 0x00, "CRT Adapter Switch")
+	PORT_CONFSETTING(   0x40, "Monochrome Display Adapter")
+	PORT_CONFSETTING(   0x00, "Color Graphics Adapter")
+	PORT_CONFNAME(0x80, 0x80, "Key Lock")
+	PORT_CONFSETTING(   0x80, DEF_STR(Off))
+	PORT_CONFSETTING(   0x00, DEF_STR(On))
+INPUT_PORTS_END
+
+} // anonymous namespace
+
+
+
 //**************************************************************************
-//  LIVE DEVICE
+//  DEVICE TYPES
 //**************************************************************************
 
-//-------------------------------------------------
-//  at_keyboard_controller_device - constructor
-//-------------------------------------------------
+DEFINE_DEVICE_TYPE(AT_KEYBOARD_CONTROLLER, at_keyboard_controller_device, "at_keybc", "PC/AT Keyboard Controller")
+DEFINE_DEVICE_TYPE(PS2_KEYBOARD_CONTROLLER, ps2_keyboard_controller_device, "ps2_keybc", "PS/2 Keyboard/Mouse Controller")
 
-at_keyboard_controller_device::at_keyboard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AT_KEYBOARD_CONTROLLER, tag, owner, clock),
-		m_cpu(nullptr),
-		m_system_reset_cb(*this),
-		m_gate_a20_cb(*this),
-		m_input_buffer_full_cb(*this),
-		m_output_buffer_empty_cb(*this),
-		m_keyboard_clock_cb(*this),
-		m_keyboard_data_cb(*this)
+
+//**************************************************************************
+//  KEYBOARD CONTROLLER DEVICE BASE
+//**************************************************************************
+
+READ8_MEMBER(at_kbc_device_base::data_r)
+{
+	return m_mcu->upi41_master_r(space, 0U);
+}
+
+READ8_MEMBER(at_kbc_device_base::status_r)
+{
+	return m_mcu->upi41_master_r(space, 1U);
+}
+
+WRITE8_MEMBER(at_kbc_device_base::data_w)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(at_kbc_device_base::write_data), this), unsigned(data));
+}
+
+WRITE8_MEMBER(at_kbc_device_base::command_w)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(at_kbc_device_base::write_command), this), unsigned(data));
+}
+
+WRITE_LINE_MEMBER(at_kbc_device_base::kbd_clk_w)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(at_kbc_device_base::set_kbd_clk_in), this), state);
+}
+
+WRITE_LINE_MEMBER(at_kbc_device_base::kbd_data_w)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(at_kbc_device_base::set_kbd_data_in), this), state);
+}
+
+at_kbc_device_base::at_kbc_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_mcu(*this, "mcu")
+	, m_hot_res_cb(*this), m_gate_a20_cb(*this), m_kbd_irq_cb(*this)
+	, m_kbd_clk_cb(*this), m_kbd_data_cb(*this)
+	, m_hot_res(0U), m_gate_a20(0U), m_kbd_irq(0U)
+	, m_kbd_clk_in(1U), m_kbd_clk_out(1U), m_kbd_data_in(1U), m_kbd_data_out(1U)
 {
 }
 
-//-------------------------------------------------
-//  rom_region - return a pointer to the device's
-//  internal ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *at_keyboard_controller_device::device_rom_region() const
+void at_kbc_device_base::device_resolve_objects()
 {
-	return ROM_NAME(at_keybc);
+	m_hot_res_cb.resolve_safe();
+	m_gate_a20_cb.resolve_safe();
+	m_kbd_irq_cb.resolve_safe();
+	m_kbd_clk_cb.resolve_safe();
+	m_kbd_data_cb.resolve_safe();
 }
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
+void at_kbc_device_base::device_start()
+{
+	save_item(NAME(m_hot_res));
+	save_item(NAME(m_gate_a20));
+	save_item(NAME(m_kbd_irq));
+	save_item(NAME(m_kbd_clk_in));
+	save_item(NAME(m_kbd_clk_out));
+	save_item(NAME(m_kbd_data_in));
+	save_item(NAME(m_kbd_data_out));
+
+	m_hot_res = m_gate_a20 = m_kbd_irq = 0U;
+	m_kbd_clk_in = m_kbd_clk_out = 1U;
+	m_kbd_data_in = m_kbd_data_out = 1U;
+}
+
+inline void at_kbc_device_base::set_hot_res(u8 state)
+{
+	if (state != m_hot_res)
+		m_hot_res_cb((m_hot_res = state) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+inline void at_kbc_device_base::set_gate_a20(u8 state)
+{
+	if (state != m_gate_a20)
+		m_gate_a20_cb((m_gate_a20 = state) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+inline void at_kbc_device_base::set_kbd_irq(u8 state)
+{
+	if (state != m_kbd_irq)
+		m_kbd_irq_cb((m_kbd_irq = state) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+inline void at_kbc_device_base::set_kbd_clk_out(u8 state)
+{
+	if (state != m_kbd_clk_out)
+		m_kbd_clk_cb(m_kbd_clk_out = state);
+}
+
+inline void at_kbc_device_base::set_kbd_data_out(u8 state)
+{
+	if (state != m_kbd_data_out)
+		m_kbd_data_cb(m_kbd_data_out = state);
+}
+
+inline u8 at_kbc_device_base::kbd_clk_r() const
+{
+	return m_kbd_clk_in & m_kbd_clk_out;
+}
+
+inline u8 at_kbc_device_base::kbd_data_r() const
+{
+	return m_kbd_data_in & m_kbd_data_out;
+}
+
+TIMER_CALLBACK_MEMBER(at_kbc_device_base::write_data)
+{
+	m_mcu->upi41_master_w(machine().dummy_space(), 0U, u8(u32(param)));
+}
+
+TIMER_CALLBACK_MEMBER(at_kbc_device_base::write_command)
+{
+	m_mcu->upi41_master_w(machine().dummy_space(), 1U, u8(u32(param)));
+}
+
+TIMER_CALLBACK_MEMBER(at_kbc_device_base::set_kbd_clk_in)
+{
+	m_kbd_clk_in = param ? 1U : 0U;
+}
+
+TIMER_CALLBACK_MEMBER(at_kbc_device_base::set_kbd_data_in)
+{
+	m_kbd_data_in = param ? 1U : 0U;
+}
+
+
+//**************************************************************************
+//  PC/AT KEYBOARD CONTROLLER DEVICE
+//**************************************************************************
+
+at_keyboard_controller_device::at_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: at_kbc_device_base(mconfig, AT_KEYBOARD_CONTROLLER, tag, owner, clock)
+{
+}
+
+tiny_rom_entry const *at_keyboard_controller_device::device_rom_region() const
+{
+	return ROM_NAME(at_kbc);
+}
+
+void at_keyboard_controller_device::device_add_mconfig(machine_config &config)
+{
+	I8042(config, m_mcu, DERIVED_CLOCK(1, 1));
+	m_mcu->p1_in_cb().set_ioport("P1");
+	m_mcu->p1_out_cb().set_nop();
+	m_mcu->p2_in_cb().set_constant(0xffU);
+	m_mcu->p2_out_cb().set(FUNC(at_keyboard_controller_device::p2_w));
+	m_mcu->t0_in_cb().set([this] () { return kbd_clk_r(); });
+	m_mcu->t1_in_cb().set([this] () { return kbd_data_r(); });
+}
 
 ioport_constructor at_keyboard_controller_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( at_keybc );
+	return INPUT_PORTS_NAME(at_kbc);
 }
 
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(at_keyboard_controller_device::device_add_mconfig)
-	MCFG_CPU_ADD("at_keybc", I8042, DERIVED_CLOCK(1,1))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(at_keyboard_controller_device, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(at_keyboard_controller_device, t1_r))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(at_keyboard_controller_device, p1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(at_keyboard_controller_device, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(at_keyboard_controller_device, p2_w))
-MACHINE_CONFIG_END
-
-/*-------------------------------------------------
-    device_start - device-specific startup
--------------------------------------------------*/
-
-void at_keyboard_controller_device::device_start()
+WRITE8_MEMBER(at_keyboard_controller_device::p2_w)
 {
-	// find our cpu
-	m_cpu = downcast<upi41_cpu_device *>(subdevice("at_keybc"));
-
-	// resolve callbacks
-	m_system_reset_cb.resolve_safe();
-	m_gate_a20_cb.resolve_safe();
-	m_input_buffer_full_cb.resolve_safe();
-	m_output_buffer_empty_cb.resolve_safe();
-	m_keyboard_clock_cb.resolve_safe();
-	m_keyboard_data_cb.resolve_safe();
-
-	// register for save states
-	save_item(NAME(m_clock_signal));
-	save_item(NAME(m_data_signal));
-}
-
-/*-------------------------------------------------
-    device_reset - device-specific reset
--------------------------------------------------*/
-
-void at_keyboard_controller_device::device_reset()
-{
+	set_hot_res(BIT(~data, 0));
+	set_gate_a20(BIT(data, 1));
+	set_kbd_irq(BIT(data, 4));
+	set_kbd_clk_out(BIT(~data, 6));
+	set_kbd_data_out(BIT(data, 7));
 }
 
 
 //**************************************************************************
-//  INTERNAL 8042 READ/WRITE HANDLERS
+//  PS/2 KEYBOARD/MOUSE CONTROLLER DEVICE
 //**************************************************************************
 
-READ_LINE_MEMBER( at_keyboard_controller_device::t0_r )
+READ8_MEMBER(ps2_keyboard_controller_device::data_r)
 {
-	return m_clock_signal;
+	set_kbd_irq(0U);
+	set_mouse_irq(0U);
+	return m_mcu->upi41_master_r(space, 0U);
 }
 
-READ_LINE_MEMBER( at_keyboard_controller_device::t1_r )
+WRITE_LINE_MEMBER(ps2_keyboard_controller_device::mouse_clk_w)
 {
-	return m_data_signal;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ps2_keyboard_controller_device::set_mouse_clk_in), this), state);
 }
 
-/*
-    Port 1 (Input port)
-    0 - P10 - Undefined
-    1 - P11 - Undefined
-    2 - P12 - Undefined
-    3 - P13 - Undefined
-    4 - P14 - External RAM (1 = Enable external RAM, 0 = Disable external RAM)
-    5 - P15 - Manufacturing setting (1 = Setting enabled, 0 = Setting disabled)
-    6 - P16 - Display type switch (1 = Monochrome display, 0 = Color display)
-    7 - P17 - Keyboard inhibit switch (1 = Keyboard enabled, 0 = Keyboard inhibited)
-*/
-READ8_MEMBER( at_keyboard_controller_device::p1_r )
+WRITE_LINE_MEMBER(ps2_keyboard_controller_device::mouse_data_w)
 {
-	return ioport("DSW")->read();
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ps2_keyboard_controller_device::set_mouse_data_in), this), state);
 }
 
-READ8_MEMBER( at_keyboard_controller_device::p2_r )
+ps2_keyboard_controller_device::ps2_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: at_kbc_device_base(mconfig, PS2_KEYBOARD_CONTROLLER, tag, owner, clock)
+	, m_mouse_irq_cb(*this)
+	, m_mouse_clk_cb(*this), m_mouse_data_cb(*this)
+	, m_mouse_irq(0U)
+	, m_mouse_clk_in(1U), m_mouse_clk_out(1U), m_mouse_data_in(1U), m_mouse_data_out(1U)
+	, m_p2_data(0xffU)
 {
-	return 0xff;
 }
 
-/*
-    Port 2 (Output port)
-    0 - P20 - System Reset (1 = Normal, 0 = Reset computer)
-    1 - P21 - Gate A20
-    2 - P22 - Undefined
-    3 - P23 - Undefined
-    4 - P24 - Input Buffer Full
-    5 - P25 - Output Buffer Empty
-    6 - P26 - Keyboard Clock (1 = Pull Clock low, 0 = High-Z)
-    7 - P27 - Keyboard Data (1 = Pull Data low, 0 = High-Z)
-*/
-WRITE8_MEMBER( at_keyboard_controller_device::p2_w )
+tiny_rom_entry const *ps2_keyboard_controller_device::device_rom_region() const
 {
-	m_system_reset_cb(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
-	m_gate_a20_cb(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
-	m_input_buffer_full_cb(BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE);
-	m_output_buffer_empty_cb(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
-
-	m_clock_signal = !BIT(data, 6);
-	m_data_signal = BIT(data, 7);
-
-	m_keyboard_data_cb(m_data_signal);
-	m_keyboard_clock_cb(m_clock_signal);
+	return ROM_NAME(ps2_kbc);
 }
 
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
-
-READ8_MEMBER( at_keyboard_controller_device::data_r )
+void ps2_keyboard_controller_device::device_add_mconfig(machine_config &config)
 {
-	return m_cpu->upi41_master_r(space, 0);
+	I8042(config, m_mcu, DERIVED_CLOCK(1, 1));
+	m_mcu->p1_in_cb().set(FUNC(ps2_keyboard_controller_device::p1_r));
+	m_mcu->p1_out_cb().set_nop();
+	m_mcu->p2_in_cb().set_constant(0xffU);
+	m_mcu->p2_out_cb().set(FUNC(ps2_keyboard_controller_device::p2_w));
+	m_mcu->t0_in_cb().set([this] () { return kbd_clk_r(); });
+	m_mcu->t1_in_cb().set([this] () { return mouse_clk_r(); });
 }
 
-WRITE8_MEMBER( at_keyboard_controller_device::data_w )
+void ps2_keyboard_controller_device::device_resolve_objects()
 {
-	m_cpu->upi41_master_w(space, 0, data);
+	at_kbc_device_base::device_resolve_objects();
+
+	m_mouse_clk_cb.resolve_safe();
+	m_mouse_data_cb.resolve_safe();
 }
 
-READ8_MEMBER( at_keyboard_controller_device::status_r )
+void ps2_keyboard_controller_device::device_start()
 {
-	return m_cpu->upi41_master_r(space, 1);
+	at_kbc_device_base::device_start();
+
+	save_item(NAME(m_mouse_irq));
+	save_item(NAME(m_mouse_clk_in));
+	save_item(NAME(m_mouse_clk_out));
+	save_item(NAME(m_mouse_data_in));
+	save_item(NAME(m_mouse_data_out));
+	save_item(NAME(m_p2_data));
+
+	m_mouse_irq = 0U;
+	m_mouse_clk_in = m_mouse_clk_out = 1U;
+	m_mouse_data_in = m_mouse_data_out = 1U;
+	m_p2_data = 0xffU;
 }
 
-WRITE8_MEMBER( at_keyboard_controller_device::command_w )
+inline void ps2_keyboard_controller_device::set_mouse_irq(u8 state)
 {
-	m_cpu->upi41_master_w(space, 1, data);
+	if (state != m_mouse_irq)
+		m_mouse_irq_cb((m_mouse_irq = state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( at_keyboard_controller_device::keyboard_clock_w )
+inline void ps2_keyboard_controller_device::set_mouse_clk_out(u8 state)
 {
-	m_clock_signal = state;
+	if (state != m_mouse_clk_out)
+		m_mouse_clk_cb(m_mouse_clk_out = state);
 }
 
-WRITE_LINE_MEMBER( at_keyboard_controller_device::keyboard_data_w )
+inline void ps2_keyboard_controller_device::set_mouse_data_out(u8 state)
 {
-	m_data_signal = state;
+	if (state != m_mouse_data_out)
+		m_mouse_data_cb(m_mouse_data_out = state);
+}
+
+inline u8 ps2_keyboard_controller_device::mouse_clk_r() const
+{
+	return m_mouse_clk_in & m_mouse_clk_out;
+}
+
+inline u8 ps2_keyboard_controller_device::mouse_data_r() const
+{
+	return m_mouse_data_in & m_mouse_data_out;
+}
+
+TIMER_CALLBACK_MEMBER(ps2_keyboard_controller_device::set_mouse_clk_in)
+{
+	m_mouse_clk_in = param ? 1U : 0U;
+}
+
+TIMER_CALLBACK_MEMBER(ps2_keyboard_controller_device::set_mouse_data_in)
+{
+	m_mouse_data_in = param ? 1U : 0U;
+}
+
+READ8_MEMBER(ps2_keyboard_controller_device::p1_r)
+{
+	return kbd_data_r() | (mouse_data_r() << 1) | 0xfcU;
+}
+
+WRITE8_MEMBER(ps2_keyboard_controller_device::p2_w)
+{
+	set_hot_res(BIT(~data, 0));
+	set_gate_a20(BIT(data, 1));
+	set_mouse_data_out(BIT(~data, 2));
+	set_mouse_clk_out(BIT(~data, 3));
+	set_kbd_clk_out(BIT(~data, 6));
+	set_kbd_data_out(BIT(~data, 7));
+
+	if (BIT(data & ~m_p2_data, 4))
+		set_kbd_irq(1U);
+	if (BIT(data & ~m_p2_data, 5))
+		set_mouse_irq(1U);
+	m_p2_data = data;
 }

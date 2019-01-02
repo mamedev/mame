@@ -6301,7 +6301,7 @@
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="VIC-CF"/>
 		<info name="release" value="19870730"/>
-		<info name="alt_title" value="チェスター・フィールド  箱・説明書無し"/>
+		<info name="alt_title" value="チェスター・フィールド 暗黒神への挑戦"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="HVC-UNROM" />
@@ -6758,7 +6758,7 @@
 		<publisher>Toho</publisher>
 		<info name="serial" value="THF-TU"/>
 		<info name="release" value="19870314"/>
-		<info name="alt_title" value="タッチ ミステリー・オブトライアングル"/>
+		<info name="alt_title" value="タッチ ミステリー・オブ・トライアングル"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="HVC-UNROM" />
@@ -16288,7 +16288,7 @@
 				<rom name="prg" size="131072" crc="770c360a" sha1="5c38f60a98ac8452206562c7eea2c18bd66e2c57" offset="00000" />
 			</dataarea> <!-- real label: カルチヤ prg -->
 			<dataarea name="chr" size="131072">
-				<rom name=" chr" size="131072" crc="5482f0c6" sha1="f92a4fa4635a66a82a4e5b64f893075993df1181" offset="00000" />
+				<rom name="chr" size="131072" crc="5482f0c6" sha1="f92a4fa4635a66a82a4e5b64f893075993df1181" offset="00000" />
 			</dataarea> <!-- real label: カルチヤ chr -->
 			<!-- 128k WRAM on cartridge -->
 			<dataarea name="wram" size="131072">
@@ -19923,10 +19923,10 @@
 			<feature name="pcb" value="COLORDREAMS-74*377" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="65536">
-				<rom name="king neptune prg." size="65536" crc="8c71f706" sha1="190bf6cea6464c77c240df3a4dab65ba6b3cf625" offset="00000" />
+				<rom name="king neptune prg" size="65536" crc="8c71f706" sha1="190bf6cea6464c77c240df3a4dab65ba6b3cf625" offset="00000" /> <!-- Actual label: KING NEPTUNE PRG. -->
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="king neptune vid." size="32768" crc="591f274b" sha1="dc3811baa95a757166a13143a2675c8e36b5825a" offset="00000" />
+				<rom name="king neptune vid" size="32768" crc="591f274b" sha1="dc3811baa95a757166a13143a2675c8e36b5825a" offset="00000" /> <!-- Actual label: KING NEPTUNE VID. -->
 			</dataarea>
 		</part>
 	</software>
@@ -19967,10 +19967,10 @@
 			<feature name="pcb" value="COLORDREAMS-74*377" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="king ver 1.2 prg." size="131072" crc="10b6aff0" sha1="88491ac9e744838e9fd09cf677bd22ba82c06bae" offset="00000" />
+				<rom name="king ver 1.2 prg" size="131072" crc="10b6aff0" sha1="88491ac9e744838e9fd09cf677bd22ba82c06bae" offset="00000" /> <!-- Actual label: KING    VER 1.2    PRG. -->
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="king ver 1.2 vid." size="131072" crc="3272bfd1" sha1="3ac1da471a671d701d3a3ca8d5b401ac4674cc99" offset="00000" />
+				<rom name="king ver 1.2 vid" size="131072" crc="3272bfd1" sha1="3ac1da471a671d701d3a3ca8d5b401ac4674cc99" offset="00000" /> <!-- Actual label: KING    VER 1.2    VID. -->
 			</dataarea>
 		</part>
 	</software>
@@ -19985,10 +19985,10 @@
 			<feature name="pcb" value="COLORDREAMS-74*377" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="king ver 1.3 prg." size="131072" crc="541989e1" sha1="0893837d08b8f8484a29f9f792e64b7d56d10b33" offset="00000" />
+				<rom name="king ver 1.3 prg" size="131072" crc="541989e1" sha1="0893837d08b8f8484a29f9f792e64b7d56d10b33" offset="00000" /> <!-- Actual label: KING    VER 1.3    PRG. -->
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="king ver 1.3 vid." size="131072" crc="1aca7960" sha1="0a26bc4ca5b74a2548fda69162d76ac2c3af5627" offset="00000" />
+				<rom name="king ver 1.3 vid" size="131072" crc="1aca7960" sha1="0a26bc4ca5b74a2548fda69162d76ac2c3af5627" offset="00000" /> <!-- Actual label: KING    VER 1.3    VID. -->
 			</dataarea>
 		</part>
 	</software>
@@ -20006,7 +20006,7 @@
 				<rom name="0.prg" size="131072" crc="028bfc44" sha1="6d01eee7300938995a4f1079f1bb8993a0cd31f7" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="king ver 1.3 vid." size="131072" crc="1aca7960" sha1="0a26bc4ca5b74a2548fda69162d76ac2c3af5627" offset="00000" />
+				<rom name="king ver 1.3 vid" size="131072" crc="1aca7960" sha1="0a26bc4ca5b74a2548fda69162d76ac2c3af5627" offset="00000" /> <!-- Actual label: KING    VER 1.3    VID. -->
 			</dataarea>
 		</part>
 	</software>
@@ -23881,10 +23881,10 @@
 			<feature name="pcb" value="COLORDREAMS-74*377" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="65536">
-				<rom name="menace beach prg 512." size="65536" crc="33d0282f" sha1="17fd38544a59b464541191905ea4124694846e6f" offset="00000" />
+				<rom name="menace beach prg 512" size="65536" crc="33d0282f" sha1="17fd38544a59b464541191905ea4124694846e6f" offset="00000" /> <!-- Actual label: MENACE BEACH PRG 512. -->
 			</dataarea>
 			<dataarea name="chr" size="65536">
-				<rom name="menace beach vid 512." size="65536" crc="38a92500" sha1="447d4c4239c67711acb310f3d799754da837df2a" offset="00000" />
+				<rom name="menace beach vid 512" size="65536" crc="38a92500" sha1="447d4c4239c67711acb310f3d799754da837df2a" offset="00000" /> <!-- Actual label: MENACE BEACH VID 512. -->
 			</dataarea>
 		</part>
 	</software>
@@ -28136,10 +28136,10 @@
 			<feature name="pcb" value="COLORDREAMS-74*377" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="65536">
-				<rom name="pesterminator prg." size="65536" crc="ba93cb95" sha1="b22197a020c4262684bc40e31ad8f3d9ebe0299e" offset="00000" />
+				<rom name="pesterminator prg" size="65536" crc="ba93cb95" sha1="b22197a020c4262684bc40e31ad8f3d9ebe0299e" offset="00000" /> <!-- no custom label -->
 			</dataarea>
 			<dataarea name="chr" size="65536">
-				<rom name="pesterminator vid." size="65536" crc="f7989510" sha1="b23c88b0a23ea96759601ab204e9aa570a304ada" offset="00000" />
+				<rom name="pesterminator vid" size="65536" crc="f7989510" sha1="b23c88b0a23ea96759601ab204e9aa570a304ada" offset="00000" /> <!-- no custom label -->
 			</dataarea>
 		</part>
 	</software>
@@ -32393,10 +32393,10 @@
 			<feature name="pcb" value="COLORDREAMS-74*377" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="65536">
-				<rom name="secret scout 512k prg" size="65536" crc="50734772" sha1="dcecc846456244db91d4c59b05ee3b1e46d0e9a3" offset="00000" />
+				<rom name="secret scout 512k prg" size="65536" crc="50734772" sha1="dcecc846456244db91d4c59b05ee3b1e46d0e9a3" offset="00000" /> <!-- Actual label: SECRET SCOUT 512 PRG -->
 			</dataarea>
 			<dataarea name="chr" size="65536">
-				<rom name="secret scout 512k vid." size="65536" crc="c1de9c94" sha1="5d945dbe1fc95dcdfa2e499e730fc8c50204c928" offset="00000" />
+				<rom name="secret scout 512k vid" size="65536" crc="c1de9c94" sha1="5d945dbe1fc95dcdfa2e499e730fc8c50204c928" offset="00000" /> <!-- Actual label: SECRET SCOUT 512 VID. -->
 			</dataarea>
 		</part>
 	</software>
@@ -49085,7 +49085,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 				<rom name="secret scout in the temple of demise (usa) (beta) (unl).prg" size="65536" crc="956125be" sha1="e667fe1a0eb044c8615042d31dea3b2913d813bb" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="chr" size="65536">
-				<rom name="secret scout 512k vid." size="65536" crc="c1de9c94" sha1="5d945dbe1fc95dcdfa2e499e730fc8c50204c928" offset="00000" />
+				<rom name="secret scout 512k vid" size="65536" crc="c1de9c94" sha1="5d945dbe1fc95dcdfa2e499e730fc8c50204c928" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -51017,10 +51017,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="COLORDREAMS-74*377" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="65536">
-				<rom name="moon ranger prg 512k." size="65536" crc="124af039" sha1="ef5f85f4023118ea514617db2a56d193bbd290e9" offset="00000" />
+				<rom name="moon ranger prg 512k" size="65536" crc="124af039" sha1="ef5f85f4023118ea514617db2a56d193bbd290e9" offset="00000" /> <!-- Actual label: MOON RANGER PRG 512K. -->
 			</dataarea>
 			<dataarea name="chr" size="65536">
-				<rom name="moon ranger vid 512k." size="65536" crc="5f3a624f" sha1="1950d3e08859b6ab924925d2f6aea33795707d58" offset="00000" />
+				<rom name="moon ranger vid 512k" size="65536" crc="5f3a624f" sha1="1950d3e08859b6ab924925d2f6aea33795707d58" offset="00000" /> <!-- Actual label: MOON RANGER VID 512K. -->
 			</dataarea>
 		</part>
 	</software>

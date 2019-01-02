@@ -414,24 +414,24 @@ READ8_MEMBER(mcr_dpoker_state::ip0_r)
 WRITE8_MEMBER(mcr_dpoker_state::lamps1_w)
 {
 	// cpanel button lamps (white)
-	output().set_lamp_value(0, data >> 0 & 1); // hold 1
-	output().set_lamp_value(1, data >> 4 & 1); // hold 2
-	output().set_lamp_value(2, data >> 5 & 1); // hold 3
-	output().set_lamp_value(3, data >> 6 & 1); // hold 4
-	output().set_lamp_value(4, data >> 7 & 1); // hold 5
-	output().set_lamp_value(5, data >> 1 & 1); // deal
-	output().set_lamp_value(6, data >> 2 & 1); // cancel
-	output().set_lamp_value(7, data >> 3 & 1); // stand
+	m_lamps[0] = BIT(data, 0); // hold 1
+	m_lamps[1] = BIT(data, 4); // hold 2
+	m_lamps[2] = BIT(data, 5); // hold 3
+	m_lamps[3] = BIT(data, 6); // hold 4
+	m_lamps[4] = BIT(data, 7); // hold 5
+	m_lamps[5] = BIT(data, 1); // deal
+	m_lamps[6] = BIT(data, 2); // cancel
+	m_lamps[7] = BIT(data, 3); // stand
 }
 
 WRITE8_MEMBER(mcr_dpoker_state::lamps2_w)
 {
 	// d5: button lamp: service or change
-	output().set_lamp_value(8, data >> 5 & 1);
+	m_lamps[8] = BIT(data, 5);
 
 	// d0-d4: marquee lamps: coin 1 to 5 --> output lamps 9 to 13
 	for (int i = 0; i < 5; i++)
-		output().set_lamp_value(9 + i, data >> i & 1);
+		m_lamps[9 + i] = BIT(data, i);
 
 	// d6, d7: unused?
 }
@@ -699,7 +699,7 @@ void mcr_state::cpu_90009_map(address_map &map)
 	map(0xf000, 0xf1ff).mirror(0x0200).ram().share("spriteram");
 	map(0xf400, 0xf41f).mirror(0x03e0).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf800, 0xf81f).mirror(0x03e0).w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xfc00, 0xffff).ram().w(this, FUNC(mcr_state::mcr_90009_videoram_w)).share("videoram");
+	map(0xfc00, 0xffff).ram().w(FUNC(mcr_state::mcr_90009_videoram_w)).share("videoram");
 }
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
@@ -707,7 +707,7 @@ void mcr_state::cpu_90009_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
+	midway_ssio_device::ssio_input_ports(map, "ssio");
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -728,7 +728,7 @@ void mcr_state::cpu_90010_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).mirror(0x1800).ram().share("nvram");
 	map(0xe000, 0xe1ff).mirror(0x1600).ram().share("spriteram");
-	map(0xe800, 0xefff).mirror(0x1000).ram().w(this, FUNC(mcr_state::mcr_90010_videoram_w)).share("videoram");
+	map(0xe800, 0xefff).mirror(0x1000).ram().w(FUNC(mcr_state::mcr_90010_videoram_w)).share("videoram");
 }
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
@@ -736,7 +736,7 @@ void mcr_state::cpu_90010_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
+	midway_ssio_device::ssio_input_ports(map, "ssio");
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -757,8 +757,8 @@ void mcr_state::cpu_91490_map(address_map &map)
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram().share("nvram");
 	map(0xe800, 0xe9ff).mirror(0x0200).ram().share("spriteram");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(mcr_state::mcr_91490_videoram_w)).share("videoram");
-	map(0xf800, 0xf87f).mirror(0x0780).w(this, FUNC(mcr_state::mcr_paletteram9_w)).share("paletteram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(mcr_state::mcr_91490_videoram_w)).share("videoram");
+	map(0xf800, 0xf87f).mirror(0x0780).w(FUNC(mcr_state::mcr_paletteram9_w)).share("paletteram");
 }
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
@@ -766,7 +766,7 @@ void mcr_state::cpu_91490_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
+	midway_ssio_device::ssio_input_ports(map, "ssio");
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -797,8 +797,8 @@ void mcr_nflfoot_state::ipu_91695_portmap(address_map &map)
 	map(0x04, 0x07).mirror(0xe0).rw(m_ipu_sio, FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
 	map(0x08, 0x0b).mirror(0xe0).rw(m_ipu_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).mirror(0xe0).rw(m_ipu_pio1, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x10, 0x13).mirror(0xe0).w(this, FUNC(mcr_nflfoot_state::ipu_laserdisk_w));
-	map(0x1c, 0x1f).mirror(0xe0).rw(this, FUNC(mcr_nflfoot_state::ipu_watchdog_r), FUNC(mcr_nflfoot_state::ipu_watchdog_w));
+	map(0x10, 0x13).mirror(0xe0).w(FUNC(mcr_nflfoot_state::ipu_laserdisk_w));
+	map(0x1c, 0x1f).mirror(0xe0).rw(FUNC(mcr_nflfoot_state::ipu_watchdog_r), FUNC(mcr_nflfoot_state::ipu_watchdog_w));
 }
 
 
@@ -1714,7 +1714,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static GFXDECODE_START( mcr )
+static GFXDECODE_START( gfx_mcr )
 	GFXDECODE_SCALE( "gfx1", 0, mcr_bg_layout,     0, 4, 2, 2 ) /* colors 0-15, 2x2 */
 	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout, 0, 4 )       /* colors 16-31 */
 GFXDECODE_END
@@ -1749,166 +1749,163 @@ static const char *const twotiger_sample_names[] =
  *************************************/
 
 /* 90009 CPU board plus 90908/90913/91483 sound board */
-MACHINE_CONFIG_START(mcr_state::mcr_90009)
-
+void mcr_state::mcr_90009(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_OSC_MCR_I/8)
-	MCFG_Z80_DAISY_CHAIN(mcr_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(cpu_90009_map)
-	MCFG_CPU_IO_MAP(cpu_90009_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr_state, mcr_interrupt, "screen", 0, 1)
+	Z80(config, m_maincpu, MAIN_OSC_MCR_I/8);
+	m_maincpu->set_daisy_config(mcr_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr_state::cpu_90009_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr_state::cpu_90009_portmap);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_OSC_MCR_I/8 /* same as "maincpu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
+	TIMER(config, "scantimer").configure_scanline(FUNC(mcr_state::mcr_interrupt), "screen", 0, 1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
+	Z80CTC(config, m_ctc, MAIN_OSC_MCR_I/8 /* same as "maincpu" */);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 16);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*16, 30*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mcr_state, screen_update_mcr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(30);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*16, 30*16);
+	screen.set_visarea(0*16, 32*16-1, 0*16, 30*16-1);
+	screen.set_screen_update(FUNC(mcr_state::screen_update_mcr));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mcr);
+	PALETTE(config, m_palette).set_format(palette_device::xRBG_444, 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ssio", MIDWAY_SSIO, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MIDWAY_SSIO(config, m_ssio);
+	m_ssio->add_route(0, "lspeaker", 1.0);
+	m_ssio->add_route(1, "rspeaker", 1.0);
+}
 
 /* as above, but in a casino cabinet */
-MACHINE_CONFIG_START(mcr_dpoker_state::mcr_90009_dp)
+void mcr_dpoker_state::mcr_90009_dp(machine_config &config)
+{
 	mcr_90009(config);
 
 	/* basic machine hardware */
-	MCFG_TIMER_DRIVER_ADD("coinin", mcr_dpoker_state, coin_in_callback)
-	MCFG_TIMER_DRIVER_ADD("hopper", mcr_dpoker_state, hopper_callback)
-MACHINE_CONFIG_END
-
+	TIMER(config, "coinin").configure_generic(FUNC(mcr_dpoker_state::coin_in_callback));
+	TIMER(config, "hopper").configure_generic(FUNC(mcr_dpoker_state::hopper_callback));
+}
 
 /* 90010 CPU board plus 90908/90913/91483 sound board */
-MACHINE_CONFIG_START(mcr_state::mcr_90010)
+void mcr_state::mcr_90010(machine_config &config)
+{
 	mcr_90009(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(cpu_90010_map)
-	MCFG_CPU_IO_MAP(cpu_90010_portmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr_state::cpu_90010_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr_state::cpu_90010_portmap);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64)
-	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
-MACHINE_CONFIG_END
-
+	m_palette->set_format(palette_device::xRBG_444, 64);
+}
 
 /* as above, plus 8-track tape */
-MACHINE_CONFIG_START(mcr_state::mcr_90010_tt)
+void mcr_state::mcr_90010_tt(machine_config &config)
+{
 	mcr_90010(config);
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(2)
-	MCFG_SAMPLES_NAMES(twotiger_sample_names)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
-MACHINE_CONFIG_END
-
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(2);
+	m_samples->set_samples_names(twotiger_sample_names);
+	m_samples->add_route(0, "lspeaker", 0.25);
+	m_samples->add_route(1, "rspeaker", 0.25);
+}
 
 /* 91475 CPU board plus 90908/90913/91483 sound board plus cassette interface */
-MACHINE_CONFIG_START(mcr_state::mcr_91475)
+void mcr_state::mcr_91475(machine_config &config)
+{
 	mcr_90010(config);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(128)
-	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
+	m_palette->set_format(palette_device::xRBG_444, 128);
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(journey_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(journey_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_samples->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+}
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board */
-MACHINE_CONFIG_START(mcr_state::mcr_91490)
+void mcr_state::mcr_91490(machine_config & config)
+{
 	mcr_90010(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(5000000)
-	MCFG_CPU_PROGRAM_MAP(cpu_91490_map)
-	MCFG_CPU_IO_MAP(cpu_91490_portmap)
+	m_maincpu->set_clock(5000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr_state::cpu_91490_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr_state::cpu_91490_portmap);
 
-	MCFG_DEVICE_MODIFY("ctc")
-	MCFG_DEVICE_CLOCK(5000000 /* same as "maincpu" */)
-MACHINE_CONFIG_END
+	m_ctc->set_clock(5000000 /* same as "maincpu" */);
+}
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board */
-MACHINE_CONFIG_START(mcr_state::mcr_91490_snt)
+void mcr_state::mcr_91490_snt(machine_config &config)
+{
 	mcr_91490(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("snt", MIDWAY_SQUAWK_N_TALK, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	MIDWAY_SQUAWK_N_TALK(config, m_squawk_n_talk);
+	m_squawk_n_talk->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_squawk_n_talk->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board plus IPU */
-MACHINE_CONFIG_START(mcr_nflfoot_state::mcr_91490_ipu)
+void mcr_nflfoot_state::mcr_91490_ipu(machine_config &config)
+{
 	mcr_91490_snt(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("ipu", Z80, 7372800/2)
-	MCFG_Z80_DAISY_CHAIN(mcr_ipu_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(ipu_91695_map)
-	MCFG_CPU_IO_MAP(ipu_91695_portmap)
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(mcr_nflfoot_state, ipu_interrupt)
+	Z80(config, m_ipu, 7372800/2);
+	m_ipu->set_daisy_config(mcr_ipu_daisy_chain);
+	m_ipu->set_addrmap(AS_PROGRAM, &mcr_nflfoot_state::ipu_91695_map);
+	m_ipu->set_addrmap(AS_IO, &mcr_nflfoot_state::ipu_91695_portmap);
 
-	MCFG_DEVICE_ADD("ipu_ctc", Z80CTC, 7372800/2 /* same as "ipu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(mcr_nflfoot_state::ipu_interrupt));
 
-	MCFG_DEVICE_ADD("ipu_pio0", Z80PIO, 7372800/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ipu_ctc, 7372800/2 /* same as "ipu" */);
+	m_ipu_ctc->intr_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ipu_pio1", Z80PIO, 7372800/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_ipu_pio0, 7372800/2);
+	m_ipu_pio0->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ipu_sio", Z80SIO0, 7372800/2)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(mcr_nflfoot_state, sio_txda_w))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(mcr_nflfoot_state, sio_txdb_w))
-MACHINE_CONFIG_END
+	Z80PIO(config, m_ipu_pio1, 7372800/2);
+	m_ipu_pio1->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
+
+	Z80SIO0(config, m_ipu_sio, 7372800/2);
+	m_ipu_sio->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
+	m_ipu_sio->out_txda_callback().set(FUNC(mcr_nflfoot_state::sio_txda_w));
+	m_ipu_sio->out_txdb_callback().set(FUNC(mcr_nflfoot_state::sio_txdb_w));
+}
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Turbo Cheap Squeak sound board */
-MACHINE_CONFIG_START(mcr_state::mcr_91490_tcs)
+void mcr_state::mcr_91490_tcs(machine_config &config)
+{
 	mcr_91490(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	MIDWAY_TURBO_CHEAP_SQUEAK(config, m_turbo_cheap_squeak);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 
@@ -2445,6 +2442,34 @@ ROM_START( tapper )
 	ROM_LOAD( "tapper_c.p.u._bg_0_5f_12-7-83.5f",   0x04000, 0x4000, CRC(394ab576) SHA1(23e29ec942e1e7516ae8068837af2d1c79592378) ) /* labeled TAPPER C.P.U. BG 0 5F 12/7/83 */
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "tapper_video_fg_1_a7_12-7-83.a7",   0x00000, 0x4000, CRC(32509011) SHA1(a38667573d235efe2dc515e52af05825fe4e0f30) ) /* labeled TAPPER VIDEO FG1 A7 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_0_a8_12-7-83.a8",   0x04000, 0x4000, CRC(8412c808) SHA1(2077f79177fda26f9c674b2ab525ec3833802059) ) /* labeled TAPPER VIDEO FG0 A8 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_3_a5_12-7-83.a5",   0x08000, 0x4000, CRC(818fffd4) SHA1(930142dd73fb30c4d3ec09a1e37517c6c6774024) ) /* labeled TAPPER VIDEO FG3 A5 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_2_a6_12-7-83.a6",   0x0c000, 0x4000, CRC(67e37690) SHA1(d553b8517c1d03a2be0b065f4da2fa99d9e6fb30) ) /* labeled TAPPER VIDEO FG2 A6 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_5_a3_12-7-83.a3",   0x10000, 0x4000, CRC(800f7c8a) SHA1(8aead89e1adaee5f0b679661c4bfba36e0d639e8) ) /* labeled TAPPER VIDEO FG5 A3 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_4_a4_12-7-83.a4",   0x14000, 0x4000, CRC(32674ee6) SHA1(402c166d50b4a693959b3f0706a7931a5daef6ce) ) /* labeled TAPPER VIDEO FG4 A4 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_7_a1_12-7-83.a1",   0x18000, 0x4000, CRC(070b4c81) SHA1(95879a455ecfe2e3de7fe2a75078f9e6934960f5) ) /* labeled TAPPER VIDEO FG7 A1 12/7/83 */
+	ROM_LOAD( "tapper_video_fg_6_a2_12-7-83.a2",   0x1c000, 0x4000, CRC(a37aef36) SHA1(a24696f16d467d9eea4f25aef5f4c5ff55bf51ff) ) /* labeled TAPPER VIDEO FG6 A2 12/7/83 */
+ROM_END
+
+ROM_START( tapperg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tapper_c.p.u._pg_0_1c_1-27-84.1c",   0x00000, 0x4000, CRC(bb060bb0) SHA1(ff5a729e36faea3758c8c7b345a42dd8bb465f44) ) /* labeled TAPPER C.P.U. PG 0 1C 1/27/84 */
+	ROM_LOAD( "tapper_c.p.u._pg_1_2c_1-27-84.2c",   0x04000, 0x4000, CRC(fd9acc22) SHA1(b9f0396e2eba5772deec4725c41fa9de49658e72) ) /* labeled TAPPER C.P.U. PG 1 2C 1/27/84 */
+	ROM_LOAD( "tapper_c.p.u._pg_2_3c_1-27-84.3c",   0x08000, 0x4000, CRC(b3755d41) SHA1(434d3c27b9f1e43def081d79b9f56dbce93a9207) ) /* labeled TAPPER C.P.U. PG 2 3C 1/27/84 */
+	ROM_LOAD( "tapper_c.p.u._pg_3_4c_1-27-84.4c",   0x0c000, 0x2000, CRC(77273096) SHA1(5e4e2dc1703b39f588ba374f6a610f273d710532) ) /* labeled TAPPER C.P.U. PG 3 4C 1/27/84 */
+
+	ROM_REGION( 0x10000, "ssio:cpu", 0 )
+	ROM_LOAD( "tapper_sound_snd_0_a7_12-7-83.a7",   0x0000, 0x1000, CRC(0e8bb9d5) SHA1(9e281c340b7702523c86d56317efad9e3688e585) ) /* labeled TAPPER SOUND SND 0 A7 12/7/83 */
+	ROM_LOAD( "tapper_sound_snd_1_a8_12-7-83.a8",   0x1000, 0x1000, CRC(0cf0e29b) SHA1(14334b9d2bfece3fe5bda0cbd53158ead8d27e53) ) /* labeled TAPPER SOUND SND 1 A8 12/7/83 */
+	ROM_LOAD( "tapper_sound_snd_2_a9_12-7-83.a9",   0x2000, 0x1000, CRC(31eb6dc6) SHA1(b38bba5f12516d899e023f99147868e3402fbd7b) ) /* labeled TAPPER SOUND SND 2 A9 12/7/83 */
+	ROM_LOAD( "tapper_sound_snd_3_a10_12-7-83.a10", 0x3000, 0x1000, CRC(01a9be6a) SHA1(0011407c1e886071282808c0a561789b1245a789) ) /* labeled TAPPER SOUND SND 3 A10 12/7/83 */
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "tapper_c.p.u._bg_1_6f_12-7-83.6f",   0x00000, 0x4000, CRC(2a30238c) SHA1(eb30b9bb654324340f0fc5b44776ac2440c1e869) ) /* labeled TAPPER C.P.U. BG 1 6F 12/7/83 */
+	ROM_LOAD( "tapper_c.p.u._bg_0_5f_12-7-83.5f",   0x04000, 0x4000, CRC(394ab576) SHA1(23e29ec942e1e7516ae8068837af2d1c79592378) ) /* labeled TAPPER C.P.U. BG 0 5F 12/7/83 */
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "fg1_a7.128",   0x00000, 0x4000, CRC(bac70b69) SHA1(7fd26cc8ff2faab86d04fcee2b5ec49ecf6b8143) ) /* Are these correct or hacked? Customers from ALL other sets match the 12/7/83 */
 	ROM_LOAD( "fg0_a8.128",   0x04000, 0x4000, CRC(c300925d) SHA1(45df1ac033512be942460d678a7c1ba9dcef1937) ) /* graphics set including the Root Beer and Suntory sets. */
 	ROM_LOAD( "fg3_a5.128",   0x08000, 0x4000, CRC(ecff6c23) SHA1(0b28e7e59eba983bc1929758f8dcaf315b7134a1) ) /* The 1/27/84 program set has been verified to come with 12/7/83 graphics in at least one machine */
@@ -2811,7 +2836,7 @@ void mcr_state::mcr_init(int cpuboard, int vidboard, int ssioboard)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,solarfox)
+void mcr_state::init_solarfox()
 {
 	mcr_init(90009, 91399, 90908);
 	m_mcr12_sprite_xoffs = 16;
@@ -2821,7 +2846,7 @@ DRIVER_INIT_MEMBER(mcr_state,solarfox)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,kick)
+void mcr_state::init_kick()
 {
 	mcr_init(90009, 91399, 90908);
 	m_mcr12_sprite_xoffs_flip = 16;
@@ -2830,7 +2855,7 @@ DRIVER_INIT_MEMBER(mcr_state,kick)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_dpoker_state,dpoker)
+void mcr_dpoker_state::init_dpoker()
 {
 	mcr_init(90009, 91399, 90908);
 	m_mcr12_sprite_xoffs_flip = 16;
@@ -2858,13 +2883,13 @@ DRIVER_INIT_MEMBER(mcr_dpoker_state,dpoker)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,mcr_90010)
+void mcr_state::init_mcr_90010()
 {
 	mcr_init(90010, 91399, 90913);
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,wacko)
+void mcr_state::init_wacko()
 {
 	mcr_init(90010, 91399, 90913);
 
@@ -2874,7 +2899,7 @@ DRIVER_INIT_MEMBER(mcr_state,wacko)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,twotiger)
+void mcr_state::init_twotiger()
 {
 	mcr_init(90010, 91399, 90913);
 
@@ -2883,7 +2908,7 @@ DRIVER_INIT_MEMBER(mcr_state,twotiger)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,kroozr)
+void mcr_state::init_kroozr()
 {
 	mcr_init(90010, 91399, 91483);
 
@@ -2892,7 +2917,7 @@ DRIVER_INIT_MEMBER(mcr_state,kroozr)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,journey)
+void mcr_state::init_journey()
 {
 	mcr_init(91475, 91464, 90913);
 
@@ -2900,13 +2925,13 @@ DRIVER_INIT_MEMBER(mcr_state,journey)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,mcr_91490)
+void mcr_state::init_mcr_91490()
 {
 	mcr_init(91490, 91464, 90913);
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,dotrone)
+void mcr_state::init_dotrone()
 {
 	mcr_init(91490, 91464, 91657);
 
@@ -2914,7 +2939,7 @@ DRIVER_INIT_MEMBER(mcr_state,dotrone)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_nflfoot_state,nflfoot)
+void mcr_nflfoot_state::init_nflfoot()
 {
 	mcr_init(91490, 91464, 91657);
 
@@ -2926,7 +2951,7 @@ DRIVER_INIT_MEMBER(mcr_nflfoot_state,nflfoot)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,demoderb)
+void mcr_state::init_demoderb()
 {
 	mcr_init(91490, 91464, 90913);
 
@@ -2935,7 +2960,7 @@ DRIVER_INIT_MEMBER(mcr_state,demoderb)
 	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::demoderb_op4_w),this));
 
 	/* the SSIO Z80 doesn't have any program to execute */
-	machine().device<cpu_device>("ssio:cpu")->suspend(SUSPEND_REASON_DISABLE, 1);
+	m_ssio->suspend_cpu();
 }
 
 
@@ -2947,49 +2972,50 @@ DRIVER_INIT_MEMBER(mcr_state,demoderb)
  *************************************/
 
 /* 90009 CPU board + 91399 video gen + 90908 sound I/O */
-GAME( 1981, solarfox, 0,        mcr_90009,     solarfox, mcr_state,          solarfox,  ROT90 ^ ORIENTATION_FLIP_Y, "Bally Midway", "Solar Fox (upright)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, kick,     0,        mcr_90009,     kick,     mcr_state,          kick,      ORIENTATION_SWAP_XY,        "Midway", "Kick (upright)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, kickman,  kick,     mcr_90009,     kick,     mcr_state,          kick,      ORIENTATION_SWAP_XY,        "Midway", "Kickman (upright)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, kickc,    kick,     mcr_90009,     kickc,    mcr_state,          kick,      ROT90,                      "Midway", "Kick (cocktail)", MACHINE_SUPPORTS_SAVE )
-GAMEL(1985, dpoker,   0,        mcr_90009_dp,  dpoker,   mcr_dpoker_state,   dpoker,    ROT0,                       "Bally",  "Draw Poker (Bally, 03-20)", MACHINE_SUPPORTS_SAVE, layout_dpoker )
+GAME(  1981, solarfox,  0,        mcr_90009,     solarfox,  mcr_state,         init_solarfox,  ROT90 ^ ORIENTATION_FLIP_Y, "Bally Midway", "Solar Fox (upright)", MACHINE_SUPPORTS_SAVE )
+GAME(  1981, kick,      0,        mcr_90009,     kick,      mcr_state,         init_kick,      ORIENTATION_SWAP_XY, "Midway", "Kick (upright)", MACHINE_SUPPORTS_SAVE )
+GAME(  1981, kickman,   kick,     mcr_90009,     kick,      mcr_state,         init_kick,      ORIENTATION_SWAP_XY, "Midway", "Kickman (upright)", MACHINE_SUPPORTS_SAVE )
+GAME(  1981, kickc,     kick,     mcr_90009,     kickc,     mcr_state,         init_kick,      ROT90, "Midway", "Kick (cocktail)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1985, dpoker,    0,        mcr_90009_dp,  dpoker,    mcr_dpoker_state,  init_dpoker,    ROT0,  "Bally",  "Draw Poker (Bally, 03-20)", MACHINE_SUPPORTS_SAVE, layout_dpoker )
 
 /* 90010 CPU board + 91399 video gen + 90913 sound I/O */
-GAME( 1981, shollow,  0,        mcr_90010,     shollow, mcr_state,  mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, shollow2, shollow,  mcr_90010,     shollow, mcr_state,  mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, tron,     0,        mcr_90010,     tron, mcr_state,     mcr_90010, ROT90, "Bally Midway", "Tron (8/9)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, tron2,    tron,     mcr_90010,     tron, mcr_state,     mcr_90010, ROT90, "Bally Midway", "Tron (6/25)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, tron3,    tron,     mcr_90010,     tron3, mcr_state,    mcr_90010, ROT90, "Bally Midway", "Tron (6/17)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1982, tron4,    tron,     mcr_90010,     tron3, mcr_state,    mcr_90010, ROT90, "Bally Midway", "Tron (6/15)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1982, tronger,  tron,     mcr_90010,     tron3, mcr_state,    mcr_90010, ROT90, "Bally Midway", "Tron (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1982, domino,   0,        mcr_90010,     domino, mcr_state,   mcr_90010, ROT0,  "Bally Midway", "Domino Man", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, wacko,    0,        mcr_90010,     wacko, mcr_state,    wacko,     ROT0,  "Bally Midway", "Wacko", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, twotigerc,twotiger, mcr_90010,     twotigrc, mcr_state, mcr_90010, ROT0,  "Bally Midway", "Two Tigers (Tron conversion)", MACHINE_SUPPORTS_SAVE )
+GAME(  1981, shollow,   0,        mcr_90010,     shollow,   mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME(  1981, shollow2,  shollow,  mcr_90010,     shollow,   mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME(  1982, tron,      0,        mcr_90010,     tron,      mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (8/9)", MACHINE_SUPPORTS_SAVE )
+GAME(  1982, tron2,     tron,     mcr_90010,     tron,      mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (6/25)", MACHINE_SUPPORTS_SAVE )
+GAME(  1982, tron3,     tron,     mcr_90010,     tron3,     mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (6/17)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME(  1982, tron4,     tron,     mcr_90010,     tron3,     mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (6/15)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME(  1982, tronger,   tron,     mcr_90010,     tron3,     mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME(  1982, domino,    0,        mcr_90010,     domino,    mcr_state,         init_mcr_90010, ROT0,  "Bally Midway", "Domino Man", MACHINE_SUPPORTS_SAVE )
+GAME(  1982, wacko,     0,        mcr_90010,     wacko,     mcr_state,         init_wacko,     ROT0,  "Bally Midway", "Wacko", MACHINE_SUPPORTS_SAVE )
+GAME(  1984, twotigerc, twotiger, mcr_90010,     twotigrc,  mcr_state,         init_mcr_90010, ROT0,  "Bally Midway", "Two Tigers (Tron conversion)", MACHINE_SUPPORTS_SAVE )
 
 /* hacked 90010 CPU board + 91399 video gen + 90913 sound I/O + 8-track interface */
-GAME( 1984, twotiger, 0,        mcr_90010_tt,  twotiger, mcr_state, twotiger,  ROT0,  "Bally Midway", "Two Tigers (dedicated)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1984, twotiger,  0,        mcr_90010_tt,  twotiger,  mcr_state,         init_twotiger,  ROT0,  "Bally Midway", "Two Tigers (dedicated)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* 90010 CPU board + 91399 video gen + 91483 sound I/O */
-GAME( 1982, kroozr,   0,        mcr_90010,     kroozr, mcr_state,   kroozr,    ROT0,  "Bally Midway", "Kozmik Kroozr", MACHINE_SUPPORTS_SAVE )
+GAME(  1982, kroozr,    0,        mcr_90010,     kroozr,    mcr_state,         init_kroozr,    ROT0,  "Bally Midway", "Kozmik Kroozr", MACHINE_SUPPORTS_SAVE )
 
 /* 91475 CPU board + 91464 video gen + 90913 sound I/O + cassette interface */
-GAME( 1983, journey,  0,        mcr_91475,     journey, mcr_state,  journey,   ROT90, "Bally Midway", "Journey", MACHINE_SUPPORTS_SAVE )
+GAME(  1983, journey,   0,        mcr_91475,     journey,   mcr_state,         init_journey,   ROT90, "Bally Midway", "Journey", MACHINE_SUPPORTS_SAVE )
 
 /* 91490 CPU board + 91464 video gen + 90913 sound I/O */
-GAME( 1983, tapper,   0,        mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 1/27/84)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - Newest version */
-GAME( 1983, tappera,  tapper,   mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 12/9/83)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - The oldest set? */
-GAME( 1983, tapperb,  tapper,   mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, Date Unknown)", MACHINE_SUPPORTS_SAVE ) /* First release at 12/7/83? or in between the other two? */
-GAME( 1983, sutapper, tapper,   mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Suntory)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, rbtapper, tapper,   mcr_91490,     tapper, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Tapper (Root Beer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, timber,   0,        mcr_91490,     timber, mcr_state,   mcr_91490, ROT0,  "Bally Midway", "Timber", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, dotron,   0,        mcr_91490,     dotron, mcr_state,   mcr_91490, ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Upright)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, dotrona,  dotron,   mcr_91490,     dotron, mcr_state,   mcr_91490, ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Upright alternate)", MACHINE_SUPPORTS_SAVE )
+GAME(  1983, tapper,    0,        mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 1/27/84)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - Newest version */
+GAME(  1983, tapperg,   tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 1/27/84 - Alternate graphics)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - Newest version */
+GAME(  1983, tappera,   tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, 12/9/83)", MACHINE_SUPPORTS_SAVE ) /* Date from program ROM labels - The oldest set? */
+GAME(  1983, tapperb,   tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Budweiser, Date Unknown)", MACHINE_SUPPORTS_SAVE ) /* First release at 12/7/83? or in between the other two? */
+GAME(  1983, sutapper,  tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Suntory)", MACHINE_SUPPORTS_SAVE )
+GAME(  1984, rbtapper,  tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Root Beer)", MACHINE_SUPPORTS_SAVE )
+GAME(  1984, timber,    0,        mcr_91490,     timber,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Timber", MACHINE_SUPPORTS_SAVE )
+GAME(  1983, dotron,    0,        mcr_91490,     dotron,    mcr_state,         init_mcr_91490, ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Upright)", MACHINE_SUPPORTS_SAVE )
+GAME(  1983, dotrona,   dotron,   mcr_91490,     dotron,    mcr_state,         init_mcr_91490, ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Upright alternate)", MACHINE_SUPPORTS_SAVE )
 
 /* 91490 CPU board + 91464 video gen + 91657 sound I/O + Squawk n' Talk */
-GAME( 1983, dotrone,  dotron,   mcr_91490_snt, dotrone, mcr_state,  dotrone,   ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Environmental)", MACHINE_SUPPORTS_SAVE )
+GAME(  1983, dotrone,   dotron,   mcr_91490_snt, dotrone,   mcr_state,         init_dotrone,   ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Environmental)", MACHINE_SUPPORTS_SAVE )
 
 /* 91490 CPU board + 91464 video gen + 91657 sound I/O + Squawk n' Talk + IPU laserdisk interface */
-GAME( 1983, nflfoot,  0,        mcr_91490_ipu, nflfoot, mcr_nflfoot_state,  nflfoot,   ROT0,  "Bally Midway", "NFL Football", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME(  1983, nflfoot,   0,        mcr_91490_ipu, nflfoot,   mcr_nflfoot_state, init_nflfoot,   ROT0,  "Bally Midway", "NFL Football", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 /* 91490 CPU board + 91464 video gen + 90913 sound I/O + Turbo Cheap Squeak */
-GAME( 1984, demoderb, 0,        mcr_91490_tcs, demoderb, mcr_state, demoderb,  ROT0,  "Bally Midway", "Demolition Derby", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, demoderbc,demoderb, mcr_91490_tcs, demoderbc,mcr_state, demoderb,  ROT0,  "Bally Midway", "Demolition Derby (cocktail)", MACHINE_SUPPORTS_SAVE )
+GAME(  1984, demoderb,  0,        mcr_91490_tcs, demoderb,  mcr_state,         init_demoderb,  ROT0,  "Bally Midway", "Demolition Derby", MACHINE_SUPPORTS_SAVE )
+GAME(  1984, demoderbc, demoderb, mcr_91490_tcs, demoderbc, mcr_state,         init_demoderb,  ROT0,  "Bally Midway", "Demolition Derby (cocktail)", MACHINE_SUPPORTS_SAVE )

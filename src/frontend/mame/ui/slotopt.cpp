@@ -61,7 +61,7 @@ menu_slot_devices::~menu_slot_devices()
 //  slot option
 //-------------------------------------------------
 
-device_slot_option *menu_slot_devices::get_current_option(device_slot_interface &slot) const
+device_slot_interface::slot_option const *menu_slot_devices::get_current_option(device_slot_interface &slot) const
 {
 	std::string current;
 
@@ -184,7 +184,7 @@ void menu_slot_devices::populate(float &customtop, float &custombottom)
 
 		// name this option
 		std::string opt_name(DIVIDER);
-		const device_slot_option *option = get_current_option(slot);
+		device_slot_interface::slot_option const *option = get_current_option(slot);
 		if (option)
 		{
 			opt_name = has_selectable_options
@@ -216,7 +216,7 @@ void menu_slot_devices::custom_render(void *selectedref, float top, float bottom
 	if (selectedref && (ITEMREF_RESET != selectedref))
 	{
 		device_slot_interface *const slot(reinterpret_cast<device_slot_interface *>(selectedref));
-		device_slot_option const *const option(get_current_option(*slot));
+		device_slot_interface::slot_option const *const option(get_current_option(*slot));
 		char const *const text[] = { option ? option->devtype().fullname() : _("[empty slot]") };
 		draw_text_box(
 				std::begin(text), std::end(text),
@@ -251,7 +251,7 @@ void menu_slot_devices::handle()
 		else if (menu_event->iptkey == IPT_UI_SELECT)
 		{
 			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
-			device_slot_option *option = get_current_option(*slot);
+			device_slot_interface::slot_option const *const option = get_current_option(*slot);
 			if (option)
 				menu::stack_push<menu_device_config>(ui(), container(), slot, option);
 		}
@@ -268,7 +268,7 @@ void menu_slot_devices::rotate_slot_device(device_slot_interface &slot, menu_slo
 	// first, we need to make sure our cache of options is up to date
 	if (m_current_option_list_slot_tag != slot.device().tag())
 	{
-		device_slot_option *current = get_current_option(slot);
+		device_slot_interface::slot_option const *current = get_current_option(slot);
 
 		// build the option list, including the blank option
 		m_current_option_list.clear();

@@ -20,11 +20,11 @@
 
 ***********************************/
 
-
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -36,22 +36,23 @@
 class cardline_state : public driver_device
 {
 public:
-	cardline_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cardline_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
+	void cardline(machine_config &config);
 
-	uint8_t m_video;
-	uint8_t m_hsync_q;
+protected:
+	virtual void machine_start() override;
 
+private:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(attr_w);
 	DECLARE_WRITE8_MEMBER(video_w);
@@ -62,29 +63,35 @@ public:
 	DECLARE_WRITE8_MEMBER(asic_w);
 	DECLARE_WRITE8_MEMBER(a3003_w);
 
-	DECLARE_PALETTE_INIT(cardline);
-
-	virtual void machine_start() override;
+	void cardline_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	required_device<cpu_device> m_maincpu;
+	void mem_io(address_map &map);
+	void mem_prg(address_map &map);
+
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+
+	uint8_t m_video;
+	uint8_t m_hsync_q;
+
+	required_device<i80c32_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	void cardline(machine_config &config);
-	void mem_io(address_map &map);
-	void mem_prg(address_map &map);
+	output_finder<8> m_lamps;
 };
 
 void cardline_state::machine_start()
 {
+	m_lamps.resolve();
 	m_video = 0;
 	m_hsync_q = 1;
-	for (int i=0; i < 0x2000; i++)
+	for (int i = 0; i < 0x2000; i++)
 		m_maincpu.target()->space(AS_IO).write_byte(i, 0x73);
 	save_item(NAME(m_video));
 	save_item(NAME(m_hsync_q));
@@ -202,14 +209,14 @@ READ8_MEMBER(cardline_state::hsync_r)
 WRITE8_MEMBER(cardline_state::lamps_w)
 {
 	/* button lamps 1-8 (collect, card 1-5, bet, start) */
-	output().set_lamp_value(5,(data >> 0) & 1);
-	output().set_lamp_value(0,(data >> 1) & 1);
-	output().set_lamp_value(1,(data >> 2) & 1);
-	output().set_lamp_value(2,(data >> 3) & 1);
-	output().set_lamp_value(3,(data >> 4) & 1);
-	output().set_lamp_value(4,(data >> 5) & 1);
-	output().set_lamp_value(6,(data >> 6) & 1);
-	output().set_lamp_value(7,(data >> 7) & 1);
+	m_lamps[5] = BIT(data, 0);
+	m_lamps[0] = BIT(data, 1);
+	m_lamps[1] = BIT(data, 2);
+	m_lamps[2] = BIT(data, 3);
+	m_lamps[3] = BIT(data, 4);
+	m_lamps[4] = BIT(data, 5);
+	m_lamps[6] = BIT(data, 6);
+	m_lamps[7] = BIT(data, 7);
 }
 
 void cardline_state::mem_prg(address_map &map)
@@ -223,18 +230,18 @@ void cardline_state::mem_io(address_map &map)
 	map(0x2003, 0x2003).portr("IN0");
 	map(0x2005, 0x2005).portr("IN1");
 	map(0x2006, 0x2006).portr("DSW");
-	map(0x2007, 0x2007).w(this, FUNC(cardline_state::lamps_w));
+	map(0x2007, 0x2007).w(FUNC(cardline_state::lamps_w));
 	map(0x2008, 0x2008).noprw(); // set to 1 during coin input
 	//AM_RANGE(0x2080, 0x213f) AM_NOP // ????
-	map(0x2100, 0x213f).rw(this, FUNC(cardline_state::asic_r), FUNC(cardline_state::asic_w));
+	map(0x2100, 0x213f).rw(FUNC(cardline_state::asic_r), FUNC(cardline_state::asic_w));
 	map(0x2400, 0x2400).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x2800, 0x2800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2801, 0x2801).w("crtc", FUNC(mc6845_device::register_w));
 	//AM_RANGE(0x2840, 0x2840) AM_NOP // ???
 	//AM_RANGE(0x2880, 0x2880) AM_NOP // ???
-	map(0x3003, 0x3003).w(this, FUNC(cardline_state::a3003_w));
-	map(0xc000, 0xdfff).w(this, FUNC(cardline_state::vram_w)).share("videoram");
-	map(0xe000, 0xffff).w(this, FUNC(cardline_state::attr_w)).share("colorram");
+	map(0x3003, 0x3003).w(FUNC(cardline_state::a3003_w));
+	map(0xc000, 0xdfff).w(FUNC(cardline_state::vram_w)).share("videoram");
+	map(0xe000, 0xffff).w(FUNC(cardline_state::attr_w)).share("colorram");
 }
 
 
@@ -285,47 +292,50 @@ static const gfx_layout charlayout =
 	8*8*8
 };
 
-static GFXDECODE_START( cardline )
+static GFXDECODE_START( gfx_cardline )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 2 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(cardline_state, cardline)
+void cardline_state::cardline_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i,r,g,b,data;
-	int bit0,bit1,bit2;
-	for (i = 0;i < palette.entries();i++)
-	{
-		data=color_prom[i];
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-		/* red component */
-		bit0 = (data >> 5) & 0x01;
-		bit1 = (data >> 6) & 0x01;
-		bit2 = (data >> 7) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (data >> 2) & 0x01;
-		bit1 = (data >> 3) & 0x01;
-		bit2 = (data >> 4) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = (data >> 0) & 0x01;
-		bit1 = (data >> 1) & 0x01;
-		b = 0x55 * bit0 + 0xaa * bit1;
-		palette.set_pen_color(i,rgb_t(r,g,b));
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int const data = color_prom[i];
+		int bit0, bit1, bit2;
+
+		// red component
+		bit0 = BIT(data, 5);
+		bit1 = BIT(data, 6);
+		bit2 = BIT(data, 7);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = BIT(data, 2);
+		bit1 = BIT(data, 3);
+		bit2 = BIT(data, 4);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
+		bit0 = BIT(data, 0);
+		bit1 = BIT(data, 1);
+		int const b = 0x55 * bit0 + 0xaa * bit1;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
 MACHINE_CONFIG_START(cardline_state::cardline)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C32, MASTER_CLOCK)
-	MCFG_MCS51_PORT1_CONFIG(0x10)
-	MCFG_CPU_PROGRAM_MAP(mem_prg)
-	MCFG_CPU_IO_MAP(mem_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(cardline_state, hsync_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(cardline_state, video_w))
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", cardline_state,  irq1_line_hold)
+	I80C32(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_port_forced_input(1, 0x10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cardline_state::mem_prg);
+	m_maincpu->set_addrmap(AS_IO, &cardline_state::mem_io);
+	m_maincpu->port_in_cb<1>().set(FUNC(cardline_state::hsync_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(cardline_state::video_w));
+	//m_maincpu->set_vblank_int("screen", FUNC(cardline_state::irq1_line_hold));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -334,27 +344,28 @@ MACHINE_CONFIG_START(cardline_state::cardline)
 	MCFG_SCREEN_SIZE(64*8, 35*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	//MCFG_SCREEN_UPDATE_DRIVER(cardline_state, screen_update_cardline)
-	//MCFG_SCREEN_PALETTE("palette")
+	//MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cardline)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(cardline_state, cardline)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cardline);
+	PALETTE(config, m_palette, FUNC(cardline_state::cardline_palette), 512);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8)   /* divisor guessed - result is 56 Hz */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_BEGIN_UPDATE_CB(cardline_state, crtc_begin_update)
-	MCFG_MC6845_UPDATE_ROW_CB(cardline_state, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(cardline_state, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(cardline_state, vsync_changed))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/8));   /* divisor guessed - result is 56 Hz */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_begin_update_callback(FUNC(cardline_state::crtc_begin_update), this);
+	crtc.set_update_row_callback(FUNC(cardline_state::crtc_update_row), this);
+	crtc.out_hsync_callback().set(FUNC(cardline_state::hsync_changed));
+	crtc.out_vsync_callback().set(FUNC(cardline_state::vsync_changed));
 
-	MCFG_DEFAULT_LAYOUT(layout_cardline)
+	config.set_default_layout(layout_cardline);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -382,4 +393,4 @@ ROM_START( cardline )
 
 ROM_END
 
-GAME( 199?, cardline,  0,       cardline,  cardline, cardline_state,  0, ROT0, "Veltmeijer", "Card Line" , MACHINE_SUPPORTS_SAVE)
+GAME( 199?, cardline, 0, cardline, cardline, cardline_state, empty_init, ROT0, "Veltmeijer", "Card Line" , MACHINE_SUPPORTS_SAVE)

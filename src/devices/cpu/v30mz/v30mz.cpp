@@ -147,7 +147,7 @@ device_memory_interface::space_config_vector v30mz_cpu_device::memory_space_conf
 void v30mz_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_regs.w));
@@ -319,7 +319,7 @@ inline void v30mz_cpu_device::write_port(uint16_t port, uint8_t data)
 
 inline uint8_t v30mz_cpu_device::fetch_op()
 {
-	uint8_t data = m_direct->read_byte( pc() );
+	uint8_t data = m_cache->read_byte( pc() );
 	m_ip++;
 	return data;
 }
@@ -327,7 +327,7 @@ inline uint8_t v30mz_cpu_device::fetch_op()
 
 inline uint8_t v30mz_cpu_device::fetch()
 {
-	uint8_t data = m_direct->read_byte( pc() );
+	uint8_t data = m_cache->read_byte( pc() );
 	m_ip++;
 	return data;
 }

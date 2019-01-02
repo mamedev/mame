@@ -27,7 +27,7 @@
 
 inline uint16_t diablo1300_cpu_device::opcode_read(uint16_t address)
 {
-	return m_direct->read_word(address);
+	return m_cache->read_word(address);
 }
 
 inline uint16_t diablo1300_cpu_device::program_read16(uint16_t address)
@@ -81,7 +81,7 @@ diablo1300_cpu_device::diablo1300_cpu_device(const machine_config &mconfig, cons
 	, m_power_on(ASSERT_LINE)
 	, m_program(nullptr)
 	, m_data(nullptr)
-	, m_direct(nullptr)
+	, m_cache(nullptr)
 
 {
 	// Allocate & setup
@@ -92,7 +92,7 @@ void diablo1300_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_data    = &space(AS_DATA);
-	m_direct  = m_program->direct<-1>();
+	m_cache  = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();

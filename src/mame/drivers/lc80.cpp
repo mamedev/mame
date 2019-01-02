@@ -332,80 +332,77 @@ void lc80_state::machine_start()
 
 MACHINE_CONFIG_START(lc80_state::lc80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, 900000) /* UD880D */
-	MCFG_CPU_PROGRAM_MAP(lc80_mem)
-	MCFG_CPU_IO_MAP(lc80_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 900000) /* UD880D */
+	MCFG_DEVICE_PROGRAM_MAP(lc80_mem)
+	MCFG_DEVICE_IO_MAP(lc80_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_lc80 )
+	config.set_default_layout(layout_lc80);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 900000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(lc80_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(lc80_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(lc80_state, ctc_z2_w))
+	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, 900000));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(lc80_state::ctc_z0_w));
+	ctc.zc_callback<1>().set(FUNC(lc80_state::ctc_z1_w));
+	ctc.zc_callback<2>().set(FUNC(lc80_state::ctc_z2_w));
 
-	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, 900000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(lc80_state, pio1_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(lc80_state, pio1_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(lc80_state, pio1_pb_w))
+	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, 900000));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.out_pa_callback().set(FUNC(lc80_state::pio1_pa_w));
+	pio1.in_pb_callback().set(FUNC(lc80_state::pio1_pb_r));
+	pio1.out_pb_callback().set(FUNC(lc80_state::pio1_pb_w));
 
-	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, 900000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PB_CB(READ8(lc80_state, pio2_pb_r))
+	Z80PIO(config, m_pio2, 900000);
+	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio2->in_pb_callback().set(FUNC(lc80_state::pio2_pb_r));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
-	MCFG_RAM_EXTRA_OPTIONS("2K,3K,4K")
+	RAM(config, RAM_TAG).set_default_size("1K").set_extra_options("2K,3K,4K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lc80_state::lc80_2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, 1800000) /* UD880D */
-	MCFG_CPU_PROGRAM_MAP(lc80_mem)
-	MCFG_CPU_IO_MAP(lc80_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 1800000) /* UD880D */
+	MCFG_DEVICE_PROGRAM_MAP(lc80_mem)
+	MCFG_DEVICE_IO_MAP(lc80_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_lc80 )
+	config.set_default_layout(layout_lc80);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 900000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(lc80_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(lc80_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(lc80_state, ctc_z2_w))
+	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, 900000));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(lc80_state::ctc_z0_w));
+	ctc.zc_callback<1>().set(FUNC(lc80_state::ctc_z1_w));
+	ctc.zc_callback<2>().set(FUNC(lc80_state::ctc_z2_w));
 
-	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, 900000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(lc80_state, pio1_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(lc80_state, pio1_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(lc80_state, pio1_pb_w))
+	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, 900000));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.out_pa_callback().set(FUNC(lc80_state::pio1_pa_w));
+	pio1.in_pb_callback().set(FUNC(lc80_state::pio1_pb_r));
+	pio1.out_pb_callback().set(FUNC(lc80_state::pio1_pb_w));
 
-	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, 900000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PB_CB(READ8(lc80_state, pio2_pb_r))
+	Z80PIO(config, m_pio2, 900000);
+	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio2->in_pb_callback().set(FUNC(lc80_state::pio2_pb_r));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
+	RAM(config, RAM_TAG).set_default_size("4K");
 MACHINE_CONFIG_END
 
 #if 0
@@ -413,8 +410,8 @@ static MACHINE_CONFIG_START( sc80 )
 	lc80_2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY(Z80_TAG)
-	MCFG_CPU_PROGRAM_MAP(sc80_mem)
+	MCFG_DEVICE_MODIFY(Z80_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(sc80_mem)
 MACHINE_CONFIG_END
 #endif
 
@@ -423,10 +420,10 @@ MACHINE_CONFIG_END
 ROM_START( lc80 )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "u505", "LC 80 (2x U505)" )
-	ROMX_LOAD( "lc80.d202", 0x0000, 0x0400, CRC(e754ef53) SHA1(044440b13e62addbc3f6a77369cfd16f99b39752), ROM_BIOS(1) )
-	ROMX_LOAD( "lc80.d203", 0x0800, 0x0400, CRC(2b544da1) SHA1(3a6cbd0c57c38eadb7055dca4b396c348567d1d5), ROM_BIOS(1) )
+	ROMX_LOAD( "lc80.d202", 0x0000, 0x0400, CRC(e754ef53) SHA1(044440b13e62addbc3f6a77369cfd16f99b39752), ROM_BIOS(0) )
+	ROMX_LOAD( "lc80.d203", 0x0800, 0x0400, CRC(2b544da1) SHA1(3a6cbd0c57c38eadb7055dca4b396c348567d1d5), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "2716", "LC 80 (2716)" )
-	ROMX_LOAD( "lc80_2716.bin", 0x0000, 0x0800, CRC(b3025934) SHA1(6fff953f0f1eee829fd774366313ab7e8053468c), ROM_BIOS(2))
+	ROMX_LOAD( "lc80_2716.bin", 0x0000, 0x0800, CRC(b3025934) SHA1(6fff953f0f1eee829fd774366313ab7e8053468c), ROM_BIOS(1))
 ROM_END
 
 ROM_START( lc80_2 )
@@ -443,7 +440,7 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT  COMPANY                FULLNAME                FLAGS
-COMP( 1984, lc80,   0,      0,      lc80,    lc80,  lc80_state, 0,    "VEB Mikroelektronik", "Lerncomputer LC 80",   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, lc80_2, lc80,   0,      lc80_2,  lc80,  lc80_state, 0,    "VEB Mikroelektronik", "Lerncomputer LC 80.2", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, sc80,   lc80,   0,      lc80_2,  lc80,  lc80_state, 0,    "VEB Mikroelektronik", "Schachcomputer SC-80", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                FULLNAME                FLAGS
+COMP( 1984, lc80,   0,      0,      lc80,    lc80,  lc80_state, empty_init, "VEB Mikroelektronik", "Lerncomputer LC 80",   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, lc80_2, lc80,   0,      lc80_2,  lc80,  lc80_state, empty_init, "VEB Mikroelektronik", "Lerncomputer LC 80.2", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, sc80,   lc80,   0,      lc80_2,  lc80,  lc80_state, empty_init, "VEB Mikroelektronik", "Schachcomputer SC-80", MACHINE_SUPPORTS_SAVE )

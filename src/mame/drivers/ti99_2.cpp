@@ -1,427 +1,505 @@
 // license:GPL-2.0+
-// copyright-holders:Raphael Nabet
+// copyright-holders: Michael Zapf
 /*
-  Experimental ti99/2 driver
+    TI-99/2 driver
+    --------------
 
-TODO :
-  * find a TI99/2 ROM dump (some TI99/2 ARE in private hands)
-  * test the driver !
-  * understand the "viden" pin
-  * implement cassette
-  * implement Hex-Bus
+    Drivers: ti99_224 - 24 KiB version
+             ti99_232 - 32 KiB version
 
-  Raphael Nabet (who really has too much time to waste), december 1999, 2000
-*/
+    Codenamed "Ground Squirrel", the TI-99/2 was designed to be an extremely
+    low-cost, downstripped version of the TI-99/4A, competing with systems
+    like the ZX81 or the Times/Sinclair 1000. The targeted price was below $100.
 
-/*
-  TI99/2 facts :
+    The 99/2 was equipped with a TMS9995, the same CPU as used in the envisioned
+    flag ship 99/8 and later in the Geneve 9640. In the 99/2 it is clocked
+    at 10.7 MHz. Also, the CPU has on-chip RAM, unlike the version in the 99/8.
 
-References :
-* TI99/2 main logic board schematics, 83/03/28-30 (on ftp.whtech.com, or just ask me)
-  (Thanks to Charles Good for posting this)
+    At many places, the tight price constraint shows up.
+    - 2 or 4 KiB of RAM
+    - Video memory is part of the CPU RAM
+    - Video controller is black/white only and has a fixed character set, no sprites
+    - No sound
+    - No GROMs (as the significant TI technology circuit)
+    - No P-Box connection
 
-general :
-* prototypes in 1983
-* uses a 10.7MHz TMS9995 CPU, with the following features :
-  - 8-bit data bus
-  - 256 bytes 16-bit RAM (0xff00-0xff0b & 0xfffc-0xffff)
-  - only available int lines are INT4 (used by vdp), INT1*, and NMI* (both free for extension)
-  - on-chip decrementer (0xfffa-0xfffb)
-  - Unlike tms9900, CRU address range is full 0x0000-0xFFFE (A0 is not used as address).
-    This is possible because tms9995 uses d0-d2 instead of the address MSBits to support external
-    opcodes.
-  - quite more efficient than tms9900, and a few additional instructions and features
-* 24 or 32kb ROM (16kb plain (1kb of which used by vdp), 16kb split into 2 8kb pages)
-* 4kb 8-bit RAM, 256 bytes 16-bit RAM
-* custom vdp shares CPU RAM/ROM.  The display is quite alike to tms9928 graphics mode, except
-  that colors are a static B&W, and no sprite is displayed. The config (particularily the
-  table base addresses) cannot be changed.  Since TI located the pattern generator table in
-  ROM, we cannot even redefine the char patterns (unless you insert a custom cartidge which
-  overrides the system ROMs).  VBL int triggers int4 on tms9995.
-* CRU is handled by one single custom chip, so the schematics don't show many details :-( .
-* I/O :
-  - 48-key keyboard.  Same as TI99/4a, without alpha lock, and with an additional break key.
-    Note that the hardware can make the difference between the two shift keys.
-  - cassette I/O (one unit)
-  - ALC bus (must be another name for Hex-Bus)
-* 60-pin expansion/cartidge port on the back
+    Main board
+    ----------
+    1 CPU @ 10.7 MHz (contrary to specs which state 5.35 MHz)
+    2 RAM circuits   (4 KiB instead of 2 KiB in specs)
+    3 or 4 EPROMs
+    1 TAL-004 custom gate array as the video controller
+    1 TAL-004 custom gate array as the I/O controller
+    and six selector or latch circuits
 
-memory map :
-* 0x0000-0x4000 : system ROM (0x1C00-0x2000 (?) : char ROM used by vdp)
-* 0x4000-0x6000 : system ROM, mapped to either of two distinct 8kb pages according to the S0
-  bit from the keyboard interface (!), which is used to select the first key row.
-  [only on second-generation TI99/2 protos, first generation protos only had 24kb of ROM]
-* 0x6000-0xE000 : free for expansion
-* 0xE000-0xF000 : 8-bit "system" RAM (0xEC00-0xEF00 used by vdp)
-* 0xF000-0xF0FB : 16-bit processor RAM (on tms9995)
-* 0xF0FC-0xFFF9 : free for expansion
-* 0xFFFA-0xFFFB : tms9995 internal decrementer
-* 0xFFFC-0xFFFF : 16-bit processor RAM (provides the NMI vector)
+    Connectors
+    ----------
+    - Built-in RF modulator, switch allows for setting the channel to VHF 3 or 4
+    - Two jacks for cassette input and output, no motor control
+    - Hexbus connector
+    - System expansion slot for cartridges (ROM or RAM), 60 pins, on the back
 
-CRU map :
-* 0x0000-0x1EFC : reserved
-* 0x1EE0-0x1EFE : tms9995 flag register
-* 0x1F00-0x1FD8 : reserved
-* 0x1FDA : tms9995 MID flag
-* 0x1FDC-0x1FFF : reserved
-* 0x2000-0xE000 : unaffected
-* 0xE400-0xE40E : keyboard I/O (8 bits input, either 3 or 6 bit output)
-* 0xE80C : cassette I/O
-* 0xE80A : ALC BAV
-* 0xE808 : ALC HSK
-* 0xE800-0xE808 : ALC data (I/O)
-* 0xE80E : video enable (probably input - seems to come from the VDP, and is present on the
-  expansion connector)
-* 0xF000-0xFFFE : reserved
-Note that only A15-A11 and A3-A1 (A15 = MSB, A0 = LSB) are decoded in the console, so the keyboard
-is actually mapped to 0xE000-0xE7FE, and other I/O bits to 0xE800-0xEFFE.
-Also, ti99/2 does not support external instructions better than ti99/4(a).  This is crazy, it
-would just have taken three extra tracks on the main board and a OR gate in an ASIC.
+    Keyboard: 48 keys, no Alpha Lock, two separate Shift keys, additional break key.
+
+    Description
+    -----------
+    Prototypes were developed in 1983. Despite a late marketing campaign,
+    including well-known faces, no devices were ever sold. A few of them
+    survived in the hands of the engineers, and were later sold to private
+    users.
+
+    The Ground Squirrel underwent several design changes. In the initial
+    design, only 2 KiB RAM were planned, and the included ROM was 24 KiB.
+    Later, the 2 KiB were obviously expanded to 4 KiB, while the ROM remained
+    the same in size. This can be proved here, since the console crashes with
+    less than 4 KiB by an unmapped memory access. Also, the CPU is not clocked
+    by 5.35 MHz as specified, but by the undivided 10.7 MHz; this was proved
+    by running test programs on the real consoles.
+
+    The next version showed an additional 8 KiB of ROM. Possibly in order
+    to avoid taking away too much address space, two EPROMs are mapped to the
+    same address space block, selectable by a CRU bit. ROM may be added as
+    cartridges to be plugged into the expansion slot, and the same is true
+    for RAM. Actually, since the complete bus is available on that connector,
+    almost any kind of peripheral device could be added. Too bad, none were
+    developed.
+
+    However, the Hexbus seemed to have matured in the meantime, which became
+    the standard peripheral bus system for the TI-99/8, and for smaller
+    systems like the CC-40 and the TI-74. The TI-99/2 also offers a Hexbus
+    interface so that any kind of Hexbus device can be connected, like, for
+    example, the HX5102 floppy drive, a Wafertape drive, or the RS232 serial
+    interface. The 24K version seems to have no proper Hexbus support for
+    floppy drives; it always starts the cassette I/O instead.
+
+    The address space layout looks like this:
+
+    0000 - 3FFF:    ROM, unbanked
+    4000 - 5FFF:    ROM, banked for 32K version
+    6000 - DFFF:    ROM or RAM; ROM growing upwards, RAM growing downwards
+    E000 - EFFF:    4K RAM
+      EC00 - EEFF:  Area used by video controller (24 rows, 32 columns)
+      EF00       :  Control byte for colors (black/white) for backdrop/border
+    EF01 - EFFF:    RAM
+    F000 - F0FB:    CPU-internal RAM
+    F0FC - FFF9:    empty
+    FFFA - FFFF:    CPU-internal decrementer and NMI vector
+
+    RAM expansions may be offered via the cartridge port, but they must be
+    contiguous with the built-in RAM, which means that it must grow
+    downwards from E000. The space from F0FC up to FFF9 may also be covered
+    by expansion RAM.
+
+    From the other side, ROM or other memory-mapped devices may occupy
+    address space, growing up from 6000.
+
+    One peculiar detail is the memory-mapped video RAM. The video controller
+    shares an area of RAM with the CPU. To avoid congestion, the video
+    controller must HOLD the CPU while it accesses the video RAM area.
+
+    This decreases processing speed of the CPU, of course. For that reason,
+    a special character may be placed in every row after which the row will
+    be filled with blank pixels, and the CPU will be released early. This
+    means that with a screen full of characters, the processing speed is
+    definitely slower than with a clear screen.
+
+    To be able to temporarily get full CPU power, there is a pin VIDENA at
+    the video controller which causes the screen to be blank when asserted,
+    and to be restored as before when cleared. This is used during cassette
+    transfer.
+
+    Technical details
+    -----------------
+    - HOLD is asserted in every scanline when characters are drawn that are
+      not the "Blank End of line" (BEOL). Once encountered, the remaining
+      scanline remains blank.
+    - During cassette transfer, the screen is blanked using the VIDENA line.
+      This is expected and not a bug.
+    - When a frame has been completed, the INT4 interrupt of the 9995 is
+      triggered as a vblank interrupt.
+    - All CRU operations are handled by the second gate array. Unfortunately,
+      there is no known documentation about this circuit.
+    - The two banks of the last 16 KiB of ROM are selected with the same
+      line that is used for selecting keyboard row 0. This should mean that
+      you cannot read the keyboard from the second ROM bank.
+
+    I/O map (CRU map)
+    -----------------
+    0000 - 1DFE: unmapped
+    1E00 - 1EFE: TMS9995-internal CRU addresses
+    1F00 - 1FD8: unmapped
+    1FDA:        TMS9995 MID flag
+    1FDC - 1FFF: unmapped
+    2000 - DFFE: unmapped
+    E000 - E00E: Read: Keyboard column input
+    E000 - E00A: Write: Keyboard row selection
+    E00C:        Write: unmapped
+    E00E:        Write: Video enable (VIDENA)
+    E010 - E7FE: Mirrors of the above
+    E800 - E80C: Hexbus
+       E800 - E806: Data lines
+       E808: HSK line
+       E80A: BAV line
+       E80C: Inhibit (Write only)
+    E80E: Cassette
+
+    ROM dumps
+    ---------
+    Although these machines are extremely rare, we were lucky to get in
+    contact with users of both console variants and got dumps from
+    their machines.
+
+    The ROMs contain a stripped-down version of TI BASIC, but without
+    the specific graphics subprograms. Programs written on the 99/2 should
+    run on the 99/4A, but the opposite is not true.
+
+    Original implementation: Raphael Nabet; December 1999, 2000
+
+    Michael Zapf, May 2018
+
+    References :
+    [1] TI-99/2 main logic board schematics, 83/03/28-30
+    [2] BYTE magazine, June 1983, pp. 128-134
 */
 
 #include "emu.h"
+#include "bus/ti99/ti99defs.h"
 #include "machine/tms9901.h"
 #include "cpu/tms9900/tms9995.h"
-#include "screen.h"
+#include "bus/ti99/internal/992board.h"
+#include "machine/ram.h"
+#include "imagedev/cassette.h"
+#include "bus/hexbus/hexbus.h"
+
+#define TI992_SCREEN_TAG      "screen"
+#define TI992_ROM          "rom_region"
+#define TI992_RAM_TAG      "ram_region"
+#define TI992_IO_TAG       "io"
+
+#define LOG_WARN           (1U<<1)   // Warnings
+#define LOG_CRU            (1U<<2)   // CRU activities
+#define LOG_SIGNALS        (1U<<3)   // Signals like HOLD/HOLDA
+
+// Minimum log should be config and warnings
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
+
+#include "logmacro.h"
 
 class ti99_2_state : public driver_device
 {
 public:
 	ti99_2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_ROM_paged(0),
-		m_irq_state(0),
-		m_keyRow(0),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_videoctrl(*this, TI992_VDC_TAG),
+		m_io992(*this, TI992_IO_TAG),
+		m_cassette(*this, TI_CASSETTE),
+		m_ram(*this, TI992_RAM_TAG),
+		m_otherbank(false),
+		m_rom(nullptr),
+		m_ram_start(0xf000),
+		m_first_ram_page(0)
+		{ }
 
-	required_shared_ptr<uint8_t> m_videoram;
-	int m_ROM_paged;
-	int m_irq_state;
-	int m_keyRow;
-	DECLARE_WRITE8_MEMBER(ti99_2_write_kbd);
-	DECLARE_WRITE8_MEMBER(ti99_2_write_misc_cru);
-	DECLARE_READ8_MEMBER(ti99_2_read_kbd);
-	DECLARE_READ8_MEMBER(ti99_2_read_misc_cru);
-	DECLARE_DRIVER_INIT(ti99_2_24);
-	DECLARE_DRIVER_INIT(ti99_2_32);
-	virtual void machine_reset() override;
-	uint32_t screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ti99_2_vblank_interrupt);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	void ti99_2(machine_config &config);
-	void ti99_2_io(address_map &map);
-	void ti99_2_memmap(address_map &map);
+	void ti99_224(machine_config &config);
+	void ti99_232(machine_config &config);
+
+	// Lifecycle
+	void driver_start() override;
+	void driver_reset() override;
+
+private:
+	DECLARE_WRITE8_MEMBER(intflag_write);
+
+	DECLARE_READ8_MEMBER(mem_read);
+	DECLARE_WRITE8_MEMBER(mem_write);
+
+	DECLARE_WRITE_LINE_MEMBER(hold);
+	DECLARE_WRITE_LINE_MEMBER(holda);
+	DECLARE_WRITE_LINE_MEMBER(interrupt);
+	DECLARE_WRITE_LINE_MEMBER(cassette_output);
+
+	DECLARE_WRITE_LINE_MEMBER( rombank_set );
+
+	void crumap(address_map &map);
+	void memmap(address_map &map);
+
+	required_device<tms9995_device> m_maincpu;
+	required_device<bus::ti99::internal::video992_device> m_videoctrl;
+	required_device<bus::ti99::internal::io992_device>    m_io992;
+
+	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
+
+	bool m_otherbank;
+
+	uint8_t*   m_rom;
+	int m_ram_start;
+	int m_first_ram_page;
 };
 
-
-
-DRIVER_INIT_MEMBER(ti99_2_state,ti99_2_24)
+void ti99_2_state::driver_start()
 {
-	/* no ROM paging */
-	m_ROM_paged = 0;
+	m_rom = memregion(TI992_ROM)->base();
+	m_ram_start = 0xf000 - m_ram->default_size();
+	m_first_ram_page = m_ram_start >> 12;
 }
 
-DRIVER_INIT_MEMBER(ti99_2_state,ti99_2_32)
+void ti99_2_state::driver_reset()
 {
-	/* ROM paging enabled */
-	m_ROM_paged = 1;
-}
-
-#define TI99_2_32_ROMPAGE0 (memregion("maincpu")->base()+0x4000)
-#define TI99_2_32_ROMPAGE1 (memregion("maincpu")->base()+0x10000)
-
-void ti99_2_state::machine_reset()
-{
-	m_irq_state = ASSERT_LINE;
-	if (! m_ROM_paged)
-		membank("bank1")->set_base(memregion("maincpu")->base()+0x4000);
-	else
-		membank("bank1")->set_base((memregion("maincpu")->base()+0x4000));
+	m_otherbank = false;
 
 	// Configure CPU to insert 1 wait state for each external memory access
 	// by lowering the READY line on reset
-	// TODO: Check with specs
-	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
-	cpu->ready_line(CLEAR_LINE);
-	cpu->reset_line(ASSERT_LINE);
+	// This has been verified with the real machine, running test loops.
+	m_maincpu->ready_line(CLEAR_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(ti99_2_state::ti99_2_vblank_interrupt)
+WRITE_LINE_MEMBER( ti99_2_state::rombank_set )
 {
-	m_maincpu->set_input_line(INT_9995_INT1, m_irq_state);
-	m_irq_state = (m_irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
+	m_otherbank = (state==ASSERT_LINE);
 }
-
 
 /*
-  TI99/2 vdp emulation.
-
-  Things could not be simpler.
-  We display 24 rows and 32 columns of characters.  Each 8*8 pixel character pattern is defined
-  in a 128-entry table located in ROM.  Character code for each screen position are stored
-  sequentially in RAM.  Colors are a fixed Black on White.
-
-    There is an EOL character that blanks the end of the current line, so that
-    the CPU can get more bus time.
+    Memory map - see description above
 */
 
-
-
-uint32_t ti99_2_state::screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void ti99_2_state::memmap(address_map &map)
 {
-	uint8_t *videoram = m_videoram;
-	int i, sx, sy;
+	// 3 or 4 ROMs of 8 KiB. The 32K version has two ROMs mapped into 4000-5fff
+	// Part of the ROM is accessed by the video controller for the
+	// character definitions (1c00-1fff)
+	map(0x0000, 0xffff).rw(FUNC(ti99_2_state::mem_read), FUNC(ti99_2_state::mem_write));
+}
 
+/*
+    CRU map - see description above
+    Note that the CRU address space has only even numbers, and the
+    read addresses in the emulation gather 8 bits in one go, so the address
+    is the bit number times 16.
+*/
+void ti99_2_state::crumap(address_map &map)
+{
+	map(0x0000, 0x0fff).r(m_io992, FUNC(bus::ti99::internal::io992_device::cruread));
+	map(0x0000, 0x7fff).w(m_io992, FUNC(bus::ti99::internal::io992_device::cruwrite));
 
-	sx = sy = 0;
+	// Mirror of CPU-internal flags (1ee0-1efe). Don't read. Write is OK.
+	map(0x01ee, 0x01ef).nopr();
+	map(0x0f70, 0x0f7f).w(FUNC(ti99_2_state::intflag_write));
+}
 
-	for (i = 0; i < 768; i++)
+/*
+    These CRU addresses are actually inside the 9995 CPU, but they are
+    propagated to the outside world, so we can watch the changes.
+*/
+WRITE8_MEMBER(ti99_2_state::intflag_write)
+{
+	int addr = 0x1ee0 | (offset<<1);
+	switch (addr)
 	{
-		/* Is the char code masked or not ??? */
-		m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, videoram[i] & 0x7F, 0,
-			0, 0, sx, sy);
+	case 0x1ee0:
+		LOGMASKED(LOG_CRU, "Setting 9995 decrementer to %s mode\n", (data==1)? "event" : "timer");
+		break;
+	case 0x1ee2:
+		LOGMASKED(LOG_CRU, "Setting 9995 decrementer to %s\n", (data==1)? "enabled" : "disabled");
+		break;
+	case 0x1ee4:
+		if (data==0) LOGMASKED(LOG_CRU, "Clear INT1 latch\n");
+		break;
+	case 0x1ee6:
+		if (data==0) LOGMASKED(LOG_CRU, "Clear INT3 latch\n");
+		break;
+	case 0x1ee8:
+		if (data==0) LOGMASKED(LOG_CRU, "Clear INT4 latch\n");
+		break;
+	case 0x1eea:
+		LOGMASKED(LOG_CRU, "Switch to bank %d\n", data);
+		break;
 
-		sx += 8;
-		if (sx == 256)
-		{
-			sx = 0;
-			sy += 8;
-		}
+	default:
+		LOGMASKED(LOG_CRU, "Writing internal flag %04x = %d\n", addr, data);
+		break;
+	}
+}
+
+/*
+    Called by CPU and video controller.
+*/
+READ8_MEMBER(ti99_2_state::mem_read)
+{
+	if (m_maincpu->is_onchip(offset)) return m_maincpu->debug_read_onchip_memory(offset&0xff);
+
+	int page = offset >> 12;
+
+	if (page>=0 && page<4)
+	{
+		// ROM, unbanked
+		return m_rom[offset];
+	}
+	if (page>=4 && page<6)
+	{
+		// ROM, banked on 32K version
+		if (m_otherbank) offset = (offset & 0x1fff) | 0x10000;
+		return m_rom[offset];
 	}
 
+	if ((page >= m_first_ram_page) && (page < 15))
+	{
+		return m_ram->pointer()[offset - m_ram_start];
+	}
+
+	LOGMASKED(LOG_WARN, "Unmapped read access at %04x\n", offset);
 	return 0;
 }
 
-static const gfx_layout ti99_2_charlayout =
+WRITE8_MEMBER(ti99_2_state::mem_write)
 {
-	8,8,        /* 8 x 8 characters */
-	128,        /* 128 characters */
-	1,          /* 1 bits per pixel */
-	{ 0 },      /* no bitplanes; 1 bit per pixel */
-	/* x offsets */
-	{ 0,1,2,3,4,5,6,7 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, },
-	8*8         /* every char takes 8 bytes */
-};
+	int page = offset >> 12;
 
-static GFXDECODE_START( ti99_2 )
-	GFXDECODE_ENTRY( "maincpu", 0x1c00,  ti99_2_charlayout, 0, 1 )
-GFXDECODE_END
+	if (page>=0 && page<4)
+	{
+		// ROM, unbanked
+		LOGMASKED(LOG_WARN, "Writing to ROM at %04x ignored (data=%02x)\n", offset, data);
+		return;
+	}
 
+	if (page>=4 && page<6)
+	{
+		LOGMASKED(LOG_WARN, "Writing to ROM at %04x (bank %d) ignored (data=%02x)\n", offset, m_otherbank? 1:0, data);
+		return;
+	}
+
+	if ((page >= m_first_ram_page) && (page < 15))
+	{
+		m_ram->pointer()[offset - m_ram_start] = data;
+		return;
+	}
+
+	LOGMASKED(LOG_WARN, "Unmapped write access at %04x\n", offset);
+}
 
 /*
-  Memory map - see description above
+    Called by the VDC as a vblank interrupt
 */
-
-void ti99_2_state::ti99_2_memmap(address_map &map)
+WRITE_LINE_MEMBER(ti99_2_state::interrupt)
 {
-	map(0x0000, 0x3fff).rom();         /* system ROM */
-	map(0x4000, 0x5fff).bankr("bank1");    /* system ROM, banked on 32kb ROMs protos */
-	map(0x6000, 0xdfff).noprw();         /* free for expansion */
-	map(0xe000, 0xebff).ram();         /* system RAM */
-	map(0xec00, 0xeeff).ram().share("videoram");
-	map(0xef00, 0xefff).ram();         /* system RAM */
-	map(0xf000, 0xffff).noprw();         /* free for expansion (and internal processor RAM) */
+	LOGMASKED(LOG_SIGNALS, "Interrupt: %d\n", state);
+	m_maincpu->set_input_line(INT_9995_INT4, state);
 }
-
 
 /*
-  CRU map - see description above
+    Called by the VDC to HOLD the CPU
 */
-
-/* current keyboard row */
-
-/* write the current keyboard row */
-WRITE8_MEMBER(ti99_2_state::ti99_2_write_kbd)
+WRITE_LINE_MEMBER(ti99_2_state::hold)
 {
-	offset &= 0x7;  /* other address lines are not decoded */
-
-	if (offset <= 2)
-	{
-		/* this implementation is just a guess */
-		if (data)
-			m_keyRow |= 1 << offset;
-		else
-			m_keyRow &= ~ (1 << offset);
-	}
-	/* now, we handle ROM paging */
-	if (m_ROM_paged)
-	{   /* if we have paged ROMs, page according to S0 keyboard interface line */
-		membank("bank1")->set_base((m_keyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
-	}
+	LOGMASKED(LOG_SIGNALS, "HOLD: %d\n", state);
+	m_maincpu->hold_line(state);
 }
 
-WRITE8_MEMBER(ti99_2_state::ti99_2_write_misc_cru)
+/*
+    Called by the CPU to ack the HOLD
+*/
+WRITE_LINE_MEMBER(ti99_2_state::holda)
 {
-	offset &= 0x7;  /* other address lines are not decoded */
-
-	switch (offset)
-	{
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-		/* ALC I/O */
-		break;
-	case 4:
-		/* ALC HSK */
-		break;
-	case 5:
-		/* ALC BAV */
-		break;
-	case 6:
-		/* cassette output */
-		break;
-	case 7:
-		/* video enable */
-		break;
-	}
+	LOGMASKED(LOG_SIGNALS, "HOLDA: %d\n", state);
 }
 
-/* read keys in the current row */
-READ8_MEMBER(ti99_2_state::ti99_2_read_kbd)
+void ti99_2_state::ti99_224(machine_config& config)
 {
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
+	ti99_2(config);
+	// Video hardware
+	VIDEO99224(config, m_videoctrl, XTAL(10'738'635));
+	m_videoctrl->readmem_cb().set(FUNC(ti99_2_state::mem_read));
+	m_videoctrl->hold_cb().set(FUNC(ti99_2_state::hold));
+	m_videoctrl->int_cb().set(FUNC(ti99_2_state::interrupt));
 
-	return ioport(keynames[m_keyRow])->read();
+	using namespace bus::ti99::internal;
+	screen_device& screen(SCREEN(config, TI992_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(10'738'635) / 2,
+			video992_device::TOTAL_HORZ,
+			video992_device::HORZ_DISPLAY_START-12,
+			video992_device::HORZ_DISPLAY_START + 256 + 12,
+			video992_device::TOTAL_VERT_NTSC,
+			video992_device::VERT_DISPLAY_START_NTSC - 12,
+			video992_device::VERT_DISPLAY_START_NTSC + 192 + 12 );
+	screen.set_screen_update(TI992_VDC_TAG, FUNC(video992_device::screen_update));
+
+	// I/O interface circuit. No banking callback.
+	IO99224(config, m_io992, 0);
 }
 
-READ8_MEMBER(ti99_2_state::ti99_2_read_misc_cru)
+void ti99_2_state::ti99_232(machine_config& config)
 {
-	return 0;
+	ti99_2(config);
+	// Video hardware
+	VIDEO99232(config, m_videoctrl, XTAL(10'738'635));
+	m_videoctrl->readmem_cb().set(FUNC(ti99_2_state::mem_read));
+	m_videoctrl->hold_cb().set(FUNC(ti99_2_state::hold));
+	m_videoctrl->int_cb().set(FUNC(ti99_2_state::interrupt));
+
+	using namespace bus::ti99::internal;
+	screen_device& screen(SCREEN(config, TI992_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(10'738'635) / 2,
+			video992_device::TOTAL_HORZ,
+			video992_device::HORZ_DISPLAY_START-12,
+			video992_device::HORZ_DISPLAY_START + 256 + 12,
+			video992_device::TOTAL_VERT_NTSC,
+			video992_device::VERT_DISPLAY_START_NTSC - 12,
+			video992_device::VERT_DISPLAY_START_NTSC + 192 + 12 );
+	screen.set_screen_update(TI992_VDC_TAG, FUNC(video992_device::screen_update));
+
+	// I/O interface circuit
+	IO99232(config, m_io992, 0).rombank_cb().set(FUNC(ti99_2_state::rombank_set));
 }
 
-void ti99_2_state::ti99_2_io(address_map &map)
+void ti99_2_state::ti99_2(machine_config& config)
 {
-	map(0x0E00, 0x0E7f).r(this, FUNC(ti99_2_state::ti99_2_read_kbd));
-	map(0x0E80, 0x0Eff).r(this, FUNC(ti99_2_state::ti99_2_read_misc_cru));
-	map(0x7000, 0x73ff).w(this, FUNC(ti99_2_state::ti99_2_write_kbd));
-	map(0x7400, 0x77ff).w(this, FUNC(ti99_2_state::ti99_2_write_misc_cru));
-}
-
-
-/* ti99/2 : 54-key keyboard */
-static INPUT_PORTS_START(ti99_2)
-
-	PORT_START("LINE0")    /* col 0 */
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 ! DEL") PORT_CODE(KEYCODE_1)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 @ INS") PORT_CODE(KEYCODE_2)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $ CLEAR") PORT_CODE(KEYCODE_4)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 % BEGIN") PORT_CODE(KEYCODE_5)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 ^ PROC'D") PORT_CODE(KEYCODE_6)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 & AID") PORT_CODE(KEYCODE_7)
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 * REDO") PORT_CODE(KEYCODE_8)
-
-	PORT_START("LINE1")    /* col 1 */
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("q Q") PORT_CODE(KEYCODE_Q)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("w W ~") PORT_CODE(KEYCODE_W)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("e E (UP)") PORT_CODE(KEYCODE_E)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("r R [") PORT_CODE(KEYCODE_R)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("t T ]") PORT_CODE(KEYCODE_T)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("y Y") PORT_CODE(KEYCODE_Y)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("i I ?") PORT_CODE(KEYCODE_I)
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 ( BACK") PORT_CODE(KEYCODE_9)
-
-	PORT_START("LINE2")    /* col 2 */
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("a A") PORT_CODE(KEYCODE_A)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("s S (LEFT)") PORT_CODE(KEYCODE_S)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("d D (RIGHT)") PORT_CODE(KEYCODE_D)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("f F {") PORT_CODE(KEYCODE_F)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("h H") PORT_CODE(KEYCODE_H)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("u U _") PORT_CODE(KEYCODE_U)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("o O '") PORT_CODE(KEYCODE_O)
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 )") PORT_CODE(KEYCODE_0)
-
-	PORT_START("LINE3")    /* col 3 */
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z Z \\") PORT_CODE(KEYCODE_Z)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x X (DOWN)") PORT_CODE(KEYCODE_X)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c C `") PORT_CODE(KEYCODE_C)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("g G }") PORT_CODE(KEYCODE_G)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("j J") PORT_CODE(KEYCODE_J)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k K") PORT_CODE(KEYCODE_K)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p P \"") PORT_CODE(KEYCODE_P)
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("= + QUIT") PORT_CODE(KEYCODE_EQUALS)
-
-	PORT_START("LINE4")    /* col 4 */
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT/*KEYCODE_CAPSLOCK*/)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v V") PORT_CODE(KEYCODE_V)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("n N") PORT_CODE(KEYCODE_N)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("l L") PORT_CODE(KEYCODE_L)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("; :") PORT_CODE(KEYCODE_COLON)
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/ -") PORT_CODE(KEYCODE_SLASH)
-
-	PORT_START("LINE5")    /* col 5 */
-		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_ESC)
-		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("(SPACE)") PORT_CODE(KEYCODE_SPACE)
-		PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b B") PORT_CODE(KEYCODE_B)
-		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("m M") PORT_CODE(KEYCODE_M)
-		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP)
-		PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FCTN") PORT_CODE(KEYCODE_LALT)
-		PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_RSHIFT)
-		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER)
-
-	PORT_START("LINE6")    /* col 6 */
-		PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("LINE7")    /* col 7 */
-		PORT_BIT(0xFF, IP_ACTIVE_LOW, IPT_UNUSED)
-
-INPUT_PORTS_END
-
-MACHINE_CONFIG_START(ti99_2_state::ti99_2)
-	// basic machine hardware
 	// TMS9995, standard variant
-	// We have no lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, 10700000, ti99_2_memmap, ti99_2_io)
+	// Documents state that there is a divider by 2 for the clock rate
+	// Experiments with real consoles proved them wrong.
+	TMS9995(config, m_maincpu, XTAL(10'738'635));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti99_2_state::memmap);
+	m_maincpu->set_addrmap(AS_IO, &ti99_2_state::crumap);
+	m_maincpu->holda_cb().set(FUNC(ti99_2_state::holda));
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ti99_2_state,  ti99_2_vblank_interrupt)
+	// RAM 4 KiB
+	// Early documents indicate 2 KiB RAM, but this does not work with
+	// either ROM version, so we have to assume that the 2 KiB were never
+	// sufficient, not even in the initial design
+	RAM(config, TI992_RAM_TAG).set_default_size("4096").set_default_value(0);
 
-	/* video hardware */
-	/*MCFG_TMS9928A( &tms9918_interface )*/
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 192)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ti99_2_state, screen_update_ti99_2)
-	MCFG_SCREEN_PALETTE("palette")
+	// Cassette drives
+	// There is no route from the cassette to some audio input,
+	// so we don't hear it.
+	CASSETTE(config, "cassette", 0);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ti99_2)
-	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
-MACHINE_CONFIG_END
-
-
+	// Hexbus
+	HEXBUS(config, TI_HEXBUS_TAG, 0, hexbus_options, nullptr);
+}
 
 /*
   ROM loading
 */
 ROM_START(ti99_224)
-	/*CPU memory space*/
-	ROM_REGION(0x10000,"maincpu",0)
-	ROM_LOAD("992rom.bin", 0x0000, 0x6000, NO_DUMP)      /* system ROMs */
+	// The 24K version is an early design; the PCB does not have any socket names
+	ROM_REGION(0x6000, TI992_ROM ,0)
+	ROM_LOAD("rom0000.bin", 0x0000, 0x2000, CRC(c57436f1) SHA1(71d9048fed0317cfcc4cd966dcbc3bc163080cf9))
+	ROM_LOAD("rom2000.bin", 0x2000, 0x2000, CRC(be22c6c4) SHA1(931931d61732bacdab1da227c01b8045ca860f0b))
+	ROM_LOAD("rom4000.bin", 0x4000, 0x2000, CRC(926ca20e) SHA1(91624a16aa2c62c7ebc23128308709efdebddca3))
 ROM_END
 
 ROM_START(ti99_232)
-	/*64kb CPU memory space + 8kb to read the extra ROM page*/
-	ROM_REGION(0x12000,"maincpu",0)
-	ROM_LOAD("992rom32.bin", 0x0000, 0x6000, NO_DUMP)    /* system ROM - 32kb */
-	ROM_CONTINUE(0x10000,0x2000)
+	ROM_REGION(0x12000, TI992_ROM, 0)
+	// The 32K version is a more elaborate design; the ROMs for addresses 0000-1fff
+	// and the second bank for 4000-5fff are stacked on the socket U2
+	ROM_LOAD("rom0000.u2a", 0x0000, 0x2000, CRC(01b94f06) SHA1(ef2e0c5f0492d7d024ebfe3fad29c2b57ea849e1))
+	ROM_LOAD("rom2000.u12", 0x2000, 0x2000, CRC(0a32f80a) SHA1(32ed98481998be295e637eaa2117337cfa4a7984))
+	ROM_LOAD("rom4000a.u3", 0x4000, 0x2000, CRC(10c11fab) SHA1(d43e0952538e66e2cedc307b71b65cb388cbe8e3))
+	ROM_LOAD("rom4000b.u2b", 0x10000, 0x2000, CRC(34dd52ed) SHA1(e01892b1b110d7d592a7e7f1f39f9f46ea0818db))
 ROM_END
 
-/* one expansion/cartridge port on the back */
-/* one cassette unit port */
-/* Hex-bus disk controller: supports up to 4 floppy disk drives */
-/* None of these is supported (tape should be easy to emulate) */
-
-//      YEAR    NAME        PARENT     COMPAT  MACHINE  INPUT   STATE          INIT        COMPANY              FULLNAME                               FLAGS
-COMP(   1983,   ti99_224,   0,         0,      ti99_2,  ti99_2, ti99_2_state,  ti99_2_24,  "Texas Instruments", "TI-99/2 BASIC Computer (24kb ROMs)" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(   1983,   ti99_232,   ti99_224,  0,      ti99_2,  ti99_2, ti99_2_state,  ti99_2_32,  "Texas Instruments", "TI-99/2 BASIC Computer (32kb ROMs)" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//      YEAR    NAME      PARENT    COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY              FULLNAME                               FLAGS
+COMP(   1983,   ti99_224, 0,        0,      ti99_224, 0, ti99_2_state, empty_init, "Texas Instruments", "TI-99/2 BASIC Computer (24 KiB ROM)" , MACHINE_NO_SOUND_HW )
+COMP(   1983,   ti99_232, 0,         0,      ti99_232, 0, ti99_2_state, empty_init, "Texas Instruments", "TI-99/2 BASIC Computer (32 KiB ROM)" , MACHINE_NO_SOUND_HW )

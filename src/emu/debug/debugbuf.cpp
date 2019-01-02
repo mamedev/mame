@@ -194,7 +194,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 	case -1: m_pc_delta_to_bytes = [](offs_t delta) { return delta << 1; }; break;
 	case  0: m_pc_delta_to_bytes = [](offs_t delta) { return delta;      }; break;
 	case  3: m_pc_delta_to_bytes = [](offs_t delta) { return delta >> 3; }; break;
-	default: throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer::setup_methods: Abnormal address buf shift\n");
+	default: throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer::setup_methods: Abnormal address bus shift\n");
 	}
 
 	// Define the filler
@@ -719,7 +719,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 2);
 						const u32 *src = get_ptr<u32>(pc);
-						return src[0] | (u64(src[1]) << 32);
+						return u64(src[0]) | (u64(src[1]) << 32);
 					};
 				}
 				break;
@@ -782,7 +782,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 4);
 						const u16 *src = get_ptr<u16>(pc);
-						return src[0] | (src[1] << 16) | (u64(src[2]) << 32) | (u64(src[3]) << 48);
+						return u64(src[0]) | (u64(src[1]) << 16) | (u64(src[2]) << 32) | (u64(src[3]) << 48);
 					};
 				}
 				break;
@@ -815,7 +815,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 4);
 						const u16 *src = get_ptr<u16>(pc);
-						return (u64(src[0]) << 48) | (u64(src[1]) << 32) | u32(src[2] << 16) | src[3];
+						return (u64(src[0]) << 48) | (u64(src[1]) << 32) | u64(src[2] << 16) | u64(src[3]);
 					};
 				}
 				break;
@@ -872,7 +872,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 8);
 						const u8 *src = get_ptr<u8>(pc);
-						return src[0] | (src[1] << 8) | (src[2] << 16) | u32(src[3] << 24) |
+						return u64(src[0]) | (u64(src[1]) << 8) | (u64(src[2]) << 16) | (u64(src[3]) << 24) |
 						(u64(src[4]) << 32) | (u64(src[5]) << 40) | (u64(src[6]) << 48) | (u64(src[7]) << 56);
 					};
 				}
@@ -920,8 +920,8 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 					m_do_r64 = [this](offs_t pc) -> u64 {
 						fill(pc, 8);
 						const u8 *src = get_ptr<u8>(pc);
-						return (u64(src[0]) << 56) | (u64(src[1]) << 32) | (u64(src[2]) << 40) | (u64(src[3]) << 32) |
-						(src[4] << 24) | (src[5] << 16) | (src[6] << 8) | src[7];
+						return (u64(src[0]) << 56) | (u64(src[1]) << 48) | (u64(src[2]) << 40) | (u64(src[3]) << 32) |
+						(u64(src[4]) << 24) | (u64(src[5]) << 16) | (u64(src[6]) << 8) | u64(src[7]);
 					};
 				}
 				break;
@@ -945,7 +945,7 @@ void debug_disasm_buffer::debug_data_buffer::setup_methods()
 			m_do_r64 = [this](offs_t pc) -> u64 {
 				fill(pc, 64);
 				const u16 *src = reinterpret_cast<u16 *>(&m_buffer[0]) + ((pc - m_lstart) >> 4);
-				return src[0] | (src[1] << 16) | (u64(src[2]) << 32) | (u64(src[3]) << 48);
+				return u64(src[0]) | (u64(src[1]) << 16) | (u64(src[2]) << 32) | (u64(src[3]) << 48);
 			};
 			break;
 		}
@@ -1193,20 +1193,22 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 	m_buf_params(dynamic_cast<device_disasm_interface &>(device).get_disassembler()),
 	m_flags(m_dintf.interface_flags())
 {
+	address_space &pspace = m_mintf->space(AS_PROGRAM);
+
 	if(m_flags & util::disasm_interface::INTERNAL_DECRYPTION) {
-		m_buf_raw.set_source(m_mintf->space(AS_PROGRAM));
+		m_buf_raw.set_source(pspace);
 		m_buf_opcodes.set_source(m_buf_raw, true);
 		if((m_flags & util::disasm_interface::SPLIT_DECRYPTION) == util::disasm_interface::SPLIT_DECRYPTION)
 			m_buf_params.set_source(m_buf_raw, false);
 	} else {
 		if(m_mintf->has_space(AS_OPCODES)) {
 			m_buf_opcodes.set_source(m_mintf->space(AS_OPCODES));
-			m_buf_params.set_source(m_mintf->space(AS_PROGRAM));
+			m_buf_params.set_source(pspace);
 		} else
-			m_buf_opcodes.set_source(m_mintf->space(AS_PROGRAM));
+			m_buf_opcodes.set_source(pspace);
 	}
 
-	m_pc_mask = m_mintf->space(AS_PROGRAM).logaddrmask();
+	m_pc_mask = pspace.logaddrmask();
 
 	if(m_flags & util::disasm_interface::PAGED)
 		m_page_mask = (1 << m_dintf.page_address_bits()) - 1;
@@ -1253,8 +1255,8 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 	}
 
 	// pc to string conversion
-	int aw = m_mintf->space(AS_PROGRAM).addr_width();
-	bool is_octal = m_mintf->space(AS_PROGRAM).is_octal();
+	int aw = pspace.logaddr_width();
+	bool is_octal = pspace.is_octal();
 	if((m_flags & util::disasm_interface::PAGED2LEVEL) == util::disasm_interface::PAGED2LEVEL) {
 		int bits1 = m_dintf.page_address_bits();
 		int bits2 = m_dintf.page2_address_bits();

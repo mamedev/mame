@@ -5,6 +5,10 @@
     Midway MCR-3 system
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_MCR3_H
+#define MAME_INCLUDES_MCR3_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "machine/adc0844.h"
@@ -14,12 +18,12 @@ class mcr3_state : public mcr_state
 {
 public:
 	mcr3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mcr_state(mconfig, type, tag),
-		m_spyhunt_alpharam(*this, "spyhunt_alpha"),
-		m_maxrpm_adc(*this, "adc"),
-		m_lamplatch(*this, "lamplatch"),
-		m_spyhunt_lamp(*this, "lamp%u", 0U),
-		m_screen(*this, "screen")
+		: mcr_state(mconfig, type, tag)
+		, m_spyhunt_alpharam(*this, "spyhunt_alpha")
+		, m_maxrpm_adc(*this, "adc")
+		, m_lamplatch(*this, "lamplatch")
+		, m_screen(*this, "screen")
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(mcr3_videoram_w);
@@ -45,20 +49,19 @@ public:
 	DECLARE_READ8_MEMBER(spyhunt_ip1_r);
 	DECLARE_READ8_MEMBER(spyhunt_ip2_r);
 	DECLARE_WRITE8_MEMBER(spyhunt_op4_w);
-	template<int n> DECLARE_WRITE_LINE_MEMBER(spyhunt_lamp_w);
 	DECLARE_READ8_MEMBER(turbotag_ip2_r);
 	DECLARE_READ8_MEMBER(turbotag_kludge_r);
-	DECLARE_DRIVER_INIT(crater);
-	DECLARE_DRIVER_INIT(demoderm);
-	DECLARE_DRIVER_INIT(turbotag);
-	DECLARE_DRIVER_INIT(powerdrv);
-	DECLARE_DRIVER_INIT(stargrds);
-	DECLARE_DRIVER_INIT(maxrpm);
-	DECLARE_DRIVER_INIT(rampage);
-	DECLARE_DRIVER_INIT(spyhunt);
-	DECLARE_DRIVER_INIT(sarge);
+	void init_crater();
+	void init_demoderm();
+	void init_turbotag();
+	void init_powerdrv();
+	void init_stargrds();
+	void init_maxrpm();
+	void init_rampage();
+	void init_spyhunt();
+	void init_sarge();
 	DECLARE_VIDEO_START(spyhunt);
-	DECLARE_PALETTE_INIT(spyhunt);
+	void spyhunt_palette(palette_device &palette) const;
 
 	uint32_t screen_update_mcr3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spyhunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -74,14 +77,15 @@ public:
 	void spyhunt_map(address_map &map);
 	void spyhunt_portmap(address_map &map);
 protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 private:
 	optional_shared_ptr<uint8_t> m_spyhunt_alpharam;
 	optional_device<adc0844_device> m_maxrpm_adc;
 	optional_device<cd4099_device> m_lamplatch;
-	output_finder<8> m_spyhunt_lamp;
 	required_device<screen_device> m_screen;
+	output_finder<3> m_lamps;
 
 	uint8_t m_latched_input;
 	uint8_t m_maxrpm_adc_control;
@@ -101,3 +105,5 @@ private:
 	void mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy, int interlaced);
 	void mcr_common_init();
 };
+
+#endif // MAME_INCLUDES_MCR3_H

@@ -21,6 +21,7 @@ TODO:
 #include "machine/eepromser.h"
 #include "sound/ym2151.h"
 #include "sound/k053260.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -179,14 +180,14 @@ void asterix_state::main_map(address_map &map)
 	map(0x300000, 0x30001f).rw(m_k053244, FUNC(k05324x_device::k053244_lsb_r), FUNC(k05324x_device::k053244_lsb_w));
 	map(0x380000, 0x380001).portr("IN0");
 	map(0x380002, 0x380003).portr("IN1");
-	map(0x380100, 0x380101).w(this, FUNC(asterix_state::control2_w));
+	map(0x380100, 0x380101).w(FUNC(asterix_state::control2_w));
 	map(0x380200, 0x380203).rw("k053260", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x380300, 0x380301).w(this, FUNC(asterix_state::sound_irq_w));
-	map(0x380400, 0x380401).w(this, FUNC(asterix_state::asterix_spritebank_w));
+	map(0x380300, 0x380301).w(FUNC(asterix_state::sound_irq_w));
+	map(0x380400, 0x380401).w(FUNC(asterix_state::asterix_spritebank_w));
 	map(0x380500, 0x38051f).w(m_k053251, FUNC(k053251_device::lsb_w));
 	map(0x380600, 0x380601).noprw();                             // Watchdog
 	map(0x380700, 0x380707).w(m_k056832, FUNC(k056832_device::b_word_w));
-	map(0x380800, 0x380803).w(this, FUNC(asterix_state::protection_w));
+	map(0x380800, 0x380803).w(FUNC(asterix_state::protection_w));
 	map(0x400000, 0x400fff).rw(m_k056832, FUNC(k056832_device::ram_half_word_r), FUNC(k056832_device::ram_half_word_w));
 	map(0x420000, 0x421fff).r(m_k056832, FUNC(k056832_device::old_rom_word_r));   // Passthrough to tile roms
 	map(0x440000, 0x44003f).w(m_k056832, FUNC(k056832_device::word_w));
@@ -198,7 +199,7 @@ void asterix_state::sound_map(address_map &map)
 	map(0xf000, 0xf7ff).ram();
 	map(0xf801, 0xf801).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
 	map(0xfa00, 0xfa2f).rw("k053260", FUNC(k053260_device::read), FUNC(k053260_device::write));
-	map(0xfc00, 0xfc00).w(this, FUNC(asterix_state::sound_arm_nmi_w));
+	map(0xfc00, 0xfc00).w(FUNC(asterix_state::sound_arm_nmi_w));
 	map(0xfe00, 0xfe00).w("ymsnd", FUNC(ym2151_device::register_w));
 }
 
@@ -259,54 +260,51 @@ void asterix_state::machine_reset()
 	}
 }
 
-MACHINE_CONFIG_START(asterix_state::asterix)
-
+void asterix_state::asterix(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2) // 12MHz
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", asterix_state,  asterix_interrupt)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2); // 12MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &asterix_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(asterix_state::asterix_interrupt));
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/4) // 8MHz Z80E ??
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(32'000'000)/4); // 8MHz Z80E ??
+	m_audiocpu->set_addrmap(AS_PROGRAM, &asterix_state::sound_map);
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(asterix_state, screen_update_asterix)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(asterix_state::screen_update_asterix));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(asterix_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 1, "none")
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(asterix_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 1);
+	m_k056832->set_palette("palette");
 
-	MCFG_DEVICE_ADD("k053244", K053244, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(-3, -1)
-	MCFG_K05324X_CB(asterix_state, sprite_callback)
+	K053244(config, m_k053244, 0);
+	m_k053244->set_palette("palette");
+	m_k053244->set_offsets(-3, -1);
+	m_k053244->set_sprite_callback(FUNC(asterix_state::sprite_callback), this);
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'000'000)/8) // 4MHz
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, "ymsnd", XTAL(32'000'000)/8).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); // 4MHz
 
-	MCFG_K053260_ADD("k053260", XTAL(32'000'000)/8) // 4MHz
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
-MACHINE_CONFIG_END
+	k053260_device &k053260(K053260(config, "k053260", XTAL(32'000'000)/8)); // 4MHz
+	k053260.add_route(0, "lspeaker", 0.75);
+	k053260.add_route(1, "rspeaker", 0.75);
+}
 
 
 ROM_START( asterix )
@@ -435,7 +433,7 @@ ROM_START( asterixj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(asterix_state,asterix)
+void asterix_state::init_asterix()
 {
 #if 0
 	*(uint16_t *)(memregion("maincpu")->base() + 0x07f34) = 0x602a;
@@ -444,8 +442,8 @@ DRIVER_INIT_MEMBER(asterix_state,asterix)
 }
 
 
-GAME( 1992, asterix,    0,       asterix, asterix, asterix_state, asterix, ROT0, "Konami", "Asterix (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixeac, asterix, asterix, asterix, asterix_state, asterix, ROT0, "Konami", "Asterix (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixeaa, asterix, asterix, asterix, asterix_state, asterix, ROT0, "Konami", "Asterix (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixaad, asterix, asterix, asterix, asterix_state, asterix, ROT0, "Konami", "Asterix (ver AAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, asterixj,   asterix, asterix, asterix, asterix_state, asterix, ROT0, "Konami", "Asterix (ver JAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterix,    0,       asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixeac, asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixeaa, asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixaad, asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver AAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, asterixj,   asterix, asterix, asterix, asterix_state, init_asterix, ROT0, "Konami", "Asterix (ver JAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

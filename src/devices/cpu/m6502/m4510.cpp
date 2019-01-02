@@ -37,7 +37,7 @@ std::unique_ptr<util::disasm_interface> m4510_device::create_disassembler()
 
 void m4510_device::device_start()
 {
-	if(direct_disabled)
+	if(cache_disabled)
 		mintf = std::make_unique<mi_4510_nd>(this);
 	else
 		mintf = std::make_unique<mi_4510_normal>(this);
@@ -82,12 +82,12 @@ uint8_t m4510_device::mi_4510_normal::read(uint16_t adr)
 
 uint8_t m4510_device::mi_4510_normal::read_sync(uint16_t adr)
 {
-	return sdirect->read_byte(base->map(adr));
+	return scache->read_byte(base->map(adr));
 }
 
 uint8_t m4510_device::mi_4510_normal::read_arg(uint16_t adr)
 {
-	return direct->read_byte(base->map(adr));
+	return cache->read_byte(base->map(adr));
 }
 
 void m4510_device::mi_4510_normal::write(uint16_t adr, uint8_t val)

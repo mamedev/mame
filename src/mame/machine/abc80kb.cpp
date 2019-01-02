@@ -127,8 +127,8 @@ void abc80_keyboard_device::abc80_keyboard_io(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(abc80_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8048_TAG, I8048, 4000000)
-	MCFG_CPU_IO_MAP(abc80_keyboard_io)
+	MCFG_DEVICE_ADD(I8048_TAG, I8048, 4000000)
+	MCFG_DEVICE_IO_MAP(abc80_keyboard_io)
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 

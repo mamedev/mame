@@ -11,6 +11,6 @@
 
 #pragma once
 
-SLOT_INTERFACE_EXTERN( svi_expander_modules );
+void svi_expander_modules(device_slot_interface &device);
 
 #endif // MAME_BUS_SVI3X8_EXPANDER_MODULES_H

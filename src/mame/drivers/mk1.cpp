@@ -55,21 +55,25 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_digits(*this, "digit%u", 0U)
-		{ }
+		, m_leds(*this, "led%u", 0U)
+	{ }
 
+	void mk1(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(mk1_f8_r);
 	DECLARE_WRITE8_MEMBER(mk1_f8_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mk1_update_leds);
-	F3853_INTERRUPT_REQ_CB(mk1_interrupt);
-	void mk1(machine_config &config);
 	void mk1_io(address_map &map);
 	void mk1_mem(address_map &map);
-private:
-	uint8_t m_f8[2];
-	uint8_t m_led[4];
+
 	virtual void machine_start() override;
+
+	uint8_t m_f8[2];
+	uint8_t m_led_data[4];
 	required_device<cpu_device> m_maincpu;
 	output_finder<4> m_digits;
+	output_finder<4> m_leds;
 };
 
 
@@ -106,10 +110,10 @@ WRITE8_MEMBER( mk1_state::mk1_f8_w )
 	/* 0 is high and allows also input */
 	m_f8[offset] = data;
 
-	if ( ! ( m_f8[1] & 1 ) ) m_led[0] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
-	if ( ! ( m_f8[1] & 2 ) ) m_led[1] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
-	if ( ! ( m_f8[1] & 4 ) ) m_led[2] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
-	if ( ! ( m_f8[1] & 8 ) ) m_led[3] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( m_f8[1] & 1 ) ) m_led_data[0] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( m_f8[1] & 2 ) ) m_led_data[1] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( m_f8[1] & 4 ) ) m_led_data[2] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
+	if ( ! ( m_f8[1] & 8 ) ) m_led_data[3] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
 }
 
 void mk1_state::mk1_mem(address_map &map)
@@ -121,7 +125,7 @@ void mk1_state::mk1_mem(address_map &map)
 
 void mk1_state::mk1_io(address_map &map)
 {
-	map(0x0, 0x1).rw(this, FUNC(mk1_state::mk1_f8_r), FUNC(mk1_state::mk1_f8_w));
+	map(0x0, 0x1).rw(FUNC(mk1_state::mk1_f8_r), FUNC(mk1_state::mk1_f8_w));
 	map(0xc, 0xf).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
@@ -166,9 +170,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk1_state::mk1_update_leds)
 {
 	for (int i = 0; i < 4; i++)
 	{
-		m_digits[i] = m_led[i] >> 1;
-		output().set_led_value(i, m_led[i] & 0x01);
-		m_led[i] = 0;
+		m_digits[i] = m_led_data[i] >> 1;
+		m_leds[i] = m_led_data[i] & 0x01;
+		m_led_data[i] = 0;
 	}
 }
 
@@ -176,28 +180,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk1_state::mk1_update_leds)
 void mk1_state::machine_start()
 {
 	m_digits.resolve();
+	m_leds.resolve();
 }
 
-
-F3853_INTERRUPT_REQ_CB(mk1_state::mk1_interrupt)
-{
-	m_maincpu->set_input_line_vector(F8_INPUT_LINE_INT_REQ, addr);
-	m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE);
-}
 
 MACHINE_CONFIG_START(mk1_state::mk1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", F8, MAIN_CLOCK )        /* MK3850 */
-	MCFG_CPU_PROGRAM_MAP(mk1_mem)
-	MCFG_CPU_IO_MAP(mk1_io)
+	MCFG_DEVICE_ADD( "maincpu", F8, MAIN_CLOCK )        /* MK3850 */
+	MCFG_DEVICE_PROGRAM_MAP(mk1_mem)
+	MCFG_DEVICE_IO_MAP(mk1_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("f3853", f3853_device, int_acknowledge)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-
-	MCFG_DEVICE_ADD("f3853", F3853, MAIN_CLOCK)
-	MCFG_F3853_EXT_INPUT_CB(mk1_state, mk1_interrupt)
+	f3853_device &f3853(F3853(config, "f3853", MAIN_CLOCK));
+	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mk1)
+	config.set_default_layout(layout_mk1);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", mk1_state, mk1_update_leds, attotime::from_hz(30))
 MACHINE_CONFIG_END
@@ -216,5 +215,5 @@ ROM_END
 ***************************************************************************/
 
 // seams to be developed by mostek (MK)
-//    YEAR   NAME    PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY  FULLNAME                FLAGS
-CONS( 1979,  ccmk1,  0,      0,      mk1,     mk1,   mk1_state, 0,    "Novag", "Chess Champion: MK I", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE      INIT        COMPANY  FULLNAME                FLAGS
+CONS( 1979, ccmk1, 0,      0,      mk1,     mk1,   mk1_state, empty_init, "Novag", "Chess Champion: MK I", MACHINE_NO_SOUND_HW )

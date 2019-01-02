@@ -7,6 +7,7 @@
 
 #include "rs232.h"
 #include "dipty.h"
+#include "diserial.h"
 
 class pseudo_terminal_device : public device_t,
 								public device_serial_interface,

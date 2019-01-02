@@ -301,6 +301,7 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 #include "machine/s3520cf.h"
 #include "machine/rp5h01.h"
 #include "video/m50458.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "speaker.h"
 
@@ -317,6 +318,13 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void nss(machine_config &config);
+
+	void init_nss();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
+
+private:
 	required_device<cpu_device> m_bioscpu;
 	required_device<m50458_device> m_m50458;
 	required_device<s3520cf_device> m_s3520cf;
@@ -342,15 +350,11 @@ public:
 	DECLARE_WRITE8_MEMBER(port_04_w);
 	DECLARE_WRITE8_MEMBER(port_07_w);
 
-	DECLARE_DRIVER_INIT(nss);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(nss_vblank_irq);
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
-	void nss(machine_config &config);
 	void bios_io_map(address_map &map);
 	void bios_map(address_map &map);
 	void snes_map(address_map &map);
@@ -369,9 +373,9 @@ uint32_t nss_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, 
 
 void nss_state::snes_map(address_map &map)
 {
-	map(0x000000, 0x7dffff).rw(this, FUNC(nss_state::snes_r_bank1), FUNC(nss_state::snes_w_bank1));
+	map(0x000000, 0x7dffff).rw(FUNC(nss_state::snes_r_bank1), FUNC(nss_state::snes_w_bank1));
 	map(0x7e0000, 0x7fffff).ram();                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	map(0x800000, 0xffffff).rw(this, FUNC(nss_state::snes_r_bank2), FUNC(nss_state::snes_w_bank2));    /* Mirror and ROM */
+	map(0x800000, 0xffffff).rw(FUNC(nss_state::snes_r_bank2), FUNC(nss_state::snes_w_bank2));    /* Mirror and ROM */
 }
 
 READ8_MEMBER(nss_state::spc_ram_100_r)
@@ -388,7 +392,7 @@ void nss_state::spc_mem(address_map &map)
 {
 	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
 	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
-	map(0x0100, 0xffff).rw(this, FUNC(nss_state::spc_ram_100_r), FUNC(nss_state::spc_ram_100_w));
+	map(0x0100, 0xffff).rw(FUNC(nss_state::spc_ram_100_r), FUNC(nss_state::spc_ram_100_w));
 }
 
 /* NSS specific */
@@ -512,10 +516,10 @@ void nss_state::bios_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x9fff).rw(this, FUNC(nss_state::ram_wp_r), FUNC(nss_state::ram_wp_w));
+	map(0x9000, 0x9fff).rw(FUNC(nss_state::ram_wp_r), FUNC(nss_state::ram_wp_w));
 	map(0xa000, 0xa000).portr("EEPROMIN");
 	map(0xc000, 0xdfff).rom().region("ibios_rom", 0x6000);
-	map(0xe000, 0xffff).rw(this, FUNC(nss_state::nss_prot_r), FUNC(nss_state::nss_prot_w));
+	map(0xe000, 0xffff).rw(FUNC(nss_state::nss_prot_r), FUNC(nss_state::nss_prot_w));
 }
 
 READ8_MEMBER(nss_state::port_00_r)
@@ -631,12 +635,12 @@ WRITE8_MEMBER(nss_state::port_07_w)
 void nss_state::bios_io_map(address_map &map)
 {
 	map.global_mask(0x7);
-	map(0x00, 0x00).r(this, FUNC(nss_state::port_00_r)).w(this, FUNC(nss_state::port_00_w));
-	map(0x01, 0x01).portr("FP").w(this, FUNC(nss_state::port_01_w));
-	map(0x02, 0x02).portr("SYSTEM").w(this, FUNC(nss_state::port_02_w));
-	map(0x03, 0x03).portr("RTC").w(this, FUNC(nss_state::port_03_w));
-	map(0x04, 0x04).w(this, FUNC(nss_state::port_04_w));
-	map(0x07, 0x07).w(this, FUNC(nss_state::port_07_w));
+	map(0x00, 0x00).r(FUNC(nss_state::port_00_r)).w(FUNC(nss_state::port_00_w));
+	map(0x01, 0x01).portr("FP").w(FUNC(nss_state::port_01_w));
+	map(0x02, 0x02).portr("SYSTEM").w(FUNC(nss_state::port_02_w));
+	map(0x03, 0x03).portr("RTC").w(FUNC(nss_state::port_03_w));
+	map(0x04, 0x04).w(FUNC(nss_state::port_04_w));
+	map(0x07, 0x07).w(FUNC(nss_state::port_07_w));
 }
 
 void nss_state::machine_start()
@@ -807,7 +811,7 @@ INPUT_PORTS_END
 WRITE_LINE_MEMBER(nss_state::nss_vblank_irq)
 {
 	if (state && m_nmi_enable)
-		m_bioscpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_bioscpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void nss_state::machine_reset()
@@ -831,44 +835,45 @@ void nss_state::machine_reset()
 MACHINE_CONFIG_START(nss_state::nss)
 
 	/* base snes hardware */
-	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68Mhz, also 3.58Mhz */
-	MCFG_CPU_PROGRAM_MAP(snes_map)
+	MCFG_DEVICE_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68Mhz, also 3.58Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(snes_map)
 
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	MCFG_CPU_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
-	MCFG_CPU_PROGRAM_MAP(spc_mem)
+	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
+	MCFG_DEVICE_PROGRAM_MAP(spc_mem)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* nss hardware */
-	MCFG_CPU_ADD("bios", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(bios_map)
-	MCFG_CPU_IO_MAP(bios_io_map)
+	MCFG_DEVICE_ADD("bios", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(bios_map)
+	MCFG_DEVICE_IO_MAP(bios_io_map)
 
 	MCFG_M50458_ADD("m50458", 4000000, "osd") /* TODO: correct clock */
-	MCFG_S3520CF_ADD("s3520cf") /* RTC */
-	MCFG_RP5H01_ADD("rp5h01")
-	MCFG_M6M80011AP_ADD("m6m80011ap")
+	S3520CF(config, m_s3520cf); /* RTC */
+	RP5H01(config, m_rp5h01, 0);
+	M6M80011AP(config, "m6m80011ap");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("spc700", SNES, 0)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("spc700", SNES_SOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	// SNES PPU
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(nss_state, nss_vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nss_state, nss_vblank_irq))
 
-	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(snes_state, snes_open_bus_r))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	SNES_PPU(config, m_ppu, MCLK_NTSC);
+	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
+	m_ppu->set_screen("screen");
 
 	// NSS
 	MCFG_SCREEN_ADD("osd", RASTER)
@@ -890,11 +895,11 @@ MACHINE_CONFIG_END
 	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) \
 	ROM_REGION(0x8000,         "bios",  0)      /* Bios CPU */ \
 	ROM_SYSTEM_BIOS( 0, "single", "Nintendo Super System (Single Cart BIOS)" ) \
-	ROMX_LOAD("nss-ic14.02.ic14", 0x00000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477), ROM_BIOS(1) )   /* bios */ \
+	ROMX_LOAD("nss-ic14.02.ic14", 0x00000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477), ROM_BIOS(0) )   /* bios */ \
 	ROM_SYSTEM_BIOS( 1, "multi", "Nintendo Super System (Multi Cart BIOS)" ) \
-	ROMX_LOAD("nss-c.ic14"  , 0x00000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2), ROM_BIOS(2) )   /* bios */ \
+	ROMX_LOAD("nss-c.ic14"  , 0x00000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2), ROM_BIOS(1) )   /* bios */ \
 	ROM_SYSTEM_BIOS( 2, "single3", "Nintendo Super System (Single Cart BIOS v3, hack?)" ) \
-	ROMX_LOAD("nss-v3.ic14" , 0x00000, 0x8000, CRC(ac385b53) SHA1(e3942f9d508c3c8074c3c3941376c37ca68b8e54), ROM_BIOS(3) )   /* bios */
+	ROMX_LOAD("nss-v3.ic14" , 0x00000, 0x8000, CRC(ac385b53) SHA1(e3942f9d508c3c8074c3c3941376c37ca68b8e54), ROM_BIOS(2) )   /* bios */
 
 
 ROM_START( nss )
@@ -1071,26 +1076,26 @@ ROM_START( nss_sten )
 	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(2fd8475b) SHA1(38af97734649b90e0ea74cb1daeaa431e4295eb9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(nss_state,nss)
+void nss_state::init_nss()
 {
 	uint8_t *PROM = memregion("rp5h01")->base();
 
 	for (int i = 0; i < 0x10; i++)
 		PROM[i] = bitswap<8>(PROM[i],0,1,2,3,4,5,6,7) ^ 0xff;
 
-	DRIVER_INIT_CALL(snes);
+	init_snes();
 }
 
-GAME( 199?, nss,       0,     nss,      snes, nss_state,    snes,   ROT0, "Nintendo",                    "Nintendo Super System BIOS", MACHINE_IS_BIOS_ROOT )
-GAME( 1992, nss_actr,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1992, nss_adam,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "The Addams Family (Nintendo Super System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1992, nss_aten,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Absolute Entertainment Inc.", "David Crane's Amazing Tennis (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1992, nss_con3,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Konami",                      "Contra 3: The Alien Wars (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1992, nss_lwep,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "Lethal Weapon (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1992, nss_ncaa,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Sculptured Software Inc.",    "NCAA Basketball (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1992, nss_rob3,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "Robocop 3 (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1992, nss_skin,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Irem",                        "Skins Game (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // can't start
-GAME( 1992, nss_ssoc,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Human Inc.",                  "Super Soccer (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1991, nss_smw,   nss,   nss,      snes, nss_state,    nss,    ROT0, "Nintendo",                    "Super Mario World (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1991, nss_fzer,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Nintendo",                    "F-Zero (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 1991, nss_sten,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Nintendo",                    "Super Tennis (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, nss,       0,     nss,      snes, nss_state, init_snes, ROT0, "Nintendo",                    "Nintendo Super System BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1992, nss_actr,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, nss_adam,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Ocean",                       "The Addams Family (Nintendo Super System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, nss_aten,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Absolute Entertainment Inc.", "David Crane's Amazing Tennis (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1992, nss_con3,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Konami",                      "Contra 3: The Alien Wars (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1992, nss_lwep,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Ocean",                       "Lethal Weapon (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1992, nss_ncaa,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Sculptured Software Inc.",    "NCAA Basketball (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1992, nss_rob3,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Ocean",                       "Robocop 3 (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1992, nss_skin,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Irem",                        "Skins Game (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // can't start
+GAME( 1992, nss_ssoc,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Human Inc.",                  "Super Soccer (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, nss_smw,   nss,   nss,      snes, nss_state, init_nss,  ROT0, "Nintendo",                    "Super Mario World (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, nss_fzer,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Nintendo",                    "F-Zero (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, nss_sten,  nss,   nss,      snes, nss_state, init_nss,  ROT0, "Nintendo",                    "Super Tennis (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

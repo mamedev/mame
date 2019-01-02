@@ -114,15 +114,6 @@ static const int gauss[]=
 #undef NO_PMOD
 #undef NO_ECHO
 
-#define CPU_RATE        1024000
-#define SAMP_FREQ       32000
-
-
-/* Original SPC DSP took samples 32000 times a second, which is once every (1024000/32000 = 32) cycles. */
-#ifdef UNUSED_DEFINITION
-	static const int               TS_CYC = CPU_RATE / SAMP_FREQ;
-#endif
-
 /* Ptrs to Gaussian table */
 static const int *const G1 = &gauss[256];
 static const int *const G2 = &gauss[512];
@@ -156,10 +147,10 @@ ALLOW_SAVE_TYPE(snes_sound_device::env_state_t32);
 
 
 
-DEFINE_DEVICE_TYPE(SNES, snes_sound_device, "snes_sound", "SNES Custom DSP (SPC700)")
+DEFINE_DEVICE_TYPE(SNES_SOUND, snes_sound_device, "snes_sound", "SNES Custom DSP (SPC700)")
 
 snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SNES, tag, owner, clock)
+	: device_t(mconfig, SNES_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 {
 }
@@ -170,7 +161,7 @@ snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *
 
 void snes_sound_device::device_start()
 {
-	m_channel = machine().sound().stream_alloc(*this, 0, 2, 32000);
+	m_channel = machine().sound().stream_alloc(*this, 0, 2, clock());
 
 	m_ram = make_unique_clear<uint8_t[]>(SNES_SPCRAM_SIZE);
 
@@ -180,7 +171,7 @@ void snes_sound_device::device_start()
 	m_tick_timer = timer_alloc(TIMER_TICK_ID);
 
 	state_register();
-	save_pointer(NAME(m_ram.get()), SNES_SPCRAM_SIZE);
+	save_pointer(NAME(m_ram), SNES_SPCRAM_SIZE);
 }
 
 //-------------------------------------------------

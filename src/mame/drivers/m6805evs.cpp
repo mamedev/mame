@@ -74,8 +74,10 @@ public:
 	{ }
 
 	void m6805evs(machine_config &config);
-	void mem_map(address_map &map);
+
 private:
+	void mem_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset() override;
 };
@@ -83,7 +85,6 @@ private:
 
 void m6805evs_state::mem_map(address_map &map)
 {
-	map.global_mask(0x1fff);
 	map.unmap_value_high();
 
 	// AM_RANGE(0x0000, 0x001f) I/O registers live here
@@ -103,8 +104,10 @@ void m6805evs_state::machine_reset()
 
 MACHINE_CONFIG_START(m6805evs_state::m6805evs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6805, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M6805, XTAL(4'000'000))
+
+//  Needs a 13-bits address bus wide version of the cpu
+//  MCFG_DEVICE_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 ROM_START(m6805evs)
@@ -119,5 +122,5 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY      FULLNAME      FLAGS
-COMP( 1990, m6805evs, 0,        0,      m6805evs, m6805evs, m6805evs_state, 0,    "Motorola",  "M68HC05EVS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME      FLAGS
+COMP( 1990, m6805evs, 0,      0,      m6805evs, m6805evs, m6805evs_state, empty_init, "Motorola", "M68HC05EVS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

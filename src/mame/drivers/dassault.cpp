@@ -280,27 +280,27 @@ void dassault_state::dassault_map(address_map &map)
 
 	map(0x100000, 0x103fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	map(0x140004, 0x140005).w(this, FUNC(dassault_state::main_irq_ack_w));
+	map(0x140004, 0x140005).w(FUNC(dassault_state::main_irq_ack_w));
 	map(0x140006, 0x140007).nopw(); /* ? */
 
 	map(0x180001, 0x180001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	map(0x1c0000, 0x1c000f).r(this, FUNC(dassault_state::dassault_control_r));
-	map(0x1c000a, 0x1c000b).w(this, FUNC(dassault_state::priority_w));
-	map(0x1c000c, 0x1c000d).w(m_spriteram2, FUNC(buffered_spriteram16_device::write));
-	map(0x1c000e, 0x1c000f).w(this, FUNC(dassault_state::dassault_control_w));
+	map(0x1c0000, 0x1c000f).r(FUNC(dassault_state::dassault_control_r));
+	map(0x1c000a, 0x1c000b).w(FUNC(dassault_state::priority_w));
+	map(0x1c000c, 0x1c000d).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write));
+	map(0x1c000e, 0x1c000f).w(FUNC(dassault_state::dassault_control_w));
 
-	map(0x200000, 0x201fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x202000, 0x203fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x200000, 0x201fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x202000, 0x203fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x212000, 0x212fff).writeonly().share("pf2_rowscroll");
-	map(0x220000, 0x22000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x220000, 0x22000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
 
-	map(0x240000, 0x240fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x242000, 0x242fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x240000, 0x240fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x242000, 0x242fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x252000, 0x252fff).writeonly().share("pf4_rowscroll");
-	map(0x260000, 0x26000f).w(m_deco_tilegen2, FUNC(deco16ic_device::pf_control_w));
+	map(0x260000, 0x26000f).w(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_w));
 
-	map(0x3f8000, 0x3fbfff).ram().share("ram"); /* Main ram */
+	map(0x3f8000, 0x3fbfff).ram(); /* Main ram */
 	map(0x3fc000, 0x3fcfff).ram().share("spriteram2"); /* Spriteram (2nd) */
 	map(0x3fe000, 0x3fefff).rw("sharedram", FUNC(mb8421_mb8431_16_device::left_r), FUNC(mb8421_mb8431_16_device::left_w));
 }
@@ -309,13 +309,13 @@ void dassault_state::dassault_sub_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
-	map(0x100000, 0x100001).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
-	map(0x100002, 0x100003).w(this, FUNC(dassault_state::sub_irq_ack_w));
+	map(0x100000, 0x100001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write));
+	map(0x100002, 0x100003).w(FUNC(dassault_state::sub_irq_ack_w));
 	map(0x100004, 0x100007).nopw(); /* ? */
-	map(0x100004, 0x100005).r(this, FUNC(dassault_state::dassault_sub_control_r));
+	map(0x100004, 0x100005).r(FUNC(dassault_state::dassault_sub_control_r));
 
-	map(0x3f8000, 0x3fbfff).ram().share("ram2"); /* Sub cpu ram */
-	map(0x3fc000, 0x3fcfff).ram().share("spriteram"); /* Sprite ram */
+	map(0x3f8000, 0x3fbfff).ram(); /* Sub cpu ram */
+	map(0x3fc000, 0x3fcfff).ram().share("spriteram1"); /* Sprite ram */
 	map(0x3fe000, 0x3fefff).rw("sharedram", FUNC(mb8421_mb8431_16_device::right_r), FUNC(mb8421_mb8431_16_device::right_w));
 }
 
@@ -329,9 +329,7 @@ void dassault_state::sound_map(address_map &map)
 	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x130000, 0x130001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8");
-	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f1fff).ram();
 }
 
 /**********************************************************************************/
@@ -479,8 +477,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	16*8
 };
 
@@ -490,14 +488,12 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(16*8*2,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	64*8
 };
 
-static GFXDECODE_START( dassault )
+static GFXDECODE_START( gfx_dassault )
 	/* "gfx1" is copied to "gfx2" at runtime */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,     0,  32 )    /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     0,  32 )    /* Tiles 16x16 */
@@ -529,100 +525,99 @@ void dassault_state::machine_reset()
 MACHINE_CONFIG_START(dassault_state::dassault)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
-	MCFG_CPU_PROGRAM_MAP(dassault_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq4_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(dassault_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dassault_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
-	MCFG_CPU_PROGRAM_MAP(dassault_sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_assert)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(dassault_sub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/8)    /* Accurate */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, XTAL(32'220'000)/8);    /* Accurate */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dassault_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(8400)) /* 140 CPU slices per frame */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // I was seeing random lockups.. let's see if this helps
 
-	MCFG_DEVICE_ADD("sharedram", MB8421_MB8431_16BIT, 0)
-	MCFG_MB8421_INTL_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
-	MCFG_MB8421_INTR_HANDLER(INPUTLINE("sub", M68K_IRQ_6))
+	mb8421_mb8431_16_device &sharedram(MB8421_MB8431_16BIT(config, "sharedram"));
+	sharedram.intl_callback().set_inputline("maincpu", M68K_IRQ_5);
+	sharedram.intr_callback().set_inputline("sub", M68K_IRQ_6);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)  // same as robocop2(cninja.cpp)? verify this from real pcb.
 	MCFG_SCREEN_UPDATE_DRIVER(dassault_state, screen_update_dassault)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dassault)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(XBGR)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dassault)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 4096);
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0)
-	MCFG_DECO16IC_PF2_COL_BANK(16)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(dassault_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(dassault_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
+	DECO16IC(config, m_deco_tilegen[0], 0);
+	m_deco_tilegen[0]->set_split(0);
+	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf1_col_bank(0);
+	m_deco_tilegen[0]->set_pf2_col_bank(16);
+	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(dassault_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(dassault_state::bank_callback), this);
+	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
+	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[1], 0);
+	m_deco_tilegen[1]->set_split(0);
+	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf1_col_bank(0);
+	m_deco_tilegen[1]->set_pf2_col_bank(16);
+	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(dassault_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(dassault_state::bank_callback), this);
+	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
+	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0)
-	MCFG_DECO16IC_PF2_COL_BANK(16)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(dassault_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(dassault_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(2)
+	DECO_SPRITE(config, m_sprgen[0], 0);
+	m_sprgen[0]->set_gfx_region(3);
+	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-
-	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(3)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-
-	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(4)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-
+	DECO_SPRITE(config, m_sprgen[1], 0);
+	m_sprgen[1]->set_gfx_region(4);
+	m_sprgen[1]->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0)) // IRQ1
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0); // IRQ1
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000)/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_YM2151_ADD("ym2", XTAL(32'220'000)/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(dassault_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	ym2151_device &ym2(YM2151(config, "ym2", XTAL(32'220'000)/9));
+	ym2.irq_handler().set_inputline(m_audiocpu, 1);
+	ym2.port_write_handler().set(FUNC(dassault_state::sound_bankswitch_w));
+	ym2.add_route(0, "lspeaker", 0.45);
+	ym2.add_route(1, "rspeaker", 0.45);
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(32'220'000)/32, PIN7_HIGH) // verified
+	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH) // verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(32'220'000)/16, PIN7_HIGH) // verified
+	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH) // verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END
@@ -1040,22 +1035,7 @@ ROM_END
 /**********************************************************************************/
 
 
-DRIVER_INIT_MEMBER(dassault_state,dassault)
-{
-	const uint8_t *src = memregion("gfx1")->base();
-	uint8_t *dst = memregion("gfx2")->base();
-	std::vector<uint8_t> tmp(0x80000);
-
-	/* Playfield 4 also has access to the char graphics, make things easier
-	by just copying the chars to both banks (if I just used a different gfx
-	bank then the colours would be wrong). */
-	memcpy(&tmp[0x000000], dst + 0x80000, 0x80000);
-	memcpy(dst + 0x090000, &tmp[0x00000], 0x80000);
-	memcpy(dst + 0x080000, src + 0x00000, 0x10000);
-	memcpy(dst + 0x110000, src + 0x10000, 0x10000);
-}
-
-DRIVER_INIT_MEMBER(dassault_state,thndzone)
+void dassault_state::init_dassault()
 {
 	const uint8_t *src = memregion("gfx1")->base();
 	uint8_t *dst = memregion("gfx2")->base();
@@ -1072,9 +1052,9 @@ DRIVER_INIT_MEMBER(dassault_state,thndzone)
 
 /**********************************************************************************/
 
-GAME( 1991, thndzone,  0,        dassault, thndzone,  dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World, Rev 1)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndzonea, thndzone, dassault, thndzone,  dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndzone4, thndzone, dassault, thndzone4, dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World 4 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndzonej, thndzone, dassault, thndzone,  dassault_state, thndzone, ROT0, "Data East Corporation", "Thunder Zone (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, dassault,  thndzone, dassault, dassault,  dassault_state, dassault, ROT0, "Data East Corporation", "Desert Assault (US)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, dassault4, thndzone, dassault, dassault4, dassault_state, dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndzone,  0,        dassault, thndzone,  dassault_state, init_dassault, ROT0, "Data East Corporation", "Thunder Zone (World, Rev 1)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndzonea, thndzone, dassault, thndzone,  dassault_state, init_dassault, ROT0, "Data East Corporation", "Thunder Zone (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndzone4, thndzone, dassault, thndzone4, dassault_state, init_dassault, ROT0, "Data East Corporation", "Thunder Zone (World 4 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndzonej, thndzone, dassault, thndzone,  dassault_state, init_dassault, ROT0, "Data East Corporation", "Thunder Zone (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, dassault,  thndzone, dassault, dassault,  dassault_state, init_dassault, ROT0, "Data East Corporation", "Desert Assault (US)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, dassault4, thndzone, dassault, dassault4, dassault_state, init_dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

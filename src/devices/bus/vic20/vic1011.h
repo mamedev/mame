@@ -22,8 +22,7 @@
 
 // ======================> vic1011_device
 
-class vic1011_device : public device_t,
-	public device_pet_user_port_interface
+class vic1011_device : public device_t, public device_pet_user_port_interface
 {
 public:
 	// construction/destruction
@@ -50,8 +49,6 @@ private:
 
 
 // device type definition
-extern const device_type VIC1011;
-
-
+DECLARE_DEVICE_TYPE(VIC1011, vic1011_device)
 
 #endif // MAME_BUS_VIC20_VIC1011_H

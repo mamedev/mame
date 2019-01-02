@@ -40,23 +40,8 @@
 #define SH2_INT_ABUS    16
 
 #define SH2_DMA_KLUDGE_CB(name)  int name(uint32_t src, uint32_t dst, uint32_t data, int size)
-
 #define SH2_DMA_FIFO_DATA_AVAILABLE_CB(name)  int name(uint32_t src, uint32_t dst, uint32_t data, int size)
-
 #define SH2_FTCSR_READ_CB(name)  void name(uint32_t data)
-
-#define MCFG_SH2_IS_SLAVE(_slave) \
-	downcast<sh2_device &>(*device).set_is_slave(_slave);
-
-#define MCFG_SH2_DMA_KLUDGE_CB(_class, _method) \
-	downcast<sh2_device &>(*device).set_dma_kludge_callback(sh2_device::dma_kludge_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_SH2_FIFO_DATA_AVAIL_CB(_class, _method) \
-	downcast<sh2_device &>(*device).set_dma_fifo_data_available_callback(sh2_device::dma_fifo_data_available_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_SH2_FTCSR_READ_CB(_class, _method) \
-	downcast<sh2_device &>(*device).set_ftcsr_read_callback(sh2_device::ftcsr_read_delegate(&_class::_method, #_class "::" #_method, this));
-
 
 class sh2_frontend;
 
@@ -71,17 +56,36 @@ public:
 
 	// construction/destruction
 	sh2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~sh2_device() override;
 
 	void set_is_slave(int slave) { m_is_slave = slave; }
+
 	template <typename Object> void set_dma_kludge_callback(Object &&cb) { m_dma_kludge_cb = std::forward<Object>(cb); }
+	template <class FunctionClass> void set_dma_kludge_callback(
+		int (FunctionClass::*callback)(uint32_t, uint32_t, uint32_t, int), const char *name)
+	{
+		set_dma_kludge_callback(dma_kludge_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+
 	template <typename Object> void set_dma_fifo_data_available_callback(Object &&cb) { m_dma_fifo_data_available_cb = std::forward<Object>(cb); }
+	template <class FunctionClass> void set_dma_fifo_data_available_callback(
+		int (FunctionClass::*callback)(uint32_t, uint32_t, uint32_t, int), const char *name)
+	{
+		set_dma_fifo_data_available_callback(dma_fifo_data_available_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+
 	template <typename Object> void set_ftcsr_read_callback(Object &&cb) { m_ftcsr_read_cb = std::forward<Object>(cb); }
+	template <class FunctionClass> void set_ftcsr_read_callback(void (FunctionClass::*callback)(uint32_t), const char *name)
+	{
+		set_ftcsr_read_callback(ftcsr_read_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+
 
 	DECLARE_WRITE32_MEMBER( sh7604_w );
 	DECLARE_READ32_MEMBER( sh7604_r );
 	DECLARE_READ32_MEMBER(sh2_internal_a5);
 
-	void sh2_set_frt_input(int state);
+	virtual void set_frt_input(int state) override;
 	void sh2_notify_dma_data_available();
 	void func_fastirq();
 
@@ -98,7 +102,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 4; }
 	virtual uint32_t execute_input_lines() const override { return 16; }
-	virtual uint32_t execute_default_irq_vector() const override { return 0; }
+	virtual uint32_t execute_default_irq_vector(int inputnum) const override { return 0; }
+	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -157,12 +162,12 @@ private:
 
 	uint32_t m_debugger_temp;
 
-	inline uint8_t RB(offs_t A) override;
-	inline uint16_t RW(offs_t A) override;
-	inline uint32_t RL(offs_t A) override;
-	inline void WB(offs_t A, uint8_t V) override;
-	inline void WW(offs_t A, uint16_t V) override;
-	inline void WL(offs_t A, uint32_t V) override;
+	virtual uint8_t RB(offs_t A) override;
+	virtual uint16_t RW(offs_t A) override;
+	virtual uint32_t RL(offs_t A) override;
+	virtual void WB(offs_t A, uint8_t V) override;
+	virtual void WW(offs_t A, uint16_t V) override;
+	virtual void WL(offs_t A, uint32_t V) override;
 
 	virtual void LDCMSR(const uint16_t opcode) override;
 	virtual void LDCSR(const uint16_t opcode) override;

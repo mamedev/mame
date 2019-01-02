@@ -25,24 +25,11 @@ Sega PCB 834-5137
 #include "includes/suprloco.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "machine/segacrpt_device.h"
 #include "sound/sn76496.h"
 #include "screen.h"
 #include "speaker.h"
-
-READ8_MEMBER(suprloco_state::soundport_r)
-{
-	m_ppi->pc6_w(0); // ACK signal
-	uint8_t data = m_ppi->pa_r(space, 0);
-	m_ppi->pc6_w(1);
-	return data;
-}
-
-WRITE_LINE_MEMBER(suprloco_state::pc0_w)
-{
-	// set by 8255 bit mode when no credits inserted
-	machine().output().set_lamp_value(0, state); // ???
-}
 
 void suprloco_state::main_map(address_map &map)
 {
@@ -54,10 +41,10 @@ void suprloco_state::main_map(address_map &map)
 	map(0xd800, 0xd800).portr("P2");
 	map(0xe000, 0xe000).portr("DSW1");
 	map(0xe001, 0xe001).portr("DSW2");
-	map(0xe800, 0xe803).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf000, 0xf6ff).ram().w(this, FUNC(suprloco_state::videoram_w)).share("videoram");
+	map(0xe800, 0xe803).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf000, 0xf6ff).ram().w(FUNC(suprloco_state::videoram_w)).share("videoram");
 	map(0xf700, 0xf7df).ram(); /* unused */
-	map(0xf7e0, 0xf7ff).ram().w(this, FUNC(suprloco_state::scrollram_w)).share("scrollram");
+	map(0xf7e0, 0xf7ff).ram().w(FUNC(suprloco_state::scrollram_w)).share("scrollram");
 	map(0xf800, 0xffff).ram();
 }
 
@@ -71,9 +58,9 @@ void suprloco_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xa003).w("sn1", FUNC(sn76496_device::write));
-	map(0xc000, 0xc003).w("sn2", FUNC(sn76496_device::write));
-	map(0xe000, 0xe000).r(this, FUNC(suprloco_state::soundport_r));
+	map(0xa000, 0xa003).w("sn1", FUNC(sn76496_device::command_w));
+	map(0xc000, 0xc003).w("sn2", FUNC(sn76496_device::command_w));
+	map(0xe000, 0xe000).r("ppi", FUNC(i8255_device::acka_r));
 }
 
 
@@ -170,7 +157,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( suprloco )
+static GFXDECODE_START( gfx_suprloco )
 	/* sprites use colors 256-511 + 512-767 */
 	GFXDECODE_ENTRY( "gfx1", 0x6000, charlayout, 0, 16 )
 GFXDECODE_END
@@ -179,21 +166,21 @@ GFXDECODE_END
 MACHINE_CONFIG_START(suprloco_state::suprloco)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz (?) */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", suprloco_state,  irq0_line_hold)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
+	sega_315_5015_device &maincpu(SEGA_315_5015(config, m_maincpu, 4000000));   /* 4 MHz (?) */
+	maincpu.set_addrmap(AS_PROGRAM, &suprloco_state::main_map);
+	maincpu.set_addrmap(AS_OPCODES, &suprloco_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(suprloco_state::irq0_line_hold));
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(suprloco_state, irq0_line_hold, 4*60)          /* NMIs are caused by the main CPU */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(suprloco_state, irq0_line_hold, 4*60)          /* NMIs are caused by the main CPU */
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(suprloco_state, control_w))
-	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
-	MCFG_I8255_OUT_PORTC_CB(WRITELINE(suprloco_state, pc0_w)) MCFG_DEVCB_BIT(0)
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI)) MCFG_DEVCB_BIT(7) MCFG_DEVCB_INVERT
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pb_callback().set(FUNC(suprloco_state::control_w));
+	ppi.tri_pb_callback().set_constant(0);
+	ppi.out_pc_callback().set_output("lamp0").bit(0).invert(); // set by 8255 bit mode when no credits inserted
+	ppi.out_pc_callback().append_inputline(m_audiocpu, INPUT_LINE_NMI).bit(7).invert();
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -204,17 +191,16 @@ MACHINE_CONFIG_START(suprloco_state::suprloco)
 	MCFG_SCREEN_UPDATE_DRIVER(suprloco_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", suprloco)
-	MCFG_PALETTE_ADD("palette", 512+256)
-	MCFG_PALETTE_INIT_OWNER(suprloco_state, suprloco)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_suprloco);
+	PALETTE(config, "palette", FUNC(suprloco_state::suprloco_palette), 512+256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("sn1", SN76496, 4000000)
+	MCFG_DEVICE_ADD("sn1", SN76496, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76496, 2000000)
+	MCFG_DEVICE_ADD("sn2", SN76496, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -283,30 +269,26 @@ ROM_START( suprlocoo )
 	ROM_LOAD( "pr-5221.7",       0x0600, 0x0020, CRC(89ba674f) SHA1(17c87840c8011968675a5a6f55966467df02364b) ) /* unknown */
 ROM_END
 
-DRIVER_INIT_MEMBER(suprloco_state,suprloco)
+void suprloco_state::init_suprloco()
 {
 	/* convert graphics to 4bpp from 3bpp */
+	uint8_t *source = memregion("gfx1")->base();
+	uint8_t *dest   = source + 0x6000;
+	uint8_t *lookup = memregion("proms")->base() + 0x0200;
 
-	int i, j, k, color_source, color_dest;
-	uint8_t *source, *dest, *lookup;
-
-	source = memregion("gfx1")->base();
-	dest   = source + 0x6000;
-	lookup = memregion("proms")->base() + 0x0200;
-
-	for (i = 0; i < 0x80; i++, lookup += 8)
+	for (int i = 0; i < 0x80; i++, lookup += 8)
 	{
-		for (j = 0; j < 0x40; j++, source++, dest++)
+		for (int j = 0; j < 0x40; j++, source++, dest++)
 		{
 			dest[0] = dest[0x2000] = dest[0x4000] = dest[0x6000] = 0;
 
-			for (k = 0; k < 8; k++)
+			for (int k = 0; k < 8; k++)
 			{
-				color_source = (((source[0x0000] >> k) & 0x01) << 2) |
-								(((source[0x2000] >> k) & 0x01) << 1) |
-								(((source[0x4000] >> k) & 0x01) << 0);
+				const int color_source = (((source[0x0000] >> k) & 0x01) << 2) |
+										 (((source[0x2000] >> k) & 0x01) << 1) |
+										 (((source[0x4000] >> k) & 0x01) << 0);
 
-				color_dest = lookup[color_source];
+				const int color_dest = lookup[color_source];
 
 				dest[0x0000] |= (((color_dest >> 3) & 0x01) << k);
 				dest[0x2000] |= (((color_dest >> 2) & 0x01) << k);
@@ -318,7 +300,5 @@ DRIVER_INIT_MEMBER(suprloco_state,suprloco)
 
 }
 
-
-
-GAME( 1982, suprloco,         0, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive (Rev.A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, suprlocoo, suprloco, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, suprloco,         0, suprloco, suprloco, suprloco_state, init_suprloco, ROT0, "Sega", "Super Locomotive (Rev.A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, suprlocoo, suprloco, suprloco, suprloco, suprloco_state, init_suprloco, ROT0, "Sega", "Super Locomotive",         MACHINE_SUPPORTS_SAVE )

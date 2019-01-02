@@ -1,15 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Carlos A. Lozano
+#ifndef MAME_INCLUDES_BLOODBRO_H
+#define MAME_INCLUDES_BLOODBRO_H
+
+#pragma once
+
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
+#include "emupal.h"
+#include "screen.h"
 
-class bloodbro_state : public driver_device, protected seibu_sound_common
+class bloodbro_state : public driver_device, public seibu_sound_common
 {
 public:
-	bloodbro_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	bloodbro_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_audiocpu(*this, "audiocpu"),
 		m_seibu_sound(*this, "seibu_sound"),
@@ -17,10 +25,12 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
-		m_txvideoram(*this, "txvideoram") { }
+		m_txvideoram(*this, "txvideoram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_audiocpu;
 	required_device<seibu_sound_device> m_seibu_sound;
@@ -47,7 +57,7 @@ public:
 	DECLARE_WRITE16_MEMBER(layer_en_w);
 	DECLARE_WRITE16_MEMBER(layer_scroll_w);
 	DECLARE_WRITE16_MEMBER(weststry_layer_scroll_w);
-	DECLARE_WRITE8_MEMBER(weststry_soundlatch_w);
+	void weststry_soundlatch_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(weststry_opl_irq_w);
 	DECLARE_WRITE8_MEMBER(weststry_opl_w);
 	DECLARE_WRITE8_MEMBER(weststry_soundnmi_ack_w);
@@ -65,7 +75,7 @@ public:
 	void bloodbro_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void weststry_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DRIVER_INIT(weststry);
+	void init_weststry();
 	void bloodbro(machine_config &config);
 	void skysmash(machine_config &config);
 	void weststry(machine_config &config);
@@ -75,3 +85,5 @@ public:
 	void weststry_map(address_map &map);
 	void weststry_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_BLOODBRO_H

@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -23,14 +24,15 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void neptunp2(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(test_r);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void neptunp2(machine_config &config);
 	void neptunp2_io(address_map &map);
 	void neptunp2_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -63,9 +65,9 @@ void neptunp2_state::neptunp2_map(address_map &map)
 	map(0xdb004, 0xdb007).ram();
 	map(0xdb00c, 0xdb00f).ram();
 
-	map(0xff806, 0xff806).r(this, FUNC(neptunp2_state::test_r));
-	map(0xff810, 0xff810).r(this, FUNC(neptunp2_state::test_r));
-	map(0xff812, 0xff812).r(this, FUNC(neptunp2_state::test_r));
+	map(0xff806, 0xff806).r(FUNC(neptunp2_state::test_r));
+	map(0xff810, 0xff810).r(FUNC(neptunp2_state::test_r));
+	map(0xff812, 0xff812).r(FUNC(neptunp2_state::test_r));
 
 	map(0xff980, 0xff980).nopw();
 
@@ -93,17 +95,17 @@ static const gfx_layout charlayout =
 };
 #endif
 
-static GFXDECODE_START( neptunp2 )
+static GFXDECODE_START( gfx_neptunp2 )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(neptunp2_state::neptunp2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I80188,20000000) // N80C188-20 AMD
-	MCFG_CPU_PROGRAM_MAP(neptunp2_map)
-	MCFG_CPU_IO_MAP(neptunp2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", neptunp2_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",I80188,20000000) // N80C188-20 AMD
+	MCFG_DEVICE_PROGRAM_MAP(neptunp2_map)
+	MCFG_DEVICE_IO_MAP(neptunp2_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", neptunp2_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -114,11 +116,11 @@ MACHINE_CONFIG_START(neptunp2_state::neptunp2)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", neptunp2)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_neptunp2)
 	MCFG_PALETTE_ADD("palette", 512)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 MACHINE_CONFIG_END
 
@@ -144,4 +146,4 @@ ROM_START( neptunp2 )
 ROM_END
 
 
-GAME( 199?, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state,  0, ROT0, "Unidesa?", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, neptunp2,  0,   neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa?", "Neptune's Pearls 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

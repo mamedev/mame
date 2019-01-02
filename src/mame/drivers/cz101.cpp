@@ -18,7 +18,11 @@
 #include "cpu/upd7810/upd7811.h"
 #include "machine/clock.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 #include "screen.h"
+
+#define VERBOSE 1
+#include "logmacro.h"
 
 #include "cz101.lh"
 
@@ -30,17 +34,18 @@
 class cz101_state : public driver_device
 {
 public:
-	cz101_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cz101_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_hd44780(*this, "hd44780"),
 		m_keys(*this, "kc%u", 0),
-		m_port_b(0), m_port_c(0)
+		m_port_b(0),
+		m_port_c(0)
 	{ }
 
 	void cz101(machine_config &config);
 
-	DECLARE_PALETTE_INIT(cz101);
+	void cz101_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
 protected:
@@ -80,11 +85,11 @@ void cz101_state::maincpu_map(address_map &map)
 	map(0x0000, 0x7fff).rom().region("program", 0);
 	map(0x8000, 0x8fff).ram();
 	map(0x9000, 0x97ff).noprw(); // rampack
-	map(0x9800, 0x9fff).w(this, FUNC(cz101_state::led_4_w));
-	map(0xa000, 0xa7ff).w(this, FUNC(cz101_state::led_3_w));
-	map(0xa800, 0xafff).w(this, FUNC(cz101_state::led_2_w));
-	map(0xb000, 0xb7ff).w(this, FUNC(cz101_state::led_1_w));
-	map(0xb800, 0xbfff).r(this, FUNC(cz101_state::keys_r));
+	map(0x9800, 0x9fff).w(FUNC(cz101_state::led_4_w));
+	map(0xa000, 0xa7ff).w(FUNC(cz101_state::led_3_w));
+	map(0xa800, 0xafff).w(FUNC(cz101_state::led_2_w));
+	map(0xb000, 0xb7ff).w(FUNC(cz101_state::led_1_w));
+	map(0xb800, 0xbfff).r(FUNC(cz101_state::keys_r));
 }
 
 
@@ -245,7 +250,7 @@ INPUT_PORTS_END
 //  MACHINE EMULATION
 //**************************************************************************
 
-PALETTE_INIT_MEMBER( cz101_state, cz101 )
+void cz101_state::cz101_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
 	palette.set_pen_color(1, rgb_t( 92,  83,  88)); // lcd pixel on
@@ -320,7 +325,7 @@ READ8_MEMBER( cz101_state::keys_r )
 READ8_MEMBER( cz101_state::port_a_r )
 {
 	if ((BIT(m_port_c, 7) == 1) && (BIT(m_port_c, 6) == 1))
-		return m_hd44780->read(space, BIT(m_port_c, 5));
+		return m_hd44780->read(BIT(m_port_c, 5));
 
 	return 0xff;
 }
@@ -328,7 +333,7 @@ READ8_MEMBER( cz101_state::port_a_r )
 WRITE8_MEMBER( cz101_state::port_a_w )
 {
 	if ((BIT(m_port_c, 7) == 1) && (BIT(m_port_c, 6) == 0))
-		m_hd44780->write(space, BIT(m_port_c, 5), data);
+		m_hd44780->write(BIT(m_port_c, 5), data);
 }
 
 // 7-------  nmi output
@@ -339,8 +344,7 @@ WRITE8_MEMBER( cz101_state::port_a_w )
 
 WRITE8_MEMBER( cz101_state::port_b_w )
 {
-	if (1)
-		logerror("port_b_w: %02x\n", data);
+	LOG("port_b_w: %02x\n", data);
 
 	m_port_b = data;
 }
@@ -356,8 +360,7 @@ WRITE8_MEMBER( cz101_state::port_b_w )
 
 WRITE8_MEMBER( cz101_state::port_c_w )
 {
-	if (1)
-		logerror("port_c_w: %02x\n", data);
+	LOG("port_c_w: %02x\n", data);
 
 	m_port_c = data;
 }
@@ -379,15 +382,14 @@ void cz101_state::machine_reset()
 //**************************************************************************
 
 MACHINE_CONFIG_START( cz101_state::cz101 )
-	MCFG_CPU_ADD("maincpu", UPD7810, 10_MHz_XTAL) // actually 7811, but internal ROM disabled
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_UPD7810_PORTA_READ_CB(READ8(cz101_state, port_a_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(cz101_state, port_a_w))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(cz101_state, port_b_w))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(cz101_state, port_c_w))
+	UPD7810(config, m_maincpu, 10_MHz_XTAL); // actually 7811, but internal ROM disabled
+	m_maincpu->set_addrmap(AS_PROGRAM, &cz101_state::maincpu_map);
+	m_maincpu->pa_in_cb().set(FUNC(cz101_state::port_a_r));
+	m_maincpu->pa_out_cb().set(FUNC(cz101_state::port_a_w));
+	m_maincpu->pb_out_cb().set(FUNC(cz101_state::port_b_w));
+	m_maincpu->pc_out_cb().set(FUNC(cz101_state::port_c_w));
 
-	MCFG_CLOCK_ADD("midi_clock", 2_MHz_XTAL)
-//  MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("maincpu", upd7810_device, sck_w)) not supported yet
+	CLOCK(config, "midi_clock", 2_MHz_XTAL)/*.signal_handler().set(m_maincpu, FUNC(upd7810_device::sck_w))*/; // not supported yet
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -398,14 +400,13 @@ MACHINE_CONFIG_START( cz101_state::cz101 )
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(cz101_state, cz101)
+	PALETTE(config, "palette", FUNC(cz101_state::cz101_palette), 3);
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)
 	MCFG_HD44780_PIXEL_UPDATE_CB(cz101_state, lcd_pixel_update)
 
-	MCFG_DEFAULT_LAYOUT(layout_cz101)
+	config.set_default_layout(layout_cz101);
 MACHINE_CONFIG_END
 
 
@@ -426,5 +427,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  CLASS        INIT  COMPANY  FULLNAME  FLAGS
-CONS( 1984, cz101, 0,      0,       cz101,   cz101, cz101_state, 0,    "Casio", "CZ-101", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
+CONS( 1984, cz101, 0,      0,      cz101,   cz101, cz101_state, empty_init, "Casio", "CZ-101", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

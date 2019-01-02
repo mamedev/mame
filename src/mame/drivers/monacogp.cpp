@@ -141,21 +141,18 @@ public:
 	{
 	}
 
+	void monacogp(machine_config &config);
+
+private:
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-
-	void monacogp(machine_config &config);
-protected:
 
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-
-private:
-
 };
 
 
@@ -270,5 +267,5 @@ ROM_END
 
 
 
-GAME( 1980, monacogp,  0,         monacogp, 0, monacogp_state,  0, ROT0, "Sega", "Monaco GP (Set 1) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1980, monacogpa, monacogp,  monacogp, 0, monacogp_state,  0, ROT0, "Sega", "Monaco GP (Set 2) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1980, monacogp,  0,         monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (Set 1) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1980, monacogpa, monacogp,  monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (Set 2) [TTL]", MACHINE_IS_SKELETON )

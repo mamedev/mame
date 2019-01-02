@@ -44,6 +44,7 @@
 #include "machine/vt100_kbd.h"
 #include "video/i8275.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 #define LOG_GENERAL (1U <<  0)
@@ -72,7 +73,7 @@ public:
 		, m_crtc1(*this, "i8275_1")
 		, m_crtc2(*this, "i8275_2")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	void ms6102(machine_config &config);
 	void ms6102_io(address_map &map);
@@ -134,15 +135,14 @@ void ms6102_state::ms6102_mem(address_map &map)
 void ms6102_state::ms6102_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).rw(m_i8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x01).rw(m_i8251, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x10, 0x18).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x20, 0x23).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x30, 0x30).mirror(0x0f).rw("589wa1", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0x40, 0x41).rw(this, FUNC(ms6102_state::crtc_r), FUNC(ms6102_state::crtc_w));
+	map(0x40, 0x41).rw(FUNC(ms6102_state::crtc_r), FUNC(ms6102_state::crtc_w));
 	map(0x50, 0x5f).noprw(); // video disable?
-	map(0x60, 0x6f).w(this, FUNC(ms6102_state::pic_w));
-	map(0x70, 0x7f).r(this, FUNC(ms6102_state::misc_status_r));
+	map(0x60, 0x6f).w(FUNC(ms6102_state::pic_w));
+	map(0x70, 0x7f).r(FUNC(ms6102_state::misc_status_r));
 }
 
 static const gfx_layout ms6102_charlayout =
@@ -156,7 +156,7 @@ static const gfx_layout ms6102_charlayout =
 	16*8
 };
 
-static GFXDECODE_START(ms6102)
+static GFXDECODE_START(gfx_ms6102)
 	GFXDECODE_ENTRY("chargen", 0x0000, ms6102_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -185,7 +185,7 @@ I8275_DRAW_CHARACTER_MEMBER(ms6102_state::display_pixels)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	u8 gfx = (lten) ? 0xff : 0;
-	if (linecount < 12 && !vsp)
+	if (!vsp)
 		gfx = m_p_chargen[linecount | (charcode << 4)];
 
 	if (rvv)
@@ -284,86 +284,89 @@ void ms6102_state::machine_start()
 	// copy over the ascii chars into their new positions (lines 0-7)
 	for (i = 0x20; i < 0x80; i++)
 		for (j = 0; j < 8; j++)
-			m_p_chargen[i*16+j] = m_p_chargen[0x1800+i*8+j];
+			m_p_chargen[i*16+j+1] = m_p_chargen[0x1800+i*8+j];
 	// copy the russian symbols to codes 0xc0-0xff for now
 	for (i = 0xc0; i < 0x100; i++)
 		for (j = 0; j < 8; j++)
-			m_p_chargen[i*16+j] = m_p_chargen[0x1800+i*8+j];
+			m_p_chargen[i*16+j+1] = m_p_chargen[0x1800+i*8+j];
 	// for punctuation, get the last 4 lines into place
 	for (i = 0x20; i < 0x40; i++)
 		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j] = m_p_chargen[0x1700+i*8+j];
+			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1700+i*8+j];
 	// for letters, get the last 4 lines into place
 	for (i = 0x40; i < 0x80; i++)
 		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j] = m_p_chargen[0x1a00+i*8+j];
+			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1a00+i*8+j];
 	// for russian, get the last 4 lines into place
 	for (i = 0xc0; i < 0x100; i++)
 		for (j = 0; j < 4; j++)
-			m_p_chargen[i*16+8+j] = m_p_chargen[0x1604+i*8+j];
+			m_p_chargen[i*16+8+j+1] = m_p_chargen[0x1604+i*8+j];
 }
 
 
-MACHINE_CONFIG_START(ms6102_state::ms6102)
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(18'432'000) / 9)
-	MCFG_CPU_PROGRAM_MAP(ms6102_mem)
-	MCFG_CPU_IO_MAP(ms6102_io)
-	MCFG_I8085A_INTE(DEVWRITELINE("i8214", i8214_device, inte_w))
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ms6102_state, ms6102_int_ack)
+void ms6102_state::ms6102(machine_config &config)
+{
+	I8080(config, m_maincpu, XTAL(18'432'000) / 9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ms6102_state::ms6102_mem);
+	m_maincpu->set_addrmap(AS_IO, &ms6102_state::ms6102_io);
+	m_maincpu->out_inte_func().set("i8214", FUNC(i8214_device::inte_w));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(ms6102_state::ms6102_int_ack));
 
-	MCFG_DEVICE_ADD("i8214", I8214, XTAL(18'432'000) / 9)
-	MCFG_I8214_INT_CALLBACK(WRITELINE(ms6102_state, irq_w))
+	I8214(config, m_pic, XTAL(18'432'000) / 9);
+	m_pic->int_wr_callback().set(FUNC(ms6102_state::irq_w));
 
-	MCFG_DEVICE_ADD("earom", KR1601RR1, 0)
+	KR1601RR1(config, m_earom, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("i8275_1", i8275_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'400'000), 784, 0, 80*8, 375, 0, 25*12)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ms6102)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update("i8275_1", FUNC(i8275_device::screen_update));
+	m_screen->set_raw(XTAL(16'400'000), 784, 0, 80*8, 375, 0, 25*12);
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(18'432'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(ms6102_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(ms6102_state, memory_read_byte))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(ms6102_state, vdack_w))
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_ms6102);
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
-	MCFG_DEVICE_ADD("i8275_1", I8275, XTAL(16'400'000) / 8) // XXX
-	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ms6102_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257", i8257_device, dreq2_w))
+	I8257(config, m_dma8257, XTAL(18'432'000) / 9);
+	m_dma8257->out_hrq_cb().set(FUNC(ms6102_state::hrq_w));
+	m_dma8257->in_memr_cb().set(FUNC(ms6102_state::memory_read_byte));
+	m_dma8257->out_iow_cb<2>().set(FUNC(ms6102_state::vdack_w));
 
-	MCFG_DEVICE_ADD("i8275_2", I8275, XTAL(16'400'000) / 8) // XXX
-	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ms6102_state, display_attr)
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE(ms6102_state, irq<5>))
+	I8275(config, m_crtc1, XTAL(16'400'000) / 8); // XXX
+	m_crtc1->set_character_width(8);
+	m_crtc1->set_display_callback(FUNC(ms6102_state::display_pixels));
+	m_crtc1->drq_wr_callback().set("dma8257", FUNC(i8257_device::dreq2_w));
+	m_crtc1->set_screen(m_screen);
+
+	I8275(config, m_crtc2, XTAL(16'400'000) / 8); // XXX
+	m_crtc2->set_character_width(8);
+	m_crtc2->set_display_callback(FUNC(ms6102_state::display_attr));
+	m_crtc2->irq_wr_callback().set(FUNC(ms6102_state::irq<5>));
+	m_crtc2->set_screen(m_screen);
 
 	// keyboard
-	MCFG_DEVICE_ADD("589wa1", AY31015, 0)
-	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(ms6102_state, irq<1>))
-	MCFG_AY31015_AUTO_RDAV(true)
+	AY31015(config, m_kbd_uart);
+	m_kbd_uart->write_dav_callback().set(FUNC(ms6102_state::irq<1>));
+	m_kbd_uart->set_auto_rdav(true);
 
-	MCFG_DEVICE_ADD("ie5", RIPPLE_COUNTER, XTAL(16'400'000) / 30)
-	MCFG_RIPPLE_COUNTER_STAGES(2)
-	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(ms6102_state, kbd_uart_clock_w))
+	ripple_counter_device &ie5(RIPPLE_COUNTER(config, "ie5", XTAL(16'400'000) / 30));
+	ie5.set_stages(2);
+	ie5.count_out_cb().set(FUNC(ms6102_state::kbd_uart_clock_w));
 
-	MCFG_DEVICE_ADD("keyboard", MS7002, 0)
-	MCFG_VT100_KEYBOARD_SIGNAL_OUT_CALLBACK(DEVWRITELINE("589wa1", ay31015_device, write_si))
+	MS7002(config, m_keyboard, 0).signal_out_callback().set(m_kbd_uart, FUNC(ay31015_device::write_si));
 
 	// serial connection to host
-	MCFG_DEVICE_ADD("i8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(ms6102_state, irq<3>))
+	I8251(config, m_i8251, 0);
+	m_i8251->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_i8251->rxrdy_handler().set(FUNC(ms6102_state::irq<3>));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
+	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
+	m_rs232->rxd_handler().set(m_i8251, FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(16'400'000) / 9)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
-	MCFG_PIT8253_CLK1(XTAL(16'400'000) / 9)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
-MACHINE_CONFIG_END
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(XTAL(16'400'000) / 9);
+	pit8253.out_handler<0>().set(m_i8251, FUNC(i8251_device::write_txc));
+	pit8253.set_clk<1>(XTAL(16'400'000) / 9);
+	pit8253.out_handler<1>().set(m_i8251, FUNC(i8251_device::write_rxc));
+}
 
 ROM_START( ms6102 )
 	ROM_REGION(0x3000, "maincpu", 0)
@@ -383,5 +386,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT       COMPANY       FULLNAME       FLAGS */
-COMP( 1984, ms6102,  0,      0,       ms6102,    0,       ms6102_state,  0, "Elektronika", "MS 6102.02", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY        FULLNAME      FLAGS */
+COMP( 1984, ms6102, 0,      0,      ms6102,  0,     ms6102_state, empty_init, "Elektronika", "MS 6102.02", MACHINE_NOT_WORKING )

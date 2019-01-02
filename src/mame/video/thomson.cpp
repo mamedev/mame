@@ -890,7 +890,7 @@ void thomson_state::thom_floppy_active( int write )
 	/* update icon */
 	fnew = FLOP_STATE;
 	if ( fold != fnew )
-		m_floppy = fnew;
+		m_floppy_led = fnew;
 }
 
 
@@ -1041,7 +1041,7 @@ WRITE_LINE_MEMBER(thomson_state::thom_vblank)
 			m_thom_floppy_rcount--;
 		fnew = FLOP_STATE;
 		if ( fnew != fold )
-			m_floppy = fnew;
+			m_floppy_led = fnew;
 
 		/* prepare state for next frame */
 		for ( i = 0; i <= THOM_TOTAL_HEIGHT; i++ )
@@ -1160,7 +1160,7 @@ VIDEO_START_MEMBER( thomson_state, thom )
 	m_thom_floppy_wcount = 0;
 	save_item(NAME(m_thom_floppy_wcount));
 	save_item(NAME(m_thom_floppy_rcount));
-	m_floppy.resolve();
+	m_floppy_led.resolve();
 
 	m_thom_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 
@@ -1184,8 +1184,8 @@ VIDEO_START_MEMBER( thomson_state, thom )
 /* sets the fixed palette (for MO5,TO7,TO7/70) and gamma correction */
 void thomson_state::thom_configure_palette(double gamma, const uint16_t* pal, palette_device& palette)
 {
-	memcpy( m_thom_last_pal, pal, 32 );
-	memcpy( m_thom_pal, pal, 32 );
+	memcpy(m_thom_last_pal, pal, 32);
+	memcpy(m_thom_pal, pal, 32);
 
 	for ( int i = 0; i < 4097; i++ )
 	{
@@ -1198,31 +1198,31 @@ void thomson_state::thom_configure_palette(double gamma, const uint16_t* pal, pa
 }
 
 
-PALETTE_INIT_MEMBER(thomson_state, thom)
+void thomson_state::thom_palette(palette_device &palette)
 {
 	LOG (( "thom: palette init called\n" ));
 
-		/* TO8 and later use an EF9369 color palette chip
-		   The spec shows a built-in gamma correction for gamma=2.8
-		   i.e., output is out = in ^ (1/2.8)
+	/* TO8 and later use an EF9369 color palette chip
+	   The spec shows a built-in gamma correction for gamma=2.8
+	   i.e., output is out = in ^ (1/2.8)
 
-		   For the TO7, the gamma correction is irrelevant.
+	   For the TO7, the gamma correction is irrelevant.
 
-		   For the TO7/70, we use the same palette and gamma has the TO8,
-		   which gives good results (but is not verified).
-		 */
-		thom_configure_palette(1.0 / 2.8, thom_pal_init, palette);
+	   For the TO7/70, we use the same palette and gamma has the TO8,
+	   which gives good results (but is not verified).
+	 */
+	thom_configure_palette(1.0 / 2.8, thom_pal_init, palette);
 }
 
-PALETTE_INIT_MEMBER(thomson_state, mo5)
+void thomson_state::mo5_palette(palette_device &palette)
 {
 	LOG (( "thom: MO5 palette init called\n" ));
 
-		/* The MO5 has a different fixed palette than the TO7/70.
-		   We use a smaller gamma correction which gives intutively better
-		   results (but is not verified).
-		 */
-		thom_configure_palette(1.0, mo5_pal_init, palette);
+	/* The MO5 has a different fixed palette than the TO7/70.
+	   We use a smaller gamma correction which gives intutively better
+	   results (but is not verified).
+	 */
+	thom_configure_palette(1.0, mo5_pal_init, palette);
 }
 
 

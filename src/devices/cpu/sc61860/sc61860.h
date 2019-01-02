@@ -16,15 +16,16 @@
 #pragma once
 
 /*
-  official names seam to be
+  Official names seem to be:
   ESR-H, ESR-J
-  (ESR-L SC62015 ist complete different)
- */
+  (ESR-L SC62015 is completely different)
+*/
 
-/* unsolved problems
-   the processor has 8 kbyte internal rom
-   only readable with special instructions and program execution
-   64 kb external ram (first 8kbyte not seen for program execution?) */
+/* Known Issues:
+   - The processor has an 8kbyte internal ROM which is only readable with
+     special instructions and program execution.
+   - 64kbyte external RAM (first 8kbytes not seen for program execution?)
+*/
 
 
 enum
@@ -33,7 +34,7 @@ enum
 	SC61860_P, SC61860_Q, SC61860_R,
 	SC61860_CARRY,
 	SC61860_ZERO,
-	// the following are in the internal ram!
+	// The following are in the internal RAM!
 	SC61860_BA,
 	SC61860_X, SC61860_Y,
 	SC61860_I, SC61860_J, SC61860_K, SC61860_L, SC61860_V, SC61860_W,
@@ -44,30 +45,6 @@ enum
 };
 
 
-#define MCFG_SC61860_READ_RESET_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_reset_cb(DEVCB_##_devcb);
-
-#define MCFG_SC61860_READ_BRK_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_brk_cb(DEVCB_##_devcb);
-
-#define MCFG_SC61860_READ_X_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_x_cb(DEVCB_##_devcb);
-
-#define MCFG_SC61860_READ_A_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_ina_cb(DEVCB_##_devcb);
-
-#define MCFG_SC61860_WRITE_A_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_outa_cb(DEVCB_##_devcb);
-
-#define MCFG_SC61860_READ_B_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_inb_cb(DEVCB_##_devcb);
-
-#define MCFG_SC61860_WRITE_B_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_outb_cb(DEVCB_##_devcb);
-
-#define MCFG_SC61860_WRITE_C_HANDLER(_devcb) \
-	devcb = &downcast<sc61860_device &>(*device).set_outc_cb(DEVCB_##_devcb);
-
 class sc61860_device : public cpu_device
 {
 public:
@@ -75,14 +52,14 @@ public:
 	sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_reset_cb(Object &&cb) { return m_reset.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_brk_cb(Object &&cb) { return m_brk.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_x_cb(Object &&cb) { return m_x.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ina_cb(Object &&cb) { return m_ina.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_outa_cb(Object &&cb) { return m_outa.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_inb_cb(Object &&cb) { return m_inb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_outb_cb(Object &&cb) { return m_outb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_outc_cb(Object &&cb) { return m_outc.set_callback(std::forward<Object>(cb)); }
+	auto reset_cb() { return m_reset.bind(); }
+	auto brk_cb() { return m_brk.bind(); }
+	auto x_cb() { return m_x.bind(); }
+	auto in_a_cb() { return m_ina.bind(); }
+	auto out_a_cb() { return m_outa.bind(); }
+	auto in_b_cb() { return m_inb.bind(); }
+	auto out_b_cb() { return m_outb.bind(); }
+	auto out_c_cb() { return m_outc.bind(); }
 
 	/* this is though for power on/off of the sharps */
 	uint8_t *internal_ram();
@@ -135,7 +112,7 @@ private:
 	emu_timer *m_2ms_tick_timer;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	int m_icount;
 	uint8_t m_ram[0x100]; // internal special ram, should be 0x60, 0x100 to avoid memory corruption for now
 

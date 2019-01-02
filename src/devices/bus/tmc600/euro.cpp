@@ -59,19 +59,20 @@ void tmc600_euro_bus_slot_t::device_start()
 //  SLOT_INTERFACE( tmc600_euro_bus_cards )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( tmc600_euro_bus_cards )
-	//SLOT_INTERFACE("tmc710", TMC710) // 5-way expander
-	//SLOT_INTERFACE("tmc720", TMC720) // 5-way expander (new model)
-	//SLOT_INTERFACE("tmce200", TMCE200) // 8 KB RAM (CMOS)
-	//SLOT_INTERFACE("tmce220", TMCE220) // 16/32 KB RAM/EPROM
-	//SLOT_INTERFACE("tmce225", TMCE225) // 16 KB RAM (CMOS)
-	//SLOT_INTERFACE("tmce250", TMCE250) // 32-way input/output
-	//SLOT_INTERFACE("tmce260", TMCE260) // RS-232
-	//SLOT_INTERFACE("tmce270", TMCE270) // generic ADC card (RCA CA3162 or CA3300, Teledyne 8700/01/02/03/04/05)
-	//SLOT_INTERFACE("tmce2701", TMCE2701) // TMCE-270 with CA3162
-	//SLOT_INTERFACE("tmce2702", TMCE2702) // TMCE-270 with CA3300
-	//SLOT_INTERFACE("tmce280", TMCE280) // floppy disc controller for 3x 5.25" and 4x 8"
-	//SLOT_INTERFACE("tmce285", TMCE285) // monochrome CRT controller (min. 80 cps)
-	//SLOT_INTERFACE("tmce300", TMCE300) // slave computer with parallel I/O
-	//SLOT_INTERFACE("tmce305", TMCE304) // slave computer with serial I/O
-SLOT_INTERFACE_END
+void tmc600_euro_bus_cards(device_slot_interface &device)
+{
+	//device.option_add("tmc710", TMC710); // 5-way expander
+	//device.option_add("tmc720", TMC720); // 5-way expander (new model)
+	//device.option_add("tmce200", TMCE200); // 8 KB RAM (CMOS)
+	//device.option_add("tmce220", TMCE220); // 16/32 KB RAM/EPROM
+	//device.option_add("tmce225", TMCE225); // 16 KB RAM (CMOS)
+	//device.option_add("tmce250", TMCE250); // 32-way input/output
+	//device.option_add("tmce260", TMCE260); // RS-232
+	//device.option_add("tmce270", TMCE270); // generic ADC card (RCA CA3162 or CA3300, Teledyne 8700/01/02/03/04/05)
+	//device.option_add("tmce2701", TMCE2701); // TMCE-270 with CA3162
+	//device.option_add("tmce2702", TMCE2702); // TMCE-270 with CA3300
+	//device.option_add("tmce280", TMCE280); // floppy disc controller for 3x 5.25" and 4x 8"
+	//device.option_add("tmce285", TMCE285); // monochrome CRT controller (min. 80 cps)
+	//device.option_add("tmce300", TMCE300); // slave computer with parallel I/O
+	//device.option_add("tmce305", TMCE304); // slave computer with serial I/O
+}

@@ -75,16 +75,16 @@ void amspdwy_state::amspdwy_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x801f).w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(amspdwy_state::amspdwy_videoram_w)).share("videoram");
-	map(0x9800, 0x9bff).ram().w(this, FUNC(amspdwy_state::amspdwy_colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(amspdwy_state::amspdwy_videoram_w)).share("videoram");
+	map(0x9800, 0x9bff).ram().w(FUNC(amspdwy_state::amspdwy_colorram_w)).share("colorram");
 	map(0x9c00, 0x9fff).ram(); // unused?
 //  AM_RANGE(0xa000, 0xa000) AM_WRITENOP // ?
 	map(0xa000, 0xa000).portr("DSW1");
-	map(0xa400, 0xa400).portr("DSW2").w(this, FUNC(amspdwy_state::amspdwy_flipscreen_w));
-	map(0xa800, 0xa800).r(this, FUNC(amspdwy_state::amspdwy_wheel_0_r));
-	map(0xac00, 0xac00).r(this, FUNC(amspdwy_state::amspdwy_wheel_1_r));
+	map(0xa400, 0xa400).portr("DSW2").w(FUNC(amspdwy_state::amspdwy_flipscreen_w));
+	map(0xa800, 0xa800).r(FUNC(amspdwy_state::amspdwy_wheel_0_r));
+	map(0xac00, 0xac00).r(FUNC(amspdwy_state::amspdwy_wheel_1_r));
 	map(0xb000, 0xb000).nopw(); // irq ack?
-	map(0xb400, 0xb400).r(this, FUNC(amspdwy_state::amspdwy_sound_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xb400, 0xb400).r(FUNC(amspdwy_state::amspdwy_sound_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xc000, 0xc0ff).ram().share("spriteram");
 	map(0xe000, 0xe7ff).ram();
 }
@@ -216,7 +216,7 @@ static const gfx_layout layout_8x8x2 =
 	8*8
 };
 
-static GFXDECODE_START( amspdwy )
+static GFXDECODE_START( gfx_amspdwy )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x2, 0, 8 )
 GFXDECODE_END
 
@@ -250,13 +250,13 @@ void amspdwy_state::machine_reset()
 MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3000000)
-	MCFG_CPU_PROGRAM_MAP(amspdwy_map)
-	MCFG_CPU_IO_MAP(amspdwy_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amspdwy_state, irq0_line_hold) /* IRQ: 60Hz, NMI: retn */
+	MCFG_DEVICE_ADD("maincpu", Z80, 3000000)
+	MCFG_DEVICE_PROGRAM_MAP(amspdwy_map)
+	MCFG_DEVICE_IO_MAP(amspdwy_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", amspdwy_state, irq0_line_hold) /* IRQ: 60Hz, NMI: retn */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)
-	MCFG_CPU_PROGRAM_MAP(amspdwy_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)
+	MCFG_DEVICE_PROGRAM_MAP(amspdwy_sound_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -267,22 +267,22 @@ MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(amspdwy_state, screen_update_amspdwy)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amspdwy)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_amspdwy);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_YM2151_ADD("ymsnd", 3000000)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	YM2151(config, m_ym2151, 3000000);
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ym2151->add_route(0, "lspeaker", 1.0);
+	m_ym2151->add_route(1, "rspeaker", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -381,5 +381,5 @@ ROM_END
 
 /* (C) 1987 ETI 8402 MAGNOLIA ST. #C SANTEE, CA 92071 */
 
-GAME( 1987, amspdwy,  0,       amspdwy, amspdwy,  amspdwy_state, 0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, amspdwy_state, 0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, amspdwy,  0,       amspdwy, amspdwy,  amspdwy_state, empty_init, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, amspdwy_state, empty_init, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 2)", MACHINE_SUPPORTS_SAVE )

@@ -104,18 +104,18 @@ void hanaawas_state::hanaawas_map(address_map &map)
 	map(0x0000, 0x2fff).rom();
 	map(0x4000, 0x4fff).rom();
 	map(0x6000, 0x6fff).rom();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(hanaawas_state::hanaawas_videoram_w)).share("videoram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(hanaawas_state::hanaawas_colorram_w)).share("colorram");
+	map(0x8000, 0x83ff).ram().w(FUNC(hanaawas_state::hanaawas_videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(hanaawas_state::hanaawas_colorram_w)).share("colorram");
 	map(0x8800, 0x8bff).ram();
-	map(0xb000, 0xb000).w(this, FUNC(hanaawas_state::irq_ack_w));
+	map(0xb000, 0xb000).w(FUNC(hanaawas_state::irq_ack_w));
 }
 
 
 void hanaawas_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(hanaawas_state::hanaawas_input_port_0_r), FUNC(hanaawas_state::hanaawas_inputs_mux_w));
-	map(0x01, 0x01).nopr().w(this, FUNC(hanaawas_state::key_matrix_status_w)); /* r bit 1: status ready, presumably of the input mux device / w = configure device? */
+	map(0x00, 0x00).rw(FUNC(hanaawas_state::hanaawas_input_port_0_r), FUNC(hanaawas_state::hanaawas_inputs_mux_w));
+	map(0x01, 0x01).nopr().w(FUNC(hanaawas_state::key_matrix_status_w)); /* r bit 1: status ready, presumably of the input mux device / w = configure device? */
 	map(0x10, 0x10).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x10, 0x11).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xc0, 0xc0).nopw(); // watchdog
@@ -197,7 +197,7 @@ static const gfx_layout name =                      \
 GFX( charlayout_1bpp, 0x2000*8+4, 0x2000*8+4, 0x2000*8+4 )
 GFX( charlayout_3bpp, 0x2000*8,   0,          4          )
 
-static GFXDECODE_START( hanaawas )
+static GFXDECODE_START( gfx_hanaawas )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_1bpp, 0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_3bpp, 0, 32 )
 GFXDECODE_END
@@ -218,10 +218,10 @@ void hanaawas_state::machine_reset()
 MACHINE_CONFIG_START(hanaawas_state::hanaawas)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(hanaawas_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hanaawas_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(hanaawas_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", hanaawas_state,  irq0_line_assert)
 
 
 	/* video hardware */
@@ -233,18 +233,16 @@ MACHINE_CONFIG_START(hanaawas_state::hanaawas)
 	MCFG_SCREEN_UPDATE_DRIVER(hanaawas_state, screen_update_hanaawas)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hanaawas)
-	MCFG_PALETTE_ADD("palette", 32*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(hanaawas_state, hanaawas)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_hanaawas);
+	PALETTE(config, "palette", FUNC(hanaawas_state::hanaawas_palette), 32 * 8, 16);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(hanaawas_state, hanaawas_portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 18432000/12));
+	aysnd.port_a_read_callback().set_ioport("DSW");
+	aysnd.port_b_write_callback().set(FUNC(hanaawas_state::hanaawas_portB_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 
@@ -274,4 +272,4 @@ ROM_START( hanaawas )
 ROM_END
 
 
-GAME( 1982, hanaawas, 0, hanaawas, hanaawas, hanaawas_state, 0, ROT0, "Seta Kikaku, Ltd.", "Hana Awase", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hanaawas, 0, hanaawas, hanaawas, hanaawas_state, empty_init, ROT0, "Seta Kikaku, Ltd.", "Hana Awase", MACHINE_SUPPORTS_SAVE )

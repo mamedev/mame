@@ -216,10 +216,10 @@ hard_disk_file *xt_hdc_device::pc_hdc_file(int id)
 	switch( id )
 	{
 	case 0:
-		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("primary").c_str()));
+		img = subdevice<harddisk_image_device>("primary");
 		break;
 	case 1:
-		img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("slave").c_str()));
+		img = subdevice<harddisk_image_device>("slave");
 		break;
 	}
 	if ( img == nullptr )
@@ -920,16 +920,16 @@ DEFINE_DEVICE_TYPE(ISA8_HDC_EC1841, isa8_hdc_ec1841_device, "isa_hdc_ec1841", "E
 
 MACHINE_CONFIG_START(isa8_hdc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("hdc",XT_HDC,0)
-	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(isa8_hdc_device,irq_w))
-	MCFG_XTHDC_DRQ_HANDLER(WRITELINE(isa8_hdc_device,drq_w))
+	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(*this, isa8_hdc_device,irq_w))
+	MCFG_XTHDC_DRQ_HANDLER(WRITELINE(*this, isa8_hdc_device,drq_w))
 	MCFG_HARDDISK_ADD("hdc:primary")
 	MCFG_HARDDISK_ADD("hdc:slave")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(isa8_hdc_ec1841_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("hdc",EC1841_HDC,0)
-	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(isa8_hdc_ec1841_device,irq_w))
-	MCFG_XTHDC_DRQ_HANDLER(WRITELINE(isa8_hdc_ec1841_device,drq_w))
+	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(*this, isa8_hdc_ec1841_device,irq_w))
+	MCFG_XTHDC_DRQ_HANDLER(WRITELINE(*this, isa8_hdc_ec1841_device,drq_w))
 	MCFG_HARDDISK_ADD("hdc:primary")
 	MCFG_HARDDISK_ADD("hdc:slave")
 MACHINE_CONFIG_END

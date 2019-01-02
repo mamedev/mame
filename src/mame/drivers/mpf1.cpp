@@ -67,7 +67,7 @@ void mpf1_state::mpf1_map(address_map &map)
 
 void mpf1_state::mpf1_step(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(mpf1_state::step_r));
+	map(0x0000, 0xffff).r(FUNC(mpf1_state::step_r));
 }
 
 void mpf1_state::mpf1b_map(address_map &map)
@@ -358,33 +358,33 @@ void mpf1_state::machine_reset()
 MACHINE_CONFIG_START(mpf1_state::mpf1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(3'579'545)/2)
-	MCFG_CPU_PROGRAM_MAP(mpf1_map)
-	MCFG_CPU_OPCODES_MAP(mpf1_step)
-	MCFG_CPU_IO_MAP(mpf1_io_map)
-	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
+	Z80(config, m_maincpu, XTAL(3'579'545)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpf1_state::mpf1_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &mpf1_state::mpf1_step);
+	m_maincpu->set_addrmap(AS_IO, &mpf1_state::mpf1_io_map);
+	m_maincpu->set_daisy_config(mpf1_daisy_chain);
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(3'579'545)/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, XTAL(3'579'545)/2));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(3'579'545)/2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc, XTAL(3'579'545)/2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mpf1_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mpf1_state, ppi_pb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mpf1_state, ppi_pc_w))
+	i8255_device &ppi(I8255A(config, I8255A_TAG));
+	ppi.in_pa_callback().set(FUNC(mpf1_state::ppi_pa_r));
+	ppi.out_pb_callback().set(FUNC(mpf1_state::ppi_pb_w));
+	ppi.out_pc_callback().set(FUNC(mpf1_state::ppi_pc_w));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mpf1)
+	config.set_default_layout(layout_mpf1);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
@@ -392,36 +392,36 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpf1_state::mpf1b)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(3'579'545)/2)
-	MCFG_CPU_PROGRAM_MAP(mpf1b_map)
-	MCFG_CPU_OPCODES_MAP(mpf1_step)
-	MCFG_CPU_IO_MAP(mpf1b_io_map)
-	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
+	Z80(config, m_maincpu, XTAL(3'579'545)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpf1_state::mpf1b_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &mpf1_state::mpf1_step);
+	m_maincpu->set_addrmap(AS_IO, &mpf1_state::mpf1b_io_map);
+	m_maincpu->set_daisy_config(mpf1_daisy_chain);
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(3'579'545)/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, XTAL(3'579'545)/2));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(3'579'545)/2)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc, XTAL(3'579'545)/2);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mpf1_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mpf1_state, ppi_pb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mpf1_state, ppi_pc_w))
+	i8255_device &ppi(I8255A(config, I8255A_TAG));
+	ppi.in_pa_callback().set(FUNC(mpf1_state::ppi_pa_r));
+	ppi.out_pb_callback().set(FUNC(mpf1_state::ppi_pb_w));
+	ppi.out_pc_callback().set(FUNC(mpf1_state::ppi_pc_w));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mpf1b)
+	config.set_default_layout(layout_mpf1b);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD(TMS5220_TAG, TMS5220, 680000L)
+	MCFG_DEVICE_ADD(TMS5220_TAG, TMS5220, 680000L)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
@@ -429,33 +429,33 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpf1_state::mpf1p)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(mpf1p_map)
-	MCFG_CPU_OPCODES_MAP(mpf1_step)
-	MCFG_CPU_IO_MAP(mpf1p_io_map)
-	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
+	Z80(config, m_maincpu, 2500000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpf1_state::mpf1p_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &mpf1_state::mpf1_step);
+	m_maincpu->set_addrmap(AS_IO, &mpf1_state::mpf1p_io_map);
+	m_maincpu->set_daisy_config(mpf1_daisy_chain);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_mpf1p)
+	config.set_default_layout(layout_mpf1p);
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, 2500000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, 2500000));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 2500000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc, 2500000);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mpf1_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mpf1_state, ppi_pb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mpf1_state, ppi_pc_w))
+	i8255_device &ppi(I8255A(config, I8255A_TAG));
+	ppi.in_pa_callback().set(FUNC(mpf1_state::ppi_pa_r));
+	ppi.out_pb_callback().set(FUNC(mpf1_state::ppi_pb_w));
+	ppi.out_pc_callback().set(FUNC(mpf1_state::ppi_pc_w));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
@@ -484,11 +484,11 @@ ROM_END
 
 /* System Drivers */
 
-DRIVER_INIT_MEMBER(mpf1_state,mpf1)
+void mpf1_state::init_mpf1()
 {
 	m_program = &m_maincpu->space(AS_PROGRAM);
 }
 
-COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1_state, mpf1, "Multitech", "Micro Professor 1",      0 )
-COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1B",     0 )
-COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1 Plus", MACHINE_NOT_WORKING )
+COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1_state, init_mpf1, "Multitech", "Micro Professor 1",      0 )
+COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1_state, init_mpf1, "Multitech", "Micro Professor 1B",     0 )
+COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1_state, init_mpf1, "Multitech", "Micro Professor 1 Plus", MACHINE_NOT_WORKING )

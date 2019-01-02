@@ -14,11 +14,10 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
-class snes_sound_device : public device_t,
-							public device_sound_interface
+class snes_sound_device : public device_t, public device_sound_interface
 {
 public:
-	snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'000);
 
 	void set_volume(int volume);
 
@@ -55,7 +54,7 @@ private:
 
 	struct voice_state_type                      /* Voice state type             */
 	{
-		uint16_t          mem_ptr;        /* Sample data memory pointer   */
+		uint16_t        mem_ptr;        /* Sample data memory pointer   */
 		int             end;            /* End or loop after block      */
 		int             envcnt;         /* Counts to envelope update    */
 		env_state_t32   envstate;       /* Current envelope state       */
@@ -67,10 +66,10 @@ private:
 		int             on_cnt;         /* Is it time to turn on yet?   */
 		int             pitch;          /* Sample pitch (4096->32000Hz) */
 		int             range;          /* Last header's range          */
-		uint32_t          samp_id;        /* Sample ID#                   */
+		uint32_t        samp_id;        /* Sample ID#                   */
 		int             sampptr;        /* Where in sampbuf we are      */
-		int32_t           smp1;           /* Last sample (for BRR filter) */
-		int32_t           smp2;           /* Second-to-last sample decoded*/
+		int32_t         smp1;           /* Last sample (for BRR filter) */
+		int32_t         smp2;           /* Second-to-last sample decoded*/
 		short           sampbuf[4];   /* Buffer for Gaussian interp   */
 	};
 
@@ -92,8 +91,8 @@ private:
 	// internal state
 	std::unique_ptr<uint8_t[]>                   m_ram;
 	sound_stream            *m_channel;
-	uint8_t                   m_dsp_regs[256];      /* DSP registers */
-	uint8_t                   m_ipl_region[64];     /* SPC top 64 bytes */
+	uint8_t                 m_dsp_regs[256];      /* DSP registers */
+	uint8_t                 m_ipl_region[64];     /* SPC top 64 bytes */
 
 	int                     m_keyed_on;
 	int                     m_keys;               /* 8-bits for 8 voices */
@@ -129,7 +128,7 @@ private:
 	uint16_t                  m_TnDIV[3]; /**< Timer N Divider */
 };
 
-DECLARE_DEVICE_TYPE(SNES, snes_sound_device)
+DECLARE_DEVICE_TYPE(SNES_SOUND, snes_sound_device)
 
 
 #endif // MAME_AUDIO_SNES_SND_H

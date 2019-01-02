@@ -10,6 +10,7 @@
     FDC: NEC 72068 (entire PC controller on a chip)
     512k RAM
     Custom gate array
+    AT28C16 parallel EPROM
     640x400 dot-matrix LCD
 
     Things to check
@@ -22,6 +23,7 @@
 #include "emu.h"
 #include "cpu/m37710/m37710.h"
 #include "machine/nvram.h"
+#include "machine/at28c16.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -33,6 +35,10 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void fontwriter(machine_config &config);
+	void fw600(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -43,17 +49,21 @@ public:
 		m_vbl ^= 0xff;
 		return m_vbl;
 	}
-	void fontwriter(machine_config &config);
+	DECLARE_READ8_MEMBER(vbl2_r)
+	{
+		m_vbl2 ^= 0x88;
+		return m_vbl;
+	}
 	void io_map(address_map &map);
 	void main_map(address_map &map);
-protected:
+	void fw600_map(address_map &map);
 
 	// devices
 	required_device<m37720s1_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void video_start() override;
-	uint8_t m_vbl;
+	uint8_t m_vbl, m_vbl2;
 };
 
 void fontwriter_state::machine_reset()
@@ -79,22 +89,35 @@ void fontwriter_state::main_map(address_map &map)
 	map(0x002000, 0x007fff).ram();
 	map(0x008000, 0x00ffff).rom().region("maincpu", 0x0000);
 	map(0x020000, 0x04ffff).ram();
-	map(0x100000, 0x1007ff).ram();
+	map(0x100000, 0x1007ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write));
 	map(0x200000, 0x3fffff).rom().region("maincpu", 0x0000);
 }
 
 void fontwriter_state::io_map(address_map &map)
 {
-	map(M37710_PORT6, M37710_PORT6).r(this, FUNC(fontwriter_state::vbl_r));
+	map(M37710_PORT6, M37710_PORT6).r(FUNC(fontwriter_state::vbl_r));
+	map(M37710_PORT7, M37710_PORT7).r(FUNC(fontwriter_state::vbl2_r));
+}
+
+void fontwriter_state::fw600_map(address_map &map)
+{
+	map(0x000280, 0x0002ff).ram();
+	map(0x000800, 0x000fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write));
+	map(0x002000, 0x007fff).ram();
+	map(0x008000, 0x00ffff).rom().region("maincpu", 0x1f8000);
+	map(0x020000, 0x04ffff).ram();
+	map(0x200000, 0x3fffff).rom().region("maincpu", 0x0000);
 }
 
 static INPUT_PORTS_START( fontwriter )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(fontwriter_state::fontwriter)
-	MCFG_CPU_ADD("maincpu", M37720S1, XTAL(16'000'000)) /* M37720S1 @ 16MHz - main CPU */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", M37720S1, XTAL(16'000'000)) /* M37720S1 @ 16MHz - main CPU */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+
+	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -104,9 +127,36 @@ MACHINE_CONFIG_START(fontwriter_state::fontwriter)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(fontwriter_state::fw600)
+	MCFG_DEVICE_ADD("maincpu", M37720S1, XTAL(16'000'000)) /* M37720S1 @ 16MHz - main CPU */
+	MCFG_DEVICE_PROGRAM_MAP(fw600_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+
+	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_UPDATE_DRIVER(fontwriter_state, screen_update)
+	MCFG_SCREEN_SIZE(640, 400)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
+MACHINE_CONFIG_END
+
+ROM_START(fw600)
+	ROM_REGION(0x200000, "maincpu", 0)      /* M37720 program ROM */
+	ROM_LOAD( "lh5388n5.bin", 0x000000, 0x100000, CRC(3bcc5c19) SHA1(510e3795faf18e10f2fef69110f96183e7cfee35) )
+	ROM_LOAD( "lh5388n9.bin", 0x100000, 0x100000, CRC(be2198df) SHA1(9e42f3a933c6f247c452910af3a2e9196291574a) )
+
+	ROM_REGION(0x800, "at28c16", 0)         /* AT28C16 parallel EPROM */
+	ROM_LOAD( "at28c16.bin",  0x000000, 0x000800, CRC(a84eafd9) SHA1(12503a71e98f80819959d41643b1d2773739b923) )
+ROM_END
+
 ROM_START(fw700ger)
 	ROM_REGION(0x200000, "maincpu", 0)       /* M37720 program ROM */
 	ROM_LOAD( "lh5370pd.ic7", 0x000000, 0x200000, CRC(29083e13) SHA1(7e1605f91b53580e75f638f9e6b0917305c35f84) )
+
+	ROM_REGION(0x800, "at28c16", ROMREGION_ERASE00)         /* AT28C16 parallel EPROM */
 ROM_END
 
-SYST( 1994, fw700ger, 0, 0, fontwriter, fontwriter, fontwriter_state, 0, "Sharp", "FontWriter FW-700 (German)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 1994, fw600,    0, 0, fw600, fontwriter, fontwriter_state, empty_init, "Sharp", "FontWriter FW-600", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 1994, fw700ger, 0, 0, fontwriter, fontwriter, fontwriter_state, empty_init, "Sharp", "FontWriter FW-700 (German)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

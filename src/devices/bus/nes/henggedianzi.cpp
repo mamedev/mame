@@ -22,8 +22,6 @@
 #include "emu.h"
 #include "henggedianzi.h"
 
-#include "cpu/m6502/m6502.h"
-
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -195,7 +193,7 @@ void nes_hengg_shjy3_device::hblank_irq(int scanline, int vblank, int blanked)
 		{
 			m_irq_count = m_irq_count_latch;
 			m_irq_enable = m_irq_enable | ((m_irq_enable & 0x01) << 1);
-			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			hold_irq_line();
 		}
 		else
 			m_irq_count++;

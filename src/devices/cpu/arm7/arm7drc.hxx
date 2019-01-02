@@ -471,15 +471,6 @@ void arm7_cpu_device::cfunc_unimplemented()
 void arm7_cpu_device::static_generate_entry_point()
 {
 	drcuml_state *drcuml = m_impstate.drcuml;
-	uml::code_label nodabt;
-	uml::code_label nofiq;
-	uml::code_label noirq;
-	uml::code_label irq32;
-	uml::code_label nopabd;
-	uml::code_label nound;
-	uml::code_label swi32;
-	uml::code_label irqadjust;
-	uml::code_label done;
 
 	drcuml_block &block(drcuml->begin_block(110));
 
@@ -1160,8 +1151,6 @@ void arm7_cpu_device::generate_update_cycles(drcuml_block &block, compiler_state
 	/* check full interrupts if pending */
 	if (compiler.checkints)
 	{
-		uml::code_label skip;
-
 		compiler.checkints = false;
 		UML_CALLH(block, *m_impstate.check_irq);
 	}
@@ -1196,12 +1185,12 @@ void arm7_cpu_device::generate_checksum_block(drcuml_block &block, compiler_stat
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
 			uint32_t sum = seqhead->opptr.l[0];
-			void *base = m_direct->read_ptr(seqhead->physpc);
+			const void *base = m_prptr(seqhead->physpc);
 			UML_LOAD(block, uml::I0, base, 0, uml::SIZE_DWORD, uml::SCALE_x4);             // load    i0,base,0,dword
 
 			if (seqhead->delay.first() != nullptr && seqhead->physpc != seqhead->delay.first()->physpc)
 			{
-				base = m_direct->read_ptr(seqhead->delay.first()->physpc);
+				base = m_prptr(seqhead->delay.first()->physpc);
 				UML_LOAD(block, uml::I1, base, 0, uml::SIZE_DWORD, uml::SCALE_x4);         // load    i1,base,dword
 				UML_ADD(block, uml::I0, uml::I0, uml::I1);                                 // add     i0,i0,i1
 
@@ -1217,20 +1206,20 @@ void arm7_cpu_device::generate_checksum_block(drcuml_block &block, compiler_stat
 	else
 	{
 		uint32_t sum = 0;
-		void *base = m_direct->read_ptr(seqhead->physpc);
+		const void *base = m_prptr(seqhead->physpc);
 		UML_LOAD(block, uml::I0, base, 0, uml::SIZE_DWORD, uml::SCALE_x4);                 // load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				base = m_direct->read_ptr(curdesc->physpc);
+				base = m_prptr(curdesc->physpc);
 				UML_LOAD(block, uml::I1, base, 0, uml::SIZE_DWORD, uml::SCALE_x4);         // load    i1,base,dword
 				UML_ADD(block, uml::I0, uml::I0, uml::I1);                                 // add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
 
 				if (curdesc->delay.first() != nullptr && (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
-					base = m_direct->read_ptr(curdesc->delay.first()->physpc);
+					base = m_prptr(curdesc->delay.first()->physpc);
 					UML_LOAD(block, uml::I1, base, 0, uml::SIZE_DWORD, uml::SCALE_x4);     // load    i1,base,dword
 					UML_ADD(block, uml::I0, uml::I0, uml::I1);                             // add     i0,i0,i1
 					sum += curdesc->delay.first()->opptr.l[0];

@@ -91,44 +91,43 @@ WRITE8_MEMBER(divebomb_state::rozcpu_pal_w)
  *
  *************************************/
 
-void divebomb_state::decode_proms(const uint8_t * rgn, int size, int index, bool inv)
+void divebomb_state::decode_proms(palette_device &palette, const uint8_t * rgn, int size, int index, bool inv)
 {
-	static const int resistances[4] = { 2000, 1000, 470, 220 };
+	static constexpr int resistances[4] = { 2000, 1000, 470, 220 };
 
+	// compute the color output resistor weights
 	double rweights[4], gweights[4], bweights[4];
-
-	/* compute the color output resistor weights */
 	compute_resistor_weights(0, 255, -1.0,
-								4, resistances, rweights, 0, 0,
-								4, resistances, gweights, 0, 0,
-								4, resistances, bweights, 0, 0);
+			4, resistances, rweights, 0, 0,
+			4, resistances, gweights, 0, 0,
+			4, resistances, bweights, 0, 0);
 
-	/* create a lookup table for the palette */
+	// create a lookup table for the palette
 	for (uint32_t i = 0; i < size; ++i)
 	{
-		uint32_t rdata = rgn[i + size*2] & 0x0f;
-		uint32_t r = combine_4_weights(rweights, BIT(rdata, 0), BIT(rdata, 1), BIT(rdata, 2), BIT(rdata, 3));
+		uint32_t const rdata = rgn[i + size*2] & 0x0f;
+		uint32_t const r = combine_4_weights(rweights, BIT(rdata, 0), BIT(rdata, 1), BIT(rdata, 2), BIT(rdata, 3));
 
-		uint32_t gdata = rgn[i + size] & 0x0f;
-		uint32_t g = combine_4_weights(gweights, BIT(gdata, 0), BIT(gdata, 1), BIT(gdata, 2), BIT(gdata, 3));
+		uint32_t const gdata = rgn[i + size] & 0x0f;
+		uint32_t const g = combine_4_weights(gweights, BIT(gdata, 0), BIT(gdata, 1), BIT(gdata, 2), BIT(gdata, 3));
 
-		uint32_t bdata = rgn[i] & 0x0f;
-		uint32_t b = combine_4_weights(bweights, BIT(bdata, 0), BIT(bdata, 1), BIT(bdata, 2), BIT(bdata, 3));
+		uint32_t const bdata = rgn[i] & 0x0f;
+		uint32_t const b = combine_4_weights(bweights, BIT(bdata, 0), BIT(bdata, 1), BIT(bdata, 2), BIT(bdata, 3));
 
 		if (!inv)
-			m_palette->set_pen_color(index + i, rgb_t(r, g, b));
+			palette.set_pen_color(index + i, rgb_t(r, g, b));
 		else
-			m_palette->set_pen_color(index + (i ^ 0xff), rgb_t(r, g, b));
+			palette.set_pen_color(index + (i ^ 0xff), rgb_t(r, g, b));
 	}
 }
 
 
-PALETTE_INIT_MEMBER(divebomb_state, divebomb)
+void divebomb_state::divebomb_palette(palette_device &palette) const
 {
-	decode_proms(memregion("spr_proms")->base(), 0x100, 0x400 + 0x400 + 0x400, false);
-	decode_proms(memregion("fg_proms")->base(), 0x400, 0x400 + 0x400, false);
-	decode_proms(memregion("k051316_1_pr")->base(), 0x400, 0, true);
-	decode_proms(memregion("k051316_2_pr")->base(), 0x400, 0x400, true);
+	decode_proms(palette, memregion("spr_proms")->base(), 0x100, 0x400 + 0x400 + 0x400, false);
+	decode_proms(palette, memregion("fg_proms")->base(), 0x400, 0x400 + 0x400, false);
+	decode_proms(palette, memregion("k051316_1_pr")->base(), 0x400, 0, true);
+	decode_proms(palette, memregion("k051316_2_pr")->base(), 0x400, 0x400, true);
 }
 
 

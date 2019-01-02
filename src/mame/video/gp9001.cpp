@@ -151,35 +151,27 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
  priority system.
 
 */
-#define GP9001_PRIMASK (0x000f)
-#define GP9001_PRIMASK_TMAPS (0x000e)
+static constexpr unsigned GP9001_PRIMASK = 0x000f;
+static constexpr unsigned GP9001_PRIMASK_TMAPS = 0x000e;
+// TODO : Wrong; It's possibly lower than 256 at real hardware
+// Most noticeable at some boss explosion scene in bgaregga
+static constexpr unsigned MAX_SPRITES = 256;
 
-WRITE16_MEMBER(gp9001vdp_device::bg_tmap_w)
+template<int Layer>
+WRITE16_MEMBER(gp9001vdp_device::tmap_w)
 {
-	COMBINE_DATA(&m_vram_bg[offset]);
-	bg.tmap->mark_tile_dirty(offset/2);
-}
-
-WRITE16_MEMBER(gp9001vdp_device::fg_tmap_w)
-{
-	COMBINE_DATA(&m_vram_fg[offset]);
-	fg.tmap->mark_tile_dirty(offset/2);
-}
-
-WRITE16_MEMBER(gp9001vdp_device::top_tmap_w)
-{
-	COMBINE_DATA(&m_vram_top[offset]);
-	top.tmap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	m_tm[Layer].tmap->mark_tile_dirty(offset>>1);
 }
 
 
 void gp9001vdp_device::map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().w(this, FUNC(gp9001vdp_device::bg_tmap_w)).share("vram_bg");
-	map(0x1000, 0x1fff).ram().w(this, FUNC(gp9001vdp_device::fg_tmap_w)).share("vram_fg");
-	map(0x2000, 0x2fff).ram().w(this, FUNC(gp9001vdp_device::top_tmap_w)).share("vram_top");
+	map(0x0000, 0x0fff).ram().w(FUNC(gp9001vdp_device::tmap_w<0>)).share("vram_0");
+	map(0x1000, 0x1fff).ram().w(FUNC(gp9001vdp_device::tmap_w<1>)).share("vram_1");
+	map(0x2000, 0x2fff).ram().w(FUNC(gp9001vdp_device::tmap_w<2>)).share("vram_2");
 	map(0x3000, 0x37ff).ram().share("spriteram").mirror(0x0800);
-//  AM_RANGE(0x3800, 0x3fff) AM_RAM // sprite mirror?
+//  map(0x3800, 0x3fff).ram(); // sprite mirror?
 }
 
 
@@ -189,11 +181,9 @@ const gfx_layout gp9001vdp_device::tilelayout =
 	RGN_FRAC(1,2),  /* Number of tiles */
 	4,              /* 4 bits per pixel */
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-		8*16+0, 8*16+1, 8*16+2, 8*16+3, 8*16+4, 8*16+5, 8*16+6, 8*16+7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-		16*16, 17*16, 18*16, 19*16, 20*16, 21*16, 22*16, 23*16 },
-	8*4*16
+	{ STEP8(0,1), STEP8(8*8*2,1) },
+	{ STEP8(0,8*2), STEP8(16*8*2,8*2) },
+	16*16*2
 };
 
 const gfx_layout gp9001vdp_device::spritelayout =
@@ -202,9 +192,9 @@ const gfx_layout gp9001vdp_device::spritelayout =
 	RGN_FRAC(1,2),  /* Number of 8x8 sprites */
 	4,              /* 4 bits per pixel */
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	8*16
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
+	8*8*2
 };
 
 GFXDECODE_MEMBER( gp9001vdp_device::gfxinfo )
@@ -216,16 +206,14 @@ GFXDECODE_END
 DEFINE_DEVICE_TYPE(GP9001_VDP, gp9001vdp_device, "gp9001vdp", "GP9001 VDP")
 
 gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GP9001_VDP, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, gfxinfo),
-		device_video_interface(mconfig, *this),
-		device_memory_interface(mconfig, *this),
-		m_space_config("gp9001vdp", ENDIANNESS_BIG, 16,14, 0, address_map_constructor(FUNC(gp9001vdp_device::map), this)),
-		m_vram_bg(*this, "vram_bg"),
-		m_vram_fg(*this, "vram_fg"),
-		m_vram_top(*this, "vram_top"),
-		m_spriteram(*this, "spriteram"),
-		m_vint_out_cb(*this)
+	: device_t(mconfig, GP9001_VDP, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, gfxinfo)
+	, device_video_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("gp9001vdp", ENDIANNESS_BIG, 16, 14, 0, address_map_constructor(FUNC(gp9001vdp_device::map), this))
+	, m_vram(*this, "vram_%u", 0)
+	, m_spriteram(*this, "spriteram")
+	, m_vint_out_cb(*this)
 {
 }
 
@@ -236,13 +224,14 @@ device_memory_interface::space_config_vector gp9001vdp_device::memory_space_conf
 	};
 }
 
-TILE_GET_INFO_MEMBER(gp9001vdp_device::get_top0_tile_info)
+template<int Layer>
+TILE_GET_INFO_MEMBER(gp9001vdp_device::get_tile_info)
 {
 	int color, tile_number, attrib;
 
-	attrib = m_vram_top[2*tile_index];
+	attrib = m_vram[Layer][2*tile_index];
 
-	tile_number = get_tile_number(m_vram_top, tile_index);
+	tile_number = get_tile_number(Layer, tile_index);
 
 	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
 	SET_TILE_INFO_MEMBER(0,
@@ -252,117 +241,89 @@ TILE_GET_INFO_MEMBER(gp9001vdp_device::get_top0_tile_info)
 	//tileinfo.category = (attrib & 0x0f00) >> 8;
 }
 
-TILE_GET_INFO_MEMBER(gp9001vdp_device::get_fg0_tile_info)
+//-------------------------------------------------
+//  device_add_mconfig - device-specific machine
+//  configuration addiitons
+//-------------------------------------------------
+
+void gp9001vdp_device::device_add_mconfig(machine_config &config)
 {
-	int color, tile_number, attrib;
-
-	attrib = m_vram_fg[2*tile_index];
-
-	tile_number = get_tile_number(m_vram_fg, tile_index);
-
-	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
-	SET_TILE_INFO_MEMBER(0,
-			tile_number,
-			color,
-			0);
-	//tileinfo.category = (attrib & 0x0f00) >> 8;
-}
-
-TILE_GET_INFO_MEMBER(gp9001vdp_device::get_bg0_tile_info)
-{
-	int color, tile_number, attrib;
-	attrib = m_vram_bg[2*tile_index];
-
-	tile_number = get_tile_number(m_vram_bg, tile_index);
-
-	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
-	SET_TILE_INFO_MEMBER(0,
-			tile_number,
-			color,
-			0);
-	//tileinfo.category = (attrib & 0x0f00) >> 8;
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 }
 
 void gp9001vdp_device::create_tilemaps()
 {
-	top.tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_top0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	fg.tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_fg0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	bg.tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_tm[2].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<2>),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_tm[1].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<1>),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_tm[0].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<0>),this),TILEMAP_SCAN_ROWS,16,16,32,32);
 
-	top.tmap->set_transparent_pen(0);
-	fg.tmap->set_transparent_pen(0);
-	bg.tmap->set_transparent_pen(0);
+	m_tm[2].tmap->set_transparent_pen(0);
+	m_tm[1].tmap->set_transparent_pen(0);
+	m_tm[0].tmap->set_transparent_pen(0);
 }
 
 
 void gp9001vdp_device::device_start()
 {
-	sp.vram16_buffer = make_unique_clear<uint16_t[]>(SPRITERAM_SIZE/2);
-
 	create_tilemaps();
 
 	m_vint_out_cb.resolve();
 
 	m_raise_irq_timer = timer_alloc(TIMER_RAISE_IRQ);
 
-	save_pointer(NAME(sp.vram16_buffer.get()), SPRITERAM_SIZE/2);
+	save_item(NAME(m_scroll_reg));
+	save_item(NAME(m_voffs));
+	for (int i = 0; i < 3; i++)
+	{
+		save_item(NAME(m_tm[i].scrollx), i);
+		save_item(NAME(m_tm[i].scrolly), i);
+		save_item(NAME(m_tm[i].flip), i);
+	}
+	save_item(NAME(m_sp.scrollx));
+	save_item(NAME(m_sp.scrolly));
+	save_item(NAME(m_sp.flip));
 
-	save_item(NAME(gp9001_scroll_reg));
-	save_item(NAME(gp9001_voffs));
-	save_item(NAME(bg.scrollx));
-	save_item(NAME(bg.scrolly));
-	save_item(NAME(fg.scrollx));
-	save_item(NAME(fg.scrolly));
-	save_item(NAME(top.scrollx));
-	save_item(NAME(top.scrolly));
-	save_item(NAME(sp.scrollx));
-	save_item(NAME(sp.scrolly));
-	save_item(NAME(bg.flip));
-	save_item(NAME(fg.flip));
-	save_item(NAME(top.flip));
-	save_item(NAME(sp.flip));
-
-	gfxrom_is_banked = false;
-	gfxrom_bank_dirty = false;
-	save_item(NAME(gfxrom_bank));
+	m_gfxrom_is_banked = false;
+	m_gfxrom_bank_dirty = false;
+	save_item(NAME(m_gfxrom_bank));
 
 	// default layer offsets used by all original games
-	bg.extra_xoffset.normal  = -0x1d6;
-	bg.extra_xoffset.flipped = -0x229;
-	bg.extra_yoffset.normal  = -0x1ef;
-	bg.extra_yoffset.flipped = -0x210;
+	m_tm[0].extra_xoffset.normal  = -0x1d6;
+	m_tm[0].extra_xoffset.flipped = -0x229;
+	m_tm[0].extra_yoffset.normal  = -0x1ef;
+	m_tm[0].extra_yoffset.flipped = -0x210;
 
-	fg.extra_xoffset.normal  = -0x1d8;
-	fg.extra_xoffset.flipped = -0x227;
-	fg.extra_yoffset.normal  = -0x1ef;
-	fg.extra_yoffset.flipped = -0x210;
+	m_tm[1].extra_xoffset.normal  = -0x1d8;
+	m_tm[1].extra_xoffset.flipped = -0x227;
+	m_tm[1].extra_yoffset.normal  = -0x1ef;
+	m_tm[1].extra_yoffset.flipped = -0x210;
 
-	top.extra_xoffset.normal = -0x1da;
-	top.extra_xoffset.flipped= -0x225;
-	top.extra_yoffset.normal = -0x1ef;
-	top.extra_yoffset.flipped= -0x210;
+	m_tm[2].extra_xoffset.normal = -0x1da;
+	m_tm[2].extra_xoffset.flipped= -0x225;
+	m_tm[2].extra_yoffset.normal = -0x1ef;
+	m_tm[2].extra_yoffset.flipped= -0x210;
 
-	sp.extra_xoffset.normal  = -0x1cc;
-	sp.extra_xoffset.flipped = -0x17b;
-	sp.extra_yoffset.normal  = -0x1ef;
-	sp.extra_yoffset.flipped = -0x108;
+	m_sp.extra_xoffset.normal  = -0x1cc;
+	m_sp.extra_xoffset.flipped = -0x17b;
+	m_sp.extra_yoffset.normal  = -0x1ef;
+	m_sp.extra_yoffset.flipped = -0x108;
 
-	sp.use_sprite_buffer = 1;
+	m_sp.use_sprite_buffer = 1;
 }
 
 void gp9001vdp_device::device_reset()
 {
-	gp9001_voffs = 0;
-	gp9001_scroll_reg = 0;
-	bg.scrollx = bg.scrolly = 0;
-	fg.scrollx = fg.scrolly = 0;
-	top.scrollx = top.scrolly = 0;
-	sp.scrollx = sp.scrolly = 0;
+	m_voffs = 0;
+	m_scroll_reg = 0;
+	m_tm[0].scrollx = m_tm[0].scrolly = 0;
+	m_tm[1].scrollx = m_tm[1].scrolly = 0;
+	m_tm[2].scrollx = m_tm[2].scrolly = 0;
+	m_sp.scrollx = m_sp.scrolly = 0;
 
-	bg.flip = 0;
-	fg.flip = 0;
-	top.flip = 0;
-	sp.flip = 0;
+	m_tm[0].flip = 0;
+	m_tm[1].flip = 0;
+	m_tm[2].flip = 0;
+	m_sp.flip = 0;
 
 	init_scroll_regs();
 
@@ -372,43 +333,43 @@ void gp9001vdp_device::device_reset()
 }
 
 
-void gp9001vdp_device::gp9001_voffs_w(uint16_t data, uint16_t mem_mask)
+void gp9001vdp_device::voffs_w(uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&gp9001_voffs);
+	COMBINE_DATA(&m_voffs);
 }
 
-int gp9001vdp_device::gp9001_videoram16_r()
+int gp9001vdp_device::videoram16_r()
 {
-	int offs = gp9001_voffs;
-	gp9001_voffs++;
+	int offs = m_voffs;
+	m_voffs++;
 	return space().read_word(offs*2);
 }
 
 
-void gp9001vdp_device::gp9001_videoram16_w(uint16_t data, uint16_t mem_mask)
+void gp9001vdp_device::videoram16_w(uint16_t data, uint16_t mem_mask)
 {
-	int offs = gp9001_voffs;
-	gp9001_voffs++;
+	int offs = m_voffs;
+	m_voffs++;
 	space().write_word(offs*2, data, mem_mask);
 }
 
 
-uint16_t gp9001vdp_device::gp9001_vdpstatus_r()
+uint16_t gp9001vdp_device::vdpstatus_r()
 {
 	return ((screen().vpos() + 15) % 262) >= 245;
 }
 
-void gp9001vdp_device::gp9001_scroll_reg_select_w(uint16_t data, uint16_t mem_mask)
+void gp9001vdp_device::scroll_reg_select_w(uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		gp9001_scroll_reg = data & 0x8f;
+		m_scroll_reg = data & 0x8f;
 		if (data & 0x70)
-			logerror("Hmmm, selecting unknown LSB video control register (%04x)\n",gp9001_scroll_reg);
+			logerror("Hmmm, selecting unknown LSB video control register (%04x)\n",m_scroll_reg);
 	}
 	else
 	{
-		logerror("Hmmm, selecting unknown MSB video control register (%04x)\n",gp9001_scroll_reg);
+		logerror("Hmmm, selecting unknown MSB video control register (%04x)\n",m_scroll_reg);
 	}
 }
 
@@ -489,28 +450,28 @@ void gp9001vdp_device::spritelayer::set_scrolly_and_flip_reg(uint16_t data, uint
 	}
 }
 
-void gp9001vdp_device::gp9001_scroll_reg_data_w(uint16_t data, uint16_t mem_mask)
+void gp9001vdp_device::scroll_reg_data_w(uint16_t data, uint16_t mem_mask)
 {
 	/************************************************************************/
 	/***** layer X and Y flips can be set independently, so emulate it ******/
 	/************************************************************************/
 
 	// writes with 8x set turn on flip for the specified layer / axis
-	int flip = gp9001_scroll_reg & 0x80;
+	int flip = m_scroll_reg & 0x80;
 
-	switch (gp9001_scroll_reg&0x7f)
+	switch (m_scroll_reg&0x7f)
 	{
-		case 0x00: bg.set_scrollx_and_flip_reg(data, mem_mask, flip); break;
-		case 0x01: bg.set_scrolly_and_flip_reg(data, mem_mask, flip); break;
+		case 0x00: m_tm[0].set_scrollx_and_flip_reg(data, mem_mask, flip); break;
+		case 0x01: m_tm[0].set_scrolly_and_flip_reg(data, mem_mask, flip); break;
 
-		case 0x02: fg.set_scrollx_and_flip_reg(data, mem_mask, flip); break;
-		case 0x03: fg.set_scrolly_and_flip_reg(data, mem_mask, flip); break;
+		case 0x02: m_tm[1].set_scrollx_and_flip_reg(data, mem_mask, flip); break;
+		case 0x03: m_tm[1].set_scrolly_and_flip_reg(data, mem_mask, flip); break;
 
-		case 0x04: top.set_scrollx_and_flip_reg(data, mem_mask, flip); break;
-		case 0x05: top.set_scrolly_and_flip_reg(data, mem_mask, flip); break;
+		case 0x04: m_tm[2].set_scrollx_and_flip_reg(data, mem_mask, flip); break;
+		case 0x05: m_tm[2].set_scrolly_and_flip_reg(data, mem_mask, flip); break;
 
-		case 0x06: sp.set_scrollx_and_flip_reg(data, mem_mask, flip); break;
-		case 0x07: sp.set_scrolly_and_flip_reg(data, mem_mask, flip); break;
+		case 0x06: m_sp.set_scrollx_and_flip_reg(data, mem_mask, flip); break;
+		case 0x07: m_sp.set_scrolly_and_flip_reg(data, mem_mask, flip); break;
 
 
 		case 0x0e:  /******* Initialise video controller register ? *******/
@@ -518,104 +479,63 @@ void gp9001vdp_device::gp9001_scroll_reg_data_w(uint16_t data, uint16_t mem_mask
 		case 0x0f: if (!m_vint_out_cb.isnull()) m_vint_out_cb(0); break;
 
 
-		default:    logerror("Hmmm, writing %08x to unknown video control register (%08x) !!!\n",data,gp9001_scroll_reg);
+		default:    logerror("Hmmm, writing %08x to unknown video control register (%08x) !!!\n",data,m_scroll_reg);
 					break;
 	}
 }
 
 void gp9001vdp_device::init_scroll_regs()
 {
-	bg.set_scrollx_and_flip_reg(0, 0xffff, 0);
-	bg.set_scrolly_and_flip_reg(0, 0xffff, 0);
-	fg.set_scrollx_and_flip_reg(0, 0xffff, 0);
-	fg.set_scrolly_and_flip_reg(0, 0xffff, 0);
-	top.set_scrollx_and_flip_reg(0, 0xffff, 0);
-	top.set_scrolly_and_flip_reg(0, 0xffff, 0);
-	sp.set_scrollx_and_flip_reg(0, 0xffff, 0);
-	sp.set_scrolly_and_flip_reg(0, 0xffff, 0);
+	m_tm[0].set_scrollx_and_flip_reg(0, 0xffff, 0);
+	m_tm[0].set_scrolly_and_flip_reg(0, 0xffff, 0);
+	m_tm[1].set_scrollx_and_flip_reg(0, 0xffff, 0);
+	m_tm[1].set_scrolly_and_flip_reg(0, 0xffff, 0);
+	m_tm[2].set_scrollx_and_flip_reg(0, 0xffff, 0);
+	m_tm[2].set_scrolly_and_flip_reg(0, 0xffff, 0);
+	m_sp.set_scrollx_and_flip_reg(0, 0xffff, 0);
+	m_sp.set_scrolly_and_flip_reg(0, 0xffff, 0);
 }
 
 
 
-READ16_MEMBER(gp9001vdp_device::gp9001_vdp_r)
+uint16_t gp9001vdp_device::read(offs_t offset, u16 mem_mask)
 {
 	switch (offset & (0xc/2))
 	{
 		case 0x04/2:
-			return gp9001_videoram16_r();
+			return videoram16_r();
 
 		case 0x0c/2:
-			return gp9001_vdpstatus_r();
+			return vdpstatus_r();
 
 		default:
-			logerror("gp9001_vdp_r: read from unhandled offset %04x\n",offset*2);
+			logerror("read: read from unhandled offset %04x\n",offset*2);
 	}
 
 	return 0xffff;
 }
 
-WRITE16_MEMBER(gp9001vdp_device::gp9001_vdp_w)
+void gp9001vdp_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
 	switch (offset & (0xc/2))
 	{
 		case 0x00/2:
-			gp9001_voffs_w(data, mem_mask);
+			voffs_w(data, mem_mask);
 			break;
 
 		case 0x04/2:
-			gp9001_videoram16_w(data, mem_mask);
+			videoram16_w(data, mem_mask);
 			break;
 
 		case 0x08/2:
-			gp9001_scroll_reg_select_w(data, mem_mask);
+			scroll_reg_select_w(data, mem_mask);
 			break;
 
 		case 0x0c/2:
-			gp9001_scroll_reg_data_w(data, mem_mask);
+			scroll_reg_data_w(data, mem_mask);
 			break;
 	}
 }
-
-/* batrider and bbakraid invert the register select lines */
-READ16_MEMBER(gp9001vdp_device::gp9001_vdp_alt_r)
-{
-	switch (offset & (0xc/2))
-	{
-		case 0x0/2:
-			return gp9001_vdpstatus_r();
-
-		case 0x8/2:
-			return gp9001_videoram16_r();
-
-		default:
-			logerror("gp9001_vdp_alt_r: read from unhandled offset %04x\n",offset*2);
-	}
-
-	return 0xffff;
-}
-
-WRITE16_MEMBER(gp9001vdp_device::gp9001_vdp_alt_w)
-{
-	switch (offset & (0xc/2))
-	{
-		case 0x0/2:
-			gp9001_scroll_reg_data_w(data, mem_mask);
-			break;
-
-		case 0x4/2:
-			gp9001_scroll_reg_select_w(data, mem_mask);
-			break;
-
-		case 0x8/2:
-			gp9001_videoram16_w(data, mem_mask);
-			break;
-
-		case 0xc/2:
-			gp9001_voffs_w(data, mem_mask);
-			break;
-	}
-}
-
 
 
 /***************************************************************************/
@@ -638,33 +558,33 @@ WRITE16_MEMBER(gp9001vdp_device::pipibibi_bootleg_scroll_w)
 			default:    logerror("PIPIBIBI writing %04x to unknown scroll register %04x",data, offset);
 		}
 
-		gp9001_scroll_reg = offset;
-		gp9001_scroll_reg_data_w(data, mem_mask);
+		m_scroll_reg = offset;
+		scroll_reg_data_w(data, mem_mask);
 	}
 }
 
 READ16_MEMBER(gp9001vdp_device::pipibibi_bootleg_videoram16_r)
 {
-	gp9001_voffs_w(offset, 0xffff);
-	return gp9001_videoram16_r();
+	voffs_w(offset, 0xffff);
+	return videoram16_r();
 }
 
 WRITE16_MEMBER(gp9001vdp_device::pipibibi_bootleg_videoram16_w)
 {
-	gp9001_voffs_w(offset, 0xffff);
-	gp9001_videoram16_w(data, mem_mask);
+	voffs_w(offset, 0xffff);
+	videoram16_w(data, mem_mask);
 }
 
 READ16_MEMBER(gp9001vdp_device::pipibibi_bootleg_spriteram16_r)
 {
-	gp9001_voffs_w((0x1800 + offset), 0);
-	return gp9001_videoram16_r();
+	voffs_w((0x1800 + offset), 0);
+	return videoram16_r();
 }
 
 WRITE16_MEMBER(gp9001vdp_device::pipibibi_bootleg_spriteram16_w)
 {
-	gp9001_voffs_w((0x1800 + offset), mem_mask);
-	gp9001_videoram16_w(data, mem_mask);
+	voffs_w((0x1800 + offset), mem_mask);
+	videoram16_w(data, mem_mask);
 }
 
 /***************************************************************************
@@ -699,30 +619,26 @@ READ_LINE_MEMBER(gp9001vdp_device::fblank_r)
 
 void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t* primap )
 {
-	const uint16_t primask = (GP9001_PRIMASK << 8);
+	uint16_t const *source = (m_sp.use_sprite_buffer) ? m_spriteram->buffer() : m_spriteram->live();
 
-	uint16_t *source;
+	int const total_elements = gfx(1)->elements();
+	int const total_colors = gfx(1)->colors();
 
-	if (sp.use_sprite_buffer) source = sp.vram16_buffer.get();
-	else source = &m_spriteram[0];
-	int total_elements = gfx(1)->elements();
-	int total_colors = gfx(1)->colors();
+	int old_x = (-(m_sp.scrollx)) & 0x1ff;
+	int old_y = (-(m_sp.scrolly)) & 0x1ff;
 
-	int old_x = (-(sp.scrollx)) & 0x1ff;
-	int old_y = (-(sp.scrolly)) & 0x1ff;
-
-	for (int offs = 0; offs < (SPRITERAM_SIZE/2); offs += 4)
+	for (int offs = 0; offs < (MAX_SPRITES * 4); offs += 4)
 	{
 		int attrib, sprite, color, priority, flipx, flipy, sx, sy;
 		int sprite_sizex, sprite_sizey, dim_x, dim_y, sx_base, sy_base;
 		int bank, sprite_num;
 
 		attrib = source[offs];
-		priority = primap[((attrib & primask)>>8)]+1;
+		priority = primap[(attrib >> 8) & GP9001_PRIMASK] + 1;
 
 		if ((attrib & 0x8000))
 		{
-			if (!gfxrom_is_banked)   /* No Sprite select bank switching needed */
+			if (!m_gfxrom_is_banked)   /* No Sprite select bank switching needed */
 			{
 				sprite = ((attrib & 3) << 16) | source[offs + 1];   /* 18 bit */
 			}
@@ -730,7 +646,7 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 			{
 				sprite_num = source[offs + 1] & 0x7fff;
 				bank = ((attrib & 3) << 1) | (source[offs + 1] >> 15);
-				sprite = (gfxrom_bank[bank] << 15 ) | sprite_num;
+				sprite = (m_gfxrom_bank[bank] << 15) | sprite_num;
 			}
 			color = (attrib >> 2) & 0x3f;
 
@@ -741,8 +657,8 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 			/***** find position to display sprite *****/
 			if (!(attrib & 0x4000))
 			{
-				sx_base = ((source[offs + 2] >> 7) - (sp.scrollx)) & 0x1ff;
-				sy_base = ((source[offs + 3] >> 7) - (sp.scrolly)) & 0x1ff;
+				sx_base = ((source[offs + 2] >> 7) - (m_sp.scrollx)) & 0x1ff;
+				sy_base = ((source[offs + 3] >> 7) - (m_sp.scrolly)) & 0x1ff;
 
 			} else {
 				sx_base = (old_x + (source[offs + 2] >> 7)) & 0x1ff;
@@ -777,17 +693,17 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 			}
 
 			/***** Flip the sprite layer in any active X or Y flip *****/
-			if (sp.flip)
+			if (m_sp.flip)
 			{
-				if (sp.flip & SPRITE_FLIPX)
+				if (m_sp.flip & SPRITE_FLIPX)
 					sx_base = 320 - sx_base;
-				if (sp.flip & SPRITE_FLIPY)
+				if (m_sp.flip & SPRITE_FLIPY)
 					sy_base = 240 - sy_base;
 			}
 
 			/***** Cancel flip, if it, and sprite layer flip are active *****/
-			flipx = (flipx ^ (sp.flip & SPRITE_FLIPX));
-			flipy = (flipy ^ (sp.flip & SPRITE_FLIPY));
+			flipx = (flipx ^ (m_sp.flip & SPRITE_FLIPX));
+			flipy = (flipy ^ (m_sp.flip & SPRITE_FLIPY));
 
 			/***** Draw the complete sprites using the dimension info *****/
 			for (dim_y = 0; dim_y < sprite_sizey; dim_y += 8)
@@ -800,8 +716,8 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 					else       sx = sx_base + dim_x;
 
 					/*
-					gfx->transpen(bitmap,cliprect,sprite,
-					    color,
+					gfx->transpen_raw(bitmap,cliprect,sprite,
+					    color << 4,
 					    flipx,flipy,
 					    sx,sy,0);
 					*/
@@ -809,7 +725,6 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 					color %= total_colors;
 					const pen_t *paldata = &palette().pen(color * 16);
 					{
-						int yy, xx;
 						const uint8_t* srcdata = gfx(1)->get_data(sprite);
 						int count = 0;
 						int ystart, yend, yinc;
@@ -841,14 +756,13 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 							xinc = 1;
 						}
 
-						for (yy=ystart;yy!=yend;yy+=yinc)
+						for (int yy = ystart; yy != yend; yy += yinc)
 						{
-							int drawyy = yy+sy;
+							int drawyy = yy + sy;
 
-
-							for (xx=xstart;xx!=xend;xx+=xinc)
+							for (int xx = xstart; xx != xend; xx += xinc)
 							{
-								int drawxx = xx+sx;
+								int drawxx = xx + sx;
 
 								if (cliprect.contains(drawxx, drawyy))
 								{
@@ -867,15 +781,13 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 									}
 								}
 
-
 								count++;
 							}
 						}
 
-
 					}
 
-					sprite++ ;
+					sprite++;
 				}
 			}
 		}
@@ -887,11 +799,9 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
     Draw the game screen in the given bitmap_ind16.
 ***************************************************************************/
 
-void gp9001vdp_device::gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, tilemap_t* tilemap, const uint8_t* priremap, const uint8_t* pri_enable )
+void gp9001vdp_device::draw_custom_tilemap( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, const uint8_t* priremap, const uint8_t* pri_enable )
 {
-	int width = screen().width();
-	int height = screen().height();
-	int y,x;
+	tilemap_t* tilemap = m_tm[layer].tmap;
 	bitmap_ind16 &tmb = tilemap->pixmap();
 	uint16_t* srcptr;
 	uint16_t* dstptr;
@@ -900,27 +810,27 @@ void gp9001vdp_device::gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, tilemap
 	int scrollx = tilemap->scrollx(0);
 	int scrolly = tilemap->scrolly(0);
 
-	for (y=0;y<height;y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		int realy = (y+scrolly)&0x1ff;
+		int realy = (y + scrolly) & 0x1ff;
 
 		srcptr = &tmb.pix16(realy);
 		dstptr = &bitmap.pix16(y);
 		dstpriptr = &this->custom_priority_bitmap->pix8(y);
 
-		for (x=0;x<width;x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			int realx = (x+scrollx)&0x1ff;
+			int realx = (x + scrollx) & 0x1ff;
 
 			uint16_t pixdat = srcptr[realx];
-			uint8_t pixpri = ((pixdat & (GP9001_PRIMASK_TMAPS<<12))>>12);
+			uint8_t pixpri = ((pixdat >> 12) & GP9001_PRIMASK_TMAPS);
 
 			if (pri_enable[pixpri])
 			{
-				pixpri = priremap[pixpri]+1; // priority of 0 isn't desireable
-				pixdat &=0x07ff;
+				pixpri = priremap[pixpri] + 1; // priority of 0 isn't desireable
+				pixdat &= 0x07ff;
 
-				if (pixdat&0xf)
+				if (pixdat & 0xf)
 				{
 					if (pixpri >= dstpriptr[x])
 					{
@@ -940,26 +850,27 @@ static const uint8_t gp9001_sprprimap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x
 
 static const uint8_t batsugun_prienable0[16]={ 1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1 };
 
-void gp9001vdp_device::gp9001_render_vdp(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void gp9001vdp_device::render_vdp(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (gfxrom_is_banked && gfxrom_bank_dirty)
+	if (m_gfxrom_is_banked && m_gfxrom_bank_dirty)
 	{
-		bg.tmap->mark_all_dirty();
-		fg.tmap->mark_all_dirty();
-		gfxrom_bank_dirty = false;
+		for (int i = 0; i < 3; i++)
+			m_tm[i].tmap->mark_all_dirty();
+
+		m_gfxrom_bank_dirty = false;
 	}
 
-	gp9001_draw_custom_tilemap(bitmap, bg.tmap, gp9001_primap1, batsugun_prienable0);
-	gp9001_draw_custom_tilemap(bitmap, fg.tmap, gp9001_primap1, batsugun_prienable0);
-	gp9001_draw_custom_tilemap(bitmap, top.tmap, gp9001_primap1, batsugun_prienable0);
-	draw_sprites(bitmap,cliprect, gp9001_sprprimap1);
+	draw_custom_tilemap(bitmap, cliprect, 0, gp9001_primap1, batsugun_prienable0);
+	draw_custom_tilemap(bitmap, cliprect, 1, gp9001_primap1, batsugun_prienable0);
+	draw_custom_tilemap(bitmap, cliprect, 2, gp9001_primap1, batsugun_prienable0);
+	draw_sprites(bitmap, cliprect, gp9001_sprprimap1);
 }
 
 
-void gp9001vdp_device::gp9001_screen_eof(void)
+void gp9001vdp_device::screen_eof(void)
 {
 	/** Shift sprite RAM buffers  ***  Used to fix sprite lag **/
-	if (sp.use_sprite_buffer) memcpy(sp.vram16_buffer.get(),m_spriteram,SPRITERAM_SIZE);
+	if (m_sp.use_sprite_buffer) m_spriteram->copy();
 
 	// the IRQ appears to fire at line 0xe6
 	if (!m_vint_out_cb.isnull())

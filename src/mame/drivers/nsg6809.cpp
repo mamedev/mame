@@ -52,11 +52,10 @@ public:
 
 	void pitchhit(machine_config &config);
 
-protected:
+private:
 	void main_map(address_map &map);
 
-private:
-	required_device<cpu_device> m_maincpu;
+	required_device<mc6809_device> m_maincpu;
 };
 
 
@@ -72,22 +71,23 @@ void nsg6809_state::main_map(address_map &map)
 static INPUT_PORTS_START( pitchhit )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(nsg6809_state::pitchhit)
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000)) // clock buffered through 74HC4060
-	MCFG_CPU_PROGRAM_MAP(main_map)
+void nsg6809_state::pitchhit(machine_config &config)
+{
+	MC6809(config, m_maincpu, XTAL(4'000'000)); // clock buffered through 74HC4060
+	m_maincpu->set_addrmap(AS_PROGRAM, &nsg6809_state::main_map);
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4)
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
+	via6522_device &via(VIA6522(config, "via", XTAL(4'000'000) / 4));
+	via.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
+	mos6551_device &acia(MOS6551(config, "acia", 0));
+	acia.set_xtal(XTAL(1'843'200));
+	acia.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_WATCHDOG_ADD("deadman")
+	WATCHDOG_TIMER(config, "deadman", 0);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-MACHINE_CONFIG_END
+	input_merger_device &merger(INPUT_MERGER_ANY_HIGH(config, "mainirq"));
+	merger.output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+}
 
 
 /*
@@ -105,4 +105,4 @@ ROM_START( pitchhit )
 ROM_END
 
 
-GAME(1993, pitchhit, 0, pitchhit, pitchhit, nsg6809_state, 0, ROT0, "National Sports Games", "Pitch Hitter - Baseball Challenge", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1993, pitchhit, 0, pitchhit, pitchhit, nsg6809_state, empty_init, ROT0, "National Sports Games", "Pitch Hitter - Baseball Challenge", MACHINE_IS_SKELETON_MECHANICAL )

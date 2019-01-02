@@ -293,7 +293,7 @@ WRITE32_MEMBER(seibuspi_state::tilemap_dma_start_w)
 	/* fore layer row scroll */
 	if (m_rowscroll_enable)
 	{
-		memcpy(&m_tilemap_ram[0x1800/4], &m_mainram[index], 0x800/4);
+		memcpy(&m_tilemap_ram[0x1800/4], &m_mainram[index], 0x800/4); // 0x2800/4?
 		index += 0x800/4;
 	}
 
@@ -313,7 +313,7 @@ WRITE32_MEMBER(seibuspi_state::tilemap_dma_start_w)
 	/* middle layer row scroll */
 	if (m_rowscroll_enable)
 	{
-		memcpy(&m_tilemap_ram[0x1800/4], &m_mainram[index], 0x800/4);
+		memcpy(&m_tilemap_ram[0x2800/4], &m_mainram[index], 0x800/4); // 0x1800/4?
 		index += 0x800/4;
 	}
 
@@ -764,6 +764,7 @@ void seibuspi_state::video_start()
 	m_midl_layer->set_transparent_pen(63);
 	m_fore_layer->set_transparent_pen(63);
 
+	// TODO : Differs per games?
 	// alpha blending (preliminary)
 	memset(m_alpha_table, 0, 0x2000);
 
@@ -841,7 +842,7 @@ void seibuspi_state::register_video_state()
 	save_item(NAME(m_midl_layer_d14));
 	save_item(NAME(m_fore_layer_d14));
 
-	if (m_tilemap_ram != nullptr) save_pointer(NAME(m_tilemap_ram.get()), m_tilemap_ram_size/4);
-	save_pointer(NAME(m_palette_ram.get()), m_palette_ram_size/4);
-	save_pointer(NAME(m_sprite_ram.get()), m_sprite_ram_size/4);
+	if (m_tilemap_ram != nullptr) save_pointer(NAME(m_tilemap_ram), m_tilemap_ram_size/4);
+	save_pointer(NAME(m_palette_ram), m_palette_ram_size/4);
+	save_pointer(NAME(m_sprite_ram), m_sprite_ram_size/4);
 }

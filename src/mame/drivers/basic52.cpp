@@ -44,19 +44,21 @@ public:
 	basic52_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
 	{ }
-
-	void kbd_put(u8 data);
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_READ8_MEMBER(from_term);
 
 	void basic52(machine_config &config);
 	void basic31(machine_config &config);
+
+protected:
+	void kbd_put(u8 data);
+	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_READ8_MEMBER(from_term);
 	void basic52_io(address_map &map);
 	void basic52_mem(address_map &map);
-private:
 	uint8_t m_term_data;
 	required_device<mcs51_cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 };
 
 
@@ -103,53 +105,55 @@ void basic52_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-MACHINE_CONFIG_START(basic52_state::basic31)
+void basic52_state::basic31(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8031, XTAL(11'059'200))
-	MCFG_CPU_PROGRAM_MAP(basic52_mem)
-	MCFG_CPU_IO_MAP(basic52_io)
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(basic52_state, unk_r))
-	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8("terminal", generic_terminal_device, write))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(basic52_state, from_term))
+	I8031(config, m_maincpu, XTAL(11'059'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &basic52_state::basic52_mem);
+	m_maincpu->set_addrmap(AS_IO, &basic52_state::basic52_io);
+	m_maincpu->port_in_cb<3>().set(FUNC(basic52_state::unk_r));
+	m_maincpu->serial_tx_cb().set(m_terminal, FUNC(generic_terminal_device::write));
+	m_maincpu->serial_rx_cb().set(FUNC(basic52_state::from_term));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(basic52_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(basic52_state::kbd_put));
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-MACHINE_CONFIG_END
+	I8255(config, "ppi8255", 0);
+}
 
-MACHINE_CONFIG_START(basic52_state::basic52)
+void basic52_state::basic52(machine_config &config)
+{
 	basic31(config);
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", I8052, XTAL(11'059'200))
-	MCFG_CPU_PROGRAM_MAP(basic52_mem)
-	MCFG_CPU_IO_MAP(basic52_io)
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(basic52_state, unk_r))
-	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8("terminal", generic_terminal_device, write))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(basic52_state, from_term))
-MACHINE_CONFIG_END
+	I8052(config.replace(), m_maincpu, XTAL(11'059'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &basic52_state::basic52_mem);
+	m_maincpu->set_addrmap(AS_IO, &basic52_state::basic52_io);
+	m_maincpu->port_in_cb<3>().set(FUNC(basic52_state::unk_r));
+	m_maincpu->serial_tx_cb().set(m_terminal, FUNC(generic_terminal_device::write));
+	m_maincpu->serial_rx_cb().set(FUNC(basic52_state::from_term));
+}
 
 /* ROM definition */
 ROM_START( basic52 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v11", "v 1.1")
-	ROMX_LOAD( "mcs-51-11.bin",  0x0000, 0x2000, CRC(4157b22b) SHA1(bd9e6869b400cc1c9b163243be7bdcf16ce72789), ROM_BIOS(1))
+	ROMX_LOAD( "mcs-51-11.bin",  0x0000, 0x2000, CRC(4157b22b) SHA1(bd9e6869b400cc1c9b163243be7bdcf16ce72789), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v11b", "v 1.1b")
-	ROMX_LOAD( "mcs-51-11b.bin", 0x0000, 0x2000, CRC(a60383cc) SHA1(9515cc435e2ca3d3adb19631c03a62dfbeab0826), ROM_BIOS(2))
+	ROMX_LOAD( "mcs-51-11b.bin", 0x0000, 0x2000, CRC(a60383cc) SHA1(9515cc435e2ca3d3adb19631c03a62dfbeab0826), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v131", "v 1.3.1")
-	ROMX_LOAD( "mcs-51-131.bin", 0x0000, 0x2000, CRC(6a493162) SHA1(ed1079a6b4d4dbf448e15238c5a9e4dd004e401c), ROM_BIOS(3))
+	ROMX_LOAD( "mcs-51-131.bin", 0x0000, 0x2000, CRC(6a493162) SHA1(ed1079a6b4d4dbf448e15238c5a9e4dd004e401c), ROM_BIOS(2))
 ROM_END
 
 ROM_START( basic31 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v12", "v 1.2")
-	ROMX_LOAD( "mcs-51-12.bin",  0x0000, 0x2000, CRC(ee667c7c) SHA1(e69b32e69ecda2012c7113649634a3a64e984bed), ROM_BIOS(1))
+	ROMX_LOAD( "mcs-51-12.bin",  0x0000, 0x2000, CRC(ee667c7c) SHA1(e69b32e69ecda2012c7113649634a3a64e984bed), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v12a", "v 1.2a")
-	ROMX_LOAD( "mcs-51-12a.bin", 0x0000, 0x2000, CRC(225bb2f0) SHA1(46e97643a7a5cb4c278f9e3c73d18cd93209f8bf), ROM_BIOS(2))
+	ROMX_LOAD( "mcs-51-12a.bin", 0x0000, 0x2000, CRC(225bb2f0) SHA1(46e97643a7a5cb4c278f9e3c73d18cd93209f8bf), ROM_BIOS(1))
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS           INIT  COMPANY  FULLNAME        FLAGS */
-COMP( 1985, basic52,  0,       0,    basic52,   basic52, basic52_state,  0,    "Intel", "MCS BASIC 52", MACHINE_NO_SOUND_HW)
-COMP( 1985, basic31,  basic52, 0,    basic31,   basic52, basic52_state,  0,    "Intel", "MCS BASIC 31", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME        FLAGS */
+COMP( 1985, basic52, 0,       0,      basic52, basic52, basic52_state, empty_init, "Intel", "MCS BASIC 52", MACHINE_NO_SOUND_HW)
+COMP( 1985, basic31, basic52, 0,      basic31, basic52, basic52_state, empty_init, "Intel", "MCS BASIC 31", MACHINE_NO_SOUND_HW)

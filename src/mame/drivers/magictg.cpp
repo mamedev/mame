@@ -148,13 +148,18 @@ class magictg_state : public driver_device
 {
 public:
 	magictg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_mips(*this, "mips"),
-		m_adsp(*this, "adsp"),
-		m_pci(*this, "pcibus"),
-		m_adsp_pram(*this, "adsp_pram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_mips(*this, "mips")
+		, m_adsp(*this, "adsp")
+		, m_pci(*this, "pcibus")
+		, m_adsp_pram(*this, "adsp_pram")
+		, m_voodoo(*this, "voodoo_%u", 0U)
+	{ }
 
-	required_device<cpu_device>         m_mips;
+	void magictg(machine_config &config);
+
+private:
+	required_device<mips3_device>       m_mips;
 	required_device<adsp2181_device>    m_adsp;
 	required_device<pci_bus_legacy_device>      m_pci;
 
@@ -182,7 +187,7 @@ public:
 
 
 	/* 3Dfx Voodoo */
-	voodoo_device*                           m_voodoo[2];
+	required_device_array<voodoo_device, 2> m_voodoo;
 
 	struct
 	{
@@ -226,7 +231,6 @@ public:
 
 	void zr36120_reset();
 
-	void magictg(machine_config &config);
 	void adsp_data_map(address_map &map);
 	void adsp_io_map(address_map &map);
 	void adsp_program_map(address_map &map);
@@ -259,8 +263,6 @@ public:
 
 void magictg_state::machine_start()
 {
-	m_voodoo[0] = (voodoo_device*)machine().device("voodoo_0");
-	m_voodoo[1] = (voodoo_device*)machine().device("voodoo_1");
 }
 
 
@@ -308,7 +310,7 @@ uint32_t magictg_state::screen_update_magictg(screen_device &screen, bitmap_rgb3
 
 uint32_t magictg_state::pci_dev0_r(int function, int reg, uint32_t mem_mask)
 {
-	osd_printf_debug("PCI[0] READ: %x\n", reg);
+	logerror("PCI[0] READ: %x\n", reg);
 	return 0x00000000; // TODO
 }
 
@@ -333,7 +335,7 @@ uint32_t magictg_state::voodoo_0_pci_r(int function, int reg, uint32_t mem_mask)
 			val = m_voodoo_pci_regs[0].init_enable;
 			break;
 		default:
-			osd_printf_debug("Voodoo[0] PCI R: %x\n", reg);
+			logerror("Voodoo[0] PCI R: %x\n", reg);
 	}
 	return val;
 }
@@ -357,7 +359,7 @@ void magictg_state::voodoo_0_pci_w(int function, int reg, uint32_t data, uint32_
 			break;
 
 		default:
-			osd_printf_debug("Voodoo [%x]: %x\n", reg, data);
+			logerror("Voodoo [%x]: %x\n", reg, data);
 	}
 }
 
@@ -378,7 +380,7 @@ uint32_t magictg_state::voodoo_1_pci_r(int function, int reg, uint32_t mem_mask)
 			val = m_voodoo_pci_regs[1].init_enable;
 			break;
 		default:
-			osd_printf_debug("Voodoo[1] PCI R: %x\n", reg);
+			logerror("Voodoo[1] PCI R: %x\n", reg);
 	}
 	return val;
 }
@@ -402,7 +404,7 @@ void magictg_state::voodoo_1_pci_w(int function, int reg, uint32_t data, uint32_
 			break;
 
 		default:
-			osd_printf_debug("Voodoo [%x]: %x\n", reg, data);
+			logerror("Voodoo [%x]: %x\n", reg, data);
 	}
 }
 #endif
@@ -460,7 +462,7 @@ uint32_t magictg_state::zr36120_pci_r(int function, int reg, uint32_t mem_mask)
 			val = m_zr36120.base_addr;
 			break;
 		default:
-			osd_printf_debug("ZR36120 R[%x]\n", reg);
+			logerror("ZR36120 R[%x]\n", reg);
 	}
 	return val;
 }
@@ -476,7 +478,7 @@ void magictg_state::zr36120_pci_w(int function, int reg, uint32_t data, uint32_t
 			m_zr36120.base_addr = data & 0xfffff000;
 			break;
 		default:
-			osd_printf_debug("ZR36120 [%x]: %x\n", reg, data);
+			logerror("ZR36120 [%x]: %x\n", reg, data);
 	}
 }
 
@@ -499,7 +501,7 @@ READ32_MEMBER( magictg_state::zr36120_r )
 		/* Post office */
 		res = 0;//mame_rand(machine);//m_zr36120.as_regs[0x48/4];
 	}
-	osd_printf_debug("PINKEYE_R[%x]\n", offset);
+	logerror("PINKEYE_R[%x]\n", offset);
 	return res;
 }
 
@@ -509,7 +511,7 @@ WRITE32_MEMBER( magictg_state::zr36120_w )
 
 	if (offset < 0x200)
 	{
-		osd_printf_debug("PINKEYE_W[%x] %x\n", offset, data);
+		logerror("PINKEYE_W[%x] %x\n", offset, data);
 		switch (offset)
 		{
 			case 0x00/4:
@@ -532,7 +534,7 @@ WRITE32_MEMBER( magictg_state::zr36120_w )
 		//  zr36120_guest_write(guest, g_data, g_reg);
 		// 2 - ZR36050 JPEG decoder
 		// 3 - ZR36016 color-space converter
-		osd_printf_debug("GUEST (%.8x): %d  REG: %d  DATA: %x\n", data, guest, g_reg, g_data);
+		logerror("GUEST (%.8x): %d  REG: %d  DATA: %x\n", data, guest, g_reg, g_data);
 	}
 }
 
@@ -569,8 +571,8 @@ WRITE32_MEMBER( magictg_state::f0_w )
 
 	offset *= 4;
 
-	data = flipendian_int32(data);
-	mem_mask = flipendian_int32(mem_mask);
+	data = swapendian_int32(data);
+	mem_mask = swapendian_int32(mem_mask);
 
 	ch = ((offset >> 2) & 3) - 1;
 
@@ -580,21 +582,21 @@ WRITE32_MEMBER( magictg_state::f0_w )
 		case 0x808:
 		case 0x80c:
 			m_dma_ch[ch].count = data;
-//          osd_printf_debug("DMA%d COUNT: %.8x\n", ch, data);
+//          logerror("DMA%d COUNT: %.8x\n", ch, data);
 			break;
 
 		case 0x814:
 		case 0x818:
 		case 0x81c:
 			m_dma_ch[ch].src_addr = data;
-//          osd_printf_debug("DMA%d SRC: %.8x\n", ch, data);
+//          logerror("DMA%d SRC: %.8x\n", ch, data);
 			break;
 
 		case 0x824:
 		case 0x828:
 		case 0x82c:
 			m_dma_ch[ch].dst_addr = data;
-//          osd_printf_debug("DMA%d DST: %.8x\n", ch, data);
+//          logerror("DMA%d DST: %.8x\n", ch, data);
 			break;
 
 		case 0x844:
@@ -602,7 +604,7 @@ WRITE32_MEMBER( magictg_state::f0_w )
 		case 0x84c:
 		{
 			m_dma_ch[ch].ctrl = data;
-//          osd_printf_debug("DMA%d CTRL: %.8x\n", ch, data);
+//          logerror("DMA%d CTRL: %.8x\n", ch, data);
 
 			if (data & 0x1000)
 			{
@@ -615,7 +617,7 @@ WRITE32_MEMBER( magictg_state::f0_w )
 
 				while (m_dma_ch[ch].count > 3)
 				{
-					uint32_t src_dword = flipendian_int32(space.read_dword(src_addr));
+					uint32_t src_dword = swapendian_int32(space.read_dword(src_addr));
 					space.write_dword(dst_addr, src_dword);
 					src_addr += 4;
 					dst_addr += 4;
@@ -625,7 +627,7 @@ WRITE32_MEMBER( magictg_state::f0_w )
 				// FIXME!
 				if (m_dma_ch[ch].count & 3)
 				{
-					uint32_t src_dword = flipendian_int32(space.read_dword(src_addr));
+					uint32_t src_dword = swapendian_int32(space.read_dword(src_addr));
 					uint32_t dst_dword = space.read_dword(dst_addr);
 					uint32_t mask = 0xffffffff >> ((m_dma_ch[ch].count & 3) << 3);
 
@@ -648,7 +650,7 @@ WRITE32_MEMBER( magictg_state::f0_w )
 			break;
 		}
 //      default:
-//          osd_printf_debug("W: %.8x: %.8x\n", 0x0f000000 + offset, data);
+//          logerror("W: %.8x: %.8x\n", 0x0f000000 + offset, data);
 	}
 }
 
@@ -676,19 +678,19 @@ READ32_MEMBER( magictg_state::f0_r )
 
 		case 0xcf8:
 		{
-			val = m_pci->read(space, 0, flipendian_int32(mem_mask));
+			val = m_pci->read(space, 0, swapendian_int32(mem_mask));
 			break;
 		}
 		case 0xcfc:
 		{
-			val = m_pci->read(space, 1, flipendian_int32(mem_mask));
+			val = m_pci->read(space, 1, swapendian_int32(mem_mask));
 			break;
 		}
 //      default:
-//          osd_printf_debug("R: %.8x\n", 0x0f000000 + offset);
+//          logerror("R: %.8x\n", 0x0f000000 + offset);
 	}
 
-	return flipendian_int32(val);
+	return swapendian_int32(val);
 }
 
 
@@ -711,7 +713,7 @@ READ32_MEMBER( magictg_state::adsp_idma_data_r )
 	// TODO: Set /IACK appropriately
 	if (ACCESSING_BITS_0_15)
 	{
-		//osd_printf_debug("RD %.8x %.8x\n", offset, mem_mask);
+		//logerror("RD %.8x %.8x\n", offset, mem_mask);
 		return m_adsp->idma_addr_r();
 	}
 	else
@@ -726,7 +728,7 @@ WRITE32_MEMBER( magictg_state::adsp_idma_addr_w )
 	if (ACCESSING_BITS_16_31)
 	{
 		m_adsp->idma_addr_w(data >> 16);
-		//osd_printf_debug("WR %.8x %.8x %.8x\n", offset, mem_mask, data >> 16);
+		//logerror("WR %.8x %.8x %.8x\n", offset, mem_mask, data >> 16);
 	}
 	else
 		fatalerror("????\n");
@@ -751,7 +753,7 @@ READ16_MEMBER( magictg_state::adsp_control_r )
 			res = machine().rand() & 0xff;
 			break;
 		default:
-			osd_printf_debug("Unhandled register: %x\n", 0x3fe0 + offset);
+			logerror("Unhandled register: %x\n", 0x3fe0 + offset);
 	}
 	return res;
 }
@@ -824,15 +826,15 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 				m_adsp_regs.bdma_control |= ((src_addr >> 14) & 0xff) << 8;
 
 				if (m_adsp_regs.bdma_control & 8)
-					m_adsp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+					m_adsp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			}
 			break;
 		}
 		case 5:
-			osd_printf_debug("PFLAGS: %x\n", data);
+			logerror("PFLAGS: %x\n", data);
 			break;
 		default:
-			osd_printf_debug("Unhandled register: %x %x\n", 0x3fe0 + offset, data);
+			logerror("Unhandled register: %x %x\n", 0x3fe0 + offset, data);
 	}
 }
 
@@ -850,17 +852,17 @@ void magictg_state::magictg_map(address_map &map)
 	map(0x0a000000, 0x0affffff).rw("voodoo_0", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
 #if defined(USE_TWO_3DFX)
 	map(0x0b000000, 0x0bffffff).rw("voodoo_1", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
-	map(0x0c000000, 0x0c000fff).rw(this, FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
+	map(0x0c000000, 0x0c000fff).rw(FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
 #else
-	map(0x0b000000, 0x0b000fff).rw(this, FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
+	map(0x0b000000, 0x0b000fff).rw(FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
 #endif
-	map(0x0f000000, 0x0f000fff).rw(this, FUNC(magictg_state::f0_r), FUNC(magictg_state::f0_w)); // Split this up?
-	map(0x14000100, 0x14000103).rw(this, FUNC(magictg_state::adsp_idma_data_r), FUNC(magictg_state::adsp_idma_data_w));
-	map(0x14000104, 0x14000107).w(this, FUNC(magictg_state::adsp_idma_addr_w));
-	map(0x1b001024, 0x1b001027).r(this, FUNC(magictg_state::adsp_status_r));
-	map(0x1b001108, 0x1b00110b).r(this, FUNC(magictg_state::unk_r));
+	map(0x0f000000, 0x0f000fff).rw(FUNC(magictg_state::f0_r), FUNC(magictg_state::f0_w)); // Split this up?
+	map(0x14000100, 0x14000103).rw(FUNC(magictg_state::adsp_idma_data_r), FUNC(magictg_state::adsp_idma_data_w));
+	map(0x14000104, 0x14000107).w(FUNC(magictg_state::adsp_idma_addr_w));
+	map(0x1b001024, 0x1b001027).r(FUNC(magictg_state::adsp_status_r));
+	map(0x1b001108, 0x1b00110b).r(FUNC(magictg_state::unk_r));
 	map(0x1e000000, 0x1e002fff).ram(); // NVRAM?
-	map(0x1e800000, 0x1e800007).rw(this, FUNC(magictg_state::unk2_r), FUNC(magictg_state::serial_w));
+	map(0x1e800000, 0x1e800007).rw(FUNC(magictg_state::unk2_r), FUNC(magictg_state::serial_w));
 	map(0x1fc00000, 0x1fffffff).rom().region("mips", 0);
 }
 
@@ -882,7 +884,7 @@ void magictg_state::adsp_data_map(address_map &map)
 	map.unmap_value_high();
 //  AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("databank")
 	map(0x0400, 0x3fdf).ram();
-	map(0x3fe0, 0x3fff).rw(this, FUNC(magictg_state::adsp_control_r), FUNC(magictg_state::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(magictg_state::adsp_control_r), FUNC(magictg_state::adsp_control_w));
 }
 
 void magictg_state::adsp_io_map(address_map &map)
@@ -909,23 +911,21 @@ INPUT_PORTS_END
  *************************************/
 
 MACHINE_CONFIG_START(magictg_state::magictg)
-	MCFG_CPU_ADD("mips", R5000BE, 150000000) /* TODO: CPU type and clock are unknown */
-	//MCFG_MIPS3_ICACHE_SIZE(16384) /* TODO: Unknown */
-	//MCFG_MIPS3_DCACHE_SIZE(16384) /* TODO: Unknown */
-	MCFG_CPU_PROGRAM_MAP(magictg_map)
+	R5000BE(config, m_mips, 150000000); /* TODO: CPU type and clock are unknown */
+	//m_mips->set_icache_size(16384); /* TODO: Unknown */
+	//m_mips->set_dcache_size(16384); /* TODO: Unknown */
+	m_mips->set_addrmap(AS_PROGRAM, &magictg_state::magictg_map);
 
-	MCFG_CPU_ADD("adsp", ADSP2181, 16000000)
-	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
-	MCFG_CPU_DATA_MAP(adsp_data_map)
-	MCFG_CPU_IO_MAP(adsp_io_map)
+	ADSP2181(config, m_adsp, 16000000);
+	m_adsp->set_addrmap(AS_PROGRAM, &magictg_state::adsp_program_map);
+	m_adsp->set_addrmap(AS_DATA, &magictg_state::adsp_data_map);
+	m_adsp->set_addrmap(AS_IO, &magictg_state::adsp_io_map);
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, magictg_state, pci_dev0_r, pci_dev0_w)
@@ -965,7 +965,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( magictg )
-	ROM_REGION32_BE( 0x400000, "mips", 0 )
+	ROM_REGION64_BE( 0x400000, "mips", 0 )
 	ROM_LOAD16_BYTE( "magic.u34", 0x000000, 0x100000, CRC(2e8971e2) SHA1(9bdf433a7c7257389ebdf131317ef26a7d4e1ba2) )
 	ROM_LOAD16_BYTE( "magic.u35", 0x000001, 0x100000, CRC(e2202143) SHA1(f07b7da81508cd4594f66e34dabd904a21eb03f0) )
 	ROM_LOAD16_BYTE( "magic.u32", 0x200000, 0x100000, CRC(f1d530e3) SHA1(fcc392804cd6b98917a869cc5d3826278b7ba90b) )
@@ -991,7 +991,7 @@ ROM_START( magictg )
 ROM_END
 
 ROM_START( magictga )
-	ROM_REGION32_BE( 0x400000, "mips", 0 )
+	ROM_REGION64_BE( 0x400000, "mips", 0 )
 	ROM_LOAD16_BYTE( "magic.u63", 0x000000, 0x100000, CRC(a10d45f1) SHA1(0ede10f19cf70baf7b43e3f672532b4be1a179f8) )
 	ROM_LOAD16_BYTE( "magic.u64", 0x000001, 0x100000, CRC(8fdb6060) SHA1(b638244cad86dc60435a4a9150a5b639f5d61a3f) )
 	ROM_LOAD16_BYTE( "magic.u61", 0x200000, 0x100000, CRC(968891d6) SHA1(67ab87039864bb148d20795333ffa7a23e3b84f2) )
@@ -1024,5 +1024,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1997, magictg,  0,       magictg, magictg, magictg_state, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, magictga, magictg, magictg, magictg, magictg_state, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, magictg,  0,       magictg, magictg, magictg_state, empty_init, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, magictga, magictg, magictg, magictg, magictg_state, empty_init, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

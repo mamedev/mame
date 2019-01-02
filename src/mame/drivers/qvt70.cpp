@@ -18,8 +18,9 @@ public:
 	{ }
 
 	void qvt70(machine_config &config);
-	void mem_map(address_map &map);
+
 private:
+	void mem_map(address_map &map);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -32,8 +33,8 @@ static INPUT_PORTS_START( qvt70 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(qvt70_state::qvt70)
-	MCFG_CPU_ADD("maincpu", Z80, 2'000'000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2'000'000)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************
@@ -50,4 +51,4 @@ ROM_START( qvt70 )
 	ROM_LOAD( "251513-03_revj.u11", 0x10000, 0x20000, CRC(c56796fe) SHA1(afe024ff93d5e75dc18041219d61e1a22fc6d883) )
 ROM_END
 
-COMP( 1992, qvt70, 0, 0, qvt70, qvt70, qvt70_state, 0, "Qume", "QVT-70", MACHINE_IS_SKELETON )
+COMP( 1992, qvt70, 0, 0, qvt70, qvt70, qvt70_state, empty_init, "Qume", "QVT-70", MACHINE_IS_SKELETON )

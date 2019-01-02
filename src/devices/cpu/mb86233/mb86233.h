@@ -89,7 +89,7 @@ private:
 	address_space_config m_rf_config;
 
 	address_space        *m_program, *m_data, *m_io, *m_rf;
-	direct_read_data<-2> *m_direct;
+	memory_access_cache<2, -2, ENDIANNESS_LITTLE> *m_cache;
 	int m_icount;
 
 	u32 m_st, m_a, m_b, m_d, m_p;

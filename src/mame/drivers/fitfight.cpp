@@ -153,7 +153,7 @@ void fitfight_state::fitfight_main_map(address_map &map)
 	//      @0x000037a6/0x000030e6: 0x??dd byte from 0xe08c05, 0xF101 then 0xF001/0xF157 then 0xF057
 
 //  AM_RANGE(0x700000, 0x700001) AM_READ(xxxx) /* see init */
-	map(0x700000, 0x700001).w(this, FUNC(fitfight_state::fitfight_700000_w)).share("fof_700000");
+	map(0x700000, 0x700001).w(FUNC(fitfight_state::fitfight_700000_w)).share("fof_700000");
 	//  kept at 0xe07900/0xe04c56
 
 	map(0x800000, 0x800001).ram().share("fof_800000");
@@ -168,9 +168,9 @@ void fitfight_state::fitfight_main_map(address_map &map)
 	//  histryma: @0x000031be,@0x00001d8e
 
 	map(0xb00000, 0xb03fff).ram(); /* unused layer? */
-	map(0xb04000, 0xb07fff).ram().w(this, FUNC(fitfight_state::fof_bak_tileram_w)).share("fof_bak_tileram");
-	map(0xb08000, 0xb0bfff).ram().w(this, FUNC(fitfight_state::fof_mid_tileram_w)).share("fof_mid_tileram");
-	map(0xb0c000, 0xb0ffff).ram().w(this, FUNC(fitfight_state::fof_txt_tileram_w)).share("fof_txt_tileram");
+	map(0xb04000, 0xb07fff).ram().w(FUNC(fitfight_state::fof_bak_tileram_w)).share("fof_bak_tileram");
+	map(0xb08000, 0xb0bfff).ram().w(FUNC(fitfight_state::fof_mid_tileram_w)).share("fof_mid_tileram");
+	map(0xb0c000, 0xb0ffff).ram().w(FUNC(fitfight_state::fof_txt_tileram_w)).share("fof_txt_tileram");
 
 	map(0xb10000, 0xb13fff).ram(); //used by histryma @0x0000b25a
 	map(0xb14000, 0xb17fff).ram(); //used by histryma @0x0000b25a,b270
@@ -197,16 +197,16 @@ void fitfight_state::bbprot_main_map(address_map &map)
 
 	map(0x600000, 0x600001).writeonly().share("fof_600000");
 
-	map(0x700000, 0x700001).rw(this, FUNC(fitfight_state::bbprot_700000_r), FUNC(fitfight_state::fitfight_700000_w)).share("fof_700000");
+	map(0x700000, 0x700001).rw(FUNC(fitfight_state::bbprot_700000_r), FUNC(fitfight_state::fitfight_700000_w)).share("fof_700000");
 
 	map(0x800000, 0x800001).writeonly().share("fof_800000");
 	map(0x900000, 0x900001).writeonly().share("fof_900000");
 	map(0xa00000, 0xa00001).writeonly().share("fof_a00000");
 
 	map(0xb00000, 0xb03fff).nopw(); /* unused layer? */
-	map(0xb04000, 0xb07fff).ram().w(this, FUNC(fitfight_state::fof_bak_tileram_w)).share("fof_bak_tileram");
-	map(0xb08000, 0xb0bfff).ram().w(this, FUNC(fitfight_state::fof_mid_tileram_w)).share("fof_mid_tileram");
-	map(0xb0c000, 0xb0ffff).ram().w(this, FUNC(fitfight_state::fof_txt_tileram_w)).share("fof_txt_tileram");
+	map(0xb04000, 0xb07fff).ram().w(FUNC(fitfight_state::fof_bak_tileram_w)).share("fof_bak_tileram");
+	map(0xb08000, 0xb0bfff).ram().w(FUNC(fitfight_state::fof_mid_tileram_w)).share("fof_mid_tileram");
+	map(0xb0c000, 0xb0ffff).ram().w(FUNC(fitfight_state::fof_txt_tileram_w)).share("fof_txt_tileram");
 
 	map(0xc00000, 0xc00fff).readonly();
 	map(0xc00000, 0xc03fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -257,11 +257,6 @@ WRITE8_MEMBER(fitfight_state::snd_portb_w)
 WRITE8_MEMBER(fitfight_state::snd_portc_w)
 {
 	//logerror("PC W %x %s\n",data,machine().describe_context());
-}
-
-INTERRUPT_GEN_MEMBER(fitfight_state::snd_irq)
-{
-	device.execute().pulse_input_line(UPD7810_INTF2, device.execute().minimum_quantum_time());
 }
 
 
@@ -698,7 +693,7 @@ static const gfx_layout bbprot_sprite_layout =
 	16*16
 };
 
-static GFXDECODE_START( fitfight )
+static GFXDECODE_START( gfx_fitfight )
 	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,   0x000, 256  ) /* tx tiles */
 	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,   0x200, 256  ) /* mid tiles */
 	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,   0x400, 256  ) /* bg tiles */
@@ -706,7 +701,7 @@ static GFXDECODE_START( fitfight )
 
 GFXDECODE_END
 
-static GFXDECODE_START( prot )
+static GFXDECODE_START( gfx_prot )
 	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,     0x0000, 256  ) /* tx tiles */
 	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,     0x0800, 256  ) /* mid tiles */
 	GFXDECODE_ENTRY( "gfx1", 0, fof_tile_layout,     0x1000, 256  ) /* bg tiles */
@@ -727,48 +722,45 @@ void fitfight_state::machine_reset()
 
 MACHINE_CONFIG_START(fitfight_state::fitfight)
 
-	MCFG_CPU_ADD("maincpu",M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(fitfight_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(fitfight_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, 12000000)
-	MCFG_CPU_PROGRAM_MAP(snd_mem)
-	MCFG_UPD7810_PORTA_READ_CB(READ8(fitfight_state, snd_porta_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(fitfight_state, snd_porta_w))
-	MCFG_UPD7810_PORTB_READ_CB(READ8(fitfight_state, snd_portb_r))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(fitfight_state, snd_portb_w))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(fitfight_state, snd_portc_r))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(fitfight_state, snd_portc_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fitfight_state,  snd_irq)
+	upd7810_device &audiocpu(UPD7810(config, m_audiocpu, 12000000));
+	audiocpu.set_addrmap(AS_PROGRAM, &fitfight_state::snd_mem);
+	audiocpu.pa_in_cb().set(FUNC(fitfight_state::snd_porta_r));
+	audiocpu.pa_out_cb().set(FUNC(fitfight_state::snd_porta_w));
+	audiocpu.pb_in_cb().set(FUNC(fitfight_state::snd_portb_r));
+	audiocpu.pb_out_cb().set(FUNC(fitfight_state::snd_portb_w));
+	audiocpu.pc_in_cb().set(FUNC(fitfight_state::snd_portc_r));
+	audiocpu.pc_out_cb().set(FUNC(fitfight_state::snd_portc_w));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fitfight)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fitfight);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(2*8, 39*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fitfight_state, screen_update_fitfight)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(2*8, 39*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(fitfight_state::screen_update_fitfight));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF2, m_audiocpu->minimum_quantum_time()); });
 
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x800);
 
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_OKIM6295_ADD("oki", 1333333, PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1333333, okim6295_device::PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fitfight_state::bbprot)
 
-	MCFG_CPU_ADD("maincpu",M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(bbprot_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu",M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(bbprot_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
 
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", prot)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_prot);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -778,13 +770,11 @@ MACHINE_CONFIG_START(fitfight_state::bbprot)
 	MCFG_SCREEN_UPDATE_DRIVER(fitfight_state, screen_update_fitfight)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x2000);
 
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_OKIM6295_ADD("oki", 1333333, PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1333333, okim6295_device::PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -993,7 +983,7 @@ ROM_END
 
 /* INIT */
 
-DRIVER_INIT_MEMBER(fitfight_state,fitfight)
+void fitfight_state::init_fitfight()
 {
 //  uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 //  mem16[0x0165B2/2] = 0x4e71; // for now so it boots
@@ -1001,7 +991,7 @@ DRIVER_INIT_MEMBER(fitfight_state,fitfight)
 	m_bbprot_kludge = 0;
 }
 
-DRIVER_INIT_MEMBER(fitfight_state,histryma)
+void fitfight_state::init_histryma()
 {
 //  uint16_t *mem16 = (uint16_t *)memregion("maincpu")->base();
 //  mem16[0x017FDC/2] = 0x4e71; // for now so it boots
@@ -1009,21 +999,21 @@ DRIVER_INIT_MEMBER(fitfight_state,histryma)
 	m_bbprot_kludge = 0;
 }
 
-DRIVER_INIT_MEMBER(fitfight_state,bbprot)
+void fitfight_state::init_bbprot()
 {
 	m_bbprot_kludge = 1;
 }
 
-DRIVER_INIT_MEMBER(fitfight_state,hotmindff)
+void fitfight_state::init_hotmindff()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, read16_delegate(FUNC(fitfight_state::hotmindff_unk_r),this));
-	DRIVER_INIT_CALL(fitfight);
+	init_fitfight();
 }
 
 
 /* GAME */
 
-GAME( 199?, fitfight,  0,       fitfight, fitfight, fitfight_state, fitfight,  ROT0, "bootleg",   "Fit of Fighting",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, histryma,  0,       fitfight, histryma, fitfight_state, histryma,  ROT0, "bootleg",   "The History of Martial Arts",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, bbprot,    0,       bbprot,   bbprot,   fitfight_state, bbprot,    ROT0, "<unknown>", "unknown fighting game 'BB' (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, hotmindff, hotmind, fitfight, fitfight, fitfight_state, hotmindff, ROT0, "Playmark",  "Hot Mind (Fit of Fighting hardware)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // need to fix scroll offsets + inputs
+GAME( 199?, fitfight,  0,       fitfight, fitfight, fitfight_state, init_fitfight,  ROT0, "bootleg",   "Fit of Fighting",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, histryma,  0,       fitfight, histryma, fitfight_state, init_histryma,  ROT0, "bootleg",   "The History of Martial Arts",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, bbprot,    0,       bbprot,   bbprot,   fitfight_state, init_bbprot,    ROT0, "<unknown>", "unknown fighting game 'BB' (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, hotmindff, hotmind, fitfight, fitfight, fitfight_state, init_hotmindff, ROT0, "Playmark",  "Hot Mind (Fit of Fighting hardware)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // need to fix scroll offsets + inputs

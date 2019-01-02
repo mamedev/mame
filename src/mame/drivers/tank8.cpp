@@ -8,6 +8,7 @@ Atari Tank 8 driver
 
 #include "emu.h"
 #include "includes/tank8.h"
+
 #include "cpu/m6800/m6800.h"
 #include "sound/discrete.h"
 #include "speaker.h"
@@ -48,17 +49,17 @@ WRITE8_MEMBER(tank8_state::int_reset_w)
 
 WRITE8_MEMBER(tank8_state::crash_w)
 {
-	m_discrete->write(space, TANK8_CRASH_EN, data);
+	m_discrete->write(TANK8_CRASH_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::explosion_w)
 {
-	m_discrete->write(space, TANK8_EXPLOSION_EN, data);
+	m_discrete->write(TANK8_EXPLOSION_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::bugle_w)
 {
-	m_discrete->write(space, TANK8_BUGLE_EN, data);
+	m_discrete->write(TANK8_BUGLE_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::bug_w)
@@ -66,20 +67,20 @@ WRITE8_MEMBER(tank8_state::bug_w)
 	/* D0 and D1 determine the on/off time off the square wave */
 	switch(data & 3) {
 		case 0:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,8.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,4.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,8.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,4.0);
 			break;
 		case 1:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,8.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,7.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,8.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,7.0);
 			break;
 		case 2:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,8.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,2.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,8.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,2.0);
 			break;
 		case 3:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,16.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,4.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,16.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,4.0);
 			break;
 	}
 
@@ -87,12 +88,12 @@ WRITE8_MEMBER(tank8_state::bug_w)
 
 WRITE8_MEMBER(tank8_state::attract_w)
 {
-	m_discrete->write(space, TANK8_ATTRACT_EN, data);
+	m_discrete->write(TANK8_ATTRACT_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::motor_w)
 {
-	m_discrete->write(space, NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
+	m_discrete->write(NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
 }
 
 void tank8_state::tank8_cpu_map(address_map &map)
@@ -101,7 +102,7 @@ void tank8_state::tank8_cpu_map(address_map &map)
 	map(0x0400, 0x17ff).rom();
 	map(0xf800, 0xffff).rom();
 
-	map(0x1c00, 0x1c00).r(this, FUNC(tank8_state::collision_r));
+	map(0x1c00, 0x1c00).r(FUNC(tank8_state::collision_r));
 
 	map(0x1c01, 0x1c01).portr("P1");
 	map(0x1c02, 0x1c02).portr("P2");
@@ -116,20 +117,20 @@ void tank8_state::tank8_cpu_map(address_map &map)
 	map(0x1c0b, 0x1c0b).portr("RC");
 	map(0x1c0f, 0x1c0f).portr("VBLANK");
 
-	map(0x1800, 0x1bff).w(this, FUNC(tank8_state::video_ram_w)).share("video_ram");
+	map(0x1800, 0x1bff).w(FUNC(tank8_state::video_ram_w)).share("video_ram");
 	map(0x1c00, 0x1c0f).writeonly().share("pos_h_ram");
 	map(0x1c10, 0x1c1f).writeonly().share("pos_v_ram");
 	map(0x1c20, 0x1c2f).writeonly().share("pos_d_ram");
 
-	map(0x1c30, 0x1c37).w(this, FUNC(tank8_state::lockout_w));
-	map(0x1d00, 0x1d00).w(this, FUNC(tank8_state::int_reset_w));
-	map(0x1d01, 0x1d01).w(this, FUNC(tank8_state::crash_w));
-	map(0x1d02, 0x1d02).w(this, FUNC(tank8_state::explosion_w));
-	map(0x1d03, 0x1d03).w(this, FUNC(tank8_state::bugle_w));
-	map(0x1d04, 0x1d04).w(this, FUNC(tank8_state::bug_w));
+	map(0x1c30, 0x1c37).w(FUNC(tank8_state::lockout_w));
+	map(0x1d00, 0x1d00).w(FUNC(tank8_state::int_reset_w));
+	map(0x1d01, 0x1d01).w(FUNC(tank8_state::crash_w));
+	map(0x1d02, 0x1d02).w(FUNC(tank8_state::explosion_w));
+	map(0x1d03, 0x1d03).w(FUNC(tank8_state::bugle_w));
+	map(0x1d04, 0x1d04).w(FUNC(tank8_state::bug_w));
 	map(0x1d05, 0x1d05).writeonly().share("team");
-	map(0x1d06, 0x1d06).w(this, FUNC(tank8_state::attract_w));
-	map(0x1e00, 0x1e07).w(this, FUNC(tank8_state::motor_w));
+	map(0x1d06, 0x1d06).w(FUNC(tank8_state::attract_w));
+	map(0x1e00, 0x1e07).w(FUNC(tank8_state::motor_w));
 
 }
 
@@ -319,7 +320,7 @@ static const gfx_layout tank_layout =
 };
 
 
-static GFXDECODE_START( tank8 )
+static GFXDECODE_START( gfx_tank8 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_1, 0, 10 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout_2, 0, 10 )
 	GFXDECODE_ENTRY( "gfx2", 0, tank_layout,   0, 8 )
@@ -330,8 +331,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tank8_state::tank8)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 11055000 / 10) /* ? */
-	MCFG_CPU_PROGRAM_MAP(tank8_cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 11055000 / 10) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(tank8_cpu_map)
 
 
 	/* video hardware */
@@ -342,19 +343,16 @@ MACHINE_CONFIG_START(tank8_state::tank8)
 	MCFG_SCREEN_SIZE(512, 524)
 	MCFG_SCREEN_VISIBLE_AREA(16, 495, 0, 463)
 	MCFG_SCREEN_UPDATE_DRIVER(tank8_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tank8_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tank8_state, screen_vblank))
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tank8)
-	MCFG_PALETTE_ADD("palette", 20)
-	MCFG_PALETTE_INDIRECT_ENTRIES(10)
-	MCFG_PALETTE_INIT_OWNER(tank8_state, tank8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tank8)
+	PALETTE(config, m_palette, FUNC(tank8_state::tank8_palette), 20, 10);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(tank8)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, tank8_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -462,28 +460,25 @@ ROM_START( tank8 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(tank8_state,decode)
+void tank8_state::init_decode()
 {
 	const uint8_t* DECODE = memregion("user1")->base();
-
 	uint8_t* p1 = memregion("maincpu")->base() + 0x00000;
 	uint8_t* p2 = memregion("maincpu")->base() + 0x10000;
 
-	int i;
-
-	for (i = 0x0400; i <= 0x17ff; i++)
+	for (int i = 0x0400; i <= 0x17ff; i++)
 	{
 		p1[i] = DECODE[p2[i]];
 	}
-	for (i = 0xf800; i <= 0xffff; i++)
+	for (int i = 0xf800; i <= 0xffff; i++)
 	{
 		p1[i] = DECODE[p2[i]];
 	}
 }
 
 
-GAME( 1976, tank8,    0,        tank8,    tank8, tank8_state,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 1)",  MACHINE_SUPPORTS_SAVE)
-GAME( 1976, tank8a,   tank8,    tank8,    tank8, tank8_state,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1976, tank8b,   tank8,    tank8,    tank8, tank8_state,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 3)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1976, tank8c,   tank8,    tank8,    tank8, tank8_state,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 4)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1976, tank8d,   tank8,    tank8,    tank8, tank8_state,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 5)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, tank8,    0,        tank8,    tank8, tank8_state, empty_init,  ROT0, "Atari (Kee Games)", "Tank 8 (set 1)",  MACHINE_SUPPORTS_SAVE)
+GAME( 1976, tank8a,   tank8,    tank8,    tank8, tank8_state, init_decode, ROT0, "Atari (Kee Games)", "Tank 8 (set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, tank8b,   tank8,    tank8,    tank8, tank8_state, init_decode, ROT0, "Atari (Kee Games)", "Tank 8 (set 3)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, tank8c,   tank8,    tank8,    tank8, tank8_state, empty_init,  ROT0, "Atari (Kee Games)", "Tank 8 (set 4)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, tank8d,   tank8,    tank8,    tank8, tank8_state, empty_init,  ROT0, "Atari (Kee Games)", "Tank 8 (set 5)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

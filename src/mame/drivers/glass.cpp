@@ -53,29 +53,22 @@ INTERRUPT_GEN_MEMBER(glass_state::interrupt)
 static const gfx_layout glass_tilelayout16 =
 {
 	16,16,                                  /* 16x16 tiles */
-	0x100000/32,                            /* number of tiles */
+	RGN_FRAC(1,2),                          /* number of tiles */
 	4,                                      /* 4 bpp */
-	{ 3*0x100000*8, 2*0x100000*8, 1*0x100000*8, 0*0x100000*8 },
-	{
-		0, 1, 2, 3, 4, 5, 6, 7,
-		16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7
-	},
-	{
-		0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8
-	},
-	32*8
+	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2), 8, 0 },
+	{ STEP8(0,1), STEP8(8*2*16,1), },
+	{ STEP16(0,8*2) },
+	8*2*16*2
 };
 
-static GFXDECODE_START( glass )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, glass_tilelayout16, 0, 64 )
+static GFXDECODE_START( gfx_glass )
+	GFXDECODE_ENTRY( "gfx", 0x000000, glass_tilelayout16, 0, 64 )
 GFXDECODE_END
 
 
-WRITE16_MEMBER(glass_state::OKIM6295_bankswitch_w)
+WRITE8_MEMBER(glass_state::oki_bankswitch_w)
 {
-	if (ACCESSING_BITS_0_7)
-		membank("okibank")->set_entry(data & 0x0f);
+	m_okibank->set_entry(data & 0x0f);
 }
 
 WRITE16_MEMBER(glass_state::coin_w)
@@ -106,28 +99,28 @@ WRITE_LINE_MEMBER(glass_state::coin2_counter_w)
 
 void glass_state::mcu_hostmem_map(address_map &map)
 {
-	map(0x0000, 0xffff).mask(0x3fff).rw(this, FUNC(glass_state::shareram_r), FUNC(glass_state::shareram_w)); // shared RAM with the main CPU
+	map(0x0000, 0xffff).mask(0x3fff).rw(FUNC(glass_state::shareram_r), FUNC(glass_state::shareram_w)); // shared RAM with the main CPU
 }
 
 
 void glass_state::glass_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                   // ROM
-	map(0x100000, 0x101fff).ram().w(this, FUNC(glass_state::vram_w)).share("videoram");                                // Video RAM
-	map(0x102000, 0x102fff).ram();                                                                   // Extra Video RAM
-	map(0x108000, 0x108007).writeonly().share("vregs");                                           // Video Registers
-	map(0x108008, 0x108009).w(this, FUNC(glass_state::clr_int_w));                                                      // CLR INT Video
-	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x440000, 0x440fff).ram().share("spriteram");                                             // Sprite RAM
+	map(0x000000, 0x0fffff).rom();                                                                  // ROM
+	map(0x100000, 0x101fff).ram().w(FUNC(glass_state::vram_w)).share("videoram");                   // Video RAM
+	map(0x102000, 0x102fff).ram();                                                                  // Extra Video RAM
+	map(0x108000, 0x108007).writeonly().share("vregs");                                             // Video Registers
+	map(0x108008, 0x108009).w(FUNC(glass_state::clr_int_w));                                        // CLR INT Video
+	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");     // Palette
+	map(0x440000, 0x440fff).ram().share("spriteram");                                               // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW2");
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
-	map(0x700008, 0x700009).w(this, FUNC(glass_state::blitter_w));                                                      // serial blitter
-	map(0x70000a, 0x70000b).select(0x000070).w(this, FUNC(glass_state::coin_w));                                     // Coin Counters/Lockout
-	map(0x70000c, 0x70000d).w(this, FUNC(glass_state::OKIM6295_bankswitch_w));                                          // OKI6295 bankswitch
-	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));            // OKI6295 status register
-	map(0xfec000, 0xfeffff).ram().share("shareram");                                              // Work RAM (partially shared with DS5002FP)
+	map(0x700008, 0x700009).w(FUNC(glass_state::blitter_w));                                        // serial blitter
+	map(0x70000a, 0x70000b).select(0x000070).w(FUNC(glass_state::coin_w));                          // Coin Counters/Lockout
+	map(0x70000d, 0x70000d).w(FUNC(glass_state::oki_bankswitch_w));                                 // OKI6295 bankswitch
+	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // OKI6295 status register
+	map(0xfec000, 0xfeffff).ram().share("shareram");                                                // Work RAM (partially shared with DS5002FP)
 }
 
 
@@ -213,37 +206,33 @@ INPUT_PORTS_END
 
 void glass_state::machine_start()
 {
-	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 
 	save_item(NAME(m_cause_interrupt));
 	save_item(NAME(m_current_bit));
-	save_item(NAME(m_current_command));
-	save_item(NAME(m_blitter_serial_buffer));
+	save_item(NAME(m_blitter_command));
 }
 
 void glass_state::machine_reset()
 {
 	m_cause_interrupt = 1;
 	m_current_bit = 0;
-	m_current_command = 0;
-
-	for (int i = 0; i < 5; i++)
-		m_blitter_serial_buffer[i] = 0;
+	m_blitter_command = 0;
 }
 
 MACHINE_CONFIG_START(glass_state::glass)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)      /* 12 MHz verified on PCB */
-	MCFG_CPU_PROGRAM_MAP(glass_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", glass_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)      /* 12 MHz verified on PCB */
+	MCFG_DEVICE_PROGRAM_MAP(glass_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", glass_state,  interrupt)
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(glass_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(glass_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(glass_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(glass_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // Sound Muting (if bit 0 == 1, sound output stream = 0)
+	LS259(config, m_outlatch);
+	m_outlatch->q_out_cb<0>().set(FUNC(glass_state::coin1_lockout_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(glass_state::coin2_lockout_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(glass_state::coin1_counter_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(glass_state::coin2_counter_w));
+	m_outlatch->q_out_cb<4>().set_nop(); // Sound Muting (if bit 0 == 1, sound output stream = 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -252,16 +241,15 @@ MACHINE_CONFIG_START(glass_state::glass)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 368-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(glass_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", glass)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_glass)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) /* 1MHz Resonator & pin 7 high verified on PCB */
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) /* 1MHz Resonator & pin 7 high verified on PCB */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -286,14 +274,11 @@ ROM_START( glass ) /* Version 1.1 */
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
-	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
-
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Graphics */
+	ROM_REGION( 0x400000, "gfx", 0 )   /* Graphics */
 	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
 	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* 16 bitmaps (320x200, indexed colors) */
+	ROM_REGION( 0x100000, "bmap", 0 )   /* 16 bitmaps (320x200, indexed colors) */
 	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
@@ -315,14 +300,11 @@ ROM_START( glass10 ) /* Version 1.0 */
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
-	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
-
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Graphics */
+	ROM_REGION( 0x400000, "gfx", 0 )   /* Graphics */
 	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
 	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* 16 bitmaps (320x200, indexed colors) */
+	ROM_REGION( 0x100000, "bmap", 0 )   /* 16 bitmaps (320x200, indexed colors) */
 	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
@@ -344,14 +326,11 @@ ROM_START( glass10a ) /* Title screen shows "GLASS" and under that "Break Editio
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
-	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
-
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Graphics */
+	ROM_REGION( 0x400000, "gfx", 0 )   /* Graphics */
 	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
 	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* 16 bitmaps (320x200, indexed colors) */
+	ROM_REGION( 0x100000, "bmap", 0 )   /* 16 bitmaps (320x200, indexed colors) */
 	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
@@ -364,67 +343,17 @@ ROM_START( glasskr )
 	ROM_LOAD16_BYTE( "glassk.c23", 0x000000, 0x080000, CRC(6ee19376) SHA1(8a8fdeebe094bd3e29c35cf59584e3cab708732d) )
 	ROM_LOAD16_BYTE( "glassk.c22", 0x000001, 0x080000, CRC(bd546568) SHA1(bcd5e7591f4e68c9470999b8a0ef1ee4392c907c) )
 
-	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )   /* Graphics */
-	/* 0x000000-0x3fffff filled in later in the DRIVER_INIT */
-
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Graphics */
+	ROM_REGION( 0x400000, "gfx", 0 )   /* Graphics */
 	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
 	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )   /* 16 bitmaps (320x200, indexed colors) */
+	ROM_REGION( 0x100000, "bmap", 0 )   /* 16 bitmaps (320x200, indexed colors) */
 	ROM_LOAD( "glassk.h9", 0x000000, 0x100000, CRC(d499be4c) SHA1(204f754813be687e8dc00bfe7b5dbc4857ac8738) )
 
 	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
 ROM_END
-
-/***************************************************************************
-
-    Split even/odd bytes from ROMs in 16 bit mode to different memory areas
-
-***************************************************************************/
-
-void glass_state::ROM16_split_gfx( const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2 )
-{
-	int i;
-
-	/* get a pointer to the source data */
-	uint8_t *src = (uint8_t *)memregion(src_reg)->base();
-
-	/* get a pointer to the destination data */
-	uint8_t *dst = (uint8_t *)memregion(dst_reg)->base();
-
-	/* fill destination areas with the proper data */
-	for (i = 0; i < length / 2; i++)
-	{
-		dst[dest1 + i] = src[start + i * 2 + 0];
-		dst[dest2 + i] = src[start + i * 2 + 1];
-	}
-}
-
-
-DRIVER_INIT_MEMBER(glass_state, glass)
-{
-	/*
-	For "gfx2" we have this memory map:
-	    0x000000-0x1fffff ROM H13
-	    0x200000-0x3fffff ROM H11
-
-	and we are going to construct this one for "gfx1":
-	    0x000000-0x0fffff ROM H13 even bytes
-	    0x100000-0x1fffff ROM H13 odd bytes
-	    0x200000-0x2fffff ROM H11 even bytes
-	    0x300000-0x3fffff ROM H11 odd bytes
-	*/
-
-	/* split ROM H13 */
-	ROM16_split_gfx("gfx2", "gfx1", 0x0000000, 0x0200000, 0x0000000, 0x0100000);
-
-	/* split ROM H11 */
-	ROM16_split_gfx("gfx2", "gfx1", 0x0200000, 0x0200000, 0x0200000, 0x0300000);
-
-}
 
 
 /*
@@ -436,7 +365,7 @@ DRIVER_INIT_MEMBER(glass_state, glass)
  The unprotected version appears to be a Korean set, is censored, and has different girl pictures.
 */
 
-GAME( 1994, glass,    0,     glass_ds5002fp, glass, glass_state, glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, Checksum 49D5E66B, Version 1994)",                           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, glasskr,  glass, glass,          glass, glass_state, glass, ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, Checksum D419AB69, Version 1994) (censored, unprotected)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // promat stickers on program roms
-GAME( 1993, glass10,  glass, glass_ds5002fp, glass, glass_state, glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, Checksum C5513F3C)",                                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, glass10a, glass, glass_ds5002fp, glass, glass_state, glass, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, Checksum D3864FDB)",                                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, glass,    0,     glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, Checksum 49D5E66B, Version 1994)",                           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, glasskr,  glass, glass,          glass, glass_state, empty_init, ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, Checksum D419AB69, Version 1994) (censored, unprotected)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // promat stickers on program roms
+GAME( 1993, glass10,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, Checksum C5513F3C)",                                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, glass10a, glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, Checksum D3864FDB)",                                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

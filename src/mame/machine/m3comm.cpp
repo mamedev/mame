@@ -90,9 +90,9 @@ SEGA 1998
 //////// Model 3 (main CPU @ C00xxxxx) and Hikaru (MMctrl bank 0E) interface
 void m3comm_device::m3_map(address_map &map)
 {
-	map(0x0000000, 0x000ffff).rw(this, FUNC(m3comm_device::m3_comm_ram_r), FUNC(m3comm_device::m3_comm_ram_w));
-	map(0x0010000, 0x00101ff).rw(this, FUNC(m3comm_device::m3_ioregs_r), FUNC(m3comm_device::m3_ioregs_w)).umask32(0xffff0000);
-	map(0x0020000, 0x003ffff).rw(this, FUNC(m3comm_device::m3_m68k_ram_r), FUNC(m3comm_device::m3_m68k_ram_w)).umask32(0xffff0000);
+	map(0x0000000, 0x000ffff).rw(FUNC(m3comm_device::m3_comm_ram_r), FUNC(m3comm_device::m3_comm_ram_w));
+	map(0x0010000, 0x00101ff).rw(FUNC(m3comm_device::m3_ioregs_r), FUNC(m3comm_device::m3_ioregs_w)).umask32(0xffff0000);
+	map(0x0020000, 0x003ffff).rw(FUNC(m3comm_device::m3_m68k_ram_r), FUNC(m3comm_device::m3_m68k_ram_w)).umask32(0xffff0000);
 }
 
 
@@ -102,9 +102,9 @@ void m3comm_device::m3_map(address_map &map)
 void m3comm_device::m3comm_mem(address_map &map)
 {
 	map(0x0000000, 0x000ffff).ram().share("m68k_ram");
-	map(0x0040000, 0x00400ff).rw(this, FUNC(m3comm_device::ctrl_r), FUNC(m3comm_device::ctrl_w));
+	map(0x0040000, 0x00400ff).rw(FUNC(m3comm_device::ctrl_r), FUNC(m3comm_device::ctrl_w));
 	map(0x0080000, 0x008ffff).bankrw("comm_ram");
-	map(0x00C0000, 0x00C00ff).rw(this, FUNC(m3comm_device::ioregs_r), FUNC(m3comm_device::ioregs_w));
+	map(0x00C0000, 0x00C00ff).rw(FUNC(m3comm_device::ioregs_r), FUNC(m3comm_device::ioregs_w));
 }
 
 
@@ -119,11 +119,10 @@ DEFINE_DEVICE_TYPE(M3COMM, m3comm_device, "m3comm", "Model 3 Communication Board
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(m3comm_device::device_add_mconfig)
-	MCFG_CPU_ADD(M68K_TAG, M68000, 10000000) // random
-	MCFG_CPU_PROGRAM_MAP(m3comm_mem)
+	MCFG_DEVICE_ADD(M68K_TAG, M68000, 10000000) // random
+	MCFG_DEVICE_PROGRAM_MAP(m3comm_mem)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -404,10 +403,10 @@ WRITE16_MEMBER(m3comm_device::naomi_w)
 	{
 	case 0:         // 5F7018
 					// bit 0: access RAM is 0 - communication RAM / 1 - M68K RAM
-					// bit 1: comm RAM bank ??? (not really used)
+					// bit 1: comm RAM bank (seems R/O for SH4)
 					// bit 5: M68K Reset
 					// bit 6: ???
-					// bit 7: ???
+					// bit 7: ??? nlCbIntr reset this bit at each VBLANK-IN during game run (but not during handshake), might be M68K IRQ 5 or 2
 					// bit 14: G1 DMA bus master 0 - active / 1 - disabled
 					// bit 15: 0 - enable / 1 - disable this device ???
 //      LOG("M3COMM control write %04x\n", data);

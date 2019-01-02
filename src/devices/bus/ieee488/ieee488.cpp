@@ -93,6 +93,13 @@ void ieee488_slot_device::device_start()
 }
 
 
+void ieee488_slot_device::add_cbm_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot)
+{
+	ieee488_slot_device &slot(IEEE488_SLOT(config, _tag, 0));
+	cbm_ieee488_devices(slot);
+	slot.set_default_option(_def_slot);
+	slot.set_address(_address);
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -400,33 +407,37 @@ uint8_t ieee488_device::get_data()
 #include "shark.h"
 #include "softbox.h"
 
-SLOT_INTERFACE_START( cbm_ieee488_devices )
-	SLOT_INTERFACE("c2040", C2040)
-	SLOT_INTERFACE("c3040", C3040)
-	SLOT_INTERFACE("c4040", C4040)
-	SLOT_INTERFACE("c8050", C8050)
-	SLOT_INTERFACE("c8250", C8250)
-	SLOT_INTERFACE("sfd1001", SFD1001)
-	SLOT_INTERFACE("c2031", C2031)
-	SLOT_INTERFACE("c8280", C8280)
-	SLOT_INTERFACE("d9060", D9060)
-	SLOT_INTERFACE("d9090", D9090)
-	SLOT_INTERFACE("softbox", SOFTBOX)
-	SLOT_INTERFACE("hardbox", HARDBOX)
-	SLOT_INTERFACE("shark", MSHARK)
-	SLOT_INTERFACE("c4023", C4023)
-SLOT_INTERFACE_END
+void cbm_ieee488_devices(device_slot_interface &device)
+{
+	device.option_add("c2040", C2040);
+	device.option_add("c3040", C3040);
+	device.option_add("c4040", C4040);
+	device.option_add("c8050", C8050);
+	device.option_add("c8250", C8250);
+	device.option_add("sfd1001", SFD1001);
+	device.option_add("c2031", C2031);
+	device.option_add("c8280", C8280);
+	device.option_add("d9060", D9060);
+	device.option_add("d9090", D9090);
+	device.option_add("softbox", SOFTBOX);
+	device.option_add("hardbox", HARDBOX);
+	device.option_add("shark", MSHARK);
+	device.option_add("c4023", C4023);
+}
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( hp_ieee488_devices )
 //-------------------------------------------------
 
 // slot devices
+#include "hp9122c.h"
 #include "hp9895.h"
 
-SLOT_INTERFACE_START(hp_ieee488_devices)
-	SLOT_INTERFACE("hp9895", HP9895)
-SLOT_INTERFACE_END
+void hp_ieee488_devices(device_slot_interface &device)
+{
+	device.option_add("hp9122c", HP9122C);
+	device.option_add("hp9895", HP9895);
+}
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( remote488_devices )
@@ -435,6 +446,7 @@ SLOT_INTERFACE_END
 // slot devices
 #include "remote488.h"
 
-SLOT_INTERFACE_START(remote488_devices)
-	SLOT_INTERFACE("remote488", REMOTE488)
-SLOT_INTERFACE_END
+void remote488_devices(device_slot_interface &device)
+{
+	device.option_add("remote488", REMOTE488);
+}

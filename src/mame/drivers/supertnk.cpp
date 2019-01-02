@@ -94,11 +94,15 @@ CRU lines:
 >b12    Unknown, maybe some special-hardware sound effect or lights blinking (?)
 >b13    Unknown, maybe some special-hardware sound effect or lights blinking (?)
 
+XTAL (on CPU board) is marked 20.790 on one PCB, 22.118 on another. The
+former value is correct according to the parts list in the service manual.
+
 ***************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/tms9900/tms9980a.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "screen.h"
@@ -116,21 +120,24 @@ public:
 	supertnk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_watchdog(*this, "watchdog")
 	{ }
 
-	DECLARE_DRIVER_INIT(supertnk);
 	void supertnk(machine_config &config);
 
-protected:
-	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_0_w);
-	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_1_w);
-	DECLARE_WRITE8_MEMBER(supertnk_interrupt_ack_w);
-	DECLARE_WRITE8_MEMBER(supertnk_videoram_w);
-	DECLARE_READ8_MEMBER(supertnk_videoram_r);
-	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_0_w);
-	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_1_w);
-	uint32_t screen_update_supertnk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(supertnk_interrupt);
+	void init_supertnk();
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(bankswitch_0_w);
+	DECLARE_WRITE_LINE_MEMBER(bankswitch_1_w);
+	DECLARE_WRITE_LINE_MEMBER(interrupt_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(watchdog_reset_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_READ8_MEMBER(videoram_r);
+	DECLARE_WRITE_LINE_MEMBER(bitplane_select_0_w);
+	DECLARE_WRITE_LINE_MEMBER(bitplane_select_1_w);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -138,12 +145,14 @@ protected:
 	void supertnk_io_map(address_map &map);
 	void supertnk_map(address_map &map);
 
-private:
 	std::unique_ptr<uint8_t[]> m_videoram[3];
 	uint8_t m_rom_bank;
 	uint8_t m_bitplane_select;
 	pen_t m_pens[NUM_PENS];
+	bool m_interrupt_enable;
+
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 };
 
 
@@ -159,16 +168,16 @@ void supertnk_state::machine_start()
  *
  *************************************/
 
-WRITE8_MEMBER(supertnk_state::supertnk_bankswitch_0_w)
+WRITE_LINE_MEMBER(supertnk_state::bankswitch_0_w)
 {
-	m_rom_bank = (m_rom_bank & 0x02) | ((data << 0) & 0x01);
+	m_rom_bank = (m_rom_bank & 0x02) | (state ? 0x01 : 0x00);
 	membank("bank1")->set_entry(m_rom_bank);
 }
 
 
-WRITE8_MEMBER(supertnk_state::supertnk_bankswitch_1_w)
+WRITE_LINE_MEMBER(supertnk_state::bankswitch_1_w)
 {
-	m_rom_bank = (m_rom_bank & 0x01) | ((data << 1) & 0x02);
+	m_rom_bank = (m_rom_bank & 0x01) | (state ? 0x02 : 0x00);
 	membank("bank1")->set_entry(m_rom_bank);
 }
 
@@ -180,17 +189,25 @@ WRITE8_MEMBER(supertnk_state::supertnk_bankswitch_1_w)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(supertnk_state::supertnk_interrupt)
+WRITE_LINE_MEMBER(supertnk_state::vblank_interrupt)
 {
-	m_maincpu->set_input_line(INT_9980A_LEVEL4, ASSERT_LINE);
+	if (state && m_interrupt_enable)
+		m_maincpu->set_input_line(INT_9980A_LEVEL4, ASSERT_LINE);
 }
 
 
-WRITE8_MEMBER(supertnk_state::supertnk_interrupt_ack_w)
+WRITE_LINE_MEMBER(supertnk_state::interrupt_enable_w)
 {
-	m_maincpu->set_input_line(INT_9980A_LEVEL4, CLEAR_LINE);
+	m_interrupt_enable = state;
+	if (!state)
+		m_maincpu->set_input_line(INT_9980A_LEVEL4, CLEAR_LINE);
 }
 
+
+WRITE_LINE_MEMBER(supertnk_state::watchdog_reset_w)
+{
+	m_watchdog->watchdog_enable(!state);
+}
 
 
 /*************************************
@@ -217,7 +234,7 @@ void supertnk_state::video_start()
 }
 
 
-WRITE8_MEMBER(supertnk_state::supertnk_videoram_w)
+WRITE8_MEMBER(supertnk_state::videoram_w)
 {
 	if (m_bitplane_select > 2)
 	{
@@ -232,7 +249,7 @@ WRITE8_MEMBER(supertnk_state::supertnk_videoram_w)
 }
 
 
-READ8_MEMBER(supertnk_state::supertnk_videoram_r)
+READ8_MEMBER(supertnk_state::videoram_r)
 {
 	uint8_t ret = 0x00;
 
@@ -243,19 +260,19 @@ READ8_MEMBER(supertnk_state::supertnk_videoram_r)
 }
 
 
-WRITE8_MEMBER(supertnk_state::supertnk_bitplane_select_0_w)
+WRITE_LINE_MEMBER(supertnk_state::bitplane_select_0_w)
 {
-	m_bitplane_select = (m_bitplane_select & 0x02) | ((data << 0) & 0x01);
+	m_bitplane_select = (m_bitplane_select & 0x02) | (state ? 0x01 : 0x00);
 }
 
 
-WRITE8_MEMBER(supertnk_state::supertnk_bitplane_select_1_w)
+WRITE_LINE_MEMBER(supertnk_state::bitplane_select_1_w)
 {
-	m_bitplane_select = (m_bitplane_select & 0x01) | ((data << 1) & 0x02);
+	m_bitplane_select = (m_bitplane_select & 0x01) | (state ? 0x02 : 0x00);
 }
 
 
-uint32_t supertnk_state::screen_update_supertnk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t supertnk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
@@ -296,12 +313,6 @@ uint32_t supertnk_state::screen_update_supertnk(screen_device &screen, bitmap_rg
 
 void supertnk_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	supertnk_bankswitch_0_w(space, 0, 0);
-	supertnk_bankswitch_1_w(space, 0, 0);
-
-	supertnk_bitplane_select_0_w(space, 0, 0);
-	supertnk_bitplane_select_1_w(space, 0, 0);
 }
 
 
@@ -322,7 +333,7 @@ void supertnk_state::supertnk_map(address_map &map)
 	map(0x1efe, 0x1eff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x1efe, 0x1efe).portr("DSW");
 	map(0x1eff, 0x1eff).portr("UNK");
-	map(0x2000, 0x3fff).rw(this, FUNC(supertnk_state::supertnk_videoram_r), FUNC(supertnk_state::supertnk_videoram_w));
+	map(0x2000, 0x3fff).rw(FUNC(supertnk_state::videoram_r), FUNC(supertnk_state::videoram_w));
 }
 
 
@@ -336,12 +347,7 @@ void supertnk_state::supertnk_map(address_map &map)
 void supertnk_state::supertnk_io_map(address_map &map)
 {
 	map(0x0000, 0x0000).nopw();
-	map(0x0400, 0x0400).w(this, FUNC(supertnk_state::supertnk_bitplane_select_0_w));
-	map(0x0401, 0x0401).w(this, FUNC(supertnk_state::supertnk_bitplane_select_1_w));
-	map(0x0402, 0x0402).w(this, FUNC(supertnk_state::supertnk_bankswitch_0_w));
-	map(0x0404, 0x0404).w(this, FUNC(supertnk_state::supertnk_bankswitch_1_w));
-	map(0x0406, 0x0406).w(this, FUNC(supertnk_state::supertnk_interrupt_ack_w));
-	map(0x0407, 0x0407).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x0400, 0x0407).w("outlatch", FUNC(ls259_device::write_d0));
 }
 
 
@@ -433,29 +439,34 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(supertnk_state::supertnk)
-
+void supertnk_state::supertnk(machine_config &config)
+{
 	// CPU TMS9980A; no line connections
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2598750, supertnk_map, supertnk_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", supertnk_state,  supertnk_interrupt)
+	TMS9980A(config, m_maincpu, 20.79_MHz_XTAL / 2); // divider not verified (possibly should be /3)
+	m_maincpu->set_addrmap(AS_PROGRAM, &supertnk_state::supertnk_map);
+	m_maincpu->set_addrmap(AS_IO, &supertnk_state::supertnk_io_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	ls259_device &outlatch(LS259(config, "outlatch")); // on CPU board near 2114 SRAM
+	outlatch.q_out_cb<0>().set(FUNC(supertnk_state::bitplane_select_0_w));
+	outlatch.q_out_cb<1>().set(FUNC(supertnk_state::bitplane_select_1_w));
+	outlatch.q_out_cb<2>().set(FUNC(supertnk_state::bankswitch_0_w));
+	outlatch.q_out_cb<4>().set(FUNC(supertnk_state::bankswitch_1_w));
+	outlatch.q_out_cb<6>().set(FUNC(supertnk_state::watchdog_reset_w)).invert();
+	outlatch.q_out_cb<7>().set(FUNC(supertnk_state::interrupt_enable_w));
+
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(supertnk_state, screen_update_supertnk)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(20.79_MHz_XTAL / 4, 330, 0, 32*8, 315, 0, 32*8); // parameters guessed
+	screen.set_screen_update(FUNC(supertnk_state::screen_update));
+	screen.screen_vblank().set(FUNC(supertnk_state::vblank_interrupt));
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	AY8910(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -491,18 +502,17 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(supertnk_state,supertnk)
+void supertnk_state::init_supertnk()
 {
 	/* decode the TMS9980 ROMs */
-	offs_t offs;
 	uint8_t *rom = memregion("maincpu")->base();
 	size_t len = memregion("maincpu")->bytes();
 
-	for (offs = 0; offs < len; offs++)
+	for (offs_t offs = 0; offs < len; offs++)
 	{
 		rom[offs] = bitswap<8>(rom[offs],0,1,2,3,4,5,6,7);
 	}
 }
 
 
-GAME( 1981, supertnk, 0, supertnk, supertnk, supertnk_state, supertnk, ROT90, "Video Games GmbH", "Super Tank", 0 )
+GAME( 1981, supertnk, 0, supertnk, supertnk, supertnk_state, init_supertnk, ROT90, "Video Games GmbH", "Super Tank", 0 )

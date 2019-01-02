@@ -125,7 +125,6 @@ i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *
 	: i80186_cpu_device(mconfig, I80188, tag, owner, clock, 8)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
-	m_fetch_xor = 0;
 	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
 }
 
@@ -133,7 +132,6 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *
 	: i80186_cpu_device(mconfig, I80186, tag, owner, clock, 16)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
-	m_fetch_xor = BYTE_XOR_LE(0);
 	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
 }
 
@@ -166,7 +164,7 @@ device_memory_interface::space_config_vector i80186_cpu_device::memory_space_con
 
 uint8_t i80186_cpu_device::fetch()
 {
-	uint8_t data = m_direct_opcodes->read_byte(update_pc(), m_fetch_xor);
+	uint8_t data = m_or8(update_pc());
 	m_ip++;
 	return data;
 }

@@ -86,10 +86,10 @@ void matmania_state::matmania_map(address_map &map)
 	map(0x2400, 0x25ff).ram().share("videoram3");
 	map(0x2600, 0x27ff).ram().share("colorram3");
 	map(0x3000, 0x3000).portr("IN0").writeonly().share("pageselect");
-	map(0x3010, 0x3010).portr("IN1").w(this, FUNC(matmania_state::matmania_sh_command_w));
+	map(0x3010, 0x3010).portr("IN1").w(FUNC(matmania_state::matmania_sh_command_w));
 	map(0x3020, 0x3020).portr("DSW2").writeonly().share("scroll");
 	map(0x3030, 0x3030).portr("DSW1").nopw(); /* ?? */
-	map(0x3050, 0x307f).w(this, FUNC(matmania_state::matmania_paletteram_w)).share("paletteram");
+	map(0x3050, 0x307f).w(FUNC(matmania_state::matmania_paletteram_w)).share("paletteram");
 	map(0x4000, 0xffff).rom();
 }
 
@@ -104,12 +104,12 @@ void matmania_state::maniach_map(address_map &map)
 	map(0x2400, 0x25ff).ram().share("videoram3");
 	map(0x2600, 0x27ff).ram().share("colorram3");
 	map(0x3000, 0x3000).portr("IN0").writeonly().share("pageselect");
-	map(0x3010, 0x3010).portr("IN1").w(this, FUNC(matmania_state::maniach_sh_command_w));
+	map(0x3010, 0x3010).portr("IN1").w(FUNC(matmania_state::maniach_sh_command_w));
 	map(0x3020, 0x3020).portr("DSW2").writeonly().share("scroll");
 	map(0x3030, 0x3030).portr("DSW1").nopw();   /* ?? */
 	map(0x3040, 0x3040).rw(m_mcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0x3041, 0x3041).r(this, FUNC(matmania_state::maniach_mcu_status_r));
-	map(0x3050, 0x307f).w(this, FUNC(matmania_state::matmania_paletteram_w)).share("paletteram");
+	map(0x3041, 0x3041).r(FUNC(matmania_state::maniach_mcu_status_r));
+	map(0x3050, 0x307f).w(FUNC(matmania_state::matmania_paletteram_w)).share("paletteram");
 	map(0x4000, 0xffff).rom();
 }
 
@@ -119,7 +119,7 @@ void matmania_state::matmania_sound_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x2000, 0x2001).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0x2002, 0x2003).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::write));
+	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x2007, 0x2007).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x8000, 0xffff).rom();
 }
@@ -128,7 +128,7 @@ void matmania_state::maniach_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x2000, 0x2001).w("ymsnd", FUNC(ym3526_device::write));
-	map(0x2002, 0x2002).w("dac", FUNC(dac_byte_interface::write));
+	map(0x2002, 0x2002).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x2004, 0x2004).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x4000, 0xffff).rom();
 }
@@ -279,13 +279,13 @@ static const gfx_layout maniach_tilelayout =
 	32*8    /* every tile takes 16 consecutive bytes */
 };
 
-static GFXDECODE_START( matmania )
+static GFXDECODE_START( gfx_matmania )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,              0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,            4*8, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, matmania_spritelayout, 8*8, 2 )
 GFXDECODE_END
 
-static GFXDECODE_START( maniach )
+static GFXDECODE_START( gfx_maniach )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,             0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, maniach_tilelayout,   4*8, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, maniach_spritelayout, 8*8, 2 )
@@ -299,89 +299,87 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(matmania_state::matmania)
-
+void matmania_state::matmania(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(matmania_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", matmania_state,  irq0_line_hold)
+	M6502(config, m_maincpu, 1500000);	/* 1.5 MHz ???? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &matmania_state::matmania_map);
+	m_maincpu->set_vblank_int("screen", FUNC(matmania_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1200000)    /* 1.2 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(matmania_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(matmania_state, nmi_line_pulse, 15*60) /* ???? */
+	M6502(config, m_audiocpu, 1200000);	/* 1.2 MHz ???? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &matmania_state::matmania_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(matmania_state::nmi_line_pulse), attotime::from_hz(15*60)); /* ???? */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(matmania_state, screen_update_matmania)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(matmania_state::screen_update_matmania));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", matmania)
-	MCFG_PALETTE_ADD("palette", 64+16)
-	MCFG_PALETTE_INIT_OWNER(matmania_state, matmania)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_matmania);
+	PALETTE(config, m_palette, FUNC(matmania_state::matmania_palette), 64 + 16);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.3);
+	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(matmania_state::maniach)
-
+void matmania_state::maniach(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(maniach_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", matmania_state,  irq0_line_hold)
+	M6502(config, m_maincpu, 1500000); /* 1.5 MHz ???? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &matmania_state::maniach_map);
+	m_maincpu->set_vblank_int("screen", FUNC(matmania_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", M6809, 1500000)    /* 1.5 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(maniach_sound_map)
+	MC6809E(config, m_audiocpu, 1500000);    /* 1.5 MHz ???? (HD68A09EP) */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &matmania_state::maniach_sound_map);
 
-	MCFG_CPU_ADD("mcu", TAITO68705_MCU, 1500000*2)  /* (don't know really how fast, but it doesn't need to even be this fast) */
+	TAITO68705_MCU(config, m_mcu, 1500000*2);  /* (don't know really how fast, but it doesn't need to even be this fast) */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slice per frame - high interleaving to sync main and mcu */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slice per frame - high interleaving to sync main and mcu */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(matmania_state, screen_update_maniach)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(matmania_state::screen_update_maniach));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", maniach)
-	MCFG_PALETTE_ADD("palette", 64+16)
-	MCFG_PALETTE_INIT_OWNER(matmania_state, matmania)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_maniach);
+	PALETTE(config, m_palette, FUNC(matmania_state::matmania_palette), 64 + 16);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, 3600000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", 3600000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 /*************************************
@@ -618,7 +616,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, matmania, 0,        matmania, matmania, matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mat Mania",               MACHINE_SUPPORTS_SAVE )
-GAME( 1985, excthour, matmania, matmania, maniach,  matmania_state, 0, ROT270, "Technos Japan (Taito license)",         "Exciting Hour",           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, maniach,  0,        maniach,  maniach,  matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, maniach2, maniach,  maniach,  maniach,  matmania_state, 0, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", MACHINE_SUPPORTS_SAVE ) // earlier version?
+GAME( 1985, matmania, 0,        matmania, matmania, matmania_state, empty_init, ROT270, "Technos Japan (Taito America license)", "Mat Mania",               MACHINE_SUPPORTS_SAVE )
+GAME( 1985, excthour, matmania, matmania, maniach,  matmania_state, empty_init, ROT270, "Technos Japan (Taito license)",         "Exciting Hour",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, maniach,  0,        maniach,  maniach,  matmania_state, empty_init, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, maniach2, maniach,  maniach,  maniach,  matmania_state, empty_init, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", MACHINE_SUPPORTS_SAVE ) // earlier version?

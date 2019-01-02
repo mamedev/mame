@@ -13,34 +13,34 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(dogfgt_state, dogfgt)
+void dogfgt_state::dogfgt_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	/* first 16 colors are RAM */
-	for (i = 0; i < 64; i++)
+	// first 16 colors are RAM
+	for (int i = 0; i < 64; i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(i + 16, rgb_t(r,g,b));
-		color_prom++;
+		palette.set_pen_color(i + 16, rgb_t(r, g, b));
 	}
 }
 
@@ -71,7 +71,7 @@ void dogfgt_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dogfgt_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_bitmapram = std::make_unique<uint8_t[]>(BITMAPRAM_SIZE);
-	save_pointer(NAME(m_bitmapram.get()), BITMAPRAM_SIZE);
+	save_pointer(NAME(m_bitmapram), BITMAPRAM_SIZE);
 
 	m_screen->register_screen_bitmap(m_pixbitmap);
 	save_item(NAME(m_pixbitmap));
@@ -84,12 +84,12 @@ void dogfgt_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(dogfgt_state::dogfgt_plane_select_w)
+WRITE8_MEMBER(dogfgt_state::plane_select_w)
 {
 	m_bm_plane = data;
 }
 
-READ8_MEMBER(dogfgt_state::dogfgt_bitmapram_r)
+READ8_MEMBER(dogfgt_state::bitmapram_r)
 {
 	if (m_bm_plane > 2)
 	{
@@ -102,19 +102,17 @@ READ8_MEMBER(dogfgt_state::dogfgt_bitmapram_r)
 
 WRITE8_MEMBER(dogfgt_state::internal_bitmapram_w)
 {
-	int x, y, subx;
-
 	m_bitmapram[offset] = data;
 
 	offset &= (BITMAPRAM_SIZE / 3 - 1);
-	x = 8 * (offset / 256);
-	y = offset % 256;
+	int x = 8 * (offset / 256);
+	int y = offset % 256;
 
-	for (subx = 0; subx < 8; subx++)
+	for (int subx = 0; subx < 8; subx++)
 	{
-		int i, color = 0;
+		int color = 0;
 
-		for (i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++)
 			color |= ((m_bitmapram[offset + BITMAPRAM_SIZE / 3 * i] >> subx) & 1) << i;
 
 		if (flip_screen())
@@ -124,7 +122,7 @@ WRITE8_MEMBER(dogfgt_state::internal_bitmapram_w)
 	}
 }
 
-WRITE8_MEMBER(dogfgt_state::dogfgt_bitmapram_w)
+WRITE8_MEMBER(dogfgt_state::bitmapram_w)
 {
 	if (m_bm_plane > 2)
 	{
@@ -135,20 +133,20 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_bitmapram_w)
 	internal_bitmapram_w(space, offset + BITMAPRAM_SIZE / 3 * m_bm_plane, data);
 }
 
-WRITE8_MEMBER(dogfgt_state::dogfgt_bgvideoram_w)
+WRITE8_MEMBER(dogfgt_state::bgvideoram_w)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(dogfgt_state::dogfgt_scroll_w)
+WRITE8_MEMBER(dogfgt_state::scroll_w)
 {
 	m_scroll[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scroll[0] + 256 * m_scroll[1] + 256);
 	m_bg_tilemap->set_scrolly(0, m_scroll[2] + 256 * m_scroll[3]);
 }
 
-WRITE8_MEMBER(dogfgt_state::dogfgt_1800_w)
+WRITE8_MEMBER(dogfgt_state::_1800_w)
 {
 	/* bits 0 and 1 are probably text color (not verified because PROM is missing) */
 	m_pixcolor = ((data & 0x01) << 1) | ((data & 0x02) >> 1);
@@ -173,18 +171,14 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_1800_w)
 
 void dogfgt_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	int offs;
-
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		if (m_spriteram[offs] & 0x01)
 		{
-			int sx, sy, flipx, flipy;
-
-			sx = m_spriteram[offs + 3];
-			sy = (240 - m_spriteram[offs + 2]) & 0xff;
-			flipx = m_spriteram[offs] & 0x04;
-			flipy = m_spriteram[offs] & 0x02;
+			int sx = m_spriteram[offs + 3];
+			int sy = (240 - m_spriteram[offs + 2]) & 0xff;
+			int flipx = m_spriteram[offs] & 0x04;
+			int flipy = m_spriteram[offs] & 0x02;
 			if (flip_screen())
 			{
 				sx = 240 - sx;
@@ -203,10 +197,8 @@ void dogfgt_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect 
 }
 
 
-uint32_t dogfgt_state::screen_update_dogfgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dogfgt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-
 	if (m_lastflip != flip_screen() || m_lastpixcolor != m_pixcolor)
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -214,7 +206,7 @@ uint32_t dogfgt_state::screen_update_dogfgt(screen_device &screen, bitmap_ind16 
 		m_lastflip = flip_screen();
 		m_lastpixcolor = m_pixcolor;
 
-		for (offs = 0; offs < BITMAPRAM_SIZE; offs++)
+		for (int offs = 0; offs < BITMAPRAM_SIZE; offs++)
 			internal_bitmapram_w(space, offs, m_bitmapram[offs]);
 	}
 

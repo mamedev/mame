@@ -33,6 +33,7 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 #include "machine/ram.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -50,16 +51,16 @@ void galaxy_state::galaxyp_io(address_map &map)
 void galaxy_state::galaxy_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x2000, 0x2037).mirror(0x07c0).r(this, FUNC(galaxy_state::galaxy_keyboard_r));
-	map(0x2038, 0x203f).mirror(0x07c0).w(this, FUNC(galaxy_state::galaxy_latch_w));
+	map(0x2000, 0x2037).mirror(0x07c0).r(FUNC(galaxy_state::galaxy_keyboard_r));
+	map(0x2038, 0x203f).mirror(0x07c0).w(FUNC(galaxy_state::galaxy_latch_w));
 }
 
 void galaxy_state::galaxyp_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).rom(); // ROM A
 	map(0x1000, 0x1fff).rom(); // ROM B
-	map(0x2000, 0x2037).mirror(0x07c0).r(this, FUNC(galaxy_state::galaxy_keyboard_r));
-	map(0x2038, 0x203f).mirror(0x07c0).w(this, FUNC(galaxy_state::galaxy_latch_w));
+	map(0x2000, 0x2037).mirror(0x07c0).r(FUNC(galaxy_state::galaxy_keyboard_r));
+	map(0x2038, 0x203f).mirror(0x07c0).w(FUNC(galaxy_state::galaxy_latch_w));
 	map(0xe000, 0xefff).rom(); // ROM C
 	map(0xf000, 0xffff).rom(); // ROM D
 }
@@ -170,17 +171,17 @@ static const gfx_layout galaxy_charlayout =
 	8                   /* every char takes 1 x 16 bytes */
 };
 
-static GFXDECODE_START( galaxy )
+static GFXDECODE_START( gfx_galaxy )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxy_charlayout, 0, 1 )
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(galaxy_state::galaxy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(galaxy_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxy_state,galaxy_irq_callback)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(galaxy_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(galaxy_state,galaxy_irq_callback)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -193,16 +194,14 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxy)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxy)
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(gtp_cassette_formats)
@@ -212,18 +211,16 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("6K")
-	MCFG_RAM_EXTRA_OPTIONS("2K,22K,38K,54K")
+	RAM(config, RAM_TAG).set_default_size("6K").set_extra_options("2K,22K,38K,54K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(galaxyp_mem)
-	MCFG_CPU_IO_MAP(galaxyp_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(galaxy_state,galaxy_irq_callback)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(galaxyp_mem)
+	MCFG_DEVICE_IO_MAP(galaxyp_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(galaxy_state,galaxy_irq_callback)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -236,17 +233,16 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL/4)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, "ay8910", XTAL/4); // FIXME: really no output routes for this AY?
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(gtp_cassette_formats)
@@ -256,8 +252,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("38K")
+	RAM(config, RAM_TAG).set_default_size("38K");
 MACHINE_CONFIG_END
 
 ROM_START (galaxy)
@@ -277,6 +272,6 @@ ROM_START (galaxyp)
 	ROM_LOAD ("galchr.bin", 0x0000, 0x0800, CRC(5c3b5bb5) SHA1(19429a61dc5e55ddec3242a8f695e06dd7961f88))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT    STATE         INIT    COMPANY                                   FULLNAME */
-COMP(1983,  galaxy,     0,      0,  galaxy, galaxy,  galaxy_state, galaxy, "Voja Antonic / Elektronika inzenjering", "Galaksija",      0)
-COMP(1985,  galaxyp,    galaxy, 0,  galaxyp,galaxyp, galaxy_state, galaxyp,"Nenad Dunjic",                           "Galaksija plus", 0)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT          COMPANY                                   FULLNAME */
+COMP( 1983, galaxy,  0,      0,      galaxy,  galaxy,  galaxy_state, init_galaxy,  "Voja Antonic / Elektronika inzenjering", "Galaksija",      0)
+COMP( 1985, galaxyp, galaxy, 0,      galaxyp, galaxyp, galaxy_state, init_galaxyp, "Nenad Dunjic",                           "Galaksija plus", 0)

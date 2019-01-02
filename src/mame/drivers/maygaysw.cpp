@@ -108,9 +108,12 @@ public:
 	maygayew_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
-	required_device<cpu_device> m_maincpu;
 	void maygayew(machine_config &config);
+
+private:
 	void maygayew_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -131,8 +134,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(maygayew_state::maygayew)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,8000000) // MC68306FC16 - standard 68000 core + peripherals
-	MCFG_CPU_PROGRAM_MAP(maygayew_map)
+	MCFG_DEVICE_ADD("maincpu", M68000,8000000) // MC68306FC16 - standard 68000 core + peripherals
+	MCFG_DEVICE_PROGRAM_MAP(maygayew_map)
 MACHINE_CONFIG_END
 
 ROM_START( mg_gbr )
@@ -433,15 +436,15 @@ ROM_START( mg_scl )
 ROM_END
 
 // complete(?) dump
-GAME( 199?, mg_gbr      , 0         , maygayew, maygayew, maygayew_state, 0, ROT0, "Maygay", "Guinness Book Of Records (Maygay M2)", MACHINE_IS_SKELETON )
-GAME( 199?, mg_risk     , 0         , maygayew, maygayew, maygayew_state, 0, ROT0, "Maygay", "Risk (Maygay M2)", MACHINE_IS_SKELETON )
-GAME( 199?, mg_bb       , 0         , maygayew, maygayew, maygayew_state, 0, ROT0, "Maygay", "Big Break (Maygay M2)", MACHINE_IS_SKELETON )
-GAME( 199?, mg_lug      , 0         , maygayew, maygayew, maygayew_state, 0, ROT0, "Maygay", "London Underground (Maygay M2)", MACHINE_IS_SKELETON )
-GAME( 199?, mg_alad     , 0         , maygayew, maygayew, maygayew_state, 0, ROT0, "Maygay", "Aladdin's Cave (Maygay M2)", MACHINE_IS_SKELETON )
+GAME( 199?, mg_gbr      , 0         , maygayew, maygayew, maygayew_state, empty_init, ROT0, "Maygay", "Guinness Book Of Records (Maygay M2)", MACHINE_IS_SKELETON )
+GAME( 199?, mg_risk     , 0         , maygayew, maygayew, maygayew_state, empty_init, ROT0, "Maygay", "Risk (Maygay M2)", MACHINE_IS_SKELETON )
+GAME( 199?, mg_bb       , 0         , maygayew, maygayew, maygayew_state, empty_init, ROT0, "Maygay", "Big Break (Maygay M2)", MACHINE_IS_SKELETON )
+GAME( 199?, mg_lug      , 0         , maygayew, maygayew, maygayew_state, empty_init, ROT0, "Maygay", "London Underground (Maygay M2)", MACHINE_IS_SKELETON )
+GAME( 199?, mg_alad     , 0         , maygayew, maygayew, maygayew_state, empty_init, ROT0, "Maygay", "Aladdin's Cave (Maygay M2)", MACHINE_IS_SKELETON )
 
 // incomplete dumps
-GAME( 199?, mg_ewg      , 0         , maygayew, maygayew, maygayew_state, 0, ROT0, "Maygay", "Each Way Gambler (Maygay M2)", MACHINE_IS_SKELETON )
-GAME( 199?, mg_jv       , 0         , maygayew, maygayew, maygayew_state, 0, ROT0, "Maygay", "Jack & Vera (Maygay M2)", MACHINE_IS_SKELETON )
-GAME( 199?, mg_pbw      , 0         , maygayew, maygayew, maygayew_state, 0, ROT0, "Maygay", "Pinball Wizard (Maygay M2)", MACHINE_IS_SKELETON )
-GAME( 199?, mg_scl      , 0         , maygayew, maygayew, maygayew_state, 0, ROT0, "Maygay", "Super Clue (Maygay M2)", MACHINE_IS_SKELETON )
-GAME( 199?, mg_kf       , 0         , maygayew, maygayew, maygayew_state, 0, ROT0, "Maygay", "Krypton Factor (Maygay M2)", MACHINE_IS_SKELETON )
+GAME( 199?, mg_ewg      , 0         , maygayew, maygayew, maygayew_state, empty_init, ROT0, "Maygay", "Each Way Gambler (Maygay M2)", MACHINE_IS_SKELETON )
+GAME( 199?, mg_jv       , 0         , maygayew, maygayew, maygayew_state, empty_init, ROT0, "Maygay", "Jack & Vera (Maygay M2)", MACHINE_IS_SKELETON )
+GAME( 199?, mg_pbw      , 0         , maygayew, maygayew, maygayew_state, empty_init, ROT0, "Maygay", "Pinball Wizard (Maygay M2)", MACHINE_IS_SKELETON )
+GAME( 199?, mg_scl      , 0         , maygayew, maygayew, maygayew_state, empty_init, ROT0, "Maygay", "Super Clue (Maygay M2)", MACHINE_IS_SKELETON )
+GAME( 199?, mg_kf       , 0         , maygayew, maygayew, maygayew_state, empty_init, ROT0, "Maygay", "Krypton Factor (Maygay M2)", MACHINE_IS_SKELETON )

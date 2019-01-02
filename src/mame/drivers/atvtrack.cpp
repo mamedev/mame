@@ -103,6 +103,7 @@ TODO:
 #include "emu.h"
 #include "cpu/sh/sh4.h"
 #include "debugger.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -116,6 +117,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu") { }
 
+	void atvtrack(machine_config &config);
+
+protected:
 	DECLARE_READ64_MEMBER(control_r);
 	DECLARE_WRITE64_MEMBER(control_w);
 	DECLARE_READ64_MEMBER(nand_data_r);
@@ -144,12 +148,12 @@ public:
 	u16 gpu_irq_mask;
 	void gpu_irq_test();
 	void gpu_irq_set(int);
-	void atvtrack(machine_config &config);
+
 	void atvtrack_main_map(address_map &map);
 	void atvtrack_main_port(address_map &map);
 	void atvtrack_sub_map(address_map &map);
 	void atvtrack_sub_port(address_map &map);
-protected:
+
 	bool m_slaverun;
 };
 
@@ -160,9 +164,12 @@ public:
 	smashdrv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atvtrack_state(mconfig, type, tag) { }
 
+	void smashdrv(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void smashdrv(machine_config &config);
+
 	void smashdrv_main_map(address_map &map);
 	void smashdrv_main_port(address_map &map);
 };
@@ -510,17 +517,17 @@ void smashdrv_state::machine_reset()
 void atvtrack_state::atvtrack_main_map(address_map &map)
 {
 	map(0x00000000, 0x000003ff).ram().share("sharedmem");
-	map(0x00020000, 0x00020007).rw(this, FUNC(atvtrack_state::control_r), FUNC(atvtrack_state::control_w)); // control registers
+	map(0x00020000, 0x00020007).rw(FUNC(atvtrack_state::control_r), FUNC(atvtrack_state::control_w)); // control registers
 //  AM_RANGE(0x00020040, 0x0002007f) // audio DAC buffer
-	map(0x14000000, 0x14000007).rw(this, FUNC(atvtrack_state::nand_data_r), FUNC(atvtrack_state::nand_data_w));
-	map(0x14100000, 0x14100007).w(this, FUNC(atvtrack_state::nand_cmd_w));
-	map(0x14200000, 0x14200007).w(this, FUNC(atvtrack_state::nand_addr_w));
+	map(0x14000000, 0x14000007).rw(FUNC(atvtrack_state::nand_data_r), FUNC(atvtrack_state::nand_data_w));
+	map(0x14100000, 0x14100007).w(FUNC(atvtrack_state::nand_cmd_w));
+	map(0x14200000, 0x14200007).w(FUNC(atvtrack_state::nand_addr_w));
 	map(0x0c000000, 0x0c7fffff).ram();
 }
 
 void atvtrack_state::atvtrack_main_port(address_map &map)
 {
-	map(0x00, 0x1f).rw(this, FUNC(atvtrack_state::ioport_r), FUNC(atvtrack_state::ioport_w));
+	map(0x00, 0x1f).rw(FUNC(atvtrack_state::ioport_r), FUNC(atvtrack_state::ioport_w));
 }
 
 // Smashing Drive
@@ -530,7 +537,7 @@ void smashdrv_state::smashdrv_main_map(address_map &map)
 	map(0x00000000, 0x03ffffff).rom();
 	map(0x0c000000, 0x0c7fffff).ram();
 	map(0x10000000, 0x100003ff).ram().share("sharedmem");
-	map(0x10000400, 0x10000407).rw(this, FUNC(smashdrv_state::control_r), FUNC(smashdrv_state::control_w)); // control registers
+	map(0x10000400, 0x10000407).rw(FUNC(smashdrv_state::control_r), FUNC(smashdrv_state::control_w)); // control registers
 
 // 0x10000400 - 0x1000043F control registers
 // 0x10000440 - 0x1000047F Audio DAC buffer
@@ -539,7 +546,7 @@ void smashdrv_state::smashdrv_main_map(address_map &map)
 
 void smashdrv_state::smashdrv_main_port(address_map &map)
 {
-	map(0x00, 0x1f).rw(this, FUNC(smashdrv_state::ioport_r), FUNC(smashdrv_state::ioport_w));
+	map(0x00, 0x1f).rw(FUNC(smashdrv_state::ioport_r), FUNC(smashdrv_state::ioport_w));
 }
 
 // Sub CPU (same for both games)
@@ -548,7 +555,7 @@ void atvtrack_state::atvtrack_sub_map(address_map &map)
 {
 	map(0x00000000, 0x000003ff).ram().share("sharedmem");
 	map(0x0c000000, 0x0cffffff).ram();
-	map(0x14000000, 0x14003fff).rw(this, FUNC(atvtrack_state::gpu_r), FUNC(atvtrack_state::gpu_w));
+	map(0x14000000, 0x14003fff).rw(FUNC(atvtrack_state::gpu_r), FUNC(atvtrack_state::gpu_w));
 // 0x14004xxx GPU PCI CONFIG registers
 	map(0x18000000, 0x19ffffff).ram();
 // 0x18000000 - 0x19FFFFFF GPU RAM (32MB)
@@ -564,56 +571,56 @@ INPUT_PORTS_END
 
 #define ATV_CPU_CLOCK XTAL(33'000'000)*6
 
-MACHINE_CONFIG_START(atvtrack_state::atvtrack)
+void atvtrack_state::atvtrack(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4LE, ATV_CPU_CLOCK)
-	MCFG_SH4_MD0(1)
-	MCFG_SH4_MD1(1)
-	MCFG_SH4_MD2(0)
-	MCFG_SH4_MD3(0)
-	MCFG_SH4_MD4(0)
-	MCFG_SH4_MD5(1)
-	MCFG_SH4_MD6(0)
-	MCFG_SH4_MD7(1)
-	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(ATV_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(atvtrack_main_map)
-	MCFG_CPU_IO_MAP(atvtrack_main_port)
-	MCFG_CPU_FORCE_NO_DRC()
+	SH4LE(config, m_maincpu, ATV_CPU_CLOCK);
+	m_maincpu->set_md(0, 1);
+	m_maincpu->set_md(1, 1);
+	m_maincpu->set_md(2, 0);
+	m_maincpu->set_md(3, 0);
+	m_maincpu->set_md(4, 0);
+	m_maincpu->set_md(5, 1);
+	m_maincpu->set_md(6, 0);
+	m_maincpu->set_md(7, 1);
+	m_maincpu->set_md(8, 0);
+	m_maincpu->set_sh4_clock(ATV_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atvtrack_state::atvtrack_main_map);
+	m_maincpu->set_addrmap(AS_IO, &atvtrack_state::atvtrack_main_port);
+	m_maincpu->set_force_no_drc(true);
 
-	MCFG_CPU_ADD("subcpu", SH4LE, ATV_CPU_CLOCK)
-	MCFG_SH4_MD0(1)
-	MCFG_SH4_MD1(1)
-	MCFG_SH4_MD2(0)
-	MCFG_SH4_MD3(0)
-	MCFG_SH4_MD4(0)
-	MCFG_SH4_MD5(1)
-	MCFG_SH4_MD6(0)
-	MCFG_SH4_MD7(1)
-	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(ATV_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(atvtrack_sub_map)
-	MCFG_CPU_IO_MAP(atvtrack_sub_port)
-	MCFG_CPU_FORCE_NO_DRC()
+	SH4LE(config, m_subcpu, ATV_CPU_CLOCK);
+	m_subcpu->set_md(0, 1);
+	m_subcpu->set_md(1, 1);
+	m_subcpu->set_md(2, 0);
+	m_subcpu->set_md(3, 0);
+	m_subcpu->set_md(4, 0);
+	m_subcpu->set_md(5, 1);
+	m_subcpu->set_md(6, 0);
+	m_subcpu->set_md(7, 1);
+	m_subcpu->set_md(8, 0);
+	m_subcpu->set_sh4_clock(ATV_CPU_CLOCK);
+	m_subcpu->set_addrmap(AS_PROGRAM, &atvtrack_state::atvtrack_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &atvtrack_state::atvtrack_sub_port);
+	m_subcpu->set_force_no_drc(true);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(atvtrack_state, screen_update_atvtrack)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(atvtrack_state::screen_update_atvtrack));
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(0x1000);
+}
 
-MACHINE_CONFIG_START(smashdrv_state::smashdrv)
+void smashdrv_state::smashdrv(machine_config &config)
+{
 	atvtrack(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(smashdrv_main_map)
-	MCFG_CPU_IO_MAP(smashdrv_main_port)
-
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &smashdrv_state::smashdrv_main_map);
+	m_maincpu->set_addrmap(AS_IO, &smashdrv_state::smashdrv_main_port);
+}
 
 
 ROM_START( atvtrack )
@@ -686,9 +693,34 @@ REF 010131
 |  TDA1543  TDA1543                            |
 |----------------------------------------------|
 
+ PRG ROM useful locations:
+   0x64C44 Country: 0 - World, 1 - Spain, 2 - UK, 3 - Italy, 4 - USA
+   0x727AC 1 - enable Develop/debug option in test mode
 */
 
-ROM_START( smashdrv )
+ROM_START( smashdrv ) // World Version: 3.3, Version 3D: 1.9, Checksum: 707A
+	ROM_REGION64_LE( 0x0400000, "data", ROMREGION_ERASEFF)
+	ROM_LOAD("prg_world.ic23", 0x0000000, 0x0400000, CRC(c642b059) SHA1(8a898f46cebc5951a6355f2b51e31ac5e17b4bca) )
+
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("sdra.ic15",    0x00000000, 0x01000000, CRC(cf702287) SHA1(84cd83c339831deff15fe5fcc353e0b596667500) )
+	ROM_LOAD32_WORD("sdrb.ic14",    0x00000002, 0x01000000, CRC(39b76f0e) SHA1(529943b6075925e5f72c6e966796e04b2c33686c) )
+	ROM_LOAD32_WORD("sdrc.ic20",    0x02000000, 0x01000000, CRC(c9021dd7) SHA1(1d08aab433614810af858a0fc5d7f03c7b782237) )
+	// ic21 unpopulated
+ROM_END
+
+ROM_START( smashdrvs ) // Spain/Portugal Version: 3.3, Version 3D: 1.9, Checksum: 707B. There is another known (undumped) Spain/Portugal (Covielsa license) set with Version: 3.3, Version 3D: 1.9, Checksum: EDD9.
+	ROM_REGION64_LE( 0x0400000, "data", ROMREGION_ERASEFF)
+	ROM_LOAD("prg_spain.ic23", 0x0000000, 0x0400000, CRC(66b80283) SHA1(7d569670fd96aaa99da24378c77a265bc2ddc91c) )
+
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("sdra.ic15",    0x00000000, 0x01000000, CRC(cf702287) SHA1(84cd83c339831deff15fe5fcc353e0b596667500) )
+	ROM_LOAD32_WORD("sdrb.ic14",    0x00000002, 0x01000000, CRC(39b76f0e) SHA1(529943b6075925e5f72c6e966796e04b2c33686c) )
+	ROM_LOAD32_WORD("sdrc.ic20",    0x02000000, 0x01000000, CRC(c9021dd7) SHA1(1d08aab433614810af858a0fc5d7f03c7b782237) )
+	// ic21 unpopulated
+ROM_END
+
+ROM_START( smashdrvb ) // UK Version: 3.3, Version 3D: 1.9, Checksum: 707C
 	ROM_REGION64_LE( 0x0400000, "data", ROMREGION_ERASEFF)
 	ROM_LOAD("prg.ic23", 0x0000000, 0x0400000, CRC(5cc6d3ac) SHA1(0c8426774212d891796b59c95b8c70f64db5b67a) )
 
@@ -699,9 +731,11 @@ ROM_START( smashdrv )
 	// ic21 unpopulated
 ROM_END
 
-GAME( 2002, atvtrack,  0,          atvtrack,    atvtrack, atvtrack_state,   0, ROT0, "Gaelco",           "ATV Track (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, atvtracka, atvtrack,   atvtrack,    atvtrack, atvtrack_state,   0, ROT0, "Gaelco",           "ATV Track (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, gfootbal,  0,          atvtrack,    atvtrack, atvtrack_state,   0, ROT0, "Gaelco / Zigurat", "Gaelco Football", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, atvtrack,  0,        atvtrack, atvtrack, atvtrack_state, empty_init, ROT0, "Gaelco",           "ATV Track (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, atvtracka, atvtrack, atvtrack, atvtrack, atvtrack_state, empty_init, ROT0, "Gaelco",           "ATV Track (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, gfootbal,  0,        atvtrack, atvtrack, atvtrack_state, empty_init, ROT0, "Gaelco / Zigurat", "Gaelco Football", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // almost identical PCB, FlashROM mapping and master registers addresses different
-GAME( 2000, smashdrv, 0,           smashdrv,    atvtrack, smashdrv_state,   0, ROT0, "Gaelco",           "Smashing Drive (UK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, smashdrv,  0,        smashdrv, atvtrack, smashdrv_state, empty_init, ROT0, "Gaelco",                       "Smashing Drive (World)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, smashdrvb, smashdrv, smashdrv, atvtrack, smashdrv_state, empty_init, ROT0, "Gaelco (Brent Sales license)", "Smashing Drive (UK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, smashdrvs, smashdrv, smashdrv, atvtrack, smashdrv_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Smashing Drive (Spain, Portugal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

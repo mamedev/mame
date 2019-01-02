@@ -106,7 +106,6 @@ the Neogeo Pocket.
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/k1ge.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -153,6 +152,14 @@ public:
 			m_nvram_loaded = false;
 		}
 
+	void ngp_common(machine_config &config);
+	void ngp(machine_config &config);
+	void ngpc(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(power_callback);
+
+private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -170,7 +177,7 @@ public:
 		uint8_t   command[2];
 	} m_flash_chip[2];
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tmp95c061_device> m_maincpu;
 	required_device<cpu_device> m_z80;
 	required_device<t6w28_device> m_t6w28;
 	required_device<dac_byte_interface> m_ldac;
@@ -196,19 +203,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ngp_hblank_pin_w );
 	DECLARE_WRITE8_MEMBER( ngp_tlcs900_porta );
 	uint32_t screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(power_callback);
 	TIMER_CALLBACK_MEMBER(ngp_seconds_callback);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ngp_cart);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ngp_cart );
 
-	void ngp_common(machine_config &config);
-	void ngp(machine_config &config);
-	void ngpc(machine_config &config);
 	void ngp_mem(address_map &map);
 	void z80_io(address_map &map);
 	void z80_mem(address_map &map);
-protected:
+
 	bool m_nvram_loaded;
 	required_ioport m_io_controls;
 	required_ioport m_io_power;
@@ -321,7 +324,7 @@ WRITE8_MEMBER( ngp_state::ngp_io_w )
 		break;
 
 	case 0x3a:  /* Trigger Z80 NMI */
-		m_z80->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+		m_z80->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		break;
 	}
 	m_io_reg[offset] = data;
@@ -553,12 +556,12 @@ WRITE8_MEMBER( ngp_state::flash1_w )
 
 void ngp_state::ngp_mem(address_map &map)
 {
-	map(0x000080, 0x0000bf).rw(this, FUNC(ngp_state::ngp_io_r), FUNC(ngp_state::ngp_io_w));                        /* ngp/c specific i/o */
+	map(0x000080, 0x0000bf).rw(FUNC(ngp_state::ngp_io_r), FUNC(ngp_state::ngp_io_w));                        /* ngp/c specific i/o */
 	map(0x004000, 0x006fff).ram().share("mainram");                              /* work ram */
 	map(0x007000, 0x007fff).ram().share("share1");                               /* shared with sound cpu */
 	map(0x008000, 0x00bfff).rw(m_k1ge, FUNC(k1ge_device::read), FUNC(k1ge_device::write));       /* video chip */
-	map(0x200000, 0x3fffff).w(this, FUNC(ngp_state::flash0_w));   /* cart area #1 */
-	map(0x800000, 0x9fffff).w(this, FUNC(ngp_state::flash1_w));   /* cart area #2 */
+	map(0x200000, 0x3fffff).w(FUNC(ngp_state::flash0_w));   /* cart area #1 */
+	map(0x800000, 0x9fffff).w(FUNC(ngp_state::flash1_w));   /* cart area #2 */
 	map(0xff0000, 0xffffff).rom().region("maincpu", 0);                          /* system rom */
 }
 
@@ -585,8 +588,8 @@ void ngp_state::z80_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");                       /* shared with tlcs900 */
 	map(0x4000, 0x4001).w(m_t6w28, FUNC(t6w28_device::write));      /* sound chip (right, left) */
-	map(0x8000, 0x8000).rw(this, FUNC(ngp_state::ngp_z80_comm_r), FUNC(ngp_state::ngp_z80_comm_w));  /* main-sound communication */
-	map(0xc000, 0xc000).w(this, FUNC(ngp_state::ngp_z80_signal_main_w));               /* signal irq to main cpu */
+	map(0x8000, 0x8000).rw(FUNC(ngp_state::ngp_z80_comm_r), FUNC(ngp_state::ngp_z80_comm_w));  /* main-sound communication */
+	map(0xc000, 0xc000).w(FUNC(ngp_state::ngp_z80_signal_main_w));               /* signal irq to main cpu */
 }
 
 
@@ -601,7 +604,7 @@ WRITE8_MEMBER( ngp_state::ngp_z80_clear_irq )
 
 void ngp_state::z80_io(address_map &map)
 {
-	map(0x0000, 0xffff).w(this, FUNC(ngp_state::ngp_z80_clear_irq));
+	map(0x0000, 0xffff).w(FUNC(ngp_state::ngp_z80_clear_irq));
 }
 
 
@@ -825,40 +828,41 @@ void ngp_state::nvram_write(emu_file &file)
 
 MACHINE_CONFIG_START(ngp_state::ngp_common)
 
-	MCFG_CPU_ADD( "maincpu", TMP95C061, 6.144_MHz_XTAL )
-	MCFG_TLCS900H_AM8_16(1)
-	MCFG_CPU_PROGRAM_MAP( ngp_mem)
-	MCFG_TMP95C061_PORTA_WRITE(WRITE8(ngp_state,ngp_tlcs900_porta))
+	TMP95C061(config, m_maincpu, 6.144_MHz_XTAL);
+	m_maincpu->set_am8_16(1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ngp_state::ngp_mem);
+	m_maincpu->porta_write().set(FUNC(ngp_state::ngp_tlcs900_porta));
 
-	MCFG_CPU_ADD( "soundcpu", Z80, 6.144_MHz_XTAL/2 )
-	MCFG_CPU_PROGRAM_MAP( z80_mem)
-	MCFG_CPU_IO_MAP( z80_io)
+	MCFG_DEVICE_ADD( "soundcpu", Z80, 6.144_MHz_XTAL/2 )
+	MCFG_DEVICE_PROGRAM_MAP( z80_mem)
+	MCFG_DEVICE_IO_MAP( z80_io)
 
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_RAW_PARAMS( 6.144_MHz_XTAL, 515, 0, 160 /*480*/, 199, 0, 152 )
 	MCFG_SCREEN_UPDATE_DRIVER(ngp_state, screen_update_ngp)
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO( "lspeaker","rspeaker" )
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD( "t6w28", T6W28, 6.144_MHz_XTAL/2 )
+	MCFG_DEVICE_ADD( "t6w28", T6W28, 6.144_MHz_XTAL/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
-	MCFG_SOUND_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(ngp_state::ngp)
 	ngp_common(config);
 
-	MCFG_K1GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
+	K1GE(config , m_k1ge, 6.144_MHz_XTAL, "screen");
+	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
+	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_PALETTE("k1ge:palette")
@@ -876,7 +880,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ngp_state::ngpc)
 	ngp_common(config);
-	MCFG_K2GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
+	K2GE(config , m_k1ge, 6.144_MHz_XTAL, "screen");
+	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
+	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_PALETTE("k1ge:palette")
@@ -904,6 +910,6 @@ ROM_START( ngpc )
 ROM_END
 
 
-//    YEAR  NAME  PARENT COMPAT MACHINE INPUT STATE      INIT COMPANY  FULLNAME               FLAGS
-CONS( 1998, ngp,  0,     0,     ngp,    ngp,  ngp_state, 0,   "SNK",   "NeoGeo Pocket",       MACHINE_SUPPORTS_SAVE )
-CONS( 1999, ngpc, ngp,   0,     ngpc,   ngp,  ngp_state, 0,   "SNK",   "NeoGeo Pocket Color", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE      INIT        COMPANY  FULLNAME               FLAGS
+CONS( 1998, ngp,  0,      0,      ngp,     ngp,   ngp_state, empty_init, "SNK",   "NeoGeo Pocket",       MACHINE_SUPPORTS_SAVE )
+CONS( 1999, ngpc, ngp,    0,      ngpc,    ngp,   ngp_state, empty_init, "SNK",   "NeoGeo Pocket Color", MACHINE_SUPPORTS_SAVE )

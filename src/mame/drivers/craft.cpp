@@ -12,6 +12,7 @@
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -62,7 +63,7 @@ public:
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_DRIVER_INIT(craft);
+	void init_craft();
 	virtual void machine_reset() override;
 	uint32_t screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
@@ -197,7 +198,7 @@ void craft_state::craft_data_map(address_map &map)
 
 void craft_state::craft_io_map(address_map &map)
 {
-	map(AVR8_IO_PORTA, AVR8_IO_PORTD).rw(this, FUNC(craft_state::port_r), FUNC(craft_state::port_w));
+	map(AVR8_IO_PORTA, AVR8_IO_PORTD).rw(FUNC(craft_state::port_r), FUNC(craft_state::port_w));
 }
 
 /****************************************************\
@@ -234,7 +235,7 @@ uint32_t craft_state::screen_update_craft(screen_device &screen, bitmap_rgb32 &b
 * Machine definition                                 *
 \****************************************************/
 
-DRIVER_INIT_MEMBER(craft_state,craft)
+void craft_state::init_craft()
 {
 }
 
@@ -244,30 +245,32 @@ void craft_state::machine_reset()
 	m_last_cycles = 0;
 }
 
-MACHINE_CONFIG_START(craft_state::craft)
-
+void craft_state::craft(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ATMEGA88, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(craft_prg_map)
-	MCFG_CPU_DATA_MAP(craft_data_map)
-	MCFG_CPU_IO_MAP(craft_io_map)
-	MCFG_CPU_AVR8_EEPROM("eeprom")
+	ATMEGA88(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &craft_state::craft_prg_map);
+	m_maincpu->set_addrmap(AS_DATA, &craft_state::craft_data_map);
+	m_maincpu->set_addrmap(AS_IO, &craft_state::craft_io_map);
+	m_maincpu->set_eeprom_tag("eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.99)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1429)) /* accurate */
-	MCFG_SCREEN_SIZE(635, 525)
-	MCFG_SCREEN_VISIBLE_AREA(47, 526, 36, 515)
-	MCFG_SCREEN_UPDATE_DRIVER(craft_state, screen_update_craft)
-	MCFG_PALETTE_ADD("palette", 0x1000)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.99);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1429)); /* accurate */
+	screen.set_size(635, 525);
+	screen.set_visarea(47, 526, 36, 515);
+	screen.set_screen_update(FUNC(craft_state::screen_update_craft));
+	PALETTE(config, "palette").set_entries(0x1000);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("avr8")
-	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "avr8", 0.25) // pd1/pd2/pd4/pd5/pd6/pd7 + 2k(x7) + 1k(x5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	SPEAKER(config, "avr8").front_center();
+	DAC_6BIT_R2R(config, "dac", 0).add_route(0, "avr8", 0.25); // pd1/pd2/pd4/pd5/pd6/pd7 + 2k(x7) + 1k(x5)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 ROM_START( craft )
 	ROM_REGION( 0x2000, "maincpu", 0 )  /* Main program store */
@@ -276,5 +279,5 @@ ROM_START( craft )
 	ROM_LOAD( "eeprom.raw", 0x0000, 0x0200, CRC(e18a2af9) SHA1(81fc6f2d391edfd3244870214fac37929af0ac0c) )
 ROM_END
 
-/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT  STATE           INIT      COMPANY          FULLNAME */
-CONS(2008, craft,    0,        0,        craft,    craft, craft_state,    craft,    "Linus Akesson", "Craft", MACHINE_NOT_WORKING)
+/*   YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME */
+CONS(2008, craft, 0,      0,      craft,   craft, craft_state, init_craft, "Linus Akesson", "Craft", MACHINE_NOT_WORKING)

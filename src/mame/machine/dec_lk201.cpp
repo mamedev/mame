@@ -197,11 +197,11 @@ ROM_END
 
 void lk201_device::lk201_map(address_map &map)
 {
-	map(0x0000, 0x0002).rw(this, FUNC(lk201_device::ports_r), FUNC(lk201_device::ports_w));
-	map(0x0004, 0x0006).rw(this, FUNC(lk201_device::ddr_r), FUNC(lk201_device::ddr_w));
-	map(0x000a, 0x000c).rw(this, FUNC(lk201_device::spi_r), FUNC(lk201_device::spi_w));
-	map(0x000d, 0x0011).rw(this, FUNC(lk201_device::sci_r), FUNC(lk201_device::sci_w));
-	map(0x0012, 0x001b).rw(this, FUNC(lk201_device::timer_r), FUNC(lk201_device::timer_w));
+	map(0x0000, 0x0002).rw(FUNC(lk201_device::ports_r), FUNC(lk201_device::ports_w));
+	map(0x0004, 0x0006).rw(FUNC(lk201_device::ddr_r), FUNC(lk201_device::ddr_w));
+	map(0x000a, 0x000c).rw(FUNC(lk201_device::spi_r), FUNC(lk201_device::spi_w));
+	map(0x000d, 0x0011).rw(FUNC(lk201_device::sci_r), FUNC(lk201_device::sci_w));
+	map(0x0012, 0x001b).rw(FUNC(lk201_device::timer_r), FUNC(lk201_device::timer_w));
 	map(0x0050, 0x00ff).ram();
 	map(0x0100, 0x1fff).rom().region(LK201_CPU_TAG, 0x100);
 }
@@ -212,11 +212,11 @@ void lk201_device::lk201_map(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(lk201_device::device_add_mconfig)
-	MCFG_CPU_ADD(LK201_CPU_TAG, M68HC05EG, XTAL(4'000'000)) // actually 68HC05C4, clock verified by Lord_Nightmare
-	MCFG_CPU_PROGRAM_MAP(lk201_map)
+	MCFG_DEVICE_ADD(LK201_CPU_TAG, M68HC05EG, XTAL(4'000'000)) // actually 68HC05C4, clock verified by Lord_Nightmare
+	MCFG_DEVICE_PROGRAM_MAP(lk201_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(LK201_SPK_TAG, BEEP, 2000) // clocked by a 555 timer at E8, the volume of the beep is controllable by: (8051 model) P2.0 thru P2.3, or (6805 model) the upper 4 bits of the LED data latch
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD(LK201_SPK_TAG, BEEP, 2000) // clocked by a 555 timer at E8, the volume of the beep is controllable by: (8051 model) P2.0 thru P2.3, or (6805 model) the upper 4 bits of the LED data latch
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

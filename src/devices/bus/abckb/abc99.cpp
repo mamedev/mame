@@ -79,16 +79,17 @@ DEFINE_DEVICE_TYPE(ABC99, abc99_device, "abc99", "Luxor ABC 99")
 //-------------------------------------------------
 
 ROM_START( abc99 )
-	ROM_REGION( 0x1000, I8035_Z2_TAG, 0 )
-	ROM_DEFAULT_BIOS("107268")
 	ROM_SYSTEM_BIOS( 0, "107268", "107268-17" )
-	ROMX_LOAD( "107268-17.z3", 0x0000, 0x0800, CRC(2f60cc35) SHA1(ebc6af9cd0a49a0d01698589370e628eebb6221c), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "106819", "106819-09" )
-	ROMX_LOAD( "106819-09.z3", 0x0000, 0x1000, CRC(ffe32a71) SHA1(fa2ce8e0216a433f9bbad0bdd6e3dc0b540f03b7), ROM_BIOS(2) ) // ABC 99 6490423-01
+	ROM_DEFAULT_BIOS("107268")
+
+	ROM_REGION( 0x1000, I8035_Z2_TAG, 0 )
+	ROMX_LOAD( "107268-17.z3", 0x0000, 0x0800, CRC(2f60cc35) SHA1(ebc6af9cd0a49a0d01698589370e628eebb6221c), ROM_BIOS(0) )
+	ROMX_LOAD( "106819-09.z3", 0x0000, 0x1000, CRC(ffe32a71) SHA1(fa2ce8e0216a433f9bbad0bdd6e3dc0b540f03b7), ROM_BIOS(1) ) // ABC 99 6490423-01
 
 	ROM_REGION( 0x800, I8035_Z5_TAG, 0 )
-	ROMX_LOAD( "107268-16.z6", 0x0000, 0x0800, CRC(785ec0c6) SHA1(0b261beae20dbc06fdfccc50b19ea48b5b6e22eb), ROM_BIOS(1) )
-	ROMX_LOAD( "107268-64.z6", 0x0000, 0x0800, CRC(e33683ae) SHA1(0c1d9e320f82df05f4804992ef6f6f6cd20623f3), ROM_BIOS(2) )
+	ROMX_LOAD( "107268-16.z6", 0x0000, 0x0800, CRC(785ec0c6) SHA1(0b261beae20dbc06fdfccc50b19ea48b5b6e22eb), ROM_BIOS(0) )
+	ROMX_LOAD( "107268-64.z6", 0x0000, 0x0800, CRC(e33683ae) SHA1(0c1d9e320f82df05f4804992ef6f6f6cd20623f3), ROM_BIOS(1) )
 ROM_END
 
 
@@ -118,7 +119,7 @@ void abc99_device::abc99_z2_mem(address_map &map)
 
 void abc99_device::abc99_z2_io(address_map &map)
 {
-	map(0x21, 0x21).w(this, FUNC(abc99_device::z2_led_w));
+	map(0x21, 0x21).w(FUNC(abc99_device::z2_led_w));
 	map(0x30, 0x30).portr("X0").nopw();
 	map(0x31, 0x31).portr("X1").nopw();
 	map(0x32, 0x32).portr("X2").nopw();
@@ -152,30 +153,30 @@ void abc99_device::abc99_z5_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc99_device::device_add_mconfig)
+void abc99_device::device_add_mconfig(machine_config &config)
+{
 	// keyboard CPU
-	MCFG_CPU_ADD(I8035_Z2_TAG, I8035, XTAL(6'000'000)/3) // from Z5 T0 output
-	MCFG_CPU_PROGRAM_MAP(abc99_z2_mem)
-	MCFG_CPU_IO_MAP(abc99_z2_io)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(abc99_device, z2_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(abc99_device, z2_p2_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(abc99_device, z2_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(abc99_device, z2_t1_r))
+	I8035(config, m_maincpu, XTAL(6'000'000)/3); // from Z5 T0 output
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc99_device::abc99_z2_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc99_device::abc99_z2_io);
+	m_maincpu->p1_out_cb().set(FUNC(abc99_device::z2_p1_w));
+	m_maincpu->p2_in_cb().set(FUNC(abc99_device::z2_p2_r));
+	m_maincpu->t0_in_cb().set(FUNC(abc99_device::z2_t0_r));
+	m_maincpu->t1_in_cb().set(FUNC(abc99_device::z2_t1_r));
 
 	// mouse CPU
-	MCFG_CPU_ADD(I8035_Z5_TAG, I8035, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(abc99_z5_mem)
-	//MCFG_MCS48_PORT_P1_IN_CB(READ8(abc99_device, z5_p1_r))
-	//MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(abc99_device, z5_p2_w))
+	I8035(config, m_mousecpu, XTAL(6'000'000));
+	m_mousecpu->set_addrmap(AS_PROGRAM, &abc99_device::abc99_z5_mem);
+	//m_mousecpu->p1_in_cb().set(FUNC(abc99_device::z5_p1_r));
+	//m_mousecpu->p2_out_cb().set(FUNC(abc99_device::z5_p2_w));
 	//MCFG_MCS48_PORT_T0_CLK_CUSTOM() // Z2 CLK
-	//MCFG_MCS48_PORT_T1_IN_CB(READ8(abc99_device, z5_t1_r))
-	MCFG_DEVICE_DISABLE() // HACK fix for broken serial I/O
+	//m_mousecpu->t1_in_cb().set(FUNC(abc99_device::z5_t1_r));
+	m_mousecpu->set_disable(); // HACK fix for broken serial I/O
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 //-------------------------------------------------
@@ -478,6 +479,7 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 	m_speaker(*this, "speaker"),
 	m_z14(*this, "Z14"),
 	m_mouseb(*this, "MOUSEB"),
+	m_leds(*this, "led%u", 0U),
 	m_si(1),
 	m_si_en(1),
 	m_so_z2(1),
@@ -498,6 +500,7 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 
 void abc99_device::device_start()
 {
+	m_leds.resolve();
 	// allocate timers
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
 	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL(6'000'000)/3), 0, MCS48_ALE_CLOCK(XTAL(6'000'000)/3));
@@ -573,14 +576,14 @@ WRITE8_MEMBER( abc99_device::z2_led_w )
 {
 	if (m_led_en) return;
 
-	machine().output().set_led_value(LED_1, BIT(data, 0));
-	machine().output().set_led_value(LED_2, BIT(data, 1));
-	machine().output().set_led_value(LED_3, BIT(data, 2));
-	machine().output().set_led_value(LED_4, BIT(data, 3));
-	machine().output().set_led_value(LED_5, BIT(data, 4));
-	machine().output().set_led_value(LED_6, BIT(data, 5));
-	machine().output().set_led_value(LED_7, BIT(data, 6));
-	machine().output().set_led_value(LED_8, BIT(data, 7));
+	m_leds[LED_1] = BIT(data, 0);
+	m_leds[LED_2] = BIT(data, 1);
+	m_leds[LED_3] = BIT(data, 2);
+	m_leds[LED_4] = BIT(data, 3);
+	m_leds[LED_5] = BIT(data, 4);
+	m_leds[LED_6] = BIT(data, 5);
+	m_leds[LED_7] = BIT(data, 6);
+	m_leds[LED_8] = BIT(data, 7);
 }
 
 
@@ -616,9 +619,9 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 	m_t1_z5 = BIT(data, 2);
 
 	// key LEDs
-	machine().output().set_led_value(LED_INS, BIT(data, 3));
-	machine().output().set_led_value(LED_ALT, BIT(data, 4));
-	machine().output().set_led_value(LED_CAPS_LOCK, BIT(data, 5));
+	m_leds[LED_INS] = BIT(data, 3);
+	m_leds[LED_ALT] = BIT(data, 4);
+	m_leds[LED_CAPS_LOCK] = BIT(data, 5);
 
 	// speaker output
 	m_speaker->level_w(!BIT(data, 6));

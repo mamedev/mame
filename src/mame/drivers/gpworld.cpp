@@ -44,6 +44,7 @@ Dumping Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ldv1000.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -65,6 +66,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void gpworld(machine_config &config);
+
+	void init_gpworld();
+
+private:
 	uint8_t m_nmi_enable;
 	uint8_t m_start_lamp;
 	uint8_t m_ldp_read_latch;
@@ -81,7 +87,6 @@ public:
 	DECLARE_WRITE8_MEMBER(misc_io_write);
 	DECLARE_WRITE8_MEMBER(brake_gas_write);
 	DECLARE_WRITE8_MEMBER(palette_write);
-	DECLARE_DRIVER_INIT(gpworld);
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback);
@@ -92,10 +97,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	void gpworld(machine_config &config);
 	void mainmem(address_map &map);
 	void mainport(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -325,14 +329,14 @@ void gpworld_state::mainmem(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram().share("sprite_ram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(gpworld_state::palette_write)).share("palette_ram"); /* The memory test reads at 0xc800 */
+	map(0xc800, 0xcfff).ram().w(FUNC(gpworld_state::palette_write)).share("palette_ram"); /* The memory test reads at 0xc800 */
 	map(0xd000, 0xd7ff).ram().share("tile_ram");
-	map(0xd800, 0xd800).rw(this, FUNC(gpworld_state::ldp_read), FUNC(gpworld_state::ldp_write));
+	map(0xd800, 0xd800).rw(FUNC(gpworld_state::ldp_read), FUNC(gpworld_state::ldp_write));
 /*  AM_RANGE(0xd801,0xd801) AM_READ(???) */
 	map(0xda00, 0xda00).portr("INWHEEL"); //8255 here....
 /*  AM_RANGE(0xda01,0xda01) AM_WRITE(???) */                 /* These inputs are interesting - there are writes and reads all over these addr's */
-	map(0xda02, 0xda02).w(this, FUNC(gpworld_state::brake_gas_write));               /*bit 0 select gas/brake input */
-	map(0xda20, 0xda20).r(this, FUNC(gpworld_state::pedal_in));
+	map(0xda02, 0xda02).w(FUNC(gpworld_state::brake_gas_write));               /*bit 0 select gas/brake input */
+	map(0xda20, 0xda20).r(FUNC(gpworld_state::pedal_in));
 
 	map(0xe000, 0xffff).ram();                              /* Potentially not all work RAM? */
 }
@@ -342,7 +346,7 @@ void gpworld_state::mainmem(address_map &map)
 void gpworld_state::mainport(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).w(this, FUNC(gpworld_state::misc_io_write));
+	map(0x01, 0x01).w(FUNC(gpworld_state::misc_io_write));
 	map(0x80, 0x80).portr("IN0");
 	map(0x81, 0x81).portr("IN1");
 	map(0x82, 0x82).portr("DSW1");
@@ -469,7 +473,7 @@ INTERRUPT_GEN_MEMBER(gpworld_state::vblank_callback)
 	{
 		m_laserdisc->data_w(m_ldp_write_latch);
 		m_ldp_read_latch = m_laserdisc->status_r();
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 
 	/* The time the IRQ line stays high is set just long enough to happen after the NMI - hacky? */
@@ -488,7 +492,7 @@ static const gfx_layout gpworld_tile_layout =
 	8*8
 };
 
-static GFXDECODE_START( gpworld )
+static GFXDECODE_START( gfx_gpworld )
 	GFXDECODE_ENTRY("gfx1", 0, gpworld_tile_layout, 0x0, 0x100)
 GFXDECODE_END
 
@@ -496,10 +500,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gpworld_state::gpworld)
 
 	/* main cpu */
-	MCFG_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(mainmem)
-	MCFG_CPU_IO_MAP(mainport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gpworld_state,  vblank_callback)
+	MCFG_DEVICE_ADD("maincpu", Z80, GUESSED_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(mainmem)
+	MCFG_DEVICE_IO_MAP(mainport)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gpworld_state,  vblank_callback)
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
@@ -509,13 +513,14 @@ MACHINE_CONFIG_START(gpworld_state::gpworld)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gpworld)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gpworld)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -557,7 +562,7 @@ ROM_START( gpworld )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(gpworld_state,gpworld)
+void gpworld_state::init_gpworld()
 {
 	m_nmi_enable = 0;
 	m_start_lamp = 0;
@@ -566,5 +571,5 @@ DRIVER_INIT_MEMBER(gpworld_state,gpworld)
 }
 
 
-/*    YEAR  NAME      PARENT   MACHINE  INPUT    STATE          INIT     MONITOR  COMPANY  FULLNAME     FLAGS) */
-GAME( 1984, gpworld,  0,       gpworld, gpworld, gpworld_state, gpworld, ROT0,    "Sega",  "GP World",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+/*    YEAR  NAME      PARENT   MACHINE  INPUT    STATE          INIT          MONITOR  COMPANY  FULLNAME     FLAGS) */
+GAME( 1984, gpworld,  0,       gpworld, gpworld, gpworld_state, init_gpworld, ROT0,    "Sega",  "GP World",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

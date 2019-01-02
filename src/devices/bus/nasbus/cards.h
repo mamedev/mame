@@ -12,6 +12,6 @@
 #pragma once
 
 
-SLOT_INTERFACE_EXTERN( nasbus_slot_cards );
+void nasbus_slot_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_NASBUS_CARDS_H

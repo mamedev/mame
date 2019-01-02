@@ -80,16 +80,17 @@ msx_cart_msx_audio_hxmu900_device::msx_cart_msx_audio_hxmu900_device(const machi
 }
 
 
-MACHINE_CONFIG_START(msx_cart_msx_audio_hxmu900_device::device_add_mconfig)
+void msx_cart_msx_audio_hxmu900_device::device_add_mconfig(machine_config &config)
+{
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("y8950", Y8950, XTAL(3'579'545))    // Not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-	MCFG_Y8950_KEYBOARD_WRITE_HANDLER(DEVWRITE8("kbdc", msx_audio_kbdc_port_device, write))
-	MCFG_Y8950_KEYBOARD_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
+	SPEAKER(config, "mono").front_center();
+	Y8950(config, m_y8950, XTAL(3'579'545)); // Not verified
+	m_y8950->add_route(ALL_OUTPUTS, "mono", 0.40);
+	m_y8950->keyboard_write().set("kbdc", FUNC(msx_audio_kbdc_port_device::write));
+	m_y8950->keyboard_read().set("kbdc", FUNC(msx_audio_kbdc_port_device::read));
 
-	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
-MACHINE_CONFIG_END
+	MSX_AUDIO_KBDC_PORT(config, "kbdc", msx_audio_keyboards, nullptr);
+}
 
 
 void msx_cart_msx_audio_hxmu900_device::device_start()
@@ -145,29 +146,27 @@ msx_cart_msx_audio_nms1205_device::msx_cart_msx_audio_nms1205_device(const machi
 }
 
 
-MACHINE_CONFIG_START(msx_cart_msx_audio_nms1205_device::device_add_mconfig)
+void msx_cart_msx_audio_nms1205_device::device_add_mconfig(machine_config &config)
+{
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
 	// At the same time the sound is also output on two output on the nms1205 cartridge itself
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("y8950", Y8950, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-	MCFG_Y8950_KEYBOARD_WRITE_HANDLER(DEVWRITE8("kbdc", msx_audio_kbdc_port_device, write))
-	MCFG_Y8950_KEYBOARD_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
-	MCFG_Y8950_IRQ_HANDLER(WRITELINE(msx_cart_msx_audio_nms1205_device, irq_write))
+	SPEAKER(config, "mono").front_center();
+	Y8950(config, m_y8950, XTAL(3'579'545));
+	m_y8950->add_route(ALL_OUTPUTS, "mono", 0.40);
+	m_y8950->keyboard_write().set("kbdc", FUNC(msx_audio_kbdc_port_device::write));
+	m_y8950->keyboard_read().set("kbdc", FUNC(msx_audio_kbdc_port_device::read));
+	m_y8950->irq().set(FUNC(msx_cart_msx_audio_nms1205_device::irq_write));
 
-	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
+	MSX_AUDIO_KBDC_PORT(config, "kbdc", msx_audio_keyboards, nullptr);
 
 	// There is a 2 MHz crystal on the PCB, the 6850 TX and RX clocks are derived from it
-	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
+	ACIA6850(config, m_acia6850, 0);
+	m_acia6850->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(msx_cart_msx_audio_nms1205_device, midi_in))
-
-	MCFG_MIDI_PORT_ADD("mdthru", midiout_slot, "midiout")
-
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-MACHINE_CONFIG_END
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(msx_cart_msx_audio_nms1205_device::midi_in));
+	MIDI_PORT(config, m_mdthru, midiout_slot, "midiout");
+	MIDI_PORT(config, m_mdout, midiout_slot, "midiout");
+}
 
 
 ROM_START( msx_nms1205 )
@@ -246,18 +245,19 @@ msx_cart_msx_audio_fsca1_device::msx_cart_msx_audio_fsca1_device(const machine_c
 }
 
 
-MACHINE_CONFIG_START(msx_cart_msx_audio_fsca1_device::device_add_mconfig)
+void msx_cart_msx_audio_fsca1_device::device_add_mconfig(machine_config &config)
+{
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("y8950", Y8950, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-	MCFG_Y8950_KEYBOARD_WRITE_HANDLER(DEVWRITE8("kbdc", msx_audio_kbdc_port_device, write))
-	MCFG_Y8950_KEYBOARD_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))
-	MCFG_Y8950_IO_READ_HANDLER(READ8(msx_cart_msx_audio_fsca1_device, y8950_io_r))
-	MCFG_Y8950_IO_WRITE_HANDLER(WRITE8(msx_cart_msx_audio_fsca1_device, y8950_io_w))
+	SPEAKER(config, "mono").front_center();
+	Y8950(config, m_y8950, XTAL(3'579'545));
+	m_y8950->add_route(ALL_OUTPUTS, "mono", 0.40);
+	m_y8950->keyboard_write().set("kbdc", FUNC(msx_audio_kbdc_port_device::write));
+	m_y8950->keyboard_read().set("kbdc", FUNC(msx_audio_kbdc_port_device::read));
+	m_y8950->io_read().set(FUNC(msx_cart_msx_audio_fsca1_device::y8950_io_r));
+	m_y8950->io_write().set(FUNC(msx_cart_msx_audio_fsca1_device::y8950_io_w));
 
-	MCFG_MSX_AUDIO_KBDC_PORT_ADD("kbdc", msx_audio_keyboards, nullptr)
-MACHINE_CONFIG_END
+	MSX_AUDIO_KBDC_PORT(config, "kbdc", msx_audio_keyboards, nullptr);
+}
 
 
 static INPUT_PORTS_START( msx_audio_fsca1 )

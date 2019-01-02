@@ -84,6 +84,7 @@ Notes:
 #include "machine/gen_latch.h"
 #include "machine/segacrp2_device.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -91,15 +92,16 @@ Notes:
 class calorie_state : public driver_device
 {
 public:
-	calorie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	calorie_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fg_ram(*this, "fg_ram"),
 		m_sprites(*this, "sprites"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_fg_ram;
@@ -114,7 +116,7 @@ public:
 	DECLARE_WRITE8_MEMBER(calorie_flipscreen_w);
 	DECLARE_READ8_MEMBER(calorie_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(bogus_w);
-	DECLARE_DRIVER_INIT(calorieb);
+	void init_calorieb();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
@@ -269,14 +271,14 @@ void calorie_state::calorie_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram().share("ram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(calorie_state::fg_ram_w)).share("fg_ram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(calorie_state::fg_ram_w)).share("fg_ram");
 	map(0xd800, 0xdbff).ram().share("sprites");
 	map(0xdc00, 0xdcff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xde00, 0xde00).w(this, FUNC(calorie_state::bg_bank_w));
+	map(0xde00, 0xde00).w(FUNC(calorie_state::bg_bank_w));
 	map(0xf000, 0xf000).portr("P1");
 	map(0xf001, 0xf001).portr("P2");
 	map(0xf002, 0xf002).portr("SYSTEM");
-	map(0xf004, 0xf004).portr("DSW1").w(this, FUNC(calorie_state::calorie_flipscreen_w));
+	map(0xf004, 0xf004).portr("DSW1").w(FUNC(calorie_state::calorie_flipscreen_w));
 	map(0xf005, 0xf005).portr("DSW2");
 	map(0xf800, 0xf800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
@@ -292,14 +294,14 @@ void calorie_state::calorie_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0xc000, 0xc000).r(this, FUNC(calorie_state::calorie_soundlatch_r));
+	map(0xc000, 0xc000).r(FUNC(calorie_state::calorie_soundlatch_r));
 }
 
 void calorie_state::calorie_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	// 3rd ?
-	map(0x00, 0xff).w(this, FUNC(calorie_state::bogus_w));
+	map(0x00, 0xff).w(FUNC(calorie_state::bogus_w));
 
 	map(0x00, 0x01).w("ay1", FUNC(ym2149_device::address_data_w));
 	map(0x01, 0x01).r("ay1", FUNC(ym2149_device::data_r));
@@ -438,7 +440,7 @@ static const gfx_layout tiles32x32_layout =
 	128*8
 };
 
-static GFXDECODE_START( calorie )
+static GFXDECODE_START( gfx_calorie )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 16 )
@@ -466,15 +468,15 @@ void calorie_state::machine_reset()
 MACHINE_CONFIG_START(calorie_state::calorie)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(calorie_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(calorie_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,3000000)        /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(calorie_sound_map)
-	MCFG_CPU_IO_MAP(calorie_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(calorie_state, irq0_line_hold,  64)
+	MCFG_DEVICE_ADD("audiocpu", Z80,3000000)        /* 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(calorie_sound_map)
+	MCFG_DEVICE_IO_MAP(calorie_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(calorie_state, irq0_line_hold,  64)
 
 
 	/* video hardware */
@@ -484,35 +486,32 @@ MACHINE_CONFIG_START(calorie_state::calorie)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(calorie_state, screen_update_calorie)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", calorie)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_calorie);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ay1", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_SOUND_ADD("ay2", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_SOUND_ADD("ay3", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	YM2149(config, "ay3", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(calorie_state::caloriee)
+void calorie_state::caloriee(machine_config &config)
+{
 	calorie(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_317_0004,4000000)         /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(calorie_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_317_0004_device &maincpu(SEGA_317_0004(config.replace(), m_maincpu, 4000000));         /* 4 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &calorie_state::calorie_map);
+	maincpu.set_addrmap(AS_OPCODES, &calorie_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(calorie_state::irq0_line_hold));
+	maincpu.set_decrypted_tag(m_decrypted_opcodes);
+}
 
 /*************************************
  *
@@ -587,7 +586,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(calorie_state,calorieb)
+void calorie_state::init_calorieb()
 {
 	memcpy(m_decrypted_opcodes, memregion("maincpu")->base() + 0x10000, 0x8000);
 }
@@ -600,5 +599,5 @@ DRIVER_INIT_MEMBER(calorie_state,calorieb)
  *************************************/
 
 /* Note: the bootleg is identical to the original once decrypted */
-GAME( 1986, calorie,  0,       caloriee,calorie, calorie_state, 0,        ROT0, "Sega",    "Calorie Kun vs Moguranian",           MACHINE_SUPPORTS_SAVE )
-GAME( 1986, calorieb, calorie, calorie, calorie, calorie_state, calorieb, ROT0, "bootleg", "Calorie Kun vs Moguranian (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, calorie,  0,       caloriee,calorie, calorie_state, empty_init,    ROT0, "Sega",    "Calorie Kun vs Moguranian",           MACHINE_SUPPORTS_SAVE )
+GAME( 1986, calorieb, calorie, calorie, calorie, calorie_state, init_calorieb, ROT0, "bootleg", "Calorie Kun vs Moguranian (bootleg)", MACHINE_SUPPORTS_SAVE )

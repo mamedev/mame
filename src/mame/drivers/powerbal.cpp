@@ -32,8 +32,8 @@ public:
 		: playmark_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_DRIVER_INIT(powerbal);
-	DECLARE_DRIVER_INIT(magicstk);
+	void init_powerbal();
+	void init_magicstk();
 
 	void magicstk(machine_config &config);
 	void powerbal(machine_config &config);
@@ -111,14 +111,14 @@ void powerbal_state::magicstk_main_map(address_map &map)
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x094000, 0x094001).nopw();
 	map(0x094002, 0x094003).nopw();
-	map(0x094004, 0x094005).w(this, FUNC(powerbal_state::tile_banking_w));
-	map(0x098180, 0x09917f).ram().w(this, FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
+	map(0x094004, 0x094005).w(FUNC(powerbal_state::tile_banking_w));
+	map(0x098180, 0x09917f).ram().w(FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
 	map(0x0c2010, 0x0c2011).portr("IN0");
 	map(0x0c2012, 0x0c2013).portr("IN1");
-	map(0x0c2014, 0x0c2015).portr("IN2").w(this, FUNC(powerbal_state::magicstk_coin_eeprom_w));
+	map(0x0c2014, 0x0c2015).portr("IN2").w(FUNC(powerbal_state::magicstk_coin_eeprom_w));
 	map(0x0c2016, 0x0c2017).portr("DSW1");
 	map(0x0c2018, 0x0c2019).portr("DSW2");
-	map(0x0c201c, 0x0c201d).w(this, FUNC(powerbal_state::oki_banking));
+	map(0x0c201c, 0x0c201d).w(FUNC(powerbal_state::oki_banking));
 	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c4000, 0x0c4001).nopw();
 	map(0x0e0000, 0x0fffff).ram();
@@ -131,15 +131,15 @@ void powerbal_state::powerbal_main_map(address_map &map)
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x094000, 0x094001).nopw();
 	map(0x094002, 0x094003).nopw();
-	map(0x094004, 0x094005).w(this, FUNC(powerbal_state::tile_banking_w));
-	map(0x098000, 0x098fff).ram().w(this, FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
+	map(0x094004, 0x094005).w(FUNC(powerbal_state::tile_banking_w));
+	map(0x098000, 0x098fff).ram().w(FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
 	map(0x099000, 0x09bfff).ram(); // not used
 	map(0x0c2010, 0x0c2011).portr("IN0");
 	map(0x0c2012, 0x0c2013).portr("IN1");
 	map(0x0c2014, 0x0c2015).portr("IN2");
 	map(0x0c2016, 0x0c2017).portr("DSW1");
 	map(0x0c2018, 0x0c2019).portr("DSW2");
-	map(0x0c201c, 0x0c201d).w(this, FUNC(powerbal_state::oki_banking));
+	map(0x0c201c, 0x0c201d).w(FUNC(powerbal_state::oki_banking));
 	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c4000, 0x0c4001).nopw();
 	map(0x0f0000, 0x0fffff).ram();
@@ -154,15 +154,15 @@ void powerbal_state::atombjt_map(address_map &map)
 	map(0x080008, 0x080009).nopr(); // remnant of the original?
 	map(0x080014, 0x080015).noprw(); // always 1 in this bootleg. Flip-screen switch not present according to dip sheet.
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x094000, 0x094001).w(this, FUNC(powerbal_state::atombjt_tile_banking_w));
+	map(0x094000, 0x094001).w(FUNC(powerbal_state::atombjt_tile_banking_w));
 	map(0x094002, 0x094003).noprw();    /* IRQ enable? */
-	map(0x09c000, 0x09cfff).mirror(0x1000).ram().w(this, FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
+	map(0x09c000, 0x09cfff).mirror(0x1000).ram().w(FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
 	map(0x0c2010, 0x0c2011).portr("IN0");
 	map(0x0c2012, 0x0c2013).portr("IN1");
 	map(0x0c2014, 0x0c2015).portr("IN2");
 	map(0x0c2016, 0x0c2017).portr("DSW1");
 	map(0x0c2018, 0x0c2019).portr("DSW2");
-	map(0x0c201c, 0x0c201d).w(this, FUNC(powerbal_state::oki_banking));
+	map(0x0c201c, 0x0c201d).w(FUNC(powerbal_state::oki_banking));
 	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c4000, 0x0c4001).nopw(); // always 0?
 	map(0x0f0000, 0x0fffff).ram().share("mainram");
@@ -551,7 +551,7 @@ void powerbal_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle
 				code,
 				color,
 				flipx,0,
-				sx + m_xoffset,sy + m_yoffset,0);
+				sx + m_xoffset,sy + m_yoffset,m_sprtranspen);
 	}
 }
 
@@ -570,6 +570,7 @@ VIDEO_START_MEMBER(powerbal_state,atombjt)
 
 	m_xoffset = 32;
 	m_yoffset = 8;
+	m_sprtranspen = 0xf;
 
 	m_bg_tilemap->set_scrollx(0, -64);
 }
@@ -607,7 +608,7 @@ static const gfx_layout tilelayout =
 
 
 
-static GFXDECODE_START( powerbal )
+static GFXDECODE_START( gfx_powerbal )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0x100, 16 )    /* colors 0x100-0x1ff */
 	GFXDECODE_ENTRY( "gfx1", 0, magicstk_charlayout, 0x000, 16 )    /* colors 0x000-0x0ff */
 GFXDECODE_END
@@ -628,9 +629,9 @@ MACHINE_RESET_MEMBER(powerbal_state,powerbal)
 MACHINE_CONFIG_START(powerbal_state::powerbal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(powerbal_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", powerbal_state, irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(powerbal_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", powerbal_state, irq2_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(powerbal_state,powerbal)
 	MCFG_MACHINE_RESET_OVERRIDE(powerbal_state,powerbal)
@@ -642,18 +643,17 @@ MACHINE_CONFIG_START(powerbal_state::powerbal)
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerbal)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerbal);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
 
 	MCFG_VIDEO_START_OVERRIDE(powerbal_state,powerbal)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
@@ -661,12 +661,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(powerbal_state::magicstk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(magicstk_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", powerbal_state, irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(magicstk_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", powerbal_state, irq2_line_hold)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
+	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
 
 	MCFG_MACHINE_START_OVERRIDE(powerbal_state,powerbal)
 	MCFG_MACHINE_RESET_OVERRIDE(powerbal_state,powerbal)
@@ -678,18 +677,17 @@ MACHINE_CONFIG_START(powerbal_state::magicstk)
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", powerbal)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerbal);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
 
 	MCFG_VIDEO_START_OVERRIDE(powerbal_state,powerbal)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
@@ -698,9 +696,9 @@ MACHINE_CONFIG_START(powerbal_state::atombjt)
 
 	powerbal(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(atombjt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", powerbal_state,  irq6_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(atombjt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", powerbal_state,  irq6_line_hold)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(512, 256) \
@@ -858,13 +856,13 @@ ROM_START( atombjt ) // based off bjtwina set
 ROM_END
 
 
-DRIVER_INIT_MEMBER(powerbal_state,powerbal)
+void powerbal_state::init_powerbal()
 {
 	m_bg_yoffset = 16;
 	m_yoffset = -8;
 }
 
-DRIVER_INIT_MEMBER(powerbal_state,magicstk)
+void powerbal_state::init_magicstk()
 {
 	m_bg_yoffset = 0;
 	m_yoffset = -5;
@@ -874,8 +872,8 @@ DRIVER_INIT_MEMBER(powerbal_state,magicstk)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT      ROT      COMPANY             FULLNAME                           FLAGS
-GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal_state, powerbal, ROT0,   "Playmark",          "Power Balls",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, magicstk, 0,       magicstk, magicstk, powerbal_state, magicstk, ROT0,   "Playmark",          "Magic Sticks",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1995, hotminda, hotmind, magicstk, hotminda, powerbal_state, magicstk, ROT0,   "Playmark",          "Hot Mind (adjustable prize)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1993, atombjt,  bjtwin,  atombjt,  atombjt,  powerbal_state, 0,        ROT270, "bootleg (Kyon K.)", "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // some non-trivial mods to the gfx and sound hw wrt nmk16 hw original
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT           ROT      COMPANY             FULLNAME                           FLAGS
+GAME( 1994, powerbal, 0,       powerbal, powerbal, powerbal_state, init_powerbal, ROT0,   "Playmark",          "Power Balls",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magicstk, 0,       magicstk, magicstk, powerbal_state, init_magicstk, ROT0,   "Playmark",          "Magic Sticks",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotminda, hotmind, magicstk, hotminda, powerbal_state, init_magicstk, ROT0,   "Playmark",          "Hot Mind (adjustable prize)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993, atombjt,  bjtwin,  atombjt,  atombjt,  powerbal_state, empty_init,    ROT270, "bootleg (Kyon K.)", "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // some non-trivial mods to the gfx and sound hw wrt nmk16 hw original

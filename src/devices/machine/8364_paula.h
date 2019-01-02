@@ -49,10 +49,10 @@
 //**************************************************************************
 
 #define MCFG_PAULA_MEM_READ_CB(_devcb) \
-	devcb = &downcast<paula_8364_device &>(*device).set_mem_r_callback(DEVCB_##_devcb);
+	downcast<paula_8364_device &>(*device).set_mem_r_callback(DEVCB_##_devcb);
 
 #define MCFG_PAULA_INT_CB(_devcb) \
-	devcb = &downcast<paula_8364_device &>(*device).set_int_w_callback(DEVCB_##_devcb);
+	downcast<paula_8364_device &>(*device).set_int_w_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -69,6 +69,8 @@ public:
 	// configuration
 	template <class Object> devcb_base &set_mem_r_callback(Object &&cb) { return m_mem_r.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_int_w_callback(Object &&cb) { return m_int_w.set_callback(std::forward<Object>(cb)); }
+	auto mem_read_cb() { return m_mem_r.bind(); }
+	auto int_cb() { return m_int_w.bind(); }
 
 	DECLARE_READ16_MEMBER(reg_r);
 	DECLARE_WRITE16_MEMBER(reg_w);

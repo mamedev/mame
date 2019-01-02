@@ -64,9 +64,9 @@ DEFINE_DEVICE_TYPE(DECO_ACE, deco_ace_device, "deco_ace", "Data East 99 'ACE' Ch
 deco_ace_device::deco_ace_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECO_ACE, tag, owner, clock),
 	device_video_interface(mconfig, *this),
+	device_palette_interface(mconfig, *this),
 	m_palette_effect_min(0x100),
 	m_palette_effect_max(0xfff),
-	m_palette(*this, finder_base::DUMMY_TAG),
 	m_paletteram(nullptr),
 	m_paletteram_buffered(nullptr),
 	m_ace_ram(nullptr)
@@ -83,9 +83,9 @@ void deco_ace_device::device_start()
 	m_paletteram_buffered = make_unique_clear<uint32_t[]>(2048);
 	m_ace_ram = make_unique_clear<uint16_t[]>(0x28);
 
-	save_pointer(NAME(m_paletteram.get()), 2048);
-	save_pointer(NAME(m_paletteram_buffered.get()), 2048);
-	save_pointer(NAME(m_ace_ram.get()), 0x28);
+	save_pointer(NAME(m_paletteram), 2048);
+	save_pointer(NAME(m_paletteram_buffered), 2048);
+	save_pointer(NAME(m_ace_ram), 0x28);
 }
 
 //-------------------------------------------------
@@ -190,7 +190,7 @@ void deco_ace_device::palette_update()
 					break;
 			}
 		}
-		m_palette->set_pen_color(i,rgb_t(r,g,b));
+		set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 

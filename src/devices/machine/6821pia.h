@@ -28,46 +28,6 @@
 
 
 /***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-// TODO: REMOVE THESE
-#define MCFG_PIA_READPA_HANDLER(_devcb) \
-	devcb = &downcast<pia6821_device &>(*device).set_readpa_handler(DEVCB_##_devcb);
-
-#define MCFG_PIA_READPB_HANDLER(_devcb) \
-	devcb = &downcast<pia6821_device &>(*device).set_readpb_handler(DEVCB_##_devcb);
-
-#define MCFG_PIA_READCA1_HANDLER(_devcb) \
-	devcb = &downcast<pia6821_device &>(*device).set_readca1_handler(DEVCB_##_devcb);
-
-#define MCFG_PIA_READCA2_HANDLER(_devcb) \
-	devcb = &downcast<pia6821_device &>(*device).set_readca2_handler(DEVCB_##_devcb);
-
-#define MCFG_PIA_READCB1_HANDLER(_devcb) \
-	devcb = &downcast<pia6821_device &>(*device).set_readcb1_handler(DEVCB_##_devcb);
-
-// TODO: CONVERT THESE TO WRITE LINE
-#define MCFG_PIA_WRITEPA_HANDLER(_devcb) \
-	devcb = &downcast<pia6821_device &>(*device).set_writepa_handler(DEVCB_##_devcb);
-
-#define MCFG_PIA_WRITEPB_HANDLER(_devcb) \
-	devcb = &downcast<pia6821_device &>(*device).set_writepb_handler(DEVCB_##_devcb);
-
-#define MCFG_PIA_CA2_HANDLER(_devcb) \
-	devcb = &downcast<pia6821_device &>(*device).set_ca2_handler(DEVCB_##_devcb);
-
-#define MCFG_PIA_CB2_HANDLER(_devcb) \
-	devcb = &downcast<pia6821_device &>(*device).set_cb2_handler(DEVCB_##_devcb);
-
-#define MCFG_PIA_IRQA_HANDLER(_devcb) \
-	devcb = &downcast<pia6821_device &>(*device).set_irqa_handler(DEVCB_##_devcb);
-
-#define MCFG_PIA_IRQB_HANDLER(_devcb) \
-	devcb = &downcast<pia6821_device &>(*device).set_irqb_handler(DEVCB_##_devcb);
-
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -77,24 +37,23 @@ class pia6821_device :  public device_t
 {
 public:
 	// construction/destruction
-	pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pia6821_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// static configuration helpers
 	// TODO: REMOVE THESE
-	template<class Obj> devcb_base &set_readpa_handler(Obj &&object) { return m_in_a_handler.set_callback(std::forward<Obj>(object)); }
-	template<class Obj> devcb_base &set_readpb_handler(Obj &&object) { return m_in_b_handler.set_callback(std::forward<Obj>(object)); }
-	template<class Obj> devcb_base &set_readca1_handler(Obj &&object) { return m_in_ca1_handler.set_callback(std::forward<Obj>(object)); }
-	template<class Obj> devcb_base &set_readca2_handler(Obj &&object) { return m_in_ca2_handler.set_callback(std::forward<Obj>(object)); }
-	template<class Obj> devcb_base &set_readcb1_handler(Obj &&object) { return m_in_cb1_handler.set_callback(std::forward<Obj>(object)); }
+	auto readpa_handler() { return m_in_a_handler.bind(); }
+	auto readpb_handler() { return m_in_b_handler.bind(); }
+	auto readca1_handler() { return m_in_ca1_handler.bind(); }
+	auto readca2_handler() { return m_in_ca2_handler.bind(); }
+	auto readcb1_handler() { return m_in_cb1_handler.bind(); }
 
 	// TODO: CONVERT THESE TO WRITE LINE
-	template<class Obj> devcb_base &set_writepa_handler(Obj &&object) { return m_out_a_handler.set_callback(std::forward<Obj>(object)); }
-	template<class Obj> devcb_base &set_writepb_handler(Obj &&object) { return m_out_b_handler.set_callback(std::forward<Obj>(object)); }
+	auto writepa_handler() { return m_out_a_handler.bind(); }
+	auto writepb_handler() { return m_out_b_handler.bind(); }
 
-	template<class Obj> devcb_base &set_ca2_handler(Obj &&object) { return m_ca2_handler.set_callback(std::forward<Obj>(object)); }
-	template<class Obj> devcb_base &set_cb2_handler(Obj &&object) { return m_cb2_handler.set_callback(std::forward<Obj>(object)); }
-	template<class Obj> devcb_base &set_irqa_handler(Obj &&object) { return m_irqa_handler.set_callback(std::forward<Obj>(object)); }
-	template<class Obj> devcb_base &set_irqb_handler(Obj &&object) { return m_irqb_handler.set_callback(std::forward<Obj>(object)); }
+	auto ca2_handler() { return m_ca2_handler.bind(); }
+	auto cb2_handler() { return m_cb2_handler.bind(); }
+	auto irqa_handler() { return m_irqa_handler.bind(); }
+	auto irqb_handler() { return m_irqb_handler.bind(); }
 
 	uint8_t reg_r(uint8_t offset);
 	void reg_w(uint8_t offset, uint8_t data);
@@ -107,8 +66,8 @@ public:
 	uint8_t port_b_z_mask() const { return ~m_ddr_b; }          // see first note in .c
 	void set_port_a_z_mask(uint8_t data) { m_port_a_z_mask = data; }// see second note in .c
 
-	DECLARE_WRITE8_MEMBER( porta_w ) { porta_w(data); }
-	void porta_w(uint8_t data);
+	DECLARE_WRITE8_MEMBER( porta_w ) { write_porta(data); }
+	void write_porta(uint8_t data);
 	void set_a_input(uint8_t data, uint8_t z_mask);
 	uint8_t a_output();
 
@@ -118,8 +77,8 @@ public:
 	bool ca2_output();
 	bool ca2_output_z();
 
-	DECLARE_WRITE8_MEMBER( portb_w ) { portb_w(data); }
-	void portb_w(uint8_t data);
+	DECLARE_WRITE8_MEMBER( portb_w ) { write_portb(data); }
+	void write_portb(uint8_t data);
 	uint8_t b_output();
 
 	DECLARE_WRITE_LINE_MEMBER( cb1_w );

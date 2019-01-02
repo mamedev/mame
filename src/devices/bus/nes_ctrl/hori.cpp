@@ -49,26 +49,29 @@ ioport_constructor nes_hori4p_device::device_input_ports() const
 }
 
 
-static SLOT_INTERFACE_START( hori_adapter )
-	SLOT_INTERFACE("joypad", NES_JOYPAD)
-SLOT_INTERFACE_END
+static void hori_adapter(device_slot_interface &device)
+{
+	device.option_add("joypad", NES_JOYPAD);
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nes_horitwin_device::device_add_mconfig)
-	MCFG_FC_EXPANSION_PORT_ADD("port1", hori_adapter, "joypad")
-	MCFG_FC_EXPANSION_PORT_ADD("port2", hori_adapter, "joypad")
-MACHINE_CONFIG_END
+void nes_horitwin_device::device_add_mconfig(machine_config &config)
+{
+	NES_CONTROL_PORT(config, "port1", hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, "port2", hori_adapter, "joypad");
+}
 
-MACHINE_CONFIG_START(nes_hori4p_device::device_add_mconfig)
-	MCFG_FC_EXPANSION_PORT_ADD("port1", hori_adapter, "joypad")
-	MCFG_FC_EXPANSION_PORT_ADD("port2", hori_adapter, "joypad")
-	MCFG_FC_EXPANSION_PORT_ADD("port3", hori_adapter, "joypad")
-	MCFG_FC_EXPANSION_PORT_ADD("port4", hori_adapter, "joypad")
-MACHINE_CONFIG_END
+void nes_hori4p_device::device_add_mconfig(machine_config &config)
+{
+	NES_CONTROL_PORT(config, "port1", hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, "port2", hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, "port3", hori_adapter, "joypad");
+	NES_CONTROL_PORT(config, "port4", hori_adapter, "joypad");
+}
 
 
 //**************************************************************************

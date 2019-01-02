@@ -78,7 +78,7 @@ void mouser_state::mouser_sound_map(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x2000, 0x23ff).ram();
 	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x4000, 0x4000).w(this, FUNC(mouser_state::mouser_sound_nmi_clear_w));
+	map(0x4000, 0x4000).w(FUNC(mouser_state::mouser_sound_nmi_clear_w));
 }
 
 void mouser_state::mouser_sound_io_map(address_map &map)
@@ -174,7 +174,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( mouser )
+static GFXDECODE_START( gfx_mouser )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x1800, spritelayout,     0, 16 )
@@ -193,22 +193,21 @@ void mouser_state::machine_reset()
 MACHINE_CONFIG_START(mouser_state::mouser)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(mouser_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(mouser_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* ??? */
-	MCFG_CPU_PROGRAM_MAP(mouser_sound_map)
-	MCFG_CPU_IO_MAP(mouser_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mouser_state, mouser_sound_nmi_assert,  4*60) /* ??? This controls the sound tempo */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(mouser_sound_map)
+	MCFG_DEVICE_IO_MAP(mouser_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mouser_state, mouser_sound_nmi_assert,  4*60) /* ??? This controls the sound tempo */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // type unconfirmed
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mouser_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mouser_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mouser_state, flip_screen_y_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // type unconfirmed
+	mainlatch.q_out_cb<0>().set(FUNC(mouser_state::nmi_enable_w));
+	mainlatch.q_out_cb<1>().set(FUNC(mouser_state::flip_screen_x_w));
+	mainlatch.q_out_cb<2>().set(FUNC(mouser_state::flip_screen_y_w));
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -217,21 +216,17 @@ MACHINE_CONFIG_START(mouser_state::mouser)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mouser_state, screen_update_mouser)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mouser_state, mouser_nmi_interrupt))
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mouser_state, mouser_nmi_interrupt))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mouser)
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INIT_OWNER(mouser_state, mouser)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mouser);
+	PALETTE(config, m_palette, FUNC(mouser_state::mouser_palette), 64);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, 4000000/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_SOUND_ADD("ay2", AY8910, 4000000/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, "ay1", 4000000/2).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, "ay2", 4000000/2).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 
@@ -283,20 +278,18 @@ ROM_START( mouserc )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(mouser_state,mouser)
+void mouser_state::init_mouser()
 {
 	/* Decode the opcodes */
-
-	offs_t i;
 	uint8_t *rom = memregion("maincpu")->base();
 	uint8_t *table = memregion("user1")->base();
 
-	for (i = 0; i < 0x6000; i++)
+	for (offs_t i = 0; i < 0x6000; i++)
 	{
 		m_decrypted_opcodes[i] = table[rom[i]];
 	}
 }
 
 
-GAME( 1983, mouser,   0,      mouser, mouser, mouser_state, mouser, ROT90, "UPL",                  "Mouser",          MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mouserc,  mouser, mouser, mouser, mouser_state, mouser, ROT90, "UPL (Cosmos license)", "Mouser (Cosmos)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mouser,   0,      mouser, mouser, mouser_state, init_mouser, ROT90, "UPL",                  "Mouser",          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mouserc,  mouser, mouser, mouser, mouser_state, init_mouser, ROT90, "UPL (Cosmos license)", "Mouser (Cosmos)", MACHINE_SUPPORTS_SAVE )

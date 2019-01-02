@@ -77,17 +77,17 @@ void mrjong_state::mrjong_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0xa000, 0xa7ff).ram();
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(mrjong_state::mrjong_videoram_w)).share("videoram");
-	map(0xe400, 0xe7ff).ram().w(this, FUNC(mrjong_state::mrjong_colorram_w)).share("colorram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(mrjong_state::mrjong_videoram_w)).share("videoram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(mrjong_state::mrjong_colorram_w)).share("colorram");
 }
 
 void mrjong_state::mrjong_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("P2").w(this, FUNC(mrjong_state::mrjong_flipscreen_w));
-	map(0x01, 0x01).portr("P1").w("sn1", FUNC(sn76489_device::write));
-	map(0x02, 0x02).portr("DSW").w("sn2", FUNC(sn76489_device::write));
-	map(0x03, 0x03).r(this, FUNC(mrjong_state::io_0x03_r));     // Unknown
+	map(0x00, 0x00).portr("P2").w(FUNC(mrjong_state::mrjong_flipscreen_w));
+	map(0x01, 0x01).portr("P1").w("sn1", FUNC(sn76489_device::command_w));
+	map(0x02, 0x02).portr("DSW").w("sn2", FUNC(sn76489_device::command_w));
+	map(0x03, 0x03).r(FUNC(mrjong_state::io_0x03_r));     // Unknown
 }
 
 /*************************************
@@ -173,7 +173,7 @@ static const gfx_layout spritelayout =
 	32*8                /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( mrjong )
+static GFXDECODE_START( gfx_mrjong )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,      0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout,    0, 32 )
 GFXDECODE_END
@@ -188,10 +188,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(mrjong_state::mrjong)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,15468000/6) /* 2.578 MHz?? */
-	MCFG_CPU_PROGRAM_MAP(mrjong_map)
-	MCFG_CPU_IO_MAP(mrjong_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mrjong_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", Z80,15468000/6) /* 2.578 MHz?? */
+	MCFG_DEVICE_PROGRAM_MAP(mrjong_map)
+	MCFG_DEVICE_IO_MAP(mrjong_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -200,21 +199,16 @@ MACHINE_CONFIG_START(mrjong_state::mrjong)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mrjong_state, screen_update_mrjong)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mrjong)
-	MCFG_PALETTE_ADD("palette", 4*32)
-	MCFG_PALETTE_INDIRECT_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(mrjong_state, mrjong)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrjong);
+	PALETTE(config, m_palette, FUNC(mrjong_state::mrjong_palette), 4 * 32, 16);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("sn1", SN76489, 15468000/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_SOUND_ADD("sn2", SN76489, 15468000/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SPEAKER(config, "mono").front_center();
+	SN76489(config, "sn1", 15468000 / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn2", 15468000 / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -278,6 +272,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mrjong,   0,      mrjong, mrjong, mrjong_state, 0, ROT90, "Kiwako",               "Mr. Jong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, crazyblk, mrjong, mrjong, mrjong, mrjong_state, 0, ROT90, "Kiwako (ECI license)", "Crazy Blocks",     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, blkbustr, mrjong, mrjong, mrjong, mrjong_state, 0, ROT90, "Kiwako (ECI license)", "BlockBuster",      MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mrjong,   0,      mrjong, mrjong, mrjong_state, empty_init, ROT90, "Kiwako",               "Mr. Jong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, crazyblk, mrjong, mrjong, mrjong, mrjong_state, empty_init, ROT90, "Kiwako (ECI license)", "Crazy Blocks",     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, blkbustr, mrjong, mrjong, mrjong, mrjong_state, empty_init, ROT90, "Kiwako (ECI license)", "BlockBuster",      MACHINE_SUPPORTS_SAVE )

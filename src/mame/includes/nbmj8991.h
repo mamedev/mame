@@ -3,6 +3,7 @@
 
 #include "machine/nb1413m3.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 
 class nbmj8991_state : public driver_device
@@ -18,6 +19,36 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_generic_paletteram_8(*this, "paletteram") { }
 
+	void nbmjdrv1(machine_config &config);
+	void nbmjdrv2(machine_config &config);
+	void nbmjdrv3(machine_config &config);
+	void tokyogal(machine_config &config);
+	void finalbny(machine_config &config);
+	void mjlstory(machine_config &config);
+	void galkaika(machine_config &config);
+	void pstadium(machine_config &config);
+	void galkoku(machine_config &config);
+	void av2mj2rg(machine_config &config);
+	void av2mj1bb(machine_config &config);
+	void vanilla(machine_config &config);
+	void mcontest(machine_config &config);
+	void triplew1(machine_config &config);
+	void ntopstar(machine_config &config);
+	void tokimbsj(machine_config &config);
+	void triplew2(machine_config &config);
+	void uchuuai(machine_config &config);
+	void hyouban(machine_config &config);
+	void qmhayaku(machine_config &config);
+	void mjgottub(machine_config &config);
+
+	void init_galkaika();
+	void init_tokimbsj();
+	void init_tokyogal();
+	void init_finalbny();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<nb1413m3_device> m_nb1413m3;
@@ -59,12 +90,7 @@ public:
 	DECLARE_WRITE8_MEMBER(blitter_w);
 	DECLARE_READ8_MEMBER(clut_r);
 	DECLARE_WRITE8_MEMBER(clut_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 
-	DECLARE_DRIVER_INIT(galkaika);
-	DECLARE_DRIVER_INIT(tokimbsj);
-	DECLARE_DRIVER_INIT(tokyogal);
-	DECLARE_DRIVER_INIT(finalbny);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -76,27 +102,6 @@ public:
 
 	void postload();
 
-	void nbmjdrv1(machine_config &config);
-	void nbmjdrv2(machine_config &config);
-	void nbmjdrv3(machine_config &config);
-	void tokyogal(machine_config &config);
-	void finalbny(machine_config &config);
-	void mjlstory(machine_config &config);
-	void galkaika(machine_config &config);
-	void pstadium(machine_config &config);
-	void galkoku(machine_config &config);
-	void av2mj2rg(machine_config &config);
-	void av2mj1bb(machine_config &config);
-	void vanilla(machine_config &config);
-	void mcontest(machine_config &config);
-	void triplew1(machine_config &config);
-	void ntopstar(machine_config &config);
-	void tokimbsj(machine_config &config);
-	void triplew2(machine_config &config);
-	void uchuuai(machine_config &config);
-	void hyouban(machine_config &config);
-	void qmhayaku(machine_config &config);
-	void mjgottub(machine_config &config);
 	void av2mj1bb_io_map(address_map &map);
 	void av2mj1bb_map(address_map &map);
 	void av2mj2rg_map(address_map &map);
@@ -112,6 +117,6 @@ public:
 	void tokyogal_map(address_map &map);
 	void triplew1_map(address_map &map);
 	void triplew2_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

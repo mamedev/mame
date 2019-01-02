@@ -51,14 +51,14 @@ WRITE8_MEMBER(bogeyman_state::ay8910_control_w)
 void bogeyman_state::bogeyman_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
-	map(0x1800, 0x1bff).ram().w(this, FUNC(bogeyman_state::videoram2_w)).share("videoram2");
-	map(0x1c00, 0x1fff).ram().w(this, FUNC(bogeyman_state::colorram2_w)).share("colorram2");
-	map(0x2000, 0x20ff).ram().w(this, FUNC(bogeyman_state::videoram_w)).share("videoram");
-	map(0x2100, 0x21ff).ram().w(this, FUNC(bogeyman_state::colorram_w)).share("colorram");
+	map(0x1800, 0x1bff).ram().w(FUNC(bogeyman_state::videoram2_w)).share("videoram2");
+	map(0x1c00, 0x1fff).ram().w(FUNC(bogeyman_state::colorram2_w)).share("colorram2");
+	map(0x2000, 0x20ff).ram().w(FUNC(bogeyman_state::videoram_w)).share("videoram");
+	map(0x2100, 0x21ff).ram().w(FUNC(bogeyman_state::colorram_w)).share("colorram");
 	map(0x2800, 0x2bff).ram().share("spriteram");
 	map(0x3000, 0x300f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x3800, 0x3800).portr("P1").w(this, FUNC(bogeyman_state::ay8910_control_w));
-	map(0x3801, 0x3801).portr("P2").w(this, FUNC(bogeyman_state::ay8910_latch_w));
+	map(0x3800, 0x3800).portr("P1").w(FUNC(bogeyman_state::ay8910_control_w));
+	map(0x3801, 0x3801).portr("P2").w(FUNC(bogeyman_state::ay8910_latch_w));
 	map(0x3802, 0x3802).portr("DSW1");
 	map(0x3803, 0x3803).portr("DSW2").nopw(); // ??? sound
 	map(0x4000, 0xffff).rom();
@@ -192,7 +192,7 @@ static const gfx_layout sprites =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( bogeyman )
+static GFXDECODE_START( gfx_bogeyman )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout1,     16, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout2,     16, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,          0,  2 )
@@ -232,9 +232,9 @@ WRITE8_MEMBER(bogeyman_state::colbank_w)
 MACHINE_CONFIG_START(bogeyman_state::bogeyman)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* Verified */
-	MCFG_CPU_PROGRAM_MAP(bogeyman_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bogeyman_state, irq0_line_hold,  16*60) // Controls sound
+	MCFG_DEVICE_ADD("maincpu", M6502, 1500000) /* Verified */
+	MCFG_DEVICE_PROGRAM_MAP(bogeyman_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bogeyman_state, irq0_line_hold,  16*60) // Controls sound
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -246,23 +246,20 @@ MACHINE_CONFIG_START(bogeyman_state::bogeyman)
 	// DECO video CRTC, unverified
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,8,248)
 	MCFG_SCREEN_UPDATE_DRIVER(bogeyman_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bogeyman)
-	MCFG_PALETTE_ADD("palette", 16+256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
-	MCFG_PALETTE_INIT_OWNER(bogeyman_state, bogeyman)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bogeyman);
+	PALETTE(config, m_palette, FUNC(bogeyman_state::bogeyman_palette)).set_format(palette_device::BGR_233_inverted, 16 + 256);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
 	// verified to be YM2149s from PCB pic
-	MCFG_SOUND_ADD("ay1", YM2149, 1500000)  /* Verified */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(bogeyman_state, colbank_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YM2149(config, m_ay1, 1500000);  /* Verified */
+	m_ay1->port_a_write_callback().set(FUNC(bogeyman_state::colbank_w));
+	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_SOUND_ADD("ay2", YM2149, 1500000)  /* Verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YM2149(config, m_ay2, 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);  /* Verified */
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -298,4 +295,4 @@ ROM_END
 
 /* Game Driver */
 
-GAME( 1985, bogeyman, 0, bogeyman, bogeyman, bogeyman_state, 0, ROT0, "Technos Japan", "Bogey Manor", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, bogeyman, 0, bogeyman, bogeyman, bogeyman_state, empty_init, ROT0, "Technos Japan", "Bogey Manor", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

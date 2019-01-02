@@ -14,15 +14,6 @@
 #include "sm510.h"
 
 
-// I/O ports setup
-
-// LCD segment outputs: H1/2 as a0, O group as a1-a4, O data as d0-d3
-#define MCFG_SM500_WRITE_O_CB(_devcb) \
-	devcb = &downcast<sm500_device &>(*device).set_write_o_callback(DEVCB_##_devcb);
-
-// see sm510.h for ACL, K, R, alpha, beta
-
-
 // pinout reference
 
 /*
@@ -77,10 +68,7 @@ O34 60 | *                                                          | 16 O48
 class sm500_device : public sm510_base_device
 {
 public:
-	sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	// configuration helpers
-	template <class Object> devcb_base &set_write_o_callback(Object &&cb) { return m_write_o.set_callback(std::forward<Object>(cb)); }
+	sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
 
 protected:
 	sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
@@ -99,7 +87,6 @@ protected:
 	virtual void wakeup_vector() override { do_branch(0, 0, 0); }
 
 	// lcd driver
-	devcb_write8 m_write_o;
 	virtual void lcd_update() override;
 
 	int m_o_pins; // number of 4-bit O pins
@@ -153,7 +140,7 @@ protected:
 class sm5a_device : public sm500_device
 {
 public:
-	sm5a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sm5a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
 
 protected:
 	sm5a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
@@ -169,13 +156,13 @@ protected:
 class sm5l_device : public sm5a_device
 {
 public:
-	sm5l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sm5l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
 };
 
 class kb1013vk12_device : public sm5a_device
 {
 public:
-	kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32768);
 };
 
 

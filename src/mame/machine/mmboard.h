@@ -14,25 +14,9 @@
 
 #include "sound/beep.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MEPHISTO_SENSORS_BOARD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MEPHISTO_SENSORS_BOARD, 0) \
-
-#define MCFG_MEPHISTO_BUTTONS_BOARD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MEPHISTO_BUTTONS_BOARD, 0) \
-
-#define MCFG_MEPHISTO_BOARD_DISABLE_LEDS(_val) \
-	downcast<mephisto_board_device &>(*device).set_disable_leds(_val);
-
-#define MCFG_MEPHISTO_DISPLAY_MODUL_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MEPHISTO_DISPLAY_MODUL, 0)
 
 
 //**************************************************************************
@@ -65,6 +49,7 @@ protected:
 
 private:
 	required_ioport_array<8> m_sensors;
+	output_finder<64>        m_led;
 	emu_timer *              m_leds_update_timer;
 	emu_timer *              m_leds_refresh_timer;
 	bool                     m_disable_leds;
@@ -114,13 +99,13 @@ public:
 	DECLARE_WRITE8_MEMBER(latch_w);
 	DECLARE_WRITE8_MEMBER(io_w);
 
-	DECLARE_PALETTE_INIT(lcd_palette);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	void lcd_palette(palette_device &palette) const;
 
 private:
 	optional_device<hd44780_device> m_lcdc;

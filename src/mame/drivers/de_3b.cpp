@@ -22,6 +22,12 @@ public:
 			m_dmdtype3(*this, "decodmd")
 	{ }
 
+	void detest(machine_config &config);
+	void de_3b(machine_config &config);
+
+	void init_de_3b();
+
+private:
 	// devices
 	optional_device<decobsmt_device> m_decobsmt;
 	optional_device<decodmd_type3_device> m_dmdtype3;
@@ -41,22 +47,11 @@ public:
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
 
-	void detest(machine_config &config);
-	void de_3b(machine_config &config);
-protected:
-
 	// driver_device overrides
 	virtual void machine_reset() override;
-public:
-	DECLARE_DRIVER_INIT(de_3b);
 
-	uint8_t m_strobe;
 	uint8_t m_kbdrow;
-	uint8_t m_diag;
-	bool m_ca1;
-	bool m_irq_active;
 	uint8_t m_sound_data;
-
 };
 
 
@@ -237,34 +232,38 @@ void de_3b_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(de_3b_state,de_3b)
+void de_3b_state::init_de_3b()
 {
 }
 
-MACHINE_CONFIG_START(de_3b_state::de_3b)
+void de_3b_state::de_3b(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE3B_ADD("decocpu",XTAL(8'000'000) / 2, ":maincpu")
-	MCFG_DECOCPU_DISPLAY(READ8(de_3b_state,display_r),WRITE8(de_3b_state,display_w))
-	MCFG_DECOCPU_SOUNDLATCH(WRITE8(de_3b_state,sound_w))
-	MCFG_DECOCPU_SWITCH(READ8(de_3b_state,switch_r),WRITE8(de_3b_state,switch_w))
-	MCFG_DECOCPU_LAMP(WRITE8(de_3b_state,lamps_w))
-	MCFG_DECOCPU_DMDSTATUS(READ8(de_3b_state,dmd_status_r))
+	decocpu_type3b_device &decocpu(DECOCPU3B(config, "decocpu", XTAL(8'000'000) / 2, "maincpu"));
+	decocpu.display_read_callback().set(FUNC(de_3b_state::display_r));
+	decocpu.display_write_callback().set(FUNC(de_3b_state::display_w));
+	decocpu.soundlatch_write_callback().set(FUNC(de_3b_state::sound_w));
+	decocpu.switch_read_callback().set(FUNC(de_3b_state::switch_r));
+	decocpu.switch_write_callback().set(FUNC(de_3b_state::switch_w));
+	decocpu.lamp_write_callback().set(FUNC(de_3b_state::lamps_w));
+	decocpu.dmdstatus_read_callback().set(FUNC(de_3b_state::dmd_status_r));
 
 	genpin_audio(config);
 
 	/* sound hardware */
-	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
+	DECOBSMT(config, m_decobsmt, 0);
 
-	MCFG_DECODMD_TYPE3_ADD("decodmd",":cpu3")
-MACHINE_CONFIG_END
+	DECODMD3(config, m_dmdtype3, 0, "cpu3");
+}
 
 
-MACHINE_CONFIG_START(de_3b_state::detest)
+void de_3b_state::detest(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE3B_ADD("decocpu",XTAL(8'000'000) / 2, ":maincpu")
+	DECOCPU3B(config, "decocpu", XTAL(8'000'000) / 2, "maincpu");
 
 	genpin_audio(config);
-MACHINE_CONFIG_END
+}
 
 /*-------------------------------------------------------------
 / Batman Forever 4.0
@@ -679,33 +678,33 @@ ROM_START(detest)
 ROM_END
 
 
-GAME(1995,  batmanf,    0,              de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (4.0)",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  batmanf3,   batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (3.0)",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  batmanf2,   batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (2.02)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  batmanf1,   batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (1.02)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_uk,     batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (English)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_cn,     batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (Canadian)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_no,     batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (Norwegian)",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_sv,     batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (Swedish)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_at,     batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (Austrian)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_ch,     batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (Swiss)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_de,     batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (German)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_be,     batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (Belgian)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_fr,     batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (French)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_nl,     batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (Dutch)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_it,     batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (Italian)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_sp,     batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (Spanish)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_jp,     batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (Japanese)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bmf_time,   batmanf,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Batman Forever (Timed Play)",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  baywatch,   0,              de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Baywatch",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bay_d300,   baywatch,       de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Baywatch (3.00 Dutch)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bay_d400,   baywatch,       de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Baywatch (4.00 English)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  bay_e400,   baywatch,       de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Baywatch (4.00 Dutch)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  frankst,    0,              de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Mary Shelley's Frankenstein",           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995,  frankstg,   frankst,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Mary Shelley's Frankenstein (Germany)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  mav_402,    0,              de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Maverick (Display Rev. 4.02)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  mav_401,    mav_402,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Maverick (Display Rev. 4.01)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  mav_400,    mav_402,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Maverick (Display Rev. 4.00)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1994,  mav_100,    mav_402,        de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Maverick (1.00)",                       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1998,  detest,     0,              detest, de_3b, de_3b_state, de_3b,  ROT0,   "Data East",  "Data East Test Chip",                   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996,  ctcheese,   0,              de_3b,  de_3b, de_3b_state, de_3b,  ROT0,   "Sega",       "Cut The Cheese (Redemption)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  batmanf,  0,       de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (4.0)",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  batmanf3, batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (3.0)",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  batmanf2, batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (2.02)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  batmanf1, batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (1.02)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_uk,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (English)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_cn,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Canadian)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_no,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Norwegian)",            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_sv,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Swedish)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_at,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Austrian)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_ch,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Swiss)",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_de,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (German)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_be,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Belgian)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_fr,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (French)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_nl,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Dutch)",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_it,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Italian)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_sp,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Spanish)",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_jp,   batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Japanese)",             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bmf_time, batmanf, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Batman Forever (Timed Play)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  baywatch, 0,       de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Baywatch",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bay_d300, baywatch,de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Baywatch (3.00 Dutch)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bay_d400, baywatch,de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Baywatch (4.00 English)",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  bay_e400, baywatch,de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Baywatch (4.00 Dutch)",                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  frankst,  0,       de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Mary Shelley's Frankenstein",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995,  frankstg, frankst, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Mary Shelley's Frankenstein (Germany)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  mav_402,  0,       de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Maverick (Display Rev. 4.02)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  mav_401,  mav_402, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Maverick (Display Rev. 4.01)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  mav_400,  mav_402, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Maverick (Display Rev. 4.00)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1994,  mav_100,  mav_402, de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Maverick (1.00)",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1998,  detest,   0,       detest, de_3b, de_3b_state, init_de_3b, ROT0, "Data East", "Data East Test Chip",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996,  ctcheese, 0,       de_3b,  de_3b, de_3b_state, init_de_3b, ROT0, "Sega",      "Cut The Cheese (Redemption)",           MACHINE_IS_SKELETON_MECHANICAL)

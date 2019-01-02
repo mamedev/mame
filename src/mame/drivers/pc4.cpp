@@ -30,7 +30,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/rp5c01.h"
 
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -72,17 +71,17 @@ void pc4_state::pc4_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x000f).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
-	map(0x1000, 0x1000).w(this, FUNC(pc4_state::beep_w));
-	map(0x1fff, 0x1fff).w(this, FUNC(pc4_state::bank_w));
+	map(0x1000, 0x1000).w(FUNC(pc4_state::beep_w));
+	map(0x1fff, 0x1fff).w(FUNC(pc4_state::bank_w));
 
-	map(0x3000, 0x3000).w(this, FUNC(pc4_state::lcd_control_w));
-	map(0x3001, 0x3001).w(this, FUNC(pc4_state::lcd_data_w));
-	map(0x3002, 0x3002).r(this, FUNC(pc4_state::lcd_control_r));
-	map(0x3003, 0x3003).r(this, FUNC(pc4_state::lcd_data_r));
-	map(0x3005, 0x3005).w(this, FUNC(pc4_state::lcd_offset_w));
+	map(0x3000, 0x3000).w(FUNC(pc4_state::lcd_control_w));
+	map(0x3001, 0x3001).w(FUNC(pc4_state::lcd_data_w));
+	map(0x3002, 0x3002).r(FUNC(pc4_state::lcd_control_r));
+	map(0x3003, 0x3003).r(FUNC(pc4_state::lcd_data_r));
+	map(0x3005, 0x3005).w(FUNC(pc4_state::lcd_offset_w));
 
 	//keyboard read, offset used as matrix
-	map(0x5000, 0x50ff).r(this, FUNC(pc4_state::kb_r));
+	map(0x5000, 0x50ff).r(FUNC(pc4_state::kb_r));
 }
 
 static INPUT_PORTS_START( pc4 )
@@ -167,7 +166,7 @@ static INPUT_PORTS_START( pc4 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(pc4_state, pc4)
+void pc4_state::pc4_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -184,7 +183,7 @@ static const gfx_layout pc4_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( pc4 )
+static GFXDECODE_START( gfx_pc4 )
 	GFXDECODE_ENTRY( "charset", 0x0000, pc4_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -220,9 +219,9 @@ void pc4_state::machine_start()
 
 MACHINE_CONFIG_START(pc4_state::pc4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(pc4_mem)
-	MCFG_CPU_IO_MAP(pc4_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pc4_mem)
+	MCFG_DEVICE_IO_MAP(pc4_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -232,17 +231,14 @@ MACHINE_CONFIG_START(pc4_state::pc4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 36-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pc4_state, pc4)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc4)
+	PALETTE(config, "palette", FUNC(pc4_state::pc4_palette), 2);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_pc4);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
+	RP5C01(config, "rtc", XTAL(32'768));
 MACHINE_CONFIG_END
 
 ROM_START( pc4 )
@@ -252,5 +248,5 @@ ROM_START( pc4 )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 ROM_END
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE      INIT  COMPANY             FULLNAME     FLAGS
-COMP( 1990, pc4,   0,      0,      pc4,     pc4,   pc4_state, 0,    "Laser Computer",   "Laser PC4", MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY           FULLNAME     FLAGS
+COMP( 1990, pc4,  0,      0,      pc4,     pc4,   pc4_state, empty_init, "Laser Computer", "Laser PC4", MACHINE_NOT_WORKING )

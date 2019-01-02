@@ -56,12 +56,14 @@ public:
 		, m_brg(*this, "brg")
 	{ }
 
-	virtual void machine_start() override;
-
 	void swtpcm(machine_config &config);
 	void swtpc(machine_config &config);
-	void mem_map(address_map &map);
+
 private:
+	virtual void machine_start() override;
+
+	void mem_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<mc14411_device> m_brg;
@@ -97,90 +99,88 @@ void swtpc_state::machine_start()
 
 MACHINE_CONFIG_START(swtpc_state::swtpc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL(1'843'200) / 2)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(1'843'200) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
-	MCFG_DEVICE_ADD("brg", MC14411, XTAL(1'843'200))
-	MCFG_MC14411_F7_CB(DEVWRITELINE("io0", ss50_interface_port_device, f600_1200_w)) // 1200b
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io1", ss50_interface_port_device, f600_1200_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io2", ss50_interface_port_device, f600_1200_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io3", ss50_interface_port_device, f600_1200_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io4", ss50_interface_port_device, f600_1200_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io5", ss50_interface_port_device, f600_1200_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io6", ss50_interface_port_device, f600_1200_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io7", ss50_interface_port_device, f600_1200_w))
-	MCFG_MC14411_F8_CB(DEVWRITELINE("io0", ss50_interface_port_device, f600_4800_w)) // 600b
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io1", ss50_interface_port_device, f600_4800_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io2", ss50_interface_port_device, f600_4800_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io3", ss50_interface_port_device, f600_4800_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io4", ss50_interface_port_device, f600_4800_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io5", ss50_interface_port_device, f600_4800_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io6", ss50_interface_port_device, f600_4800_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io7", ss50_interface_port_device, f600_4800_w))
-	MCFG_MC14411_F9_CB(DEVWRITELINE("io0", ss50_interface_port_device, f300_w)) // 300b
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io1", ss50_interface_port_device, f300_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io2", ss50_interface_port_device, f300_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io3", ss50_interface_port_device, f300_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io4", ss50_interface_port_device, f300_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io5", ss50_interface_port_device, f300_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io6", ss50_interface_port_device, f300_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io7", ss50_interface_port_device, f300_w))
-	MCFG_MC14411_F11_CB(DEVWRITELINE("io0", ss50_interface_port_device, f150_9600_w)) // 150b
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io1", ss50_interface_port_device, f150_9600_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io2", ss50_interface_port_device, f150_9600_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io3", ss50_interface_port_device, f150_9600_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io4", ss50_interface_port_device, f150_9600_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io5", ss50_interface_port_device, f150_9600_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io6", ss50_interface_port_device, f150_9600_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io7", ss50_interface_port_device, f150_9600_w))
-	MCFG_MC14411_F13_CB(DEVWRITELINE("io0", ss50_interface_port_device, f110_w)) // 110b
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io1", ss50_interface_port_device, f110_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io2", ss50_interface_port_device, f110_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io3", ss50_interface_port_device, f110_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io4", ss50_interface_port_device, f110_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io5", ss50_interface_port_device, f110_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io6", ss50_interface_port_device, f110_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("io7", ss50_interface_port_device, f110_w))
+	MC14411(config, m_brg, XTAL(1'843'200));
+	m_brg->out_f<7>().set("io0", FUNC(ss50_interface_port_device::f600_1200_w)); // 1200b
+	m_brg->out_f<7>().append("io1", FUNC(ss50_interface_port_device::f600_1200_w));
+	m_brg->out_f<7>().append("io2", FUNC(ss50_interface_port_device::f600_1200_w));
+	m_brg->out_f<7>().append("io3", FUNC(ss50_interface_port_device::f600_1200_w));
+	m_brg->out_f<7>().append("io4", FUNC(ss50_interface_port_device::f600_1200_w));
+	m_brg->out_f<7>().append("io5", FUNC(ss50_interface_port_device::f600_1200_w));
+	m_brg->out_f<7>().append("io6", FUNC(ss50_interface_port_device::f600_1200_w));
+	m_brg->out_f<7>().append("io7", FUNC(ss50_interface_port_device::f600_1200_w));
+	m_brg->out_f<8>().set("io0", FUNC(ss50_interface_port_device::f600_4800_w)); // 600b
+	m_brg->out_f<8>().append("io1", FUNC(ss50_interface_port_device::f600_4800_w));
+	m_brg->out_f<8>().append("io2", FUNC(ss50_interface_port_device::f600_4800_w));
+	m_brg->out_f<8>().append("io3", FUNC(ss50_interface_port_device::f600_4800_w));
+	m_brg->out_f<8>().append("io4", FUNC(ss50_interface_port_device::f600_4800_w));
+	m_brg->out_f<8>().append("io5", FUNC(ss50_interface_port_device::f600_4800_w));
+	m_brg->out_f<8>().append("io6", FUNC(ss50_interface_port_device::f600_4800_w));
+	m_brg->out_f<8>().append("io7", FUNC(ss50_interface_port_device::f600_4800_w));
+	m_brg->out_f<9>().set("io0", FUNC(ss50_interface_port_device::f300_w)); // 300b
+	m_brg->out_f<9>().append("io1", FUNC(ss50_interface_port_device::f300_w));
+	m_brg->out_f<9>().append("io2", FUNC(ss50_interface_port_device::f300_w));
+	m_brg->out_f<9>().append("io3", FUNC(ss50_interface_port_device::f300_w));
+	m_brg->out_f<9>().append("io4", FUNC(ss50_interface_port_device::f300_w));
+	m_brg->out_f<9>().append("io5", FUNC(ss50_interface_port_device::f300_w));
+	m_brg->out_f<9>().append("io6", FUNC(ss50_interface_port_device::f300_w));
+	m_brg->out_f<9>().append("io7", FUNC(ss50_interface_port_device::f300_w));
+	m_brg->out_f<11>().set("io0", FUNC(ss50_interface_port_device::f150_9600_w)); // 150b
+	m_brg->out_f<11>().append("io1", FUNC(ss50_interface_port_device::f150_9600_w));
+	m_brg->out_f<11>().append("io2", FUNC(ss50_interface_port_device::f150_9600_w));
+	m_brg->out_f<11>().append("io3", FUNC(ss50_interface_port_device::f150_9600_w));
+	m_brg->out_f<11>().append("io4", FUNC(ss50_interface_port_device::f150_9600_w));
+	m_brg->out_f<11>().append("io5", FUNC(ss50_interface_port_device::f150_9600_w));
+	m_brg->out_f<11>().append("io6", FUNC(ss50_interface_port_device::f150_9600_w));
+	m_brg->out_f<11>().append("io7", FUNC(ss50_interface_port_device::f150_9600_w));
+	m_brg->out_f<13>().set("io0", FUNC(ss50_interface_port_device::f110_w)); // 110b
+	m_brg->out_f<13>().append("io1", FUNC(ss50_interface_port_device::f110_w));
+	m_brg->out_f<13>().append("io2", FUNC(ss50_interface_port_device::f110_w));
+	m_brg->out_f<13>().append("io3", FUNC(ss50_interface_port_device::f110_w));
+	m_brg->out_f<13>().append("io4", FUNC(ss50_interface_port_device::f110_w));
+	m_brg->out_f<13>().append("io5", FUNC(ss50_interface_port_device::f110_w));
+	m_brg->out_f<13>().append("io6", FUNC(ss50_interface_port_device::f110_w));
+	m_brg->out_f<13>().append("io7", FUNC(ss50_interface_port_device::f110_w));
 
 	MCFG_SS50_INTERFACE_PORT_ADD("io0", default_2rs_devices, nullptr)
-	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
-	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<0>))
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(WRITELINE("mainirq", input_merger_device, in_w<0>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(WRITELINE("mainnmi", input_merger_device, in_w<0>))
 	MCFG_SS50_INTERFACE_PORT_ADD("io1", default_2rs_devices, "mps")
-	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
-	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<1>))
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(WRITELINE("mainirq", input_merger_device, in_w<1>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(WRITELINE("mainnmi", input_merger_device, in_w<1>))
 	MCFG_SS50_INTERFACE_PORT_ADD("io2", default_2rs_devices, nullptr)
-	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<2>))
-	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<2>))
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(WRITELINE("mainirq", input_merger_device, in_w<2>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(WRITELINE("mainnmi", input_merger_device, in_w<2>))
 	MCFG_SS50_INTERFACE_PORT_ADD("io3", default_2rs_devices, nullptr)
-	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<3>))
-	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<3>))
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(WRITELINE("mainirq", input_merger_device, in_w<3>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(WRITELINE("mainnmi", input_merger_device, in_w<3>))
 	MCFG_SS50_INTERFACE_PORT_ADD("io4", default_2rs_devices, nullptr)
-	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<4>))
-	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<4>))
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(WRITELINE("mainirq", input_merger_device, in_w<4>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(WRITELINE("mainnmi", input_merger_device, in_w<4>))
 	MCFG_SS50_INTERFACE_PORT_ADD("io5", default_2rs_devices, nullptr)
-	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<5>))
-	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<5>))
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(WRITELINE("mainirq", input_merger_device, in_w<5>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(WRITELINE("mainnmi", input_merger_device, in_w<5>))
 	MCFG_SS50_INTERFACE_PORT_ADD("io6", default_2rs_devices, nullptr)
-	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<6>))
-	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<6>))
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(WRITELINE("mainirq", input_merger_device, in_w<6>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(WRITELINE("mainnmi", input_merger_device, in_w<6>))
 	MCFG_SS50_INTERFACE_PORT_ADD("io7", default_2rs_devices, nullptr)
-	MCFG_SS50_INTERFACE_IRQ_CALLBACK(DEVWRITELINE("mainirq", input_merger_device, in_w<7>))
-	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(DEVWRITELINE("mainnmi", input_merger_device, in_w<7>))
+	MCFG_SS50_INTERFACE_IRQ_CALLBACK(WRITELINE("mainirq", input_merger_device, in_w<7>))
+	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(WRITELINE("mainnmi", input_merger_device, in_w<7>))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_INPUT_MERGER_ANY_HIGH("mainnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_EXTRA_OPTIONS("4K,8K,12K,16K,20K,24K,28K,32K")
+	RAM(config, RAM_TAG).set_default_size("2K").set_extra_options("4K,8K,12K,16K,20K,24K,28K,32K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(swtpc_state::swtpcm)
 	swtpc(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL(1'797'100) / 2)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(1'797'100) / 2)
 
 	MCFG_DEVICE_MODIFY("brg")
 	MCFG_DEVICE_CLOCK(XTAL(1'797'100))
@@ -202,6 +202,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY                                     FULLNAME      FLAGS
-COMP( 1977, swtpc,  0,      0,      swtpc,   swtpc, swtpc_state, 0,    "Southwest Technical Products Corporation", "SWTPC 6800 Computer System (with SWTBUG)", MACHINE_NO_SOUND_HW )
-COMP( 1975, swtpcm, swtpc,  0,      swtpcm,  swtpc, swtpc_state, 0,    "Southwest Technical Products Corporation", "SWTPC 6800 Computer System (with MIKBUG)", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                                     FULLNAME      FLAGS
+COMP( 1977, swtpc,  0,      0,      swtpc,   swtpc, swtpc_state, empty_init, "Southwest Technical Products Corporation", "SWTPC 6800 Computer System (with SWTBUG)", MACHINE_NO_SOUND_HW )
+COMP( 1975, swtpcm, swtpc,  0,      swtpcm,  swtpc, swtpc_state, empty_init, "Southwest Technical Products Corporation", "SWTPC 6800 Computer System (with MIKBUG)", MACHINE_NO_SOUND_HW )

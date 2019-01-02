@@ -70,17 +70,6 @@ Notes:
 //**************************************************************************
 
 //-------------------------------------------------
-//  com8116_w - baud rate selection
-//-------------------------------------------------
-
-WRITE8_MEMBER( ob68k1a_state::com8116_w )
-{
-	m_dbrg->stt_w(data & 0x0f);
-	m_dbrg->str_w(data >> 4);
-}
-
-
-//-------------------------------------------------
 //  pia_r - trampoline for PIA odd/even access
 //-------------------------------------------------
 
@@ -123,11 +112,11 @@ void ob68k1a_state::ob68k1a_mem(address_map &map)
 	map(0x000000, 0x01ffff).ram();
 	map(0xfe0000, 0xfeffff).rom().region(MC68000L10_TAG, 0);
 	map(0xffff00, 0xffff03).rw(m_acia0, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
-	map(0xffff10, 0xffff10).w(this, FUNC(ob68k1a_state::com8116_w));
+	map(0xffff10, 0xffff10).w(COM8116_TAG, FUNC(com8116_device::str_stt_w));
 	map(0xffff20, 0xffff23).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 //  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_0_TAG, pia6821_device, read, write, 0x00ff)
 //  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_1_TAG, pia6821_device, read, write, 0xff00)
-	map(0xffff40, 0xffff47).rw(this, FUNC(ob68k1a_state::pia_r), FUNC(ob68k1a_state::pia_w));
+	map(0xffff40, 0xffff47).rw(FUNC(ob68k1a_state::pia_r), FUNC(ob68k1a_state::pia_w));
 	map(0xffff60, 0xffff6f).rw(MC6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 }
 
@@ -171,8 +160,8 @@ void ob68k1a_state::machine_start()
 void ob68k1a_state::machine_reset()
 {
 	// initialize COM8116
-	m_dbrg->stt_w(0x0e);
-	m_dbrg->str_w(0x0e);
+	m_dbrg->write_stt(0x0e);
+	m_dbrg->write_str(0x0e);
 
 	// set reset vector
 	void *ram = m_maincpu->space(AS_PROGRAM).get_write_ptr(0);
@@ -193,46 +182,46 @@ void ob68k1a_state::machine_reset()
 //  MACHINE_CONFIG( ob68k1a )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ob68k1a_state::ob68k1a)
+void ob68k1a_state::ob68k1a(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD(MC68000L10_TAG, M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(ob68k1a_mem)
+	M68000(config, m_maincpu, 10_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ob68k1a_state::ob68k1a_mem);
 
 	// devices
-	MCFG_DEVICE_ADD(MC6821_0_TAG, PIA6821, 0)
-	MCFG_DEVICE_ADD(MC6821_1_TAG, PIA6821, 0)
-	MCFG_DEVICE_ADD(MC6840_TAG, PTM6840, XTAL(10'000'000)/10)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
+	PIA6821(config, m_pia0, 0);
+	PIA6821(config, m_pia1, 0);
+	PTM6840(config, MC6840_TAG, 10_MHz_XTAL/10).set_external_clocks(0, 0, 0);
 
-	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	ACIA6850(config, m_acia0, 0);
+	m_acia0->txd_handler().set(m_rs232a, FUNC(rs232_port_device::write_txd));
+	m_acia0->rts_handler().set(m_rs232a, FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_cts))
+	RS232_PORT(config, m_rs232a, default_rs232_devices, "terminal");
+	m_rs232a->rxd_handler().set(m_acia0, FUNC(acia6850_device::write_rxd));
+	m_rs232a->dcd_handler().set(m_acia0, FUNC(acia6850_device::write_dcd));
+	m_rs232a->cts_handler().set(m_acia0, FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD(MC6850_1_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	ACIA6850(config, m_acia1, 0);
+	m_acia1->txd_handler().set(m_rs232b, FUNC(rs232_port_device::write_txd));
+	m_acia1->rts_handler().set(m_rs232b, FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_cts))
+	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
+	m_rs232b->rxd_handler().set(m_acia1, FUNC(acia6850_device::write_rxd));
+	m_rs232b->dcd_handler().set(m_acia1, FUNC(acia6850_device::write_dcd));
+	m_rs232b->cts_handler().set(m_acia1, FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_rxc))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_rxc))
+	COM8116(config, m_dbrg, 5.0688_MHz_XTAL);
+	m_dbrg->fr_handler().set(m_acia0, FUNC(acia6850_device::write_txc));
+	m_dbrg->fr_handler().append(m_acia0, FUNC(acia6850_device::write_rxc));
+	m_dbrg->ft_handler().set(m_acia1, FUNC(acia6850_device::write_txc));
+	m_dbrg->ft_handler().append(m_acia1, FUNC(acia6850_device::write_rxc));
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("128K")
-MACHINE_CONFIG_END
+	RAM(config, m_ram, 0);
+	m_ram->set_default_size("32K");
+	m_ram->set_extra_options("128K");
+}
 
 
 
@@ -266,5 +255,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY     FULLNAME     FLAGS
-COMP( 1982, ob68k1a,  0,       0,   ob68k1a,    ob68k1a, ob68k1a_state, 0,    "Omnibyte", "OB68K1A",   MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME   FLAGS
+COMP( 1982, ob68k1a, 0,      0,      ob68k1a, ob68k1a, ob68k1a_state, empty_init, "Omnibyte", "OB68K1A Single Board Computer", MACHINE_NO_SOUND_HW )

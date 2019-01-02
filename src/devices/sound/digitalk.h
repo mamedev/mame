@@ -7,17 +7,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_DIGITALKER_ADD(tag, clock) \
-		MCFG_DEVICE_ADD((tag), DIGITALKER, (clock))
-
-#define MCFG_DIGITALKER_REPLACE(tag, clock) \
-		MCFG_DEVICE_REPLACE((tag), DIGITALKER, (clock))
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

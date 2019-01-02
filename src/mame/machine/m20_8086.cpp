@@ -2,23 +2,23 @@
 // copyright-holders:Carl
 #include "emu.h"
 #include "m20_8086.h"
-#include "machine/ram.h"
 
 DEFINE_DEVICE_TYPE(M20_8086, m20_8086_device, "m20_8086", "Olivetti M20 8086 Adapter")
 
 m20_8086_device::m20_8086_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, M20_8086, tag, owner, clock),
 	m_8086(*this, "8086"),
-	m_maincpu(*this, ":maincpu"),
-	m_pic(*this, ":i8259"),
+	m_maincpu(*this, finder_base::DUMMY_TAG),
+	m_pic(*this, finder_base::DUMMY_TAG),
+	m_ram(*this, finder_base::DUMMY_TAG),
 	m_8086_halt(true)
 {
 }
 
 void m20_8086_device::device_start()
 {
-	uint8_t* ram = machine().device<ram_device>("ram")->pointer();
-	m_8086->space(AS_PROGRAM).install_readwrite_bank(0x00000,  machine().device<ram_device>("ram")->size() - 0x4001, "mainram");
+	uint8_t* ram = m_ram->pointer();
+	m_8086->space(AS_PROGRAM).install_readwrite_bank(0x00000,  m_ram->size() - 0x4001, "mainram");
 	membank("highram")->set_base(ram);
 	membank("mainram")->set_base(&ram[0x4000]);
 	membank("vram")->set_base(memshare(":videoram")->ptr());
@@ -53,15 +53,15 @@ void m20_8086_device::i86_prog(address_map &map)
 
 void m20_8086_device::i86_io(address_map &map)
 {
-	map(0x4000, 0x4fff).rw(this, FUNC(m20_8086_device::z8000_io_r), FUNC(m20_8086_device::z8000_io_w));
-	map(0x7ffa, 0x7ffd).w(this, FUNC(m20_8086_device::handshake_w));
+	map(0x4000, 0x4fff).rw(FUNC(m20_8086_device::z8000_io_r), FUNC(m20_8086_device::z8000_io_w));
+	map(0x7ffa, 0x7ffd).w(FUNC(m20_8086_device::handshake_w));
 }
 
 MACHINE_CONFIG_START(m20_8086_device::device_add_mconfig)
-	MCFG_CPU_ADD("8086", I8086, XTAL(24'000'000)/3)
-	MCFG_CPU_PROGRAM_MAP(i86_prog)
-	MCFG_CPU_IO_MAP(i86_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(m20_8086_device, int_cb)
+	MCFG_DEVICE_ADD("8086", I8086, XTAL(24'000'000)/3)
+	MCFG_DEVICE_PROGRAM_MAP(i86_prog)
+	MCFG_DEVICE_IO_MAP(i86_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(m20_8086_device, int_cb)
 MACHINE_CONFIG_END
 
 READ16_MEMBER(m20_8086_device::z8000_io_r)
@@ -104,13 +104,13 @@ WRITE16_MEMBER(m20_8086_device::handshake_w)
 	{
 		m_8086->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		m_8086_halt = true;
 	}
 	else
 	{
 		m_8086->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_8086->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_8086->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_8086_halt = false;
 	}

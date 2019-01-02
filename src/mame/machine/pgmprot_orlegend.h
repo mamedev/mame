@@ -16,7 +16,7 @@ public:
 	uint16_t        m_asic3_hilo;
 	uint16_t        m_asic3_hold;
 
-	DECLARE_DRIVER_INIT(orlegend);
+	void init_orlegend();
 	void asic3_compute_hold(int,int);
 	DECLARE_READ16_MEMBER( pgm_asic3_r );
 	DECLARE_WRITE16_MEMBER( pgm_asic3_w );

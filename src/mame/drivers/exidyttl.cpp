@@ -51,21 +51,19 @@ public:
 	{
 	}
 
+	void attack(machine_config &config);
+	void deathrac(machine_config &config);
+
+private:
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-
-	void attack(machine_config &config);
-	void deathrac(machine_config &config);
-protected:
 
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-
-private:
 
 };
 
@@ -234,7 +232,7 @@ ROM_START( rhunting )
 ROM_END
 
 
-GAME( 1977, attckexd,  0,        attack,   0, exidyttl_state,  0, ROT0, "Exidy", "Attack (Set 1) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1977, attckexd2, attckexd, attack,   0, exidyttl_state,  0, ROT0, "Exidy", "Attack (Set 2) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1976, deathrac,  0,        deathrac, 0, exidyttl_state,  0, ROT0, "Exidy", "Death Race [TTL]",     MACHINE_IS_SKELETON )
-GAME( 1976, rhunting,  deathrac, deathrac, 0, exidyttl_state,  0, ROT0, "bootleg", "Robot Hunting (bootleg of Death Race) [TTL]",MACHINE_IS_SKELETON )
+GAME( 1977, attckexd,  0,        attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (Set 1) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1977, attckexd2, attckexd, attack,   0, exidyttl_state, empty_init, ROT0, "Exidy", "Attack (Set 2) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, deathrac,  0,        deathrac, 0, exidyttl_state, empty_init, ROT0, "Exidy", "Death Race [TTL]",     MACHINE_IS_SKELETON )
+GAME( 1976, rhunting,  deathrac, deathrac, 0, exidyttl_state, empty_init, ROT0, "bootleg", "Robot Hunting (bootleg of Death Race) [TTL]",MACHINE_IS_SKELETON )

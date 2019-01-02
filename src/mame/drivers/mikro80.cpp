@@ -15,6 +15,7 @@
 #include "includes/mikro80.h"
 #include "sound/volt_reg.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -33,8 +34,8 @@ void mikro80_state::mikro80_mem(address_map &map)
 void mikro80_state::mikro80_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x01, 0x01).rw(this, FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
-	map(0x04, 0x07).rw(this, FUNC(mikro80_state::mikro80_keyboard_r), FUNC(mikro80_state::mikro80_keyboard_w));
+	map(0x01, 0x01).rw(FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
+	map(0x04, 0x07).rw(FUNC(mikro80_state::mikro80_keyboard_r), FUNC(mikro80_state::mikro80_keyboard_w));
 }
 
 void mikro80_state::kristall_io(address_map &map)
@@ -46,11 +47,11 @@ void mikro80_state::kristall_io(address_map &map)
 void mikro80_state::radio99_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x01, 0x01).rw(this, FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
-	map(0x04, 0x04).w(this, FUNC(mikro80_state::radio99_sound_w));
-	map(0x05, 0x05).rw(this, FUNC(mikro80_state::mikro80_8255_portc_r), FUNC(mikro80_state::mikro80_8255_portc_w));
-	map(0x06, 0x06).r(this, FUNC(mikro80_state::mikro80_8255_portb_r));
-	map(0x07, 0x07).w(this, FUNC(mikro80_state::mikro80_8255_porta_w));
+	map(0x01, 0x01).rw(FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
+	map(0x04, 0x04).w(FUNC(mikro80_state::radio99_sound_w));
+	map(0x05, 0x05).rw(FUNC(mikro80_state::mikro80_8255_portc_r), FUNC(mikro80_state::mikro80_8255_portc_w));
+	map(0x06, 0x06).r(FUNC(mikro80_state::mikro80_8255_portb_r));
+	map(0x07, 0x07).w(FUNC(mikro80_state::mikro80_8255_porta_w));
 }
 
 /* Input ports */
@@ -160,20 +161,20 @@ static const gfx_layout mikro80_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( mikro80 )
+static GFXDECODE_START( gfx_mikro80 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikro80_charlayout, 0, 1 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(mikro80_state::mikro80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, 2000000)
-	MCFG_CPU_PROGRAM_MAP(mikro80_mem)
-	MCFG_CPU_IO_MAP(mikro80_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(mikro80_mem)
+	MCFG_DEVICE_IO_MAP(mikro80_io)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mikro80_state, mikro80_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(mikro80_state, mikro80_8255_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(mikro80_state, mikro80_8255_portc_r))
+	I8255(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set(FUNC(mikro80_state::mikro80_8255_porta_w));
+	m_ppi8255->in_pb_callback().set(FUNC(mikro80_state::mikro80_8255_portb_r));
+	m_ppi8255->in_pc_callback().set(FUNC(mikro80_state::mikro80_8255_portc_r));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -184,12 +185,11 @@ MACHINE_CONFIG_START(mikro80_state::mikro80)
 	MCFG_SCREEN_UPDATE_DRIVER(mikro80_state, screen_update_mikro80)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mikro80)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mikro80)
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SPEAKER(config, "speaker").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rk8_cassette_formats)
@@ -203,18 +203,18 @@ MACHINE_CONFIG_START(mikro80_state::radio99)
 	mikro80(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(radio99_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(radio99_io)
 
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mikro80_state::kristall)
 	mikro80(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(kristall_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(kristall_io)
 MACHINE_CONFIG_END
 
 
@@ -243,7 +243,7 @@ ROM_END
 
 
 /* Driver */
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT    STATE          INIT     COMPANY      FULLNAME       FLAGS */
-COMP( 1983, mikro80,   0,       0,      mikro80,    mikro80, mikro80_state, mikro80, "<unknown>", "Mikro-80",    0)
-COMP( 1993, radio99,   mikro80, 0,      radio99,    mikro80, mikro80_state, radio99, "<unknown>", "Radio-99DM",  0)
-COMP( 1987, kristall2, mikro80, 0,      kristall,   mikro80, mikro80_state, mikro80, "<unknown>", "Kristall-2",  0)
+/*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT          COMPANY      FULLNAME       FLAGS */
+COMP( 1983, mikro80,   0,       0,      mikro80,  mikro80, mikro80_state, init_mikro80, "<unknown>", "Mikro-80",    0)
+COMP( 1993, radio99,   mikro80, 0,      radio99,  mikro80, mikro80_state, init_radio99, "<unknown>", "Radio-99DM",  0)
+COMP( 1987, kristall2, mikro80, 0,      kristall, mikro80, mikro80_state, init_mikro80, "<unknown>", "Kristall-2",  0)

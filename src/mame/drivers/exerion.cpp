@@ -195,14 +195,14 @@ void exerion_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram().share("main_ram");
-	map(0x6008, 0x600b).r(this, FUNC(exerion_state::exerion_protection_r));
+	map(0x6008, 0x600b).r(FUNC(exerion_state::exerion_protection_r));
 	map(0x8000, 0x87ff).ram().share("videoram");
 	map(0x8800, 0x887f).ram().share("spriteram");
 	map(0x8880, 0x8bff).ram();
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa800, 0xa800).portr("DSW0");
 	map(0xb000, 0xb000).portr("DSW1");
-	map(0xc000, 0xc000).w(this, FUNC(exerion_state::exerion_videoreg_w));
+	map(0xc000, 0xc000).w(FUNC(exerion_state::exerion_videoreg_w));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xd000, 0xd001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0xd800, 0xd801).w("ay2", FUNC(ay8910_device::address_data_w));
@@ -222,8 +222,8 @@ void exerion_state::sub_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x8000, 0x800c).w(this, FUNC(exerion_state::exerion_video_latch_w));
-	map(0xa000, 0xa000).r(this, FUNC(exerion_state::exerion_video_timing_r));
+	map(0x8000, 0x800c).w(FUNC(exerion_state::exerion_video_latch_w));
+	map(0xa000, 0xa000).r(FUNC(exerion_state::exerion_video_timing_r));
 }
 
 
@@ -333,7 +333,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( exerion )
+static GFXDECODE_START( gfx_exerion )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     256, 64 )
 	GFXDECODE_SCALE( "gfx2", 0, spritelayout,     256, 64, 2, 2 )
@@ -374,42 +374,40 @@ void exerion_state::machine_reset()
 
 MACHINE_CONFIG_START(exerion_state::exerion)
 
-	MCFG_CPU_ADD("maincpu", Z80, EXERION_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, EXERION_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("sub", Z80, EXERION_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("sub", Z80, EXERION_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(EXERION_PIXEL_CLOCK, EXERION_HTOTAL, EXERION_HBEND, EXERION_HBSTART, EXERION_VTOTAL, EXERION_VBEND, EXERION_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(exerion_state, screen_update_exerion)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exerion)
-	MCFG_PALETTE_ADD("palette", 256*3)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(exerion_state, exerion)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exerion);
+	PALETTE(config, m_palette, FUNC(exerion_state::exerion_palette), 256*3, 32);
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ay1", AY8910, EXERION_AY8910_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "ay1", EXERION_AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_SOUND_ADD("ay2", AY8910, EXERION_AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(exerion_state, exerion_porta_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(exerion_state, exerion_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &ay2(AY8910(config, "ay2", EXERION_AY8910_CLOCK));
+	ay2.port_a_read_callback().set(FUNC(exerion_state::exerion_porta_r));
+	ay2.port_b_write_callback().set(FUNC(exerion_state::exerion_portb_w));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(exerion_state::irion)
+void exerion_state::irion(machine_config &config)
+{
 	exerion(config);
-	MCFG_DEVICE_REMOVE("sub")
-MACHINE_CONFIG_END
+	config.device_remove("sub");
+}
 
 
 
@@ -539,29 +537,26 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(exerion_state,exerion)
+void exerion_state::init_exerion()
 {
-	uint32_t oldaddr, newaddr, length;
-	uint8_t *src, *dst;
-
 	/* allocate some temporary space */
 	std::vector<uint8_t> temp(0x10000);
 
 	/* make a temporary copy of the character data */
-	src = &temp[0];
-	dst = memregion("gfx1")->base();
-	length = memregion("gfx1")->bytes();
+	uint8_t *src = &temp[0];
+	uint8_t *dst = memregion("gfx1")->base();
+	uint32_t length = memregion("gfx1")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
 	/* the bits in the ROM are ordered: n8-n7 n6 n5 n4-v2 v1 v0 n3-n2 n1 n0 h2 */
 	/* we want them ordered like this:  n8-n7 n6 n5 n4-n3 n2 n1 n0-v2 v1 v0 h2 */
-	for (oldaddr = 0; oldaddr < length; oldaddr++)
+	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
-		newaddr = ((oldaddr     ) & 0x1f00) |       /* keep n8-n4 */
-					((oldaddr << 3) & 0x00f0) |       /* move n3-n0 */
-					((oldaddr >> 4) & 0x000e) |       /* move v2-v0 */
-					((oldaddr     ) & 0x0001);        /* keep h2 */
+		uint32_t newaddr = ((oldaddr     ) & 0x1f00) |       /* keep n8-n4 */
+						   ((oldaddr << 3) & 0x00f0) |       /* move n3-n0 */
+						   ((oldaddr >> 4) & 0x000e) |       /* move v2-v0 */
+						   ((oldaddr     ) & 0x0001);        /* keep h2 */
 		dst[newaddr] = src[oldaddr];
 	}
 
@@ -574,45 +569,42 @@ DRIVER_INIT_MEMBER(exerion_state,exerion)
 	/* decode the sprites */
 	/* the bits in the ROMs are ordered: n9 n8 n3 n7-n6 n5 n4 v3-v2 v1 v0 n2-n1 n0 h3 h2 */
 	/* we want them ordered like this:   n9 n8 n7 n6-n5 n4 n3 n2-n1 n0 v3 v2-v1 v0 h3 h2 */
-	for (oldaddr = 0; oldaddr < length; oldaddr++)
+	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
-		newaddr = ((oldaddr << 1) & 0x3c00) |       /* move n7-n4 */
-					((oldaddr >> 4) & 0x0200) |       /* move n3 */
-					((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
-					((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
-					((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
+		uint32_t newaddr = ((oldaddr << 1) & 0x3c00) |       /* move n7-n4 */
+						   ((oldaddr >> 4) & 0x0200) |       /* move n3 */
+						   ((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
+						   ((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
+						   ((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
 		dst[newaddr] = src[oldaddr];
 	}
 }
 
 
-DRIVER_INIT_MEMBER(exerion_state,exerionb)
+void exerion_state::init_exerionb()
 {
 	uint8_t *ram = memregion("maincpu")->base();
-	int addr;
 
 	/* the program ROMs have data lines D1 and D2 swapped. Decode them. */
-	for (addr = 0; addr < 0x6000; addr++)
+	for (int addr = 0; addr < 0x6000; addr++)
 		ram[addr] = (ram[addr] & 0xf9) | ((ram[addr] & 2) << 1) | ((ram[addr] & 4) >> 1);
 
 	/* also convert the gfx as in Exerion */
-	DRIVER_INIT_CALL(exerion);
+	init_exerion();
 }
 
-DRIVER_INIT_MEMBER(exerion_state, irion)
+void exerion_state::init_irion()
 {
 	// convert the gfx and cpu roms like in ExerionB
-	DRIVER_INIT_CALL(exerionb);
+	init_exerionb();
 
 	// a further unscramble of gfx2
 	uint8_t *ram = memregion("gfx2")->base();
-	u16 i,j;
-	u8 k;
-	for (i = 0; i < 0x4000; i += 0x400)
+	for (u16 i = 0; i < 0x4000; i += 0x400)
 	{
-		for (j = 0; j < 0x200; j++)
+		for (u16 j = 0; j < 0x200; j++)
 		{
-			k = ram[i+j];
+			u8 k = ram[i+j];
 			ram[i+j] = ram[i+j+0x200];
 			ram[i+j+0x200] = k;
 		}
@@ -627,7 +619,7 @@ DRIVER_INIT_MEMBER(exerion_state, irion)
  *
  *************************************/
 
-GAME( 1983, exerion,  0,       exerion, exerion, exerion_state, exerion,  ROT90, "Jaleco", "Exerion", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exeriont, exerion, exerion, exerion, exerion_state, exerion,  ROT90, "Jaleco (Taito America license)", "Exerion (Taito)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exerionb, exerion, exerion, exerion, exerion_state, exerionb, ROT90, "bootleg", "Exerion (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, irion,    exerion, irion,   exerion, exerion_state, irion,    ROT90, "bootleg", "Irion", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exerion,  0,       exerion, exerion, exerion_state, init_exerion,  ROT90, "Jaleco", "Exerion", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exeriont, exerion, exerion, exerion, exerion_state, init_exerion,  ROT90, "Jaleco (Taito America license)", "Exerion (Taito)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exerionb, exerion, exerion, exerion, exerion_state, init_exerionb, ROT90, "bootleg", "Exerion (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, irion,    exerion, irion,   exerion, exerion_state, init_irion,    ROT90, "bootleg", "Irion", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

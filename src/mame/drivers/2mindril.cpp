@@ -46,10 +46,16 @@ DAC               -26.6860Mhz
 class _2mindril_state : public taito_f3_state
 {
 public:
-	_2mindril_state(const machine_config &mconfig, device_type type, const char *tag)
-		: taito_f3_state(mconfig, type, tag),
-		m_in0(*this, "IN0") { }
+	_2mindril_state(const machine_config &mconfig, device_type type, const char *tag) :
+		taito_f3_state(mconfig, type, tag),
+		m_in0(*this, "IN0")
+	{ }
 
+	void drill(machine_config &config);
+
+	void init_drill();
+
+private:
 	/* input-related */
 	required_ioport m_in0;
 	uint8_t         m_defender_sensor;
@@ -63,7 +69,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sensors_w);
 	DECLARE_READ16_MEMBER(drill_irq_r);
 	DECLARE_WRITE16_MEMBER(drill_irq_w);
-	DECLARE_DRIVER_INIT(drill);
+
 	DECLARE_MACHINE_START(drill);
 	DECLARE_MACHINE_RESET(drill);
 	INTERRUPT_GEN_MEMBER(drill_vblank_irq);
@@ -71,7 +77,6 @@ public:
 	void tile_decode();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
-	void drill(machine_config &config);
 	void drill_map(address_map &map);
 
 	#ifdef UNUSED_FUNCTION
@@ -199,21 +204,21 @@ void _2mindril_state::drill_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x20ffff).ram();
 	map(0x300000, 0x3000ff).ram();
-	map(0x400000, 0x40ffff).rw(this, FUNC(_2mindril_state::f3_spriteram_r), FUNC(_2mindril_state::f3_spriteram_w));
-	map(0x410000, 0x41bfff).rw(this, FUNC(_2mindril_state::f3_pf_data_r), FUNC(_2mindril_state::f3_pf_data_w));
-	map(0x41c000, 0x41dfff).rw(this, FUNC(_2mindril_state::f3_videoram_r), FUNC(_2mindril_state::f3_videoram_w));
-	map(0x41e000, 0x41ffff).rw(this, FUNC(_2mindril_state::f3_vram_r), FUNC(_2mindril_state::f3_vram_w));
-	map(0x420000, 0x42ffff).rw(this, FUNC(_2mindril_state::f3_lineram_r), FUNC(_2mindril_state::f3_lineram_w));
-	map(0x430000, 0x43ffff).rw(this, FUNC(_2mindril_state::f3_pivot_r), FUNC(_2mindril_state::f3_pivot_w));
-	map(0x460000, 0x46000f).w(this, FUNC(_2mindril_state::f3_control_0_w));
-	map(0x460010, 0x46001f).w(this, FUNC(_2mindril_state::f3_control_1_w));
+	map(0x400000, 0x40ffff).rw(FUNC(_2mindril_state::f3_spriteram_r), FUNC(_2mindril_state::f3_spriteram_w));
+	map(0x410000, 0x41bfff).rw(FUNC(_2mindril_state::f3_pf_data_r), FUNC(_2mindril_state::f3_pf_data_w));
+	map(0x41c000, 0x41dfff).rw(FUNC(_2mindril_state::f3_videoram_r), FUNC(_2mindril_state::f3_videoram_w));
+	map(0x41e000, 0x41ffff).rw(FUNC(_2mindril_state::f3_vram_r), FUNC(_2mindril_state::f3_vram_w));
+	map(0x420000, 0x42ffff).rw(FUNC(_2mindril_state::f3_lineram_r), FUNC(_2mindril_state::f3_lineram_w));
+	map(0x430000, 0x43ffff).rw(FUNC(_2mindril_state::f3_pivot_r), FUNC(_2mindril_state::f3_pivot_w));
+	map(0x460000, 0x46000f).w(FUNC(_2mindril_state::f3_control_0_w));
+	map(0x460010, 0x46001f).w(FUNC(_2mindril_state::f3_control_1_w));
 	map(0x500000, 0x501fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x502022, 0x502023).nopw(); //countinously switches between 0 and 2
 	map(0x600000, 0x600007).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write)).umask16(0x00ff);
-	map(0x60000c, 0x60000d).rw(this, FUNC(_2mindril_state::drill_irq_r), FUNC(_2mindril_state::drill_irq_w));
+	map(0x60000c, 0x60000d).rw(FUNC(_2mindril_state::drill_irq_r), FUNC(_2mindril_state::drill_irq_w));
 	map(0x60000e, 0x60000f).ram(); // unknown purpose, zeroed at start-up and nothing else
 	map(0x700000, 0x70000f).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write)).umask16(0xff00);
-	map(0x800000, 0x800001).w(this, FUNC(_2mindril_state::sensors_w));
+	map(0x800000, 0x800001).w(FUNC(_2mindril_state::sensors_w));
 }
 
 static INPUT_PORTS_START( drill )
@@ -312,7 +317,7 @@ static const gfx_layout tile_layout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( 2mindril )
+static GFXDECODE_START( gfx_2mindril )
 	GFXDECODE_ENTRY( nullptr,   0x000000, charlayout,       0x0000, 0x0400>>4 ) /* Dynamically modified */
 	GFXDECODE_ENTRY( "gfx2", 0x000000, tile_layout,      0x0000, 0x2000>>4 ) /* Tiles area */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, spriteram_layout, 0x1000, 0x1000>>4 ) /* Sprites area */
@@ -353,46 +358,44 @@ MACHINE_RESET_MEMBER(_2mindril_state,drill)
 	m_irq_reg = 0;
 }
 
-MACHINE_CONFIG_START(_2mindril_state::drill)
+void _2mindril_state::drill(machine_config &config)
+{
+	M68000(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &_2mindril_state::drill_map);
+	m_maincpu->set_vblank_int("screen", FUNC(_2mindril_state::drill_vblank_irq));
+	//MCFG_DEVICE_PERIODIC_INT_DRIVER(_2mindril_state, drill_device_irq, 60)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_2mindril);
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000 )
-	MCFG_CPU_PROGRAM_MAP(drill_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _2mindril_state,  drill_vblank_irq)
-	//MCFG_CPU_PERIODIC_INT_DRIVER(_2mindril_state, drill_device_irq, 60)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 2mindril)
-
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSW"))
-	MCFG_TC0510NIO_READ_1_CB(READ8(_2mindril_state, arm_pwr_r))
-	MCFG_TC0510NIO_READ_2_CB(READ8(_2mindril_state, sensors_r))
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(_2mindril_state, coins_w))
-	MCFG_TC0510NIO_READ_7_CB(IOPORT("COINS"))
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio.read_0_callback().set_ioport("DSW");
+	tc0510nio.read_1_callback().set(FUNC(_2mindril_state::arm_pwr_r));
+	tc0510nio.read_2_callback().set(FUNC(_2mindril_state::sensors_r));
+	tc0510nio.write_4_callback().set(FUNC(_2mindril_state::coins_w));
+	tc0510nio.read_7_callback().set_ioport("COINS");
 
 	MCFG_MACHINE_START_OVERRIDE(_2mindril_state,drill)
 	MCFG_MACHINE_RESET_OVERRIDE(_2mindril_state,drill)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* inaccurate, same as Taito F3? (needs screen raw params anyway) */
-	MCFG_SCREEN_SIZE(40*8+48*2, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(_2mindril_state, screen_update_f3)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(_2mindril_state, screen_vblank_f3))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* inaccurate, same as Taito F3? (needs screen raw params anyway) */
+	m_screen->set_size(40*8+48*2, 32*8);
+	m_screen->set_visarea(46, 40*8-1 + 46, 24, 24+224-1);
+	m_screen->set_screen_update(FUNC(_2mindril_state::screen_update_f3));
+	m_screen->screen_vblank().set(FUNC(_2mindril_state::screen_vblank_f3));
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x2000);
 
-	MCFG_VIDEO_START_OVERRIDE(_2mindril_state,f3)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(_2mindril_state, irqhandler))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16000000/2));
+	ymsnd.irq_handler().set(FUNC(_2mindril_state::irqhandler));
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
+}
 
 
 ROM_START( 2mindril )
@@ -472,10 +475,10 @@ void _2mindril_state::tile_decode()
 	}
 }
 
-DRIVER_INIT_MEMBER(_2mindril_state,drill)
+void _2mindril_state::init_drill()
 {
-	m_f3_game=TMDRILL;
+	m_f3_game = TMDRILL;
 	tile_decode();
 }
 
-GAME( 1993, 2mindril,    0,        drill,    drill, _2mindril_state,    drill, ROT0,  "Taito", "Two Minute Drill", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)
+GAME( 1993, 2mindril, 0, drill, drill, _2mindril_state, init_drill, ROT0, "Taito", "Two Minute Drill", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)

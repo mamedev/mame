@@ -308,7 +308,8 @@ DEFINE_DEVICE_TYPE(MSX_AUDIO_KB_HXMU901, msx_hxmu901_device, "hxmu901", "Toshiba
 DEFINE_DEVICE_TYPE(MSX_AUDIO_KB_NMS1160, msx_nms1160_device, "nms1160", "Philips NMS-1160")
 
 
-SLOT_INTERFACE_START( msx_audio_keyboards )
-	SLOT_INTERFACE("hxmu901", MSX_AUDIO_KB_HXMU901)
-	SLOT_INTERFACE("nms1160", MSX_AUDIO_KB_NMS1160)
-SLOT_INTERFACE_END
+void msx_audio_keyboards(device_slot_interface &device)
+{
+	device.option_add("hxmu901", MSX_AUDIO_KB_HXMU901);
+	device.option_add("nms1160", MSX_AUDIO_KB_NMS1160);
+}

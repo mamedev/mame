@@ -27,13 +27,15 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void konami_pc(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_konami_pc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void konami_pc(machine_config &config);
 	void konami_pc_map(address_map &map);
 };
 
@@ -68,8 +70,8 @@ void konami_pc_state::machine_reset()
 MACHINE_CONFIG_START(konami_pc_state::konami_pc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 100000000) // not correct, but why bother?
-	MCFG_CPU_PROGRAM_MAP(konami_pc_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 100000000) // not correct, but why bother?
+	MCFG_DEVICE_PROGRAM_MAP(konami_pc_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -97,4 +99,4 @@ ROM_START( otomedius )
 	DISK_IMAGE( "otomedius", 0, SHA1(9283f8b7cd747be7b8e7321953adbf6cbe926f25) )
 ROM_END
 
-GAME( 2007, otomedius,  0,   konami_pc, konami_pc, konami_pc_state,  0, ROT0, "Konami", "Otomedius (ver GGG:J:A:A:2008041801)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2007, otomedius,  0,   konami_pc, konami_pc, konami_pc_state, empty_init, ROT0, "Konami", "Otomedius (ver GGG:J:A:A:2008041801)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

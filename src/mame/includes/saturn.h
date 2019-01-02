@@ -1,22 +1,29 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
+#ifndef MAME_INCLUDES_SATURN_H
+#define MAME_INCLUDES_SATURN_H
 
-#include "machine/timer.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/sega_scu.h"
-#include "machine/smpc.h"
-#include "cpu/sh/sh2.h"
+#pragma once
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "machine/315-5881_crypt.h"
-#include "machine/315-5838_317-0229_comp.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/sh/sh2.h"
 
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
-#include "debugger.h"
 
+#include "machine/315-5881_crypt.h"
+#include "machine/315-5838_317-0229_comp.h"
+#include "machine/sega_scu.h"
+#include "machine/smpc.h"
+#include "machine/timer.h"
+
+#include "sound/scsp.h"
+
+#include "debugger.h"
+#include "emupal.h"
 #include "screen.h"
 
 class saturn_state : public driver_device
@@ -32,6 +39,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_slave(*this, "slave"),
 			m_audiocpu(*this, "audiocpu"),
+			m_scsp(*this, "scsp"),
 			m_smpc_hle(*this, "smpc"),
 			m_scu(*this, "scu"),
 			m_gfxdecode(*this, "gfxdecode"),
@@ -40,6 +48,20 @@ public:
 	{
 	}
 
+	DECLARE_WRITE8_MEMBER(scsp_irq);
+
+	// SMPC HLE delegates
+	DECLARE_WRITE_LINE_MEMBER(master_sh2_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(master_sh2_nmi_w);
+	DECLARE_WRITE_LINE_MEMBER(slave_sh2_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_68k_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(system_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(system_halt_w);
+	DECLARE_WRITE_LINE_MEMBER(dot_select_w);
+
+	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
+
+protected:
 	required_region_ptr<uint32_t> m_rom;
 	required_shared_ptr<uint32_t> m_workram_l;
 	required_shared_ptr<uint32_t> m_workram_h;
@@ -102,6 +124,7 @@ public:
 	required_device<sh2_device> m_maincpu;
 	required_device<sh2_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
+	required_device<scsp_device> m_scsp;
 	required_device<smpc_hle_device> m_smpc_hle;
 	required_device<sega_scu_device> m_scu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -124,7 +147,7 @@ public:
 	DECLARE_WRITE32_MEMBER(saturn_sinit_w);
 	DECLARE_READ8_MEMBER(saturn_backupram_r);
 	DECLARE_WRITE8_MEMBER(saturn_backupram_w);
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+
 	int m_scsp_last_line;
 
 	DECLARE_READ16_MEMBER ( saturn_vdp1_regs_r );
@@ -256,8 +279,8 @@ public:
 
 	void refresh_palette_data( void );
 	inline int stv_vdp2_window_process(int x,int y);
-	void stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y);
-	void stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y);
+	void stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y);
+	void stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y);
 	int get_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t win_num);
 	int stv_vdp2_apply_window_on_layer(rectangle &cliprect);
 
@@ -343,6 +366,7 @@ public:
 		uint8_t   linescroll_interval;
 		uint32_t  linescroll_table_address;
 		uint8_t   vertical_linescroll_enable;
+		uint8_t   vertical_cell_scroll_enable;
 		uint8_t   linezoom_enable;
 
 		uint8_t  plane_size;
@@ -414,21 +438,9 @@ public:
 
 	} stv_rbg_cache_data;
 
-	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
-
 //  DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
 //  DECLARE_READ16_MEMBER(scudsp_dma_r);
 //  DECLARE_WRITE16_MEMBER(scudsp_dma_w);
-
-	// SMPC HLE delegates
-	DECLARE_WRITE_LINE_MEMBER(master_sh2_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(master_sh2_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(slave_sh2_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_68k_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(system_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(system_halt_w);
-	DECLARE_WRITE_LINE_MEMBER(dot_select_w);
-
 
 //  void debug_scudma_command(int ref, const std::vector<std::string> &params);
 //  void debug_scuirq_command(int ref, const std::vector<std::string> &params);
@@ -449,4 +461,6 @@ public:
 #define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
 
 
-GFXDECODE_EXTERN( stv );
+extern gfx_decode_entry const gfx_stv[];
+
+#endif // MAME_INCLUDES_SATURN_H

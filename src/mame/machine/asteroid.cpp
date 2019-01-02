@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/atari_vg.h"
 #include "video/avgdvg.h"
 #include "includes/asteroid.h"
 
@@ -19,21 +18,29 @@ INTERRUPT_GEN_MEMBER(asteroid_state::asteroid_interrupt)
 {
 	/* Turn off interrupts if self-test is enabled */
 	if (!(ioport("IN0")->read() & 0x80))
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(asteroid_state::asterock_interrupt)
 {
 	/* Turn off interrupts if self-test is enabled */
 	if ((ioport("IN0")->read() & 0x80))
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(asteroid_state::llander_interrupt)
 {
 	/* Turn off interrupts if self-test is enabled */
 	if (ioport("IN0")->read() & 0x02)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+WRITE_LINE_MEMBER(asteroid_state::cocktail_inv_w)
+{
+	// Inverter circuit is only hooked up for Cocktail Asteroids
+	int flip = state && m_cocktail->read();
+	m_dvg->set_flip_x(flip);
+	m_dvg->set_flip_y(flip);
 }
 
 READ8_MEMBER(asteroid_state::asteroid_IN0_r)
@@ -105,39 +112,6 @@ READ8_MEMBER(asteroid_state::asteroid_DSW1_r)
 }
 
 
-WRITE8_MEMBER(asteroid_state::asteroid_bank_switch_w)
-{
-	// 76------  not used
-	// --5-----  coin counter right coin
-	// ---4----  coin counter center coin
-	// ----3---  coin counter left coin
-	// -----2--  ramsel
-	// ------1-  start2 led
-	// -------0  start1 led
-
-	start1_led_w(BIT(data, 0));
-	start2_led_w(BIT(data, 1));
-
-	int bank = BIT(data, 2);
-	m_ram1->set_entry(bank);
-	m_ram2->set_entry(bank);
-
-	machine().bookkeeping().coin_counter_w(0, BIT(data, 3));
-	machine().bookkeeping().coin_counter_w(1, BIT(data, 4));
-	machine().bookkeeping().coin_counter_w(2, BIT(data, 5));
-}
-
-
-WRITE_LINE_MEMBER(asteroid_state::start1_led_w)
-{
-	output().set_led_value(0, state ? 0 : 1);
-}
-
-WRITE_LINE_MEMBER(asteroid_state::start2_led_w)
-{
-	output().set_led_value(1, state ? 0 : 1);
-}
-
 void asteroid_state::machine_start()
 {
 	/* configure RAM banks if present (not on llander) */
@@ -157,7 +131,9 @@ void asteroid_state::machine_start()
 
 void asteroid_state::machine_reset()
 {
-	m_dvg->reset_w(m_maincpu->space(AS_PROGRAM), 0, 0);
+	m_dvg->reset_w(machine().dummy_space(), 0, 0);
+	if (m_earom.found())
+		earom_control_w(machine().dummy_space(), 0, 0);
 
 	/* reset RAM banks if present */
 	if (m_ram1.target() != nullptr)

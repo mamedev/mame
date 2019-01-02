@@ -35,7 +35,7 @@ void s11a_state::s11a_main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("nvram");
 	map(0x2100, 0x2103).mirror(0x00fc).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
-	map(0x2200, 0x2200).mirror(0x01ff).w(this, FUNC(s11a_state::sol3_w)); // solenoids
+	map(0x2200, 0x2200).mirror(0x01ff).w(FUNC(s11a_state::sol3_w)); // solenoids
 	map(0x2400, 0x2403).mirror(0x03fc).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
 	map(0x2800, 0x2803).mirror(0x03fc).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
 	map(0x2c00, 0x2c03).mirror(0x03fc).rw(m_pia2c, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
@@ -47,7 +47,7 @@ void s11a_state::s11a_main_map(address_map &map)
 void s11a_state::s11a_audio_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x0800).ram();
-	map(0x1000, 0x1fff).w(this, FUNC(s11a_state::bank_w));
+	map(0x1000, 0x1fff).w(FUNC(s11a_state::bank_w));
 	map(0x2000, 0x2003).mirror(0x0ffc).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8000, 0xbfff).bankr("bank0");
 	map(0xc000, 0xffff).bankr("bank1");
@@ -58,7 +58,7 @@ void s11a_state::s11a_bg_map(address_map &map)
 	map(0x0000, 0x07ff).mirror(0x1800).ram();
 	map(0x2000, 0x2001).mirror(0x1ffe).rw(m_ym, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x4000, 0x4003).mirror(0x1ffc).rw(m_pia40, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x7800, 0x7fff).w(this, FUNC(s11a_state::bgbank_w));
+	map(0x7800, 0x7fff).w(FUNC(s11a_state::bgbank_w));
 	map(0x8000, 0xffff).bankr("bgbank");
 }
 
@@ -166,7 +166,7 @@ WRITE8_MEMBER( s11a_state::bgbank_w )
 	membank("bgbank")->set_entry(data & 0x03);
 }
 
-DRIVER_INIT_MEMBER( s11a_state, s11a )
+void s11a_state::init_s11a()
 {
 	uint8_t *BGROM = memregion("bgcpu")->base();
 	membank("bgbank")->configure_entries(0, 4, &BGROM[0x10000], 0x8000);
@@ -176,104 +176,104 @@ DRIVER_INIT_MEMBER( s11a_state, s11a )
 
 MACHINE_CONFIG_START(s11a_state::s11a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(s11a_main_map)
+	MCFG_DEVICE_ADD("maincpu", M6808, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(s11a_main_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s11a_state, s11a)
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_s11a)
+	config.set_default_layout(layout_s11a);
 
 	/* Sound */
 	genpin_audio(config);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia21", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s11_state, sound_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, sound_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, sol2_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s11_state, pia21_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia21_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	PIA6821(config, m_pia21, 0);
+	m_pia21->readpa_handler().set(FUNC(s11_state::sound_r));
+	m_pia21->writepa_handler().set(FUNC(s11_state::sound_w));
+	m_pia21->writepb_handler().set(FUNC(s11_state::sol2_w));
+	m_pia21->ca2_handler().set(FUNC(s11_state::pia21_ca2_w));
+	m_pia21->cb2_handler().set(FUNC(s11_state::pia21_cb2_w));
+	m_pia21->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia21->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia24", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, lamp0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, lamp1_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia24_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	PIA6821(config, m_pia24, 0);
+	m_pia24->writepa_handler().set(FUNC(s11_state::lamp0_w));
+	m_pia24->writepb_handler().set(FUNC(s11_state::lamp1_w));
+	m_pia24->cb2_handler().set(FUNC(s11_state::pia24_cb2_w));
+	m_pia24->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia24->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia28", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s11_state, pia28_w7_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11a_state, dig0_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, dig1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s11_state, pia28_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia28_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	PIA6821(config, m_pia28, 0);
+	m_pia28->readpa_handler().set(FUNC(s11_state::pia28_w7_r));
+	m_pia28->writepa_handler().set(FUNC(s11a_state::dig0_w));
+	m_pia28->writepb_handler().set(FUNC(s11_state::dig1_w));
+	m_pia28->ca2_handler().set(FUNC(s11_state::pia28_ca2_w));
+	m_pia28->cb2_handler().set(FUNC(s11_state::pia28_cb2_w));
+	m_pia28->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia28->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia2c", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, pia2c_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, pia2c_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	PIA6821(config, m_pia2c, 0);
+	m_pia2c->writepa_handler().set(FUNC(s11_state::pia2c_pa_w));
+	m_pia2c->writepb_handler().set(FUNC(s11_state::pia2c_pb_w));
+	m_pia2c->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia2c->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia30", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s11_state, switch_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, switch_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia30_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	PIA6821(config, m_pia30, 0);
+	m_pia30->readpa_handler().set(FUNC(s11_state::switch_r));
+	m_pia30->writepb_handler().set(FUNC(s11_state::switch_w));
+	m_pia30->cb2_handler().set(FUNC(s11_state::pia30_cb2_w));
+	m_pia30->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia30->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_DEVICE_ADD("pia34", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, pia34_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, pia34_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia34_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(s11_state, pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(s11_state, pia_irq))
+	PIA6821(config, m_pia34, 0);
+	m_pia34->writepa_handler().set(FUNC(s11_state::pia34_pa_w));
+	m_pia34->writepb_handler().set(FUNC(s11_state::pia34_pb_w));
+	m_pia34->cb2_handler().set(FUNC(s11_state::pia34_cb2_w));
+	m_pia34->irqa_handler().set(FUNC(s11_state::pia_irq));
+	m_pia34->irqb_handler().set(FUNC(s11_state::pia_irq));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* Add the soundcard */
-	MCFG_CPU_ADD("audiocpu", M6802, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(s11a_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6802, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(s11a_audio_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SPEAKER(config, "speaker").front_center();
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SPEAKER_STANDARD_MONO("speech")
-	MCFG_SOUND_ADD("hc55516", HC55516, 0)
+	SPEAKER(config, "speech").front_center();
+	MCFG_DEVICE_ADD("hc55516", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speech", 0.50)
 
-	MCFG_DEVICE_ADD("pias", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(s11_state, sound_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(s11_state, sound_w))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pia40_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
+	PIA6821(config, m_pias, 0);
+	m_pias->readpa_handler().set(FUNC(s11_state::sound_r));
+	m_pias->writepa_handler().set(FUNC(s11_state::sound_w));
+	m_pias->writepb_handler().set("dac", FUNC(dac_byte_interface::data_w));
+	m_pias->cb2_handler().set(FUNC(s11_state::pia40_cb2_w));
+	m_pias->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
+	m_pias->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
 
 	/* Add the background music card */
-	MCFG_CPU_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
-	MCFG_CPU_PROGRAM_MAP(s11a_bg_map)
+	MCFG_DEVICE_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
+	MCFG_DEVICE_PROGRAM_MAP(s11a_bg_map)
 
-	MCFG_SPEAKER_STANDARD_MONO("bg")
-	MCFG_YM2151_ADD("ym2151", XTAL(3'579'545))
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(s11a_state, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+	SPEAKER(config, "bg").front_center();
+	YM2151(config, m_ym, XTAL(3'579'545));
+	m_ym->irq_handler().set(FUNC(s11a_state::ym2151_irq_w));
+	m_ym->add_route(ALL_OUTPUTS, "bg", 0.50);
 
-	MCFG_SOUND_ADD("dac1", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
+	MCFG_DEVICE_ADD("dac1", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.25)
 
-	MCFG_DEVICE_ADD("pia40", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac1", dac_byte_interface, write))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(s11_state, pia40_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(s11_state, pias_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(s11_state, pias_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("bgcpu", M6809_FIRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("bgcpu", INPUT_LINE_NMI))
+	PIA6821(config, m_pia40, 0);
+	m_pia40->writepa_handler().set("dac1", FUNC(dac_byte_interface::data_w));
+	m_pia40->writepb_handler().set(FUNC(s11_state::pia40_pb_w));
+	m_pia40->ca2_handler().set(FUNC(s11_state::pias_ca2_w));
+	m_pia40->cb2_handler().set(FUNC(s11_state::pias_cb2_w));
+	m_pia40->irqa_handler().set_inputline("bgcpu", M6809_FIRQ_LINE);
+	m_pia40->irqb_handler().set_inputline("bgcpu", INPUT_LINE_NMI);
 MACHINE_CONFIG_END
 
 /*------------------------
@@ -459,15 +459,15 @@ ROM_START(pb_p4)
 	ROM_LOAD("pbot_u19.l1", 0x18000, 0x8000, CRC(40eb4e9f) SHA1(07b0557b35599a2dd5aa66a306fbbe8f50eed998))
 ROM_END
 
-GAME(1987, f14_l1,   0,       s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F-14 Tomcat (L-1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, f14_p3,   f14_l1,  s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F-14 Tomcat (P-3)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, f14_p4,   f14_l1,  s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F-14 Tomcat (P-4)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, f14_p5,   f14_l1,  s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F-14 Tomcat (P-5)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, fire_l3,  0,       s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Fire! (L-3)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, fire_l2,  fire_l3, s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Fire! (L-2)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, milln_l3, 0,       s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Millionaire (L-3)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l5,    0,       s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Pin-Bot (L-5)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l1,    pb_l5,   s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Pin-Bot (L-1)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l2,    pb_l5,   s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Pin-Bot (L-2)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_l3,    pb_l5,   s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Pin-Bot (L-3)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, pb_p4,    pb_l5,   s11a, s11a, s11a_state, s11a, ROT0, "Williams", "Pin-Bot (P-4)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, f14_l1,   0,       s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "F-14 Tomcat (L-1)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, f14_p3,   f14_l1,  s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "F-14 Tomcat (P-3)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, f14_p4,   f14_l1,  s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "F-14 Tomcat (P-4)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, f14_p5,   f14_l1,  s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "F-14 Tomcat (P-5)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, fire_l3,  0,       s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Fire! (L-3)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, fire_l2,  fire_l3, s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Fire! (L-2)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, milln_l3, 0,       s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Millionaire (L-3)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l5,    0,       s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-5)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l1,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-1)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l2,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-2)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_l3,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-3)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, pb_p4,    pb_l5,   s11a, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (P-4)",     MACHINE_IS_SKELETON_MECHANICAL)

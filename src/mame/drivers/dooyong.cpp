@@ -57,7 +57,7 @@ because one of interrupt sources is _dead_ (timer never restarts).
 
 Music tempo and audio pitch depends on (unknown) YM clocks.
 Sound cpu runs currently at 8 MHz to avoid jerky music when there's (too)
-many sfx scheduled.
+many SFX scheduled.
 
 Currently there's some workaround implemented - both YM lines are OR-ed to
 allow nested (and in fact - delayed) interrupts. It's temporary solution
@@ -65,7 +65,7 @@ until we find real PCB and verify clocks and trace int lines.
 
 Pollux:
 Many (all? at least pollux, primella and flying tiger) use some kind of
-banked palette ram. Bit 1 at address 0xf008 controls banking (both palettes
+banked palette RAM. Bit 1 at address 0xf008 controls banking (both palettes
 are almost identical, except for much darker BG layer colors).
 
 
@@ -77,11 +77,13 @@ are almost identical, except for much darker BG layer colors).
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "machine/timer.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -97,10 +99,8 @@ protected:
 		, m_audiocpu(*this, "audiocpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_bg(*this, "bg")
-		, m_bg2(*this, "bg2")
-		, m_fg(*this, "fg")
-		, m_fg2(*this, "fg2")
+		, m_bg(*this, "bg%u", 1U)
+		, m_fg(*this, "fg%u", 1U)
 	{
 	}
 
@@ -111,10 +111,8 @@ protected:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_device<dooyong_rom_tilemap_device> m_bg;
-	optional_device<dooyong_rom_tilemap_device> m_bg2;
-	optional_device<dooyong_rom_tilemap_device> m_fg;
-	optional_device<dooyong_rom_tilemap_device> m_fg2;
+	optional_device_array<dooyong_rom_tilemap_device, 2> m_bg;
+	optional_device_array<dooyong_rom_tilemap_device, 2> m_fg;
 };
 
 class dooyong_z80_state : public dooyong_state
@@ -124,6 +122,7 @@ public:
 		: dooyong_state(mconfig, type, tag)
 		, m_tx(*this, "tx")
 		, m_spriteram(*this, "spriteram")
+		, m_mainbank(*this, "mainbank")
 	{
 	}
 
@@ -147,7 +146,7 @@ protected:
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w)
 	{
-		membank("bank1")->set_entry(data & 0x07);
+		m_mainbank->set_entry(data & 0x07);
 		if (data & 0xf8) popmessage("bankswitch %02x",data);
 	}
 
@@ -198,7 +197,7 @@ protected:
 
 	DECLARE_MACHINE_START(cpu_z80)
 	{
-		membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
+		m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 	}
 
 	DECLARE_VIDEO_START(bluehawk)
@@ -208,7 +207,7 @@ protected:
 	DECLARE_VIDEO_START(flytiger)
 	{
 		m_paletteram_flytiger = make_unique_clear<uint8_t[]>(0x1000);
-		save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
+		save_pointer(NAME(m_paletteram_flytiger), 0x1000);
 
 		m_palette_bank = 0;
 
@@ -238,6 +237,8 @@ protected:
 
 	required_device<dooyong_ram_tilemap_device> m_tx;
 	optional_device<buffered_spriteram8_device> m_spriteram;
+
+	required_memory_bank m_mainbank;
 };
 
 class dooyong_z80_ym2203_state : public dooyong_z80_state
@@ -255,15 +256,7 @@ public:
 protected:
 	DECLARE_WRITE8_MEMBER(lastday_ctrl_w);
 	DECLARE_WRITE8_MEMBER(pollux_ctrl_w);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_1);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_2);
 	DECLARE_READ8_MEMBER(unk_r);
-
-	DECLARE_MACHINE_RESET(sound_ym2203)
-	{
-		m_interrupt_line_1 = 0;
-		m_interrupt_line_2 = 0;
-	}
 
 	uint32_t screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -273,8 +266,6 @@ protected:
 	{
 		/* Register for save/restore */
 		save_item(NAME(m_sprites_disabled));
-		save_item(NAME(m_interrupt_line_1));
-		save_item(NAME(m_interrupt_line_2));
 	}
 
 	DECLARE_VIDEO_START(gulfstrm)
@@ -283,21 +274,17 @@ protected:
 
 		/* Register for save/restore */
 		save_item(NAME(m_palette_bank));
-		save_item(NAME(m_interrupt_line_1));
-		save_item(NAME(m_interrupt_line_2));
 	}
 
 	DECLARE_VIDEO_START(pollux)
 	{
 		m_paletteram_flytiger = make_unique_clear<uint8_t[]>(0x1000);
-		save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
+		save_pointer(NAME(m_paletteram_flytiger), 0x1000);
 
 		m_palette_bank = 0;
 
 		/* Register for save/restore */
 		save_item(NAME(m_palette_bank));
-		save_item(NAME(m_interrupt_line_1));
-		save_item(NAME(m_interrupt_line_2));
 	}
 
 	void sound_2203(machine_config &config);
@@ -308,9 +295,6 @@ protected:
 
 	void lastday_sound_map(address_map &map);
 	void pollux_sound_map(address_map &map);
-
-	int m_interrupt_line_1 = 0;
-	int m_interrupt_line_2 = 0;
 };
 
 
@@ -378,8 +362,6 @@ class popbingo_state : public dooyong_68k_state
 public:
 	popbingo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dooyong_68k_state(mconfig, type, tag)
-		, m_bg_bitmap()
-		, m_bg2_bitmap()
 		, m_screen(*this, "screen")
 	{
 	}
@@ -391,8 +373,8 @@ protected:
 
 	virtual void video_start() override
 	{
-		m_screen->register_screen_bitmap(m_bg_bitmap);
-		m_screen->register_screen_bitmap(m_bg2_bitmap);
+		m_screen->register_screen_bitmap(m_bg_bitmap[0]);
+		m_screen->register_screen_bitmap(m_bg_bitmap[1]);
 
 		/* Register for save/restore */
 		save_item(NAME(m_bg2_priority)); // Not used atm
@@ -401,8 +383,7 @@ protected:
 	void popbingo_map(address_map &map);
 
 private:
-	bitmap_ind16 m_bg_bitmap;
-	bitmap_ind16 m_bg2_bitmap;
+	bitmap_ind16 m_bg_bitmap[2];
 
 	required_device<screen_device> m_screen;
 };
@@ -442,8 +423,8 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 	if (m_paletteram_flytiger) m_palette_bank = BIT(data, 1);
 	if (last_palbank != m_palette_bank)
 	{
-		m_bg->set_palette_bank(m_palette_bank << 6);
-		m_fg->set_palette_bank(m_palette_bank << 6);
+		m_bg[0]->set_palette_bank(m_palette_bank << 6);
+		m_fg[0]->set_palette_bank(m_palette_bank << 6);
 		m_tx->set_palette_bank(m_palette_bank << 6);
 	}
 
@@ -457,7 +438,7 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
 {
 	/* bits 0-2 select ROM bank */
-	membank("bank1")->set_entry(data & 0x07);
+	m_mainbank->set_entry(data & 0x07);
 
 	/* bit 3 disables tx layer */
 	m_tx_pri = data & 0x08;
@@ -483,8 +464,8 @@ WRITE8_MEMBER(dooyong_z80_state::flytiger_ctrl_w)
 	m_palette_bank = BIT(data, 3);
 	if (last_palbank != m_palette_bank)
 	{
-		m_bg->set_palette_bank(m_palette_bank << 6);
-		m_fg->set_palette_bank(m_palette_bank << 6);
+		m_bg[0]->set_palette_bank(m_palette_bank << 6);
+		m_fg[0]->set_palette_bank(m_palette_bank << 6);
 		m_tx->set_palette_bank(m_palette_bank << 6);
 	}
 
@@ -587,8 +568,8 @@ uint32_t dooyong_z80_ym2203_state::screen_update_lastday(screen_device &screen, 
 	/* Text layer is offset on this machine */
 	m_tx->set_scrolly(flip_screen() ? -8 : 8);
 
-	m_bg->draw(screen, bitmap, cliprect, 0, 1);
-	m_fg->draw(screen, bitmap, cliprect, 0, 2);
+	m_bg[0]->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg[0]->draw(screen, bitmap, cliprect, 0, 2);
 	m_tx->draw(screen, bitmap, cliprect, 0, 4);
 
 	if (!m_sprites_disabled)
@@ -605,8 +586,8 @@ uint32_t dooyong_z80_ym2203_state::screen_update_gulfstrm(screen_device &screen,
 	/* Text layer is offset on this machine */
 	m_tx->set_scrolly(flip_screen() ? -8 : 8);
 
-	m_bg->draw(screen, bitmap, cliprect, 0, 1);
-	m_fg->draw(screen, bitmap, cliprect, 0, 2);
+	m_bg[0]->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg[0]->draw(screen, bitmap, cliprect, 0, 2);
 	m_tx->draw(screen, bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen, bitmap, cliprect, SPRITE_12BIT);
@@ -619,8 +600,8 @@ uint32_t dooyong_z80_ym2203_state::screen_update_pollux(screen_device &screen, b
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
-	m_bg->draw(screen, bitmap, cliprect, 0, 1);
-	m_fg->draw(screen, bitmap, cliprect, 0, 2);
+	m_bg[0]->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg[0]->draw(screen, bitmap, cliprect, 0, 2);
 	m_tx->draw(screen, bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen, bitmap, cliprect, SPRITE_12BIT | SPRITE_HEIGHT);
@@ -635,13 +616,13 @@ uint32_t dooyong_z80_state::screen_update_flytiger(screen_device &screen, bitmap
 
 	if (m_flytiger_pri)
 	{
-		m_fg->draw(screen, bitmap, cliprect, 0, 1);
-		m_bg->draw(screen, bitmap, cliprect, 0, 2);
+		m_fg[0]->draw(screen, bitmap, cliprect, 0, 1);
+		m_bg[0]->draw(screen, bitmap, cliprect, 0, 2);
 	}
 	else
 	{
-		m_bg->draw(screen, bitmap, cliprect, 0, 1);
-		m_fg->draw(screen, bitmap, cliprect, 0, 2);
+		m_bg[0]->draw(screen, bitmap, cliprect, 0, 1);
+		m_fg[0]->draw(screen, bitmap, cliprect, 0, 2);
 	}
 	m_tx->draw(screen, bitmap, cliprect, 0, 4);
 
@@ -656,9 +637,9 @@ uint32_t dooyong_z80_state::screen_update_bluehawk(screen_device &screen, bitmap
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
-	m_bg->draw(screen, bitmap, cliprect, 0, 1);
-	m_fg->draw(screen, bitmap, cliprect, 0, 2);
-	m_fg2->draw(screen, bitmap, cliprect, 0, 4);
+	m_bg[0]->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg[0]->draw(screen, bitmap, cliprect, 0, 2);
+	m_fg[1]->draw(screen, bitmap, cliprect, 0, 4);
 	m_tx->draw(screen, bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen, bitmap, cliprect, SPRITE_12BIT | SPRITE_HEIGHT | SPRITE_YSHIFT_BLUEHAWK);
@@ -670,9 +651,9 @@ uint32_t dooyong_z80_state::screen_update_primella(screen_device &screen, bitmap
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	m_bg->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg[0]->draw(screen, bitmap, cliprect, 0, 0);
 	if (m_tx_pri) m_tx->draw(screen, bitmap, cliprect, 0, 0);
-	m_fg->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg[0]->draw(screen, bitmap, cliprect, 0, 0);
 	if (!m_tx_pri) m_tx->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -710,7 +691,7 @@ void dooyong_68k_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 			int const color = buffered_spriteram[offs+7] & 0x000f;
 			//TODO: This priority mechanism works for known games, but seems a bit strange.
 			//Are we missing something?  (The obvious spare palette bit isn't it.)
-			int const pri = (((color == 0x00) || (color == 0x0f)) ? 0xfc : 0xf0);
+			int const pri = GFX_PMASK_4 | (((color == 0x00) || (color == 0x0f)) ? GFX_PMASK_2 : 0);
 			int const width = buffered_spriteram[offs+1] & 0x000f;
 			int const height = (buffered_spriteram[offs+1] & 0x00f0) >> 4;
 
@@ -750,10 +731,10 @@ uint32_t rshark_state::screen_update_rshark(screen_device &screen, bitmap_ind16 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
-	m_bg->draw(screen, bitmap, cliprect, 0, 1);
-	m_bg2->draw(screen, bitmap, cliprect, 0, (m_bg2_priority ? 2 : 1));
-	m_fg->draw(screen, bitmap, cliprect, 0, 2);
-	m_fg2->draw(screen, bitmap, cliprect, 0, 2);
+	m_bg[0]->draw(screen, bitmap, cliprect, 0, 1);
+	m_bg[1]->draw(screen, bitmap, cliprect, 0, (m_bg2_priority ? 2 : 1));
+	m_fg[0]->draw(screen, bitmap, cliprect, 0, 2);
+	m_fg[1]->draw(screen, bitmap, cliprect, 0, 2);
 
 	draw_sprites(screen, bitmap, cliprect);
 
@@ -766,18 +747,18 @@ uint32_t popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_in
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
-	m_bg_bitmap.fill(m_palette->black_pen(), cliprect);
-	m_bg->draw(screen, m_bg_bitmap, cliprect, 0, 1);
+	m_bg_bitmap[0].fill(m_palette->black_pen(), cliprect);
+	m_bg[0]->draw(screen, m_bg_bitmap[0], cliprect, 0, 1);
 
-	m_bg2_bitmap.fill(m_palette->black_pen(), cliprect);
-	m_bg2->draw(screen, m_bg2_bitmap, cliprect, 0, 1);
+	m_bg_bitmap[1].fill(m_palette->black_pen(), cliprect);
+	m_bg[1]->draw(screen, m_bg_bitmap[1], cliprect, 0, 1);
 
-	for (int y = cliprect.min_y; cliprect.max_y >= y; y++)
+	for (int y = cliprect.top(); cliprect.bottom() >= y; y++)
 	{
-		uint16_t const *const bg_src(&m_bg_bitmap.pix16(y, 0));
-		uint16_t const *const bg2_src(&m_bg2_bitmap.pix16(y, 0));
+		uint16_t const *const bg_src(&m_bg_bitmap[0].pix16(y, 0));
+		uint16_t const *const bg2_src(&m_bg_bitmap[1].pix16(y, 0));
 		uint16_t *const dst(&bitmap.pix16(y, 0));
-		for (int x = cliprect.min_x; cliprect.max_x >= x; x++)
+		for (int x = cliprect.left(); cliprect.right() >= x; x++)
 			dst[x] = 0x100U | (bg_src[x] << 4) | bg2_src[x];
 	}
 
@@ -797,19 +778,19 @@ uint32_t popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_in
 void dooyong_z80_ym2203_state::lastday_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xc007).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xc008, 0xc00f).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0x8000, 0xbfff).bankr(m_mainbank);
+	map(0xc000, 0xc007).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xc008, 0xc00f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xc010, 0xc010).portr("SYSTEM");
-	map(0xc010, 0xc010).w(this, FUNC(dooyong_z80_ym2203_state::lastday_ctrl_w));   /* coin counter, flip screen */
+	map(0xc010, 0xc010).w(FUNC(dooyong_z80_ym2203_state::lastday_ctrl_w));   /* coin counter, flip screen */
 	map(0xc011, 0xc011).portr("P1");
-	map(0xc011, 0xc011).w(this, FUNC(dooyong_z80_ym2203_state::bankswitch_w));
+	map(0xc011, 0xc011).w(FUNC(dooyong_z80_ym2203_state::bankswitch_w));
 	map(0xc012, 0xc012).portr("P2");
 	map(0xc012, 0xc012).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc013, 0xc013).portr("DSWA");
 	map(0xc014, 0xc014).portr("DSWB");
 	map(0xc800, 0xcfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xd000, 0xdfff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
+	map(0xd000, 0xdfff).rw(FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xffff).ram().share("spriteram");
 }
@@ -817,59 +798,59 @@ void dooyong_z80_ym2203_state::lastday_map(address_map &map)
 void dooyong_z80_ym2203_state::pollux_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram().share("spriteram");
-	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
-	map(0xf000, 0xf000).portr("DSWA").w(this, FUNC(dooyong_z80_ym2203_state::bankswitch_w));
+	map(0xe000, 0xefff).rw(FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
+	map(0xf000, 0xf000).portr("DSWA").w(FUNC(dooyong_z80_ym2203_state::bankswitch_w));
 	map(0xf001, 0xf001).portr("DSWB");
 	map(0xf002, 0xf002).portr("P1");
 	map(0xf003, 0xf003).portr("P2");
 	map(0xf004, 0xf004).portr("SYSTEM");
-	map(0xf008, 0xf008).w(this, FUNC(dooyong_z80_ym2203_state::pollux_ctrl_w));    /* coin counter, flip screen */
+	map(0xf008, 0xf008).w(FUNC(dooyong_z80_ym2203_state::pollux_ctrl_w));    /* coin counter, flip screen */
 	map(0xf010, 0xf010).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xf018, 0xf01f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xf020, 0xf027).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xf800, 0xffff).rw(this, FUNC(dooyong_z80_ym2203_state::paletteram_flytiger_r), FUNC(dooyong_z80_ym2203_state::paletteram_flytiger_w));
+	map(0xf018, 0xf01f).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xf020, 0xf027).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xf800, 0xffff).rw(FUNC(dooyong_z80_ym2203_state::paletteram_flytiger_r), FUNC(dooyong_z80_ym2203_state::paletteram_flytiger_w));
 }
 
 void dooyong_z80_ym2203_state::gulfstrm_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram().share("spriteram");
-	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
+	map(0xe000, 0xefff).rw(FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
 	map(0xf000, 0xf000).portr("DSWA");
-	map(0xf000, 0xf000).w(this, FUNC(dooyong_z80_ym2203_state::bankswitch_w));
+	map(0xf000, 0xf000).w(FUNC(dooyong_z80_ym2203_state::bankswitch_w));
 	map(0xf001, 0xf001).portr("DSWB");
 	map(0xf002, 0xf002).portr("P2");
 	map(0xf003, 0xf003).portr("P1");
 	map(0xf004, 0xf004).portr("SYSTEM");
-	map(0xf008, 0xf008).w(this, FUNC(dooyong_z80_ym2203_state::pollux_ctrl_w));    /* coin counter, flip screen */
+	map(0xf008, 0xf008).w(FUNC(dooyong_z80_ym2203_state::pollux_ctrl_w));    /* coin counter, flip screen */
 	map(0xf010, 0xf010).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xf018, 0xf01f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xf020, 0xf027).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xf018, 0xf01f).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xf020, 0xf027).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xf800, 0xffff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
 void dooyong_z80_state::bluehawk_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xc000).portr("DSWA");
-	map(0xc000, 0xc000).w(this, FUNC(dooyong_z80_state::flip_screen_w));
+	map(0xc000, 0xc000).w(FUNC(dooyong_z80_state::flip_screen_w));
 	map(0xc001, 0xc001).portr("DSWB");
 	map(0xc002, 0xc002).portr("P1");
 	map(0xc003, 0xc003).portr("P2");
 	map(0xc004, 0xc004).portr("SYSTEM");
-	map(0xc008, 0xc008).w(this, FUNC(dooyong_z80_state::bankswitch_w));
+	map(0xc008, 0xc008).w(FUNC(dooyong_z80_state::bankswitch_w));
 	map(0xc010, 0xc010).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc018, 0xc01f).w(m_fg2, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xc040, 0xc047).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xc048, 0xc04f).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xc018, 0xc01f).w(m_fg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xc040, 0xc047).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xc048, 0xc04f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xc800, 0xcfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xd000, 0xdfff).rw(this, FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
+	map(0xd000, 0xdfff).rw(FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
 	map(0xe000, 0xefff).ram().share("spriteram");
 	map(0xf000, 0xffff).ram();
 }
@@ -877,40 +858,40 @@ void dooyong_z80_state::bluehawk_map(address_map &map)
 void dooyong_z80_state::flytiger_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram().share("spriteram");
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xe000).portr("P1");
-	map(0xe000, 0xe000).w(this, FUNC(dooyong_z80_state::bankswitch_w));
+	map(0xe000, 0xe000).w(FUNC(dooyong_z80_state::bankswitch_w));
 	map(0xe002, 0xe002).portr("P2");
 	map(0xe004, 0xe004).portr("SYSTEM");
 	map(0xe006, 0xe006).portr("DSWA");
 	map(0xe008, 0xe008).portr("DSWB");
-	map(0xe010, 0xe010).w(this, FUNC(dooyong_z80_state::flytiger_ctrl_w));  /* coin counter, flip screen */
+	map(0xe010, 0xe010).w(FUNC(dooyong_z80_state::flytiger_ctrl_w));  /* coin counter, flip screen */
 	map(0xe020, 0xe020).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xe030, 0xe037).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xe040, 0xe047).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xe800, 0xefff).rw(this, FUNC(dooyong_z80_state::paletteram_flytiger_r), FUNC(dooyong_z80_state::paletteram_flytiger_w));
-	map(0xf000, 0xffff).rw(this, FUNC(dooyong_z80_state::lastday_tx_r), FUNC(dooyong_z80_state::lastday_tx_w));
+	map(0xe030, 0xe037).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xe040, 0xe047).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xe800, 0xefff).rw(FUNC(dooyong_z80_state::paletteram_flytiger_r), FUNC(dooyong_z80_state::paletteram_flytiger_w));
+	map(0xf000, 0xffff).rw(FUNC(dooyong_z80_state::lastday_tx_r), FUNC(dooyong_z80_state::lastday_tx_w));
 }
 
 void dooyong_z80_state::primella_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xd3ff).ram(); /* what is this? looks like a palette? scratchpad RAM maybe? */
-	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
+	map(0xe000, 0xefff).rw(FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
 	map(0xf000, 0xf7ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf800, 0xf800).portr("DSWA");
-	map(0xf800, 0xf800).w(this, FUNC(dooyong_z80_state::primella_ctrl_w));  /* bank switch, flip screen etc */
+	map(0xf800, 0xf800).w(FUNC(dooyong_z80_state::primella_ctrl_w));  /* bank switch, flip screen etc */
 	map(0xf810, 0xf810).portr("DSWB");
 	map(0xf810, 0xf810).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xf820, 0xf820).portr("P1");
 	map(0xf830, 0xf830).portr("P2");
 	map(0xf840, 0xf840).portr("SYSTEM");
-	map(0xfc00, 0xfc07).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xfc08, 0xfc0f).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xfc00, 0xfc07).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xfc08, 0xfc0f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 }
 
 void rshark_state::rshark_map(address_map &map)
@@ -923,13 +904,13 @@ void rshark_state::rshark_map(address_map &map)
 	map(0x0c0002, 0x0c0003).portr("DSW");
 	map(0x0c0004, 0x0c0005).portr("P1_P2");
 	map(0x0c0006, 0x0c0007).portr("SYSTEM");
-	map(0x0c4000, 0x0c400f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
-	map(0x0c4010, 0x0c401f).w(m_bg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0c4000, 0x0c400f).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0c4010, 0x0c401f).w(m_bg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 	map(0x0c8000, 0x0c8fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0c0013, 0x0c0013).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x0c0014, 0x0c0015).w(this, FUNC(rshark_state::ctrl_w));    /* flip screen + unknown stuff */
-	map(0x0cc000, 0x0cc00f).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
-	map(0x0cc010, 0x0cc01f).w(m_fg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0c0014, 0x0c0015).w(FUNC(rshark_state::ctrl_w));    /* flip screen + unknown stuff */
+	map(0x0cc000, 0x0cc00f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0cc010, 0x0cc01f).w(m_fg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 }
 
 void rshark_state::superx_map(address_map &map)
@@ -942,13 +923,13 @@ void rshark_state::superx_map(address_map &map)
 	map(0x080002, 0x080003).portr("DSW");
 	map(0x080004, 0x080005).portr("P1_P2");
 	map(0x080006, 0x080007).portr("SYSTEM");
-	map(0x084000, 0x08400f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
-	map(0x084010, 0x08401f).w(m_bg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x084000, 0x08400f).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x084010, 0x08401f).w(m_bg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 	map(0x088000, 0x088fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x080013, 0x080013).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x080014, 0x080015).w(this, FUNC(rshark_state::ctrl_w));    /* flip screen + unknown stuff */
-	map(0x08c000, 0x08c00f).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
-	map(0x08c010, 0x08c01f).w(m_fg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x080014, 0x080015).w(FUNC(rshark_state::ctrl_w));    /* flip screen + unknown stuff */
+	map(0x08c000, 0x08c00f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x08c010, 0x08c01f).w(m_fg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 }
 
 void popbingo_state::popbingo_map(address_map &map)
@@ -962,13 +943,13 @@ void popbingo_state::popbingo_map(address_map &map)
 	map(0x0c0004, 0x0c0005).portr("P1_P2");
 	map(0x0c0006, 0x0c0007).portr("SYSTEM");
 	map(0x0c0013, 0x0c0013).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x0c0014, 0x0c0015).w(this, FUNC(popbingo_state::ctrl_w));
+	map(0x0c0014, 0x0c0015).w(FUNC(popbingo_state::ctrl_w));
 	map(0x0c0018, 0x0c001b).nopw(); // ?
-	map(0x0c4000, 0x0c400f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
-	map(0x0c4010, 0x0c401f).w(m_bg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0c4000, 0x0c400f).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0c4010, 0x0c401f).w(m_bg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 	map(0x0c8000, 0x0c8fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
-	//map(0x08c000, 0x08c00f) AM_DEVWRITE8("fg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff) apparently not present
-	//map(0x08c010, 0x08c01f) AM_DEVWRITE8("fg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff) apparently not present
+	//map(0x08c000, 0x08c00f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff); apparently not present
+	//map(0x08c010, 0x08c01f).w(m_fg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff); apparently not present
 	map(0x0dc000, 0x0dc01f).ram(); // registers of some kind?
 }
 
@@ -1334,10 +1315,10 @@ const gfx_layout lastday_charlayout =
 	8,8,
 	RGN_FRAC(1,2),
 	4,
-	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8
+	{ STEP2(0,4), STEP2(RGN_FRAC(1,2), 4) },
+	{ STEP4(0,1), STEP4(8,1) },
+	{ STEP8(0,2*8) },
+	8*8*2
 };
 
 const gfx_layout bluehawk_charlayout =
@@ -1345,10 +1326,10 @@ const gfx_layout bluehawk_charlayout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
+	8*8*4
 };
 
 const gfx_layout tilelayout =
@@ -1356,16 +1337,15 @@ const gfx_layout tilelayout =
 	32,32,
 	RGN_FRAC(1,1),
 	4,
-	{ 0*4, 1*4, 2*4, 3*4 },
-	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
-			32*32+0, 32*32+1, 32*32+2, 32*32+3, 32*32+16+0, 32*32+16+1, 32*32+16+2, 32*32+16+3,
-			2*32*32+0, 2*32*32+1, 2*32*32+2, 2*32*32+3, 2*32*32+16+0, 2*32*32+16+1, 2*32*32+16+2, 2*32*32+16+3,
-			3*32*32+0, 3*32*32+1, 3*32*32+2, 3*32*32+3, 3*32*32+16+0, 3*32*32+16+1, 3*32*32+16+2, 3*32*32+16+3 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32,
-			16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32,
-			24*32, 25*32, 26*32, 27*32, 28*32, 29*32, 30*32, 31*32 },
-	512*8
+	{ STEP4(0,4) },
+	{
+		STEP4(0,1), STEP4(16,1),
+		STEP4(4*8*32,1), STEP4(4*8*32+16,1),
+		STEP4(2*4*8*32,1), STEP4(2*4*8*32+16,1),
+		STEP4(3*4*8*32,1), STEP4(3*4*8*32+16,1)
+	},
+	{ STEP32(0,4*8) },
+	32*32*4
 };
 
 const gfx_layout spritelayout =
@@ -1373,11 +1353,9 @@ const gfx_layout spritelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0*4, 1*4, 2*4, 3*4 },
-	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
-			16*32+0, 16*32+1, 16*32+2, 16*32+3, 16*32+16+0, 16*32+16+1, 16*32+16+2, 16*32+16+3 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP4(0,4) },
+	{ STEP4(0,1), STEP4(16,1), STEP4(4*8*16,1), STEP4(4*8*16+16,1) },
+	{ STEP16(0,4*8) },
 	128*8
 };
 
@@ -1386,29 +1364,27 @@ const gfx_layout rshark_spritelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			16*32+0*4, 16*32+1*4, 16*32+2*4, 16*32+3*4, 16*32+4*4, 16*32+5*4, 16*32+6*4, 16*32+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP4(0,1) },
+	{ STEP8(0,4), STEP8(4*8*16,4) },
+	{ STEP16(0,4*8) },
 	128*8
 };
 
-GFXDECODE_START( lastday )
+GFXDECODE_START( gfx_lastday )
 	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16+64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16+64 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16+64 )
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,         512, 16+64 )
 GFXDECODE_END
 
-GFXDECODE_START( flytiger )
+GFXDECODE_START( gfx_flytiger )
 	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16+64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16+64 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16+64 )
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,         512, 32+64 )
 GFXDECODE_END
 
-GFXDECODE_START( bluehawk )
+GFXDECODE_START( gfx_bluehawk )
 	GFXDECODE_ENTRY( "gfx1", 0, bluehawk_charlayout,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16 )
@@ -1416,14 +1392,14 @@ GFXDECODE_START( bluehawk )
 	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,           0, 16 )
 GFXDECODE_END
 
-GFXDECODE_START( primella )
+GFXDECODE_START( gfx_primella )
 	GFXDECODE_ENTRY( "gfx1", 0, bluehawk_charlayout,  0, 16 )
 	/* no sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         768, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         512, 16 )
 GFXDECODE_END
 
-GFXDECODE_START( rshark )
+GFXDECODE_START( gfx_rshark )
 	/* no chars */
 	GFXDECODE_ENTRY( "gfx1", 0, rshark_spritelayout,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16 )
@@ -1432,7 +1408,7 @@ GFXDECODE_START( rshark )
 	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,      1024, 16 )
 GFXDECODE_END
 
-GFXDECODE_START( popbingo )
+GFXDECODE_START( gfx_popbingo )
 	/* no chars */
 	GFXDECODE_ENTRY( "gfx1", 0, rshark_spritelayout,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,           0,  1 )
@@ -1445,18 +1421,6 @@ READ8_MEMBER(dooyong_z80_ym2203_state::unk_r)
 	return 0;
 }
 
-WRITE_LINE_MEMBER(dooyong_z80_ym2203_state::irqhandler_2203_1)
-{
-	m_interrupt_line_1=state;
-	m_audiocpu->set_input_line(0, (m_interrupt_line_1 | m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(dooyong_z80_ym2203_state::irqhandler_2203_2)
-{
-	m_interrupt_line_2=state;
-	m_audiocpu->set_input_line(0, (m_interrupt_line_1 | m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /***************************************************************************
 
     Machine driver(s)
@@ -1465,65 +1429,66 @@ WRITE_LINE_MEMBER(dooyong_z80_ym2203_state::irqhandler_2203_2)
 
 
 MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dooyong_z80_ym2203_state, irqhandler_2203_1))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(dooyong_z80_ym2203_state, unk_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ym2", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dooyong_z80_ym2203_state, irqhandler_2203_2))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(dooyong_z80_ym2203_state, unk_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym1.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
+	ym1.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
+
+	ym2203_device &ym2(YM2203(config, "ym2", 1500000));
+	ym2.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
+	ym2.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_YM2151_ADD("ymsnd", 3.579'545_MHz_XTAL)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579'545_MHz_XTAL));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_OKIM6295_ADD("oki", 1_MHz_XTAL, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1_MHz_XTAL, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_state::sound_2151_4mhz)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_YM2151_ADD("ymsnd", 16_MHz_XTAL/4)  /* 4MHz (16MHz/4 for most, 8Mhz/2 for Super-X) */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL/4));  /* 4MHz (16MHz/4 for most, 8Mhz/2 for Super-X) */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_OKIM6295_ADD("oki", 16_MHz_XTAL/16, PIN7_HIGH)  /* 1MHz (16MHz/16 for most, 8Mhz/8 for Super-X) */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 16_MHz_XTAL/16, okim6295_device::PIN7_HIGH)  /* 1MHz (16MHz/16 for most, 8Mhz/8 for Super-X) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8MHz verified for Last Day / D-day */
-	MCFG_CPU_PROGRAM_MAP(lastday_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8MHz verified for Last Day / D-day */
+	MCFG_DEVICE_PROGRAM_MAP(lastday_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4MHz verified for Last Day / D-day */
-	MCFG_CPU_PROGRAM_MAP(lastday_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4MHz verified for Last Day / D-day */
+	MCFG_DEVICE_PROGRAM_MAP(lastday_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
-	MCFG_MACHINE_RESET_OVERRIDE(dooyong_z80_ym2203_state, sound_ym2203)
-
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1531,51 +1496,51 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_lastday)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 2, "gfx5", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 3, "gfx6", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lastday);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 2, "gfx5", 0x00000);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 3, "gfx6", 0x00000);
+	m_fg[0]->set_transparent_pen(15);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, lastday)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym1", YM2203, 16_MHz_XTAL/4)  /* 4MHz verified for Last Day / D-day */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dooyong_z80_ym2203_state, irqhandler_2203_1))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(dooyong_z80_ym2203_state, unk_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ym2", YM2203, 16_MHz_XTAL/4)  /* 4MHz verified for Last Day / D-day */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dooyong_z80_ym2203_state, irqhandler_2203_2))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(dooyong_z80_ym2203_state, unk_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", 16_MHz_XTAL/4));  /* 4MHz verified for Last Day / D-day */
+	ym1.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
+	ym1.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
+	ym2203_device &ym2(YM2203(config, "ym2", 16_MHz_XTAL/4));  /* 4MHz verified for Last Day / D-day */
+	ym2.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
+	ym2.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8000000)   /* ??? */
-	MCFG_CPU_PROGRAM_MAP(gulfstrm_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8000000)   /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(gulfstrm_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)  /* ??? */
-	MCFG_CPU_PROGRAM_MAP(lastday_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)  /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(lastday_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
-	MCFG_MACHINE_RESET_OVERRIDE(dooyong_z80_ym2203_state, sound_ym2203)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1583,16 +1548,15 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_gulfstrm)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 2, "gfx5", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 3, "gfx6", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lastday);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 2, "gfx5", 0x00000);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 3, "gfx6", 0x00000);
+	m_fg[0]->set_transparent_pen(15);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, gulfstrm)
 
@@ -1603,18 +1567,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8Mhz */
-	MCFG_CPU_PROGRAM_MAP(pollux_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(pollux_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4Mhz */
-	MCFG_CPU_PROGRAM_MAP(pollux_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(pollux_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
-	MCFG_MACHINE_RESET_OVERRIDE(dooyong_z80_ym2203_state, sound_ym2203)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1622,16 +1585,15 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_pollux)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
-	MCFG_PALETTE_ADD("palette", 1024*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 2, "gfx5", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 3, "gfx6", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lastday);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024*2);
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 2, "gfx5", 0x00000);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 3, "gfx6", 0x00000);
+	m_fg[0]->set_transparent_pen(15);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, pollux)
 
@@ -1642,17 +1604,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8000000)   /* ??? */
-	MCFG_CPU_PROGRAM_MAP(bluehawk_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8000000)   /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(bluehawk_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* ??? */
-	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1660,18 +1622,17 @@ MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_bluehawk)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bluehawk)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 2, "gfx3", 0x3c000)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 3, "gfx4", 0x3c000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg2", "gfxdecode", 4, "gfx5", 0x1c000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bluehawk);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 2, "gfx3", 0x3c000);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 3, "gfx4", 0x3c000);
+	m_fg[0]->set_transparent_pen(15);
+	DOOYONG_ROM_TILEMAP(config, m_fg[1], m_gfxdecode, 4, "gfx5", 0x1c000);
+	m_fg[1]->set_transparent_pen(15);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, bluehawk)
 
@@ -1682,17 +1643,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8MHz */
-	MCFG_CPU_PROGRAM_MAP(flytiger_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(flytiger_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4Mhz */
-	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1700,17 +1661,16 @@ MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_flytiger)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flytiger)
-	MCFG_PALETTE_ADD("palette", 1024*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 2, "gfx3", 0x3c000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 3, "gfx4", 0x3c000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_flytiger);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024*2);
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 2, "gfx3", 0x3c000);
+	m_bg[0]->set_transparent_pen(15);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 3, "gfx4", 0x3c000);
+	m_fg[0]->set_transparent_pen(15);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, flytiger)
 
@@ -1721,12 +1681,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dooyong_z80_state::primella)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8MHz */
-	MCFG_CPU_PROGRAM_MAP(primella_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(primella_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL/4)   /* 4MHz */
-	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)   /* 4MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
@@ -1737,17 +1697,16 @@ MACHINE_CONFIG_START(dooyong_z80_state::primella)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 0*8, 32*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_primella)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", primella)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 1, "gfx2", -0x4000)
-	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(10)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 2, "gfx3", -0x4000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(10)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_primella);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 1, "gfx2", -0x4000);
+	m_bg[0]->set_primella_code_bits(10);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 2, "gfx3", -0x4000);
+	m_fg[0]->set_transparent_pen(15);
+	m_fg[0]->set_primella_code_bits(10);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, primella)
 
@@ -1771,14 +1730,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(dooyong_68k_state::scanline)
 MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, 8_MHz_XTAL)  // 8MHz measured on Super-X
+	MCFG_DEVICE_ADD("maincpu", M68000, 8_MHz_XTAL)  // 8MHz measured on Super-X
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", rshark_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8_MHz_XTAL/2)  // 4MHz measured on Super-X
-	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL/2)  // 4MHz measured on Super-X
+	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	// video hardware
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1786,20 +1745,19 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rshark_state, screen_update_rshark)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rshark)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rshark)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_RSHARK_ROM_TILEMAP_ADD("bg", "gfxdecode", 4, "gfx5", 0x00000, "gfx6", 0x60000)
-	MCFG_RSHARK_ROM_TILEMAP_ADD("bg2", "gfxdecode", 3, "gfx4", 0x00000, "gfx6", 0x40000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
-	MCFG_RSHARK_ROM_TILEMAP_ADD("fg", "gfxdecode", 2, "gfx3", 0x00000, "gfx6", 0x20000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
-	MCFG_RSHARK_ROM_TILEMAP_ADD("fg2", "gfxdecode", 1, "gfx2", 0x00000, "gfx6", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
+	RSHARK_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 4, "gfx5", 0x00000, "gfx6", 0x60000);
+	RSHARK_ROM_TILEMAP(config, m_bg[1], m_gfxdecode, 3, "gfx4", 0x00000, "gfx6", 0x40000);
+	m_bg[1]->set_transparent_pen(15);
+	RSHARK_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 2, "gfx3", 0x00000, "gfx6", 0x20000);
+	m_fg[0]->set_transparent_pen(15);
+	RSHARK_ROM_TILEMAP(config, m_fg[1], m_gfxdecode, 1, "gfx2", 0x00000, "gfx6", 0x00000);
+	m_fg[1]->set_transparent_pen(15);
 
 	// sound hardware
 	sound_2151_4mhz(config);
@@ -1808,29 +1766,29 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(rshark_state::rshark)
 	dooyong_68k(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rshark_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rshark_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rshark_state::superx)
 	dooyong_68k(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(superx_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(superx_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(popbingo_state::popbingo)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, 20_MHz_XTAL/2)   // 10MHz measured
-	MCFG_CPU_PROGRAM_MAP(popbingo_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL/2)   // 10MHz measured
+	MCFG_DEVICE_PROGRAM_MAP(popbingo_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", popbingo_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL/4)     // 4MHz measured
-	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)     // 4MHz measured
+	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	// video hardware
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1838,17 +1796,16 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(popbingo_state, screen_update_popbingo)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(m_spriteram, buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popbingo)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popbingo)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 1, "gfx2", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(11)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg2", "gfxdecode", 2, "gfx3", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(11)
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 1, "gfx2", 0x00000);
+	m_bg[0]->set_primella_code_bits(11);
+	DOOYONG_ROM_TILEMAP(config, m_bg[1], m_gfxdecode, 2, "gfx3", 0x00000);
+	m_bg[1]->set_primella_code_bits(11);
 
 	// sound hardware
 	sound_2151_4mhz(config);
@@ -2787,35 +2744,35 @@ ROM_END
 
 /* The differences between the two lastday sets are only in the sound program and graphics. The main program is the same. */
 
-GAME( 1990, lastday,  0,        lastday,  lastday,  dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "The Last Day (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, lastdaya, lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "The Last Day (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddaydoo,  lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Chulgyeok D-Day (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lastday,   0,        lastday,  lastday,  dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "The Last Day (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lastdaya,  lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "The Last Day (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddaydoo,   lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Chulgyeok D-Day (Korea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (set 1)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrma,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (set 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrmb,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (set 3)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrmm,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrmk,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (Korea)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrm,  0,        gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrma, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (set 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrmb, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (set 3)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrmm, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrmk, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (Korea)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, pollux,   0,        pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Pollux (set 1)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1991, polluxa,  pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Pollux (set 2)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1991, polluxa2, pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Pollux (set 3)",       MACHINE_SUPPORTS_SAVE ) // Original Dooyong Board distributed by TCH
-GAME( 1991, polluxn,  pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong (NTC / Atlus license)", "Pollux (Japan, NTC license, distributed by Atlus)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pollux,    0,        pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Pollux (set 1)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1991, polluxa,   pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Pollux (set 2)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1991, polluxa2,  pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Pollux (set 3)",       MACHINE_SUPPORTS_SAVE ) // Original Dooyong Board distributed by TCH
+GAME( 1991, polluxn,   pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong (NTC / Atlus license)", "Pollux (Japan, NTC license, distributed by Atlus)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, flytiger, 0,        flytiger, flytiger, dooyong_z80_state,        0, ROT270, "Dooyong",                       "Flying Tiger (set 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1992, flytigera,flytiger, flytiger, flytiger, dooyong_z80_state,        0, ROT270, "Dooyong",                       "Flying Tiger (set 2)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1992, flytiger,  0,        flytiger, flytiger, dooyong_z80_state,        empty_init, ROT270, "Dooyong",                       "Flying Tiger (set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1992, flytigera, flytiger, flytiger, flytiger, dooyong_z80_state,        empty_init, ROT270, "Dooyong",                       "Flying Tiger (set 2)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, bluehawk, 0,        bluehawk, bluehawk, dooyong_z80_state,        0, ROT270, "Dooyong",                       "Blue Hawk",            MACHINE_SUPPORTS_SAVE )
-GAME( 1993, bluehawkn,bluehawk, bluehawk, bluehawk, dooyong_z80_state,        0, ROT270, "Dooyong (NTC license)",         "Blue Hawk (NTC)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1993, bluehawk,  0,        bluehawk, bluehawk, dooyong_z80_state,        empty_init, ROT270, "Dooyong",                       "Blue Hawk",            MACHINE_SUPPORTS_SAVE )
+GAME( 1993, bluehawkn, bluehawk, bluehawk, bluehawk, dooyong_z80_state,        empty_init, ROT270, "Dooyong (NTC license)",         "Blue Hawk (NTC)",      MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, sadari,   0,        primella, sadari,   dooyong_z80_state,        0, ROT0,   "Dooyong (NTC license)",         "Sadari",  MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sadari,    0,        primella, sadari,   dooyong_z80_state,        empty_init, ROT0,   "Dooyong (NTC license)",         "Sadari",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, gundl94,  0,        primella, primella, dooyong_z80_state,        0, ROT0,   "Dooyong",                       "Gun Dealer '94",       MACHINE_SUPPORTS_SAVE )
-GAME( 1994, primella, gundl94,  primella, primella, dooyong_z80_state,        0, ROT0,   "Dooyong (NTC license)",         "Primella",             MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gundl94,   0,        primella, primella, dooyong_z80_state,        empty_init, ROT0,   "Dooyong",                       "Gun Dealer '94",       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, primella,  gundl94,  primella, primella, dooyong_z80_state,        empty_init, ROT0,   "Dooyong (NTC license)",         "Primella",             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, superx,   0,        superx,   superx,   rshark_state,             0, ROT270, "Dooyong (NTC license)",         "Super-X (NTC)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1994, superxm,  superx,   superx,   superx,   rshark_state,             0, ROT270, "Dooyong (Mitchell license)",    "Super-X (Mitchell)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, superx,    0,        superx,   superx,   rshark_state,             empty_init, ROT270, "Dooyong (NTC license)",         "Super-X (NTC)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1994, superxm,   superx,   superx,   superx,   rshark_state,             empty_init, ROT270, "Dooyong (Mitchell license)",    "Super-X (Mitchell)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, rshark,   0,        rshark,   rshark,   rshark_state,             0, ROT270, "Dooyong",                       "R-Shark",              MACHINE_SUPPORTS_SAVE )
+GAME( 1995, rshark,    0,        rshark,   rshark,   rshark_state,             empty_init, ROT270, "Dooyong",                       "R-Shark",              MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, popbingo, 0,        popbingo, popbingo, popbingo_state,           0, ROT0,   "Dooyong",                       "Pop Bingo",            MACHINE_SUPPORTS_SAVE )
+GAME( 1996, popbingo,  0,        popbingo, popbingo, popbingo_state,           empty_init, ROT0,   "Dooyong",                       "Pop Bingo",            MACHINE_SUPPORTS_SAVE )

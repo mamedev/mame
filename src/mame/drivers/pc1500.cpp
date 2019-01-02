@@ -16,6 +16,7 @@
 #include "cpu/lh5801/lh5801.h"
 #include "machine/lh5810.h"
 #include "machine/upd1990a.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "pc1500.lh"
@@ -34,7 +35,13 @@ public:
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
+	void pc1500(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	required_device<lh5801_cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
 
 	required_shared_ptr<uint8_t> m_lcd_data;
@@ -44,7 +51,6 @@ public:
 	uint8_t m_kb_matrix;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( kb_matrix_w );
 	DECLARE_READ8_MEMBER( port_a_r );
@@ -52,8 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER( port_c_w );
 
 	DECLARE_READ8_MEMBER( pc1500_kb_r );
-	DECLARE_PALETTE_INIT(pc1500);
-	void pc1500(machine_config &config);
+	void pc1500_palette(palette_device &palette) const;
 	void pc1500_mem(address_map &map);
 	void pc1500_mem_io(address_map &map);
 };
@@ -261,39 +266,39 @@ READ8_MEMBER( pc1500_state::port_a_r )
 	return 0xff;
 }
 
-PALETTE_INIT_MEMBER(pc1500_state, pc1500)
+void pc1500_state::pc1500_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-MACHINE_CONFIG_START(pc1500_state::pc1500)
-	MCFG_CPU_ADD("maincpu", LH5801, 1300000)            //1.3 MHz
-	MCFG_CPU_PROGRAM_MAP( pc1500_mem )
-	MCFG_CPU_IO_MAP( pc1500_mem_io )
-	MCFG_LH5801_IN(READ8(pc1500_state,pc1500_kb_r))
+void pc1500_state::pc1500(machine_config &config)
+{
+	LH5801(config, m_maincpu, 1300000); // 1.3 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc1500_state::pc1500_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc1500_state::pc1500_mem_io);
+	m_maincpu->in_func().set(FUNC(pc1500_state::pc1500_kb_r));
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
-	MCFG_SCREEN_UPDATE_DRIVER(pc1500_state, screen_update)
-	MCFG_SCREEN_SIZE(156, 8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 156-1, 0, 7-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
+	screen.set_screen_update(FUNC(pc1500_state::screen_update));
+	screen.set_size(156, 8);
+	screen.set_visarea(0, 156-1, 0, 7-1);
+	screen.set_palette("palette");
 
-	MCFG_DEFAULT_LAYOUT(layout_pc1500)
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pc1500_state, pc1500)
+	config.set_default_layout(layout_pc1500);
+	PALETTE(config, "palette", FUNC(pc1500_state::pc1500_palette), 2);
 
-	MCFG_DEVICE_ADD("lh5810", LH5810, 0)
-	MCFG_LH5810_PORTA_R_CB(READ8(pc1500_state, port_a_r))
-	MCFG_LH5810_PORTA_W_CB(WRITE8(pc1500_state, kb_matrix_w))
-	MCFG_LH5810_PORTB_R_CB(READ8(pc1500_state, port_b_r))
-	MCFG_LH5810_PORTC_W_CB(WRITE8(pc1500_state, port_c_w))
-	MCFG_LH5810_OUT_INT_CB(INPUTLINE("maincpu", LH5801_LINE_MI))
+	lh5810_device &ioports(LH5810(config, "lh5810"));
+	ioports.porta_r().set(FUNC(pc1500_state::port_a_r));
+	ioports.porta_w().set(FUNC(pc1500_state::kb_matrix_w));
+	ioports.portb_r().set(FUNC(pc1500_state::port_b_r));
+	ioports.portc_w().set(FUNC(pc1500_state::port_c_w));
+	ioports.out_int().set_inputline("maincpu", LH5801_LINE_MI);
 
-	MCFG_UPD1990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
-MACHINE_CONFIG_END
+	UPD1990A(config, m_rtc);
+}
 
 
 ROM_START( pc1500 )
@@ -303,5 +308,5 @@ ROM_START( pc1500 )
 	ROM_LOAD( "ce-150.rom", 0x0000, 0x2000, CRC(8fa1df6d) SHA1(a3aa02a641a46c27c0d4c0dc025b0dbe9b5b79c8))
 ROM_END
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE INPUT   STATE          INIT  COMPANY  FULLNAME                FLAGS
-COMP( 198?, pc1500, 0,      0,       pc1500, pc1500, pc1500_state,  0,    "Sharp", "Pocket Computer 1500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT        COMPANY  FULLNAME                FLAGS
+COMP( 198?, pc1500, 0,      0,      pc1500, pc1500, pc1500_state, empty_init, "Sharp", "Pocket Computer 1500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -37,9 +37,9 @@ DEFINE_DEVICE_TYPE(I8008, i8008_device, "i8008", "Intel 8008")
 i8008_device::i8008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, I8008, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 14)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 5)
 	, m_program(nullptr)
-	, m_direct(nullptr)
+	, m_cache(nullptr)
 {
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -53,7 +53,7 @@ void i8008_device::device_start()
 {
 	// find address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 	m_io = &space(AS_IO);
 
 	// save state
@@ -601,7 +601,7 @@ inline void i8008_device::pop_stack()
 
 inline uint8_t i8008_device::rop()
 {
-	uint8_t retVal = m_direct->read_byte(GET_PC.w.l);
+	uint8_t retVal = m_cache->read_byte(GET_PC.w.l);
 	GET_PC.w.l = (GET_PC.w.l + 1) & 0x3fff;
 	m_PC = GET_PC;
 	return retVal;
@@ -639,7 +639,7 @@ inline void i8008_device::set_reg(uint8_t reg, uint8_t val)
 
 inline uint8_t i8008_device::arg()
 {
-	uint8_t retVal = m_direct->read_byte(GET_PC.w.l);
+	uint8_t retVal = m_cache->read_byte(GET_PC.w.l);
 	GET_PC.w.l = (GET_PC.w.l + 1) & 0x3fff;
 	m_PC = GET_PC;
 	return retVal;

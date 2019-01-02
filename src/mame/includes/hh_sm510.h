@@ -9,6 +9,7 @@
 #ifndef MAME_INCLUDES_HH_SM510_H
 #define MAME_INCLUDES_HH_SM510_H
 
+#include "cpu/sm510/sm510.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
@@ -28,7 +29,7 @@ public:
 	{ }
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<sm510_base_device> m_maincpu;
 	optional_ioport_array<8> m_inp_matrix; // max 8
 	output_finder<16, 16, 4> m_out_x;
 	optional_device<speaker_sound_device> m_speaker;
@@ -37,6 +38,7 @@ public:
 	u16 m_inp_mux;                  // multiplexed inputs mask
 	int m_inp_lines;                // number of input mux columns
 	int m_inp_fixed;                // input column fixed to GND/Vdd (-1 means none)
+	u8 m_speaker_data;              // speaker output data(if more than 1 bit)
 	u8 m_s;                         // MCU S output pins
 	u8 m_r;                         // MCU R output pins
 
@@ -52,6 +54,8 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(piezo_r1_w);
 	virtual DECLARE_WRITE8_MEMBER(piezo_r2_w);
 	virtual DECLARE_WRITE8_MEMBER(piezo_input_w);
+	virtual DECLARE_WRITE8_MEMBER(piezo2bit_r1_w);
+	virtual DECLARE_WRITE8_MEMBER(piezo2bit_input_w);
 
 	// display common
 	int m_display_wait;             // lcd segment on/off-delay in milliseconds (default 33ms)

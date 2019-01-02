@@ -5,20 +5,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_TC0140SYT_MASTER_CPU(_tag) \
-	downcast<tc0140syt_device &>(*device).set_master_tag("^" _tag);
-
-#define MCFG_TC0140SYT_SLAVE_CPU(_tag) \
-	downcast<tc0140syt_device &>(*device).set_slave_tag("^" _tag);
-
-#define MCFG_PC060HA_MASTER_CPU(_tag) MCFG_TC0140SYT_MASTER_CPU(_tag)
-#define MCFG_PC060HA_SLAVE_CPU(_tag) MCFG_TC0140SYT_SLAVE_CPU(_tag)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -29,8 +15,8 @@ class tc0140syt_device : public device_t
 public:
 	tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_master_tag(const char *tag) { m_mastercpu.set_tag(tag); }
-	void set_slave_tag(const char *tag)  { m_slavecpu.set_tag(tag); }
+	template <typename T> void set_master_tag(T &&tag) { m_mastercpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_slave_tag(T &&tag) { m_slavecpu.set_tag(std::forward<T>(tag)); }
 
 	// MASTER (4-bit bus) control functions
 	DECLARE_WRITE8_MEMBER( master_port_w );

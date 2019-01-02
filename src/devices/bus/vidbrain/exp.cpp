@@ -188,8 +188,9 @@ void videobrain_expansion_slot_device::bo_w(address_space &space, offs_t offset,
 #include "money_minder.h"
 #include "timeshare.h"
 
-SLOT_INTERFACE_START( vidbrain_expansion_cards )
-	SLOT_INTERFACE_INTERNAL("standard", VB_STD)
-	SLOT_INTERFACE_INTERNAL("moneyminder", VB_MONEY_MINDER)
-	SLOT_INTERFACE_INTERNAL("timeshare", VB_TIMESHARE)
-SLOT_INTERFACE_END
+void vidbrain_expansion_cards(device_slot_interface &device)
+{
+	device.option_add_internal("standard", VB_STD);
+	device.option_add_internal("moneyminder", VB_MONEY_MINDER);
+	device.option_add_internal("timeshare", VB_TIMESHARE);
+}

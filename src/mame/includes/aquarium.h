@@ -1,17 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_INCLUDES_AQUARIUM_H
+#define MAME_INCLUDES_AQUARIUM_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/mb3773.h"
 #include "sound/okim6295.h"
 #include "video/excellent_spr.h"
+#include "emupal.h"
 #include "screen.h"
 
 class aquarium_state : public driver_device
 {
 public:
-	aquarium_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	aquarium_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mid_videoram(*this, "mid_videoram"),
 		m_bak_videoram(*this, "bak_videoram"),
 		m_txt_videoram(*this, "txt_videoram"),
@@ -25,7 +30,7 @@ public:
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
 		m_watchdog(*this, "watchdog")
-		{ }
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_mid_videoram;
@@ -56,7 +61,7 @@ public:
 	DECLARE_WRITE16_MEMBER(aquarium_txt_videoram_w);
 	DECLARE_WRITE16_MEMBER(aquarium_mid_videoram_w);
 	DECLARE_WRITE16_MEMBER(aquarium_bak_videoram_w);
-	DECLARE_DRIVER_INIT(aquarium);
+	void init_aquarium();
 	TILE_GET_INFO_MEMBER(get_aquarium_txt_tile_info);
 	TILE_GET_INFO_MEMBER(get_aquarium_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_aquarium_bak_tile_info);
@@ -70,3 +75,5 @@ public:
 	void snd_map(address_map &map);
 	void snd_portmap(address_map &map);
 };
+
+#endif // MAME_INCLUDES_AQUARIUM_H

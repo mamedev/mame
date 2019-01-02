@@ -12,22 +12,6 @@
 #pragma once
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_YMZ770_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, YMZ770, _clock)
-
-#define MCFG_YMZ770_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, YMZ770, _clock)
-
-#define MCFG_YMZ774_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, YMZ774, _clock)
-
-#define MCFG_YMZ774_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, YMZ774, _clock)
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

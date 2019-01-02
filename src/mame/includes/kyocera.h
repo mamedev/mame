@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "machine/buffer.h"
@@ -25,6 +24,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 
+#include "emupal.h"
 #include "rendlay.h"
 
 
@@ -84,7 +84,22 @@ public:
 		m_battery(*this, "BATTERY")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	void kc85(machine_config &config);
+	void kc85_video(machine_config &config);
+
+	DECLARE_WRITE_LINE_MEMBER(kc85_sod_w);
+	DECLARE_READ_LINE_MEMBER(kc85_sid_r);
+
+	DECLARE_WRITE8_MEMBER( i8155_pa_w );
+	DECLARE_WRITE8_MEMBER( i8155_pb_w );
+	DECLARE_READ8_MEMBER( i8155_pc_r );
+
+	DECLARE_WRITE_LINE_MEMBER( i8155_to_w );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
+
+protected:
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
 	optional_device<im6402_device> m_uart;
 	required_device<hd44102_device> m_lcdc0;
@@ -119,12 +134,6 @@ public:
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_READ8_MEMBER( lcd_r );
 	DECLARE_WRITE8_MEMBER( lcd_w );
-	DECLARE_WRITE8_MEMBER( i8155_pa_w );
-	DECLARE_WRITE8_MEMBER( i8155_pb_w );
-	DECLARE_READ8_MEMBER( i8155_pc_r );
-	DECLARE_WRITE_LINE_MEMBER( i8155_to_w );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 
 	/* memory state */
 	uint8_t m_bank;           /* memory bank selection */
@@ -139,11 +148,7 @@ public:
 	int m_centronics_busy;
 	int m_centronics_select;
 
-	DECLARE_PALETTE_INIT(kc85);
-	DECLARE_WRITE_LINE_MEMBER(kc85_sod_w);
-	DECLARE_READ_LINE_MEMBER(kc85_sid_r);
-	void kc85(machine_config &config);
-	void kc85_video(machine_config &config);
+	void kc85_palette(palette_device &palette) const;
 	void kc85_io(address_map &map);
 	void kc85_mem(address_map &map);
 	void trsm100_io(address_map &map);
@@ -152,8 +157,9 @@ public:
 class trsm100_state : public kc85_state
 {
 public:
-	trsm100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kc85_state(mconfig, type, tag) { }
+	trsm100_state(const machine_config &mconfig, device_type type, const char *tag) :
+		kc85_state(mconfig, type, tag)
+	{ }
 
 	virtual void machine_start() override;
 	void trsm100(machine_config &config);
@@ -163,9 +169,9 @@ public:
 class pc8201_state : public kc85_state
 {
 public:
-	pc8201_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kc85_state(mconfig, type, tag),
-			m_cas_cart(*this, "cas_cartslot")
+	pc8201_state(const machine_config &mconfig, device_type type, const char *tag) :
+		kc85_state(mconfig, type, tag),
+		m_cas_cart(*this, "cas_cartslot")
 	{ }
 
 	virtual void machine_start() override;
@@ -213,7 +219,7 @@ public:
 		m_y(*this, "Y%u", 0)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<rp5c01_device> m_rtc;
 	required_device<hd61830_device> m_lcdc;
 	required_device<centronics_device> m_centronics;
@@ -244,7 +250,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 
-	DECLARE_PALETTE_INIT(tandy200);
+	void tandy200_palette(palette_device &palette) const;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(tandy200_tp_tick);
 

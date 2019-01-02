@@ -180,16 +180,16 @@ CUSTOM_INPUT_MEMBER(midyunit_state::adpcm_irq_state_r)
 
 void midyunit_state::main_map(address_map &map)
 {
-	map(0x00000000, 0x001fffff).rw(this, FUNC(midyunit_state::midyunit_vram_r), FUNC(midyunit_state::midyunit_vram_w));
+	map(0x00000000, 0x001fffff).rw(FUNC(midyunit_state::midyunit_vram_r), FUNC(midyunit_state::midyunit_vram_w));
 	map(0x01000000, 0x010fffff).ram().share("mainram");
-	map(0x01400000, 0x0140ffff).rw(this, FUNC(midyunit_state::midyunit_cmos_r), FUNC(midyunit_state::midyunit_cmos_w));
-	map(0x01800000, 0x0181ffff).ram().w(this, FUNC(midyunit_state::midyunit_paletteram_w)).share("paletteram");
-	map(0x01a00000, 0x01a0009f).mirror(0x00080000).rw(this, FUNC(midyunit_state::midyunit_dma_r), FUNC(midyunit_state::midyunit_dma_w));
-	map(0x01c00000, 0x01c0005f).r(this, FUNC(midyunit_state::midyunit_input_r));
-	map(0x01c00060, 0x01c0007f).rw(this, FUNC(midyunit_state::midyunit_protection_r), FUNC(midyunit_state::midyunit_cmos_enable_w));
-	map(0x01e00000, 0x01e0001f).w(this, FUNC(midyunit_state::midyunit_sound_w));
-	map(0x01f00000, 0x01f0001f).w(this, FUNC(midyunit_state::midyunit_control_w));
-	map(0x02000000, 0x05ffffff).r(this, FUNC(midyunit_state::midyunit_gfxrom_r)).share("gfx_rom");
+	map(0x01400000, 0x0140ffff).rw(FUNC(midyunit_state::midyunit_cmos_r), FUNC(midyunit_state::midyunit_cmos_w));
+	map(0x01800000, 0x0181ffff).ram().w(FUNC(midyunit_state::midyunit_paletteram_w)).share("paletteram");
+	map(0x01a00000, 0x01a0009f).mirror(0x00080000).rw(FUNC(midyunit_state::midyunit_dma_r), FUNC(midyunit_state::midyunit_dma_w));
+	map(0x01c00000, 0x01c0005f).r(FUNC(midyunit_state::midyunit_input_r));
+	map(0x01c00060, 0x01c0007f).rw(FUNC(midyunit_state::midyunit_protection_r), FUNC(midyunit_state::midyunit_cmos_enable_w));
+	map(0x01e00000, 0x01e0001f).w(FUNC(midyunit_state::midyunit_sound_w));
+	map(0x01f00000, 0x01f0001f).w(FUNC(midyunit_state::midyunit_control_w));
+	map(0x02000000, 0x05ffffff).r(FUNC(midyunit_state::midyunit_gfxrom_r)).share("gfx_rom");
 	map(0xc0000000, 0xc00001ff).rw("maincpu", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff800000, 0xffffffff).rom().region("user1", 0);
 }
@@ -199,7 +199,7 @@ void midyunit_state::yawdim_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x97ff).w(this, FUNC(midyunit_state::yawdim_oki_bank_w));
+	map(0x9000, 0x97ff).w(FUNC(midyunit_state::yawdim_oki_bank_w));
 	map(0x9800, 0x9fff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa7ff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -1102,17 +1102,17 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(midyunit_state::zunit)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, FAST_MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(MEDRES_PIXEL_CLOCK) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(midyunit_state, scanline_update)       /* scanline updater (indexed16) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(midyunit_state, to_shiftreg)           /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(midyunit_state, from_shiftreg)          /* read from shiftreg function */
+	TMS34010(config, m_maincpu, FAST_MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &midyunit_state::main_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(MEDRES_PIXEL_CLOCK);
+	m_maincpu->set_pixels_per_clock(2);
+	m_maincpu->set_scanline_ind16_callback(FUNC(midyunit_state::scanline_update));
+	m_maincpu->set_shiftreg_in_callback(FUNC(midyunit_state::to_shiftreg));
+	m_maincpu->set_shiftreg_out_callback(FUNC(midyunit_state::from_shiftreg));
 
 	MCFG_MACHINE_RESET_OVERRIDE(midyunit_state,midyunit)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 8192)
@@ -1127,8 +1127,9 @@ MACHINE_CONFIG_START(midyunit_state::zunit)
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midzunit)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("narcsnd", WILLIAMS_NARC_SOUND, 0)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("narcsnd", WILLIAMS_NARC_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1144,17 +1145,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(midyunit_state::yunit_core)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, SLOW_MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(STDRES_PIXEL_CLOCK) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(midyunit_state, scanline_update)       /* scanline updater (indexed16) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(midyunit_state, to_shiftreg)           /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(midyunit_state, from_shiftreg)          /* read from shiftreg function */
+	TMS34010(config, m_maincpu, SLOW_MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &midyunit_state::main_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(STDRES_PIXEL_CLOCK);
+	m_maincpu->set_pixels_per_clock(2);
+	m_maincpu->set_scanline_ind16_callback(FUNC(midyunit_state::scanline_update));
+	m_maincpu->set_shiftreg_in_callback(FUNC(midyunit_state::to_shiftreg));
+	m_maincpu->set_shiftreg_out_callback(FUNC(midyunit_state::from_shiftreg));
 
 	MCFG_MACHINE_RESET_OVERRIDE(midyunit_state,midyunit)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 256)
@@ -1168,7 +1169,7 @@ MACHINE_CONFIG_START(midyunit_state::yunit_core)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 MACHINE_CONFIG_END
 
 
@@ -1176,11 +1177,11 @@ MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_slow)
 	yunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256)
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_4bit)
 MACHINE_CONFIG_END
@@ -1190,14 +1191,14 @@ MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_4bit_fast)
 	yunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(FAST_MASTER_CLOCK)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(FAST_MASTER_CLOCK)
 
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(256)
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_4bit)
 MACHINE_CONFIG_END
@@ -1207,11 +1208,11 @@ MACHINE_CONFIG_START(midyunit_state::yunit_cvsd_6bit_slow)
 	yunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
 MACHINE_CONFIG_END
@@ -1221,14 +1222,14 @@ MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_fast)
 	yunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(FAST_MASTER_CLOCK)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(FAST_MASTER_CLOCK)
 
-	MCFG_SOUND_ADD("adpcm", WILLIAMS_ADPCM_SOUND, 0)
+	MCFG_DEVICE_ADD("adpcm", WILLIAMS_ADPCM_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
 MACHINE_CONFIG_END
@@ -1238,27 +1239,28 @@ MACHINE_CONFIG_START(midyunit_state::yunit_adpcm_6bit_faster)
 	yunit_core(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(FASTER_MASTER_CLOCK)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(FASTER_MASTER_CLOCK)
 
-	MCFG_SOUND_ADD("adpcm", WILLIAMS_ADPCM_SOUND, 0)
+	MCFG_DEVICE_ADD("adpcm", WILLIAMS_ADPCM_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,midyunit_6bit)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(midyunit_state::term2)
+void midyunit_state::term2(machine_config &config)
+{
 	yunit_adpcm_6bit_faster(config);
-	MCFG_ADC0844_ADD("adc") // U2 on Coil Lamp Driver Board (A-14915)
-	MCFG_ADC0844_CH1_CB(IOPORT("STICK0_X"))
-	MCFG_ADC0844_CH2_CB(IOPORT("STICK0_Y"))
-	MCFG_ADC0844_CH3_CB(IOPORT("STICK1_X"))
-	MCFG_ADC0844_CH4_CB(IOPORT("STICK1_Y"))
-MACHINE_CONFIG_END
+	ADC0844(config, m_term2_adc); // U2 on Coil Lamp Driver Board (A-14915)
+	m_term2_adc->ch1_callback().set_ioport("STICK0_X");
+	m_term2_adc->ch2_callback().set_ioport("STICK0_Y");
+	m_term2_adc->ch3_callback().set_ioport("STICK1_X");
+	m_term2_adc->ch4_callback().set_ioport("STICK1_Y");
+}
 
 
 MACHINE_CONFIG_START(midyunit_state::mkyawdim)
@@ -1266,19 +1268,19 @@ MACHINE_CONFIG_START(midyunit_state::mkyawdim)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(yawdim_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(yawdim_sound_map)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
+	MCFG_DEVICE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
 	MCFG_VIDEO_START_OVERRIDE(midyunit_state,mkyawdim)
 
 	/* sound hardware */
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000) / 8, PIN7_HIGH)
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000) / 8, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -1735,141 +1737,141 @@ ROM_END
 
 ROM_START( smashtv )
 	ROM_REGION( 0x90000, "cvsd:cpu", 0 )    /* sound CPU */
-	ROM_LOAD (  "sl2.u4", 0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
-	ROM_RELOAD(           0x20000, 0x10000 )
-	ROM_LOAD ( "sl2.u19", 0x30000, 0x10000, CRC(ac5a402a) SHA1(c476018062126dc3936caa2c328de490737165ec) )
-	ROM_RELOAD(           0x40000, 0x10000 )
-	ROM_LOAD ( "sl2.u20", 0x50000, 0x10000, CRC(875c66d9) SHA1(51cdad62ec57e69bba6fcf14e59841ec628dec11) )
-	ROM_RELOAD(           0x60000, 0x10000 )
+	ROM_LOAD ( "sl2_smash_tv_sound_rom_u4.u4",   0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
+	ROM_RELOAD(                                  0x20000, 0x10000 )
+	ROM_LOAD ( "sl2_smash_tv_sound_rom_u19.u19", 0x30000, 0x10000, CRC(ac5a402a) SHA1(c476018062126dc3936caa2c328de490737165ec) ) // == SL1 SMASH T.V. SOUND ROM U19
+	ROM_RELOAD(                                  0x40000, 0x10000 )
+	ROM_LOAD ( "sl2_smash_tv_sound_rom_u20.u20", 0x50000, 0x10000, CRC(875c66d9) SHA1(51cdad62ec57e69bba6fcf14e59841ec628dec11) ) // == SL1 SMASH T.V. SOUND ROM U20
+	ROM_RELOAD(                                  0x60000, 0x10000 )
 
 	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */
-	ROM_LOAD16_BYTE( "u105-la8",  0xc0000, 0x20000, CRC(48cd793f) SHA1(7d0d9edccf0610f57e40934ab33e32315369656d) )
-	ROM_LOAD16_BYTE( "u89-la8",   0xc0001, 0x20000, CRC(8e7fe463) SHA1(629332be706cda26f8b170b8e2877355230119ee) )
+	ROM_LOAD16_BYTE( "la8_smash_tv_game_rom_u105.u105", 0xc0000, 0x20000, CRC(48cd793f) SHA1(7d0d9edccf0610f57e40934ab33e32315369656d) )
+	ROM_LOAD16_BYTE( "la8_smash_tv_game_rom_u89.u89",   0xc0001, 0x20000, CRC(8e7fe463) SHA1(629332be706cda26f8b170b8e2877355230119ee) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
-	ROM_LOAD ( "la1.u111",  0x000000, 0x20000, CRC(72f0ba84) SHA1(2e925b3cdd3c8e14046b3948d82f0f3cde3c22c5) )
-	ROM_LOAD ( "la1.u112",  0x020000, 0x20000, CRC(436f0283) SHA1(ec33a8942c0fc326db885e08dad9346ec5a63360) )
-	ROM_LOAD ( "la1.u113",  0x040000, 0x20000, CRC(4a4b8110) SHA1(9f1881d1d2682764ab85aebd685d97eb8b4afe46) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u111.u111",  0x000000, 0x20000, CRC(72f0ba84) SHA1(2e925b3cdd3c8e14046b3948d82f0f3cde3c22c5) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u112.u112",  0x020000, 0x20000, CRC(436f0283) SHA1(ec33a8942c0fc326db885e08dad9346ec5a63360) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u113.u113",  0x040000, 0x20000, CRC(4a4b8110) SHA1(9f1881d1d2682764ab85aebd685d97eb8b4afe46) )
 
-	ROM_LOAD (  "la1.u95",  0x200000, 0x20000, CRC(e864a44b) SHA1(40eb8e11a183f4f82dc8decb36aaeded9cd1bc26) )
-	ROM_LOAD (  "la1.u96",  0x220000, 0x20000, CRC(15555ea7) SHA1(4fefc059736ca424dc05a08cb55b9acf9e31228b) )
-	ROM_LOAD (  "la1.u97",  0x240000, 0x20000, CRC(ccac9d9e) SHA1(a43d70d1a0bbd377f0fc539c2e8b725f7079f463) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u95.u95",    0x200000, 0x20000, CRC(e864a44b) SHA1(40eb8e11a183f4f82dc8decb36aaeded9cd1bc26) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u96.u96",    0x220000, 0x20000, CRC(15555ea7) SHA1(4fefc059736ca424dc05a08cb55b9acf9e31228b) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u97.u97",    0x240000, 0x20000, CRC(ccac9d9e) SHA1(a43d70d1a0bbd377f0fc539c2e8b725f7079f463) )
 
-	ROM_LOAD ( "la1.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
-	ROM_LOAD ( "la1.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
-	ROM_LOAD ( "la1.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u106.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u107.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u108.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
 ROM_END
 
 
 ROM_START( smashtv6 )
 	ROM_REGION( 0x90000, "cvsd:cpu", 0 )    /* sound CPU */
-	ROM_LOAD (  "sl2.u4", 0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
-	ROM_RELOAD(           0x20000, 0x10000 )
-	ROM_LOAD ( "sl2.u19", 0x30000, 0x10000, CRC(ac5a402a) SHA1(c476018062126dc3936caa2c328de490737165ec) )
-	ROM_RELOAD(           0x40000, 0x10000 )
-	ROM_LOAD ( "sl2.u20", 0x50000, 0x10000, CRC(875c66d9) SHA1(51cdad62ec57e69bba6fcf14e59841ec628dec11) )
-	ROM_RELOAD(           0x60000, 0x10000 )
+	ROM_LOAD ( "sl2_smash_tv_sound_rom_u4.u4",   0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
+	ROM_RELOAD(                                  0x20000, 0x10000 )
+	ROM_LOAD ( "sl2_smash_tv_sound_rom_u19.u19", 0x30000, 0x10000, CRC(ac5a402a) SHA1(c476018062126dc3936caa2c328de490737165ec) ) // == SL1 SMASH T.V. SOUND ROM U19
+	ROM_RELOAD(                                  0x40000, 0x10000 )
+	ROM_LOAD ( "sl2_smash_tv_sound_rom_u20.u20", 0x50000, 0x10000, CRC(875c66d9) SHA1(51cdad62ec57e69bba6fcf14e59841ec628dec11) ) // == SL1 SMASH T.V. SOUND ROM U20
+	ROM_RELOAD(                                  0x60000, 0x10000 )
 
 	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */
-	ROM_LOAD16_BYTE( "u105-la6",  0xc0000, 0x20000, CRC(f1666017) SHA1(2283e71ad55a7cd3bc97bd6b20aebb90ad618bf8) )
-	ROM_LOAD16_BYTE( "u89-la6",   0xc0001, 0x20000, CRC(908aca5d) SHA1(c97f05ecb8d96306fecef40330331e279d29f78d) )
+	ROM_LOAD16_BYTE( "la6_smash_tv_game_rom_u105.u105", 0xc0000, 0x20000, CRC(f1666017) SHA1(2283e71ad55a7cd3bc97bd6b20aebb90ad618bf8) )
+	ROM_LOAD16_BYTE( "la6_smash_tv_game_rom_u89.u89",   0xc0001, 0x20000, CRC(908aca5d) SHA1(c97f05ecb8d96306fecef40330331e279d29f78d) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
-	ROM_LOAD ( "la1.u111",  0x000000, 0x20000, CRC(72f0ba84) SHA1(2e925b3cdd3c8e14046b3948d82f0f3cde3c22c5) )
-	ROM_LOAD ( "la1.u112",  0x020000, 0x20000, CRC(436f0283) SHA1(ec33a8942c0fc326db885e08dad9346ec5a63360) )
-	ROM_LOAD ( "la1.u113",  0x040000, 0x20000, CRC(4a4b8110) SHA1(9f1881d1d2682764ab85aebd685d97eb8b4afe46) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u111.u111",  0x000000, 0x20000, CRC(72f0ba84) SHA1(2e925b3cdd3c8e14046b3948d82f0f3cde3c22c5) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u112.u112",  0x020000, 0x20000, CRC(436f0283) SHA1(ec33a8942c0fc326db885e08dad9346ec5a63360) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u113.u113",  0x040000, 0x20000, CRC(4a4b8110) SHA1(9f1881d1d2682764ab85aebd685d97eb8b4afe46) )
 
-	ROM_LOAD (  "la1.u95",  0x200000, 0x20000, CRC(e864a44b) SHA1(40eb8e11a183f4f82dc8decb36aaeded9cd1bc26) )
-	ROM_LOAD (  "la1.u96",  0x220000, 0x20000, CRC(15555ea7) SHA1(4fefc059736ca424dc05a08cb55b9acf9e31228b) )
-	ROM_LOAD (  "la1.u97",  0x240000, 0x20000, CRC(ccac9d9e) SHA1(a43d70d1a0bbd377f0fc539c2e8b725f7079f463) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u95.u95",    0x200000, 0x20000, CRC(e864a44b) SHA1(40eb8e11a183f4f82dc8decb36aaeded9cd1bc26) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u96.u96",    0x220000, 0x20000, CRC(15555ea7) SHA1(4fefc059736ca424dc05a08cb55b9acf9e31228b) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u97.u97",    0x240000, 0x20000, CRC(ccac9d9e) SHA1(a43d70d1a0bbd377f0fc539c2e8b725f7079f463) )
 
-	ROM_LOAD ( "la1.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
-	ROM_LOAD ( "la1.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
-	ROM_LOAD ( "la1.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u106.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u107.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u108.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
 ROM_END
 
 
 ROM_START( smashtv5 )
 	ROM_REGION( 0x90000, "cvsd:cpu", 0 ) /* sound CPU */
-	ROM_LOAD (  "sl2.u4", 0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
-	ROM_RELOAD(           0x20000, 0x10000 )
-	ROM_LOAD ( "sl2.u19", 0x30000, 0x10000, CRC(ac5a402a) SHA1(c476018062126dc3936caa2c328de490737165ec) )
-	ROM_RELOAD(           0x40000, 0x10000 )
-	ROM_LOAD ( "sl2.u20", 0x50000, 0x10000, CRC(875c66d9) SHA1(51cdad62ec57e69bba6fcf14e59841ec628dec11) )
-	ROM_RELOAD(           0x60000, 0x10000 )
+	ROM_LOAD ( "sl2_smash_tv_sound_rom_u4.u4",   0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
+	ROM_RELOAD(                                  0x20000, 0x10000 )
+	ROM_LOAD ( "sl2_smash_tv_sound_rom_u19.u19", 0x30000, 0x10000, CRC(ac5a402a) SHA1(c476018062126dc3936caa2c328de490737165ec) ) // == SL1 SMASH T.V. SOUND ROM U19
+	ROM_RELOAD(                                  0x40000, 0x10000 )
+	ROM_LOAD ( "sl2_smash_tv_sound_rom_u20.u20", 0x50000, 0x10000, CRC(875c66d9) SHA1(51cdad62ec57e69bba6fcf14e59841ec628dec11) ) // == SL1 SMASH T.V. SOUND ROM U20
+	ROM_RELOAD(                                  0x60000, 0x10000 )
 
 	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */
-	ROM_LOAD16_BYTE( "u105-la5",  0xc0000, 0x20000, CRC(81f564b9) SHA1(5bddcda054be6766b40af88ae2519b3a87c33667) )
-	ROM_LOAD16_BYTE( "u89-la5",   0xc0001, 0x20000, CRC(e5017d25) SHA1(27e544efa7f5cbe6ed3fc3211b12694c15a316c7) )
+	ROM_LOAD16_BYTE( "la5_smash_tv_game_rom_u105.u105", 0xc0000, 0x20000, CRC(81f564b9) SHA1(5bddcda054be6766b40af88ae2519b3a87c33667) )
+	ROM_LOAD16_BYTE( "la5_smash_tv_game_rom_u89.u89",   0xc0001, 0x20000, CRC(e5017d25) SHA1(27e544efa7f5cbe6ed3fc3211b12694c15a316c7) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
-	ROM_LOAD ( "la1.u111",  0x000000, 0x20000, CRC(72f0ba84) SHA1(2e925b3cdd3c8e14046b3948d82f0f3cde3c22c5) )
-	ROM_LOAD ( "la1.u112",  0x020000, 0x20000, CRC(436f0283) SHA1(ec33a8942c0fc326db885e08dad9346ec5a63360) )
-	ROM_LOAD ( "la1.u113",  0x040000, 0x20000, CRC(4a4b8110) SHA1(9f1881d1d2682764ab85aebd685d97eb8b4afe46) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u111.u111",  0x000000, 0x20000, CRC(72f0ba84) SHA1(2e925b3cdd3c8e14046b3948d82f0f3cde3c22c5) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u112.u112",  0x020000, 0x20000, CRC(436f0283) SHA1(ec33a8942c0fc326db885e08dad9346ec5a63360) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u113.u113",  0x040000, 0x20000, CRC(4a4b8110) SHA1(9f1881d1d2682764ab85aebd685d97eb8b4afe46) )
 
-	ROM_LOAD (  "la1.u95",  0x200000, 0x20000, CRC(e864a44b) SHA1(40eb8e11a183f4f82dc8decb36aaeded9cd1bc26) )
-	ROM_LOAD (  "la1.u96",  0x220000, 0x20000, CRC(15555ea7) SHA1(4fefc059736ca424dc05a08cb55b9acf9e31228b) )
-	ROM_LOAD (  "la1.u97",  0x240000, 0x20000, CRC(ccac9d9e) SHA1(a43d70d1a0bbd377f0fc539c2e8b725f7079f463) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u95.u95",    0x200000, 0x20000, CRC(e864a44b) SHA1(40eb8e11a183f4f82dc8decb36aaeded9cd1bc26) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u96.u96",    0x220000, 0x20000, CRC(15555ea7) SHA1(4fefc059736ca424dc05a08cb55b9acf9e31228b) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u97.u97",    0x240000, 0x20000, CRC(ccac9d9e) SHA1(a43d70d1a0bbd377f0fc539c2e8b725f7079f463) )
 
-	ROM_LOAD ( "la1.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
-	ROM_LOAD ( "la1.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
-	ROM_LOAD ( "la1.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u106.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u107.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u108.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
 ROM_END
 
 
 ROM_START( smashtv4 )
 	ROM_REGION( 0x90000, "cvsd:cpu", 0 )    /* sound CPU */
-	ROM_LOAD (  "sl2.u4", 0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
-	ROM_RELOAD(           0x20000, 0x10000 )
-	ROM_LOAD ( "sl2.u19", 0x30000, 0x10000, CRC(ac5a402a) SHA1(c476018062126dc3936caa2c328de490737165ec) )
-	ROM_RELOAD(           0x40000, 0x10000 )
-	ROM_LOAD ( "sl2.u20", 0x50000, 0x10000, CRC(875c66d9) SHA1(51cdad62ec57e69bba6fcf14e59841ec628dec11) )
-	ROM_RELOAD(           0x60000, 0x10000 )
+	ROM_LOAD ( "sl2_smash_tv_sound_rom_u4.u4",   0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
+	ROM_RELOAD(                                  0x20000, 0x10000 )
+	ROM_LOAD ( "sl2_smash_tv_sound_rom_u19.u19", 0x30000, 0x10000, CRC(ac5a402a) SHA1(c476018062126dc3936caa2c328de490737165ec) ) // == SL1 SMASH T.V. SOUND ROM U19
+	ROM_RELOAD(                                  0x40000, 0x10000 )
+	ROM_LOAD ( "sl2_smash_tv_sound_rom_u20.u20", 0x50000, 0x10000, CRC(875c66d9) SHA1(51cdad62ec57e69bba6fcf14e59841ec628dec11) ) // == SL1 SMASH T.V. SOUND ROM U20
+	ROM_RELOAD(                                  0x60000, 0x10000 )
 
 	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */
-	ROM_LOAD16_BYTE( "u105-la4",  0xc0000, 0x20000, CRC(a50ccb71) SHA1(414dfe355e314f6460ce07edbdd5e4b801451cf8) )
-	ROM_LOAD16_BYTE( "u89-la4",   0xc0001, 0x20000, CRC(ef0b0279) SHA1(baad5a2a8d51d007e365f378f3214bbd2ea9699c) )
+	ROM_LOAD16_BYTE( "la4_smash_tv_game_rom_u105.u105", 0xc0000, 0x20000, CRC(a50ccb71) SHA1(414dfe355e314f6460ce07edbdd5e4b801451cf8) )
+	ROM_LOAD16_BYTE( "la4_smash_tv_game_rom_u89.u89",   0xc0001, 0x20000, CRC(ef0b0279) SHA1(baad5a2a8d51d007e365f378f3214bbd2ea9699c) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
-	ROM_LOAD ( "la1.u111",  0x000000, 0x20000, CRC(72f0ba84) SHA1(2e925b3cdd3c8e14046b3948d82f0f3cde3c22c5) )
-	ROM_LOAD ( "la1.u112",  0x020000, 0x20000, CRC(436f0283) SHA1(ec33a8942c0fc326db885e08dad9346ec5a63360) )
-	ROM_LOAD ( "la1.u113",  0x040000, 0x20000, CRC(4a4b8110) SHA1(9f1881d1d2682764ab85aebd685d97eb8b4afe46) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u111.u111",  0x000000, 0x20000, CRC(72f0ba84) SHA1(2e925b3cdd3c8e14046b3948d82f0f3cde3c22c5) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u112.u112",  0x020000, 0x20000, CRC(436f0283) SHA1(ec33a8942c0fc326db885e08dad9346ec5a63360) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u113.u113",  0x040000, 0x20000, CRC(4a4b8110) SHA1(9f1881d1d2682764ab85aebd685d97eb8b4afe46) )
 
-	ROM_LOAD (  "la1.u95",  0x200000, 0x20000, CRC(e864a44b) SHA1(40eb8e11a183f4f82dc8decb36aaeded9cd1bc26) )
-	ROM_LOAD (  "la1.u96",  0x220000, 0x20000, CRC(15555ea7) SHA1(4fefc059736ca424dc05a08cb55b9acf9e31228b) )
-	ROM_LOAD (  "la1.u97",  0x240000, 0x20000, CRC(ccac9d9e) SHA1(a43d70d1a0bbd377f0fc539c2e8b725f7079f463) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u95.u95",    0x200000, 0x20000, CRC(e864a44b) SHA1(40eb8e11a183f4f82dc8decb36aaeded9cd1bc26) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u96.u96",    0x220000, 0x20000, CRC(15555ea7) SHA1(4fefc059736ca424dc05a08cb55b9acf9e31228b) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u97.u97",    0x240000, 0x20000, CRC(ccac9d9e) SHA1(a43d70d1a0bbd377f0fc539c2e8b725f7079f463) )
 
-	ROM_LOAD ( "la1.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
-	ROM_LOAD ( "la1.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
-	ROM_LOAD ( "la1.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u106.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u107.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u108.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
 ROM_END
 
 
 ROM_START( smashtv3 )
 	ROM_REGION( 0x90000, "cvsd:cpu", 0 )    /* sound CPU */
-	ROM_LOAD (  "sl2.u4", 0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
-	ROM_RELOAD(           0x20000, 0x10000 )
-	ROM_LOAD ( "sl2.u19", 0x30000, 0x10000, CRC(ac5a402a) SHA1(c476018062126dc3936caa2c328de490737165ec) )
-	ROM_RELOAD(           0x40000, 0x10000 )
-	ROM_LOAD ( "sl2.u20", 0x50000, 0x10000, CRC(875c66d9) SHA1(51cdad62ec57e69bba6fcf14e59841ec628dec11) )
-	ROM_RELOAD(           0x60000, 0x10000 )
+	ROM_LOAD ( "sl1_smash_tv_sound_rom_u4.u4",   0x10000, 0x10000, CRC(a3370987) SHA1(e03c9980a243200a8c0f1ad546868c77991a6f53) )
+	ROM_RELOAD(                                  0x20000, 0x10000 )
+	ROM_LOAD ( "sl1_smash_tv_sound_rom_u19.u19", 0x30000, 0x10000, CRC(ac5a402a) SHA1(c476018062126dc3936caa2c328de490737165ec) )
+	ROM_RELOAD(                                  0x40000, 0x10000 )
+	ROM_LOAD ( "sl1_smash_tv_sound_rom_u20.u20", 0x50000, 0x10000, CRC(875c66d9) SHA1(51cdad62ec57e69bba6fcf14e59841ec628dec11) )
+	ROM_RELOAD(                                  0x60000, 0x10000 )
 
 	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */
-	ROM_LOAD16_BYTE( "u105-la3",  0xc0000, 0x20000, CRC(33b626c3) SHA1(8f0582f6fe08dc7de920aeac578ed570ca4e717f) )
-	ROM_LOAD16_BYTE( "u89-la3",   0xc0001, 0x20000, CRC(5f6fbc25) SHA1(d623f5e64ff4e70e24d770ac3ac0d32ff3928ce0) )
+	ROM_LOAD16_BYTE( "la3_smash_tv_game_rom_u105.u105", 0xc0000, 0x20000, CRC(33b626c3) SHA1(8f0582f6fe08dc7de920aeac578ed570ca4e717f) )
+	ROM_LOAD16_BYTE( "la3_smash_tv_game_rom_u89.u89",   0xc0001, 0x20000, CRC(5f6fbc25) SHA1(d623f5e64ff4e70e24d770ac3ac0d32ff3928ce0) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
-	ROM_LOAD ( "la1.u111",  0x000000, 0x20000, CRC(72f0ba84) SHA1(2e925b3cdd3c8e14046b3948d82f0f3cde3c22c5) )
-	ROM_LOAD ( "la1.u112",  0x020000, 0x20000, CRC(436f0283) SHA1(ec33a8942c0fc326db885e08dad9346ec5a63360) )
-	ROM_LOAD ( "la1.u113",  0x040000, 0x20000, CRC(4a4b8110) SHA1(9f1881d1d2682764ab85aebd685d97eb8b4afe46) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u111.u111",  0x000000, 0x20000, CRC(72f0ba84) SHA1(2e925b3cdd3c8e14046b3948d82f0f3cde3c22c5) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u112.u112",  0x020000, 0x20000, CRC(436f0283) SHA1(ec33a8942c0fc326db885e08dad9346ec5a63360) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u113.u113",  0x040000, 0x20000, CRC(4a4b8110) SHA1(9f1881d1d2682764ab85aebd685d97eb8b4afe46) )
 
-	ROM_LOAD (  "la1.u95",  0x200000, 0x20000, CRC(e864a44b) SHA1(40eb8e11a183f4f82dc8decb36aaeded9cd1bc26) )
-	ROM_LOAD (  "la1.u96",  0x220000, 0x20000, CRC(15555ea7) SHA1(4fefc059736ca424dc05a08cb55b9acf9e31228b) )
-	ROM_LOAD (  "la1.u97",  0x240000, 0x20000, CRC(ccac9d9e) SHA1(a43d70d1a0bbd377f0fc539c2e8b725f7079f463) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u95.u95",    0x200000, 0x20000, CRC(e864a44b) SHA1(40eb8e11a183f4f82dc8decb36aaeded9cd1bc26) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u96.u96",    0x220000, 0x20000, CRC(15555ea7) SHA1(4fefc059736ca424dc05a08cb55b9acf9e31228b) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u97.u97",    0x240000, 0x20000, CRC(ccac9d9e) SHA1(a43d70d1a0bbd377f0fc539c2e8b725f7079f463) )
 
-	ROM_LOAD ( "la1.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
-	ROM_LOAD ( "la1.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
-	ROM_LOAD ( "la1.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u106.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u107.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
+	ROM_LOAD ( "la1_smash_tv_game_rom_u108.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
 ROM_END
 
 
@@ -3061,59 +3063,59 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, narc,     0,        zunit,                 narc, midyunit_state,     narc,     ROT0, "Williams", "Narc (rev 7.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, narc3,    narc,     zunit,                 narc, midyunit_state,     narc,     ROT0, "Williams", "Narc (rev 3.20)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, narc2,    narc,     zunit,                 narc, midyunit_state,     narc,     ROT0, "Williams", "Narc (rev 2.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, narc,       0,        zunit,                   narc,     midyunit_state, init_narc,     ROT0, "Williams", "Narc (rev 7.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, narc3,      narc,     zunit,                   narc,     midyunit_state, init_narc,     ROT0, "Williams", "Narc (rev 3.20)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, narc2,      narc,     zunit,                   narc,     midyunit_state, init_narc,     ROT0, "Williams", "Narc (rev 2.00)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, trog,     0,        yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (rev LA5 03/29/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, trog4,    trog,     yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (rev LA4 03/11/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, trog3,    trog,     yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (rev LA3 02/14/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, trogpa6,  trog,     yunit_cvsd_4bit_slow,  trog, midyunit_state,     trog,     ROT0, "Midway",   "Trog (prototype, rev PA6-PAC 09/09/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, trogpa4,  trog,     yunit_cvsd_4bit_slow,  trogpa4, midyunit_state,  trog,     ROT0, "Midway",   "Trog (prototype, rev 4.00 07/27/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trog,       0,        yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (rev LA5 03/29/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trog4,      trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (rev LA4 03/11/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trog3,      trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (rev LA3 02/14/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trogpa6,    trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (prototype, rev PA6-PAC 09/09/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trogpa4,    trog,     yunit_cvsd_4bit_slow,    trogpa4,  midyunit_state, init_trog,     ROT0, "Midway",   "Trog (prototype, rev 4.00 07/27/90)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, smashtv,  0,        yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 8.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, smashtv6, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 6.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, smashtv5, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 5.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, smashtv4, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 4.00)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, smashtv3, smashtv,  yunit_cvsd_6bit_slow,  smashtv, midyunit_state,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 3.01)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, smashtv,    0,        yunit_cvsd_6bit_slow,    smashtv,  midyunit_state, init_smashtv,  ROT0, "Williams", "Smash T.V. (rev 8.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, smashtv6,   smashtv,  yunit_cvsd_6bit_slow,    smashtv,  midyunit_state, init_smashtv,  ROT0, "Williams", "Smash T.V. (rev 6.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, smashtv5,   smashtv,  yunit_cvsd_6bit_slow,    smashtv,  midyunit_state, init_smashtv,  ROT0, "Williams", "Smash T.V. (rev 5.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, smashtv4,   smashtv,  yunit_cvsd_6bit_slow,    smashtv,  midyunit_state, init_smashtv,  ROT0, "Williams", "Smash T.V. (rev 4.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, smashtv3,   smashtv,  yunit_cvsd_6bit_slow,    smashtv,  midyunit_state, init_smashtv,  ROT0, "Williams", "Smash T.V. (rev 3.01)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, hiimpact,   0,        yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA5 02/15/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiimpact4,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA4 02/04/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiimpact3,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA3 12/27/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiimpact2,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA2 12/26/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiimpact1,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA1 12/16/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hiimpactp,  hiimpact, yunit_cvsd_6bit_slow,  hiimpact, midyunit_state,     hiimpact, ROT0, "Williams", "High Impact Football (prototype, rev 8.6 12/09/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpact,   0,        yunit_cvsd_6bit_slow,    hiimpact, midyunit_state, init_hiimpact, ROT0, "Williams", "High Impact Football (rev LA5 02/15/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpact4,  hiimpact, yunit_cvsd_6bit_slow,    hiimpact, midyunit_state, init_hiimpact, ROT0, "Williams", "High Impact Football (rev LA4 02/04/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpact3,  hiimpact, yunit_cvsd_6bit_slow,    hiimpact, midyunit_state, init_hiimpact, ROT0, "Williams", "High Impact Football (rev LA3 12/27/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpact2,  hiimpact, yunit_cvsd_6bit_slow,    hiimpact, midyunit_state, init_hiimpact, ROT0, "Williams", "High Impact Football (rev LA2 12/26/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpact1,  hiimpact, yunit_cvsd_6bit_slow,    hiimpact, midyunit_state, init_hiimpact, ROT0, "Williams", "High Impact Football (rev LA1 12/16/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiimpactp,  hiimpact, yunit_cvsd_6bit_slow,    hiimpact, midyunit_state, init_hiimpact, ROT0, "Williams", "High Impact Football (prototype, rev 8.6 12/09/90)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, shimpact,   0,        yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (rev LA1 09/30/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, shimpactp6, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 6.0 09/23/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, shimpactp5, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, shimpactp4, shimpact, yunit_cvsd_6bit_slow,  shimpact, midyunit_state,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 4.0 09/10/91)", MACHINE_SUPPORTS_SAVE ) /* See notes about factory restore above */
+GAME( 1991, shimpact,   0,        yunit_cvsd_6bit_slow,    shimpact, midyunit_state, init_shimpact, ROT0, "Midway",   "Super High Impact (rev LA1 09/30/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, shimpactp6, shimpact, yunit_cvsd_6bit_slow,    shimpact, midyunit_state, init_shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 6.0 09/23/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, shimpactp5, shimpact, yunit_cvsd_6bit_slow,    shimpact, midyunit_state, init_shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, shimpactp4, shimpact, yunit_cvsd_6bit_slow,    shimpact, midyunit_state, init_shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 4.0 09/10/91)", MACHINE_SUPPORTS_SAVE ) /* See notes about factory restore above */
 
-GAME( 1991, strkforc, 0,        yunit_cvsd_4bit_fast,  strkforc, midyunit_state, strkforc, ROT0, "Midway",   "Strike Force (rev 1 02/25/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, strkforc,   0,        yunit_cvsd_4bit_fast,    strkforc, midyunit_state, init_strkforc, ROT0, "Midway",   "Strike Force (rev 1 02/25/91)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, term2,    0,        term2,                   term2, midyunit_state,    term2,    ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA4 08/03/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2la3, term2,    term2,                   term2, midyunit_state,    term2la3, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA3 03/27/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2la2, term2,    term2,                   term2, midyunit_state,    term2la2, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA2 12/09/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2la1, term2,    term2,                   term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA1 11/01/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2pa2, term2,    term2,                   term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (prototype, rev PA2 10/18/91)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, term2lg1, term2,    term2,                   term2, midyunit_state,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LG1 11/04/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2,      0,        term2,                   term2,    midyunit_state, init_term2,    ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA4 08/03/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2la3,   term2,    term2,                   term2,    midyunit_state, init_term2la3, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA3 03/27/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2la2,   term2,    term2,                   term2,    midyunit_state, init_term2la2, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA2 12/09/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2la1,   term2,    term2,                   term2,    midyunit_state, init_term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA1 11/01/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2pa2,   term2,    term2,                   term2,    midyunit_state, init_term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (prototype, rev PA2 10/18/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, term2lg1,   term2,    term2,                   term2,    midyunit_state, init_term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LG1 11/04/91)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, mkla4,    mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 4.0 09/28/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkla3,    mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 3.0 08/31/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkla2,    mk,       yunit_adpcm_6bit_fast,   mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 2.0 08/18/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkla1,    mk,       yunit_adpcm_6bit_fast,   mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 1.0 08/09/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkprot9,  mk,       yunit_adpcm_6bit_faster, mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 9.0 07/28/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkprot8,  mk,       yunit_adpcm_6bit_faster, mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 8.0 07/21/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkprot4,  mk,       yunit_adpcm_6bit_faster, mkla2, midyunit_state,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 4.0 07/14/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkyturbo, mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Turbo 3.1 09/09/93, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkyturboe,mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Turbo 3.0 08/31/92, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mknifty,  mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mknifty666, mk,     yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo 666, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkrep,    mk,       yunit_adpcm_6bit_fast,   mkla4, midyunit_state,    mkyturbo, ROT0, "hack",     "Mortal Kombat (Reptile Man hack)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1992, mkyawdim, mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkyawdim2,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
-GAME( 1992, mkyawdim3,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
-GAME( 1992, mkyawdim4,mk,       mkyawdim,                mkyawdim, midyunit_state, mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
+GAME( 1992, mkla4,      mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 4.0 09/28/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkla3,      mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 3.0 08/31/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkla2,      mk,       yunit_adpcm_6bit_fast,   mkla2,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 2.0 08/18/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkla1,      mk,       yunit_adpcm_6bit_fast,   mkla2,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 1.0 08/09/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkprot9,    mk,       yunit_adpcm_6bit_faster, mkla2,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 9.0 07/28/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkprot8,    mk,       yunit_adpcm_6bit_faster, mkla2,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 8.0 07/21/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkprot4,    mk,       yunit_adpcm_6bit_faster, mkla2,    midyunit_state, init_mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 4.0 07/14/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkyturbo,   mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo, ROT0, "hack",     "Mortal Kombat (Turbo 3.1 09/09/93, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkyturboe,  mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo, ROT0, "hack",     "Mortal Kombat (Turbo 3.0 08/31/92, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mknifty,    mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mknifty666, mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo, ROT0, "hack",     "Mortal Kombat (Nifty Kombo 666, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkrep,      mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_state, init_mkyturbo, ROT0, "hack",     "Mortal Kombat (Reptile Man hack)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1992, mkyawdim,   mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkyawdim2,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
+GAME( 1992, mkyawdim3,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
+GAME( 1992, mkyawdim4,  mk,       mkyawdim,                mkyawdim, midyunit_state, init_mkyawdim, ROT0, "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
 
-GAME( 1992, totcarn,  0,        yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, totcarnp, totcarn,  yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  totcarn,  ROT0, "Midway",   "Total Carnage (prototype, rev 1.0 01/25/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, totcarn,    0,        yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  init_totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, totcarnp,   totcarn,  yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  init_totcarn,  ROT0, "Midway",   "Total Carnage (prototype, rev 1.0 01/25/92)", MACHINE_SUPPORTS_SAVE )

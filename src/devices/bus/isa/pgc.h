@@ -10,6 +10,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/timer.h"
 #include "isa.h"
+#include "emupal.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -19,6 +19,7 @@
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 
+#include "emupal.h"
 #include "softlist.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -110,74 +111,73 @@ void ct486_state::ct486_io(address_map &map)
 //**************************************************************************
 
 MACHINE_CONFIG_START(ct486_state::ct486)
-	MCFG_CPU_ADD("maincpu", I486, XTAL(25'000'000))
-	MCFG_CPU_PROGRAM_MAP(ct486_map)
-	MCFG_CPU_IO_MAP(ct486_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("cs4031", cs4031_device, int_ack_r)
+	MCFG_DEVICE_ADD("maincpu", I486, XTAL(25'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(ct486_map)
+	MCFG_DEVICE_IO_MAP(ct486_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("cs4031", cs4031_device, int_ack_r)
 
-	MCFG_CS4031_ADD("cs4031", XTAL(25'000'000), "maincpu", "isa", "bios", "keybc")
+	CS4031(config, m_cs4031, XTAL(25'000'000), "maincpu", "isa", "bios", "keybc");
 	// cpu connections
-	MCFG_CS4031_HOLD(WRITELINE(ct486_state, cs4031_hold));
-	MCFG_CS4031_NMI(INPUTLINE("maincpu", INPUT_LINE_NMI));
-	MCFG_CS4031_INTR(INPUTLINE("maincpu", INPUT_LINE_IRQ0));
-	MCFG_CS4031_CPURESET(INPUTLINE("maincpu", INPUT_LINE_RESET));
-	MCFG_CS4031_A20M(INPUTLINE("maincpu", INPUT_LINE_A20));
+	m_cs4031->hold().set(FUNC(ct486_state::cs4031_hold));
+	m_cs4031->nmi().set_inputline("maincpu", INPUT_LINE_NMI);
+	m_cs4031->intr().set_inputline("maincpu", INPUT_LINE_IRQ0);
+	m_cs4031->cpureset().set_inputline("maincpu", INPUT_LINE_RESET);
+	m_cs4031->a20m().set_inputline("maincpu", INPUT_LINE_A20);
 	// isa dma
-	MCFG_CS4031_IOR(READ16(ct486_state, cs4031_ior))
-	MCFG_CS4031_IOW(WRITE16(ct486_state, cs4031_iow))
-	MCFG_CS4031_TC(WRITE8(ct486_state, cs4031_tc))
+	m_cs4031->ior().set(FUNC(ct486_state::cs4031_ior));
+	m_cs4031->iow().set(FUNC(ct486_state::cs4031_iow));
+	m_cs4031->tc().set(FUNC(ct486_state::cs4031_tc));
 	// speaker
-	MCFG_CS4031_SPKR(WRITELINE(ct486_state, cs4031_spkr))
+	m_cs4031->spkr().set(FUNC(ct486_state::cs4031_spkr));
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
+	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M");
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
-	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(DEVWRITELINE("cs4031", cs4031_device, kbrst_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(DEVWRITELINE("cs4031", cs4031_device, gatea20_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(DEVWRITELINE("cs4031", cs4031_device, irq01_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(DEVWRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(DEVWRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
+	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
+	keybc.hot_res().set("cs4031", FUNC(cs4031_device::kbrst_w));
+	keybc.gate_a20().set("cs4031", FUNC(cs4031_device::gatea20_w));
+	keybc.kbd_irq().set("cs4031", FUNC(cs4031_device::irq01_w));
+	keybc.kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+
 	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_kbc_device_base, kbd_clk_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_kbc_device_base, kbd_data_w))
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
-	MCFG_DEVICE_ADD("isabus", ISA16, 0)
-	MCFG_ISA16_CPU(":maincpu")
-	MCFG_ISA_BUS_IOCHCK(DEVWRITELINE("cs4031", cs4031_device, iochck_w))
-	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("cs4031", cs4031_device, irq09_w))
-	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("cs4031", cs4031_device, irq03_w))
-	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("cs4031", cs4031_device, irq04_w))
-	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("cs4031", cs4031_device, irq05_w))
-	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("cs4031", cs4031_device, irq06_w))
-	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("cs4031", cs4031_device, irq07_w))
-	MCFG_ISA_OUT_IRQ10_CB(DEVWRITELINE("cs4031", cs4031_device, irq10_w))
-	MCFG_ISA_OUT_IRQ11_CB(DEVWRITELINE("cs4031", cs4031_device, irq11_w))
-	MCFG_ISA_OUT_IRQ12_CB(DEVWRITELINE("cs4031", cs4031_device, irq12_w))
-	MCFG_ISA_OUT_IRQ14_CB(DEVWRITELINE("cs4031", cs4031_device, irq14_w))
-	MCFG_ISA_OUT_IRQ15_CB(DEVWRITELINE("cs4031", cs4031_device, irq15_w))
-	MCFG_ISA_OUT_DRQ0_CB(DEVWRITELINE("cs4031", cs4031_device, dreq0_w))
-	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("cs4031", cs4031_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("cs4031", cs4031_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("cs4031", cs4031_device, dreq3_w))
-	MCFG_ISA_OUT_DRQ5_CB(DEVWRITELINE("cs4031", cs4031_device, dreq5_w))
-	MCFG_ISA_OUT_DRQ6_CB(DEVWRITELINE("cs4031", cs4031_device, dreq6_w))
-	MCFG_ISA_OUT_DRQ7_CB(DEVWRITELINE("cs4031", cs4031_device, dreq7_w))
-	MCFG_ISA16_SLOT_ADD("isabus", "board1", pc_isa16_cards, "fdcsmc", true)
-	MCFG_ISA16_SLOT_ADD("isabus", "board2", pc_isa16_cards, "comat", true)
-	MCFG_ISA16_SLOT_ADD("isabus", "board3", pc_isa16_cards, "ide", true)
-	MCFG_ISA16_SLOT_ADD("isabus", "board4", pc_isa16_cards, "lpt", true)
-	MCFG_ISA16_SLOT_ADD("isabus", "isa1", pc_isa16_cards, "svga_et4k", false)
-	MCFG_ISA16_SLOT_ADD("isabus", "isa2", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("isabus", "isa3", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("isabus", "isa4", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("isabus", "isa5", pc_isa16_cards, nullptr, false)
+	ISA16(config, m_isabus, 0);
+	m_isabus->set_cputag("maincpu");
+	m_isabus->iochck_callback().set(m_cs4031, FUNC(cs4031_device::iochck_w));
+	m_isabus->irq2_callback().set(m_cs4031, FUNC(cs4031_device::irq09_w));
+	m_isabus->irq3_callback().set(m_cs4031, FUNC(cs4031_device::irq03_w));
+	m_isabus->irq4_callback().set(m_cs4031, FUNC(cs4031_device::irq04_w));
+	m_isabus->irq5_callback().set(m_cs4031, FUNC(cs4031_device::irq05_w));
+	m_isabus->irq6_callback().set(m_cs4031, FUNC(cs4031_device::irq06_w));
+	m_isabus->irq7_callback().set(m_cs4031, FUNC(cs4031_device::irq07_w));
+	m_isabus->irq10_callback().set(m_cs4031, FUNC(cs4031_device::irq10_w));
+	m_isabus->irq11_callback().set(m_cs4031, FUNC(cs4031_device::irq11_w));
+	m_isabus->irq12_callback().set(m_cs4031, FUNC(cs4031_device::irq12_w));
+	m_isabus->irq14_callback().set(m_cs4031, FUNC(cs4031_device::irq14_w));
+	m_isabus->irq15_callback().set(m_cs4031, FUNC(cs4031_device::irq15_w));
+	m_isabus->drq0_callback().set(m_cs4031, FUNC(cs4031_device::dreq0_w));
+	m_isabus->drq1_callback().set(m_cs4031, FUNC(cs4031_device::dreq1_w));
+	m_isabus->drq2_callback().set(m_cs4031, FUNC(cs4031_device::dreq2_w));
+	m_isabus->drq3_callback().set(m_cs4031, FUNC(cs4031_device::dreq3_w));
+	m_isabus->drq5_callback().set(m_cs4031, FUNC(cs4031_device::dreq5_w));
+	m_isabus->drq6_callback().set(m_cs4031, FUNC(cs4031_device::dreq6_w));
+	m_isabus->drq7_callback().set(m_cs4031, FUNC(cs4031_device::dreq7_w));
+	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "fdcsmc", true)
+	MCFG_DEVICE_ADD("board2", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "comat", true)
+	MCFG_DEVICE_ADD("board3", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "ide", true)
+	MCFG_DEVICE_ADD("board4", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "lpt", true)
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "svga_et4k", false)
+	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// video hardware
@@ -205,4 +205,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1993, ct486, 0, 0, ct486, 0, ct486_state, 0, "<unknown>", "PC/AT 486 with CS4031 chipset", 0 )
+COMP( 1993, ct486, 0, 0, ct486, 0, ct486_state, empty_init, "<unknown>", "PC/AT 486 with CS4031 chipset", 0 )

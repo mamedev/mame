@@ -154,17 +154,29 @@ Notes:
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 
 class dgpix_state : public driver_device
 {
 public:
-	dgpix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dgpix_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_vblank(*this, "VBLANK") { }
+		m_vblank(*this, "VBLANK")
+	{ }
 
+	void dgpix(machine_config &config);
+
+	void init_elfin();
+	void init_jumpjump();
+	void init_xfiles();
+	void init_xfilesk();
+	void init_kdynastg();
+	void init_fmaniac3();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_vblank;
 
@@ -183,19 +195,11 @@ public:
 	DECLARE_WRITE32_MEMBER(coin_w);
 	DECLARE_READ32_MEMBER(vblank_r);
 
-	DECLARE_DRIVER_INIT(elfin);
-	DECLARE_DRIVER_INIT(jumpjump);
-	DECLARE_DRIVER_INIT(xfiles);
-	DECLARE_DRIVER_INIT(xfilesk);
-	DECLARE_DRIVER_INIT(kdynastg);
-	DECLARE_DRIVER_INIT(fmaniac3);
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	uint32_t screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void dgpix(machine_config &config);
 	void cpu_map(address_map &map);
 	void io_map(address_map &map);
 };
@@ -327,18 +331,18 @@ READ32_MEMBER(dgpix_state::vblank_r)
 void dgpix_state::cpu_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).ram();
-	map(0x40000000, 0x4003ffff).rw(this, FUNC(dgpix_state::vram_r), FUNC(dgpix_state::vram_w));
-	map(0xe0000000, 0xe1ffffff).rw(this, FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
-	map(0xe2000000, 0xe3ffffff).rw(this, FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
+	map(0x40000000, 0x4003ffff).rw(FUNC(dgpix_state::vram_r), FUNC(dgpix_state::vram_w));
+	map(0xe0000000, 0xe1ffffff).rw(FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
+	map(0xe2000000, 0xe3ffffff).rw(FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
 	map(0xffc00000, 0xffffffff).rom().region("flash", 0x1c00000).share("nvram");
 }
 
 void dgpix_state::io_map(address_map &map)
 {
 	map(0x0200, 0x0203).nopr(); // used to sync with the protecion PIC? tested bits 0 and 1
-	map(0x0400, 0x0403).rw(this, FUNC(dgpix_state::vblank_r), FUNC(dgpix_state::vbuffer_w));
+	map(0x0400, 0x0403).rw(FUNC(dgpix_state::vblank_r), FUNC(dgpix_state::vbuffer_w));
 	map(0x0a10, 0x0a13).portr("INPUTS");
-	map(0x0200, 0x0203).w(this, FUNC(dgpix_state::coin_w));
+	map(0x0200, 0x0203).w(FUNC(dgpix_state::coin_w));
 	map(0x0c00, 0x0c03).nopw(); // writes only: 1, 0, 1 at startup
 	map(0x0c80, 0x0c83).nopw(); // sound commands / latches
 	map(0x0c80, 0x0c83).nopr(); //read at startup -> cmp 0xFE
@@ -384,7 +388,7 @@ void dgpix_state::video_start()
 {
 	m_vram = std::make_unique<uint32_t[]>(0x40000*2/4);
 
-	save_pointer(NAME(m_vram.get()), 0x40000*2/4);
+	save_pointer(NAME(m_vram), 0x40000*2/4);
 }
 
 uint32_t dgpix_state::screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -428,16 +432,16 @@ void dgpix_state::machine_reset()
 
 
 MACHINE_CONFIG_START(dgpix_state::dgpix)
-	MCFG_CPU_ADD("maincpu", E132XT, 20000000*4) /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", E132XT, 20000000*4) /* 4x internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 /*
     unknown 16bit sound cpu, embedded inside the KS0164 sound chip
     running at 16.9MHz
 */
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -448,8 +452,7 @@ MACHINE_CONFIG_START(dgpix_state::dgpix)
 	MCFG_SCREEN_UPDATE_DRIVER(dgpix_state, screen_update_dgpix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR("palette")
-
+	PALETTE(config, "palette", palette_device::BGR_555);
 
 	/* sound hardware */
 	// KS0164 sound chip
@@ -608,7 +611,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(dgpix_state,elfin)
+void dgpix_state::init_elfin()
 {
 	uint8_t *rom = (uint8_t *)memregion("flash")->base() + 0x1c00000;
 
@@ -622,7 +625,7 @@ DRIVER_INIT_MEMBER(dgpix_state,elfin)
 	m_flash_roms = 2;
 }
 
-DRIVER_INIT_MEMBER(dgpix_state,jumpjump)
+void dgpix_state::init_jumpjump()
 {
 	uint8_t *rom = (uint8_t *)memregion("flash")->base() + 0x1c00000;
 
@@ -636,7 +639,7 @@ DRIVER_INIT_MEMBER(dgpix_state,jumpjump)
 	m_flash_roms = 2;
 }
 
-DRIVER_INIT_MEMBER(dgpix_state,xfiles)
+void dgpix_state::init_xfiles()
 {
 	uint8_t *rom = (uint8_t *)memregion("flash")->base() + 0x1c00000;
 
@@ -650,7 +653,7 @@ DRIVER_INIT_MEMBER(dgpix_state,xfiles)
 	m_flash_roms = 2;
 }
 
-DRIVER_INIT_MEMBER(dgpix_state,xfilesk)
+void dgpix_state::init_xfilesk()
 {
 	uint8_t *rom = (uint8_t *)memregion("flash")->base() + 0x1c00000;
 
@@ -667,7 +670,7 @@ DRIVER_INIT_MEMBER(dgpix_state,xfilesk)
 	m_flash_roms = 2;
 }
 
-DRIVER_INIT_MEMBER(dgpix_state,kdynastg)
+void dgpix_state::init_kdynastg()
 {
 	uint8_t *rom = (uint8_t *)memregion("flash")->base() + 0x1c00000;
 
@@ -687,14 +690,14 @@ DRIVER_INIT_MEMBER(dgpix_state,kdynastg)
 	m_flash_roms = 4;
 }
 
-DRIVER_INIT_MEMBER(dgpix_state,fmaniac3)
+void dgpix_state::init_fmaniac3()
 {
 	m_flash_roms = 2;
 }
 
-GAME( 1999, elfin,          0, dgpix, dgpix, dgpix_state, elfin,    ROT0, "dgPIX Entertainment Inc.", "Elfin",                             MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, jumpjump,       0, dgpix, dgpix, dgpix_state, jumpjump, ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, xfiles,         0, dgpix, dgpix, dgpix_state, xfiles,   ROT0, "dgPIX Entertainment Inc.", "The X-Files",                       MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, xfilesk,   xfiles, dgpix, dgpix, dgpix_state, xfilesk,  ROT0, "dgPIX Entertainment Inc.", "The X-Files (Censored, Korea)",     MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, kdynastg,       0, dgpix, dgpix, dgpix_state, kdynastg, ROT0, "EZ Graphics",              "King of Dynast Gear (version 1.8)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2002, fmaniac3,       0, dgpix, dgpix, dgpix_state, fmaniac3, ROT0, "Saero Entertainment",      "Fishing Maniac 3",                  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, elfin,    0,      dgpix, dgpix, dgpix_state, init_elfin,    ROT0, "dgPIX Entertainment Inc.", "Elfin",                             MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jumpjump, 0,      dgpix, dgpix, dgpix_state, init_jumpjump, ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, xfiles,   0,      dgpix, dgpix, dgpix_state, init_xfiles,   ROT0, "dgPIX Entertainment Inc.", "The X-Files",                       MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, xfilesk,  xfiles, dgpix, dgpix, dgpix_state, init_xfilesk,  ROT0, "dgPIX Entertainment Inc.", "The X-Files (Censored, Korea)",     MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, kdynastg, 0,      dgpix, dgpix, dgpix_state, init_kdynastg, ROT0, "EZ Graphics",              "King of Dynast Gear (version 1.8)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, fmaniac3, 0,      dgpix, dgpix, dgpix_state, init_fmaniac3, ROT0, "Saero Entertainment",      "Fishing Maniac 3",                  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

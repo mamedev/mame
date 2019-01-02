@@ -13,20 +13,27 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/timeplt.h"
 #include "audio/timeplt.h"
 
 #include "machine/gen_latch.h"
 #include "speaker.h"
 
 
-#define MASTER_CLOCK         XTAL(14'318'181)
-
-
 DEFINE_DEVICE_TYPE(TIMEPLT_AUDIO, timeplt_audio_device, "timplt_audio", "Time Pilot Audio")
+DEFINE_DEVICE_TYPE(LOCOMOTN_AUDIO, locomotn_audio_device, "locomotn_audio", "Loco-Motion Audio")
 
 timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TIMEPLT_AUDIO, tag, owner, clock)
+	: timeplt_audio_device(mconfig, TIMEPLT_AUDIO, tag, owner, clock)
+{
+}
+
+locomotn_audio_device::locomotn_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: timeplt_audio_device(mconfig, LOCOMOTN_AUDIO, tag, owner, clock)
+{
+}
+
+timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_soundcpu(*this, "tpsound")
 	, m_soundlatch(*this, "soundlatch")
@@ -88,7 +95,7 @@ READ8_MEMBER( timeplt_audio_device::portB_r )
  *
  *************************************/
 
-void timeplt_audio_device::filter_w(filter_rc_device &device, int data)
+void timeplt_audio_device::set_filter(filter_rc_device &device, int data)
 {
 	int C = 0;
 
@@ -103,12 +110,12 @@ void timeplt_audio_device::filter_w(filter_rc_device &device, int data)
 
 WRITE8_MEMBER( timeplt_audio_device::filter_w )
 {
-	filter_w(*m_filter_1[0], (offset >>  0) & 3);
-	filter_w(*m_filter_1[1], (offset >>  2) & 3);
-	filter_w(*m_filter_1[2], (offset >>  4) & 3);
-	filter_w(*m_filter_0[0], (offset >>  6) & 3);
-	filter_w(*m_filter_0[1], (offset >>  8) & 3);
-	filter_w(*m_filter_0[2], (offset >> 10) & 3);
+	set_filter(*m_filter_1[0], (offset >>  0) & 3);
+	set_filter(*m_filter_1[1], (offset >>  2) & 3);
+	set_filter(*m_filter_1[2], (offset >>  4) & 3);
+	set_filter(*m_filter_0[0], (offset >>  6) & 3);
+	set_filter(*m_filter_0[1], (offset >>  8) & 3);
+	set_filter(*m_filter_0[2], (offset >> 10) & 3);
 }
 
 
@@ -159,15 +166,15 @@ void timeplt_audio_device::timeplt_sound_map(address_map &map)
 	map(0x5000, 0x5000).mirror(0x0fff).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x6000, 0x6000).mirror(0x0fff).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x7000, 0x7000).mirror(0x0fff).w("ay2", FUNC(ay8910_device::address_w));
-	map(0x8000, 0xffff).w(this, FUNC(timeplt_audio_device::filter_w));
+	map(0x8000, 0xffff).w(FUNC(timeplt_audio_device::filter_w));
 }
 
 
-void timeplt_audio_device::locomotn_sound_map(address_map &map)
+void locomotn_audio_device::locomotn_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).mirror(0x0c00).ram();
-	map(0x3000, 0x3fff).w(this, FUNC(timeplt_audio_device::filter_w));
+	map(0x3000, 0x3fff).w(FUNC(locomotn_audio_device::filter_w));
 	map(0x4000, 0x4000).mirror(0x0fff).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x5000, 0x5000).mirror(0x0fff).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x6000, 0x6000).mirror(0x0fff).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
@@ -181,51 +188,43 @@ void timeplt_audio_device::locomotn_sound_map(address_map &map)
  *
  *************************************/
 
-MACHINE_CONFIG_START(timeplt_audio_device::timeplt_sound)
-
+void timeplt_audio_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("tpsound",Z80,MASTER_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(timeplt_sound_map)
+	Z80(config, m_soundcpu, DERIVED_CLOCK(1, 8));
+	m_soundcpu->set_addrmap(AS_PROGRAM, &timeplt_audio_device::timeplt_sound_map);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(timeplt_audio_device, portB_r))
-	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.60)
-	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.60)
-	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.60)
+	ay8910_device &ay1(AY8910(config, "ay1", DERIVED_CLOCK(1, 8)));
+	ay1.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	ay1.port_b_read_callback().set(FUNC(timeplt_audio_device::portB_r));
+	ay1.add_route(0, "filter.0.0", 0.60);
+	ay1.add_route(1, "filter.0.1", 0.60);
+	ay1.add_route(2, "filter.0.2", 0.60);
 
-	MCFG_SOUND_ADD("ay2", AY8910, MASTER_CLOCK/8)
-	MCFG_SOUND_ROUTE(0, "filter.1.0", 0.60)
-	MCFG_SOUND_ROUTE(1, "filter.1.1", 0.60)
-	MCFG_SOUND_ROUTE(2, "filter.1.2", 0.60)
+	ay8910_device &ay2(AY8910(config, "ay2", DERIVED_CLOCK(1, 8)));
+	ay2.add_route(0, "filter.1.0", 0.60);
+	ay2.add_route(1, "filter.1.1", 0.60);
+	ay2.add_route(2, "filter.1.2", 0.60);
 
-	MCFG_FILTER_RC_ADD("filter.0.0", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter.0.1", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter.0.2", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	for (required_device<filter_rc_device> &filter : m_filter_0)
+		FILTER_RC(config, filter).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_FILTER_RC_ADD("filter.1.0", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter.1.1", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter.1.2", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	for (required_device<filter_rc_device> &filter : m_filter_1)
+		FILTER_RC(config, filter).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(timeplt_audio_device::locomotn_sound)
-	timeplt_sound(config);
+MACHINE_CONFIG_START(locomotn_audio_device::device_add_mconfig)
+	timeplt_audio_device::device_add_mconfig(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("tpsound")
-	MCFG_CPU_PROGRAM_MAP(locomotn_sound_map)
+	MCFG_DEVICE_MODIFY("tpsound")
+	MCFG_DEVICE_PROGRAM_MAP(locomotn_sound_map)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

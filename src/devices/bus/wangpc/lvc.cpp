@@ -124,11 +124,12 @@ MACHINE_CONFIG_START(wangpc_lvc_device::device_add_mconfig)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(60)
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845_1, SCREEN_TAG, XTAL(14'318'181)/16)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(wangpc_lvc_device, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(wangpc_lvc_device, vsync_w))
+	MC6845_1(config, m_crtc, XTAL(14'318'181)/16);
+	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(wangpc_lvc_device::crtc_update_row), this);
+	m_crtc->out_vsync_callback().set(FUNC(wangpc_lvc_device::vsync_w));
 MACHINE_CONFIG_END
 
 

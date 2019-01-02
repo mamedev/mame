@@ -63,62 +63,62 @@ alto2_log_t logprintf;
 
 void alto2_cpu_device::ucode_map(address_map &map)
 {
-	map(0, 4*ALTO2_UCODE_PAGE_SIZE - 1).rw(this, FUNC(alto2_cpu_device::crom_cram_r), FUNC(alto2_cpu_device::crom_cram_w));
+	map(0, 4*ALTO2_UCODE_PAGE_SIZE - 1).rw(FUNC(alto2_cpu_device::crom_cram_r), FUNC(alto2_cpu_device::crom_cram_w));
 }
 
 void alto2_cpu_device::const_map(address_map &map)
 {
-	map(0, ALTO2_CONST_SIZE - 1).r(this, FUNC(alto2_cpu_device::const_r));
+	map(0, ALTO2_CONST_SIZE - 1).r(FUNC(alto2_cpu_device::const_r));
 }
 
 void alto2_cpu_device::iomem_map(address_map &map)
 {
-	map(0, ALTO2_IO_PAGE_BASE - 1).rw(this, FUNC(alto2_cpu_device::ioram_r), FUNC(alto2_cpu_device::ioram_w));
+	map(0, ALTO2_IO_PAGE_BASE - 1).rw(FUNC(alto2_cpu_device::ioram_r), FUNC(alto2_cpu_device::ioram_w));
 	// page 0376
-	map(0177000, 0177015).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
-	map(0177016, 0177016).rw(this, FUNC(alto2_cpu_device::utilout_r), FUNC(alto2_cpu_device::utilout_w));    // UTILOUT register
-	map(0177017, 0177017).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // unused range
-	map(0177020, 0177023).rw(this, FUNC(alto2_cpu_device::xbus_r), FUNC(alto2_cpu_device::xbus_w));         // XBUS[0-3] registers
-	map(0177024, 0177024).r(this, FUNC(alto2_cpu_device::mear_r));                  // MEAR (memory error address register)
-	map(0177025, 0177025).rw(this, FUNC(alto2_cpu_device::mesr_r), FUNC(alto2_cpu_device::mesr_w));        // MESR (memory error status register)
-	map(0177026, 0177026).rw(this, FUNC(alto2_cpu_device::mecr_r), FUNC(alto2_cpu_device::mecr_w));        // MECR (memory error control register)
-	map(0177027, 0177027).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
-	map(0177030, 0177033).r(this, FUNC(alto2_cpu_device::utilin_r));                // UTILIN register
-	map(0177034, 0177037).r(this, FUNC(alto2_cpu_device::kbd_ad_r));                // KBD_AD[0-3] matrix
-	map(0177040, 0177057).rw(this, FUNC(alto2_cpu_device::bank_reg_r), FUNC(alto2_cpu_device::bank_reg_w));  // BANK[0-17] registers (4 bit)
-	map(0177060, 0177077).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
-	map(0177100, 0177101).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Summagraphics tablet X, Y }
-	map(0177102, 0177137).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
-	map(0177140, 0177157).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Organ keyboard }
-	map(0177160, 0177177).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
-	map(0177200, 0177204).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { PROM programmer }
-	map(0177205, 0177233).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
-	map(0177234, 0177237).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Experimental cursor control }
-	map(0177240, 0177257).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Alto-II debugger }
+	map(0177000, 0177015).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
+	map(0177016, 0177016).rw(FUNC(alto2_cpu_device::utilout_r), FUNC(alto2_cpu_device::utilout_w));    // UTILOUT register
+	map(0177017, 0177017).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // unused range
+	map(0177020, 0177023).rw(FUNC(alto2_cpu_device::xbus_r), FUNC(alto2_cpu_device::xbus_w));         // XBUS[0-3] registers
+	map(0177024, 0177024).r(FUNC(alto2_cpu_device::mear_r));                  // MEAR (memory error address register)
+	map(0177025, 0177025).rw(FUNC(alto2_cpu_device::mesr_r), FUNC(alto2_cpu_device::mesr_w));        // MESR (memory error status register)
+	map(0177026, 0177026).rw(FUNC(alto2_cpu_device::mecr_r), FUNC(alto2_cpu_device::mecr_w));        // MECR (memory error control register)
+	map(0177027, 0177027).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
+	map(0177030, 0177033).r(FUNC(alto2_cpu_device::utilin_r));                // UTILIN register
+	map(0177034, 0177037).r(FUNC(alto2_cpu_device::kbd_ad_r));                // KBD_AD[0-3] matrix
+	map(0177040, 0177057).rw(FUNC(alto2_cpu_device::bank_reg_r), FUNC(alto2_cpu_device::bank_reg_w));  // BANK[0-17] registers (4 bit)
+	map(0177060, 0177077).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
+	map(0177100, 0177101).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Summagraphics tablet X, Y }
+	map(0177102, 0177137).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
+	map(0177140, 0177157).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Organ keyboard }
+	map(0177160, 0177177).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
+	map(0177200, 0177204).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { PROM programmer }
+	map(0177205, 0177233).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
+	map(0177234, 0177237).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Experimental cursor control }
+	map(0177240, 0177257).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Alto-II debugger }
 //  AM_RANGE(0177244,                    0177247)                           AM_READWRITE( noop_r, noop_w )          // { Graphics keyboard }
-	map(0177260, 0177377).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
+	map(0177260, 0177377).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
 	// page 0377
 //  AM_RANGE(0177400,                    0177405)                           AM_READWRITE( noop_r, noop_w )          // { Maxc2 maintenance interface }
-	map(0177400, 0177400).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Alto DLS input }
-	map(0177401, 0177417).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
-	map(0177420, 0177420).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { "" }
-	map(0177421, 0177437).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
-	map(0177440, 0177440).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { "" }
-	map(0177441, 0177457).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
-	map(0177460, 0177460).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { "" }
-	map(0177461, 0177577).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
-	map(0177600, 0177677).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Alto DLS output }
-	map(0177700, 0177700).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { EIA interface output bit }
-	map(0177701, 0177701).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { EIA interface input bit }
-	map(0177702, 0177717).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
-	map(0177720, 0177737).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { TV camera interface }
-	map(0177740, 0177763).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
-	map(0177764, 0177773).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Redactron tape drive }
-	map(0177774, 0177775).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
-	map(0177776, 0177776).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Digital-Analog Converter, Joystick }
-	map(0177777, 0177777).rw(this, FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Digital-Analog Converter, Joystick }
+	map(0177400, 0177400).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Alto DLS input }
+	map(0177401, 0177417).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
+	map(0177420, 0177420).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { "" }
+	map(0177421, 0177437).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
+	map(0177440, 0177440).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { "" }
+	map(0177441, 0177457).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
+	map(0177460, 0177460).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { "" }
+	map(0177461, 0177577).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
+	map(0177600, 0177677).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Alto DLS output }
+	map(0177700, 0177700).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { EIA interface output bit }
+	map(0177701, 0177701).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { EIA interface input bit }
+	map(0177702, 0177717).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
+	map(0177720, 0177737).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { TV camera interface }
+	map(0177740, 0177763).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
+	map(0177764, 0177773).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Redactron tape drive }
+	map(0177774, 0177775).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
+	map(0177776, 0177776).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Digital-Analog Converter, Joystick }
+	map(0177777, 0177777).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Digital-Analog Converter, Joystick }
 
-	map(0200000, 0377777).rw(this, FUNC(alto2_cpu_device::ioram_r), FUNC(alto2_cpu_device::ioram_w));
+	map(0200000, 0377777).rw(FUNC(alto2_cpu_device::ioram_r), FUNC(alto2_cpu_device::ioram_w));
 }
 
 //-------------------------------------------------

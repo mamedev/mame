@@ -14,43 +14,39 @@ void i82875p_host_device::agp_translation_map(address_map &map)
 void i82875p_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
-	map(0x51, 0x51).rw(this, FUNC(i82875p_host_device::agpm_r), FUNC(i82875p_host_device::agpm_w));
-	map(0x52, 0x52).r(this, FUNC(i82875p_host_device::gc_r));
-	map(0x53, 0x53).r(this, FUNC(i82875p_host_device::csabcont_r));
-	map(0x58, 0x5b).r(this, FUNC(i82875p_host_device::eap_r));
-	map(0x5c, 0x5c).r(this, FUNC(i82875p_host_device::derrsyn_r));
-	map(0x5d, 0x5d).r(this, FUNC(i82875p_host_device::des_r));
-	map(0x60, 0x60).rw(this, FUNC(i82875p_host_device::fpllcont_r), FUNC(i82875p_host_device::fpllcont_w));
-	map(0x90, 0x97).rw(this, FUNC(i82875p_host_device::pam_r), FUNC(i82875p_host_device::pam_w));
-	map(0x9d, 0x9d).rw(this, FUNC(i82875p_host_device::smram_r), FUNC(i82875p_host_device::smram_w));
-	map(0x9e, 0x9e).rw(this, FUNC(i82875p_host_device::esmramc_r), FUNC(i82875p_host_device::esmramc_w));
-	map(0xa0, 0xa3).r(this, FUNC(i82875p_host_device::acapid_r));
-	map(0xa4, 0xa7).r(this, FUNC(i82875p_host_device::agpstat_r));
-	map(0xa8, 0xab).r(this, FUNC(i82875p_host_device::agpcmd_r));
-	map(0xb0, 0xb3).rw(this, FUNC(i82875p_host_device::agpctrl_r), FUNC(i82875p_host_device::agpctrl_w));
-	map(0xb4, 0xb4).rw(this, FUNC(i82875p_host_device::apsize_r), FUNC(i82875p_host_device::apsize_w));
-	map(0xb8, 0xbb).rw(this, FUNC(i82875p_host_device::attbase_r), FUNC(i82875p_host_device::attbase_w));
-	map(0xbc, 0xbc).rw(this, FUNC(i82875p_host_device::amtt_r), FUNC(i82875p_host_device::amtt_w));
-	map(0xbd, 0xbd).rw(this, FUNC(i82875p_host_device::lptt_r), FUNC(i82875p_host_device::lptt_w));
-	map(0xc4, 0xc5).rw(this, FUNC(i82875p_host_device::toud_r), FUNC(i82875p_host_device::toud_w));
-	map(0xc6, 0xc7).rw(this, FUNC(i82875p_host_device::mchcfg_r), FUNC(i82875p_host_device::mchcfg_w));
-	map(0xc8, 0xc9).r(this, FUNC(i82875p_host_device::errsts_r));
-	map(0xca, 0xcb).rw(this, FUNC(i82875p_host_device::errcmd_r), FUNC(i82875p_host_device::errcmd_w));
-	map(0xcc, 0xcd).rw(this, FUNC(i82875p_host_device::smicmd_r), FUNC(i82875p_host_device::smicmd_w));
-	map(0xce, 0xcf).rw(this, FUNC(i82875p_host_device::scicmd_r), FUNC(i82875p_host_device::scicmd_w));
-	map(0xde, 0xdf).rw(this, FUNC(i82875p_host_device::skpd_r), FUNC(i82875p_host_device::skpd_w));
-	map(0xe4, 0xe7).r(this, FUNC(i82875p_host_device::capreg1_r));
-	map(0xe8, 0xe8).r(this, FUNC(i82875p_host_device::capreg2_r));
+	map(0x51, 0x51).rw(FUNC(i82875p_host_device::agpm_r), FUNC(i82875p_host_device::agpm_w));
+	map(0x52, 0x52).r(FUNC(i82875p_host_device::gc_r));
+	map(0x53, 0x53).r(FUNC(i82875p_host_device::csabcont_r));
+	map(0x58, 0x5b).r(FUNC(i82875p_host_device::eap_r));
+	map(0x5c, 0x5c).r(FUNC(i82875p_host_device::derrsyn_r));
+	map(0x5d, 0x5d).r(FUNC(i82875p_host_device::des_r));
+	map(0x60, 0x60).rw(FUNC(i82875p_host_device::fpllcont_r), FUNC(i82875p_host_device::fpllcont_w));
+	map(0x90, 0x97).rw(FUNC(i82875p_host_device::pam_r), FUNC(i82875p_host_device::pam_w));
+	map(0x9d, 0x9d).rw(FUNC(i82875p_host_device::smram_r), FUNC(i82875p_host_device::smram_w));
+	map(0x9e, 0x9e).rw(FUNC(i82875p_host_device::esmramc_r), FUNC(i82875p_host_device::esmramc_w));
+	map(0xa0, 0xa3).r(FUNC(i82875p_host_device::acapid_r));
+	map(0xa4, 0xa7).r(FUNC(i82875p_host_device::agpstat_r));
+	map(0xa8, 0xab).r(FUNC(i82875p_host_device::agpcmd_r));
+	map(0xb0, 0xb3).rw(FUNC(i82875p_host_device::agpctrl_r), FUNC(i82875p_host_device::agpctrl_w));
+	map(0xb4, 0xb4).rw(FUNC(i82875p_host_device::apsize_r), FUNC(i82875p_host_device::apsize_w));
+	map(0xb8, 0xbb).rw(FUNC(i82875p_host_device::attbase_r), FUNC(i82875p_host_device::attbase_w));
+	map(0xbc, 0xbc).rw(FUNC(i82875p_host_device::amtt_r), FUNC(i82875p_host_device::amtt_w));
+	map(0xbd, 0xbd).rw(FUNC(i82875p_host_device::lptt_r), FUNC(i82875p_host_device::lptt_w));
+	map(0xc4, 0xc5).rw(FUNC(i82875p_host_device::toud_r), FUNC(i82875p_host_device::toud_w));
+	map(0xc6, 0xc7).rw(FUNC(i82875p_host_device::mchcfg_r), FUNC(i82875p_host_device::mchcfg_w));
+	map(0xc8, 0xc9).r(FUNC(i82875p_host_device::errsts_r));
+	map(0xca, 0xcb).rw(FUNC(i82875p_host_device::errcmd_r), FUNC(i82875p_host_device::errcmd_w));
+	map(0xcc, 0xcd).rw(FUNC(i82875p_host_device::smicmd_r), FUNC(i82875p_host_device::smicmd_w));
+	map(0xce, 0xcf).rw(FUNC(i82875p_host_device::scicmd_r), FUNC(i82875p_host_device::scicmd_w));
+	map(0xde, 0xdf).rw(FUNC(i82875p_host_device::skpd_r), FUNC(i82875p_host_device::skpd_w));
+	map(0xe4, 0xe7).r(FUNC(i82875p_host_device::capreg1_r));
+	map(0xe8, 0xe8).r(FUNC(i82875p_host_device::capreg2_r));
 }
 
 i82875p_host_device::i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, I82875P_HOST, tag, owner, clock)
+	, cpu(*this, finder_base::DUMMY_TAG)
 {
-}
-
-void i82875p_host_device::set_cpu_tag(const char *_cpu_tag)
-{
-	cpu_tag = _cpu_tag;
 }
 
 void i82875p_host_device::set_ram_size(int _ram_size)
@@ -66,7 +62,6 @@ READ8_MEMBER(i82875p_host_device::capptr_r)
 void i82875p_host_device::device_start()
 {
 	pci_host_device::device_start();
-	cpu = machine().device<cpu_device>(cpu_tag);
 	memory_space = &cpu->space(AS_PROGRAM);
 	io_space = &cpu->space(AS_IO);
 
@@ -431,6 +426,7 @@ void i82875p_host_device::map_extra(uint64_t memory_window_start, uint64_t memor
 i82875p_agp_device::i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: agp_bridge_device(mconfig, I82875P_AGP, tag, owner, clock)
 {
+	set_ids_bridge(0x80862579, 0x02);
 }
 
 void i82875p_agp_device::device_start()
@@ -445,10 +441,10 @@ void i82875p_agp_device::device_reset()
 
 void i82875p_overflow_device::overflow_map(address_map &map)
 {
-	map(0x000, 0x007).rw(this, FUNC(i82875p_overflow_device::dram_row_boundary_r), FUNC(i82875p_overflow_device::dram_row_boundary_w));
-	map(0x010, 0x013).rw(this, FUNC(i82875p_overflow_device::dram_row_attribute_r), FUNC(i82875p_overflow_device::dram_row_attribute_w));
-	map(0x060, 0x064).rw(this, FUNC(i82875p_overflow_device::dram_timing_r), FUNC(i82875p_overflow_device::dram_timing_w));
-	map(0x068, 0x06b).rw(this, FUNC(i82875p_overflow_device::dram_controller_mode_r), FUNC(i82875p_overflow_device::dram_controller_mode_w));
+	map(0x000, 0x007).rw(FUNC(i82875p_overflow_device::dram_row_boundary_r), FUNC(i82875p_overflow_device::dram_row_boundary_w));
+	map(0x010, 0x013).rw(FUNC(i82875p_overflow_device::dram_row_attribute_r), FUNC(i82875p_overflow_device::dram_row_attribute_w));
+	map(0x060, 0x064).rw(FUNC(i82875p_overflow_device::dram_timing_r), FUNC(i82875p_overflow_device::dram_timing_w));
+	map(0x068, 0x06b).rw(FUNC(i82875p_overflow_device::dram_controller_mode_r), FUNC(i82875p_overflow_device::dram_controller_mode_w));
 }
 
 

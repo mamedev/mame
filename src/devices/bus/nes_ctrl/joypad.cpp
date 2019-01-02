@@ -39,7 +39,8 @@ DEFINE_DEVICE_TYPE(NES_FCPAD_P2,    nes_fcpad2_device,   "nes_fcpad2",   "Ninten
 DEFINE_DEVICE_TYPE(NES_CCPAD_LEFT,  nes_ccpadl_device,   "nes_ccpadl",   "FC Crazy Climber Left Pad")
 DEFINE_DEVICE_TYPE(NES_CCPAD_RIGHT, nes_ccpadr_device,   "nes_ccpadr",   "FC Crazy Climber Right Pad")
 DEFINE_DEVICE_TYPE(NES_ARCSTICK,    nes_arcstick_device, "nes_arcstick", "Nintendo Family Computer Arcade Stick")
-
+// for the standalone TV Plug and Play
+DEFINE_DEVICE_TYPE(NES_VT_MAJESCO_DDR, nes_vt_majesco_ddr_device,   "nes_ddr",   "Majesco DDR Pad")
 
 static INPUT_PORTS_START( nes_joypad )
 	PORT_START("JOYPAD")
@@ -75,6 +76,18 @@ static INPUT_PORTS_START( nes_ccpad_left )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nes_ddr )
+	PORT_START("JOYPAD")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Up Arrow") // these can't be treated as a joystick as opposing directions are often required
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Down Arrow")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Left Arrow")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Right Arrow")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nes_ccpad_right )
@@ -142,21 +155,27 @@ ioport_constructor nes_arcstick_device::device_input_ports() const
 	return INPUT_PORTS_NAME( nes_arcstick );
 }
 
+ioport_constructor nes_vt_majesco_ddr_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( nes_ddr );
+}
 
 
-static SLOT_INTERFACE_START( arcstick_daisy )
-	SLOT_INTERFACE("arcstick", NES_ARCSTICK)
-SLOT_INTERFACE_END
+static void arcstick_daisy(device_slot_interface &device)
+{
+	device.option_add("arcstick", NES_ARCSTICK);
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nes_arcstick_device::device_add_mconfig)
+void nes_arcstick_device::device_add_mconfig(machine_config &config)
+{
 	// expansion port to allow daisy chaining
-	MCFG_FC_EXPANSION_PORT_ADD("subexp", arcstick_daisy, nullptr)
-MACHINE_CONFIG_END
+	NES_CONTROL_PORT(config, "subexp", arcstick_daisy, nullptr);
+}
 
 
 //**************************************************************************
@@ -191,6 +210,11 @@ nes_ccpadl_device::nes_ccpadl_device(const machine_config &mconfig, const char *
 
 nes_ccpadr_device::nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nes_joypad_device(mconfig, NES_CCPAD_RIGHT, tag, owner, clock)
+{
+}
+
+nes_vt_majesco_ddr_device::nes_vt_majesco_ddr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nes_joypad_device(mconfig, NES_VT_MAJESCO_DDR, tag, owner, clock)
 {
 }
 

@@ -12,51 +12,6 @@
 
 #pragma once
 
-#define MCFG_ROC10937_ADD(_tag,_val) \
-		MCFG_DEVICE_ADD(_tag, ROC10937,60)\
-		MCFG_ROC10937_PORT(_val)
-
-#define MCFG_ROC10937_PORT(_val) \
-		downcast<roc10937_device &>(*device).set_port_value(_val);
-#define MCFG_ROC10937_REMOVE(_tag) \
-		MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_ROC10957_ADD(_tag,_val) \
-		MCFG_DEVICE_ADD(_tag, ROC10957,60)\
-		MCFG_ROC10957_PORT(_val)
-
-#define MCFG_ROC10957_PORT(_val) \
-		downcast<roc10957_device &>(*device).set_port_value(_val);
-#define MCFG_ROC10957_REMOVE(_tag) \
-		MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_MSC1937_ADD(_tag,_val) \
-		MCFG_DEVICE_ADD(_tag, MSC1937,60)\
-		MCFG_MSC1937_PORT(_val)
-
-#define MCFG_MSC1937_PORT(_val) \
-		downcast<msc1937_device &>(*device).set_port_value(_val);
-
-#define MCFG_MSC1937_REMOVE(_tag) \
-		MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_MIC10937_ADD(_tag,_val) \
-		MCFG_DEVICE_ADD(_tag, MIC10937,60)\
-		MCFG_MIC10937_PORT(_val)
-
-#define MCFG_MIC10937_PORT(_val) \
-		downcast<mic10937_device &>(*device).set_port_value(_val);
-
-#define MCFG_MIC10937_REMOVE(_tag) \
-		MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_S16LF01_ADD(_tag,_val) \
-		MCFG_DEVICE_ADD(_tag, S16LF01,60)\
-		MCFG_S16LF01_PORT(_val)
-
-#define MCFG_S16LF01_PORT(_val) \
-		downcast<s16lf01_device &>(*device).set_port_value(_val);
-
 class rocvfd_device : public device_t
 {
 public:
@@ -103,29 +58,29 @@ private:
 
 class roc10937_device : public rocvfd_device {
 public:
-	roc10937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	roc10937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 60);
 };
 
 class msc1937_device : public rocvfd_device {
 public:
-	msc1937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msc1937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 60);
 };
 
 class mic10937_device : public rocvfd_device {
 public:
-	mic10937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mic10937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 60);
 };
 
 class roc10957_device : public rocvfd_device {
 public:
-	roc10957_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	roc10957_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 60);
 
 	void write_char(int data);
 };
 
 class s16lf01_device : public rocvfd_device {
 public:
-	s16lf01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s16lf01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 60);
 };
 
 

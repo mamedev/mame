@@ -65,9 +65,11 @@ public:
 	su2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag){ }
 
-		void su2000(machine_config &config);
-		void pcat_io(address_map &map);
-		void pcat_map(address_map &map);
+	void su2000(machine_config &config);
+
+private:
+	void pcat_io(address_map &map);
+	void pcat_map(address_map &map);
 };
 
 
@@ -126,23 +128,23 @@ static void ide_interrupt(device_t *device, int state)
 
 MACHINE_CONFIG_START(su2000_state::su2000)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486, I486_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(pcat_map)
-	MCFG_CPU_IO_MAP(pcat_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I486, I486_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(pcat_map)
+	MCFG_DEVICE_IO_MAP(pcat_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 #if 0
-	MCFG_CPU_ADD("tracker", TMS32031, TMS320C1_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(tracker_map)
+	MCFG_DEVICE_ADD("tracker", TMS32031, TMS320C1_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(tracker_map)
 
-	MCFG_CPU_ADD("pix_cpu1", MC88110, MC88110_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(pix_cpu_a)
+	MCFG_DEVICE_ADD("pix_cpu1", MC88110, MC88110_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(pix_cpu_a)
 
-	MCFG_CPU_ADD("pix_cpu2", MC88110, MC88110_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(pix_cpu_b)
+	MCFG_DEVICE_ADD("pix_cpu2", MC88110, MC88110_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(pix_cpu_b)
 
-	MCFG_CPU_ADD("format_c", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(formatc_map)
+	MCFG_DEVICE_ADD("format_c", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(formatc_map)
 #endif
 
 	/* Video hardware */
@@ -150,10 +152,9 @@ MACHINE_CONFIG_START(su2000_state::su2000)
 
 	pcat_common(config);
 
-	MCFG_DEVICE_REMOVE("rtc")
-	MCFG_DS12885_ADD("rtc")
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	DS12885(config.replace(), m_mc146818); // TODO: Rename m_mc146818 to m_rtc
+	m_mc146818->irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
+	m_mc146818->set_century_index(0x32);
 MACHINE_CONFIG_END
 
 
@@ -271,4 +272,4 @@ ROM_START( su2000 )
  *
  *************************************/
 
-GAME( 1993, su2000, 0, su2000, pc_keyboard, su2000_state, 0, ROT0, "Virtuality", "SU2000", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1993, su2000, 0, su2000, pc_keyboard, su2000_state, empty_init, ROT0, "Virtuality", "SU2000", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -8,15 +8,13 @@
 
 #include "video/vector.h"
 
-#define MCFG_AVGDVG_VECTOR(_tag) \
-	downcast<avgdvg_device &>(*device).set_vector_tag("^" _tag);
 
 // ======================> avgdvg_device
 
 class avgdvg_device : public device_t
 {
 public:
-	void set_vector_tag(const char *tag) { m_vector.set_tag(tag); }
+	template <typename T> void set_vector_tag(T &&tag) { m_vector.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(done_r);
 	DECLARE_WRITE8_MEMBER(go_w);

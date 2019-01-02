@@ -114,7 +114,7 @@ READ16_MEMBER( sns_rom20_necdsp_device::necdsp_data_r )
 
 void sns_rom20_necdsp_device::dsp_prg_map_lorom(address_map &map)
 {
-	map(0x0000, 0x07ff).r(this, FUNC(sns_rom20_necdsp_device::necdsp_prg_r));
+	map(0x0000, 0x07ff).r(FUNC(sns_rom20_necdsp_device::necdsp_prg_r));
 }
 
 
@@ -124,7 +124,7 @@ void sns_rom20_necdsp_device::dsp_prg_map_lorom(address_map &map)
 
 void sns_rom20_necdsp_device::dsp_data_map_lorom(address_map &map)
 {
-	map(0x0000, 0x03ff).r(this, FUNC(sns_rom20_necdsp_device::necdsp_data_r));
+	map(0x0000, 0x03ff).r(FUNC(sns_rom20_necdsp_device::necdsp_data_r));
 }
 
 
@@ -133,9 +133,9 @@ void sns_rom20_necdsp_device::dsp_data_map_lorom(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sns_rom20_necdsp_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
-	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_lorom)
 MACHINE_CONFIG_END
 
 READ8_MEMBER( sns_rom20_necdsp_device::chip_read )
@@ -172,7 +172,7 @@ READ16_MEMBER( sns_rom21_necdsp_device::necdsp_data_r )
 
 void sns_rom21_necdsp_device::dsp_prg_map_hirom(address_map &map)
 {
-	map(0x0000, 0x07ff).r(this, FUNC(sns_rom21_necdsp_device::necdsp_prg_r));
+	map(0x0000, 0x07ff).r(FUNC(sns_rom21_necdsp_device::necdsp_prg_r));
 }
 
 
@@ -182,7 +182,7 @@ void sns_rom21_necdsp_device::dsp_prg_map_hirom(address_map &map)
 
 void sns_rom21_necdsp_device::dsp_data_map_hirom(address_map &map)
 {
-	map(0x0000, 0x03ff).r(this, FUNC(sns_rom21_necdsp_device::necdsp_data_r));
+	map(0x0000, 0x03ff).r(FUNC(sns_rom21_necdsp_device::necdsp_data_r));
 }
 
 //-------------------------------------------------
@@ -190,9 +190,9 @@ void sns_rom21_necdsp_device::dsp_data_map_hirom(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sns_rom21_necdsp_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_hirom)
-	MCFG_CPU_DATA_MAP(dsp_data_map_hirom)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_hirom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_hirom)
 MACHINE_CONFIG_END
 
 READ8_MEMBER( sns_rom21_necdsp_device::chip_read )
@@ -282,7 +282,7 @@ READ16_MEMBER( sns_rom_setadsp_device::setadsp_data_r )
 
 void sns_rom_setadsp_device::st01x_prg_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(sns_rom_setadsp_device::setadsp_prg_r));
+	map(0x0000, 0x3fff).r(FUNC(sns_rom_setadsp_device::setadsp_prg_r));
 }
 
 
@@ -292,7 +292,7 @@ void sns_rom_setadsp_device::st01x_prg_map(address_map &map)
 
 void sns_rom_setadsp_device::st01x_data_map(address_map &map)
 {
-	map(0x0000, 0x07ff).r(this, FUNC(sns_rom_setadsp_device::setadsp_data_r));
+	map(0x0000, 0x07ff).r(FUNC(sns_rom_setadsp_device::setadsp_data_r));
 }
 
 
@@ -301,16 +301,16 @@ void sns_rom_setadsp_device::st01x_data_map(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sns_rom_seta10dsp_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", UPD96050, 10000000)
-	MCFG_CPU_PROGRAM_MAP(st01x_prg_map)
-	MCFG_CPU_DATA_MAP(st01x_data_map)
+	MCFG_DEVICE_ADD("dsp", UPD96050, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(st01x_prg_map)
+	MCFG_DEVICE_DATA_MAP(st01x_data_map)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(sns_rom_seta11dsp_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", UPD96050, 15000000)
-	MCFG_CPU_PROGRAM_MAP(st01x_prg_map)
-	MCFG_CPU_DATA_MAP(st01x_data_map)
+	MCFG_DEVICE_ADD("dsp", UPD96050, 15000000)
+	MCFG_DEVICE_PROGRAM_MAP(st01x_prg_map)
+	MCFG_DEVICE_DATA_MAP(st01x_data_map)
 MACHINE_CONFIG_END
 
 
@@ -412,51 +412,51 @@ sns_rom_seta11dsp_legacy_device::sns_rom_seta11dsp_legacy_device(const machine_c
 
 
 MACHINE_CONFIG_START(sns_rom20_necdsp1_legacy_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
-	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_lorom)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sns_rom20_necdsp1b_legacy_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
-	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_lorom)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sns_rom20_necdsp2_legacy_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
-	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_lorom)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sns_rom20_necdsp3_legacy_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
-	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_lorom)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sns_rom20_necdsp4_legacy_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
-	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_lorom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_lorom)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sns_rom21_necdsp1_legacy_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_hirom)
-	MCFG_CPU_DATA_MAP(dsp_data_map_hirom)
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map_hirom)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map_hirom)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sns_rom_seta10dsp_legacy_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", UPD96050, 10000000)
-	MCFG_CPU_PROGRAM_MAP(st01x_prg_map)
-	MCFG_CPU_DATA_MAP(st01x_data_map)
+	MCFG_DEVICE_ADD("dsp", UPD96050, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(st01x_prg_map)
+	MCFG_DEVICE_DATA_MAP(st01x_data_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sns_rom_seta11dsp_legacy_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", UPD96050, 15000000)
-	MCFG_CPU_PROGRAM_MAP(st01x_prg_map)
-	MCFG_CPU_DATA_MAP(st01x_data_map)
+	MCFG_DEVICE_ADD("dsp", UPD96050, 15000000)
+	MCFG_DEVICE_PROGRAM_MAP(st01x_prg_map)
+	MCFG_DEVICE_DATA_MAP(st01x_data_map)
 MACHINE_CONFIG_END
 
 

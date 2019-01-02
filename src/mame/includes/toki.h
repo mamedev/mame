@@ -1,17 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski
+#ifndef MAME_INCLUDES_TOKI_H
+#define MAME_INCLUDES_TOKI_H
+
+#pragma once
 
 #include "audio/seibu.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "video/bufsprite.h"
+#include "emupal.h"
 #include "screen.h"
 
 class toki_state : public driver_device
 {
 public:
-	toki_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	toki_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_audiocpu_rom(*this, "audiocpu"),
@@ -25,8 +30,18 @@ public:
 		m_background1_videoram(*this, "bg1_vram"),
 		m_background2_videoram(*this, "bg2_vram"),
 		m_videoram(*this, "videoram"),
-		m_scrollram(*this, "scrollram") { }
+		m_scrollram(*this, "scrollram")
+	{ }
 
+	void toki(machine_config &config);
+	void jujuba(machine_config &config);
+	void tokib(machine_config &config);
+
+	void init_tokib();
+	void init_jujuba();
+	void init_toki();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_region_ptr<u8> m_audiocpu_rom;
@@ -62,10 +77,6 @@ public:
 
 	DECLARE_READ8_MEMBER(jujuba_z80_data_decrypt);
 
-	DECLARE_DRIVER_INIT(tokib);
-	DECLARE_DRIVER_INIT(jujuba);
-	DECLARE_DRIVER_INIT(toki);
-
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
@@ -76,9 +87,7 @@ public:
 	uint32_t screen_update_tokib(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void toki_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void tokib_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void toki(machine_config &config);
-	void jujuba(machine_config &config);
-	void tokib(machine_config &config);
+
 	void jujuba_audio_map(address_map &map);
 	void jujuba_audio_opcodes_map(address_map &map);
 	void toki_audio_map(address_map &map);
@@ -87,3 +96,5 @@ public:
 	void tokib_audio_map(address_map &map);
 	void tokib_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TOKI_H

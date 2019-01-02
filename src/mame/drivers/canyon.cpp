@@ -40,6 +40,7 @@
 
 #include "emu.h"
 #include "includes/canyon.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/discrete.h"
 #include "screen.h"
@@ -52,12 +53,12 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(canyon_state, canyon)
+void canyon_state::canyon_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80)); /* GREY  */
-	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); /* BLACK */
-	palette.set_pen_color(2, rgb_t(0x80, 0x80, 0x80)); /* GREY  */
-	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff)); /* WHITE */
+	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80)); // GREY
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // BLACK
+	palette.set_pen_color(2, rgb_t(0x80, 0x80, 0x80)); // GREY
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff)); // WHITE
 }
 
 
@@ -101,16 +102,6 @@ WRITE8_MEMBER(canyon_state::output_latch_w)
 	m_outlatch->write_bit((offset & 0x180) >> 6 | BIT(offset, 0), BIT(offset, 1));
 }
 
-WRITE_LINE_MEMBER(canyon_state::led1_w)
-{
-	output().set_led_value(0, state);
-}
-
-WRITE_LINE_MEMBER(canyon_state::led2_w)
-{
-	output().set_led_value(1, state);
-}
-
 
 
 
@@ -124,13 +115,13 @@ void canyon_state::main_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x00ff).mirror(0x100).ram();
-	map(0x0400, 0x0401).w(this, FUNC(canyon_state::canyon_motor_w));
-	map(0x0500, 0x0500).w(this, FUNC(canyon_state::canyon_explode_w));
+	map(0x0400, 0x0401).w(FUNC(canyon_state::canyon_motor_w));
+	map(0x0500, 0x0500).w(FUNC(canyon_state::canyon_explode_w));
 	map(0x0501, 0x0501).w(m_watchdog, FUNC(watchdog_timer_device::reset_w)); /* watchdog, disabled in service mode */
-	map(0x0600, 0x0603).select(0x0180).w(this, FUNC(canyon_state::output_latch_w));
-	map(0x0800, 0x0bff).ram().w(this, FUNC(canyon_state::canyon_videoram_w)).share("videoram");
-	map(0x1000, 0x17ff).r(this, FUNC(canyon_state::canyon_switches_r)).nopw();  /* sloppy code writes here */
-	map(0x1800, 0x1fff).r(this, FUNC(canyon_state::canyon_options_r));
+	map(0x0600, 0x0603).select(0x0180).w(FUNC(canyon_state::output_latch_w));
+	map(0x0800, 0x0bff).ram().w(FUNC(canyon_state::canyon_videoram_w)).share("videoram");
+	map(0x1000, 0x17ff).r(FUNC(canyon_state::canyon_switches_r)).nopw();  /* sloppy code writes here */
+	map(0x1800, 0x1fff).r(FUNC(canyon_state::canyon_options_r));
 	map(0x2000, 0x3fff).rom();
 }
 
@@ -235,7 +226,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START( canyon )
+static GFXDECODE_START( gfx_canyon )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_layout,   0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout, 0, 2 )
 GFXDECODE_END
@@ -251,39 +242,34 @@ GFXDECODE_END
 MACHINE_CONFIG_START(canyon_state::canyon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'096'000) / 16)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", canyon_state,  nmi_line_pulse)
+	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL / 16)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // C7
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<CANYON_WHISTLE1_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<CANYON_WHISTLE2_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(canyon_state, led1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(canyon_state, led2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<CANYON_ATTRACT1_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<CANYON_ATTRACT2_EN>))
+	F9334(config, m_outlatch); // C7
+	m_outlatch->q_out_cb<0>().set("discrete", FUNC(discrete_device::write_line<CANYON_WHISTLE1_EN>));
+	m_outlatch->q_out_cb<1>().set("discrete", FUNC(discrete_device::write_line<CANYON_WHISTLE2_EN>));
+	m_outlatch->q_out_cb<2>().set_output("led0"); // 1 PLAYER LAMP
+	m_outlatch->q_out_cb<3>().set_output("led1"); // 2 PLAYER LAMP
+	m_outlatch->q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<CANYON_ATTRACT1_EN>));
+	m_outlatch->q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<CANYON_ATTRACT2_EN>));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(22 * 1000000 / 15750))
-	MCFG_SCREEN_SIZE(256, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240) // HSYNC = 15,750 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(canyon_state, screen_update_canyon)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", m6502_device::NMI_LINE))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", canyon)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(canyon_state, canyon)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_canyon)
+	PALETTE(config, m_palette, FUNC(canyon_state::canyon_palette), 4);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(canyon)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, canyon_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -340,5 +326,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, canyon,  0,      canyon, canyon, canyon_state, 0, ROT0, "Atari", "Canyon Bomber", MACHINE_SUPPORTS_SAVE )
-GAME( 1977, canyonp, canyon, canyon, canyon, canyon_state, 0, ROT0, "Atari", "Canyon Bomber (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1977, canyon,  0,      canyon, canyon, canyon_state, empty_init, ROT0, "Atari", "Canyon Bomber", MACHINE_SUPPORTS_SAVE )
+GAME( 1977, canyonp, canyon, canyon, canyon, canyon_state, empty_init, ROT0, "Atari", "Canyon Bomber (prototype)", MACHINE_SUPPORTS_SAVE )

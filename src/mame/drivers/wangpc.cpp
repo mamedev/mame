@@ -26,6 +26,7 @@
 #include "bus/wangpc/wangpc.h"
 #include "cpu/i86/i86.h"
 #include "formats/pc_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/im6402.h"
@@ -47,6 +48,7 @@
 #define CENTRONICS_TAG  "centronics"
 #define RS232_TAG       "rs232"
 #define WANGPC_KEYBOARD_TAG "wangpckb"
+#define LED_DIAGNOSTIC  "led0"
 
 class wangpc_state : public driver_device
 {
@@ -70,6 +72,7 @@ public:
 		m_cent_data_out(*this, "cent_data_out"),
 		m_bus(*this, WANGPC_BUS_TAG),
 		m_sw(*this, "SW"),
+		m_led_diagnostic(*this, LED_DIAGNOSTIC),
 		m_timer2_irq(1),
 		m_centronics_ack(1),
 		m_dav(1),
@@ -89,6 +92,9 @@ public:
 	{
 	}
 
+	void wangpc(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<am9517a_device> m_dmac;
 	required_device<pic8259_device> m_pic;
@@ -105,6 +111,7 @@ public:
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<wangpcbus_device> m_bus;
 	required_ioport m_sw;
+	output_finder<> m_led_diagnostic;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -189,6 +196,9 @@ public:
 	image_init_result on_disk1_load(floppy_image_device *image);
 	void on_disk1_unload(floppy_image_device *image);
 
+	void wangpc_io(address_map &map);
+	void wangpc_mem(address_map &map);
+
 	uint8_t m_dma_page[4];
 	int m_dack;
 
@@ -214,9 +224,6 @@ public:
 	int m_ds2;
 
 	int m_led[6];
-	void wangpc(machine_config &config);
-	void wangpc_io(address_map &map);
-	void wangpc_mem(address_map &map);
 };
 
 
@@ -226,11 +233,6 @@ public:
 //**************************************************************************
 
 #define LOG 0
-
-enum
-{
-	LED_DIAGNOSTIC = 0
-};
 
 
 
@@ -511,7 +513,7 @@ READ8_MEMBER( wangpc_state::led_on_r )
 {
 	if (LOG) logerror("%s: Diagnostic LED on\n", machine().describe_context());
 
-	output().set_led_value(LED_DIAGNOSTIC, 1);
+	m_led_diagnostic = 1;
 
 	return 0xff;
 }
@@ -675,7 +677,7 @@ READ8_MEMBER( wangpc_state::led_off_r )
 {
 	if (LOG) logerror("%s: Diagnostic LED off\n", machine().describe_context());
 
-	output().set_led_value(LED_DIAGNOSTIC, 0);
+	m_led_diagnostic = 0;
 
 	return 0xff;
 }
@@ -746,18 +748,18 @@ void wangpc_state::wangpc_mem(address_map &map)
 void wangpc_state::wangpc_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x1000, 0x1000).w(this, FUNC(wangpc_state::fdc_ctrl_w));
-	map(0x1004, 0x1004).rw(this, FUNC(wangpc_state::deselect_drive1_r), FUNC(wangpc_state::deselect_drive1_w));
-	map(0x1006, 0x1006).rw(this, FUNC(wangpc_state::select_drive1_r), FUNC(wangpc_state::select_drive1_w));
-	map(0x1008, 0x1008).rw(this, FUNC(wangpc_state::deselect_drive2_r), FUNC(wangpc_state::deselect_drive2_w));
-	map(0x100a, 0x100a).rw(this, FUNC(wangpc_state::select_drive2_r), FUNC(wangpc_state::select_drive2_w));
-	map(0x100c, 0x100c).rw(this, FUNC(wangpc_state::motor1_off_r), FUNC(wangpc_state::motor1_off_w));
-	map(0x100e, 0x100e).rw(this, FUNC(wangpc_state::motor1_on_r), FUNC(wangpc_state::motor1_on_w));
-	map(0x1010, 0x1010).rw(this, FUNC(wangpc_state::motor2_off_r), FUNC(wangpc_state::motor2_off_w));
-	map(0x1012, 0x1012).rw(this, FUNC(wangpc_state::motor2_on_r), FUNC(wangpc_state::motor2_on_w));
+	map(0x1000, 0x1000).w(FUNC(wangpc_state::fdc_ctrl_w));
+	map(0x1004, 0x1004).rw(FUNC(wangpc_state::deselect_drive1_r), FUNC(wangpc_state::deselect_drive1_w));
+	map(0x1006, 0x1006).rw(FUNC(wangpc_state::select_drive1_r), FUNC(wangpc_state::select_drive1_w));
+	map(0x1008, 0x1008).rw(FUNC(wangpc_state::deselect_drive2_r), FUNC(wangpc_state::deselect_drive2_w));
+	map(0x100a, 0x100a).rw(FUNC(wangpc_state::select_drive2_r), FUNC(wangpc_state::select_drive2_w));
+	map(0x100c, 0x100c).rw(FUNC(wangpc_state::motor1_off_r), FUNC(wangpc_state::motor1_off_w));
+	map(0x100e, 0x100e).rw(FUNC(wangpc_state::motor1_on_r), FUNC(wangpc_state::motor1_on_w));
+	map(0x1010, 0x1010).rw(FUNC(wangpc_state::motor2_off_r), FUNC(wangpc_state::motor2_off_w));
+	map(0x1012, 0x1012).rw(FUNC(wangpc_state::motor2_on_r), FUNC(wangpc_state::motor2_on_w));
 	map(0x1014, 0x1017).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
-	map(0x1018, 0x1018).mirror(0x0002).rw(this, FUNC(wangpc_state::fdc_reset_r), FUNC(wangpc_state::fdc_reset_w));
-	map(0x101c, 0x101c).mirror(0x0002).rw(this, FUNC(wangpc_state::fdc_tc_r), FUNC(wangpc_state::fdc_tc_w));
+	map(0x1018, 0x1018).mirror(0x0002).rw(FUNC(wangpc_state::fdc_reset_r), FUNC(wangpc_state::fdc_reset_w));
+	map(0x101c, 0x101c).mirror(0x0002).rw(FUNC(wangpc_state::fdc_tc_r), FUNC(wangpc_state::fdc_tc_w));
 	map(0x1020, 0x1027).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x1028, 0x1029); //AM_WRITE(?)
 	map(0x1040, 0x1047).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
@@ -765,16 +767,16 @@ void wangpc_state::wangpc_io(address_map &map)
 	map(0x1080, 0x1087).r(m_epci, FUNC(mc2661_device::read)).umask16(0x00ff);
 	map(0x1088, 0x108f).w(m_epci, FUNC(mc2661_device::write)).umask16(0x00ff);
 	map(0x10a0, 0x10bf).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
-	map(0x10c2, 0x10c7).w(this, FUNC(wangpc_state::dma_page_w)).umask16(0x00ff);
-	map(0x10e0, 0x10e0).rw(this, FUNC(wangpc_state::status_r), FUNC(wangpc_state::timer0_irq_clr_w));
-	map(0x10e2, 0x10e2).rw(this, FUNC(wangpc_state::timer2_irq_clr_r), FUNC(wangpc_state::nmi_mask_w));
-	map(0x10e4, 0x10e4).rw(this, FUNC(wangpc_state::led_on_r), FUNC(wangpc_state::fpu_mask_w));
-	map(0x10e6, 0x10e6).rw(this, FUNC(wangpc_state::dma_eop_clr_r), FUNC(wangpc_state::uart_tbre_clr_w));
-	map(0x10e8, 0x10e8).rw(this, FUNC(wangpc_state::uart_r), FUNC(wangpc_state::uart_w));
-	map(0x10ea, 0x10ea).rw(this, FUNC(wangpc_state::centronics_r), FUNC(wangpc_state::centronics_w));
-	map(0x10ec, 0x10ec).rw(this, FUNC(wangpc_state::busy_clr_r), FUNC(wangpc_state::acknlg_clr_w));
-	map(0x10ee, 0x10ee).rw(this, FUNC(wangpc_state::led_off_r), FUNC(wangpc_state::parity_nmi_clr_w));
-	map(0x10fe, 0x10fe).r(this, FUNC(wangpc_state::option_id_r));
+	map(0x10c2, 0x10c7).w(FUNC(wangpc_state::dma_page_w)).umask16(0x00ff);
+	map(0x10e0, 0x10e0).rw(FUNC(wangpc_state::status_r), FUNC(wangpc_state::timer0_irq_clr_w));
+	map(0x10e2, 0x10e2).rw(FUNC(wangpc_state::timer2_irq_clr_r), FUNC(wangpc_state::nmi_mask_w));
+	map(0x10e4, 0x10e4).rw(FUNC(wangpc_state::led_on_r), FUNC(wangpc_state::fpu_mask_w));
+	map(0x10e6, 0x10e6).rw(FUNC(wangpc_state::dma_eop_clr_r), FUNC(wangpc_state::uart_tbre_clr_w));
+	map(0x10e8, 0x10e8).rw(FUNC(wangpc_state::uart_r), FUNC(wangpc_state::uart_w));
+	map(0x10ea, 0x10ea).rw(FUNC(wangpc_state::centronics_r), FUNC(wangpc_state::centronics_w));
+	map(0x10ec, 0x10ec).rw(FUNC(wangpc_state::busy_clr_r), FUNC(wangpc_state::acknlg_clr_w));
+	map(0x10ee, 0x10ee).rw(FUNC(wangpc_state::led_off_r), FUNC(wangpc_state::parity_nmi_clr_w));
+	map(0x10fe, 0x10fe).r(FUNC(wangpc_state::option_id_r));
 	map(0x1100, 0x1fff).rw(m_bus, FUNC(wangpcbus_device::sad_r), FUNC(wangpcbus_device::sad_w));
 }
 
@@ -1093,9 +1095,10 @@ WRITE_LINE_MEMBER( wangpc_state::epci_irq_w )
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( wangpc_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void wangpc_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 FLOPPY_FORMATS_MEMBER( wangpc_state::floppy_formats )
 	FLOPPY_PC_FORMAT
@@ -1188,6 +1191,8 @@ void wangpc_state::machine_start()
 	m_floppy1->setup_load_cb(floppy_image_device::load_cb(&wangpc_state::on_disk1_load, this));
 	m_floppy1->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk1_unload, this));
 
+	m_led_diagnostic.resolve();
+
 	// state saving
 	save_item(NAME(m_dma_page));
 	save_item(NAME(m_dack));
@@ -1271,90 +1276,89 @@ void wangpc_state::on_disk1_unload(floppy_image_device *image)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(wangpc_state::wangpc)
-	MCFG_CPU_ADD(I8086_TAG, I8086, 8000000)
-	MCFG_CPU_PROGRAM_MAP(wangpc_mem)
-	MCFG_CPU_IO_MAP(wangpc_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD(I8086_TAG, I8086, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(wangpc_mem)
+	MCFG_DEVICE_IO_MAP(wangpc_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)
 	//MCFG_QUANTUM_PERFECT_CPU(I8086_TAG)
 
 	// devices
-	MCFG_DEVICE_ADD(AM9517A_TAG, AM9517A, 4000000)
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(wangpc_state, hrq_w))
-	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(wangpc_state, eop_w))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(wangpc_state, memr_r))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(wangpc_state, memw_w))
-	MCFG_AM9517A_IN_IOR_1_CB(DEVREAD8(WANGPC_BUS_TAG, wangpcbus_device, dack1_r))
-	MCFG_AM9517A_IN_IOR_2_CB(READ8(wangpc_state, ior2_r))
-	MCFG_AM9517A_IN_IOR_3_CB(DEVREAD8(WANGPC_BUS_TAG, wangpcbus_device, dack3_r))
-	MCFG_AM9517A_OUT_IOW_1_CB(DEVWRITE8(WANGPC_BUS_TAG, wangpcbus_device, dack1_w))
-	MCFG_AM9517A_OUT_IOW_2_CB(WRITE8(wangpc_state, iow2_w))
-	MCFG_AM9517A_OUT_IOW_3_CB(DEVWRITE8(WANGPC_BUS_TAG, wangpcbus_device, dack3_w))
-	MCFG_AM9517A_OUT_DACK_0_CB(WRITELINE(wangpc_state, dack0_w))
-	MCFG_AM9517A_OUT_DACK_1_CB(WRITELINE(wangpc_state, dack1_w))
-	MCFG_AM9517A_OUT_DACK_2_CB(WRITELINE(wangpc_state, dack2_w))
-	MCFG_AM9517A_OUT_DACK_3_CB(WRITELINE(wangpc_state, dack3_w))
+	AM9517A(config, m_dmac, 4000000);
+	m_dmac->out_hreq_callback().set(FUNC(wangpc_state::hrq_w));
+	m_dmac->out_eop_callback().set(FUNC(wangpc_state::eop_w));
+	m_dmac->in_memr_callback().set(FUNC(wangpc_state::memr_r));
+	m_dmac->out_memw_callback().set(FUNC(wangpc_state::memw_w));
+	m_dmac->in_ior_callback<1>().set(m_bus, FUNC(wangpcbus_device::dack1_r));
+	m_dmac->in_ior_callback<2>().set(FUNC(wangpc_state::ior2_r));
+	m_dmac->in_ior_callback<3>().set(m_bus, FUNC(wangpcbus_device::dack3_r));
+	m_dmac->out_iow_callback<1>().set(m_bus, FUNC(wangpcbus_device::dack1_w));
+	m_dmac->out_iow_callback<2>().set(FUNC(wangpc_state::iow2_w));
+	m_dmac->out_iow_callback<3>().set(m_bus, FUNC(wangpcbus_device::dack3_w));
+	m_dmac->out_dack_callback<0>().set(FUNC(wangpc_state::dack0_w));
+	m_dmac->out_dack_callback<1>().set(FUNC(wangpc_state::dack1_w));
+	m_dmac->out_dack_callback<2>().set(FUNC(wangpc_state::dack2_w));
+	m_dmac->out_dack_callback<3>().set(FUNC(wangpc_state::dack3_w));
 
-	MCFG_DEVICE_ADD(I8259A_TAG, PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(wangpc_state, ppi_pa_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(wangpc_state, ppi_pb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(wangpc_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(wangpc_state, ppi_pc_w))
+	I8255A(config, m_ppi, 0);
+	m_ppi->in_pa_callback().set(FUNC(wangpc_state::ppi_pa_r));
+	m_ppi->in_pb_callback().set(FUNC(wangpc_state::ppi_pb_r));
+	m_ppi->in_pc_callback().set(FUNC(wangpc_state::ppi_pc_r));
+	m_ppi->out_pc_callback().set(FUNC(wangpc_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(500000)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(I8259A_TAG, pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_CLK2(500000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(wangpc_state, pit2_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(500000);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_pit->set_clk<1>(2000000);
+	m_pit->set_clk<2>(500000);
+	m_pit->out_handler<2>().set(FUNC(wangpc_state::pit2_w));
 
-	MCFG_IM6402_ADD(IM6402_TAG, 62500*16, 62500*16)
-	MCFG_IM6402_TRO_CALLBACK(DEVWRITELINE(WANGPC_KEYBOARD_TAG, wangpc_keyboard_device, write_rxd))
-	MCFG_IM6402_DR_CALLBACK(WRITELINE(wangpc_state, uart_dr_w))
-	MCFG_IM6402_TBRE_CALLBACK(WRITELINE(wangpc_state, uart_tbre_w))
+	IM6402(config, m_uart, 62500*16, 62500*16);
+	m_uart->tro_callback().set("wangpckb", FUNC(wangpc_keyboard_device::write_rxd));
+	m_uart->dr_callback().set(FUNC(wangpc_state::uart_dr_w));
+	m_uart->tbre_callback().set(FUNC(wangpc_state::uart_tbre_w));
 
-	MCFG_DEVICE_ADD(SCN2661_TAG, MC2661, 0)
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_MC2661_RXRDY_HANDLER(WRITELINE(wangpc_state, epci_irq_w))
-	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_MC2661_TXEMT_DSCHG_HANDLER(WRITELINE(wangpc_state, epci_irq_w))
+	MC2661(config, m_epci, 0);
+	m_epci->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_epci->rxrdy_handler().set(FUNC(wangpc_state::epci_irq_w));
+	m_epci->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_epci->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_epci->txemt_dschg_handler().set(FUNC(wangpc_state::epci_irq_w));
 
-	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(wangpc_state, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(wangpc_state, fdc_drq))
+	UPD765A(config, m_fdc, 8'000'000, false, false);
+	m_fdc->intrq_wr_callback().set(FUNC(wangpc_state::fdc_irq));
+	m_fdc->drq_wr_callback().set(FUNC(wangpc_state::fdc_drq));
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_DATA_INPUT_BUFFER("cent_data_in")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(wangpc_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(wangpc_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(wangpc_state, write_centronics_fault))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(wangpc_state, write_centronics_perror))
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer");
+	m_centronics->set_data_input_buffer(m_cent_data_in);
+	m_centronics->ack_handler().set(FUNC(wangpc_state::write_centronics_ack));
+	m_centronics->busy_handler().set(FUNC(wangpc_state::write_centronics_busy));
+	m_centronics->fault_handler().set(FUNC(wangpc_state::write_centronics_fault));
+	m_centronics->perror_handler().set(FUNC(wangpc_state::write_centronics_perror));
 
-	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, m_cent_data_in);
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCN2661_TAG, mc2661_device, rx_w))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_epci, FUNC(mc2661_device::rx_w));
 
-	MCFG_DEVICE_ADD(WANGPC_KEYBOARD_TAG, WANGPC_KEYBOARD, 0)
-	MCFG_WANGPCKB_TXD_HANDLER(DEVWRITELINE(IM6402_TAG, im6402_device, write_rri))
+	WANGPC_KEYBOARD(config, "wangpckb").txd_handler().set(m_uart, FUNC(im6402_device::write_rri));
 
 	// bus
 	MCFG_WANGPC_BUS_ADD()
-	MCFG_WANGPC_BUS_IRQ2_CALLBACK(WRITELINE(wangpc_state, bus_irq2_w))
-	MCFG_WANGPC_BUS_IRQ3_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir3_w))
-	MCFG_WANGPC_BUS_IRQ4_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir4_w))
-	MCFG_WANGPC_BUS_IRQ5_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir5_w))
-	MCFG_WANGPC_BUS_IRQ6_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir6_w))
-	MCFG_WANGPC_BUS_IRQ7_CALLBACK(DEVWRITELINE(I8259A_TAG, pic8259_device, ir7_w))
-	MCFG_WANGPC_BUS_DRQ1_CALLBACK(DEVWRITELINE(AM9517A_TAG, am9517a_device, dreq1_w))
-	MCFG_WANGPC_BUS_DRQ2_CALLBACK(DEVWRITELINE(AM9517A_TAG, am9517a_device, dreq2_w))
-	MCFG_WANGPC_BUS_DRQ3_CALLBACK(DEVWRITELINE(AM9517A_TAG, am9517a_device, dreq3_w))
+	MCFG_WANGPC_BUS_IRQ2_CALLBACK(WRITELINE(*this, wangpc_state, bus_irq2_w))
+	MCFG_WANGPC_BUS_IRQ3_CALLBACK(WRITELINE(I8259A_TAG, pic8259_device, ir3_w))
+	MCFG_WANGPC_BUS_IRQ4_CALLBACK(WRITELINE(I8259A_TAG, pic8259_device, ir4_w))
+	MCFG_WANGPC_BUS_IRQ5_CALLBACK(WRITELINE(I8259A_TAG, pic8259_device, ir5_w))
+	MCFG_WANGPC_BUS_IRQ6_CALLBACK(WRITELINE(I8259A_TAG, pic8259_device, ir6_w))
+	MCFG_WANGPC_BUS_IRQ7_CALLBACK(WRITELINE(I8259A_TAG, pic8259_device, ir7_w))
+	MCFG_WANGPC_BUS_DRQ1_CALLBACK(WRITELINE(AM9517A_TAG, am9517a_device, dreq1_w))
+	MCFG_WANGPC_BUS_DRQ2_CALLBACK(WRITELINE(AM9517A_TAG, am9517a_device, dreq2_w))
+	MCFG_WANGPC_BUS_DRQ3_CALLBACK(WRITELINE(AM9517A_TAG, am9517a_device, dreq3_w))
 	MCFG_WANGPC_BUS_IOERROR_CALLBACK(INPUTLINE(I8086_TAG, INPUT_LINE_NMI))
 	MCFG_WANGPC_BUS_SLOT_ADD("slot1", 1, wangpc_cards, nullptr)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot2", 2, wangpc_cards, "mvc")
@@ -1363,8 +1367,7 @@ MACHINE_CONFIG_START(wangpc_state::wangpc)
 	MCFG_WANGPC_BUS_SLOT_ADD("slot5", 5, wangpc_cards, nullptr)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "wangpc")
@@ -1392,4 +1395,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1985, wangpc, 0, 0, wangpc, wangpc, wangpc_state, 0, "Wang Laboratories", "Wang Professional Computer", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, wangpc, 0, 0, wangpc, wangpc, wangpc_state, empty_init, "Wang Laboratories", "Wang Professional Computer", MACHINE_SUPPORTS_SAVE )

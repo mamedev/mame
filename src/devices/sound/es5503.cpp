@@ -111,10 +111,9 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 
 		*accumulator = altram << resshift;
 	}
-	int omode = (pPartner->control>>1) & 3;
 
 	// if swap mode, start the partner
-	if ((mode == MODE_SWAP) || (omode == MODE_SWAP))
+	if (mode == MODE_SWAP)
 	{
 		pPartner->control &= ~1;    // clear the halt bit
 		pPartner->accumulator = 0;  // and make sure it starts from the top (does this also need phase preservation?)
@@ -229,11 +228,21 @@ void es5503_device::device_start()
 		save_item(NAME(oscillators[osc].irqpend), osc);
 	}
 
-	output_rate = (clock()/8)/34;   // (input clock / 8) / # of oscs. enabled + 2
+	output_rate = (clock() / 8) / (2 + oscsenabled);
 	m_stream = machine().sound().stream_alloc(*this, 0, output_channels, output_rate);
 
 	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(attotime::from_hz(output_rate), 0, attotime::from_hz(output_rate));
+	attotime update_rate = output_rate ? attotime::from_hz(output_rate) : attotime::never;
+	m_timer->adjust(update_rate, 0, update_rate);
+}
+
+void es5503_device::device_clock_changed()
+{
+	output_rate = (clock() / 8) / (2 + oscsenabled);
+	m_stream->set_sample_rate(output_rate);
+
+	attotime update_rate = output_rate ? attotime::from_hz(output_rate) : attotime::never;
+	m_timer->adjust(update_rate, 0, update_rate);
 }
 
 void es5503_device::device_reset()
@@ -417,12 +426,16 @@ WRITE8_MEMBER( es5503_device::write )
 				break;
 
 			case 0xe1:  // oscillator enable
+			{
 				oscsenabled = (data>>1) & 0x1f;
 
 				output_rate = (clock()/8)/(2+oscsenabled);
 				m_stream->set_sample_rate(output_rate);
-				m_timer->adjust(attotime::from_hz(output_rate), 0, attotime::from_hz(output_rate));
+
+				attotime update_rate = output_rate ? attotime::from_hz(output_rate) : attotime::never;
+				m_timer->adjust(update_rate, 0, update_rate);
 				break;
+			}
 
 			case 0xe2:  // A/D converter
 				break;

@@ -227,12 +227,13 @@ void dmv_keyboard_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(dmv_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", I8741, XTAL(6'000'000))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(dmv_keyboard_device, port1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(dmv_keyboard_device, port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(dmv_keyboard_device, port2_w))
-MACHINE_CONFIG_END
+void dmv_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	I8741(config, m_maincpu, XTAL(6'000'000));
+	m_maincpu->p1_in_cb().set(FUNC(dmv_keyboard_device::port1_r));
+	m_maincpu->p2_in_cb().set(FUNC(dmv_keyboard_device::port2_r));
+	m_maincpu->p2_out_cb().set(FUNC(dmv_keyboard_device::port2_w));
+}
 
 
 //-------------------------------------------------

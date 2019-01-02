@@ -3,55 +3,44 @@
 /******************************************************************************
 
     Markham (c) 1983 Sun Electronics
+    Strength & Skill (c) 1984 Sun Electronics
 
     Video hardware driver by Uki
-
-    17/Jun/2001 -
 
 ******************************************************************************/
 
 #include "emu.h"
 #include "includes/markham.h"
 
-PALETTE_INIT_MEMBER(markham_state, markham)
+void markham_state::markham_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(color_prom[i + 0x000]);
-		int g = pal4bit(color_prom[i + 0x100]);
-		int b = pal4bit(color_prom[i + 0x200]);
+		int const r = pal4bit(color_prom[i | 0x000]);
+		int const g = pal4bit(color_prom[i | 0x100]);
+		int const b = pal4bit(color_prom[i | 0x200]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x300;
 
-	/* sprites lookup table */
-	for (i = 0; i < 0x400; i++)
+	// sprites lookup table
+	for (int i = 0; i < 0x400; i++)
 	{
-		uint8_t ctabentry = color_prom[i];
+		uint8_t const ctabentry = color_prom[i];
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
-WRITE8_MEMBER(markham_state::markham_videoram_w)
+WRITE8_MEMBER(markham_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
-}
-
-WRITE8_MEMBER(markham_state::markham_flipscreen_w)
-{
-	if (flip_screen() != (data & 0x01))
-	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
-	}
 }
 
 TILE_GET_INFO_MEMBER(markham_state::get_bg_tile_info)
@@ -70,6 +59,20 @@ void markham_state::video_start()
 	m_bg_tilemap->set_scroll_rows(32);
 }
 
+VIDEO_START_MEMBER(markham_state, strnskil)
+{
+	video_start();
+
+	m_bg_tilemap->set_scroll_rows(32);
+	m_irq_scanline_start = 96;
+	m_irq_scanline_end = 240;
+
+	save_item(NAME(m_irq_source));
+	save_item(NAME(m_irq_scanline_start));
+	save_item(NAME(m_irq_scanline_end));
+	save_item(NAME(m_scroll_ctrl));
+}
+
 void markham_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	uint8_t *spriteram = m_spriteram;
@@ -86,7 +89,7 @@ void markham_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		int x = spriteram[offs + 3];
 		int y = spriteram[offs + 0];
 		int px, py;
-		col &= 0x3f ;
+		col &= 0x3f;
 
 		if (flip_screen() == 0)
 		{
@@ -115,14 +118,40 @@ void markham_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 
 uint32_t markham_state::screen_update_markham(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
+	int row;
 
-	for (i = 0; i < 32; i++)
+	for (row = 0; row < 32; row++)
 	{
-		if ((i > 3) && (i < 16))
-			m_bg_tilemap->set_scrollx(i, m_xscroll[0]);
-		if (i >= 16)
-			m_bg_tilemap->set_scrollx(i, m_xscroll[1]);
+		if ((row > 3) && (row < 16))
+			m_bg_tilemap->set_scrollx(row, m_xscroll[0]);
+		if (row >= 16)
+			m_bg_tilemap->set_scrollx(row, m_xscroll[1]);
+	}
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
+
+uint32_t markham_state::screen_update_strnskil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const uint8_t *scroll_data = (const uint8_t *)memregion("scroll_prom")->base();
+
+	int row;
+
+	for (row = 0; row < 32; row++)
+	{
+		if (m_scroll_ctrl != 0x07)
+		{
+			switch (scroll_data[m_scroll_ctrl * 32 + row])
+			{
+				case 2:
+					m_bg_tilemap->set_scrollx(row, -~m_xscroll[1]);
+				case 4:
+					m_bg_tilemap->set_scrollx(row, -~m_xscroll[0]);
+				break;
+			}
+		}
 	}
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

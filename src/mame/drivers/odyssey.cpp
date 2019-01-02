@@ -77,13 +77,15 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void odyssey(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void odyssey(machine_config &config);
 	void odyssey_map(address_map &map);
 };
 
@@ -134,8 +136,8 @@ void odyssey_state::machine_reset()
 MACHINE_CONFIG_START(odyssey_state::odyssey)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // a Celeron at 1.70 GHz on the MB I checked.
-	MCFG_CPU_PROGRAM_MAP(odyssey_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM, 133000000) // a Celeron at 1.70 GHz on the MB I checked.
+	MCFG_DEVICE_PROGRAM_MAP(odyssey_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -202,5 +204,5 @@ ROM_END
 *           Game Driver(s)            *
 **************************************/
 
-/*    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT   ROT    COMPANY           FULLNAME    FLAGS  */
-GAME( 1998, odyssey,  0,      odyssey, odyssey, odyssey_state, 0,     ROT0, "Silicon Gaming", "Odyssey",   MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT        ROT   COMPANY           FULLNAME    FLAGS  */
+GAME( 1998, odyssey,  0,      odyssey, odyssey, odyssey_state, empty_init, ROT0, "Silicon Gaming", "Odyssey",   MACHINE_IS_SKELETON )

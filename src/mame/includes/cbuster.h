@@ -5,28 +5,33 @@
     Crude Buster
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CBUSTER_H
+#define MAME_INCLUDES_CBUSTER_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "cpu/h6280/h6280.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
+#include "emupal.h"
 
 class cbuster_state : public driver_device
 {
 public:
 	cbuster_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_deco_tilegen(*this, "tilegen%u", 1),
-		m_palette(*this, "palette"),
-		m_spriteram(*this, "spriteram"),
-		m_soundlatch(*this, "soundlatch"),
-		m_sprgen(*this, "spritegen"),
-		m_pf_rowscroll(*this, "pf%u_rowscroll", 1),
-		m_paletteram(*this, "palette"),
-		m_paletteram_ext(*this, "palette_ext")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_deco_tilegen(*this, "tilegen%u", 1U)
+		, m_palette(*this, "palette")
+		, m_spriteram(*this, "spriteram")
+		, m_soundlatch(*this, "soundlatch")
+		, m_sprgen(*this, "spritegen")
+		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1U)
+		, m_paletteram(*this, "palette")
+		, m_paletteram_ext(*this, "palette_ext")
 	{ }
 
 	/* devices */
@@ -49,16 +54,18 @@ public:
 
 	DECLARE_WRITE16_MEMBER(twocrude_control_w);
 	DECLARE_READ16_MEMBER(twocrude_control_r);
-	DECLARE_DRIVER_INIT(twocrude);
+	void init_twocrude();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_twocrude(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
-	DECLARE_WRITE16_MEMBER(cbuster_palette_w);
-	DECLARE_WRITE16_MEMBER(cbuster_palette_ext_w);
+	DECLARE_WRITE16_MEMBER(palette_w);
+	DECLARE_WRITE16_MEMBER(palette_ext_w);
 	void update_palette(int offset);
 	void twocrude(machine_config &config);
 	void sound_map(address_map &map);
 	void twocrude_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CBUSTER_H
