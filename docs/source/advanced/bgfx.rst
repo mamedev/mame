@@ -25,13 +25,13 @@ Getting Started with BGFX
 
 You will need to have followed the initial MAME setup instructions elsewhere in this manual before beginning. Official MAME distributions include BGFX as of 172, so you don't need to download any additional files.
 
-Open your MAME.INI in your text editor of choice (e.g. Notepad), and make sure the following options are set correctly:
+Open your mame.ini in your text editor of choice (e.g. Notepad), and make sure the following options are set correctly:
 
 * **video bgfx**
 
 Now, you may want to take a moment to look below at the Configuration Settings section to see how to set up these next options.
 
-As referenced in :ref:`advanced-multi-CFG`, MAME has a order in which it processes INI files. The BGFX settings can be edited in MAME.INI, but to take full advantage of the power of MAME's config files, you'll want to copy the BGFX settings from MAME.INI to one of the other config files and make changes there.)
+As referenced in :ref:`advanced-multi-CFG`, MAME has a order in which it processes INI files. The BGFX settings can be edited in mame.ini, but to take full advantage of the power of MAME's config files, you'll want to copy the BGFX settings from mame.ini to one of the other config files and make changes there.)
 
 In particular, you will want the **bgfx_screen_chains** to be specific to each game.
 
