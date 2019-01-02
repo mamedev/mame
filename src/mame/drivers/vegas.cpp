@@ -1101,15 +1101,14 @@ CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
 *************************************/
 WRITE32_MEMBER(vegas_state::wheel_board_w)
 {
-	/* two writes in pairs. bit 11 high, bit 10 flag, flag off first, on second. arg remains the same. */
-	bool valid = (data & (1 << 11));
-	bool flag = (data & (1 << 10));
+	bool chip_select = BIT(data, 11);
+	bool latch_clk = BIT(data, 10);
 	uint8_t op = (data >> 8) & 0x3;
 	uint8_t arg = data & 0xff;
 
 	//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
 
-	if (valid && flag)
+	if (chip_select && latch_clk)
 	{
 		switch (op)
 		{
@@ -1123,7 +1122,7 @@ WRITE32_MEMBER(vegas_state::wheel_board_w)
 				m_lamps[bit] = BIT(arg, bit);
 
 			/* leader lamp bit is included in every write, for some reason. */
-			m_lamps[8] = BIT(arg, 12);
+			m_lamps[8] = BIT(data, 12);
 			break;
 
 		case 0x2:

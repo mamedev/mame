@@ -19,7 +19,7 @@ class mc68340_serial_module_device : public mc68340_duart_device
 	friend class m68340_cpu_device;
 
 public:
-	mc68340_serial_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc68340_serial_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override;
