@@ -279,7 +279,7 @@ WRITE8_MEMBER(ashnojoe_state::ym2203_write_b)
 
 WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
 {
-	if (m_msm5205_vclk_toggle == 0)
+	if (state)
 	{
 		m_msm->write_data(m_adpcm_byte >> 4);
 	}
@@ -288,42 +288,38 @@ WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
 		m_msm->write_data(m_adpcm_byte & 0xf);
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
-
-	m_msm5205_vclk_toggle ^= 1;
 }
 
 void ashnojoe_state::machine_start()
 {
 	save_item(NAME(m_adpcm_byte));
-	save_item(NAME(m_msm5205_vclk_toggle));
 }
 
 void ashnojoe_state::machine_reset()
 {
 	m_adpcm_byte = 0;
-	m_msm5205_vclk_toggle = 0;
 }
 
 
-MACHINE_CONFIG_START(ashnojoe_state::ashnojoe)
-
+void ashnojoe_state::ashnojoe(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(ashnojoe_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ashnojoe_state,  irq1_line_hold)
+	M68000(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ashnojoe_state::ashnojoe_map);
+	m_maincpu->set_vblank_int("screen", FUNC(ashnojoe_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	Z80(config, m_audiocpu, 4000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ashnojoe_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &ashnojoe_state::sound_portmap);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, 50*8-1, 3*8, 29*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ashnojoe_state, screen_update_ashnojoe)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 512);
+	screen.set_visarea(14*8, 50*8-1, 3*8, 29*8-1);
+	screen.set_screen_update(FUNC(ashnojoe_state::screen_update_ashnojoe));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_ashnojoe);
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x1000/2);
@@ -339,11 +335,11 @@ MACHINE_CONFIG_START(ashnojoe_state::ashnojoe)
 	ymsnd.port_b_write_callback().set(FUNC(ashnojoe_state::ym2203_write_b));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.1);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ashnojoe_state, ashnojoe_vclk_cb))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_callback().set(FUNC(ashnojoe_state::ashnojoe_vclk_cb));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 ROM_START( scessjoe )
 	ROM_REGION( 0xc0000, "maincpu", 0 )     /* 68000 code */

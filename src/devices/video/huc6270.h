@@ -26,6 +26,7 @@ public:
 
 	void set_vram_size(uint32_t vram_size) { m_vram_size = vram_size; }
 	template <class Object> devcb_base &set_irq_changed_callback(Object &&cb) { return m_irq_changed_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_irq_changed_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
