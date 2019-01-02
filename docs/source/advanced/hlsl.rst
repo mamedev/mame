@@ -48,7 +48,7 @@ For multiple, complicated to explain reasons, HLSL settings are no longer saved 
 
 Start by loading MAME with the game of your choice (e.g. **mame pacman**)
 
-The tilde key (``~``) brings up the on-screen display options. Use up and down to go through the various settings, while left and right will allow you to change that setting. Results will be shown in real time as you're changing these settings.
+The tilde key (**~**) brings up the on-screen display options. Use up and down to go through the various settings, while left and right will allow you to change that setting. Results will be shown in real time as you're changing these settings.
 
 Once you've found settings you like, write the numbers down on a notepad and exit MAME.
 

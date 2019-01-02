@@ -75,7 +75,7 @@ Configuration Settings
 |
 |	On a single window, multiple screen game, such as Darius on one physical PC monitor, specify multiple entries (one per window) like:
 |
-|		``bgfx_screen_chains hlsl,hlsl,hlsl``
+|		bgfx_screen_chains hlsl,hlsl,hlsl
 |
 |	This also works with single screen games where you are mirroring the output to more than one physical display. For instance, you could set up Pac-Man to have one unfiltered output for use with video broadcasting while a second display is set up HLSL for playing on.
 |
@@ -89,7 +89,7 @@ Configuration Settings
 |
 |	One more special case is that Nichibutsu had a special cocktail mahjongg cabinet that used a CRT in the middle along with two LCD displays to show each player their hand. We would want the LCDs to be unfiltered and untouched as they were, while the CRT would be improved through HLSL. Since we want to give each player their own full screen display (two physical monitors) along with the LCD, we'll go with:
 |
-|		``-numscreens 2 -view0 "Player 1" -view1 "Player 2" -video bgfx -bgfx_screen_chains hlsl,unfiltered,unfiltered:hlsl,unfiltered,unfiltered``
+|		**-numscreens 2 -view0 "Player 1" -view1 "Player 2" -video bgfx -bgfx_screen_chains hlsl,unfiltered,unfiltered:hlsl,unfiltered,unfiltered**
 |
 |	This sets up the view for each display respectively, keeping HLSL effect on the CRT for each window (physical display) while going unfiltered for the LCD screens.
 |
@@ -114,6 +114,6 @@ Tweaking BGFX HLSL Settings inside MAME
 
 Start by loading MAME with the game of your choice (e.g. **mame pacman**)
 
-The tilde key (``~``) brings up the on-screen display options. Use up and down to go through the various settings, while left and right will allow you to change that setting. Results will be shown in real time as you're changing these settings.
+The tilde key (**~**) brings up the on-screen display options. Use up and down to go through the various settings, while left and right will allow you to change that setting. Results will be shown in real time as you're changing these settings.
 
 Note that settings are individually changable on a per-screen basis.
