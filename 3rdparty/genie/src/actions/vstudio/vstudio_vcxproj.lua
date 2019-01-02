@@ -1021,7 +1021,6 @@
 			vs2010_config(prj)
 			vs2010_globals(prj)
 
-			_p(1,'<Import Project="$(SolutionDir)Microsoft.VCToolsVersion.14.14.props" />')
 			_p(1,'<Import Project="$(VCTargetsPath)\\Microsoft.Cpp.Default.props" />')
 
 			for _, cfginfo in ipairs(prj.solution.vstudio_configs) do
