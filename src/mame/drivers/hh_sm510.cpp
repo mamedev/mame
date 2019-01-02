@@ -1694,10 +1694,10 @@ public:
 
 static INPUT_PORTS_START( gnw_bjack )
 	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Double Down")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Bet x10 / Hit")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)  PORT_NAME("Bet x1 / Stand")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Enter")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Double Down")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Bet x10 / Hit")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Bet x1 / Stand")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Enter")
 
 	PORT_START("IN.1") // S2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
@@ -1707,7 +1707,6 @@ static INPUT_PORTS_START( gnw_bjack )
 
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
-
 INPUT_PORTS_END
 
 void gnw_bjack_state::gnw_bjack(machine_config &config)
@@ -7286,13 +7285,13 @@ ROM_START( gnw_bjack )
 	ROM_LOAD( "bj-60.program", 0x0000, 0x1000, CRC(8e74f633) SHA1(54b0f65ee716d2820a9ed9c743755d2a2d99ce4d) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "bj-60.melody", 0x000, 0x100, BAD_DUMP CRC(2619224e) SHA1(b65dc590b6eb1de793e980af236ccf8360b3cfee) )
+	ROM_LOAD( "bj-60.melody", 0x000, 0x100, BAD_DUMP CRC(2619224e) SHA1(b65dc590b6eb1de793e980af236ccf8360b3cfee) ) // dumped electronically, decap needed to verify accuracy
 
 	ROM_REGION( 75217, "svg_top", 0)
-	ROM_LOAD( "gnw_bjack_top.svg", 0, 75217, CRC(f8b8c9a3) SHA1(fdd99cf58f7c5dce3a8d5ef444845a928cd6b480) )
+	ROM_LOAD( "gnw_bjack_top.svg", 0, 75205, CRC(5eb0956e) SHA1(f7acd148e5478d4c2ddf06cff23c5e40faee2c24) )
 
 	ROM_REGION( 112450, "svg_bottom", 0)
-	ROM_LOAD( "gnw_bjack_bottom.svg", 0, 112450, CRC(ff78620f) SHA1(4923866fe215177bf08003c1a9204f2654a5b1da) )
+	ROM_LOAD( "gnw_bjack_bottom.svg", 0, 112438, CRC(9d985b1d) SHA1(cf8af6ce18994f687a5e6fbdda62af4d07a07cf8) )
 ROM_END
 
 
