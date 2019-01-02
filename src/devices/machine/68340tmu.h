@@ -22,6 +22,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tin_w );
 	DECLARE_WRITE_LINE_MEMBER( tgate_w );
 
+	uint8_t irq_level() const { return (m_sr & REG_SR_IRQ) ? (m_ir & REG_IR_INTLEV) >> 8 : 0; }
+	uint8_t irq_vector() const { return m_ir & REG_IR_INTVEC; }
+	uint8_t arbitrate(uint8_t level) const { return (irq_level() == level) ? (m_mcr & REG_MCR_ARBLV) : 0; }
+
  protected:
 	m68340_cpu_device *m_cpu;
 
@@ -75,9 +79,9 @@ public:
 	enum {
 			REG_CR_SWR    = 0x8000,
 			REG_CR_INTMSK = 0x7000,
-			REG_CR_IE0    = 0x4000,
+			REG_CR_IE2    = 0x4000,
 			REG_CR_IE1    = 0x2000,
-			REG_CR_IE2    = 0x1000,
+			REG_CR_IE0    = 0x1000,
 			REG_CR_TGE    = 0x0800,
 			REG_CR_PCLK   = 0x0400,
 			REG_CR_CPE    = 0x0200,

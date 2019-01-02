@@ -7,6 +7,13 @@
 #include "emu.h"
 #include "68340.h"
 
+#include <algorithm>
+
+#define LOG_BASE (1 << 1U)
+#define LOG_IPL (1 << 2U)
+#define VERBOSE (LOG_BASE)
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(M68340, m68340_cpu_device, "mc68340", "MC68340")
 
 int m68340_cpu_device::calc_cs(offs_t address) const
@@ -41,17 +48,88 @@ uint16_t m68340_cpu_device::get_cs(offs_t address)
 
 
 
+void m68340_cpu_device::update_ipl()
+{
+	uint8_t new_ipl = std::max({
+		pit_irq_level(),
+		m_serial->irq_level(),
+		m_timer[0]->irq_level(),
+		m_timer[1]->irq_level()
+	});
+	if (m_ipl != new_ipl)
+	{
+		if (m_ipl != 0)
+			set_input_line(m_ipl, CLEAR_LINE);
+		LOGMASKED(LOG_IPL, "Changing interrupt level from %d to %d\n", m_ipl, new_ipl);
+		m_ipl = new_ipl;
+		if (m_ipl != 0)
+			set_input_line(m_ipl, ASSERT_LINE);
+	}
+}
+
+IRQ_CALLBACK_MEMBER(m68340_cpu_device::int_ack)
+{
+	uint8_t pit_iarb = pit_arbitrate(irqline);
+	uint8_t scu_iarb = m_serial->arbitrate(irqline);
+	uint8_t t1_iarb = m_timer[0]->arbitrate(irqline);
+	uint8_t t2_iarb = m_timer[1]->arbitrate(irqline);
+	uint8_t iarb = std::max({pit_iarb, scu_iarb, t1_iarb, t2_iarb});
+	LOGMASKED(LOG_IPL, "Level %d interrupt arbitration: PIT = %X, SCU = %X, T1 = %X, T2 = %X\n", irqline, pit_iarb, scu_iarb, t1_iarb, t2_iarb);
+	int response = 0;
+	uint32_t vector = standard_irq_callback(irqline);
+
+	if (iarb != 0)
+	{
+		if (iarb == scu_iarb)
+		{
+			vector = m_serial->irq_vector();
+			LOGMASKED(LOG_IPL, "SCU acknowledged interrupt with vector %02X\n", vector);
+			response++;
+		}
+
+		if (iarb == t1_iarb)
+		{
+			vector = m_timer[0]->irq_vector();
+			LOGMASKED(LOG_IPL, "T1 acknowledged interrupt with vector %02X\n", vector);
+			response++;
+		}
+
+		if (iarb == t2_iarb)
+		{
+			vector = m_timer[1]->irq_vector();
+			LOGMASKED(LOG_IPL, "T2 acknowledged interrupt with vector %02X\n", vector);
+			response++;
+		}
+
+		if (iarb == pit_iarb)
+		{
+			vector = pit_iack();
+			LOGMASKED(LOG_IPL, "PIT acknowledged interrupt with vector %02X\n", vector);
+			response++;
+		}
+	}
+
+	if (response == 0)
+		logerror("Spurious interrupt (level %d)\n", irqline);
+	else if (response > 1)
+		logerror("%d modules responded to interrupt (level %d, IARB = %X)\n", response, irqline, iarb);
+
+	return vector;
+}
+
+
 /* 68340 specifics - MOVE */
 
 READ32_MEMBER( m68340_cpu_device::m68340_internal_base_r )
 {
-	logerror("%08x m68340_internal_base_r %08x, (%08x)\n", m_ppc, offset*4,mem_mask);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_r %08x, (%08x)\n", m_ppc, offset*4,mem_mask);
 	return m_m68340_base;
 }
 
 WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 {
-	logerror("%08x m68340_internal_base_w %08x, %08x (%08x)\n", m_ppc, offset*4,data,mem_mask);
+	LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %08x (%08x)\n", m_ppc, offset*4,data,mem_mask);
 
 	// other conditions?
 	if (m_dfc==0x7)
@@ -69,7 +147,7 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 		}
 
 		COMBINE_DATA(&m_m68340_base);
-		logerror("%08x m68340_internal_base_w %08x, %08x (%08x) (m_m68340_base write)\n", pc(), offset*4,data,mem_mask);
+		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %08x (%08x) (m_m68340_base write)\n", pc(), offset*4,data,mem_mask);
 
 		// map new modules
 		if (m_m68340_base&1)
@@ -103,7 +181,7 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 	}
 	else
 	{
-		logerror("%08x m68340_internal_base_w %08x, %04x (%04x) (should fall through?)\n", pc(), offset*4,data,mem_mask);
+		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %04x (%04x) (should fall through?)\n", pc(), offset*4,data,mem_mask);
 	}
 
 
@@ -148,6 +226,7 @@ m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *
 	m_m68340SIM = nullptr;
 	m_m68340DMA = nullptr;
 	m_m68340_base = 0;
+	m_ipl = 0;
 }
 
 void m68340_cpu_device::device_reset()
@@ -179,4 +258,6 @@ void m68340_cpu_device::device_start()
 	m_m68340_base = 0x00000000;
 
 	m_internal = &space(AS_PROGRAM);
+
+	m_int_ack_callback = device_irq_acknowledge_delegate(FUNC(m68340_cpu_device::int_ack), this);
 }

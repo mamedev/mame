@@ -21,7 +21,6 @@
 #define LOG_INT     (1U <<  4)
 
 //#define VERBOSE  (LOG_SETUP|LOG_INT|LOG_TIMER)
-#define LOG_OUTPUT_FUNC printf // Needs always to be enabled as the default value 'logerror' is not available here
 
 #include "logmacro.h"
 
@@ -86,6 +85,8 @@ READ16_MEMBER( mc68340_timer_module_device::read )
 			break;
 	case REG_COM:
 			val = m_com;
+			if (!machine().side_effects_disabled())
+				m_sr &= ~REG_SR_COM;
 			LOGTIMER("- %08x %s %04x, %04x (%04x) (COM - Compare Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, val, mem_mask);
 			break;
 	default:
@@ -121,13 +122,14 @@ WRITE16_MEMBER( mc68340_timer_module_device::write )
 		LOGTIMER("- Clocks are %s\n", data & REG_MCR_STP ? "stopped" : "running");
 		LOGTIMER("- Freeze signal %s - not implemented\n", data & REG_MCR_FRZ1 ? "stops execution" : "is ignored");
 		LOGTIMER("- Supervisor registers %s - not implemented\n", data & REG_MCR_SUPV ? "requries supervisor privileges" : "can be accessed by user privileged software");
-		LOGTIMER("- Interrupt Arbitration level: %02x - not implemented\n", data & REG_MCR_ARBLV);
+		LOGTIMER("- Interrupt Arbitration level: %02x\n", data & REG_MCR_ARBLV);
 		break;
 	case REG_IR:
 		COMBINE_DATA(&m_ir);
 		LOGTIMER("PC: %08x %s %04x, %04x (%04x) (IR - Interrupt Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, data, mem_mask);
 		LOGTIMER("- Interrupt level : %02x\n", (data & REG_IR_INTLEV) >> 8);
 		LOGTIMER("- Interrupt vector: %02x\n", (data & REG_IR_INTVEC));
+		m_cpu->update_ipl();
 		break;
 	case REG_CR:
 		COMBINE_DATA(&m_cr);
@@ -135,9 +137,9 @@ WRITE16_MEMBER( mc68340_timer_module_device::write )
 		LOGTIMER("- Software reset: %s\n", (data & REG_CR_SWR) ? "inactive" : "active" );
 		LOGTIMER("- Enabled interrupts: %02x TO:%d TG:%d TC:%d\n",
 			 data & REG_CR_INTMSK,
-			 (data & REG_CR_IE0) ? 1 : 0,
+			 (data & REG_CR_IE2) ? 1 : 0,
 			 (data & REG_CR_IE1) ? 1 : 0,
-			 (data & REG_CR_IE2) ? 1 : 0);
+			 (data & REG_CR_IE0) ? 1 : 0);
 		LOGTIMER("- TGE signal, TGATE%d is %s\n",  m_cpu->get_timer_index(this) + 1, (data & REG_CR_TGE) ? "enabled" : "disabled");
 		LOGTIMER("- PCLK: Counter uses %s\n", (data & REG_CR_PCLK) ? "prescaler" : "clock");
 		LOGTIMER("- CPE: Counter is %s\n", (data & REG_CR_CPE) ? "enabled" : "disabled");
@@ -163,6 +165,7 @@ WRITE16_MEMBER( mc68340_timer_module_device::write )
 		   register (PREL1). TODO: make sure of the intial load of PREL1 on first falling flank */
 		if (m_cr & REG_CR_SWR)
 		{
+			m_sr &= ~REG_SR_COM;
 			if (m_cr & REG_CR_CPE)
 			{
 				m_sr |= REG_SR_ON; // Starts the counter
@@ -202,13 +205,14 @@ WRITE16_MEMBER( mc68340_timer_module_device::write )
 		/* IRQ - Interrupt Request bit
 		   1 = An interrupt condition has occurred. This bit is the logical OR of the enabled TO, TG, and TC interrupt bits.
 		   0 = The bit(s) that caused the interrupt condition has been cleared. If an IRQ signal has been asserted, it is negated when this bit is cleared. */
-		data = (m_sr & ~(data & (REG_SR_TO | REG_SR_TG | REG_SR_TC))); // Clear only the set interrupt bits
-		if ((data & (REG_SR_TO | REG_SR_TG | REG_SR_TC)) == 0)
+		m_sr &= ~(data & mem_mask & (REG_SR_TO | REG_SR_TG | REG_SR_TC)); // Clear only the set interrupt bits
+		if ((m_sr & (REG_SR_IRQ | REG_SR_TO | REG_SR_TG | REG_SR_TC)) == REG_SR_IRQ)
 		{
-			data &= ~REG_SR_IRQ;
-			// TODO: clear IRQ line
+			LOGINT("TIMER IRQ cleared\n");
+			m_sr &= ~REG_SR_IRQ;
+			m_cpu->update_ipl();
 		}
-		COMBINE_DATA(&m_sr);
+		data = m_sr;
 		LOGTIMER("PC %08x %s %04x, %04x (%04x) (SR - Status/Prescaler Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, data, mem_mask);
 		LOGTIMER("- IRQ: %s\n", (data & REG_SR_IRQ) ? "Yes" : "None");
 		LOGTIMER("- TO TimeOut int      : %s\n", (data & REG_SR_TO) ? "Asserted" : "Cleared");
@@ -238,6 +242,7 @@ WRITE16_MEMBER( mc68340_timer_module_device::write )
 		COMBINE_DATA(&m_com);
 		LOGTIMER("PC %08x %s %04x, %04x (%04x) (COM - Compare Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, data, mem_mask);
 		LOGTIMER("- COM15-COM0: %04x\n", (data & 0xfff));
+		m_sr &= ~REG_SR_COM;
 		break;
 	default:
 		LOGTIMER("- %08x FUNCNAME %08x, %08x (%08x) - not implemented\n", m_cpu->pcbase(), offset * 2, data, mem_mask);
@@ -267,10 +272,8 @@ WRITE_LINE_MEMBER( mc68340_timer_module_device::tgate_w)
 			m_sr |= REG_SR_TG;
 			if (m_cr & REG_CR_IE1)
 			{
-				LOGTIMER(" - TG interrupt");
+				LOGTIMER(" - TG interrupt\n");
 				do_timer_irq();
-				m_sr |= REG_SR_IRQ;
-
 			}
 		}
 		m_sr |= REG_SR_TGL;
@@ -307,27 +310,12 @@ void mc68340_timer_module_device::device_start()
 
 void mc68340_timer_module_device::do_timer_irq()
 {
-	assert(m_cpu->m_m68340SIM);
-	m68340_sim &sim = *m_cpu->m_m68340SIM;
-	int timer_irq_level  = (m_ir & 0x0700) >> 8;
-	int timer_irq_vector = (m_ir & 0x00ff) >> 0;
-
-	if (timer_irq_level) // 0 is irq disabled
+	assert((m_sr & (REG_SR_TO | REG_SR_TG | REG_SR_TC)) != 0);
+	if ((m_sr & REG_SR_IRQ) == 0)
 	{
-		int use_autovector = (sim.m_avr_rsr >> (8 + timer_irq_level)) & 1;
-
-		LOGINT("TIMER IRQ triggered, Lvl: %d using Vector: %d (0 = auto vector)\n", timer_irq_level, use_autovector ? 0 : timer_irq_vector);
-
-		if (use_autovector)
-		{
-			//logerror("irq with autovector\n");
-			m_cpu->set_input_line(timer_irq_level, HOLD_LINE);
-		}
-		else
-		{
-			//logerror("irq without autovector\n");
-			m_cpu->set_input_line_and_vector(timer_irq_level, HOLD_LINE, timer_irq_vector);
-		}
+		LOGINT("TIMER IRQ triggered\n");
+		m_sr |= REG_SR_IRQ;
+		m_cpu->update_ipl();
 	}
 }
 
@@ -358,7 +346,7 @@ void mc68340_timer_module_device::do_timer_tick()
 			       affected by disabling the timer (SWR = 0).*/
 			if (m_cntr == m_com) // Check COM register
 			{
-				m_sr |= (REG_SR_TC | REG_SR_COM);
+				m_sr |= REG_SR_COM;
 			}
 		}
 
@@ -457,22 +445,22 @@ void mc68340_timer_module_device::do_timer_tick()
 
 		if (m_cntr_reg == 0) // timer reached timeout value?
 		{
+			m_sr &= ~REG_SR_COM;
 			m_cntr = m_prel1; // TODO: Support prel2 for certain modes
+			m_sr |= REG_SR_TO;
 			if (m_cr & REG_CR_IE2)
 			{
-				LOGTIMER(" - TO interrupt");
+				LOGTIMER(" - TO interrupt\n");
 				do_timer_irq();
-				m_sr |= REG_SR_IRQ;
 			}
 		}
 		if ((m_sr & REG_SR_COM) != 0) // timer reached compare value? )
 		{
+			m_sr |= REG_SR_TC;
 			if (m_cr & REG_CR_IE0)
 			{
-				LOGTIMER(" - TC interrupt");
+				LOGTIMER(" - TC interrupt\n");
 				do_timer_irq();
-				m_sr |= REG_SR_IRQ;
-
 			}
 		}
 	}
