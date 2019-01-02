@@ -15004,6 +15004,7 @@ uspbball                        // US Games
 
 @source:hh_sm510.cpp
 exospace                        // Elektronika
+gnw_bjack                       // Nintendo
 gnw_boxing                      // Nintendo
 gnw_climber                     // Nintendo
 gnw_dkjr                        // Nintendo
@@ -21580,6 +21581,7 @@ pangb2                          // bootleg
 pangba                          // bootleg
 pangbb                          // bootleg
 pangbold                        // bootleg
+pangbp                          // bootleg
 pkladies                        // (c) 1989 Mitchell
 pkladiesbl                      // bootleg
 pkladiesbl2                     // bootleg
@@ -30436,6 +30438,7 @@ bjtwinpa
 blkheart                        // UPL-91069
 blkheartj                       // UPL-91069
 bubl2000                        // (c) 1998 Tuning
+bubl2000a                       // (c) 1998 Tuning
 cactus                          // bootleg
 dolmen                          // (c) 1995
 firehawk                        // (c) 2001 ESD
@@ -31034,27 +31037,31 @@ ataripc1                        // Atari PC1
 ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 compc1                          // 1984 Commodore PC-1
+comport							// Compaq Portable
 dgone                           // 1984 Data General/One
 eagle1600                       //
+eaglespirit						// Eagle PC Spirit
 epc                             // 1984 Ericsson PC
 eppc                            // 1985 Ericsson Portable PC
 ibm5550                         //
 iskr3104                        //
-kaypro16                        //
+ittxtra							// 1984 ITT XTRA
+kaypro16                        // Kaypro 16
+laser_turbo_xt                  // 1988 VTech Laser Turbo XT
+laser_xt3                       // 1989 VTech Laser XT/3
 mbc16                           // Sanyo MBC-16
+mpc1600							// Columbia Data Products MPC 1600
 mc1702                          //
 mk88                            //
-olivm15                         //
+ncrpc4i                         // NCR PC4i
+olivm15                         // Olivetti M15
+olytext30                       // AEG Olympia Olytext 30
 pc7000                          // 1985 Sharp PC-7000
 poisk2                          //
-sicpc1605                       //
+sicpc1605                       // Siemens Sicomp PC16-05
 ssam88s                         //
 sx16                            // Sanyo SX-16
 zdsupers                        //
-ncrpc4i                         // NCR PC4i
-laser_turbo_xt                  // 1988 VTech Laser Turbo XT
-laser_xt3                       // 1989 VTech Laser XT/3
-olytext30                       // AEG Olympia Olytext 30
 
 @source:pc100.cpp
 pc100                           //
@@ -37248,9 +37255,10 @@ rockna                          // (c) 1999 Jaleco
 rocknms                         // (c) 1999 Jaleco
 step3                           // (c) 1999 Jaleco
 stepstag                        // (c) 1999 Jaleco
-tetrisp2                        // (c) 1997 Jaleco
-tetrisp2j                       // (c) 1997 Jaleco
-tetrisp2ja                      // (c) 1997 Jaleco
+tetrisp2                        // (c) 1997 Jaleco (World v2.8)
+tetrisp2a                       // (c) 1997 Jaleco (World v2.7)
+tetrisp2j                       // (c) 1997 Jaleco (Japan v2.2)
+tetrisp2ja                      // (c) 1997 Jaleco (Japan v2.1)
 vjdash                          // (c) 1999 Jaleco
 
 @source:textelcomp.cpp

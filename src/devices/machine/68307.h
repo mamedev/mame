@@ -36,6 +36,7 @@ protected:
 	class m68307_mbus;
 	class m68307_timer;
 
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -44,11 +45,12 @@ protected:
 	virtual uint32_t execute_max_cycles() const override { return 158; }
 
 private:
-	void set_interrupt(int level, int vector);
-	void timer0_interrupt();
-	void timer1_interrupt();
-	void serial_interrupt(int vector);
-	void mbus_interrupt();
+	void set_ipl(int level);
+	DECLARE_WRITE_LINE_MEMBER(timer0_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(timer1_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(mbus_interrupt);
+
+	IRQ_CALLBACK_MEMBER(int_ack);
 
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa) { m_write_a_tx(state); }
@@ -88,6 +90,8 @@ private:
 	uint16_t m_m68307_scrlow;
 
 	int m_m68307_currentcs;
+
+	uint8_t m_ipl;
 
 	porta_read_delegate  m_porta_r;
 	porta_write_delegate m_porta_w;

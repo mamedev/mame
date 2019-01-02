@@ -140,17 +140,9 @@ WRITE8_MEMBER(taito_en_device::mb87078_gain_changed)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(taito_en_device::duart_irq_handler)
+IRQ_CALLBACK_MEMBER(taito_en_device::duart_iack)
 {
-	if (state == ASSERT_LINE)
-	{
-		m_audiocpu->set_input_line_vector(M68K_IRQ_6, m_duart68681->get_irq_vector());
-		m_audiocpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
-	}
-	else
-	{
-		m_audiocpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
-	}
+	return m_duart68681->get_irq_vector();
 }
 
 
@@ -201,13 +193,14 @@ void taito_en_device::device_add_mconfig(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_audiocpu, XTAL(30'476'100) / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taito_en_device::en_sound_map);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(taito_en_device::duart_iack));
 
 	ES5510(config, m_esp, XTAL(10'000'000)); // from Gun Buster schematics
 	m_esp->set_disable();
 
 	MC68681(config, m_duart68681, XTAL(16'000'000) / 4);
 	m_duart68681->set_clocks(XTAL(16'000'000)/2/8, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/8);
-	m_duart68681->irq_cb().set(FUNC(taito_en_device::duart_irq_handler));
+	m_duart68681->irq_cb().set_inputline(m_audiocpu, M68K_IRQ_6);
 	m_duart68681->outport_cb().set(FUNC(taito_en_device::duart_output));
 
 	MB87078(config, m_mb87078);
