@@ -4,8 +4,8 @@
  * wd33c9x.h
  */
 
-#ifndef MAME_MACHINE_WD33C93_H
-#define MAME_MACHINE_WD33C93_H
+#ifndef MAME_MACHINE_WD33C9X_H
+#define MAME_MACHINE_WD33C9X_H
 
 #pragma once
 
@@ -32,8 +32,9 @@ public:
 	DECLARE_WRITE8_MEMBER(indir_reg_w);
 
 	// Master Reset (MR) Interface
-	DECLARE_WRITE_LINE_MEMBER(reset);
+	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
+	// DMA Interface (for use with DRQ)
 	uint8_t dma_r();
 	void dma_w(const uint8_t data);
 
@@ -78,7 +79,6 @@ private:
 	uint8_t m_data_fifo_size;
 
 	uint32_t send_byte(const uint32_t value = 0, const uint32_t mask = 0);
-	void recv_byte();
 
 	uint8_t irq_fifo_pop();
 	void irq_fifo_push(const uint8_t status);
@@ -117,15 +117,15 @@ public:
 	wd33c92_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class wd33c93_device : public wd33c9x_base_device
+class wd33c93n_device : public wd33c9x_base_device
 {
 public:
-	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: wd33c93_device(mconfig, tag, owner, 0)
+	wd33c93n_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: wd33c93n_device(mconfig, tag, owner, 0)
 	{
 	}
 
-	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd33c93n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class wd33c93a_device : public wd33c9x_base_device
@@ -152,8 +152,8 @@ public:
 
 
 DECLARE_DEVICE_TYPE(WD33C92, wd33c92_device)
-DECLARE_DEVICE_TYPE(WD33C93, wd33c93_device)
+DECLARE_DEVICE_TYPE(WD33C93N, wd33c93n_device)
 DECLARE_DEVICE_TYPE(WD33C93A, wd33c93a_device)
 DECLARE_DEVICE_TYPE(WD33C93B, wd33c93b_device)
 
-#endif // MAME_MACHINE_WD33C93_H
+#endif // MAME_MACHINE_WD33C9X_H

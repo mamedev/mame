@@ -25,10 +25,12 @@
 #define LOG_MISC        (1 << 4)
 #define LOG_LINES       (1 << 5)
 #define LOG_STATE       (1 << 6)
+#define LOG_STEP        (1 << 7)
 #define LOG_REGS        (LOG_READS | LOG_WRITES)
-#define LOG_ALL         (LOG_REGS | LOG_COMMANDS | LOG_ERRORS | LOG_MISC | LOG_LINES | LOG_STATE)
+#define LOG_ALL         (LOG_REGS | LOG_COMMANDS | LOG_ERRORS | LOG_MISC | LOG_LINES | LOG_STATE | LOG_STEP)
 
-#define VERBOSE         (0)
+#define VERBOSE         (LOG_COMMANDS | LOG_ERRORS | LOG_STATE)
+#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
 enum register_addresses_e : uint8_t {
@@ -112,7 +114,18 @@ enum command_phase_e : uint8_t {
 	COMMAND_PHASE_TAG_MESSAGE              = 0x21,
 	COMMAND_PHASE_QUEUE_TAG                = 0x22,
 	COMMAND_PHASE_CP_BYTES_0               = 0x30,
-	COMMAND_PHASE_CP_BYTES_F               = 0x3F,
+	COMMAND_PHASE_CP_BYTES_1               = 0x31,
+	COMMAND_PHASE_CP_BYTES_2               = 0x32,
+	COMMAND_PHASE_CP_BYTES_3               = 0x33,
+	COMMAND_PHASE_CP_BYTES_4               = 0x34,
+	COMMAND_PHASE_CP_BYTES_5               = 0x35,
+	COMMAND_PHASE_CP_BYTES_6               = 0x36,
+	COMMAND_PHASE_CP_BYTES_7               = 0x37,
+	COMMAND_PHASE_CP_BYTES_8               = 0x38,
+	COMMAND_PHASE_CP_BYTES_9               = 0x39,
+	COMMAND_PHASE_CP_BYTES_A               = 0x3a,
+	COMMAND_PHASE_CP_BYTES_B               = 0x3b,
+	COMMAND_PHASE_CP_BYTES_C               = 0x3c,
 	COMMAND_PHASE_SAVE_DATA_POINTER        = 0x41,
 	COMMAND_PHASE_DISCONNECT_MESSAGE       = 0x42,
 	COMMAND_PHASE_DISCONNECTED             = 0x43,
@@ -252,7 +265,6 @@ enum : uint16_t {
 	// Initiator commands
 	INIT_MSG_WAIT_REQ,
 	INIT_XFR,
-	INIT_XFR_SEND_BYTE,
 	INIT_XFR_SEND_PAD_WAIT_REQ,
 	INIT_XFR_SEND_PAD,
 	INIT_XFR_RECV_PAD_WAIT_REQ,
@@ -299,7 +311,7 @@ enum : uint16_t {
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(WD33C92, wd33c92_device, "wd33c92", "Western Digital WD33C92 SCSI Controller")
-DEFINE_DEVICE_TYPE(WD33C93, wd33c93_device, "wd33c93", "Western Digital WD33C93 SCSI Controller")
+DEFINE_DEVICE_TYPE(WD33C93N, wd33c93n_device, "wd33c93", "Western Digital WD33C93 SCSI Controller")
 DEFINE_DEVICE_TYPE(WD33C93A, wd33c93a_device, "wd33c93a", "Western Digital WD33C93A SCSI Controller")
 DEFINE_DEVICE_TYPE(WD33C93B, wd33c93b_device, "wd33c93b", "Western Digital WD33C93B SCSI Controller")
 
@@ -622,7 +634,7 @@ WRITE8_MEMBER(wd33c9x_base_device::indir_reg_w)
 //  reset - Host reset line handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(wd33c9x_base_device::reset)
+WRITE_LINE_MEMBER(wd33c9x_base_device::reset_w)
 {
 	if (state) {
 		LOGMASKED(LOG_LINES, "%s: Reset via MR line\n", shortname());
@@ -684,21 +696,26 @@ void wd33c9x_base_device::start_command()
 	switch (cc) {
 	case COMMAND_CC_RESET:
 		LOGMASKED(LOG_COMMANDS, "%s: Reset Command\n", shortname());
-		set_scsi_state(FINISHED);
-		m_regs[OWN_ID] = m_command_length;
-		scsi_id = (m_regs[OWN_ID] & OWN_ID_SCSI_ID);
-		m_regs[AUXILIARY_STATUS] &= ~AUXILIARY_STATUS_DBR;
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
 		scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
-		data_fifo_reset();
-		m_mode = MODE_D;
+		m_regs[OWN_ID] = m_command_length;
 		memset(&m_regs[CONTROL], 0, SOURCE_ID - CONTROL);
 		m_regs[COMMAND] = 0;
+		m_regs[AUXILIARY_STATUS] &= ~AUXILIARY_STATUS_DBR;
+		m_mode = MODE_D;
+		data_fifo_reset();
+		irq_fifo_reset();
+		update_irq();
+		set_scsi_state(FINISHED);
+		irq_fifo_push((m_regs[OWN_ID] & OWN_ID_EAF) ? SCSI_STATUS_RESET_EAF : SCSI_STATUS_RESET);
+		scsi_id = (m_regs[OWN_ID] & OWN_ID_SCSI_ID);
 		break;
 
 	case COMMAND_CC_ABORT:
 		LOGMASKED(LOG_COMMANDS, "%s: Abort Command\n", shortname());
 		set_scsi_state(FINISHED);
+		// FIXME
+		irq_fifo_push((m_regs[OWN_ID] & OWN_ID_EAF) ? SCSI_STATUS_RESET_EAF : SCSI_STATUS_RESET);
 		break;
 
 	case COMMAND_CC_ASSERT_ATN:
@@ -720,15 +737,16 @@ void wd33c9x_base_device::start_command()
 
 	case COMMAND_CC_DISCONNECT:
 		LOGMASKED(LOG_COMMANDS, "%s: Disconnect Command\n", shortname());
-		m_mode = MODE_D;
-		set_scsi_state(FINISHED);
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
 		scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
+		m_mode = MODE_D;
+		set_scsi_state(FINISHED);
+		irq_fifo_push(SCSI_STATUS_DISCONNECT);
 		break;
 
 	case COMMAND_CC_SELECT:
 	case COMMAND_CC_SELECT_ATN:
-		LOGMASKED(LOG_COMMANDS, "%s: %s Command\n", select_strings[cc - COMMAND_CC_SELECT_ATN], shortname());
+		LOGMASKED(LOG_COMMANDS, "%s: %s Command\n", shortname(), select_strings[cc - COMMAND_CC_SELECT_ATN]);
 		if (m_mode != MODE_D) {
 			fatalerror("Select commands only valid in the Disconnected state.");
 		}
@@ -737,13 +755,13 @@ void wd33c9x_base_device::start_command()
 
 	case COMMAND_CC_SELECT_TRANSFER:
 	case COMMAND_CC_SELECT_ATN_TRANSFER:
-		LOGMASKED(LOG_COMMANDS, "%s: %s Command\n", select_strings[cc - COMMAND_CC_SELECT_ATN], shortname());
-		if (m_mode == MODE_I) {
-			set_scsi_state(INIT_XFR);
-		}
-		else if (m_mode == MODE_D) {
-			m_regs[COMMAND_PHASE] = COMMAND_PHASE_ZERO;
+		LOGMASKED(LOG_COMMANDS, "%s: %s Command\n", shortname(), select_strings[cc - COMMAND_CC_SELECT_ATN]);
+		if (m_mode == MODE_D) {
 			set_scsi_state((ARB_WAIT_BUS_FREE << SUB_SHIFT) | DISC_SEL_ARBITRATION);
+			m_regs[COMMAND_PHASE] = COMMAND_PHASE_ZERO;
+		}
+		else if (m_mode == MODE_I) {
+			set_scsi_state(INIT_XFR);
 		}
 		else {
 			fatalerror("%s: Select-and-Transfer commands only valid in the Disconnected and Initiator states.", shortname());
@@ -797,6 +815,7 @@ void wd33c9x_base_device::step(bool timeout)
 	}
 
 	const uint8_t cc = (m_regs[COMMAND] & COMMAND_CC);
+	const bool sat = (cc == COMMAND_CC_SELECT_TRANSFER || cc == COMMAND_CC_SELECT_ATN_TRANSFER);
 
 	uint32_t cycles = 0;
 	do {
@@ -805,7 +824,7 @@ void wd33c9x_base_device::step(bool timeout)
 
 		m_step_count = 1;
 
-		LOGMASKED(LOG_STATE,
+		LOGMASKED(LOG_STEP,
 			"%s: step - PHASE:%s BSY:%x SEL:%x REQ:%x ACK:%x ATN:%x RST:%x DATA:%x (%d.%d) %s\n",
 			shortname(),
 			phase_strings[ctrl & S_PHASE_MASK],
@@ -820,57 +839,67 @@ void wd33c9x_base_device::step(bool timeout)
 			(timeout) ? "timeout" : "change"
 		);
 
-		if (m_mode == MODE_I && !(ctrl & S_BSY)) {
-			LOGMASKED(LOG_STATE, "%s: Target disconnected\n", shortname());
-			m_mode = MODE_D;
-			set_scsi_state(FINISHED);
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
-			scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
+		if (m_mode == MODE_I) {
+			if (ctrl & S_BSY) {
+				if (ctrl & S_REQ) {
+					uint8_t xfr_phase = (ctrl & S_PHASE_MASK);
+					switch (m_scsi_state) {
+					case DISC_SEL_ARBITRATION:
+						m_xfr_phase = xfr_phase;
+						break;
+
+					case INIT_XFR_WAIT_REQ:
+						break;
+
+					default:
+						if (m_xfr_phase != xfr_phase) {
+							fatalerror("%s: Unexpected phase change during state.\n", shortname());
+						}
+						break;
+					}
+				}
+			}
+			else {
+				LOGMASKED(LOG_STATE, "%s: Target disconnected\n", shortname());
+				if (sat) {
+					switch (m_regs[COMMAND_PHASE]) {
+					case COMMAND_PHASE_DISCONNECT_MESSAGE:
+						set_scsi_state(FINISHED);
+						m_regs[COMMAND_PHASE] = COMMAND_PHASE_DISCONNECTED;
+						break;
+
+					case COMMAND_PHASE_COMMAND_COMPLETE:
+						if (m_regs[CONTROL] & CONTROL_EDI) {
+							set_scsi_state(FINISHED);
+							irq_fifo_push(SCSI_STATUS_SELECT_TRANSFER_SUCCESS);
+						}
+						break;
+
+					default:
+						fatalerror("%s: Unhandled command phase during Select-and-Transfer disconnect.\n", shortname());
+						break;
+					}
+				}
+				else {
+					set_scsi_state(FINISHED);
+					irq_fifo_push(SCSI_STATUS_DISCONNECT);
+				}
+				m_mode = MODE_D;
+				scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
+				scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
+				continue;
+			}
 		}
 
 		switch (m_scsi_state & SUB_MASK ? m_scsi_state & SUB_MASK : m_scsi_state & STATE_MASK) {
 		case IDLE:
 			break;
 
-		case FINISHED: {
-			m_regs[AUXILIARY_STATUS] &= ~(AUXILIARY_STATUS_CIP | AUXILIARY_STATUS_BSY);
+		case FINISHED:
 			set_scsi_state(IDLE);
-			uint8_t scsi_status;
-			switch (cc) {
-			case COMMAND_CC_RESET:
-				scsi_status = (m_regs[OWN_ID] & OWN_ID_EAF) ? SCSI_STATUS_RESET_EAF : SCSI_STATUS_RESET;
-				break;
-			case COMMAND_CC_DISCONNECT:
-				scsi_status = SCSI_STATUS_DISCONNECT;
-				break;
-			case COMMAND_CC_SELECT:
-			case COMMAND_CC_SELECT_ATN:
-				scsi_status = SCSI_STATUS_SELECT_SUCCESS;
-				break;
-			case COMMAND_CC_SELECT_TRANSFER:
-			case COMMAND_CC_SELECT_ATN_TRANSFER:
-				scsi_status = SCSI_STATUS_SELECT_TRANSFER_SUCCESS;
-				break;
-			case COMMAND_CC_TRANSFER_INFO:
-				scsi_status = SCSI_STATUS_TRANSFER_SUCCESS | uint8_t(ctrl & S_PHASE_MASK);
-				break;
-			default:
-				scsi_status = 0xff;
-				break;
-			}
-			irq_fifo_push(scsi_status);
-			switch (cc) {
-			case COMMAND_CC_SELECT:
-			case COMMAND_CC_SELECT_ATN:
-			case COMMAND_CC_SELECT_TRANSFER:
-			case COMMAND_CC_SELECT_ATN_TRANSFER:
-				if (ctrl & S_REQ) {
-					irq_fifo_push(SCSI_STATUS_REQ | uint8_t(ctrl & S_PHASE_MASK));
-				}
-				break;
-			}
+			m_regs[AUXILIARY_STATUS] &= ~(AUXILIARY_STATUS_CIP | AUXILIARY_STATUS_BSY);
 			update_irq();
-		} break;
+			break;
 
 		case ARB_WAIT_BUS_FREE << SUB_SHIFT:
 			if (timeout) {
@@ -993,7 +1022,7 @@ void wd33c9x_base_device::step(bool timeout)
 					m_regs[AUXILIARY_STATUS] &= ~(AUXILIARY_STATUS_CIP | AUXILIARY_STATUS_BSY);
 					m_mode = MODE_D;
 					set_scsi_state(IDLE);
-					irq_fifo_push(0x42);
+					irq_fifo_push(SCSI_STATUS_SELECTION_TIMEOUT);
 					update_irq();
 				}
 			}
@@ -1011,8 +1040,12 @@ void wd33c9x_base_device::step(bool timeout)
 				set_scsi_state_sub(0);
 				scsi_bus->data_w(scsi_refid, 0);
 				scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
-				if ((ctrl & S_PHASE_MASK) == S_PHASE_COMMAND) {
-					++m_regs[COMMAND_PHASE];
+				if (sat) {
+					switch (m_xfr_phase) {
+					case S_PHASE_COMMAND:
+						++m_regs[COMMAND_PHASE];
+						break;
+					}
 				}
 				++m_step_count;
 			}
@@ -1027,45 +1060,42 @@ void wd33c9x_base_device::step(bool timeout)
 
 		case RECV_WAIT_SETTLE << SUB_SHIFT:
 			if (timeout) {
-				switch (ctrl & S_PHASE_MASK) {
-				case S_PHASE_DATA_IN:
+				if (sat) {
+					switch (m_xfr_phase) {
+					case S_PHASE_DATA_IN:
+						data_fifo_push(data);
+						if ((m_regs[CONTROL] & CONTROL_DM) != CONTROL_DM_POLLED) {
+							set_drq();
+						}
+						else {
+							decrement_transfer_count();
+							m_regs[AUXILIARY_STATUS] |= AUXILIARY_STATUS_DBR;
+						}
+						break;
+
+					case S_PHASE_STATUS:
+						m_regs[TARGET_LUN] = data;
+						m_regs[COMMAND_PHASE] = COMMAND_PHASE_STATUS_RECEIVED;
+						break;
+
+					case S_PHASE_MSG_IN:
+						data_fifo_push(data);
+						break;
+
+					default:
+						fatalerror("%s: Unexpected phase in RECV_WAIT_SETTLE.\n", shortname());
+						break;
+					}
+				}
+				else {
 					data_fifo_push(data);
-					if ((m_regs[CONTROL] & CONTROL_DM) != CONTROL_DM_POLLED) {
+					if (m_xfr_phase == S_PHASE_DATA_IN && (m_regs[CONTROL] & CONTROL_DM) != CONTROL_DM_POLLED) {
 						set_drq();
 					}
 					else {
 						decrement_transfer_count();
 						m_regs[AUXILIARY_STATUS] |= AUXILIARY_STATUS_DBR;
 					}
-					break;
-				case S_PHASE_STATUS:
-					if (cc == COMMAND_CC_SELECT_ATN_TRANSFER || cc == COMMAND_CC_SELECT_TRANSFER) {
-						m_regs[TARGET_LUN] = data;
-					}
-					else {
-						data_fifo_push(data);
-						decrement_transfer_count();
-						m_regs[AUXILIARY_STATUS] |= AUXILIARY_STATUS_DBR;
-					}
-					break;
-				case S_PHASE_MSG_IN:
-					if (cc == COMMAND_CC_SELECT_ATN_TRANSFER || cc == COMMAND_CC_SELECT_TRANSFER) {
-						// If the Target is requesting a
-						// Message In phase, a pending disconnection is
-						// assumed. The WD33C9x therefore expects to receive
-						// either a Save Data Pointer Message (Hex 02) or a
-						// Disconnect Message (Hex 04).
-						// Ignore it for now
-					}
-					else {
-						data_fifo_push(data);
-						decrement_transfer_count();
-						m_regs[AUXILIARY_STATUS] |= AUXILIARY_STATUS_DBR;
-					}
-					break;
-				default:
-					fatalerror("%s: Unexpected phase in RECV_WAIT_SETTLE.\n", shortname());
-					break;
 				}
 				set_scsi_state_sub(RECV_WAIT_REQ_0);
 				scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
@@ -1081,18 +1111,24 @@ void wd33c9x_base_device::step(bool timeout)
 			break;
 
 		case DISC_SEL_ARBITRATION:
-			m_regs[COMMAND_PHASE] = COMMAND_PHASE_SELECTED;
-			set_scsi_state((cc == COMMAND_CC_SELECT || cc == COMMAND_CC_SELECT_ATN) ? FINISHED : INIT_XFR);
-			scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
-			if (ctrl & S_REQ) {
-				m_xfr_phase = (ctrl & S_PHASE_MASK);
-				++m_step_count;
+ 			scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+			if (cc == COMMAND_CC_SELECT || cc == COMMAND_CC_SELECT_ATN) {
+				set_scsi_state(FINISHED);
+				irq_fifo_push(SCSI_STATUS_SELECT_SUCCESS);
+				if (ctrl & S_REQ) {
+					irq_fifo_push(SCSI_STATUS_REQ | m_xfr_phase);
+				}
 			}
+			else {
+				set_scsi_state(INIT_XFR);
+				m_regs[COMMAND_PHASE] = COMMAND_PHASE_SELECTED;
+			}
+			++m_step_count;
 			break;
 
 		case INIT_XFR:
 			if (ctrl & S_REQ) {
-				switch (ctrl & S_PHASE_MASK) {
+				switch (m_xfr_phase) {
 				case S_PHASE_DATA_OUT:
 					if ((m_regs[CONTROL] & CONTROL_DM) != CONTROL_DM_POLLED) {
 						while (!data_fifo_full() && m_transfer_count > 0) {
@@ -1100,59 +1136,49 @@ void wd33c9x_base_device::step(bool timeout)
 						}
 					}
 					if (!data_fifo_empty()) {
-						set_scsi_state(INIT_XFR_SEND_BYTE);
+						set_scsi_state(INIT_XFR_WAIT_REQ);
 						cycles = send_byte();
 					}
 					else if ((m_regs[CONTROL] & CONTROL_DM) == CONTROL_DM_POLLED) {
 						m_regs[AUXILIARY_STATUS] |= AUXILIARY_STATUS_DBR;
 					}
 					break;
+
 				case S_PHASE_COMMAND:
-					if ((cc == COMMAND_CC_SELECT_TRANSFER || cc == COMMAND_CC_SELECT_ATN_TRANSFER) &&
-						m_regs[COMMAND_PHASE] < COMMAND_PHASE_CP_BYTES_0) {
-						m_regs[COMMAND_PHASE] = COMMAND_PHASE_CP_BYTES_0;
-						LOGMASKED(LOG_COMMANDS, "%s: Sending Command:", shortname());
-						for (uint8_t i = 0; i < m_command_length; ++i) {
-							const uint8_t command_byte = m_regs[CDB_1 + i];
-							LOGMASKED(LOG_COMMANDS, " %02x", command_byte);
-							data_fifo_push(command_byte);
-						}
-						LOGMASKED(LOG_COMMANDS, " (%d)\n", m_transfer_count);
-					}
 					if (!data_fifo_empty()) {
 						uint32_t mask;
-						if (cc == COMMAND_CC_SELECT_TRANSFER || cc == COMMAND_CC_SELECT_ATN_TRANSFER) {
+						if (sat) {
 							mask = 0;
 						}
 						else {
 							m_regs[AUXILIARY_STATUS] |= AUXILIARY_STATUS_DBR;
 							mask = (m_transfer_count == 0 && m_data_fifo_size == 1) ? S_ATN : 0;
 						}
-						set_scsi_state(INIT_XFR_SEND_BYTE);
+						set_scsi_state(INIT_XFR_WAIT_REQ);
 						cycles = send_byte(0, mask);
 					}
-					else if (!(cc == COMMAND_CC_SELECT_TRANSFER || cc == COMMAND_CC_SELECT_ATN_TRANSFER)) {
+					else if (!sat) {
 						m_regs[AUXILIARY_STATUS] |= AUXILIARY_STATUS_DBR;
 					}
 					break;
 
 				case S_PHASE_MSG_OUT:
-					if (cc == COMMAND_CC_SELECT_ATN_TRANSFER) {
+					if (sat) {
 						data_fifo_push(get_msg_out());
 					}
 					if (!data_fifo_empty()) {
 						uint32_t mask;
-						if (cc == COMMAND_CC_SELECT_ATN_TRANSFER) {
+						if (sat) {
 							mask = S_ATN;
 						}
 						else {
 							m_regs[AUXILIARY_STATUS] |= AUXILIARY_STATUS_DBR;
 							mask = (m_transfer_count == 0 && m_data_fifo_size == 1) ? S_ATN : 0;
 						}
-						set_scsi_state(INIT_XFR_SEND_BYTE);
+						set_scsi_state(INIT_XFR_WAIT_REQ);
 						cycles = send_byte(0, mask);
 					}
-					else if (cc != COMMAND_CC_SELECT_ATN_TRANSFER) {
+					else if (!sat) {
 						m_regs[AUXILIARY_STATUS] |= AUXILIARY_STATUS_DBR;
 					}
 					break;
@@ -1163,8 +1189,8 @@ void wd33c9x_base_device::step(bool timeout)
 					if (!data_fifo_full()) {
 						// if it's the last message byte, ACK remains asserted, terminate with function_complete()
 						//state = (m_xfr_phase == S_PHASE_MSG_IN && (!dma_command || tcounter == 1)) ? INIT_XFR_RECV_BYTE_NACK : INIT_XFR_RECV_BYTE_ACK;
-						set_scsi_state(INIT_XFR_RECV_BYTE_ACK);
-						recv_byte();
+						scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+						set_scsi_state((RECV_WAIT_REQ_1 << SUB_SHIFT) | INIT_XFR_RECV_BYTE_ACK);
 						if (ctrl & S_REQ) {
 							++m_step_count;
 						}
@@ -1180,81 +1206,152 @@ void wd33c9x_base_device::step(bool timeout)
 
 		case INIT_XFR_WAIT_REQ:
 			if (ctrl & S_REQ) {
-				const uint8_t xfr_phase = (ctrl & S_PHASE_MASK);
 				uint16_t next_state = m_scsi_state;
+
+				const uint8_t xfr_phase = (ctrl & S_PHASE_MASK);
+
 				switch ((m_xfr_phase << 3) | xfr_phase) {
-				case ((S_PHASE_COMMAND  << 3) | S_PHASE_COMMAND):
-				case ((S_PHASE_STATUS   << 3) | S_PHASE_STATUS):
-				case ((S_PHASE_MSG_OUT  << 3) | S_PHASE_MSG_OUT):
-				case ((S_PHASE_MSG_IN   << 3) | S_PHASE_MSG_IN):
+				case ((S_PHASE_MSG_OUT << 3) | S_PHASE_MSG_OUT):
+				case ((S_PHASE_COMMAND << 3) | S_PHASE_COMMAND):
+				case ((S_PHASE_MSG_IN  << 3) | S_PHASE_MSG_IN):
 					next_state = INIT_XFR;
 					break;
+
 				case ((S_PHASE_DATA_IN  << 3) | S_PHASE_DATA_IN):
-					next_state = (m_transfer_count > 0) ? INIT_XFR : FINISHED;
-					break;
 				case ((S_PHASE_DATA_OUT << 3) | S_PHASE_DATA_OUT):
-					next_state = (m_transfer_count > 0 || !data_fifo_empty()) ? INIT_XFR : FINISHED;
+					if (sat || cc == COMMAND_CC_TRANSFER_INFO) {
+						if (m_transfer_count > 0 || (m_xfr_phase == S_PHASE_DATA_OUT && !data_fifo_empty())) {
+							next_state = INIT_XFR;
+						}
+						else {
+							next_state = FINISHED;
+							uint8_t scsi_status;
+							if (sat) {
+								m_regs[COMMAND_PHASE] = COMMAND_PHASE_TRANSFER_COUNT;
+								scsi_status = SCSI_STATUS_UNEXPECTED_PHASE;
+							}
+							else {
+								scsi_status = SCSI_STATUS_TRANSFER_SUCCESS;
+							}
+							irq_fifo_push(scsi_status | m_xfr_phase);
+						}
+					}
+					else {
+						fatalerror("%s: Unhandled command in data phase.\n", shortname());
+						next_state = FINISHED;
+					}
 					break;
-				case ((S_PHASE_MSG_OUT << 3) | S_PHASE_COMMAND):
-					if (data_fifo_empty()) {
-						switch (cc) {
-						case COMMAND_CC_SELECT_ATN_TRANSFER:
+
+				case ((S_PHASE_MSG_OUT  << 3) | S_PHASE_COMMAND):
+				case ((S_PHASE_COMMAND  << 3) | S_PHASE_DATA_OUT):
+				case ((S_PHASE_COMMAND  << 3) | S_PHASE_DATA_IN):
+				case ((S_PHASE_COMMAND  << 3) | S_PHASE_STATUS):
+				case ((S_PHASE_COMMAND  << 3) | S_PHASE_MSG_IN):
+				case ((S_PHASE_DATA_OUT << 3) | S_PHASE_STATUS):
+				case ((S_PHASE_DATA_IN  << 3) | S_PHASE_STATUS):
+				case ((S_PHASE_STATUS   << 3) | S_PHASE_MSG_IN):
+					if (!(m_xfr_phase & 1) && !data_fifo_empty()) {
+						fatalerror("%s: Data FIFO is not empty on phase transition.\n", shortname());
+					}
+
+					if (sat) {
+						switch (xfr_phase) {
+						case S_PHASE_MSG_OUT:
 							next_state = INIT_XFR;
 							break;
-						case COMMAND_CC_SELECT_ATN:
-						case COMMAND_CC_TRANSFER_INFO:
-							next_state = FINISHED;
+
+						case S_PHASE_COMMAND:
+							next_state = INIT_XFR;
+							m_regs[COMMAND_PHASE] = COMMAND_PHASE_CP_BYTES_0;
+							LOGMASKED(LOG_COMMANDS, "%s: Sending Command:", shortname());
+							for (uint8_t i = 0; i < m_command_length; ++i) {
+								const uint8_t command_byte = m_regs[CDB_1 + i];
+								LOGMASKED(LOG_COMMANDS, " %02x", command_byte);
+								data_fifo_push(command_byte);
+							}
+							LOGMASKED(LOG_COMMANDS, " (%d)\n", m_transfer_count);
 							break;
+
+						case S_PHASE_DATA_OUT:
+						case S_PHASE_DATA_IN:
+							next_state = INIT_XFR;
+							break;
+
+						case S_PHASE_STATUS:
+							next_state = INIT_XFR;
+							m_regs[COMMAND_PHASE] = COMMAND_PHASE_RECEIVE_STATUS;
+							break;
+
+						case S_PHASE_MSG_IN:
+							next_state = INIT_XFR;
+							break;
+
 						default:
-							fatalerror("%s: Unhandled command when transitioning from S_PHASE_MSG_OUT -> S_PHASE_COMMAND.\n", shortname());
+							fatalerror("%s: Unhandled phase in Select-w/Atn-and-Transfer.\n", shortname());
 							next_state = FINISHED;
 							break;
 						}
 					}
-					break;
-				case ((S_PHASE_COMMAND << 3) | S_PHASE_STATUS):
-				case ((S_PHASE_COMMAND << 3) | S_PHASE_DATA_IN):
-				case ((S_PHASE_COMMAND << 3) | S_PHASE_DATA_OUT):
-				case ((S_PHASE_DATA_IN << 3) | S_PHASE_STATUS):
-				case ((S_PHASE_DATA_OUT << 3) | S_PHASE_STATUS):
-					if (!data_fifo_empty()) {
-						fatalerror("%s: Data FIFO is not empty on phase transition.\n", shortname());
+					else if (cc == COMMAND_CC_TRANSFER_INFO) {
+						next_state = FINISHED;
+						irq_fifo_push(SCSI_STATUS_TRANSFER_SUCCESS | xfr_phase);
 					}
-					// Fall through
-				case ((S_PHASE_STATUS  << 3) | S_PHASE_MSG_IN):
-					switch (cc) {
-					case COMMAND_CC_SELECT_ATN_TRANSFER:
-						next_state = INIT_XFR;
-						break;
-					case COMMAND_CC_TRANSFER_INFO:
+					else {
+						fatalerror("%s: Unhandled command in data phase.\n", shortname());
 						next_state = FINISHED;
-						break;
-					default:
-						fatalerror("%s: Unhandled command when transitioning from S_PHASE_STATUS -> S_PHASE_MSG_IN.\n", shortname());
-						next_state = FINISHED;
-						break;
 					}
 					break;
+
 				default:
 					fatalerror("%s: Unhandled phase transition in INIT_XFR_WAIT_REQ.\n", shortname());
 					next_state = FINISHED;
 					break;
 				}
+
 				if (next_state != m_scsi_state) {
-					m_xfr_phase = xfr_phase;
 					set_scsi_state(next_state);
 					++m_step_count;
+					m_xfr_phase = xfr_phase;
 				}
 			}
 			break;
 
-		case INIT_XFR_SEND_BYTE:
-			set_scsi_state(INIT_XFR_WAIT_REQ);
-			++m_step_count;
-			break;
-
 		case INIT_XFR_RECV_BYTE_ACK:
-			set_scsi_state(INIT_XFR_WAIT_REQ);
+			if (sat && m_xfr_phase == S_PHASE_MSG_IN) {
+				const uint8_t msg = data_fifo_pop();
+				if (m_regs[COMMAND_PHASE] <= COMMAND_PHASE_CP_BYTES_C) {
+					switch (msg) {
+					case SM_SAVE_DATA_PTR:
+						set_scsi_state(FINISHED);
+						irq_fifo_push(SCSI_STATUS_SAVE_DATA_POINTERS);
+						m_regs[COMMAND_PHASE] = COMMAND_PHASE_SAVE_DATA_POINTER;
+						break;
+
+					case SM_DISCONNECT:
+						m_regs[COMMAND_PHASE] = COMMAND_PHASE_DISCONNECT_MESSAGE;
+						break;
+
+					default:
+						fatalerror("%s: Unhandled MSG_IN.\n", shortname());
+						break;
+					}
+				}
+				else if (m_regs[COMMAND_PHASE] < COMMAND_PHASE_COMMAND_COMPLETE) {
+					switch (msg) {
+					case SM_COMMAND_COMPLETE:
+						set_scsi_state(FINISHED);
+						irq_fifo_push(SCSI_STATUS_SELECT_TRANSFER_SUCCESS);
+						m_regs[COMMAND_PHASE] = COMMAND_PHASE_COMMAND_COMPLETE;
+						break;
+					default:
+						fatalerror("%s: Unhandled MSG_IN.\n", shortname());
+						break;
+					}
+				}
+			}
+			else {
+				set_scsi_state(INIT_XFR_WAIT_REQ);
+			}
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 			++m_step_count;
 			break;
@@ -1397,22 +1494,12 @@ uint32_t wd33c9x_base_device::send_byte(const uint32_t value, const uint32_t mas
 
 
 //-------------------------------------------------
-//  recv_byte
-//-------------------------------------------------
-
-void wd33c9x_base_device::recv_byte()
-{
-	scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
-	set_scsi_state_sub(RECV_WAIT_REQ_1);
-}
-
-//-------------------------------------------------
 //  set_scsi_state - change SCSI state
 //-------------------------------------------------
 
 void wd33c9x_base_device::set_scsi_state(uint16_t state)
 {
-	LOGMASKED(LOG_STATE, "%s: SCSI state change: %x to %x\n", shortname(), m_scsi_state, state);
+	LOGMASKED(LOG_STEP, "%s: SCSI state change: %x to %x\n", shortname(), m_scsi_state, state);
 	m_scsi_state = state;
 }
 
@@ -1450,6 +1537,11 @@ void wd33c9x_base_device::irq_fifo_push(const uint8_t status)
 {
 	if (irq_fifo_full()) {
 		fatalerror("%s: IRQ FIFO overflow.\n", shortname());
+	}
+	// Kind of hacky, but don't push duplicate interrupt statuses.
+	if (m_irq_fifo_size &&
+		m_irq_fifo[(m_irq_fifo_pos + m_irq_fifo_size - 1) % IRQ_FIFO_SIZE] == status) {
+		return;
 	}
 	m_irq_fifo[(m_irq_fifo_pos + m_irq_fifo_size) % IRQ_FIFO_SIZE] = status;
 	++m_irq_fifo_size;
@@ -1495,14 +1587,32 @@ void wd33c9x_base_device::irq_fifo_reset()
 void wd33c9x_base_device::update_irq()
 {
 	if (m_regs[AUXILIARY_STATUS] & AUXILIARY_STATUS_INT) {
-		LOGMASKED(LOG_LINES, "%s: Clearing IRQ\n", shortname());
 		m_regs[AUXILIARY_STATUS] &= ~AUXILIARY_STATUS_INT;
+		LOGMASKED(LOG_LINES, "%s: Clearing IRQ\n", shortname());
 		m_irq_cb(CLEAR_LINE);
 	}
 	if (!irq_fifo_empty()) {
 		m_regs[SCSI_STATUS] = irq_fifo_pop();
-		LOGMASKED(LOG_LINES, "%s: Asserting IRQ - SCSI Status (%02x)\n", shortname(), m_regs[SCSI_STATUS]);
 		m_regs[AUXILIARY_STATUS] |= AUXILIARY_STATUS_INT;
+
+		const uint8_t cc = (m_regs[COMMAND] & COMMAND_CC);
+		if (cc == COMMAND_CC_SELECT_TRANSFER || cc == COMMAND_CC_SELECT_ATN_TRANSFER) {
+			switch (m_regs[SCSI_STATUS]) {
+			case SCSI_STATUS_DISCONNECT:
+				if (!(m_regs[CONTROL] & CONTROL_IDI)) {
+					return;
+				}
+				break;
+
+			case SCSI_STATUS_SELECT_TRANSFER_SUCCESS:
+				if ((m_regs[CONTROL] & CONTROL_EDI) && m_mode != MODE_D) {
+					return;
+				}
+				break;
+			}
+		}
+
+		LOGMASKED(LOG_LINES, "%s: Asserting IRQ - SCSI Status (%02x)\n", shortname(), m_regs[SCSI_STATUS]);
 		m_irq_cb(ASSERT_LINE);
 	}
 }
@@ -1571,7 +1681,7 @@ bool wd33c9x_base_device::set_command_length(const uint8_t cc)
 	}
 	else if (eaf && cc == COMMAND_CC_WAIT_SELECT_RECEIVE_DATA) {
 		m_command_length = 6;
-		m_regs[COMMAND_PHASE] = 0x31;
+		m_regs[COMMAND_PHASE] = COMMAND_PHASE_CP_BYTES_1;
 		irq_fifo_push(SCSI_STATUS_NEED_COMMAND_SIZE);
 		update_irq();
 		ret = false;
@@ -1605,8 +1715,8 @@ wd33c92_device::wd33c92_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-wd33c93_device::wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: wd33c9x_base_device(mconfig, WD33C93, tag, owner, clock)
+wd33c93n_device::wd33c93n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: wd33c9x_base_device(mconfig, WD33C93N, tag, owner, clock)
 {
 }
 
