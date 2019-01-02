@@ -27,22 +27,22 @@ public:
 	auto pb_in_callback() { return m_pb_in_cb.bind(); }
 	auto pb_out_callback() { return m_pb_out_cb.bind(); }
 
-	auto tout1_out_callback() { return m_timer1->m_tout_out_cb.bind(); }
-	auto tin1_in_callback() { return m_timer1->m_tin_in_cb.bind(); }
-	auto tgate1_in_callback() { return m_timer1->m_tgate_in_cb.bind(); }
-	auto tout2_out_callback() { return m_timer2->m_tout_out_cb.bind(); }
-	auto tin2_in_callback() { return m_timer2->m_tin_in_cb.bind(); }
-	auto tgate2_in_callback() { return m_timer2->m_tgate_in_cb.bind(); }
+	auto tout1_out_callback() { return m_timer[0]->m_tout_out_cb.bind(); }
+	auto tin1_in_callback() { return m_timer[0]->m_tin_in_cb.bind(); }
+	auto tgate1_in_callback() { return m_timer[0]->m_tgate_in_cb.bind(); }
+	auto tout2_out_callback() { return m_timer[1]->m_tout_out_cb.bind(); }
+	auto tin2_in_callback() { return m_timer[1]->m_tin_in_cb.bind(); }
+	auto tgate2_in_callback() { return m_timer[1]->m_tgate_in_cb.bind(); }
 
 	uint16_t get_cs(offs_t address);
 
 	void set_crystal(const XTAL &crystal) { set_crystal(crystal.value()); }
 
 	// Timer input methods, can be used instead of the corresponding polling MCFG callbacks
-	DECLARE_WRITE_LINE_MEMBER( tin1_w )  { m_timer1->tin_w(state);  }
-	DECLARE_WRITE_LINE_MEMBER( tgate1_w ){ m_timer1->tgate_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( tin2_w )  { m_timer2->tin_w(state);  }
-	DECLARE_WRITE_LINE_MEMBER( tgate2_w ){ m_timer2->tgate_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( tin1_w )  { m_timer[0]->tin_w(state);  }
+	DECLARE_WRITE_LINE_MEMBER( tgate1_w ){ m_timer[0]->tgate_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( tin2_w )  { m_timer[1]->tin_w(state);  }
+	DECLARE_WRITE_LINE_MEMBER( tgate2_w ){ m_timer[1]->tgate_w(state); }
 
 protected:
 	virtual void device_start() override;
@@ -51,8 +51,7 @@ protected:
 
 private:
 	required_device<mc68340_serial_module_device> m_serial;
-	required_device<mc68340_timer_module_device> m_timer1;
-	required_device<mc68340_timer_module_device> m_timer2;
+	required_device_array<mc68340_timer_module_device, 2> m_timer;
 
 	TIMER_CALLBACK_MEMBER(periodic_interrupt_timer_callback);
 
@@ -61,7 +60,7 @@ private:
 	void do_tick_pit();
 
 	int calc_cs(offs_t address) const;
-	int get_timer_index(mc68340_timer_module_device *timer) { return (timer == m_timer1) ? 0 : 1; }
+	int get_timer_index(mc68340_timer_module_device *timer) { return (timer == m_timer[0].target()) ? 0 : 1; }
 
 	int m_currentcs;
 	uint32_t m_clock_mode;

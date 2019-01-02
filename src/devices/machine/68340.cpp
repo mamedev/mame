@@ -86,11 +86,11 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 								read32_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_cs_r),this),
 								write32_delegate(FUNC(m68340_cpu_device::m68340_internal_sim_cs_w),this));
 			m_internal->install_readwrite_handler(base + 0x600, base + 0x63f,
-								READ16_DEVICE_DELEGATE(m_timer1, mc68340_timer_module_device, read),
-								WRITE16_DEVICE_DELEGATE(m_timer1, mc68340_timer_module_device, write),0xffffffff);
+								READ16_DEVICE_DELEGATE(m_timer[0], mc68340_timer_module_device, read),
+								WRITE16_DEVICE_DELEGATE(m_timer[0], mc68340_timer_module_device, write),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x640, base + 0x67f,
-								READ16_DEVICE_DELEGATE(m_timer2, mc68340_timer_module_device, read),
-								WRITE16_DEVICE_DELEGATE(m_timer2, mc68340_timer_module_device, write),0xffffffff);
+								READ16_DEVICE_DELEGATE(m_timer[1], mc68340_timer_module_device, read),
+								WRITE16_DEVICE_DELEGATE(m_timer[1], mc68340_timer_module_device, write),0xffffffff);
 			m_internal->install_readwrite_handler(base + 0x700, base + 0x723,
 								read8sm_delegate(FUNC(mc68340_serial_module_device::read), &*m_serial),
 								write8sm_delegate(FUNC(mc68340_serial_module_device::write), &*m_serial),0xffffffff);
@@ -119,12 +119,14 @@ void m68340_cpu_device::m68340_internal_map(address_map &map)
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START(m68340_cpu_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("serial", MC68340_SERIAL_MODULE, 0)
-	MCFG_MC68340SER_IRQ_CALLBACK(WRITELINE("serial", mc68340_serial_module_device, irq_w))
-	MCFG_DEVICE_ADD("timer1", MC68340_TIMER_MODULE, 0)
-	MCFG_DEVICE_ADD("timer2", MC68340_TIMER_MODULE, 0)
-MACHINE_CONFIG_END
+
+void m68340_cpu_device::device_add_mconfig(machine_config &config)
+{
+	MC68340_SERIAL_MODULE(config, m_serial);
+	m_serial->irq_cb().set(m_serial, FUNC(mc68340_serial_module_device::irq_w));
+	MC68340_TIMER_MODULE(config, m_timer[0]);
+	MC68340_TIMER_MODULE(config, m_timer[1]);
+}
 
 
 //**************************************************************************
@@ -134,8 +136,7 @@ MACHINE_CONFIG_END
 m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: fscpu32_device(mconfig, tag, owner, clock, M68340, 32,32, address_map_constructor(FUNC(m68340_cpu_device::m68340_internal_map), this))
 	, m_serial(*this, "serial")
-	, m_timer1(*this, "timer1")
-	, m_timer2(*this, "timer2")
+	, m_timer(*this, "timer%u", 1U)
 	, m_clock_mode(0)
 	, m_crystal(0)
 	, m_extal(0)
