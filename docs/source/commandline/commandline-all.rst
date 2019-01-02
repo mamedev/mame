@@ -801,7 +801,9 @@ Core Video Options
 
 	Enable bilinear filtering on the system screen graphics. When disabled, point filtering is applied, which is crisper but leads to scaling artifacts. If you don't like the filtered look, you are probably better off increasing the **-prescale** value rather than turning off filtering altogether. The default is ON (**-filter**).
 
-	This is supported with all video output types (``bgfx``, ``d3d``, etc) on Windows and is **ONLY** supported with OpenGL on other platforms.
+	This is supported with OpenGL and D3D video on Windows and is **ONLY** supported with OpenGL on other platforms.
+
+	Use bgfx_screen_chains with BGFX to adjust filtering with that video system.
 
 .. _mame-commandline-unevenstretch:
 
