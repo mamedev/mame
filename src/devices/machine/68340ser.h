@@ -28,6 +28,10 @@ public:
 	virtual void write(offs_t offset, uint8_t data) override;
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
+	uint8_t irq_level() const { return irq_pending() ? (m_ilr & REG_ILR_MASK) : 0; }
+	uint8_t irq_vector() const { return m_ivr; }
+	uint8_t arbitrate(uint8_t level) const { return (irq_level() == level) ? (m_mcrl & REG_MCRL_ARBLV) : 0; }
+
 protected:
 	m68340_cpu_device *m_cpu;
 
