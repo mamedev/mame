@@ -78,6 +78,7 @@ IRQ_CALLBACK_MEMBER(m68340_cpu_device::int_ack)
 	int response = 0;
 	uint32_t vector = standard_irq_callback(irqline);
 
+	// Valid IARB levels are F (high) to 1 (low) and should be unique among modules using the same interrupt level
 	if (iarb != 0)
 	{
 		if (iarb == scu_iarb)
