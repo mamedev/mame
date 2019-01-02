@@ -38,4 +38,4 @@ The line you need to edit will be the port line defining the actual input. For S
 |             </port>
 |
 
-Save and exit. To disable this, simply remove the ``toggle="no"`` from each desired .CFG input.
+Save and exit. To disable this, simply remove the **toggle="no"** from each desired .CFG input.
