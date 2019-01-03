@@ -38546,6 +38546,7 @@ rad_skat                        //
 rad_skatp                       //
 rad_sktv                        //
 rad_crik                        //
+rad_fb2                         //
 
 @source:vsmile.cpp
 vsmile                          //
