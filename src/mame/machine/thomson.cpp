@@ -157,7 +157,7 @@ WRITE_LINE_MEMBER( thomson_state::to7_set_cassette_motor )
    Bit-order is most significant bit first (unlike TO7).
 
    Double-density MO6 cassettes follow the exact same mechanism, but with
-   at double frequency (perdiods at 2400 Hz, and half-perdios at 1200 Hz).
+   at double frequency (periods at 2400 Hz, and half-periods at 1200 Hz).
 */
 
 
