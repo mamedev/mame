@@ -62,22 +62,25 @@ protected:
 		MIPS1_COP0_PRID,     // reg 15
 	};
 
-	enum exception : int
+	enum exception : u32
 	{
-		EXCEPTION_INTERRUPT = 0,
-		EXCEPTION_TLBMOD    = 1,
-		EXCEPTION_TLBLOAD   = 2,
-		EXCEPTION_TLBSTORE  = 3,
-		EXCEPTION_ADDRLOAD  = 4,
-		EXCEPTION_ADDRSTORE = 5,
-		EXCEPTION_BUSINST   = 6,
-		EXCEPTION_BUSDATA   = 7,
-		EXCEPTION_SYSCALL   = 8,
-		EXCEPTION_BREAK     = 9,
-		EXCEPTION_INVALIDOP = 10,
-		EXCEPTION_BADCOP    = 11,
-		EXCEPTION_OVERFLOW  = 12,
-		EXCEPTION_TRAP      = 13,
+		EXCEPTION_INTERRUPT = 0x00000000,
+		EXCEPTION_TLBMOD    = 0x00000004,
+		EXCEPTION_TLBLOAD   = 0x00000008,
+		EXCEPTION_TLBSTORE  = 0x0000000c,
+		EXCEPTION_ADDRLOAD  = 0x00000010,
+		EXCEPTION_ADDRSTORE = 0x00000014,
+		EXCEPTION_BUSINST   = 0x00000018,
+		EXCEPTION_BUSDATA   = 0x0000001c,
+		EXCEPTION_SYSCALL   = 0x00000020,
+		EXCEPTION_BREAK     = 0x00000024,
+		EXCEPTION_INVALIDOP = 0x00000028,
+		EXCEPTION_BADCOP0   = 0x0000002c,
+		EXCEPTION_BADCOP1   = 0x1000002c,
+		EXCEPTION_BADCOP2   = 0x2000002c,
+		EXCEPTION_BADCOP3   = 0x3000002c,
+		EXCEPTION_OVERFLOW  = 0x00000030,
+		EXCEPTION_TRAP      = 0x00000034,
 	};
 
 	enum cop0_reg : u8
@@ -127,6 +130,16 @@ protected:
 		SR_COP1  = 0x20000000, // coprocessor 1 usable
 		SR_COP2  = 0x40000000, // coprocessor 2 usable
 		SR_COP3  = 0x80000000, // coprocessor 3 usable
+
+		SR_KUIE  = 0x0000003f, // all interrupt enable and user mode bits
+	};
+
+	enum cause_mask : u32
+	{
+		CAUSE_EXCCODE = 0x0000007c, // exception code
+		CAUSE_IP      = 0x0000ff00, // interrupt pending
+		CAUSE_CE      = 0x30000000, // co-processor error
+		CAUSE_BD      = 0x80000000, // branch delay
 	};
 
 	enum entryhi_mask : u32
@@ -171,7 +184,7 @@ protected:
 	void dcache_map(address_map &map);
 
 	// interrupts
-	void generate_exception(int exception, bool refill = false);
+	void generate_exception(u32 exception, bool refill = false);
 	void check_irqs();
 	void set_irq_line(int irqline, int state);
 
@@ -201,6 +214,10 @@ protected:
 	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> load(u32 program_address, U &&apply);
 	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::value, void> store(u32 program_address, U data);
 	bool fetch(u32 program_address, std::function<void(u32)> &&apply);
+
+	// debug helpers
+	std::string debug_string(u32 string_pointer);
+	std::string debug_string_array(u32 array_pointer);
 
 	// address spaces
 	const address_space_config m_program_config_be;
