@@ -43,13 +43,13 @@
  *   https://web.archive.org/web/20140518203135/http://no-l.org/pages/riscos.html
  *
  * TODO (rx2030)
- *   - remaining iop interface
- *   - figure out the brcond0 signal
  *   - keyboard controller and keyboard
  *   - buzzer
  *
  * TODO (rx3230)
  *   - verify/complete address maps
+ *   - keyboard controller and interrupts
+ *   - isa slot and colour graphics board
  *   - idprom
  *
  *   Ref   Part                      Function
@@ -133,7 +133,7 @@
 /*
  * Rx2030 WIP
  *
- *   status: loads RISC/os, but panics
+ *   status: boots RISC/os, requires unimplemented MIPS keyboard
  *
  * V50 internal peripherals:
  * base = 0xfe00
@@ -171,7 +171,7 @@
 /*
  * Rx3230 WIP
  *
- *   status: boots to monitor
+ *   status: boots RISC/os from network, panics during installation
  *
  * R3000 interrupts
  *  0 <- lance, scc, slot, keyboard
@@ -477,7 +477,8 @@ static void mips_scsi_devices(device_slot_interface &device)
 void rx2030_state::rx2030(machine_config &config)
 {
 	R2000A(config, m_cpu, 33.333_MHz_XTAL / 2, 32768, 32768);
-	m_cpu->set_fpurev(mips1_device_base::MIPS_R2010A);
+	// TODO: FPU disabled until properly emulated
+	//m_cpu->set_fpurev(mips1_device_base::MIPS_R2010A);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
 	V50(config, m_iop, 20_MHz_XTAL / 2);
@@ -756,7 +757,8 @@ void rx3230_state::rx3230(machine_config &config)
 {
 	R3000A(config, m_cpu, 50_MHz_XTAL / 2, 32768, 32768);
 	m_cpu->set_addrmap(AS_PROGRAM, &rx3230_state::rx3230_map);
-	m_cpu->set_fpurev(mips1_device_base::MIPS_R3010A);
+	// TODO: FPU disabled until properly emulated
+	//m_cpu->set_fpurev(mips1_device_base::MIPS_R3010A);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
 	// 32 SIMM slots, 8-128MB memory, banks of 8 1MB or 4MB SIMMs
@@ -767,6 +769,7 @@ void rx3230_state::rx3230(machine_config &config)
 
 	MIPS_RAMBO(config, m_rambo, 25_MHz_XTAL / 4);
 	m_rambo->timer_out().set_inputline(m_cpu, INPUT_LINE_IRQ2);
+	m_rambo->irq_out().set_inputline(m_cpu, INPUT_LINE_IRQ1);
 	m_rambo->parity_out().set_inputline(m_cpu, INPUT_LINE_IRQ5);
 	//m_rambo->buzzer_out().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_rambo->set_ram(m_ram);
@@ -847,7 +850,7 @@ void rx3230_state::rx3230(machine_config &config)
 	AT_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL); // TODO: confirm
 	m_kbdc->kbd_clk().set(kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_kbdc->kbd_irq().set(FUNC(rx3230_state::irq_w<INT_KBD>));
+	//m_kbdc->kbd_irq().set(FUNC(rx3230_state::irq_w<INT_KBD>));
 
 	// buzzer
 	SPEAKER(config, "mono").front_center();
