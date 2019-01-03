@@ -17,7 +17,6 @@
 #include "cpu/i386/i386.h"
 #include "machine/atapicdr.h"
 #include "machine/idehd.h"
-#include "machine/pit8253.h"
 
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"

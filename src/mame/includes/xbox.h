@@ -105,20 +105,18 @@ protected:
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
-	DECLARE_WRITE_LINE_MEMBER(xbox_pic8259_1_set_int_line);
+	DECLARE_WRITE_LINE_MEMBER(maincpu_interrupt);
 	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE_LINE_MEMBER(xbox_pit8254_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(xbox_pit8254_out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(xbox_ohci_usb_interrupt_changed);
-	DECLARE_WRITE_LINE_MEMBER(xbox_smbus_interrupt_changed);
-	DECLARE_WRITE_LINE_MEMBER(xbox_nv2a_interrupt_changed);
+	DECLARE_WRITE_LINE_MEMBER(pit8254_out0_changed);
+	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
+	DECLARE_WRITE_LINE_MEMBER(ohci_usb_interrupt_changed);
+	DECLARE_WRITE_LINE_MEMBER(smbus_interrupt_changed);
+	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_changed);
+	DECLARE_WRITE_LINE_MEMBER(nv2a_interrupt_changed);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	struct xbox_devices {
-		pic8259_device    *pic8259_1;
-		pic8259_device    *pic8259_2;
-		bus_master_ide_controller_device    *ide;
-	} xbox_base_devs;
+	mcpx_lpc_device *mcpxlpc;
+	bus_master_ide_controller_device *ide;
 	struct superio_state
 	{
 		bool configuration_mode;
