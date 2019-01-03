@@ -448,8 +448,8 @@ void dcs_audio_device::denver_data_map(address_map &map)
 
 void dcs_audio_device::denver_rambank_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x3fff).bankrw("databank");
+	map(0x0000, 0x3fff).ram();
+	map(0x4000, 0x7fff).bankrw("databank");
 }
 
 
@@ -1373,7 +1373,8 @@ WRITE32_MEMBER( dcs_audio_device::dsio_idma_data_w )
 {
 	dsio_state &dsio = m_dsio;
 	// IDMA is to internal memory only
-	m_ram_map->set_bank(0);
+	if (m_dmovlay_val)
+		m_ram_map->set_bank(0);
 	if (ACCESSING_BITS_0_15)
 	{
 		if (LOG_DCS_TRANSFERS && !(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x00ff))
@@ -1392,7 +1393,8 @@ WRITE32_MEMBER( dcs_audio_device::dsio_idma_data_w )
 		m_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 	// Restore internal/external mapping
-	m_ram_map->set_bank(m_dmovlay_val);
+	if (m_dmovlay_val)
+		m_ram_map->set_bank(m_dmovlay_val);
 
 }
 
@@ -1910,12 +1912,8 @@ WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
 			if (m_sport0_timer != nullptr) {
 				if (data & 0x1000) {
 					// Start the SPORT0 timer
-					// Hack to make sf2049 start to function
-					if (m_rev == REV_DENV)
-						m_sport0_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(800));
-					else
-						// SPORT0 is used as a 1kHz timer
-						m_sport0_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
+					// SPORT0 is used as a 1kHz timer
+					m_sport0_timer->adjust(attotime::from_usec(10), 0, attotime::from_hz(1000));
 					if (LOG_DCS_IO)
 						logerror("adsp_control_w: Setting SPORT0 freqency to 1kHz\n");
 				}
@@ -2704,7 +2702,7 @@ void dcs2_audio_denver_device::device_add_mconfig(machine_config &config)
 	denver.set_addrmap(AS_DATA, &dcs2_audio_denver_device::denver_data_map);
 	denver.set_addrmap(AS_IO, &dcs2_audio_denver_device::denver_io_map);
 
-	ADDRESS_MAP_BANK(config, "data_map_bank").set_map(&dcs2_audio_denver_device::denver_rambank_map).set_options(ENDIANNESS_LITTLE, 16, 14, 0x2000);
+	ADDRESS_MAP_BANK(config, "data_map_bank").set_map(&dcs2_audio_denver_device::denver_rambank_map).set_options(ENDIANNESS_LITTLE, 16, 15, 0x2000*2);
 
 	TIMER(config, "dcs_reg_timer").configure_generic(FUNC(dcs_audio_device::dcs_irq));
 	TIMER(config, "dcs_int_timer").configure_generic(FUNC(dcs_audio_device::internal_timer_callback));

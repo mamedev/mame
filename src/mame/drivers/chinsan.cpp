@@ -506,12 +506,13 @@ void chinsan_state::init_chinsan()
 //**************************************************************************
 
 // C1-00114-B
-MACHINE_CONFIG_START(chinsan_state::chinsan)
-	MCFG_DEVICE_ADD("maincpu", MC8123, XTAL(10'000'000)/2) // 317-5012
-	MCFG_DEVICE_PROGRAM_MAP(chinsan_map)
-	MCFG_DEVICE_IO_MAP(chinsan_io_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
+void chinsan_state::chinsan(machine_config &config)
+{
+	MC8123(config, m_maincpu, XTAL(10'000'000)/2); // 317-5012
+	m_maincpu->set_addrmap(AS_PROGRAM, &chinsan_state::chinsan_map);
+	m_maincpu->set_addrmap(AS_IO, &chinsan_state::chinsan_io_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &chinsan_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(chinsan_state::vblank_int));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -521,15 +522,15 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	ppi.in_pc_callback().set(FUNC(chinsan_state::input_p1_r));
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_VISIBLE_AREA(24, 512-24-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(chinsan_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(24, 512-24-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(chinsan_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinsan)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_chinsan);
 	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);
 
 	// sound hardware
@@ -543,24 +544,24 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	ymsnd.add_route(2, "mono", 0.15);
 	ymsnd.add_route(3, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("adpcm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, chinsan_state, adpcm_int_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B) // 8kHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	MSM5205(config, m_adpcm, XTAL(384'000));
+	m_adpcm->vck_legacy_callback().set(FUNC(chinsan_state::adpcm_int_w));
+	m_adpcm->set_prescaler_selector(msm5205_device::S64_4B); // 8kHz
+	m_adpcm->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(chinsan_state::mayumi)
+void chinsan_state::mayumi(machine_config &config)
+{
 	chinsan(config);
 	// standard Z80 instead of MC-8123
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(chinsan_map)
-	MCFG_DEVICE_IO_MAP(mayumi_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
+	Z80(config.replace(), m_maincpu, XTAL(10'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &chinsan_state::chinsan_map);
+	m_maincpu->set_addrmap(AS_IO, &chinsan_state::mayumi_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(chinsan_state::vblank_int));
 
 	// no ADPCM
-	MCFG_DEVICE_REMOVE("adpcm")
-MACHINE_CONFIG_END
+	config.device_remove("adpcm");
+}
 
 
 //**************************************************************************

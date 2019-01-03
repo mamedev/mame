@@ -29,7 +29,7 @@ Driver file for IBM PC, IBM PC XT, and related machines.
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
-#include "softlist.h"	
+#include "softlist.h"
 
 /******************************************************* Generic PC with CGA ***/
 
@@ -178,7 +178,7 @@ DEVICE_INPUT_DEFAULTS_END
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 
-// Floppy configurations	
+// Floppy configurations
 void pc_state::cfg_dual_720K(device_t *device)
 {
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
@@ -197,7 +197,7 @@ void pc_state::cfg_single_720K(device_t *device)
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
-}	
+}
 
 MACHINE_CONFIG_START(pc_state::pccga)
 	/* basic machine hardware */
@@ -226,8 +226,8 @@ MACHINE_CONFIG_END
 
 /**************************************************************** Atari PC1 ***
 
-Links:	http://www.ataripc.net/pc1-8088/ ; http://krap.pl/mirrorz/atari/www.atari-computermuseum.de/pc.htm ; 
-		http://www.atari-computermuseum.de/pc1.htm
+Links:  http://www.ataripc.net/pc1-8088/ ; http://krap.pl/mirrorz/atari/www.atari-computermuseum.de/pc.htm ;
+        http://www.atari-computermuseum.de/pc1.htm
 Form Factor: Desktop
 CPU: 8088 @ 4.77 MHz / 8 MHz
 RAM: 512K / 640KB
@@ -240,8 +240,8 @@ Expansion: Up to two external floppy drives: PCF554, SF314 or SF354
 
 ***************************************************************** Atari PC2 ***
 
-Links:	http://www.binarydinosaurs.co.uk/Museum/atari/pc2.php ; http://www.ataripc.net/pc2-8088/ ; 
-		http://www.ataripc.net/components/
+Links:  http://www.binarydinosaurs.co.uk/Museum/atari/pc2.php ; http://www.ataripc.net/pc2-8088/ ;
+        http://www.ataripc.net/components/
 Info: The Atari PC2 mainboard has only one ISA slot, but is expanded via a four slot riser card. BIOS is identical to later PC1 and PC3
 CPU: 8088 @ 4.77 MHz / 8 MHz
 RAM: 512K / 640KB
@@ -272,8 +272,8 @@ ROM_END
 
 /**************************************************************** Atari PC3 ***
 
-Links:	http://www.atari-computermuseum.de/pc1.htm , http://trelohra.blogspot.de/2015/06/atari-pc3.html , 
-		http://www.ataripc.net/pc3-8088/
+Links:  http://www.atari-computermuseum.de/pc1.htm , http://trelohra.blogspot.de/2015/06/atari-pc3.html ,
+        http://www.ataripc.net/pc3-8088/
 Form Factor: Desktop
 CPU: 8088 @ 4.77 MHz or 8 MHz
 RAM: 640K
@@ -281,7 +281,7 @@ Bus: 5x ISA:    1) Adaptec ACB-2072 RLL Controller Card
 Video: On-board MDA/CGA/Hercules/EGA
 Mass storage: 1x 5.25" 360K floppy + 30MB RLL harddisk
 On board ports: floppy, parallel, serial, mouse, speaker
-Options: 8087 FPU	
+Options: 8087 FPU
 ******************************************************************************/
 
 ROM_START( ataripc3 )
@@ -298,11 +298,11 @@ ROM_END
 
 /******************************************** Bondwell BW230 (Pro28 series) ***
 
-Links:	http://gallery.fdd5-25.net/details.php?image_id=3463&sessionid=1eaeb42abdf2758a020b16204a2a8e5a ; 
-		http://www.zonadepruebas.com/viewtopic.php?t=3696 ; 
-		ftp://ftp.whtech.com/emulators/mess/old/Complete%20MESS%20Geneve%20emulation/mess/sysinfo/bondwell.htm
-Info:   Info is hard to come by. A BW230 is nowhere to be found, the links about the Pro28 series suggest an XT 
-		compatible built around a passive backplane and a slot CPU. This is confirmed by the old MESS info.
+Links:  http://gallery.fdd5-25.net/details.php?image_id=3463&sessionid=1eaeb42abdf2758a020b16204a2a8e5a ;
+        http://www.zonadepruebas.com/viewtopic.php?t=3696 ;
+        ftp://ftp.whtech.com/emulators/mess/old/Complete%20MESS%20Geneve%20emulation/mess/sysinfo/bondwell.htm
+Info:   Info is hard to come by. A BW230 is nowhere to be found, the links about the Pro28 series suggest an XT
+        compatible built around a passive backplane and a slot CPU. This is confirmed by the old MESS info.
 Form Factor: Desktop
 CPU: 8088 @ 4.77 MHz (MESS sysinfo: 3.75)/ 8 MHz
 RAM: 512K / 640K
@@ -341,8 +341,8 @@ ROM_END
 
 /****************************************** Columbia Data Products MPC 1600 ***
 
-Links:	http://www.old-computers.com/museum/computer.asp?st=1&c=633, https://winworldpc.com/download/6f07e280-9d12-7ae2-80a6-11c3a6e28094, 
-		http://www.minuszerodegrees.net/rom/rom.htm
+Links:  http://www.old-computers.com/museum/computer.asp?st=1&c=633, https://winworldpc.com/download/6f07e280-9d12-7ae2-80a6-11c3a6e28094,
+        http://www.minuszerodegrees.net/rom/rom.htm
 Form Factor: Desktop
 CPU: 8088 @ 4.77 MHz
 RAM: 128K, up to 1MB
@@ -368,7 +368,7 @@ ROM_START( mpc1600 )
 	ROM_LOAD("mpc4.34_u45.bin",  0xf000, 0x01000, CRC(ed9a11b3) SHA1(ca819579e6c2a06cddacf893e1f57c5b37723d90))
 	ROM_LOAD("mpc4.34_u46.bin",  0xe000, 0x01000, CRC(33a87335) SHA1(a8ee188cbb93fe32c6cde881bdf3b9c783a59a5b))
 	ROM_LOAD("mpc4.34_u47.bin",  0xd000, 0x01000, CRC(cc2e4c28) SHA1(3b02be4bebe2b57098102eca04f738df50a734a4))
-	
+
 	ROM_REGION(0x8000,"gfx1", 0)
 	ROM_LOAD("mpc_vid-1.0.bin", 0x00000, 0x0800, CRC(a362ffe6) SHA1(1fddd01dcc0fa8c002ced3a1a94873dccdc88424)) // CGA Card
 ROM_END
@@ -399,11 +399,11 @@ ROM_END
 
 /********************************************************** Compaq Portable ***
 
-Links:	https://en.wikipedia.org/wiki/Compaq_Portable , http://oldcomputers.net/compaqi.html , 
-		http://www.digibarn.com/collections/systems/compaq/index.html , 
-		http://www.old-computers.com/museum/computer.asp?c=547 , https://www.seasip.info/VintagePC/compaq.html
+Links:  https://en.wikipedia.org/wiki/Compaq_Portable , http://oldcomputers.net/compaqi.html ,
+        http://www.digibarn.com/collections/systems/compaq/index.html ,
+        http://www.old-computers.com/museum/computer.asp?c=547 , https://www.seasip.info/VintagePC/compaq.html
 Form Factor: Luggable
-CPU: 	   
+CPU:
 
 ******************************************************************************/
 
@@ -421,15 +421,16 @@ ROM_START( comport )
 	ROMX_LOAD("award_atari_pc_bios_3.06.bin", 0xe000, 0x2000, CRC(e9a055b2) SHA1(faa31687ef3d967c5e46d6b2546a28efb79a2097), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "rev.c", "rev.c" )
 	ROMX_LOAD("compaq_portable_rev_c.bin", 0xe000, 0x2000, CRC(1d1f7c38) SHA1(d9782eb46cd1a7d40f3e8b37eb48db04ac588acb), ROM_BIOS(1))
-	
-	ROM_REGION(0x8000,"gfx1", 0)	
-	ROM_LOAD("compaq_portable_video_cpqvid.bin", 0x0000, 0x2000, CRC(3ae64565) SHA1(6eeb06620e588a2f7bfab72eb4fadbd70503ea94))
+
+	ROM_REGION(0x8000,"gfx1", 0)
+	ROM_LOAD("compaq_portable_video_cpqvid.bin", 0x0000, 0x2000, BAD_DUMP CRC(3ae64565) SHA1(6eeb06620e588a2f7bfab72eb4fadbd70503ea94))
 ROM_END
+
 
 /************************************************** Data General One / DG-1 ***
 
-Links: http://www.1000bit.it/ad/bro/datageneral/DG-ONE-PersonalSystem.pdf , http://www.1000bit.it/ad/bro/datageneral/DG-ONE-Interduction-PR.pdf , 
-	   http://www.oldcomputers.net/data-general-one.html , http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=30897&page=all
+Links: http://www.1000bit.it/ad/bro/datageneral/DG-ONE-PersonalSystem.pdf , http://www.1000bit.it/ad/bro/datageneral/DG-ONE-Interduction-PR.pdf ,
+       http://www.oldcomputers.net/data-general-one.html , http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=30897&page=all
 Info: According to the discussion in the thread, the ROM we have is from the original version. Specs for later permutations can be found on oldcomputers.net
 Form Factor: Laptop
 CPU: 80C88 @ 4 MHz
@@ -458,11 +459,11 @@ ROM_END
 
 /*************************************************************** Eagle 1600 ***
 
-Links: https://archive.org/details/bitsavers_eagleCompu00Brochure_9975235 , http://www.vcfed.org/forum/showthread.php?49510-Eagle-Computer-model-list , 
-	   http://bitsavers.trailing-edge.com/pdf/eagleComputer/1600/1600_Series_Training_Notes.pdf
-Info:   Eagle 1620 - 8086/128K, 2 Quad density floppy drives, 4 Expansion slots available, ~1983, Eagle 1630 - 8086/128K, 
-		1 Quad density floppy drive, 10MB HD, 3 Expansion Slots available (Same as 1620 with hard drive), ~1983
-		Eagle 1640 - 8086/512K, 1 Quad density floppy drive, 32MB HD, 3 Expansion Slots available, ~1984
+Links: https://archive.org/details/bitsavers_eagleCompu00Brochure_9975235 , http://www.vcfed.org/forum/showthread.php?49510-Eagle-Computer-model-list ,
+       http://bitsavers.trailing-edge.com/pdf/eagleComputer/1600/1600_Series_Training_Notes.pdf
+Info:   Eagle 1620 - 8086/128K, 2 Quad density floppy drives, 4 Expansion slots available, ~1983, Eagle 1630 - 8086/128K,
+        1 Quad density floppy drive, 10MB HD, 3 Expansion Slots available (Same as 1620 with hard drive), ~1983
+        Eagle 1640 - 8086/512K, 1 Quad density floppy drive, 32MB HD, 3 Expansion Slots available, ~1984
         The native floppy format is 780K, 2 sides, 80 tracks/side, 1024 bytes/sector, 5 sectors per track. Standard 360K disks can be read
         Holding "T" and resetting starts a system diagnostics test
 Form Factor: Desktop
@@ -639,9 +640,9 @@ ROM_END
 
 /***************************************************************** ITT XTRA ***
 
-Links:	https://www.atarimagazines.com/creative/v10n12/71_ITT_Xtra_an_IBM_PC_compa.php
-Info:	Model I: 128K RAM, 14" mono (green or amber) or 12" colour screen; Model II adds another floppy drive;
-		Model III: 256K RAM, 1 floppy, 10MB harddisk
+Links:  https://www.atarimagazines.com/creative/v10n12/71_ITT_Xtra_an_IBM_PC_compa.php
+Info:   Model I: 128K RAM, 14" mono (green or amber) or 12" colour screen; Model II adds another floppy drive;
+        Model III: 256K RAM, 1 floppy, 10MB harddisk
 Form Factor: Desktop
 CPU: 8088
 RAM: 128K or 256K on board
@@ -661,8 +662,8 @@ ROM_END
 
 /**************************************************************** Kaypro 16 ***
 
-Links:	http://www.mofeel.net/679-comp-sys-ibm-pc-classic/309.aspx, https://groups.google.com/forum/#!topic/comp.os.cpm/HYQnpUOyQXg, 
-		https://amaus.org/static/S100/kaypro/systems/kaypro%2016/Kaypro%2016.pdf , http://ajordan.dpease.com/kaypro16/index.htm
+Links:  http://www.mofeel.net/679-comp-sys-ibm-pc-classic/309.aspx, https://groups.google.com/forum/#!topic/comp.os.cpm/HYQnpUOyQXg,
+        https://amaus.org/static/S100/kaypro/systems/kaypro%2016/Kaypro%2016.pdf , http://ajordan.dpease.com/kaypro16/index.htm
 Form Factor: Luggable
 CPU: 8088 @ 4.77MHz
 RAM: 256K, expandable to 512K and 640K
@@ -765,8 +766,8 @@ ROM_END
 
 /************************************************************* Olivetti M15 ***
 
-Links:  http://www.1000bit.it/ad/bro/olivetti/olivettiM15.pdf , http://electrickery.xs4all.nl/comp/m15/ , 
-		http://electrickery.xs4all.nl/comp/m15/doc/M15_InstallationAndOperationsGuide.pdf
+Links:  http://www.1000bit.it/ad/bro/olivetti/olivettiM15.pdf , http://electrickery.xs4all.nl/comp/m15/ ,
+        http://electrickery.xs4all.nl/comp/m15/doc/M15_InstallationAndOperationsGuide.pdf
         http://www.museotecnologicamente.it/olivetti-m-15-1987/ , http://www.museotecnologicamente.it/wp-content/uploads/M15_Depliant_inglese.pdf
 Info: The info brochure has a picture of a working M15. This shows the LCD display with a green background and blue text/graphics.
 Form Factor: Laptop
@@ -966,8 +967,8 @@ ROM_END
 
 /************************************************************ Sharp PC-7000 ***
 
-Links:	http://oldcomputers.net/sharp-pc7000.html , http://curtamania.com/curta/database/brand/sharp/Sharp%20PC-7000/index.html , 
-		http://pcmuseum.de/pc7000.html
+Links:  http://oldcomputers.net/sharp-pc7000.html , http://curtamania.com/curta/database/brand/sharp/Sharp%20PC-7000/index.html ,
+        http://pcmuseum.de/pc7000.html
 Form Factor: Luggable
 CPU: 8086 @ 4.77 MHz or 7.37 MHz
 RAM: 320K / 704K
@@ -989,8 +990,8 @@ ROM_END
 
 /*************************************************** Siemens Sicomp PC16-05 ***
 
-Links:	http://www.computerwoche.de/a/siemens-erweitert-pc-16-programm,1169752 , 
-		http://www.phantom.sannata.ru/museum/siemens_pc_16_05.shtml
+Links:  http://www.computerwoche.de/a/siemens-erweitert-pc-16-programm,1169752 ,
+        http://www.phantom.sannata.ru/museum/siemens_pc_16_05.shtml
 Info: Multitech PC/700 mainboard
 Form Factor: Desktop
 CPU: 8088 @ 4.77MHz / 8 MHz
@@ -1109,8 +1110,8 @@ ROM_END
 
 /******************************************************** Zenith SuperSport ***
 
-Links:  http://www.focushacks.com/zenith/myzenith.html , http://retro-computing.blogspot.de/2006/08/zds-supersport-laptop.html , 
-		http://www.minuszerodegrees.net/manuals/Zenith%20Data%20Systems/ZDS%20SupersPort%20-%20Service%20Manual.pdf
+Links:  http://www.focushacks.com/zenith/myzenith.html , http://retro-computing.blogspot.de/2006/08/zds-supersport-laptop.html ,
+        http://www.minuszerodegrees.net/manuals/Zenith%20Data%20Systems/ZDS%20SupersPort%20-%20Service%20Manual.pdf
         http://www.minuszerodegrees.net/manuals/Zenith%20Data%20Systems/ZDS%20SupersPort%20-%20User%20and%20Technical%20Manual.pdf
 Info: ZWL-184 to distinguish it from the later 80286 based models
 Form Factor: Laptop
@@ -1169,33 +1170,33 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME            PARENT   COMPAT  MACHINE         INPUT     CLASS     INIT           COMPANY                            FULLNAME					FLAGS
-COMP( 1984, dgone,          ibm5150, 0,      dgone,          pccga,    pc_state, empty_init,    "Data General",                    "Data General/One" ,		MACHINE_NOT_WORKING )
-COMP( 1985, epc,            ibm5150, 0,      epc,            pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson PC" ,			MACHINE_NOT_WORKING )
-COMP( 1985, eppc,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",	MACHINE_NOT_WORKING )
-COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "Bondwell BW230 (PRO28 Series)", 0 )
-COMP( 1984, compc1,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Commodore Business Machines",     "Commodore PC-1" ,		MACHINE_NOT_WORKING )
-COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state, empty_init,    "Schetmash",                       "Iskra 3104",			MACHINE_NOT_WORKING )
-COMP( 1989, mk88,           ibm5150, 0,      mk88,           pccga,    pc_state, empty_init,    "<unknown>",                       "MK-88",					MACHINE_NOT_WORKING )
-COMP( 1991, poisk2,         ibm5150, 0,      poisk2,         pccga,    pc_state, empty_init,    "<unknown>",                       "Poisk-2",				MACHINE_NOT_WORKING )
-COMP( 1990, mc1702,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "<unknown>",                       "Elektronika MC-1702",	MACHINE_NOT_WORKING )
-COMP( 1987, zdsupers,       ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "Zenith SuperSport",		0 )
-COMP( 1985, sicpc1605,      ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Siemens",                         "Siemens Sicomp PC16-05",MACHINE_NOT_WORKING )
-COMP( 1985, ncrpc4i,        ibm5150, 0,      ncrpc4i,        pccga,    pc_state, empty_init,    "NCR",                             "PC4i",					MACHINE_NOT_WORKING )
-COMP( 198?, olivm15,        ibm5150, 0,      m15,            pccga,    pc_state, empty_init,    "Olivetti",                        "Olivetti M15",			0 )
-COMP( 1983, ibm5550,        ibm5150, 0,      ibm5550,        pccga,    pc_state, empty_init,    "International Business Machines", "IBM 5550",				MACHINE_NOT_WORKING )
-COMP( 1985, pc7000,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sharp",                           "Sharp PC-7000",			MACHINE_NOT_WORKING )
-COMP( 1988, sx16,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "Sanyo SX-16",			MACHINE_NOT_WORKING )
-COMP( 198?, mbc16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "Sanyo MBC-16",			MACHINE_NOT_WORKING )
-COMP( 1987, ataripc1,       ibm5150, 0,      ataripc1,       pccga,    pc_state, empty_init,    "Atari",                           "Atari PC1",				0 )
-COMP( 1988, ataripc3,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Atari",                           "Atari PC3",				0 )
-COMP( 1989, ssam88s,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Samsung",                         "Samsung Samtron 88S",	MACHINE_NOT_WORKING )
-COMP( 1983, eagle1600,      ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "Eagle",                           "Eagle 1600" ,			MACHINE_NOT_WORKING )
-COMP( 1983, eaglespirit,    ibm5150, 0,      pccga,		     pccga,    pc_state, empty_init,    "Eagle",                           "Eagle PC Spirit",		MACHINE_NOT_WORKING )
-COMP( 1988, laser_turbo_xt, ibm5150, 0,      laser_turbo_xt, 0,        pc_state, empty_init,    "VTech",                           "Laser Turbo XT",		0 )
-COMP( 1989, laser_xt3,      ibm5150, 0,      laser_turbo_xt, 0,        pc_state, empty_init,    "VTech",                           "Laser XT/3",			0 )
+//    YEAR  NAME            PARENT   COMPAT  MACHINE         INPUT     CLASS     INIT           COMPANY                            FULLNAME                 FLAGS
+COMP( 1984, dgone,          ibm5150, 0,      dgone,          pccga,    pc_state, empty_init,    "Data General",                    "Data General/One" ,     MACHINE_NOT_WORKING )
+COMP( 1985, epc,            ibm5150, 0,      epc,            pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson PC" ,          MACHINE_NOT_WORKING )
+COMP( 1985, eppc,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )
+COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)",  0 )
+COMP( 1984, compc1,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Commodore Business Machines",     "Commodore PC-1" ,       MACHINE_NOT_WORKING )
+COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state, empty_init,    "Schetmash",                       "Iskra 3104",            MACHINE_NOT_WORKING )
+COMP( 1989, mk88,           ibm5150, 0,      mk88,           pccga,    pc_state, empty_init,    "<unknown>",                       "MK-88",                 MACHINE_NOT_WORKING )
+COMP( 1991, poisk2,         ibm5150, 0,      poisk2,         pccga,    pc_state, empty_init,    "<unknown>",                       "Poisk-2",               MACHINE_NOT_WORKING )
+COMP( 1990, mc1702,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "<unknown>",                       "Elektronika MC-1702",   MACHINE_NOT_WORKING )
+COMP( 1987, zdsupers,       ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "SuperSport",            0 )
+COMP( 1985, sicpc1605,      ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Siemens",                         "Sicomp PC16-05",        MACHINE_NOT_WORKING )
+COMP( 1985, ncrpc4i,        ibm5150, 0,      ncrpc4i,        pccga,    pc_state, empty_init,    "NCR",                             "PC4i",                  MACHINE_NOT_WORKING )
+COMP( 198?, olivm15,        ibm5150, 0,      m15,            pccga,    pc_state, empty_init,    "Olivetti",                        "M15",                   0 )
+COMP( 1983, ibm5550,        ibm5150, 0,      ibm5550,        pccga,    pc_state, empty_init,    "International Business Machines", "5550",                  MACHINE_NOT_WORKING )
+COMP( 1985, pc7000,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sharp",                           "PC-7000",               MACHINE_NOT_WORKING )
+COMP( 1988, sx16,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "SX-16",                 MACHINE_NOT_WORKING )
+COMP( 198?, mbc16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "MBC-16",                MACHINE_NOT_WORKING )
+COMP( 1987, ataripc1,       ibm5150, 0,      ataripc1,       pccga,    pc_state, empty_init,    "Atari",                           "PC1",                   0 )
+COMP( 1988, ataripc3,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Atari",                           "PC3",                   0 )
+COMP( 1989, ssam88s,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Samsung",                         "Samtron 88S",           MACHINE_NOT_WORKING )
+COMP( 1983, eagle1600,      ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "Eagle",                           "Eagle 1600" ,           MACHINE_NOT_WORKING )
+COMP( 1983, eaglespirit,    ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                           "Eagle PC Spirit",       MACHINE_NOT_WORKING )
+COMP( 1988, laser_turbo_xt, ibm5150, 0,      laser_turbo_xt, 0,        pc_state, empty_init,    "VTech",                           "Laser Turbo XT",        0 )
+COMP( 1989, laser_xt3,      ibm5150, 0,      laser_turbo_xt, 0,        pc_state, empty_init,    "VTech",                           "Laser XT/3",            0 )
 COMP( 198?, olytext30,      ibm5150, 0,      olytext30,      pccga,    pc_state, empty_init,    "AEG Olympia",                     "Olytext 30",            MACHINE_NOT_WORKING )
-COMP( 1985, kaypro16,       ibm5150, 0,      kaypro16,       pccga,    pc_state, empty_init,    "Kaypro Corporation",              "Kaypro 16",				0 )
-COMP( 1983, comport,		ibm5150, 0, 	 comport,		 pccga,	   pc_state, empty_init,	"Compaq",						   "Compaq Portable",		MACHINE_NOT_WORKING )
-COMP( 1982, mpc1600,		ibm5150, 0, 	 mpc1600,		 pccga,	   pc_state, empty_init,	"Columbia Data Products",		   "CDP MPC 1600",			0 )
-COMP( 1984, ittxtra,		ibm5150, 0, 	 pccga,			 pccga,	   pc_state, empty_init,	"ITT Information Systems",		   "ITT XTRA",				MACHINE_NOT_WORKING )
+COMP( 1985, kaypro16,       ibm5150, 0,      kaypro16,       pccga,    pc_state, empty_init,    "Kaypro Corporation",              "Kaypro 16",             0 )
+COMP( 1983, comport,        ibm5150, 0,      comport,        pccga,    pc_state, empty_init,    "Compaq",                          "Compaq Portable",       MACHINE_NOT_WORKING )
+COMP( 1982, mpc1600,        ibm5150, 0,      mpc1600,        pccga,    pc_state, empty_init,    "Columbia Data Products",          "MPC 1600",              0 )
+COMP( 1984, ittxtra,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "ITT Information Systems",         "ITT XTRA",              MACHINE_NOT_WORKING )

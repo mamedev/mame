@@ -54,7 +54,7 @@ private:
 
 	uint32_t m_bankmask;
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	IRQ_CALLBACK_MEMBER(duart_iack);
 	DECLARE_WRITE8_MEMBER(duart_output);
 
 	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);

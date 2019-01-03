@@ -141,19 +141,41 @@ reg: 0->1 (main->2nd) /     : (1->0) 2nd->main :
 
 gsword notes:
 
-There are three 8041 MCUs:
+There are two 8041 MCUs and one 8741 MCU:
 * One connected to the main CPU for communicating with the sub CPU and
   reading DIP switch C.
 * One connected to the sub CPU for communicating with the main CPU and
   reading DIP switches A and B.
 * One connected to the sub CPU for reading player, start and coin
   inputs, and driving the coin counter outputs.
+* TODO: confirm which MCU is connected to which CPU.
 
 So far, only the AA-016 MCU has been dumped successfully.  There's no
-reason to believe that the three MCUs run different programs.  Other
+reason to believe that the AA-017 MCU runs a different program.  Other
 Allumer-developed games are known to have different silkscreen on
 identical parts.  It's not clear which of the MCUs (AA-013 at 5A, AA-016
-at 9C and AA-017 at 9G) plays which role,
+at 9C and AA-017 at 9G) plays which role.
+
+The AA-016 MCU program is divided into several parts, each entirely
+contained in a single program page.  The initialisation/self test, mode
+selection, and the main loop of the communication mode are in page 0;
+the subroutines implementing communication mode are in page 1; the
+input/coin handling main loop and host communiction code is in page 2;
+finally, the subroutines that implement coin handling are in page 3.
+This suggests componentes were assigned to different developers who were
+each given exclusive use of a page to simplify integration.  There was
+insufficient space in page 3 for the program checksum fragment, so the
+coin handling subroutines are not checksummed, despite plenty of zero-
+filled space elsewhere in the ROM.
+
+At least two Great Swordsman boards have been seen with a UVEPROM-based
+D8741A-8 MCU for AA-103 at 5A.  This suggests the developers made some
+last-minute change to the code that only affected one of the three use
+cases.  The AA-016 program contains complete code for communication and
+input/coin handling, so it would have to be some change in behaviour.
+One possibility is that they decided they needed to ensure the coin
+handling code is checksummed, and rearranged or refactored the code to
+allow this.
 
 The clock inputs for the MCUs are unknown - the values used are taken
 from gladiatr, where a superficially similar arrangement is used.  It
@@ -1050,7 +1072,7 @@ ROM_START( gsword )
 	ROM_LOAD( "ac10-14.3d",   0x4000, 0x2000, CRC(819db933) SHA1(5e8b10d94ca6ba608a074bd5f30f14b95122fe85) )
 	ROM_LOAD( "ac10-17.4d",   0x6000, 0x2000, CRC(87817985) SHA1(370399a4622958829ca6d1545e614b121f09c2c0) )
 
-	ROM_REGION( 0x0400, "mcu1", 0 )    // 8041AH
+	ROM_REGION( 0x0400, "mcu1", 0 )    // D8741A-8
 	ROM_LOAD( "aa-013.5a",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) )
 
 	ROM_REGION( 0x0400, "mcu2", 0 )    // 8041AH
@@ -1097,7 +1119,7 @@ ROM_START( gsword2 )
 	ROM_LOAD( "ac0-14.3d",    0x4000, 0x2000, CRC(455364b6) SHA1(ebabf077d1ba113c13e7620d61720ed141acb5ad) )
 	// 6000-7fff empty
 
-	ROM_REGION( 0x0400, "mcu1", 0 )    // 8041AH
+	ROM_REGION( 0x0400, "mcu1", 0 )    // D8741A-8
 	ROM_LOAD( "aa-013.5a",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) )
 
 	ROM_REGION( 0x0400, "mcu2", 0 )    // 8041AH

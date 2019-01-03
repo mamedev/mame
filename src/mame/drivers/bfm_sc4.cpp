@@ -636,8 +636,9 @@ READ32_MEMBER(sc4_adder4_state::adder4_mem_r)
 			return m_adder4ram[offset];
 
 		default:
-			logerror("%08x adder4cpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
-
+			//logerror("%08x adder4cpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
+			(void)pc;
+			break;
 	}
 
 	return 0x0000;
@@ -651,7 +652,9 @@ WRITE32_MEMBER(sc4_adder4_state::adder4_mem_w)
 	switch ( cs )
 	{
 		default:
-			logerror("%08x adder4cpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
+			//logerror("%08x adder4cpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
+			(void)pc;
+			break;
 
 		case 2:
 			offset &=0x3fff;

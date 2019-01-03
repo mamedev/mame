@@ -44,6 +44,10 @@ public:
 	template <class Object> devcb_base &set_time_til_next_event_callback(Object &&cb) { return m_time_til_next_event_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_vsync_changed_callback(Object &&cb) { return m_vsync_changed_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_hsync_changed_callback(Object &&cb) { return m_hsync_changed_cb.set_callback(std::forward<Object>(cb)); }
+	auto next_pixel_data() { return m_next_pixel_data_cb.bind(); }
+	auto time_til_next_event() { return m_time_til_next_event_cb.bind(); }
+	auto vsync_changed() { return m_vsync_changed_cb.bind(); }
+	auto hsync_changed() { return m_hsync_changed_cb.bind(); }
 
 	void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER( read );

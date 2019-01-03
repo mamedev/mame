@@ -2779,6 +2779,7 @@ files {
 	MAME_DIR .. "src/mame/includes/namcos1.h",
 	MAME_DIR .. "src/mame/machine/namcos1.cpp",
 	MAME_DIR .. "src/mame/video/namcos1.cpp",
+	MAME_DIR .. "src/mame/drivers/namcos1b.cpp",
 	MAME_DIR .. "src/mame/drivers/namcos10.cpp",
 	MAME_DIR .. "src/mame/machine/ns10crypt.cpp",
 	MAME_DIR .. "src/mame/machine/ns10crypt.h",
