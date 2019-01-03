@@ -1563,7 +1563,7 @@ void gnw_dkong2_state::gnw_dkong2(machine_config &config)
 	screen_top.set_visarea(0, 1920/2-1, 0, 1241/2-1);
 
 	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
-	screen_bottom.set_svg_region("svg_top");
+	screen_bottom.set_svg_region("svg_bottom");
 	screen_bottom.set_refresh_hz(50);
 	screen_bottom.set_size(1920/2, 1237/2);
 	screen_bottom.set_visarea(0, 1920/2-1, 0, 1237/2-1);
