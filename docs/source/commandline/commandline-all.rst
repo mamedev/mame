@@ -3,7 +3,6 @@
 Universal Commandline Options
 =============================
 
-
 This section contains configuration options that are applicable to *all* MAME sub-builds (both SDL and Windows native).
 
 
@@ -15,14 +14,65 @@ Commands include **mame** itself as well as various tools included with the MAME
 Verbs are actions to take upon something with the command (e.g. **mame -validate pacman** has *mame* as a command and *-validate* as a verb)
 
 
-
 Patterns
 --------
 
-Many verbs support the use of *patterns*, which are either a system or device short name (e.g. **a2600**, **zorba_kbd**) or a glob pattern that matches either (e.g. **zorba_\***)
+Many verbs support the use of *patterns*, which are either a system or device
+short name (e.g. **a2600**, **zorba_kbd**) or a glob pattern that matches either
+(e.g. **zorba_\***).
 
-Depending on the command you're using the pattern with, pattern matching may match systems or systems and devices. It is advised to put quotes around your patterns to avoid having your shell try to expand them against filenames. (e.g. **mame -validate "pac\*"**)
+Depending on the command you're using the pattern with, pattern matching may
+match systems or systems and devices.  It is advised to put quotes around your
+patterns to avoid having your shell try to expand them against filenames (e.g.
+**mame -validate "pac\*"**).
 
+
+.. _mame-commandline-paths:
+
+File Names and Directory Paths
+------------------------------
+
+A number of options for specifying directories support multiple paths (for
+for example to search for ROMs in multiple locations).  MAME expects multiple
+paths to be separated with semicolons (``;``).
+
+MAME expands environment variable expressions in paths.  The syntax used depends
+on your operating system.  On Windows, ``%`` (percent) syntax is used.  For
+example ``%APPDATA%\mame\cfg`` will expand the application data path for the
+current user's roaming profile.  On UNIX-like system (including macOS and
+Linux), Bourne shell syntax is used, and a leading ``~`` expands to the current
+user's home directory.  For example, ``~/.mame/${HOSTNAME}/cfg`` expands to
+a host-specific path inside the ``.mame`` directory in the current user's home
+directory.  Note that only simple variable substitutions are supported; more
+complex expressions supported by Bash, ksh or zsh are not recognised by MAME.
+
+Relative paths are resolved relative to the current working directory.  If you
+start MAME by double-clicking it in Windows Explorer, the working directory is
+set to the folder containing the MAME executable.  If you start MAME by
+double-clicking it in the macOS Finder, it will open a Terminal window with the
+working directory is set to your home directory (usually ``/Users/<username>``)
+and start MAME.
+
+If you want behaviour similar to what Windows Explorer provides on macOS, create
+a script file containing these lines in the directory containing the MAME
+executable (for example you could call it ``mame-here``)::
+
+    #!/bin/sh
+    cd "`dirname "$0"`"
+    exec ./mame64
+
+You should be able to use any text editor.  If you have a choice of file format
+or line ending style, chose UNIX.  I've assumed you're using a 64-bit release
+build of MAME, but if you aren't you just need to change ``mame64`` to the name
+of your MAME executable.  Once you've created the file, you need to mark is as
+executable.  You can do this by opening a Terminal window, typing **chmod a+x**
+followed by a space, dragging the file you created onto the window (this causes
+Terminal to insert the full escaped path to the file), and then ensuring the
+Terminal window is active and hitting **Return** (or **Enter**) on your
+keyboard.  You can close the Terminal window after doing this.  Now if you
+double-click the script in the Finder, it will open a Terminal windows, set the
+working directory to the location of the script (i.e. the folder containing
+MAME), and then start MAME.
 
 
 Core Verbs
@@ -32,18 +82,20 @@ Core Verbs
 
 **-help** / **-h** / **-?**
 
-	Displays current MAME version and copyright notice.
+    Displays current MAME version and copyright notice.
 
 .. _mame-commandline-validate:
 
 **-validate** / **-valid** [*<pattern>*]
 
-	Performs internal validation on one or more drivers and devices in the
-	system. Run this before submitting changes to ensure that you haven't
-	violated any of the core system rules.
+    Performs internal validation on one or more drivers and devices in the
+    system. Run this before submitting changes to ensure that you haven't
+    violated any of the core system rules.
 
-	If a pattern is specified, it will validate systems matching
-	the pattern, otherwise it will validate all systems and devices.
+    If a pattern is specified, it will validate systems matching the pattern,
+    otherwise it will validate all systems and devices.  Note that if a pattern
+    is specified, it will be matched against systems only (not other devices),
+    and no device type validation will be performed.
 
 
 
@@ -54,39 +106,44 @@ Configuration Verbs
 
 **-createconfig** / **-cc**
 
-	Creates the default ``mame.ini`` file. All the configuration options
-	(not verbs) described below can be permanently changed by editing
-	this configuration file.
+    Creates the default ``mame.ini`` file. All the configuration options (not
+    verbs) described below can be permanently changed by editing this
+    configuration file.
 
 .. _mame-commandline-showconfig:
 
 **-showconfig** / **-sc**
 
-	Displays the current configuration settings. If you route this to a
-	file, you can use it as an INI file. For example, the command:
+    Displays the current configuration settings. If you route this to a file,
+    you can use it as an INI file. For example, the command:
 
-		**mame -showconfig >mame.ini**
+        **mame -showconfig > mame.ini**
 
-	is equivalent to **-createconfig**.
+    is equivalent to **-createconfig**.
 
 .. _mame-commandline-showusage:
 
 **-showusage** / **-su**
 
-	Displays a summary of all the command line options. For options that
-	are not mentioned here, the short summary given by "mame -showusage"
-	is usually sufficient.
+    Displays a summary of all the command line options. For options that are not
+    mentioned here, the short summary given by "mame -showusage" is usually
+    a sufficient description.
 
 
 
 Frontend Verbs
 --------------
 
-Note: By default, all the '**-list**' verbs below write info to the screen. If you wish to write the info to a textfile instead, add this to the end of your command:
+Note: By default, all the '**-list**' verbs below write info to the standard
+output (usually the terminal/command window where you typed the command). If you
+wish to write the info to a text file instead, add this to the end of your
+command:
 
-  **> filename**
+    **>** *filename*
 
-...where 'filename' is the textfile's path and name (e.g., list.txt).
+where *filename* is the name of the file to save the output in (e.g.
+``list.txt``).  Note that if this file already exists, it will be completely
+overwritten.
 
 Example:
 
@@ -97,45 +154,67 @@ Example:
 
 .. _mame-commandline-listxml:
 
-**-listxml** / **-lx** [*<pattern>*]
+**-listxml** / **-lx** [*<pattern>*...]
 
-	List comprehensive details for all of the supported systems and drivers. The output is quite long, so it is usually better to redirect this into a file. The output is in XML format. By default all systems are listed; however, you can limit this list by specifying a *pattern* after the -listxml command.
+    List comprehensive details for all of the supported systems and devices in
+    XML format.  The output is quite long, so it is usually better to redirect
+    this into a file.  By default all systems are listed; however, you can limit
+    this list by specifying one or more *patterns* after the **-listxml** verb.
+
+    This XML output is typically imported into other tools (like graphical
+    front-ends and ROM managers), or processed with scripts query detailed
+    information.
 
 .. _mame-commandline-listfull:
 
-**-listfull** / **-ll** [*<pattern>*]
+**-listfull** / **-ll** [*<pattern>*...]
 
-	Displays a list of system driver names and descriptions. By default all systems and devices are listed; however, you can limit this list by specifying a *pattern* after the **-listfull** command.
+    Displays a list of system driver names and descriptions. By default all
+    systems and devices are listed; however, you can limit this list by
+    specifying one or more *patterns* after the **-listfull** verb.
 
 .. _mame-commandline-listsource:
 
-**-listsource** / **-ls** [<*pattern>*]
+**-listsource** / **-ls** [*<pattern>*...]
 
-	Displays a list of drivers and the names of the source files their system drivers are defined in. Useful for finding which driver a system runs on in order to fix bugs. By default all systems are listed; however, you can limit this list by specifying a *pattern* after the **-listsource** command.
+    Displays a list of system drivers/devices and the names of the source files
+    where they are defined.  Useful for finding which driver a system runs on in
+    order to fix bugs.  By default all systems and devices are listed; however,
+    you can limit this list by specifying one or more *pattern* after the
+    **-listsource** verb.
 
 .. _mame-commandline-listclones:
 
-**-listclones** / **-lc** [<*pattern*>]
+**-listclones** / **-lc** [*<pattern>*]
 
-	Displays a list of clones. By default all clones are listed; however, you can limit this list by specifying a driver name or wildcard after the **-listsource** command.
+    Displays a list of clones.  By default all clones are listed; however, you
+    can limit this list by specifying a *pattern* after the **-listsource**
+    verb.  If a pattern is specified, MAME will list clones of systems that
+    match the pattern, as well as clones that match the pattern themselves.
 
 .. _mame-commandline-listbrothers:
 
-**-listbrothers** / **-lb** [<*pattern*>]
+**-listbrothers** / **-lb** [*<pattern>*]
 
-	Displays a list of '*brothers*', or rather, other sets which are located in the same sourcefile as the system name searched for.
+    Displays a list of *brothers*, i.e. other systems that are defined in the
+    same source file as a system that matches the specified *pattern*.
 
 .. _mame-commandline-listcrc:
 
-**-listcrc** [<*pattern*>]
+**-listcrc** [*<pattern>*...]
 
-	Displays a full list of CRCs of all ROM images referenced by the specified pattern of system or device names. If no pattern is specified, the results will be *all* systems and devices.
+    Displays a full list of CRCs and names of all ROM images referenced by
+    systems and devices matching the specified pattern(s).  If no patterns are
+    specified, ROMs referenced by all supported systems and devices will be
+    included.
 
 .. _mame-commandline-listroms:
 
-**-listroms** / **-lr** [<*pattern*>]
+**-listroms** / **-lr** [*<pattern>*...]
 
-	Displays a list of ROM images referenced by the specified pattern of system or device names. If no pattern is specified, the results will be *all* systems and devices.
+    Displays a list of ROM images referenced by supported systems/devices that
+    match the specified pattern(s). If no patterns are specified, the results
+    will include *all* supported systems and devices.
 
 .. _mame-commandline-listsamples:
 
@@ -222,30 +301,33 @@ OSD-related Options
 
 **-uimodekey** [*keystring*]
 
-	Key used to toggle emulated keyboard on and off. Default setting is **SCRLOCK** on Windows, **Forward Delete** on Mac (use **FN-Delete** on laptop/compact keyboards).
+    Key used to enable/disable MAME keyboard controls when the emulated system
+    has keyboard inputs.  The default setting is **Forward Delete** on macOS or
+    **SCRLOCK** on other operating systems (including Windows and Linux).  Use
+    **FN-Delete** on Macintosh computers with notebook/compact keyboards.
 
 .. _mame-commandline-uifontprovider:
 
-**\-uifontprovider**
+**-uifontprovider**
 
-	Chooses provider for UI font.
+   Chooses provider for UI font rendering.
 
-	On Windows, you can choose from: ``win``, ``dwrite``, ``none`` or ``auto``.
-	On Mac, you can choose from: ``osx`` or ``auto``.
-	On other platforms, you can choose from: ``sdl`` or ``auto``.
+    On Windows, you can choose from: ``win``, ``dwrite``, ``none`` or ``auto``.
+    On macOS, you can choose from: ``osx``, ``none`` or ``auto``.
+    On other platforms, you can choose from: ``sdl``, ``none`` or ``auto``.
 
-	Default setting is *auto*.
+    Default setting is ``auto``.
 
 .. _mame-commandline-keyboardprovider:
 
-**\-keyboardprovider**
+**-keyboardprovider**
 
 	Chooses how MAME will get keyboard input.
 
 	On Windows, you can choose from: ``auto``, ``rawinput``, ``dinput``, ``win32``, or ``none``
 	On SDL, you can choose from: ``auto``, ``sdl``, ``none``
 
-	The default is *auto*. On Windows, auto will try rawinput with fallback to dinput. On SDL, auto will default to sdl.
+	The default is ``auto``. On Windows, ``auto`` will try ``rawinput`` with fallback to ``dinput``. On SDL, ``auto`` will default to ``sdl``.
 
 .. _mame-commandline-mouseprovider:
 
@@ -256,7 +338,7 @@ OSD-related Options
 	On Windows, you can choose from: ``auto``, ``rawinput``, ``dinput``, ``win32``, or ``none``
 	On SDL, you can choose from: ``auto``, ``sdl``, ``none``
 
-	The default is *auto*. On Windows, auto will try rawinput with fallback to dinput. On SDL, auto will default to sdl.
+	The default is ``auto``. On Windows, ``auto`` will try ``rawinput`` with fallback to ``dinput``. On SDL, ``auto`` will default to ``sdl``.
 
 .. _mame-commandline-lightgunprovider:
 
@@ -267,7 +349,7 @@ OSD-related Options
 	On Windows, you can choose from: ``auto``, ``rawinput``, ``win32``, or ``none``
 	On SDL, you can choose from: ``auto``, ``x11`` or ``none``
 
-	The default is *auto*. On Windows, auto will try rawinput with fallback to win32, or none if it doesn't find any. On SDL/Linux, auto will default to x11, or none if it doesn't find any. On other SDL, auto will default to none.
+	The default is ``auto``. On Windows, auto will try ``rawinput`` with fallback to ``win32``, or ``none`` if it doesn't find any. On SDL/Linux, ``auto`` will default to ``x11``, or ``none`` if it doesn't find any. On other SDL, ``auto`` will default to ``none``.
 
 .. _mame-commandline-joystickprovider:
 
@@ -278,9 +360,9 @@ OSD-related Options
 	On Windows, you can choose from: ``auto, ``winhybrid``, ``dinput``, ``xinput``, or ``none``
 	On SDL, you can choose from: ``auto``, ``sdl``, ``none``
 
-	The default is *auto*. On Windows, auto will default to dinput.
+	The default is ``auto``. On Windows, auto will default to ``dinput``.
 
-	Note that Microsoft XBox 360 and XBox One controllers will be happiest with ``winhybrid`` or ``xinput``. The ``winhybrid`` option supports a mix of DirectInput and XInput controllers at the same time. On SDL, auto will default to sdl.
+	Note that Microsoft XBox 360 and XBox One controllers will work best with ``winhybrid`` or ``xinput``. The ``winhybrid`` option supports a mix of DirectInput and XInput controllers at the same time. On SDL, auto will default to ``sdl``.
 
 
 
@@ -297,7 +379,7 @@ OSD CLI Options
 
 **\-listnetwork**
 
-	Create a list of available Network Adapters for use with emulation.
+    Create a list of available Network Adapters for use with emulation.
 
 
 
@@ -323,25 +405,28 @@ Configuration Options
 
 **-[no]readconfig** / **-[no]rc**
 
-	Enables or disables the reading of the config files. When enabled (which is the default), MAME reads the following config files in order:
+     Enables or disables the reading of the config files. When enabled (which is the default), MAME reads the following config files in order:
 
-		- mame.ini
-		- debug.ini      (if the debugger is enabled)
-		- <driver>.ini   (based on the source filename of the driver)
-		- vertical.ini   (for systems with vertical monitor orientation)
-		- horizont.ini   (for systems with horizontal monitor orientation)
-		- arcade.ini     (for systems in source added with GAME() macro)
-		- console.ini    (for systems in source added with CONS() macro)
-		- computer.ini   (for systems in source added with COMP() macro)
-		- othersys.ini   (for systems in source added with SYST() macro)
-		- vector.ini     (for vector systems only)
-		- <parent>.ini   (for clones only, may be called recursively)
-		- <systemname>.ini
+        - ``mame.ini``
+        - ``debug.ini``                       (if the debugger is enabled)
+        - ``source/``\ *<driver>*\ ``.ini``   (based on the source filename of the driver)
+        - ``vertical.ini``                    (for systems with vertical monitor orientation)
+        - ``horizont.ini``                    (for systems with horizontal monitor orientation)
+        - ``arcade.ini``                      (for systems in source added with ``GAME()`` macro)
+        - ``console.ini``                     (for systems in source added with ``CONS()`` macro)
+        - ``computer.ini``                    (for systems in source added with ``COMP()`` macro)
+        - ``othersys.ini``                    (for systems in source added with ``SYST()`` macro)
+        - ``vector.ini``                      (for vector systems only)
+        - *<parent>*\ ``.ini``                (for clones only, may be called recursively)
+        - *<systemname>*\ ``.ini``
 
         (See :ref:`advanced-multi-CFG` for further details)
 
-	The settings in the later INIs override those in the earlier INIs.
-	So, for example, if you wanted to disable overlay effects in the vector systems, you can create a ``vector.ini`` with the "effect none" line in it, and it will override whatever effect value you have in your ``mame.ini``. The default is ON (**-readconfig**).
+    The settings in the later INIs override those in the earlier INIs.  So, for
+    example, if you wanted to disable overlay effects in the vector systems, you
+    can create a ``vector.ini`` with line ``effect none`` in it, and it will
+    override whatever ``effect`` value you have in your ``mame.ini``.  The
+    default is ON (**-readconfig**).
 
 
 
@@ -352,79 +437,129 @@ Core Search Path Options
 
 **-homepath** *<path>*
 
-	Specifies a path where the base 'plugins' folder is to be found. The default is '.' (that is, in the current working directory).
+    Specifies a path for Lua plugins to store data.  The default is ``.`` (that
+    is, in the current working directory).
 
 .. _mame-commandline-rompath:
 
-**-rompath** / **-rp** *<path>*
+**-rompath** / **-rp** / **-biospath** / **-bp** *<path>*
 
-	Specifies a list of paths within which to find ROM or hard disk images. Multiple paths can be specified by separating them with semicolons. The default is ``roms`` (that is, a directory "roms" in the same directory as the MAME executable).
+    Specifies one or more paths within which to find ROM or disk images.
+    Multiple paths can be specified by separating them with semicolons. The
+    default is ``roms`` (that is, a directory ``roms`` in the current working
+    directory).
 
 .. _mame-commandline-hashpath:
 
-**-hashpath** *<path>*
+**-hashpath** / **-hash_directory** / **-hash** *<path>*
 
-	Specifies a list of paths within which to find Software List HASH files. Multiple paths can be specified by separating them with semicolons. The default is ``hash`` (that is, a directory "roms" in the same directory as the MAME executable).
+    Specifies one or more paths within which to find software definition files.
+    Multiple paths can be specified by separating them with semicolons.  The
+    default is ``hash`` (that is, a directory ``hash`` in the current working
+    directory).
 
 .. _mame-commandline-samplepath:
 
 **-samplepath** / **-sp** *<path>*
 
-	Specifies a list of paths within which to find sample files. Multiple paths can be specified by separating them with semicolons. The default is ``samples`` (that is, a directory "samples" in the same directory as the MAME executable).
+    Specifies one or more paths within which to find audio sample files.
+    Multiple paths can be specified by separating them with semicolons. The
+    default is ``samples`` (that is, a directory ``samples`` in the current
+    working directory).
 
 .. _mame-commandline-artpath:
 
-**-artpath** *<path>* / **-artwork_directory** *<path>*
+**-artpath** *<path>* *<path>*
 
-	Specifies a list of paths within which to find artwork files. Multiple paths can be specified by separating them with semicolons. The default is ``artwork`` (that is, a directory "artwork" in the same directory as the MAME executable).
+    Specifies one or more paths within which to find external layout and artwork
+    files.  Multiple paths can be specified by separating them with semicolons.
+    The default is ``artwork`` (that is, a directory ``artwork`` in the current
+    working directory).
 
 .. _mame-commandline-ctrlrpath:
 
-**-ctrlrpath** / **-ctrlr_directory** *<path>*
+**-ctrlrpath** *<path>*
 
-	Specifies a list of paths within which to find controller-specific configuration files. Multiple paths can be specified by separating them with semicolons. The default is ``ctrlr`` (that is, a directory "ctrlr" in the same directory as the MAME executable).
+    Specifies one or more paths within which to find default input configuration
+    files.  Multiple paths can be specified by separating them with semicolons.
+    The default is ``ctrlr`` (that is, a directory ``ctrlr`` in the current
+    working directory).
 
 .. _mame-commandline-inipath:
 
 **-inipath** *<path>*
 
-	Specifies a list of paths within which to find .INI files. Multiple paths can be specified by separating them with semicolons. The default is ``.;ini`` (that is, search in the current directory first, and then in the directory "ini" in the same directory as the MAME executable).
+    Specifies one or more paths within which to find INI files.  Multiple paths
+    can be specified by separating them with semicolons.
+
+    On Windows, the default is ``.;ini;ini/presets`` (that is, search in the
+    current directory first, then in the directory ``ini`` in the current
+    working directory, and finally the directory ``presets`` inside that
+    directory).
+
+    On macOS, the default is
+    ``$HOME/Library/Application Support/mame;$HOME/.mame;.;ini`` (that is,
+    search the ``mame`` folder inside the current user's Application Support
+    folder, followed by the ``.mame`` folder in the current user's home
+    directory, then the current working directory, and finally the directory
+    ``ini`` in the current working directory).
+
+    On other platforms (including Linux), the default is ``$HOME/.mame;.;ini``
+    (that is search the ``.mame`` directory in the current user's home
+    directory, followed by the current working directory, and finally the
+    directory ``ini`` in the current working directory).
 
 .. _mame-commandline-fontpath:
 
 **-fontpath** *<path>*
 
-	Specifies a list of paths within which to find .BDF font files. Multiple paths can be specified by separating them with semicolons. The default is ``.`` (that is, search in the current working directory).
+    Specifies one or more paths within which to find BDF (Adobe Glyph Bitmap
+    Distribution Format) font files. Multiple paths can be specified by
+    separating them with semicolons. The default is ``.`` (that is, search in
+    the current working directory).
 
 .. _mame-commandline-cheatpath:
 
 **-cheatpath** *<path>*
 
-    Specifies a list of paths within which to find .XML cheat files. Multiple paths can be specified by separating them with semicolons. The default is ``cheat`` (that is, a folder called 'cheat' located in the same directory as the as the MAME executable).
+    Specifies one or more paths within which to find XML cheat files. Multiple
+    paths can be specified by separating them with semicolons. The default is
+    ``cheat`` (that is, a folder called ``cheat`` located in the current working
+    directory).
 
 .. _mame-commandline-crosshairpath:
 
 **-crosshairpath** *<path>*
 
-	Specifies a list of paths within which to find crosshair files. Multiple paths can be specified by separating them with semicolons. The default is ``crsshair`` (that is, a directory "crsshair" in the same directory as the MAME executable). If the crosshair is set to default in the menu, MAME will look for ``systemname\\cross#.png`` and then cross#.png in the specified crsshairpath, where # is the player number. Failing that, MAME will use built-in default crosshairs.
+    Specifies one or more paths within which to find crosshair image files.
+    Multiple paths can be specified by separating them with semicolons. The
+    default is ``crsshair`` (that is, a directory ``crsshair`` in the current
+    working directory).
 
 .. _mame-commandline-pluginspath:
 
 **-pluginspath** *<path>*
 
-	Specifies a list of paths within which to find Lua plugins for MAME.
+    Specifies one or more paths within which to find Lua plugins for MAME.  The
+    default is ``plugins`` (that is, a directory ``plugins`` in the current
+    working directory).
 
 .. _mame-commandline-languagepath:
 
 **-languagepath** *<path>*
 
-	Specifies a list of paths within which to find language files for localized UI text.
+    Specifies one or more paths within which to find language files for
+    localized UI text.  The default is ``language`` (that is, a directory
+    ``language`` (that is, a directory ``language`` in the current working
+    directory).
 
 .. _mame-commandline-swpath:
 
 **-swpath** *<path>*
 
-	Specifies a path within which to find loose software to be used by emulation.
+    Specifies the default path from which to load loose software image files.
+    The default is ``sofware`` (that is, a directory ``software`` in the current
+    working directory).
 
 
 Core Output Directory Options
@@ -434,43 +569,75 @@ Core Output Directory Options
 
 **-cfg_directory** *<path>*
 
-	Specifies a single directory where configuration files are stored. Configuration files store user configurable settings that are read at startup and written when MAME exits. The default is ``cfg`` (that is, a directory "cfg" in the same directory as the MAME executable). If this directory does not exist, it will be automatically created.
+    Specifies the directory where configuration files are stored.  Configuration
+    files are read when starting MAME or when starting an emulated machine, and
+    written on exit.  Configuration files preserve settings including input
+    assignment, DIP switch settings, bookkeeping statistics, and debugger window
+    arrangement.  The default is ``cfg`` (that is, a directory ``cfg`` in the
+    current working directory).  If this directory does not exist, it will be
+    created automatically.
 
 .. _mame-commandline-nvramdirectory:
 
 **-nvram_directory** *<path>*
 
-	Specifies a single directory where NVRAM files are stored. NVRAM files store the contents of EEPROM and non-volatile RAM (NVRAM) for systems which used this type of hardware. This data is read at startup and written when MAME exits. The default is ``nvram`` (that is, a directory "nvram" in the same directory as the MAME executable). If this directory does not exist, it will be automatically created.
+    Specifies the directory where NVRAM files are stored.  NVRAM files store the
+    contents of EEPROM, non-volatile RAM (NVRAM), and other programmable devices
+    for systems that used this type of hardware.  This data is read when
+    starting an emulated machine and written on exit. The default is ``nvram``
+    (that is, a directory ``nvram`` in the current working directory)).  If this
+    directory does not exist, it will be created automatically.
 
 .. _mame-commandline-inputdirectory:
 
 **-input_directory** *<path>*
 
-	Specifies a single directory where input recording files are stored. Input recordings are created via the -record option and played back via the -playback option. The default is ``inp`` (that is, a directory "inp" in the same directory as the MAME executable). If this directory does not exist, it will be automatically created.
+    Specifies the directory where input recording files are stored.  Input
+    recordings are created using the **-record** option and played back using
+    the **-playback** option. The default is ``inp`` (that is, a directory
+    ``inp`` in the current working directory). If this directory does not exist,
+    it will be created automatically.
 
 .. _mame-commandline-statedirectory:
 
 **-state_directory** *<path>*
 
-	Specifies a single directory where save state files are stored. Save state files are read and written either upon user request, or when using the -autosave option. The default is ``sta`` (that is, a directory "sta" in the same directory as the MAME executable). If this directory does not exist, it will be automatically created.
+    Specifies the directory where save state files are stored.  Save state files
+    are read and written either upon user request, or when using the
+    **-autosave** option.  The default is ``sta`` (that is, a directory ``sta``
+    in the current working directory).  If this directory does not exist, it
+    will be created automatically.
 
 .. _mame-commandline-snapshotdirectory:
 
 **-snapshot_directory** *<path>*
 
-	Specifies a single directory where screen snapshots are stored, when requested by the user. The default is ``snap`` (that is, a directory "snap" in the same directory as the MAME executable). If this directory does not exist, it will be automatically created.
+    Specifies the directory where screen snapshots and video recordings are
+    stored when requested by the user.  The default is ``snap`` (that is, a
+    directory ``snap`` in the current working directory). If this directory does
+    not exist, it will be created automatically.
 
 .. _mame-commandline-diffdirectory:
 
 **-diff_directory** *<path>*
 
-	Specifies a single directory where hard drive differencing files are stored. Hard drive differencing files store any data that is written back to a hard disk image, in order to preserve the original image. The differencing files are created at startup with a system with a hard disk image. The default is ``diff`` (that is, a directory "diff" in the same directory as the MAME executable). If this directory does not exist, it will be automatically created.
+    Specifies the directory where hard drive difference files are stored.  Hard
+    drive difference files store data that is written back to an emulated hard
+    disk, in order to preserve the original image file.  The difference files
+    are created when starting an emulated system with a compressed hard disk
+    image.  The default is ``diff`` (that is, a directory ``diff`` in the
+    current working directory).  If this directory does not exist, it will be
+    created automatically.
 
 .. _mame-commandline-commentdirectory:
 
 **-comment_directory** *<path>*
 
-	Specifies a single directory where debugger comment files are stored. Debugger comment files are written by the debugger when comments are added to the disassembly for a system. The default is ``comments`` (that is, a directory "comments" in the same directory as the MAME executable). If this directory does not exist, it will be automatically created.
+    Specifies a directory where debugger comment files are stored.  Debugger
+    comment files are written by the debugger when comments are added to the
+    disassembly for a system.  The default is ``comments`` (that is, a directory
+    ``comments`` in the current working directory).  If this directory does not
+    exist, it will be created automatically.
 
 
 
@@ -610,57 +777,97 @@ Core Performance Options
 
 **-[no]autoframeskip** / **-[no]afs**
 
-	Automatically determines the frameskip level while you're running the system, adjusting it constantly in a frantic attempt to keep the system running at full speed. Turning this on overrides the value you have set for -frameskip below. The default is OFF (**-noautoframeskip**).
+    Dynamically adjust the frameskip level while you're running the system to
+    maintain full speed.  Turning this on overrides the **-frameskip** setting
+    described below.  This is off by default (**-noautoframeskip**).
 
 .. _mame-commandline-frameskip:
 
 **-frameskip** / **-fs** *<level>*
 
-	Specifies the frameskip value. This is the number of frames out of every 12 to drop when running. For example, if you say **-frameskip 2**, then MAME will display 10 out of every 12 frames. By skipping those frames, you may be able to get full speed in a system that requires more horsepower than your computer has. The default value is **-frameskip 0**, which skips no frames.
+    Specifies the frameskip value.  This is the number of frames out of every 12
+    to drop when running.  For example, if you specify **-frameskip 2**, MAME
+    will render and display 10 out of every 12 emulated frames.  By skipping
+    some frames, you may be able to get full speed emulation for a system that
+    would otherwise be too demanding for your computer.  The default value is
+    **-frameskip 0**, which skips no frames.
 
 .. _mame-commandline-secondstorun:
 
 **-seconds_to_run** / **-str** *<seconds>*
 
-	This option can be used for benchmarking and automated testing. It tells MAME to stop execution after a fixed number of seconds. By combining this with a fixed set of other command line options, you can set up a consistent environment for benchmarking MAME performance. In addition, upon exit, the **-str** option will write a screenshot called ``final.png`` to the system's snapshot directory.
+    This option tells MAME to automatically stop emulation after a fixed number
+    of seconds of emulated time have elapsed.  This may be useful for
+    benchmarking and automated testing.  By combining this with a fixed set of
+    other command line options, you can set up a consistent environment for
+    benchmarking MAME's emulation performance.  In addition, upon exit, the
+    **-str** option will write a screenshot called ``final.png`` to the system's
+    snapshot directory.
 
 .. _mame-commandline-nothrottle:
 
 **-[no]throttle**
 
-	Configures the default thottling setting. When throttling is on, MAME attempts to keep the system running at the system's intended speed. When throttling is off, MAME runs the system as fast as it can. Note that the fastest speed is more often than not limited by your graphics card, especially for older systems. The default is ON (**-throttle**).
+   Enable or disable thottling emulation speed.  When throttling is enabled,
+   MAME limits emulation speed to so the emulated system will not run faster
+   than the original hardware.  When throttling is disabled, MAME runs the
+   emulation as fast as possible. Depending on your settings and the
+   characteristics of the emulated system, performance may be limited by your
+   CPU, graphics card, or even memory performance.  The default is to enable
+   throttling (**-throttle**).
 
 .. _mame-commandline-nosleep:
 
 **-[no]sleep**
 
-	Allows MAME to give time back to the system when running with **-throttle**. This allows other programs to have some CPU time, assuming that the system isn't taxing 100% of your CPU resources. This option can potentially cause hiccups in performance if other demanding programs are running. The default is ON (**-sleep**).
+    When enabled along with **-throttle**, MAME will yield the CPU when
+    limiting emulation speed.  This allows other programs to use CPU time,
+    assuming the main emulation thread isn't completely utilising a CPU core.
+    This option can potentially cause hiccups in performance if other demanding
+    programs are running.  The default is on (**-sleep**).
 
 .. _mame-commandline-speed:
 
 **-speed** *<factor>*
 
-	Changes the way MAME throttles the emulated system such that it runs at some multiplier of the original speed. A <factor> of 1.0 means to run the system at its normal speed. A <factor> of 0.5 means run at half speed, and a <factor> of 2.0 means run at 2x speed. Note that changing this value affects sound playback as well, which will scale in pitch accordingly. The internal resolution of the fraction is two decimal places, so a value of 1.002 is the same as 1.0. The default is ``1.0``.
+    Changes the way MAME throttles the emulation so that it runs at some
+    multiple of the system's original speed.  A *<factor>* of ``1.0`` means to
+    run the system at its normal speed, a *<factor>* of ``0.5`` means run at
+    half speed, and a *<factor>* of 2.0 means run at double speed.  Note that
+    changing this value affects sound playback as well, which will scale in
+    pitch accordingly.  The internal precision of the fraction is two decimal
+    places, so a *<factor>* of ``1.002`` is rounded to ``1.00``. The default is
+    ``1.0`` (normal speed).
 
 .. _mame-commandline-norefreshspeed:
 
 **-[no]refreshspeed** / **-[no]rs**
 
-	Allows MAME to dynamically adjust the system's speed such that it does not exceed the slowest refresh rate for any targeted monitors in your system. Thus, if you have a 60Hz monitor and run a system that is actually designed to run at 60.6Hz, MAME will dynamically change the speed down to 99% in order to prevent sound hiccups or other undesirable side effects of running at a slower refresh rate. The default is OFF (**-norefreshspeed**).
+    Allows MAME to adjust the emulation speed so that the refresh rate of the
+    first emulated screen does not exceed the slowest refresh rate for any
+    targeted monitors in your system.  Thus, if you have a 60Hz monitor and run
+    a system that is designed to run at 60.6Hz, MAME will reduce the emulation
+    speed to 99% in order to prevent sound hiccups or other undesirable side
+    effects of running at a slower refresh rate. The default is off
+    (**-norefreshspeed**).
 
 .. _mame-commandline-numprocessors:
 
-**-numprocessors** *<auto|value>* / **-np** *<auto|value>*
+**-numprocessors** / **-np** **auto**\ \|\ *<value>*
 
-	Specify the number of processors to use for work queues. Specifying ``auto`` will use the value reported by the system or environment variable **OSDPROCESSORS**. To avoid abuse, this value is internally limited to 4 times the number of processors reported by the system. The default is ``auto``.
+    Specify the number of threads to use for work queues.  Specifying ``auto``
+    will use the value reported by the system or environment variable
+    ``OSDPROCESSORS``.  This value is internally limited to four times the
+    number of processors reported by the system. The default is ``auto``.
 
 .. _mame-commandline-bench:
 
-**-bench** *[n]*
+**-bench** *<n>*
 
-        Benchmark for *[n]* number of emulated seconds; implies the command string:
+    Benchmark for *<n>* emulated seconds.  This is equivalent to the following
+    options:
 
-        **-str [n] -video none -sound none -nothrottle**
+    **-str** *<n>* **-video none -sound none -nothrottle**
 
 
 
