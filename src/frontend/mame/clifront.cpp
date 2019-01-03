@@ -99,11 +99,11 @@ const options_entry cli_option_entries[] =
 	{ CLICOMMAND_LISTCLONES     ";lc",      "0",       OPTION_COMMAND,    "show clones" },
 	{ CLICOMMAND_LISTBROTHERS   ";lb",      "0",       OPTION_COMMAND,    "show \"brothers\", or other drivers from same sourcefile" },
 	{ CLICOMMAND_LISTCRC,                   "0",       OPTION_COMMAND,    "CRC-32s" },
-	{ CLICOMMAND_LISTROMS       ";lr",      "0",       OPTION_COMMAND,    "list required roms for a driver" },
+	{ CLICOMMAND_LISTROMS       ";lr",      "0",       OPTION_COMMAND,    "list required ROMs for a driver" },
 	{ CLICOMMAND_LISTSAMPLES,               "0",       OPTION_COMMAND,    "list optional samples for a driver" },
 	{ CLICOMMAND_VERIFYROMS,                "0",       OPTION_COMMAND,    "report romsets that have problems" },
 	{ CLICOMMAND_VERIFYSAMPLES,             "0",       OPTION_COMMAND,    "report samplesets that have problems" },
-	{ CLICOMMAND_ROMIDENT,                  "0",       OPTION_COMMAND,    "compare files with known MAME roms" },
+	{ CLICOMMAND_ROMIDENT,                  "0",       OPTION_COMMAND,    "compare files with known MAME ROMs" },
 	{ CLICOMMAND_LISTDEVICES    ";ld",      "0",       OPTION_COMMAND,    "list available devices" },
 	{ CLICOMMAND_LISTSLOTS      ";lslot",   "0",       OPTION_COMMAND,    "list available slots and slot devices" },
 	{ CLICOMMAND_LISTMEDIA      ";lm",      "0",       OPTION_COMMAND,    "list available media for the system" },
@@ -513,7 +513,7 @@ void cli_frontend::listcrc(const std::vector<std::string> &args)
 
 //-------------------------------------------------
 //  listroms - output the list of ROMs referenced
-//  by matchign systems/devices
+//  by matching systems/devices
 //-------------------------------------------------
 
 void cli_frontend::listroms(const std::vector<std::string> &args)
@@ -526,7 +526,7 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 				if (!first)
 					osd_printf_info("\n");
 
-				// iterate through roms
+				// iterate through ROMs
 				bool hasroms = false;
 				for (device_t const &device : device_iterator(root))
 				{
@@ -1094,7 +1094,7 @@ void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlis
 			for (const feature_list_item &flist : part.featurelist())
 				fprintf(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name().c_str(), util::xml::normalize_string(flist.value().c_str()));
 
-			/* TODO: display rom region information */
+			// TODO: display ROM region information
 			for (const rom_entry *region = part.romdata().data(); region; region = rom_next_region(region))
 			{
 				int is_disk = ROMREGION_ISDISKDATA(region);
@@ -1225,7 +1225,7 @@ void cli_frontend::listsoftware(const std::vector<std::string> &args)
 
 
 /*-------------------------------------------------
-    verifysoftware - verify roms from the software
+    verifysoftware - verify ROMs from the software
     list of the specified driver(s)
 -------------------------------------------------*/
 void cli_frontend::verifysoftware(const std::vector<std::string> &args)
@@ -1595,7 +1595,7 @@ void cli_frontend::execute_commands(const char *exename)
 	{
 		if (m_options.command_arguments().size() > 1)
 		{
-			osd_printf_error("Auxillary verb -validate takes at most 1 argument\n");
+			osd_printf_error("Auxiliary verb -validate takes at most 1 argument\n");
 			return;
 		}
 		validity_checker valid(m_options);
@@ -1665,9 +1665,9 @@ void cli_frontend::execute_commands(const char *exename)
 		// validate argument count
 		const char *error_message = nullptr;
 		if (m_options.command_arguments().size() < info_command->min_args)
-			error_message = "Auxillary verb -%s requires at least %d argument(s)\n";
+			error_message = "Auxiliary verb -%s requires at least %d argument(s)\n";
 		if ((info_command->max_args >= 0) && (m_options.command_arguments().size() > info_command->max_args))
-			error_message = "Auxillary verb -%s takes at most %d argument(s)\n";
+			error_message = "Auxiliary verb -%s takes at most %d argument(s)\n";
 		if (error_message)
 		{
 			osd_printf_info(error_message, info_command->option, info_command->max_args);
@@ -1676,7 +1676,7 @@ void cli_frontend::execute_commands(const char *exename)
 			return;
 		}
 
-		// invoke the auxillary command!
+		// invoke the auxiliary command!
 		(this->*info_command->function)(m_options.command_arguments());
 		return;
 	}
