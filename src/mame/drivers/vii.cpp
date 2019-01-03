@@ -883,7 +883,7 @@ void spg2xx_game_state::init_crc()
 	const uint8_t* rom = memregion("maincpu")->base();
 
 	uint32_t checksum = 0x00000000;
-	// the first 0x10 bytes are where the 'CHECKSUM: ' string is listed, so skip over them
+	// the first 0x10 bytes are where the "chksum:xxxxxxxx " string is listed, so skip over them
 	for (int i = 0x10; i < length; i++)
 	{
 		checksum += rom[i];
