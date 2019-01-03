@@ -348,7 +348,7 @@ ROM_START(leapster)
 	ROM_LOAD_BIOS( 1, "leapster2_1004.bin", 0x00000, 0x800000, CRC(b466e14d) SHA1(910c234f03e76b7de55b8aa0a0c62fd1daae4910) )
 	ROM_SYSTEM_BIOS( 2, "ger21", "German 2.1" )    // 152-11435 Leapster BaseROM German v2.1    - Oct 21 2005 18:53:59
 	ROM_LOAD_BIOS( 2, "leapster2_1006.bin", 0x00000, 0x800000, CRC(a69ed8ca) SHA1(e6aacba0c39b1465f344c2b07ff1cbd8a395adac) )
-	ROM_SYSTEM_BIOS( 3, "sp10",  Spanish 1.0" )    // 152-11546 Leapster Baserom SP v1.0        - Apr 03 2006 06:26:00
+	ROM_SYSTEM_BIOS( 3, "sp10",  "Spanish 1.0" )   // 152-11546 Leapster Baserom SP v1.0        - Apr 03 2006 06:26:00
 	ROM_LOAD_BIOS( 3, "leapster2_1008.bin", 0x00000, 0x800000, CRC(b43345e7) SHA1(31c27e79568115bf36e5ef668f528e3005054152) )
 ROM_END
 
