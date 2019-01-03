@@ -437,8 +437,8 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 				uint8_t *vram = &m_vram[m_vram_addr & ~3];
 				uint8_t *vramsrc = &m_vram[m_vram_src & ~3];
 
-				int sdx = m_vram_addr & 3;
-				int ddx = m_vram_src & 3;
+				int sdx = m_vram_src & 3;
+				int ddx = m_vram_addr & 3;
 
                 logerror("Copy rectangle forwards, width %d height %d src %x dst %x mode %03x\n", m_width, m_height, m_vram_addr, m_vram_src, data);
 
@@ -457,8 +457,8 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 				uint8_t *vram = &m_vram[m_vram_addr & ~3];
 				uint8_t *vramsrc = &m_vram[m_vram_src & ~3];
 
-				int sdx = m_vram_addr & 3;
-				int ddx = m_vram_src & 3;
+				int sdx = m_vram_src & 3;
+				int ddx = m_vram_addr & 3;
 
                 logerror("Copy rectangle backwards, width %d height %d src %x dst %x mode %03x\n", m_width, m_height, m_vram_addr, m_vram_src, data);
 
