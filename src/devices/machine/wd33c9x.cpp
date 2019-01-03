@@ -594,6 +594,10 @@ READ8_MEMBER(wd33c9x_base_device::indir_reg_r)
 
 		logerror("reg %02x = %02x\n", m_addr, ret);
 
+		if(m_addr == 1) {
+			ret |= 8;
+			machine().debug_break();
+		}
 		// No address increment on accesses to Command, Data, and Auxiliary Status Registers
 		if (m_addr != COMMAND && m_addr != AUXILIARY_STATUS) {
 			m_addr = (m_addr + 1) & REGS_MASK;
@@ -662,6 +666,8 @@ WRITE8_MEMBER(wd33c9x_base_device::indir_reg_w)
 		else {
 			m_regs[m_addr] = data;
 		}
+		if(m_addr == 1)
+			machine().debug_break();
 		m_addr = (m_addr + 1) & REGS_MASK;
 		break;
 	}
