@@ -82,7 +82,7 @@ public:
 	void rad_crik(machine_config &config);
 	void non_spg_base(machine_config &config);
 
-	void init_rad_crik();
+	void init_crc();
 
 protected:
 	virtual void machine_start() override;
@@ -121,9 +121,6 @@ protected:
 	optional_ioport m_io_p3;
 	optional_device<i2cmem_device> m_i2cmem;
 	optional_device<nvram_device> m_nvram;
-
-	// temp hack
-	DECLARE_READ16_MEMBER(rad_crik_hack_r);
 };
 
 class vii_state : public spg2xx_game_state
@@ -706,65 +703,50 @@ void spg2xx_game_state::rad_crik(machine_config &config)
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }
 
-READ16_MEMBER(spg2xx_game_state::rad_crik_hack_r)
-{
-	int pc = m_maincpu->state_int(UNSP_PC);
-	if (pc == 0xf851)
-		return 0xf859;
-	else
-		return 0xf854;
-}
-
-void spg2xx_game_state::init_rad_crik()
-{
-	// not 100% sure what this is waiting on, could be eeprom as it seems to end up here frequently during the eeprom test, patch running code, not ROM, so that checksum can still pass
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf851, 0xf851, read16_delegate(FUNC(spg2xx_game_state::rad_crik_hack_r),this));
-}
-
 ROM_START( vii )
-	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "vii.bin", 0x0000, 0x2000000, CRC(04627639) SHA1(f883a92d31b53c9a5b0cdb112d07cd793c95fc43))
 ROM_END
 
 ROM_START( batmantv )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "batman.bin", 0x000000, 0x400000, CRC(46f848e5) SHA1(5875d57bb3fe0cac5d20e626e4f82a0e5f9bb94c) )
 ROM_END
 
 ROM_START( walle )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, BAD_DUMP CRC(bd554cba) SHA1(6cd06a036ab12e7b0e1fd8003db873b0bb783868) )
 	// Alternate dump, we need to decide which one is correct.
 	//ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, CRC(6bc90b16) SHA1(184d72de059057aae7800da510fcf05ed1da9ec9))
 ROM_END
 
 ROM_START( zone40 )
-	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "zone40.bin", 0x0000, 0x4000000, CRC(4ba1444f) SHA1(de83046ab93421486668a247972ad6d3cda19440) )
 ROM_END
 
 ROM_START( zone60 )
-	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "zone60.bin", 0x0000, 0x4000000, CRC(4cb637d1) SHA1(1f97cbdb4299ac0fbafc2a3aa592066cb0727066))
 ROM_END
 
 ROM_START( wirels60 )
-	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "wirels60.bin", 0x0000, 0x4000000, CRC(b4df8b28) SHA1(00e3da542e4bc14baf4724ad436f66d4c0f65c84))
 ROM_END
 
 ROM_START( rad_skat )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "skateboarder.bin", 0x000000, 0x400000, CRC(08b9ab91) SHA1(6665edc4740804956136c68065890925a144626b) )
 ROM_END
 
 ROM_START( rad_skatp ) // rom was dumped from the NTSC version, but region comes from an io port, so ROM is probably the same
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "skateboarder.bin", 0x000000, 0x400000, CRC(08b9ab91) SHA1(6665edc4740804956136c68065890925a144626b) )
 ROM_END
 
 ROM_START( rad_sktv )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "skannerztv.bin", 0x000000, 0x200000, CRC(e92278e3) SHA1(eb6bee5e661128d83784960dfff50379c36bfaeb) )
 
 	/* The external scanner MCU is a Winbond from 2000: SA5641
@@ -775,12 +757,12 @@ ROM_START( rad_sktv )
 ROM_END
 
 ROM_START( rad_fb2 )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "football2.bin", 0x000000, 0x400000, CRC(96b4f0d2) SHA1(e91f2ac679fb0c026ffe216eb4ab58802f361a17) )
 ROM_END
 
 ROM_START( rad_crik ) // only released in EU?
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "cricket.bin", 0x000000, 0x200000, CRC(6fa0aaa9) SHA1(210d2d4f542181f59127ce2f516d0408dc6de7a8) )
 ROM_END
 
@@ -808,7 +790,7 @@ http://www.lcis.com.tw/paper_store/paper_store/GPL162004A-507A_162005A-707AV10_c
 */
 
 ROM_START( wlsair60 )
-	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
 ROM_END
 
@@ -889,9 +871,28 @@ which is also found in the Wireless Air 60 ROM.
 */
 
 ROM_START( wrlshunt )
-	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796) )
 ROM_END
+
+
+void spg2xx_game_state::init_crc()
+{
+	// several games have a byte sum checksum listed at the start of ROM, this little helper function logs what it should match.
+	const int length = memregion("maincpu")->bytes();
+	const uint8_t* rom = memregion("maincpu")->base();
+
+	uint32_t checksum = 0x00000000;
+	// the first 0x10 bytes are where the 'CHECKSUM: ' string is listed, so skip over them
+	for (int i = 0x10; i < length; i++)
+	{
+		checksum += rom[i];
+	}
+
+	logerror("Calculated Byte Sum of bytes from 0x10 to 0x%08x is %08x)\n", length - 1, checksum);
+}
+
+
 
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
 
@@ -905,11 +906,11 @@ CONS( 2004, batmantv, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS
 CONS( 2008, walle,    0, 0, walle, walle,  spg2xx_game_state, empty_init, "JAKKS Pacific Inc",              "Wall-E",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Radica TV games
-CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,   spg2xx_game_state, empty_init, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, rad_skatp, rad_skat, 0, rad_skatp,rad_skatp,  spg2xx_game_state, empty_init, "Radica", "Connectv Skateboarder (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, rad_crik,  0,        0, rad_crik, rad_crik,   spg2xx_game_state, empty_init, "Radica", "Connectv Cricket (PAL)",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
-CONS( 2007, rad_sktv,  0,        0, rad_skat, rad_sktv,   spg2xx_game_state, empty_init, "Radica", "Skannerz TV",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-CONS( 2007, rad_fb2,   0,        0, rad_skat, rad_fb2,    spg2xx_game_state, empty_init, "Radica", "Play TV Football 2",          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,   spg2xx_game_state, init_crc, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_skatp, rad_skat, 0, rad_skatp,rad_skatp,  spg2xx_game_state, init_crc, "Radica", "Connectv Skateboarder (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_crik,  0,        0, rad_crik, rad_crik,   spg2xx_game_state, init_crc, "Radica", "Connectv Cricket (PAL)",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
+CONS( 2007, rad_sktv,  0,        0, rad_skat, rad_sktv,   spg2xx_game_state, init_crc, "Radica", "Skannerz TV",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 2007, rad_fb2,   0,        0, rad_skat, rad_fb2,    spg2xx_game_state, init_crc, "Radica", "Play TV Football 2",          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 // might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least
 CONS( 2009, zone40,    0,       0,        non_spg_base, wirels60, spg2xx_game_state, empty_init, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
