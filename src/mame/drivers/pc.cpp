@@ -423,7 +423,7 @@ ROM_START( comport )
 	ROMX_LOAD("compaq_portable_rev_c.bin", 0xe000, 0x2000, CRC(1d1f7c38) SHA1(d9782eb46cd1a7d40f3e8b37eb48db04ac588acb), ROM_BIOS(1))
 
 	ROM_REGION(0x8000,"gfx1", 0)
-	ROM_LOAD("compaq_portable_video_cpqvid.bin", 0x0000, 0x2000, BAD_DUMP CRC(3ae64565) SHA1(6eeb06620e588a2f7bfab72eb4fadbd70503ea94))
+	ROM_LOAD("compaq_portable_video_cpqvid.bin", 0x0000, 0x1ffe, BAD_DUMP CRC(3ae64565) SHA1(6eeb06620e588a2f7bfab72eb4fadbd70503ea94))
 ROM_END
 
 
