@@ -1206,7 +1206,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		</part>
 	</software>
 
-	<software name="wrdchsrss" supported="no">
+	<software name="wrdchsrss" cloneof="wrdchsrsg" supported="no"> <!-- By now, clone of "wrdchsrsg", until the English set is found -->
 		<description>El Laberinto de las Letras (Spa)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
