@@ -32,9 +32,6 @@
             The "SPEECH IC" option in the diagnostic menu does nothing when selected.
             On 'vii_vc1' & 'vii_vc2' cart, the left-right keys are transposed with the up-down keys.
             - This is not a bug per se, as the games are played with the controller physically rotated 90 degrees.
-            When entering a game in Basketball, MAME fatalerrors when starting the game due to jumping to invalid code.
-        zone60/wirels60:
-            When entering a game in Basketball, MAME fatalerrors when starting the game due to jumping to invalid code.
 
 	Note:
 		Cricket, Skateboarder, Skannerz and Football 2 list a 32-bit checksum at the start of ROM.
