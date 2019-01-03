@@ -239,7 +239,7 @@ uint32_t groundfx_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	    it's contents the usual way.
 
 	*/
-	if (((m_tc0100scn->ram_r(0x4090 / 2, 0xffff) << 16) | m_tc0100scn->ram_r(0x4092 / 2, 0xffff)) ||
+	if ((m_tc0100scn->ram_r(0x4090 / 2) | m_tc0100scn->ram_r(0x4092 / 2)) ||
 			m_tc0480scp->long_r(space, 0x20 / 4, 0xffffffff) == 0x240866)  /* Anything in text layer - really stupid hack */
 	{
 		m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);

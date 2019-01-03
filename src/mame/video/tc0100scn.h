@@ -43,10 +43,13 @@ public:
 	To change from the default (0,0,0) use after calling TC0100SCN_vh_start */
 	void set_colbanks(u8 bg0, u8 bg1, u8 tx);
 
-	u16 ram_r(offs_t offset, u16 mem_mask);
-	void ram_w(offs_t offset, u16 data, u16 mem_mask);
-	u16 ctrl_r(offs_t offset, u16 mem_mask);
-	void ctrl_w(offs_t offset, u16 data, u16 mem_mask);
+	// read16s_handler
+	u16 ram_r(offs_t offset, u16 mem_mask = 0xffff);
+	u16 ctrl_r(offs_t offset, u16 mem_mask = 0xffff);
+
+	// write16s_handler
+	void ram_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
+	void ctrl_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
 
 	void tilemap_update();
 	int tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u32 priority, u32 pri_mask = 0xff);

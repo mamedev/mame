@@ -93,20 +93,6 @@ WRITE8_MEMBER(groundfx_state::coin_word_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
-WRITE32_MEMBER(groundfx_state::rotate_control_w)/* only a guess that it's rotation */
-{
-		if (ACCESSING_BITS_0_15)
-		{
-			m_rotate_ctrl[m_port_sel] = data;
-			return;
-		}
-
-		if (ACCESSING_BITS_16_31)
-		{
-			m_port_sel = (data &0x70000) >> 16;
-		}
-}
-
 WRITE32_MEMBER(groundfx_state::motor_control_w)
 {
 /*
@@ -144,7 +130,8 @@ void groundfx_state::groundfx_map(address_map &map)
 	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xb00000, 0xb003ff).ram();                     // ?? single bytes, blending ??
 	map(0xc00000, 0xc00007).nopr(); /* Network? */
-	map(0xd00000, 0xd00003).w(FUNC(groundfx_state::rotate_control_w)); /* perhaps port based rotate control? */
+	map(0xd00000, 0xd00001).lw16("port_sel_w", [this](u16 data){ m_port_sel = data & 0x7; });/* only a guess that it's rotation */
+	map(0xd00002, 0xd00003).lw16("rot_ctrl_w", [this](u16 data){ m_rotate_ctrl[m_port_sel] = data; }); /* perhaps port based rotate control? */
 	/* f00000 is seat control? */
 }
 
@@ -232,6 +219,13 @@ INTERRUPT_GEN_MEMBER(groundfx_state::interrupt)
 {
 	m_frame_counter^=1;
 	device.execute().set_input_line(4, HOLD_LINE);
+}
+
+void groundfx_state::machine_start()
+{
+	save_item(NAME(m_frame_counter));
+	save_item(NAME(m_port_sel));
+	save_item(NAME(m_rotate_ctrl));
 }
 
 MACHINE_CONFIG_START(groundfx_state::groundfx)

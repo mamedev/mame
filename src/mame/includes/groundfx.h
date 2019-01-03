@@ -38,6 +38,7 @@ public:
 	void init_groundfx();
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
@@ -58,7 +59,6 @@ private:
 	uint16_t m_rotate_ctrl[8];
 	rectangle m_hack_cliprect;
 
-	DECLARE_WRITE32_MEMBER(rotate_control_w);
 	DECLARE_WRITE32_MEMBER(motor_control_w);
 	DECLARE_READ32_MEMBER(irq_speedup_r);
 	DECLARE_READ_LINE_MEMBER(frame_counter_r);

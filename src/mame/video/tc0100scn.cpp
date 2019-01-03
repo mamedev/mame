@@ -361,8 +361,6 @@ void tc0100scn_device::set_layer_ptrs()
 
 void tc0100scn_device::restore_scroll()
 {
-	int flip;
-
 	m_bgscrollx = -m_ctrl[0];
 	m_fgscrollx = -m_ctrl[1];
 	m_tilemap[2][0]->set_scrollx(0, -m_ctrl[2]);
@@ -373,7 +371,7 @@ void tc0100scn_device::restore_scroll()
 	m_tilemap[2][0]->set_scrolly(0, -m_ctrl[5]);
 	m_tilemap[2][1]->set_scrolly(0, -m_ctrl[5]);
 
-	flip = (m_ctrl[7] & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+	int flip = (m_ctrl[7] & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
 	m_tilemap[0][0]->set_flip(flip);
 	m_tilemap[1][0]->set_flip(flip);
 	m_tilemap[2][0]->set_flip(flip);
