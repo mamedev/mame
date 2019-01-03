@@ -18,7 +18,7 @@ class nscsi_device;
 class nscsi_bus_device : public device_t
 {
 public:
-	nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void ctrl_w(int refid, uint32_t lines, uint32_t mask);
 	void data_w(int refid, uint32_t lines);
@@ -49,7 +49,7 @@ private:
 };
 
 class nscsi_connector: public device_t,
-						public device_slot_interface
+					   public device_slot_interface
 {
 public:
 	template <typename T>
@@ -61,7 +61,7 @@ public:
 		set_default_option(dflt);
 		set_fixed(fixed);
 	}
-	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~nscsi_connector();
 
 	nscsi_device *get_device();

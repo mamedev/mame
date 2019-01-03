@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "machine/nscsi_cd.h"
 
-#define VERBOSE 0
+#define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device, "scsi_cdrom", "SCSI CD-ROM")
@@ -76,10 +76,10 @@ void nscsi_cdrom_device::device_reset()
 	cur_sector = -1;
 }
 
-MACHINE_CONFIG_START(nscsi_cdrom_device::device_add_mconfig)
-	MCFG_CDROM_ADD("image")
-	MCFG_CDROM_INTERFACE("cdrom")
-MACHINE_CONFIG_END
+void nscsi_cdrom_device::device_add_mconfig(machine_config &config)
+{
+	CDROM(config, image).set_interface("cdrom");
+}
 
 void nscsi_cdrom_device::set_block_size(u32 block_size)
 {
