@@ -740,8 +740,8 @@ void wd33c9x_base_device::start_command()
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
 		scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
 		m_mode = MODE_D;
-		set_scsi_state(FINISHED);
-		irq_fifo_push(SCSI_STATUS_DISCONNECT);
+		set_scsi_state(IDLE);
+		m_regs[AUXILIARY_STATUS] &= ~(AUXILIARY_STATUS_CIP | AUXILIARY_STATUS_BSY);
 		break;
 
 	case COMMAND_CC_SELECT:
