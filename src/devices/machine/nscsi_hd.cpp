@@ -68,18 +68,15 @@ uint8_t nscsi_harddisk_device::scsi_get_data(int id, int pos)
 	}
 	else
 	{
-		int offset = pos % bytes_per_sector;
-		if (offset == 0) {
-			int clba = lba + pos / bytes_per_sector;
-			if (clba != cur_lba) {
-				cur_lba = clba;
-				if (!hard_disk_read(harddisk, cur_lba, block)) {
-					LOG("HD READ ERROR !\n");
-					memset(block, 0, sizeof(block));
-				}
+		int clba = lba + pos / bytes_per_sector;
+		if(clba != cur_lba) {
+			cur_lba = clba;
+			if(!hard_disk_read(harddisk, cur_lba, block)) {
+				LOG("HD READ ERROR !\n");
+				memset(block, 0, sizeof(block));
 			}
 		}
-		data = block[offset];
+		data = block[pos % bytes_per_sector];
 	}
 	LOGMASKED(LOG_DATA, "nscsi_hd: scsi_get_data, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
 	return data;
@@ -95,10 +92,8 @@ void nscsi_harddisk_device::scsi_put_data(int id, int pos, uint8_t data)
 
 	int offset = pos % bytes_per_sector;
 	block[offset] = data;
-	if (offset == 0) {
-		cur_lba = lba + pos / bytes_per_sector;
-	}
-	else if(offset == bytes_per_sector-1) {
+	cur_lba = lba + pos / bytes_per_sector;
+	if(offset == bytes_per_sector-1) {
 		if(!hard_disk_write(harddisk, cur_lba, block))
 			LOG("HD WRITE ERROR !\n");
 	}
