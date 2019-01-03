@@ -311,7 +311,7 @@ enum : uint16_t {
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(WD33C92, wd33c92_device, "wd33c92", "Western Digital WD33C92 SCSI Controller")
-DEFINE_DEVICE_TYPE(WD33C93N, wd33c93n_device, "wd33c93", "Western Digital WD33C93 SCSI Controller")
+DEFINE_DEVICE_TYPE(WD33C93N, wd33c93n_device, "wd33c93n", "Western Digital WD33C93 SCSI Controller")
 DEFINE_DEVICE_TYPE(WD33C93A, wd33c93a_device, "wd33c93a", "Western Digital WD33C93A SCSI Controller")
 DEFINE_DEVICE_TYPE(WD33C93B, wd33c93b_device, "wd33c93b", "Western Digital WD33C93B SCSI Controller")
 
