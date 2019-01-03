@@ -92,9 +92,9 @@ void nscsi_harddisk_device::scsi_put_data(int id, int pos, uint8_t data)
 
 	int offset = pos % bytes_per_sector;
 	block[offset] = data;
-	int clba = lba + pos / bytes_per_sector;
+	cur_lba = lba + pos / bytes_per_sector;
 	if(offset == bytes_per_sector-1) {
-		if(!hard_disk_write(harddisk, clba, block))
+		if(!hard_disk_write(harddisk, cur_lba, block))
 			LOG("HD WRITE ERROR !\n");
 	}
 }
