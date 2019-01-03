@@ -659,7 +659,7 @@
 		<description>The Amazing Spider-Man (Euro, USA)</description>
 		<year>1990</year>
 		<publisher>LJN</publisher> <!-- Nintendo in Europe? -->
-		<info name="serial" value="DMG-SM-(NOE/UKV)"/>
+		<info name="serial" value="DMG-SM-NOE, DMG-SM-UKV, DMG-SM-ESP-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-01" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -3288,7 +3288,7 @@
 		<description>The Castlevania Adventure (Euro)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="DMG-CV-(NOE/UKV)"/>
+		<info name="serial" value="DMG-CV-NOE, DMG-CV-UKV, DMG-CV-ESP)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
@@ -5041,7 +5041,7 @@
 		<description>Double Dragon 3 (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="DMG-DX-USA, DMG-DX-NOE"/>
+		<info name="serial" value="DMG-DX-USA, DMG-DX-NOE, DMG-DX-ESP"/>
 		<info name="alt_title" value="Double Dragon 3 - The Arcade Game (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
@@ -8711,7 +8711,7 @@
 		<description>Hook (Euro)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
-		<info name="serial" value="DMG-HS-UKV"/>
+		<info name="serial" value="DMG-HS-UKV, DMG-HS-ESP"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -11073,7 +11073,7 @@
 		<description>Kung-Fu Master (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Irem</publisher>
-		<info name="serial" value="DMG-SX-USA, DMG-SX-NOE"/>
+		<info name="serial" value="DMG-SX-USA, DMG-SX-NOE, DMG-SX-ESP-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -11486,7 +11486,7 @@
 		<description>The Lion King (Euro)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
-		<info name="serial" value="DMG-ALNP-(EUR/NOE)"/>
+		<info name="serial" value="DMG-ALNP-EUR, DMG-ALNP-NOE, DMG-ALNP-EUR"/>
 		<info name="alt_title" value="Disney's The Lion King (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />
@@ -12488,7 +12488,7 @@
 		<description>Mega Man II (Euro)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-W2-EUR"/>
+		<info name="serial" value="DMG-W2-EUR, DMG-W2-ESP-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
@@ -14813,7 +14813,7 @@
 		<description>Nigel Mansell's World Championship (Euro, Alt)</description>
 		<year>1992</year>
 		<publisher>Gremlin Interactive</publisher>
-		<info name="serial" value="DMG-WC-(FAH/UKV)"/>
+		<info name="serial" value="DMG-WC-FAH, DMG-WC-UKV, DMG-WC-ESP-1"/>
 		<info name="alt_title" value="Nigel Mansell's World Championship Racing (Box)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
@@ -20885,6 +20885,7 @@
 		<description>Star Wars (Euro)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
+		<info name="serial" value="DMG-WS-ESP"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="131072">
@@ -22517,7 +22518,7 @@
 		<description>Tetris (World, Rev. A)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-TRA, DMG-TR-(USA/CAN), DMG-TR-(NOE/ESP/UKVAUS), DMG-TR-HKG, DMG-104 CHN"/>
+		<info name="serial" value="DMG-TRA, DMG-TR-USA, DMG-TR-CAN, DMG-TR-NOE, DMG-TR-ESP, DMG-TR-ESP-1, DMG-TR-UKVAUS, DMG-TR-HKG, DMG-104 CHN"/>
 		<info name="release" value="19890614 (JPN)"/>
 		<info name="alt_title" value="テトリス"/>
 		<part name="cart" interface="gameboy_cart">
@@ -24023,7 +24024,7 @@
 		<description>Wario Land - Super Mario Land 3 (World)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="DMG-WJA, DMG-WJ-USA, DMG-WJ-(NOE/EUR)"/>
+		<info name="serial" value="DMG-WJA, DMG-WJ-USA, DMG-WJ-NOE, DMG-WJ-EUR, DMG-WJ-ESP-1"/>
 		<info name="release" value="19940121 (JPN)"/>
 		<info name="alt_title" value="スーパーマリオランド3 ワリオランド"/>
 		<part name="cart" interface="gameboy_cart">
@@ -24656,7 +24657,7 @@
 		<description>WWF Superstars 2 (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
-		<info name="serial" value="DMG-WX-USA, DMG-WX-NOE"/>
+		<info name="serial" value="DMG-WX-USA, DMG-WX-NOE, DMG-WX-ESP"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- NOE cart -->
 			<feature name="u1" value="U1 PRG" />
@@ -24737,7 +24738,7 @@
 		<description>Xenon 2 - Megablast (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
-		<info name="serial" value="DMG-X2-USA, DMG-X2-(NOE/FRG)"/>
+		<info name="serial" value="DMG-X2-USA, DMG-X2-NOE, DMG-X2-FRG, DMG-X2-ESP"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-BEAN-02" />  <!-- FRG cart -->
 			<feature name="u1" value="U1 PRG" />
