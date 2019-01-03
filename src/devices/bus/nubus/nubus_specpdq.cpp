@@ -431,7 +431,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 					}
 				}
 			}
-			else if ((data == 0x101) || (data == 0x100))
+			else if (data == 0x100)
 			{
 				int x, y;
 				uint8_t *vram = &m_vram[m_vram_addr & ~3];
@@ -440,7 +440,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 				int sdx = m_vram_addr & 3;
 				int ddx = m_vram_src & 3;
 
-                logerror("Copy rectangle, width %d height %d  src %x dst %x\n", m_width, m_height, m_vram_addr, m_vram_src);
+                logerror("Copy rectangle forwards, width %d height %d src %x dst %x mode %03x\n", m_width, m_height, m_vram_addr, m_vram_src, data);
 
 				for (y = 0; y < m_height; y++)
 				{
@@ -449,8 +449,27 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 						vram[(y * 1152)+BYTE4_XOR_BE(x + ddx)] = vramsrc[(y * 1152)+BYTE4_XOR_BE(x + sdx)];
 					}
 				}
-				(void)vramsrc;
-				(void)sdx;
+				(void)vramsrc; (void)sdx;
+			}
+			else if (data == 0x101)
+			{
+				int x, y;
+				uint8_t *vram = &m_vram[m_vram_addr & ~3];
+				uint8_t *vramsrc = &m_vram[m_vram_src & ~3];
+
+				int sdx = m_vram_addr & 3;
+				int ddx = m_vram_src & 3;
+
+                logerror("Copy rectangle backwards, width %d height %d src %x dst %x mode %03x\n", m_width, m_height, m_vram_addr, m_vram_src, data);
+
+				for (y = 0; y < m_height; y++)
+				{
+					for (x = 0; x < m_width; x++)
+					{
+						vram[(-y * 1152)+BYTE4_XOR_BE(-x + ddx)] = vramsrc[(-y * 1152)+BYTE4_XOR_BE(-x + sdx)];
+					}
+				}
+				(void)vramsrc; (void)sdx;
 			}
 			else
 			{
