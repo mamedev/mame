@@ -1020,7 +1020,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<info name="serial" value="500-12210-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-12210-A - Spider-Man - El Caso de Las Letras Revueltas (Spa).bin" size="8388608" crc="96568ab9" sha1="24fab31e1b0aec1c963867da485d22b97da10660" offset="0" />
+				<rom name="500-12210-A - Spider-Man - El Caso de Las Letras Revueltas (Spa).bin" size="8388608" crc="96468ab9" sha1="24fab31e1b0aec1c963867da485d22b97da10660" offset="0" />
 			</dataarea>
 		</part>
 	</software>
