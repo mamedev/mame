@@ -59,6 +59,11 @@ private:
 
 	DECLARE_READ16_MEMBER(rom_r);
 
+	DECLARE_READ16_MEMBER(portc_r)
+	{
+		return machine().rand();
+	};
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<spg2xx_device> m_spg;
@@ -134,6 +139,7 @@ void clickstart_state::clickstart(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	m_spg->portc_in().set(FUNC(clickstart_state::portc_r));
 	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
@@ -150,4 +156,4 @@ ROM_START( clikstrt )
 ROM_END
 
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
-CONS( 2007, clikstrt,  0,      0, clickstart,  clickstart, clickstart_state, empty_init, "LeapFrog Enterprises", "ClickStart",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2007, clikstrt,  0,      0, clickstart,  clickstart, clickstart_state, empty_init, "LeapFrog Enterprises", "ClickStart",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 'My First Computer' tagline
