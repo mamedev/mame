@@ -772,12 +772,6 @@ void cps3_state::cps3_decrypt_bios()
 #endif
 }
 
-void cps3_state::init_common(void)
-{
-	m_eeprom = std::make_unique<uint32_t[]>(0x400/4);
-	subdevice<nvram_device>("eeprom")->set_base(m_eeprom.get(), 0x400);
-}
-
 
 void cps3_state::init_crypt(uint32_t key1, uint32_t key2, int altEncryption)
 {
@@ -814,8 +808,6 @@ void cps3_state::init_crypt(uint32_t key1, uint32_t key2, int altEncryption)
 	m_maincpu->sh2drc_add_fastram(0x040C0030, 0x040C003b, 0, &m_tilemap30_regs_base[0]);
 
 	cps3_decrypt_bios();
-
-	init_common();
 }
 
 void cps3_state::init_redearth()  { init_crypt(0x9e300ab1, 0xa175b82c, 0); }
@@ -902,13 +894,8 @@ void cps3_state::cps3_set_mame_colours(int colournum, uint16_t data, uint32_t fa
 
 void cps3_state::video_start()
 {
-	m_ss_ram       = std::make_unique<uint32_t[]>(0x10000/4);
-	memset(m_ss_ram.get(), 0x00, 0x10000);
-	save_pointer(NAME(m_ss_ram), 0x10000/4);
-
-	m_char_ram = std::make_unique<uint32_t[]>(0x800000/4);
-	memset(m_char_ram.get(), 0x00, 0x800000);
-	save_pointer(NAME(m_char_ram), 0x800000 /4);
+	m_ss_ram = make_unique_clear<uint32_t[]>(0x10000/4);
+	m_char_ram = make_unique_clear<uint32_t[]>(0x800000/4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, cps3_tiles8x8_layout, (uint8_t *)m_ss_ram.get(), 0, m_palette->entries() / 16, 0));
@@ -921,8 +908,7 @@ void cps3_state::video_start()
 
 	//decode_charram();
 
-	m_mame_colours = std::make_unique<uint32_t[]>(0x80000/4);
-	memset(m_mame_colours.get(), 0x00, 0x80000);
+	m_mame_colours = make_unique_clear<uint32_t[]>(0x80000/2);
 
 	m_screenwidth = 384;
 
@@ -933,6 +919,14 @@ void cps3_state::video_start()
 	m_renderbuffer_clip.set(0, m_screenwidth-1, 0, 224-1);
 
 	m_renderbuffer_bitmap.fill(0x3f, m_renderbuffer_clip);
+
+	save_item(NAME(m_ss_pal_base));
+	save_item(NAME(m_unk_vidregs));
+	save_item(NAME(m_ss_bank_base));
+
+	save_pointer(NAME(m_ss_ram), 0x10000/4);
+	save_pointer(NAME(m_char_ram), 0x800000/4);
+	save_pointer(NAME(m_mame_colours), 0x80000/2);
 }
 
 // the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
@@ -1086,10 +1080,16 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 	uint32_t fszx = (fullscreenzoomx << 16) / 0x40;
 	uint32_t fszy = (fullscreenzoomy << 16) / 0x40;
 
-	m_renderbuffer_clip.set(
-		0, ((m_screenwidth*fszx) >> 16) - 1,
-		0, ((224 * fszx) >> 16) - 1);
-
+	if (fullscreenzoomx == 0x40 && fullscreenzoomy == 0x40)
+	{
+		m_renderbuffer_clip = cliprect;
+	}
+	else
+	{
+		m_renderbuffer_clip.set(
+			(cliprect.left() * fszx) >> 16, (((cliprect.right() + 1) * fszx + 0x8000) >> 16) - 1,
+			(cliprect.top() * fszy) >> 16, (((cliprect.bottom() + 1) * fszy + 0x8000) >> 16) - 1);
+	}
 	m_renderbuffer_bitmap.fill(0, m_renderbuffer_clip);
 
 	/* Sprites */
@@ -1164,7 +1164,7 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 
 					if (bg_drawn[tilemapnum] == 0)
 					{
-						for (int uu = 0; uu < 1023; uu++)
+						for (int uu = m_renderbuffer_clip.top(); uu <= m_renderbuffer_clip.bottom(); uu++)
 						{
 							cps3_draw_tilemapsprite_line(tilemapnum, uu, m_renderbuffer_bitmap, m_renderbuffer_clip);
 						}
@@ -1269,21 +1269,35 @@ uint32_t cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-	/* copy render bitmap with zoom */
+	if (fullscreenzoomx == 0x40 && fullscreenzoomy == 0x40)
 	{
-		uint32_t srcy = 0;
-		for (uint32_t rendery = 0; rendery < 224; rendery++)
+		/* copy render bitmap without zoom */
+		for (uint32_t rendery = cliprect.top(); rendery <= cliprect.bottom(); rendery++)
+		{
+			uint32_t* dstbitmap = &bitmap.pix32(rendery);
+			uint32_t* srcbitmap = &m_renderbuffer_bitmap.pix32(rendery);
+
+			for (uint32_t renderx = cliprect.left(); renderx <= cliprect.right(); renderx++)
+			{
+				dstbitmap[renderx] = m_mame_colours[srcbitmap[renderx] & 0x1ffff];
+			}
+		}
+	}
+	else
+	{
+		/* copy render bitmap with zoom */
+		uint32_t srcy = cliprect.top() * fszy;
+		for (uint32_t rendery = cliprect.top(); rendery <= cliprect.bottom(); rendery++)
 		{
 			uint32_t* dstbitmap = &bitmap.pix32(rendery);
 			uint32_t* srcbitmap = &m_renderbuffer_bitmap.pix32(srcy >> 16);
-			uint32_t srcx = 0;
+			uint32_t srcx = cliprect.left() * fszx;
 
-			for (uint32_t renderx = 0; renderx < m_screenwidth; renderx++)
+			for (uint32_t renderx = cliprect.left(); renderx <= cliprect.right(); renderx++)
 			{
 				dstbitmap[renderx] = m_mame_colours[srcbitmap[srcx >> 16] & 0x1ffff];
 				srcx += fszx;
 			}
-
 			srcy += fszy;
 		}
 	}
@@ -2275,6 +2289,28 @@ INTERRUPT_GEN_MEMBER(cps3_state::cps3_other_interrupt)
 }
 
 
+void cps3_state::machine_start()
+{
+	m_eeprom = std::make_unique<uint32_t[]>(0x400/4);
+	subdevice<nvram_device>("eeprom")->set_base(m_eeprom.get(), 0x400);
+
+	save_item(NAME(m_cram_gfxflash_bank));
+	save_item(NAME(m_cram_bank));
+	save_item(NAME(m_current_eeprom_read));
+	save_item(NAME(m_paldma_source));
+	save_item(NAME(m_paldma_realsource));
+	save_item(NAME(m_paldma_dest));
+	save_item(NAME(m_paldma_fade));
+	save_item(NAME(m_paldma_other2));
+	save_item(NAME(m_paldma_length));
+	save_item(NAME(m_chardma_source));
+	save_item(NAME(m_chardma_other));
+	save_item(NAME(m_current_table_address));
+
+	save_pointer(NAME(m_eeprom), 0x400/4);
+}
+
+
 void cps3_state::machine_reset()
 {
 	m_current_table_address = -1;
@@ -2283,6 +2319,12 @@ void cps3_state::machine_reset()
 	copy_from_nvram();
 }
 
+
+void cps3_state::device_post_load()
+{
+	// copy data from flashroms back into user regions + decrypt into regions we execute/draw from.
+	copy_from_nvram();
+}
 
 
 // make a copy in the regions we execute code / draw gfx from
