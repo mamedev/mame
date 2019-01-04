@@ -40,6 +40,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 | 500-11993-A |ENG| Number Raiders - Arcade-Style Learning                    | LEAPSTER       |
 | 500-11994-A |ENG| Cosmic Math - Arcade-Style Learning!                      | LEAPSTER       |
 | 500-11995-A |ENG| Letterpillar                                              | LEAPSTER       | (*)
+| 500-11996-A |ENG| Word Chasers                                              | LEAPSTER       | (*)
 | 500-12098-A |ENG| Cars                                                      | LEAPSTER       |
 | 500-12099-A |ENG| NASCAR                                                    | LEAPSTER L-MAX |
 | 500-12139-A |GER| Buchstabenraupe - Lernen im Arcade-Stil!                  | LEAPSTER       | (*)
@@ -49,13 +50,13 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 | 500-12160-A |ENG| Scooby Doo! - Spooky Snacks!                              | LEAPSTER       |
 | 500-12161-A |ENG| Dora the Explorer - Piñata Party - Arcade-Style Learning! | LEAPSTER       |
 | 500-12171-A |GER| Cars                                                      | LEAPSTER       |
-| 500-12202-A |SPA| La Conquista De Los Números                               | LEAPSTER       | (**)
-| 500-12206-A |SPA| Don Lápiz - Aprender A Dibujar Y Escribir                 | LEAPSTER       | (**)
-| 500-12210-A |SPA| Buscando A Nemo - Leer Bajo El Mar                        | LEAPSTER       | (**)
+| 500-12202-A |SPA| La Conquista De Los Números                               | LEAPSTER       |
+| 500-12206-A |SPA| Don Lápiz - Aprender A Dibujar Y Escribir                 | LEAPSTER       |
+| 500-12210-A |SPA| Spider-Man - El Caso de Las Letras Revueltas              | LEAPSTER       |
 | 500-12218-A |SPA| Disney Princesa - La Magia De Aprender                    | LEAPSTER       |
 | 500-12223-A |SPA| Cars                                                      | LEAPSTER       |
-| 500-12227-A |SPA| Spider-Man - El Caso De Las Letras Revueltas              | LEAPSTER       | (**)
-| 500-12259-A |SPA| El Laberinto De Las Letras                                | LEAPSTER       | (**)
+| 500-12227-A |SPA| Buscando a Nemo - Leer Bajo el Mar                        | LEAPSTER       |
+| 500-12259-A |SPA| El Laberinto De Las Letras                                | LEAPSTER       |
 | 500-12293-A |ENG| Animal Genius                                             | LEAPSTER       |
 | 500-12296-A |ENG| SonicX                                                    | LEAPSTER       |
 | 500-12339-A |FRA| Dora L'Exploratrice - Au Secours Des Animaux              | LEAPSTER       |
@@ -507,6 +508,18 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		</part>
 	</software>
 
+	<software name="findnemos" cloneof="findnemo" supported="no">
+		<description>Buscando a Nemo - Leer Bajo el Mar (Spa)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12227-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-12227-A - Buscando a Nemo (Spa).bin" size="8388608" crc="7aa17c75" sha1="798e2bf0d2decc08430ff5d3009b60dffa341aba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="imagfrnd" supported="no">
 		<description>Foster's Home for Imaginary Friends (USA)</description>
 		<year>2003</year>
@@ -675,6 +688,18 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		</part>
 	</software>
 
+	<software name="mrpencils" cloneof="mrpencil" supported="no">
+		<description>Don Lápiz - Aprender a Dibujar y Escribir (Spa)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12206-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-12206-A - Don Lapiz - Aprender a Dibujar y Escribir (Spa).bin" size="8388608" crc="e6e50c84" sha1="9fb971ac661618bad549f37fbad28ffdd3873a30" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="amuspark" supported="no">
 		<description>My Amusement Park (USA)</description>
 		<year>2003</year>
@@ -719,6 +744,18 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="500-12141-a.bin" size="4194304" crc="334ab5d0" sha1="00eb76e267bfaded25fdf8361e933dc4ec72d059" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numraids" cloneof="numraid" supported="no">
+		<description>La Conquista de los Números (Spa)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12141-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="500-12202-A - La Conquista de los Numeros (Spa).bin" size="4194304" crc="2fb737c6" sha1="6490a57d98f83ef96b0f4f783632a97c0fa460e4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -976,6 +1013,18 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		</part>
 	</software>
 
+	<software name="spidermns" cloneof="spidermn" supported="no">
+		<description>Spider-Man - El Caso de Las Letras Revueltas (Spa)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12210-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-12210-A - Spider-Man - El Caso de Las Letras Revueltas (Spa).bin" size="8388608" crc="96568ab9" sha1="24fab31e1b0aec1c963867da485d22b97da10660" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jedimath" supported="no">
 		<description>Star Wars - Jedi Math (USA)</description>
 		<year>2003</year>
@@ -1144,7 +1193,8 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		</part>
 	</software>
 
-	<software name="worter" supported="no">
+	<!-- Word Chasers -->
+	<software name="wrdchsrsg" supported="no">
 		<description>Wörterjäger - Lernen im Arcade-Stil! (Ger)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
@@ -1155,6 +1205,19 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="wrdchsrss" cloneof="wrdchsrsg" supported="no"> <!-- By now, clone of "wrdchsrsg", until the English set is found -->
+		<description>El Laberinto de las Letras (Spa)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12259-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-12259-A - El Laberinto de las Letras (Spa).bin" size="4194304" crc="4a999f60" sha1="91f79a22a8f9f1af6d8ab11f7dc03858b58510d1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 	<!-- L-MAX carts, ordered by title -->
 
