@@ -8210,7 +8210,7 @@
 	<software name="preisle2">
 		<description>Prehistoric Isle 2</description>
 		<year>1999</year>
-		<publisher>Yumekobo</publisher>
+		<publisher>Yumekobo / Saurus</publisher> <!--co-developed with saurus-->
 		<info name="serial" value="NGM-2550"/>
 		<info name="release" value="19990927"/>
 		<info name="alt_title" value="原始島2"/>
