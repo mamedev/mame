@@ -33048,6 +33048,10 @@ rabbitjt                        // (c) 1996 Electronic Arts
 @source:rad_eu3a14.cpp
 rad_gtg
 rad_foot
+rad_bb3
+rad_bb3p
+rad_hnt3
+rad_hnt3p
 
 @source:rad_eu3a05.cpp
 rad_sinv
@@ -38547,6 +38551,7 @@ rad_skat                        //
 rad_skatp                       //
 rad_sktv                        //
 rad_crik                        //
+rad_fb2                         //
 
 @source:vsmile.cpp
 vsmile                          //
