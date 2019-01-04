@@ -57,20 +57,6 @@
 #define RED_PLANE_TAG       "red"
 #define BLUE_PLANE_TAG      "blue"
 
-// Keyboard
-
-#define MBC55X_KEYROWS          7
-#define KEYBOARD_QUEUE_SIZE     32
-
-#define KB_BITMASK      0x1000
-#define KB_SHIFTS       12
-
-#define KEY_SPECIAL_TAG     "KEY_SPECIAL"
-#define KEY_BIT_LSHIFT      0x01
-#define KEY_BIT_RSHIFT      0x02
-#define KEY_BIT_CTRL        0x04
-#define KEY_BIT_GRAPH       0x08
-
 #define PPI8255_TAG     "ppi8255"
 #define PIC8259_TAG     "pic8259"
 #define PIT8253_TAG     "pit8253"
@@ -79,14 +65,6 @@
 #define I8251A_KB_TAG           "i8251a_kb"
 #define FDC_TAG                 "wd1793"
 
-
-struct keyboard_t
-{
-	uint8_t       keyrows[MBC55X_KEYROWS];
-	emu_timer   *keyscan_timer;
-
-	uint8_t       key_special;
-};
 
 
 class mbc55x_state : public driver_device
@@ -127,7 +105,6 @@ private:
 	DECLARE_READ8_MEMBER(iodecode_r);
 	DECLARE_WRITE8_MEMBER(iodecode_w);
 
-	DECLARE_READ8_MEMBER(mbc55x_kb_usart_r);
 	DECLARE_READ8_MEMBER(vram_page_r);
 	DECLARE_WRITE8_MEMBER(vram_page_w);
 	DECLARE_READ8_MEMBER(game_io_r);
@@ -144,14 +121,11 @@ private:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void mbc55x_palette(palette_device &palette) const;
-	TIMER_CALLBACK_MEMBER(keyscan_callback);
 
 	void mbc55x_io(address_map &map);
 	void mbc55x_mem(address_map &map);
 	void mbc55x_iodecode(address_map &map);
 
-	void keyboard_reset();
-	void scan_keyboard();
 	void set_ram_size();
 
 	required_device<mc6845_device> m_crtc;
@@ -171,12 +145,8 @@ private:
 	uint8_t       m_vram_page;
 	uint8_t       m_printer_status;
 
-	keyboard_t  m_keyboard;
-
 	void video_debug(int ref, const std::vector<std::string> &params);
 };
-
-INPUT_PORTS_EXTERN(mbc55x);
 
 /*----------- defined in machine/mbc55x.c -----------*/
 

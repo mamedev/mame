@@ -2985,10 +2985,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/mbc200.cpp",
 	MAME_DIR .. "src/mame/drivers/mbc55x.cpp",
 	MAME_DIR .. "src/mame/includes/mbc55x.h",
-	MAME_DIR .. "src/mame/machine/mbc55x.cpp",
 	MAME_DIR .. "src/mame/video/mbc55x.cpp",
 	MAME_DIR .. "src/mame/drivers/phc25.cpp",
 	MAME_DIR .. "src/mame/includes/phc25.h",
+	MAME_DIR .. "src/mame/machine/mbc55x_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/mbc55x_kbd.h",
 }
 
 -- Don't call this project "sega" or it collides with the arcade one

@@ -20,7 +20,7 @@
 #include "machine/clock.h"
 #include "machine/i8087.h"
 #include "machine/input_merger.h"
-//#include "machine/mbc55x_kbd.h"
+#include "machine/mbc55x_kbd.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -64,7 +64,7 @@ void mbc55x_state::mbc55x_iodecode(address_map &map)
 	map(0x14, 0x15).mirror(0x02).rw("sio", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x18, 0x18).mirror(0x02).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x19, 0x19).mirror(0x02).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x1c, 0x1d).mirror(0x02).r(FUNC(mbc55x_state::mbc55x_kb_usart_r)).w(m_kb_uart, FUNC(i8251_device::write));
+	map(0x1c, 0x1d).mirror(0x02).rw(m_kb_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 READ8_MEMBER(mbc55x_state::iodecode_r)
@@ -144,26 +144,6 @@ WRITE_LINE_MEMBER(mbc55x_state::printer_select_w)
 }
 
 
-READ8_MEMBER(mbc55x_state::mbc55x_kb_usart_r)
-{
-	uint8_t result = 0;
-
-	switch (offset)
-	{
-		case 0: //logerror("%s read kb_uart\n",machine().describe_context());
-			result = m_kb_uart->data_r();
-			break;
-
-		case 1:
-			result = m_kb_uart->status_r();
-			if (m_keyboard.key_special & KEY_BIT_CTRL)  // Parity error used to flag control down
-				result |= i8251_device::I8251_STATUS_PARITY_ERROR;
-			break;
-	}
-
-	return result;
-}
-
 void mbc55x_state::set_ram_size()
 {
 	address_space   &space      = m_maincpu->space( AS_PROGRAM );
@@ -210,22 +190,18 @@ void mbc55x_state::set_ram_size()
 void mbc55x_state::machine_reset()
 {
 	set_ram_size();
-	keyboard_reset();
 }
 
 void mbc55x_state::machine_start()
 {
 	m_printer_status = 0xff;
 
-	// Allocate keyscan timer
-	m_keyboard.keyscan_timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mbc55x_state::keyscan_callback),this));
-
 	m_kb_uart->write_cts(0);
 }
 
 
-//static INPUT_PORTS_START( mbc55x )
-//INPUT_PORTS_END
+static INPUT_PORTS_START( mbc55x )
+INPUT_PORTS_END
 
 
 FLOPPY_FORMATS_MEMBER( mbc55x_state::floppy_formats )
@@ -267,7 +243,8 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	m_iodecode->addr_width(5);
 	m_iodecode->set_addrmap(0, &mbc55x_state::mbc55x_iodecode);
 
-	//MBC55X_KEYBOARD(config, "keyboard");
+	mbc55x_keyboard_device &keyboard(MBC55X_KEYBOARD(config, "keyboard"));
+	keyboard.txd_callback().set(m_kb_uart, FUNC(i8251_device::write_rxd));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
