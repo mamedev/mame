@@ -988,7 +988,7 @@ void radica_eu3a14_state::init_rad_hnt3()
 {
 	// must be registers to control this
 	m_tilerambase = 0x0200 - 0x200;
-	m_spriterambase = 0x2800 - 0x200; // wrong or alt addressing mode
+	m_spriterambase = 0x1800 - 0x200; // wrong or alt addressing mode
 	// uses an 8x8 mode, could depend on that, but other 8x8 use case above is different
 	m_pagewidth = 32;
 	m_pageheight = 28;
