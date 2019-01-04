@@ -112,11 +112,8 @@ public:
 
 	void mbc55x(machine_config &config);
 
-	void init_mbc55x();
-
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_iodecode;
-	uint32_t      m_debug_machine;
 
 protected:
 	virtual void machine_start() override;
@@ -176,9 +173,10 @@ private:
 
 	keyboard_t  m_keyboard;
 
-	void debug_command(int ref, const std::vector<std::string> &params);
 	void video_debug(int ref, const std::vector<std::string> &params);
 };
+
+INPUT_PORTS_EXTERN(mbc55x);
 
 /*----------- defined in machine/mbc55x.c -----------*/
 
