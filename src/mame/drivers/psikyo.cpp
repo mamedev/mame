@@ -97,7 +97,7 @@ CUSTOM_INPUT_MEMBER(psikyo_state::mcu_status_r)
 	    01A550:  andi.b  #$4, D0
 	    01A554:  bne     $1a54e
 
-	    Interestingly, s1945jn has the code that spins on this bit,
+	    Interestingly, s1945nj has the code that spins on this bit,
 	    but said code is never reached.  Prototype? */
 	if (m_mcu_status)
 		ret = 0x01;
@@ -382,7 +382,7 @@ void psikyo_state::gunbird_map(address_map &map)
 	map(0xc00013, 0xc00013).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
-void psikyo_state::s1945jn_map(address_map &map)
+void psikyo_state::s1945n_map(address_map &map)
 {
 	psikyo_map(map);
 	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::gunbird_input_r));
@@ -704,6 +704,31 @@ static INPUT_PORTS_START( btlkroad )
 	PORT_DIPNAME( 0x00400000, 0x00400000, "Use DSW 3 (Debug)" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(          0x00400000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( btlkroadk )
+	PORT_INCLUDE( btlkroad )
+
+	PORT_MODIFY("DSW")      /* c00004 -> c00007 */
+	/***********************************************
+
+	Bit 0 1 2 3
+	    1 1 1 1 Japan
+
+	    0 1 1 1 USA & Canada
+	    0 0 1 1 Korea
+	    0 1 0 1 Hong Kong
+	    0 1 1 0 Taiwan
+	    Other   World
+
+	************************************************/
+	PORT_CONFNAME( 0x0000000f, 0x0000000c, DEF_STR( Region ) ) // Game code supports multi-region, but set default to Korea
+	PORT_CONFSETTING(          0x0000000f, DEF_STR( Japan ) )
+	PORT_CONFSETTING(          0x0000000e, "USA & Canada (Jaleco license)" )
+	PORT_CONFSETTING(          0x0000000c, DEF_STR( Korea ) )
+	PORT_CONFSETTING(          0x0000000a, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(          0x00000006, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(          0x00000000, DEF_STR( World ) )
 INPUT_PORTS_END
 
 
@@ -1106,10 +1131,10 @@ void psikyo_state::gunbird(machine_config &config)
 	m_soundlatch->set_separate_acknowledge(true);
 }
 
-void psikyo_state::s1945jn(machine_config &config)
+void psikyo_state::s1945n(machine_config &config)
 {
 	gunbird(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::s1945jn_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo_state::s1945n_map);
 }
 
 void psikyo_state::s1945bl(machine_config &config) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
@@ -1421,7 +1446,7 @@ ROM_END
 ROM_START( btlkroadk )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "4,dot.u46", 0x000000, 0x040000, CRC(e724d429) SHA1(8b5f80366fd22d6f7e7d8a9623de4fe231303267) ) // 1&0
-	ROM_LOAD32_WORD_SWAP( "5,dot.u39", 0x000002, 0x040000, CRC(c0d65765) SHA1(a6a26e6b9693a2ef245e9aaa4c9daa888aebb360)) // 3&2
+	ROM_LOAD32_WORD_SWAP( "5,dot.u39", 0x000002, 0x040000, CRC(c0d65765) SHA1(a6a26e6b9693a2ef245e9aaa4c9daa888aebb360) ) // 3&2
 
 	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3,k.u71", 0x00000, 0x20000, CRC(e0f0c597) SHA1(cc337633f1f579baf0f8ba1dd65c5d51122a7e97) )
@@ -1492,7 +1517,7 @@ ROM_START( s1945n )
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 ROM_END
 
-ROM_START( s1945jn )
+ROM_START( s1945nj )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "1-u46.bin", 0x000000, 0x040000, CRC(95028132) SHA1(6ed8e53efb0511dca37c35a7da17217f5aa83734) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2-u39.bin", 0x000002, 0x040000, CRC(3df79a16) SHA1(6184f27579d846a40313fd11b57c46ac0d02fc76) ) // 3&2
@@ -1519,8 +1544,7 @@ ROM_START( s1945jn )
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 ROM_END
 
-/* closely based on s1945jn set, unsurprising because it's unprotected */
-ROM_START( s1945bl )
+ROM_START( s1945bl ) /* closely based on s1945nj set, unsurprising because it's unprotected */
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* Main CPU Code */
 	ROM_LOAD32_BYTE( "27c010-1", 0x000000, 0x020000, CRC(d3361536) SHA1(430df1c98645603c17333222834d344efd4fb584) ) // 1-u46.bin    [odd 1/2]  99.797821%
 	ROM_LOAD32_BYTE( "27c010-2", 0x000001, 0x020000, CRC(1d1916b1) SHA1(4e200454c16d0bd45c4146ee41902a811a55c008) ) // 1-u46.bin    [even 1/2] 99.793243%
@@ -1539,8 +1563,9 @@ ROM_START( s1945bl )
 	ROM_LOAD( "rv27c040.m6",  0x000000, 0x080000, CRC(c22e5b65) SHA1(d807bd7c136d6b51f54258b44ebf3eecbd5b35fa) )
 
 	ROM_REGION( 0x040000, "spritelut", 0 )  /* */
-	ROM_LOAD16_BYTE( "27c010-b",  0x000000, 0x020000, CRC(e38d5ab7) SHA1(73a708ebc305cb6297efd3296da23c87898e805e) ) // u1.bin       [even]     IDENTICAL
-	ROM_LOAD16_BYTE( "27c010-a",  0x000001, 0x020000, CRC(cb8c65ec) SHA1(a55c5c5067b50a1243e7ba60fa1f9569bfed5de8) ) // u1.bin       [odd]      99.999237%
+	// in 27c010-a 0x460E:01 but should 0x00. Might be bit rot or error when bootleggers copied U1 as all other graphics data matches.
+	ROM_LOAD16_BYTE( "27c010-b",  0x000000, 0x020000, CRC(e38d5ab7) SHA1(73a708ebc305cb6297efd3296da23c87898e805e) ) // u1.bin  [even]  IDENTICAL
+	ROM_LOAD16_BYTE( "27c010-a",  0x000001, 0x020000, CRC(cb8c65ec) SHA1(a55c5c5067b50a1243e7ba60fa1f9569bfed5de8) ) // u1.bin  [odd]   99.999237%
 
 	ROM_REGION( 0x080000, "unknown", 0 )    /* unknown - matches Semicom's Dream World */
 	ROM_LOAD( "27c512",  0x000000, 0x010000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
@@ -1950,24 +1975,24 @@ void psikyo_state::init_s1945bl()
 
 ***************************************************************************/
 
-GAME( 1993, samuraia,  0,        sngkace,  samuraia, psikyo_state, init_sngkace,  ROT270, "Psikyo",  "Samurai Aces (World)",       MACHINE_SUPPORTS_SAVE ) // Banpresto?
-GAME( 1993, sngkace,   samuraia, sngkace,  sngkace,  psikyo_state, init_sngkace,  ROT270, "Psikyo",  "Sengoku Ace (Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // Banpresto?
-GAME( 1993, sngkacea,  samuraia, sngkace,  sngkace,  psikyo_state, init_sngkace,  ROT270, "Psikyo",  "Sengoku Ace (Japan, set 2)", MACHINE_SUPPORTS_SAVE ) // Banpresto?
+GAME( 1993, samuraia,  0,        sngkace,  samuraia,  psikyo_state, init_sngkace,  ROT270, "Psikyo",  "Samurai Aces (World)",       MACHINE_SUPPORTS_SAVE ) // Banpresto?
+GAME( 1993, sngkace,   samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo",  "Sengoku Ace (Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // Banpresto?
+GAME( 1993, sngkacea,  samuraia, sngkace,  sngkace,   psikyo_state, init_sngkace,  ROT270, "Psikyo",  "Sengoku Ace (Japan, set 2)", MACHINE_SUPPORTS_SAVE ) // Banpresto?
 
-GAME( 1994, gunbird,   0,        gunbird,  gunbird,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbirdk,  gunbird,  gunbird,  gunbirdj, psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbirdj,  gunbird,  gunbird,  gunbirdj, psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbird,   0,        gunbird,  gunbird,   psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbirdk,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbirdj,  gunbird,  gunbird,  gunbirdj,  psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Gunbird (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, btlkroad,  0,        gunbird,  btlkroad, psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road",              MACHINE_SUPPORTS_SAVE )
-GAME( 1994, btlkroadk, btlkroad, gunbird,  btlkroad, psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road (Korean PCB)", MACHINE_SUPPORTS_SAVE ) // game code is still multi-region, but sound rom appears to be Korea specific at least
+GAME( 1994, btlkroad,  0,        gunbird,  btlkroad,  psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road",         MACHINE_SUPPORTS_SAVE )
+GAME( 1994, btlkroadk, btlkroad, gunbird,  btlkroadk, psikyo_state, init_gunbird,  ROT0,   "Psikyo",  "Battle K-Road (Korea)", MACHINE_SUPPORTS_SAVE ) // game code is still multi-region, but sound rom appears to be Korea specific at least
 
-GAME( 1995, s1945,     0,        s1945,    s1945,    psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (World)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1995, s1945a,    s1945,    s1945,    s1945a,   psikyo_state, init_s1945a,   ROT270, "Psikyo",  "Strikers 1945 (Japan / World)",      MACHINE_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World
-GAME( 1995, s1945j,    s1945,    s1945,    s1945j,   psikyo_state, init_s1945j,   ROT270, "Psikyo",  "Strikers 1945 (Japan)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1995, s1945n,    s1945,    s1945jn,  s1945,    psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (World, unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, s1945jn,   s1945,    s1945jn,  s1945j,   psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (Japan, unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, s1945k,    s1945,    s1945,    s1945j,   psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (Korea)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1995, s1945bl,   s1945,    s1945bl,  s1945bl,  psikyo_state, init_s1945bl,  ROT270, "bootleg", "Strikers 1945 (Hong Kong, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945,     0,        s1945,    s1945,     psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (World)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945a,    s1945,    s1945,    s1945a,    psikyo_state, init_s1945a,   ROT270, "Psikyo",  "Strikers 1945 (Japan / World)",      MACHINE_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World
+GAME( 1995, s1945j,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945j,   ROT270, "Psikyo",  "Strikers 1945 (Japan)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945n,    s1945,    s1945n,   s1945,     psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (World, unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945nj,   s1945,    s1945n,   s1945j,    psikyo_state, init_gunbird,  ROT270, "Psikyo",  "Strikers 1945 (Japan, unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945k,    s1945,    s1945,    s1945j,    psikyo_state, init_s1945,    ROT270, "Psikyo",  "Strikers 1945 (Korea)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1995, s1945bl,   s1945,    s1945bl,  s1945bl,   psikyo_state, init_s1945bl,  ROT270, "bootleg", "Strikers 1945 (Hong Kong, bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, tengai,    0,        s1945,    tengai,   psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Tengai (World)",                                 MACHINE_SUPPORTS_SAVE )
-GAME( 1996, tengaij,   tengai,   s1945,    tengaij,  psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Sengoku Blade: Sengoku Ace Episode II / Tengai", MACHINE_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World
+GAME( 1996, tengai,    0,        s1945,    tengai,    psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Tengai (World)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1996, tengaij,   tengai,   s1945,    tengaij,   psikyo_state, init_tengai,   ROT0,   "Psikyo",  "Sengoku Blade: Sengoku Ace Episode II / Tengai", MACHINE_SUPPORTS_SAVE ) // Region dip - 0x0f=Japan, anything else=World

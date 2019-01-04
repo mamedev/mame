@@ -32804,22 +32804,22 @@ gametree                        // (c) 1978 PSE
 
 @source:psikyo.cpp
 btlkroad                        // (c) 1994
-btlkroadk                       // (c) 1994
+btlkroadk                       // (c) 1994 (Korea)
 gunbird                         // (c) 1994
-gunbirdj                        // (c) 1994
-gunbirdk                        // (c) 1994
-s1945                           // (c) 1995
+gunbirdj                        // (c) 1994 (Japan)
+gunbirdk                        // (c) 1994 (Korea)
+s1945                           // (c) 1995 (Japan)
 s1945a                          // (c) 1995
 s1945bl                         // (c) 1995 (Hong Kong bootleg)
-s1945j                          // (c) 1995
-s1945jn                         // (c) 1995
-s1945k                          // (c) 1995
-s1945n                          // (c) 1995
+s1945j                          // (c) 1995 (Japan)
+s1945k                          // (c) 1995 (Korea)
+s1945n                          // (c) 1995 (World, unprotected)
+s1945nj                         // (c) 1995 (Japan, unprotected)
 samuraia                        // (c) 1993 (World)
 sngkace                         // (c) 1993 (Japan)
 sngkacea                        // (c) 1993 (Japan)
-tengai                          // (c) 1996
-tengaij                         // (c) 1996
+tengai                          // (c) 1996 (World)
+tengaij                         // (c) 1996 (Japan)
 
 @source:psikyo4.cpp
 hgkairak                        // (c) 1998
