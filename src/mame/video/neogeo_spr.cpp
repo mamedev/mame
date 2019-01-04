@@ -18,7 +18,9 @@ neosprite_base_device::neosprite_base_device(
 		device_t *owner,
 		uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
 	, m_bppshift(4)
+	, m_region_zoomy(*this, "zoomy")
 {
 }
 
@@ -53,9 +55,6 @@ void neosprite_base_device::device_start()
 	save_item(NAME(m_auto_animation_disabled));
 	save_item(NAME(m_auto_animation_counter));
 	save_item(NAME(m_auto_animation_frame_counter));
-
-
-	m_region_zoomy = memregion(":zoomy")->base();
 }
 
 void neosprite_base_device::device_reset()
@@ -146,7 +145,7 @@ TIMER_CALLBACK_MEMBER(neosprite_base_device::auto_animation_timer_callback)
 	else
 		m_auto_animation_frame_counter = m_auto_animation_frame_counter - 1;
 
-	m_auto_animation_timer->adjust(m_screen->time_until_pos(NEOGEO_VSSTART));
+	m_auto_animation_timer->adjust(screen().time_until_pos(NEOGEO_VSSTART));
 }
 
 
@@ -158,7 +157,7 @@ void neosprite_base_device::create_auto_animation_timer()
 
 void neosprite_base_device::start_auto_animation_timer()
 {
-	m_auto_animation_timer->adjust(m_screen->time_until_pos(NEOGEO_VSSTART));
+	m_auto_animation_timer->adjust(screen().time_until_pos(NEOGEO_VSSTART));
 }
 
 
@@ -552,14 +551,14 @@ TIMER_CALLBACK_MEMBER(neosprite_base_device::sprite_line_timer_callback)
 	/* we are at the beginning of a scanline -
 	   we need to draw the previous scanline and parse the sprites on the current one */
 	if (scanline != 0)
-		m_screen->update_partial(scanline - 1);
+		screen().update_partial(scanline - 1);
 
 	parse_sprites(scanline);
 
 	/* let's come back at the beginning of the next line */
 	scanline = (scanline + 1) % NEOGEO_VTOTAL;
 
-	m_sprite_line_timer->adjust(m_screen->time_until_pos(scanline), scanline);
+	m_sprite_line_timer->adjust(screen().time_until_pos(scanline), scanline);
 }
 
 
@@ -571,7 +570,7 @@ void neosprite_base_device::create_sprite_line_timer()
 
 void neosprite_base_device::start_sprite_line_timer()
 {
-	m_sprite_line_timer->adjust(m_screen->time_until_pos(0));
+	m_sprite_line_timer->adjust(screen().time_until_pos(0));
 }
 
 
@@ -624,11 +623,6 @@ void neosprite_base_device::set_fixed_regions(uint8_t* fix_cart, uint32_t fix_ca
 	m_region_fixed = fix_cart;
 	m_region_fixed_size = fix_cart_size;
 	m_region_fixedbios = fix_bios;
-}
-
-void neosprite_base_device::set_screen(screen_device* screen)
-{
-	m_screen = screen;
 }
 
 void neosprite_base_device::set_pens(const pen_t* pens)
