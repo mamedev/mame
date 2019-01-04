@@ -368,8 +368,10 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 		case 0x18103d:
 		case 0x18103e:
 		case 0x18103f:
-			if(offset == 0x181000)
+			if(offset == 0x181000) {
+				machine().debug_break();
 				logerror("Pattern %08x @ %x\n", data ^ 0xffffffff, offset);
+			}
 			m_fillbytes[((offset&0x3f)*4)] = ((data>>24) & 0xff) ^ 0xff;
 			m_fillbytes[((offset&0x3f)*4)+1] = ((data>>16) & 0xff) ^ 0xff;
 			m_fillbytes[((offset&0x3f)*4)+2] = ((data>>8) & 0xff) ^ 0xff;
@@ -378,11 +380,11 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 
 		// blitter control
 		case 0x182006:
-            logerror("%08x (%d) to blitter ctrl 1 %s\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
+            logerror("%08x (%d) to blitter ctrl 1 %s rectangle\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
 			break;
 
 		case 0x182008:
-            logerror("%08x (%d) to blitter ctrl 2 %s\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
+            logerror("%08x (%d) to blitter ctrl 2 %s rectangle\n", data^0xffffffff, data^0xffffffff, machine().describe_context());
 			m_patofsx = (data ^ 0xffffffff) & 7;
 			m_patofsy = ((data ^ 0xffffffff)>>3) & 7;
 			break;
@@ -417,17 +419,17 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 			if (data == 2)
 			{
 				int x, y;
-				uint8_t *vram = &m_vram[(m_vram_addr + m_patofsx) & ~3]; // m_vram_addr is missing the low 2 bits, we add them back here
+				uint8_t *vram = &m_vram[m_vram_addr & ~3];
 
-				int ddx = (m_vram_addr + m_patofsx) & 3;
+				int ddx = m_vram_addr & 3;
 
-                logerror("Fill rectangle with %02x %02x %02x %02x, width %d height %d\n", m_fillbytes[0], m_fillbytes[1], m_fillbytes[2], m_fillbytes[3], m_width, m_height);
+                logerror("Fill rectangle with %02x %02x %02x %02x, adr %x (%d, %d) width %d height %d delta %d %d\n", m_fillbytes[0], m_fillbytes[1], m_fillbytes[2], m_fillbytes[3], m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_width, m_height, m_patofsx, m_patofsy);
 
-				for (y = 0; y < m_height; y++)
+				for (y = 0; y <= m_height; y++)
 				{
-					for (x = 0; x < m_width; x++)
+					for (x = 0; x <= m_width; x++)
 					{
-						vram[(y * 1152)+BYTE4_XOR_BE(x + ddx)] = m_fillbytes[((m_patofsx + x) & 0x1f)+(((m_patofsy + y) & 0x7)*32)];
+						vram[(y * 1152)+BYTE4_XOR_BE(x + ddx)] = m_fillbytes[((m_patofsx + x) & 0x1f)+(((m_patofsy + y) & 0x7) << 5)];
 					}
 				}
 			}
@@ -440,11 +442,11 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 				int sdx = m_vram_src & 3;
 				int ddx = m_vram_addr & 3;
 
-                logerror("Copy rectangle forwards, width %d height %d src %x dst %x mode %03x\n", m_width, m_height, m_vram_addr, m_vram_src, data);
+                logerror("Copy rectangle forwards, width %d height %d dst %x (%d, %d) src %x (%d, %d)\n", m_width, m_height, m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_vram_src, m_vram_src % 1152, m_vram_src / 1152);
 
-				for (y = 0; y < m_height; y++)
+				for (y = 0; y <= m_height; y++)
 				{
-					for (x = 0; x < m_width; x++)
+					for (x = 0; x <= m_width; x++)
 					{
 						vram[(y * 1152)+BYTE4_XOR_BE(x + ddx)] = vramsrc[(y * 1152)+BYTE4_XOR_BE(x + sdx)];
 					}
@@ -460,7 +462,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 				int sdx = m_vram_src & 3;
 				int ddx = m_vram_addr & 3;
 
-                logerror("Copy rectangle backwards, width %d height %d src %x dst %x mode %03x\n", m_width, m_height, m_vram_addr, m_vram_src, data);
+                logerror("Copy rectangle backwards, width %d height %d dst %x (%d, %d) src %x (%d, %d)\n", m_width, m_height, m_vram_addr, m_vram_addr % 1152, m_vram_addr / 1152, m_vram_src, m_vram_src % 1152, m_vram_src / 1152);
 
 				for (y = 0; y < m_height; y++)
 				{
