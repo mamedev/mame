@@ -5,11 +5,13 @@
     Serial keyboard emulation for Sanyo MBC-55x.
 
     The key matrix is based on schematics, though the MCU is not yet dumped.
-    Many keys are not yet implemented, as are the Lock and Graph key LEDs. The
-    unknown jumper may select an international key layout.
+    The Graph, Lock, Num Lock and 00 keys are not emulated yet, nor are the
+    Lock and Graph key LEDs and the alternate keypad functions. The unknown
+    jumper might select an international key layout.
 
     The interface has only one unidirectional communication line. The reset
-    switch appears to be part of the main unit rather than the keyboard.
+    switch appears to be part of the main unit rather than the keyboard. The
+    ASCII codes sent by this keyboard are converted into XT codes by MS-DOS.
 
 *******************************************************************************/
 
@@ -204,29 +206,29 @@ void mbc55x_keyboard_device::tra_complete()
 const u8 mbc55x_keyboard_device::s_code_table[2][12][8] =
 {
 	{
-		{ 0x00, '>',  'A',  'Q',  '!',  0x00, 0x1b, '|'  },
-		{ 0x00, 'Z',  'S',  'W',  '@',  ' ',  0x00, 0x08 },
-		{ 0x00, 'X',  'D',  'E',  '#',  0x00, 0x0d, 0x00 },
-		{ 0x00, 'C',  'F',  'R',  '$',  '0',  '4',  0x00 },
-		{ 0x00, 'V',  'G',  'T',  '%',  0x00, '5',  0x00 },
-		{ 0x00, 'B',  'H',  'Y',  '^',  '.',  '6',  0x00 },
-		{ 0x00, 'N',  'J',  'U',  '&',  '1',  '7',  0x00 },
-		{ 0x00, 'M',  'K',  'I',  '*',  '2',  '8',  0x00 },
-		{ 0x00, ',',  'L',  'O',  '(',  '3',  '9',  0x00 },
+		{ 0x15, '>',  'A',  'Q',  '!',  0x00, 0x1b, '|'  },
+		{ 0x16, 'Z',  'S',  'W',  '@',  ' ',  0x05, 0x08 },
+		{ 0x17, 'X',  'D',  'E',  '#',  0x00, 0x0d, 0x0f },
+		{ 0x18, 'C',  'F',  'R',  '$',  '0',  '4',  0x00 },
+		{ 0x19, 'V',  'G',  'T',  '%',  0x00, '5',  0x00 },
+		{ '=',  'B',  'H',  'Y',  '^',  '.',  '6',  0x00 },
+		{ '/',  'N',  'J',  'U',  '&',  '1',  '7',  0x00 },
+		{ '*',  'M',  'K',  'I',  '*',  '2',  '8',  0x00 },
+		{ 0x03, ',',  'L',  'O',  '(',  '3',  '9',  0x00 },
 		{ '-',  '.',  ':',  'P',  ')',  0x00, 0x00, 0x00 },
 		{ '+',  '?',  '"',  '{',  '_',  0x00, 0x00, 0x00 },
 		{ 0x0d, '*',  '~',  '}',  '+',  0x00, 0x00, 0x00 }
 	},
 	{
-		{ 0x00, '<',  'a',  'q',  '1',  0x00, 0x1b, '\\' },
-		{ 0x00, 'z',  's',  'w',  '2',  ' ',  0x09, 0x08 },
-		{ 0x00, 'x',  'd',  'e',  '3',  0x00, 0x0d, 0x00 },
-		{ 0x00, 'c',  'f',  'r',  '4',  '0',  '4',  0x00 },
-		{ 0x00, 'v',  'g',  't',  '5',  0x00, '5',  0x00 },
-		{ 0x00, 'b',  'h',  'y',  '6',  '.',  '6',  0x00 },
-		{ 0x00, 'n',  'j',  'u',  '7',  '1',  '7',  0x00 },
-		{ 0x00, 'm',  'k',  'i',  '8',  '2',  '8',  0x00 },
-		{ 0x00, ',',  'l',  'o',  '9',  '3',  '9',  0x00 },
+		{ 0x10, '<',  'a',  'q',  '1',  0x00, 0x1b, '\\' },
+		{ 0x11, 'z',  's',  'w',  '2',  ' ',  0x09, 0x08 },
+		{ 0x12, 'x',  'd',  'e',  '3',  0x00, 0x0d, 0x7f },
+		{ 0x13, 'c',  'f',  'r',  '4',  '0',  '4',  0x00 },
+		{ 0x14, 'v',  'g',  't',  '5',  0x00, '5',  0x00 },
+		{ '=',  'b',  'h',  'y',  '6',  '.',  '6',  0x00 },
+		{ '/',  'n',  'j',  'u',  '7',  '1',  '7',  0x00 },
+		{ '*',  'm',  'k',  'i',  '8',  '2',  '8',  0x00 },
+		{ 0x03, ',',  'l',  'o',  '9',  '3',  '9',  0x00 },
 		{ '-',  '.',  ';',  'p',  '0',  0x00, 0x00, 0x00 },
 		{ '+',  '?',  '\'', '[',  '-',  0x00, 0x00, 0x00 },
 		{ 0x0d, '*',  '`',  ']',  '=',  0x00, 0x00, 0x00 }
