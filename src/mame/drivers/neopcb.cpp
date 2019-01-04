@@ -69,16 +69,17 @@ void neopcb_state::device_post_load()
 	membank("cpu_bank")->set_base(m_region_maincpu->base() + m_bank_base);
 }
 
-MACHINE_CONFIG_START(neopcb_state::neopcb)
+void neopcb_state::neopcb(machine_config &config)
+{
 	neogeo_arcade(config);
 	neogeo_mono(config);
 
-	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", true)
+	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", true);
 
-	MCFG_CMC_PROT_ADD("cmc50")
-	MCFG_PCM2_PROT_ADD("pcm2")
-	MCFG_PVC_PROT_ADD("pvc")
-MACHINE_CONFIG_END
+	NG_CMC_PROT(config, "cmc50", 0);
+	NG_PCM2_PROT(config, "pcm2", 0);
+	NG_PVC_PROT(config, "pvc", 0);
+}
 
 
 // Game specific input definitions
@@ -106,7 +107,7 @@ INPUT_PORTS_END
  *************************************/
 
 #define ROM_Y_ZOOM \
-	ROM_REGION( 0x20000, "zoomy", 0 ) \
+	ROM_REGION( 0x20000, "spritegen:zoomy", 0 ) \
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 
 
