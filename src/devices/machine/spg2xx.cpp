@@ -942,6 +942,9 @@ READ16_MEMBER(spg2xx_device::io_r)
 		LOGMASKED(LOG_UART, "io_r: UART Rx FIFO Control = %04x\n", val);
 		break;
 
+	case 0x51: // unknown, polled by ClickStart cartridges ( clikstrt )
+		return 0x8000;
+
 	case 0x59: // I2C Status
 		LOGMASKED(LOG_I2C, "io_r: I2C Status = %04x\n", val);
 		break;

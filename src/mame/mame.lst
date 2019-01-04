@@ -9872,6 +9872,9 @@ clayshoo                        // [1979 Allied Leisure]
 @source:clcd.cpp
 clcd                            // Commodore LCD
 
+@source:clickstart.cpp
+clikstrt                        // (c) 2007 LeapFrog Enterprises
+
 @source:cliffhgr.cpp
 cliffhgr                        // (c) 1983
 cliffhgra                       // (c) 1983
