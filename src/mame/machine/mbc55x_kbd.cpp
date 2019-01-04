@@ -11,7 +11,8 @@
 
     The interface has only one unidirectional communication line. The reset
     switch appears to be part of the main unit rather than the keyboard. The
-    ASCII codes sent by this keyboard are converted into XT codes by MS-DOS.
+    ASCII codes sent by this keyboard are converted into XT codes by MS-DOS
+    using the lookup tables at the beginning of the ROM.
 
 *******************************************************************************/
 
@@ -230,7 +231,7 @@ const u8 mbc55x_keyboard_device::s_code_table[2][12][8] =
 		{ '*',  'm',  'k',  'i',  '8',  '2',  '8',  0x00 },
 		{ 0x03, ',',  'l',  'o',  '9',  '3',  '9',  0x00 },
 		{ '-',  '.',  ';',  'p',  '0',  0x00, 0x00, 0x00 },
-		{ '+',  '?',  '\'', '[',  '-',  0x00, 0x00, 0x00 },
+		{ '+',  '/',  '\'', '[',  '-',  0x00, 0x00, 0x00 },
 		{ 0x0d, '*',  '`',  ']',  '=',  0x00, 0x00, 0x00 }
 	}
 };
