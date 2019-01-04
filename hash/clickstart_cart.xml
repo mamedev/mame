@@ -1,9 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!--
-NOTE: These dumps might not be correct, haven't been able to work out how to calcualte the checksum listed at the start of some of them.
--->
+<!-- It is unclear how to calculate the checksum that's stored as ASCII at the start of some of these, however there is a secondary checksum in a footer area at the end that works out correctly, so the ROMs should be good -->
 
 <softwarelist name="clickstart_cart" description="LeapFrog ClickStart cartridges">
 
