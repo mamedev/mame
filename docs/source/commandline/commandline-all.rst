@@ -913,9 +913,7 @@ Core State/Playback Options
 
 **-[no]snapbilinear**
 
-    Specify if the snapshot or movie should have bilinear filtering	applied.
-    Shutting this off can make a difference in some performance while recording
-    video to a file.
+    Specify if the snapshot or movie should have bilinear filtering applied.
 
     The default is ON (**-snapbilinear**).
 
@@ -962,7 +960,7 @@ Core State/Playback Options
     alpha (e.g, 0.1-0.2 seems to work well) and blended over the entire screen.
 
     The PNG files are saved in the snap directory under the
-    ``systemname/burnin-<screen.name>.png``.
+    ``<systemname>/burnin-<screen.name>.png``.
 
     The default is OFF (**-noburnin**).
 
@@ -1209,8 +1207,10 @@ Core Video Options
 
     Controls initial window size in windowed mode.  If it is set on, the window
     will initially be set to the maximum supported size when you start MAME.  If
-    it is turned off, the window will start out at the smallest supported size.
-    This option only has an effect when the -window option is used.
+    it is turned off, the window will start out at the closest possible size to
+    the original size of the display; it will scale on only one axis where
+    non-square pixels are used. This option only has an effect when the
+    **-window** option is used.
 
     The default is ON (**-maximize**).
 
@@ -1218,9 +1218,10 @@ Core Video Options
 
 **-[no]keepaspect** / **-[no]ka**
 
-    Enables aspect ratio enforcement. When this option is on, the system's
-    proper aspect ratio (generally 4:3 or 3:4) is enforced, so you get the
-    system looking like it should.
+    When enabled, MAME preserves the correct aspect ratio for the emulated
+    system's screen(s).  This is usually 4:3 or 3:4 on CRT monitors, though some
+    systems may have ratios such as 3:2 (Nintendo Game Boy) or 5:4
+    (some workstations).
 
     When running in a window with this option on, you can only resize the window
     to the proper aspect ratio, unless you are holding down the CONTROL key.  By
@@ -1243,24 +1244,33 @@ Core Video Options
 
     Waits for the refresh period on your computer's monitor to finish before
     starting to draw video to your screen.  If this option is off, MAME will
-    just draw to the screen at any old time, even in the middle of a refresh
-    cycle.  This can cause "tearing" artifacts, where the top portion of the
-    screen is out of sync with the bottom portion.  Tearing is not noticeable
-    on all systems, and some people hate it more than others.  However, if you
-    turn this option on, you will waste more of your CPU cycles waiting for the
-    proper time to draw, so you will see a performance hit.
+    just draw to the screen as a frame is ready, even if in the middle of a
+    refresh cycle.  This can cause "tearing" artifacts, where the top portion of
+    the screen is out of sync with the bottom portion.
+
+    The effect of turning **-waitvsync** on differs a bit between combinations
+    of different operating systems and video drivers.
+
+    On Windows, **-waitvsync** will block until video blanking before allowing
+    MAME to draw the next frame, limiting the emulated machine's framerate to
+    that of the host display. Note that this option does not work with
+    **-video gdi** mode in Windows.
+
+    On macOS, **-waitvsync** does not block; instead the most recent completely
+    drawn frame will be displayed at vblank. This means that if an emulated
+    system has a higher framerate than your host display, emulated frames will
+    be dropped periodically resulting in motion judder.
 
     You should only need to turn this on in windowed mode. In full screen mode,
     it is only needed if **-triplebuffer** does not remove the tearing, in which
-    case you should use **-notriplebuffer -waitvsync**. Note that this option
-    does not work with **-video gdi** mode.
-
-    The default is OFF (**-nowaitvsync**).
+    case you should use **-notriplebuffer -waitvsync**.
 
     Note that SDL-based MAME support for this option depends entirely on your
     operating system and video drivers; in general it will not work in windowed
     mode so **-video opengl** and fullscreen give the greatest chance of
-    success.
+    success with SDL builds of MAME.
+
+    The default is OFF (**-nowaitvsync**).
 
 .. _mame-commandline-syncrefresh:
 
@@ -1284,9 +1294,9 @@ Core Video Options
     Controls the size of the screen images when they are passed off to the
     graphics system for scaling.  At the minimum setting of 1, the screen is
     rendered at its original resolution before being scaled.  At higher
-    settings, the screen is expanded by a factor of *<amount>* before being
-    scaled.  With **-video d3d**, this produces a less blurry image at the
-    expense of some speed.
+    settings, the screen is expanded in both axes by a factor of *<amount>*
+    using nearest-neighbor sampling before being scaled.  With **-video d3d**,
+    this produces a less blurry image at the expense of some speed.
 
     The default is ``1``.
 
@@ -1314,7 +1324,7 @@ Core Video Options
 
 **-[no]unevenstretch**
 
-    Allow non-integer stretch factors allowing for great window sizing
+    Allow non-integer scaling factors allowing for great window sizing
     flexability.
 
     The default is ON. (**-unevenstretch**)
@@ -1693,7 +1703,8 @@ Core Video OpenGL GLSL Options
 
 **-gl_glsl_filter**
 
-    Enable OpenGL GLSL filtering instead of FF filtering.
+    Use OpenGL GLSL shader-based filtering instead of fixed function
+    pipeline-based filtering.
 
     *0-plain, 1-bilinear, 2-bicubic*
 
@@ -1792,7 +1803,7 @@ Core Sound Options
 |
 
     On Windows and Linux, *portaudio* is likely to give the lowest possible
-    latency, where on Mac *coreaudio* provides the best results.
+    latency, while Mac users will find *coreaudio* provides the best results.
 
     When using the ``sdl`` sound subsystem, the audio API to use may be selected
     by setting the *SDL_AUDIODRIVER* environment variable.  Available audio APIs
@@ -2129,7 +2140,11 @@ Debugging Options
 
 **-[no]oslog**
 
-    Output error.log data to the system debugger.
+    Output ``error.log`` data to the system debugger, if one is present.
+
+    On Windows, the ``error.log`` data goes nowhere if no debugger is present.
+    On other operating systems, the ``error.log`` data will go to standard
+    error output, which typically goes to the console or terminal window.
 
     The default is OFF (**-nooslog**).
 
@@ -2167,8 +2182,8 @@ Debugging Options
 **-[no]update_in_pause**
 
     Enables updating of the main screen bitmap while the system is paused.  This
-    means that the VIDEO_UPDATE callback will be called repeatedly during pause,
-    which can be useful for debugging.
+    means that the video update callback will be called repeatedly while the
+    emulation is paused, which can be useful for debugging.
 
     The default is OFF (**-noupdate_in_pause**).
 
@@ -2216,7 +2231,8 @@ Core Communication Options
     Local address to bind to. This can be a traditional ``xxx.xxx.xxx.xxx``
     address or a string containing a resolvable hostname.
 
-    The default is value is "``0.0.0.0``"
+    The default is value is "``0.0.0.0``" (which binds to all local IPv4
+    addresses)
 
 .. _mame-commandline-commlocalport:
 
@@ -2234,7 +2250,8 @@ Core Communication Options
     Remote address to connect to. This can be a traditional xxx.xxx.xxx.xxx
     address or a string containing a resolvable hostname.
 
-    The default is value is "``0.0.0.0``"
+    The default is value is "``0.0.0.0``" (which binds to all local IPv4
+    addresses)
 
 .. _mame-commandline-commremoteport:
 
@@ -2304,7 +2321,10 @@ Core Misc Options
 **-[no]cheat** / **-[no]c**
 
     Activates the cheat menu with autofire options and other tricks from the
-    cheat database, if present.
+    cheat database, if present. This also activates additional options on the
+    slider menu for overclocking/underclocking.
+
+    *Be advised that savestates may not work correctly with this turned on.*
 
     The default is OFF (**-nocheat**).
 
@@ -2386,6 +2406,8 @@ Scripting Options
     Command string to execute after machine boot (in quotes " "). To issue a
     quote to the emulation, use """ in the string. Using **\\n** will issue a
     create a new line, issuing what was typed prior as a command.
+
+    This works only with systems that support natural keyboard mode.
 
       Example:  **-autoboot_command "load """$""",8,1\\n"**
 
