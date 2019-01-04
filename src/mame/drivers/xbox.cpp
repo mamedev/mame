@@ -33,7 +33,7 @@ class xbox_state : public xbox_base_state
 public:
 	xbox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xbox_base_state(mconfig, type, tag)
-		, m_ide(*this, "ide")
+		, m_ide(*this, "pci:09.0:ide")
 		, m_devh(*this, "pci:09.0:ide:0:hdd")
 		, m_devc(*this, "pci:09.0:ide:1:cdrom")
 	{ }

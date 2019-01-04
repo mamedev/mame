@@ -84,6 +84,8 @@ public:
 		debug_irq_active(false),
 		debug_irq_number(0),
 		m_maincpu(*this, "maincpu"),
+		mcpxlpc(*this, ":pci:01.0"),
+		ide(*this, ":pci:09.0:ide"),
 		debugc_bios(nullptr) { }
 
 	void xbox_base(machine_config &config);
@@ -115,8 +117,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(nv2a_interrupt_changed);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	mcpx_lpc_device *mcpxlpc;
-	bus_master_ide_controller_device *ide;
 	struct superio_state
 	{
 		bool configuration_mode;
@@ -128,6 +128,8 @@ protected:
 	bool debug_irq_active;
 	int debug_irq_number;
 	required_device<cpu_device> m_maincpu;
+	required_device<mcpx_isalpc_device> mcpxlpc;
+	required_device<bus_master_ide_controller_device> ide;
 	static const struct debugger_constants
 	{
 		uint32_t id;

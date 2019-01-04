@@ -58,9 +58,9 @@ DECLARE_DEVICE_TYPE(NV2A_RAM, nv2a_ram_device)
  * LPC Bus
  */
 
-class mcpx_lpc_device : public pci_device {
+class mcpx_isalpc_device : public pci_device {
 public:
-	mcpx_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto interrupt_output() { return m_interrupt_output.bind(); }
 
@@ -98,7 +98,7 @@ private:
 	required_device<pit8254_device> pit8254;
 };
 
-DECLARE_DEVICE_TYPE(MCPX_LPC, mcpx_lpc_device)
+DECLARE_DEVICE_TYPE(MCPX_ISALPC, mcpx_isalpc_device)
 
 /*
  * SMBus
