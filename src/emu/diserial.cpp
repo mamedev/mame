@@ -442,16 +442,6 @@ u8 device_serial_interface::transmit_register_get_data_bit()
 	return bit;
 }
 
-bool device_serial_interface::is_receive_register_full()
-{
-	return m_rcv_flags & RECEIVE_REGISTER_FULL;
-}
-
-bool device_serial_interface::is_transmit_register_empty()
-{
-	return m_tra_flags & TRANSMIT_REGISTER_EMPTY;
-}
-
 const char *device_serial_interface::parity_tostring(parity_t parity)
 {
 	switch (parity)
