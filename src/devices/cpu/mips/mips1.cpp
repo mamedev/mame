@@ -722,7 +722,7 @@ void mips1core_device_base::execute_run()
 					length = 4095;
 				while (length)
 				{
-					load<u8>(ptr, [this](char c) { printf("%c", c); });
+					load<u8>(ptr, [](char c) { printf("%c", c); });
 					ptr++;
 					length--;
 				}
