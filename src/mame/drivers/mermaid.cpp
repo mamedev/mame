@@ -419,11 +419,11 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 	}
 }
 
-MACHINE_CONFIG_START(mermaid_state::mermaid)
-
+void mermaid_state::mermaid(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   // ???
-	MCFG_DEVICE_PROGRAM_MAP(mermaid_map)
+	Z80(config, m_maincpu, 4000000);	// ???
+	m_maincpu->set_addrmap(AS_PROGRAM, &mermaid_state::mermaid_map);
 
 	LS259(config, m_latch[0]);
 	m_latch[0]->q_out_cb<0>().set(FUNC(mermaid_state::ay1_enable_w));
@@ -440,14 +440,14 @@ MACHINE_CONFIG_START(mermaid_state::mermaid)
 	m_latch[1]->q_out_cb<7>().set_nop(); // very frequent
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mermaid_state, screen_update_mermaid)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mermaid_state, screen_vblank_mermaid))
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(mermaid_state::screen_update_mermaid));
+	m_screen->screen_vblank().set(FUNC(mermaid_state::screen_vblank_mermaid));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mermaid);
 	PALETTE(config, m_palette, FUNC(mermaid_state::mermaid_palette), 4*16+2*2, 64+1);
@@ -456,12 +456,11 @@ MACHINE_CONFIG_START(mermaid_state::mermaid)
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, m_ay8910[0], 1500000).add_route(ALL_OUTPUTS, "mono", 0.25);
-
 	AY8910(config, m_ay8910[1], 1500000).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mermaid_state::rougien)
+void mermaid_state::rougien(machine_config &config)
+{
 	mermaid(config);
 
 	m_latch[0]->q_out_cb<2>().set(FUNC(mermaid_state::rougien_sample_playback_w));
@@ -471,16 +470,16 @@ MACHINE_CONFIG_START(mermaid_state::rougien)
 
 	m_palette->set_init(FUNC(mermaid_state::rougien_palette));
 
-	MCFG_DEVICE_ADD("adpcm", MSM5205, 384000)
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, mermaid_state, rougien_adpcm_int))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MSM5205(config, m_adpcm, 384000);
+	m_adpcm->vck_callback().set(FUNC(mermaid_state::rougien_adpcm_int));
+	m_adpcm->set_prescaler_selector(msm5205_device::S96_4B);
+	m_adpcm->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	RIPPLE_COUNTER(config, m_adpcm_counter);
 	m_adpcm_counter->set_device_rom_tag("adpcm");
 	m_adpcm_counter->set_stages(12);
 	m_adpcm_counter->rom_out_cb().set(FUNC(mermaid_state::adpcm_data_w));
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

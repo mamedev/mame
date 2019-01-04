@@ -1463,13 +1463,13 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(lucky74_state::lucky74)
-
+void lucky74_state::lucky74(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, C_06B49P_CLKOUT_03)    /* 3 MHz. */
-	MCFG_DEVICE_PROGRAM_MAP(lucky74_map)
-	MCFG_DEVICE_IO_MAP(lucky74_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lucky74_state,  nmi_interrupt) /* 60 Hz. measured */
+	Z80(config, m_maincpu, C_06B49P_CLKOUT_03);		/* 3 MHz. */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lucky74_state::lucky74_map);
+	m_maincpu->set_addrmap(AS_IO, &lucky74_state::lucky74_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(lucky74_state::nmi_interrupt));	/* 60 Hz. measured */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1495,13 +1495,13 @@ MACHINE_CONFIG_START(lucky74_state::lucky74)
 	ppi3.out_pc_callback().set(FUNC(lucky74_state::lamps_b_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lucky74_state, screen_update_lucky74)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 1*8, 30*8-1);
+	screen.set_screen_update(FUNC(lucky74_state::screen_update_lucky74));
+	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_lucky74);
 	PALETTE(config, "palette", FUNC(lucky74_state::lucky74_palette), 512);
@@ -1509,14 +1509,9 @@ MACHINE_CONFIG_START(lucky74_state::lucky74)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
-	MCFG_DEVICE_ADD("sn2", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
-	MCFG_DEVICE_ADD("sn3", SN76489, C_06B49P_CLKOUT_03)  /* 3 MHz. */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SN76489(config, "sn1", C_06B49P_CLKOUT_03).add_route(ALL_OUTPUTS, "mono", 0.80);	/* 3 MHz. */
+	SN76489(config, "sn2", C_06B49P_CLKOUT_03).add_route(ALL_OUTPUTS, "mono", 0.80);	/* 3 MHz. */
+	SN76489(config, "sn3", C_06B49P_CLKOUT_03).add_route(ALL_OUTPUTS, "mono", 0.80);	/* 3 MHz. */
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", C_06B49P_CLKOUT_04)); /* 1.5 MHz. */
 	aysnd.port_a_read_callback().set_ioport("IN3");
@@ -1524,12 +1519,11 @@ MACHINE_CONFIG_START(lucky74_state::lucky74)
 	aysnd.port_b_write_callback().set(FUNC(lucky74_state::ym2149_portb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.00);         /* not routed to audio hardware */
 
-	MCFG_DEVICE_ADD("msm", MSM5205, C_06B49P_CLKOUT_06)  /* 375 kHz. */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, lucky74_state, lucky74_adpcm_int))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, C_06B49P_CLKOUT_06);	/* 375 kHz. */
+	m_msm->vck_legacy_callback().set(FUNC(lucky74_state::lucky74_adpcm_int));	/* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8KHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
 
 /*************************

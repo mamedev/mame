@@ -341,26 +341,25 @@ void yunsung8_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(yunsung8_state::yunsung8)
-
+void yunsung8_state::yunsung8(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/2)           /* Z80B @ 8MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(port_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", yunsung8_state, irq0_line_assert)   /* No nmi routine */
+	Z80(config, m_maincpu, XTAL(16'000'000)/2);		/* Z80B @ 8MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &yunsung8_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &yunsung8_state::port_map);
+	m_maincpu->set_vblank_int("screen", FUNC(yunsung8_state::irq0_line_assert));	/* No nmi routine */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)          /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(16'000'000)/4);	/* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &yunsung8_state::sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2, 512, 64, 512-64, 262, 8, 256-8) /* TODO: completely inaccurate */
-	MCFG_SCREEN_UPDATE_DRIVER(yunsung8_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(16'000'000)/2, 512, 64, 512-64, 262, 8, 256-8); /* TODO: completely inaccurate */
+	screen.set_screen_update(FUNC(yunsung8_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yunsung8)
-	MCFG_PALETTE_ADD("palette", 2048)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_yunsung8);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -368,19 +367,19 @@ MACHINE_CONFIG_START(yunsung8_state::yunsung8)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(16'000'000)/4));
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	LS157(config, m_adpcm_select, 0);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, yunsung8_state, adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4KHz, 4 Bits */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, XTAL(400'000)); /* verified on pcb */
+	m_msm->vck_legacy_callback().set(FUNC(yunsung8_state::adpcm_int)); /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);	/* 4KHz, 4 Bits */
+	m_msm->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
+	m_msm->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+}
 
 
 /***************************************************************************

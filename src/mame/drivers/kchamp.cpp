@@ -404,18 +404,19 @@ void kchamp_state::machine_reset()
 	m_sound_nmi_enable = 0;
 }
 
-MACHINE_CONFIG_START(kchamp_state::kchampvs)
-
+void kchamp_state::kchampvs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)    /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(kchampvs_map)
-	MCFG_DEVICE_IO_MAP(kchampvs_io_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	Z80(config, m_maincpu, XTAL(12'000'000)/4);		/* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchampvs_map);
+	m_maincpu->set_addrmap(AS_IO, &kchamp_state::kchampvs_io_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &kchamp_state::decrypted_opcodes_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/4)    /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(kchampvs_sound_map)
-	MCFG_DEVICE_IO_MAP(kchampvs_sound_io_map)      /* irq's triggered from main cpu */
-										/* nmi's from msm5205 */
+	Z80(config, m_audiocpu, XTAL(12'000'000)/4);	/* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchampvs_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchampvs_sound_io_map);
+	/* IRQs triggered from main CPU */
+	/* NMIs from MSM5205 */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 8C
 	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flipscreen_w));
@@ -425,16 +426,16 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchampvs)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.10) /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchampvs)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, kchamp_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.10); /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(kchamp_state::screen_update_kchampvs));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(kchamp_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_kchamp)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kchamp);
 	PALETTE(config, m_palette, FUNC(kchamp_state::kchamp_palette), 256);
 
 	/* sound hardware */
@@ -444,35 +445,34 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	AY8910(config, m_ay[0], XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.3);    /* verified on pcb */
-
 	AY8910(config, m_ay[1], XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.3);    /* verified on pcb */
 
 	LS157(config, m_adpcm_select, 0); // at 4C
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 375000)  /* verified on pcb, discrete circuit clock */
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, kchamp_state, msmint))         /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 = 3906.25Hz playback */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 375000);  /* verified on pcb, discrete circuit clock */
+	m_msm->vck_callback().set(FUNC(kchamp_state::msmint));	/* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);	/* 1 / 96 = 3906.25Hz playback */
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 /********************
 * 1 Player Version  *
 ********************/
 
-MACHINE_CONFIG_START(kchamp_state::kchamp)
-
+void kchamp_state::kchamp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 12MHz / 4 = 3.0 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kchamp_map)
-	MCFG_DEVICE_IO_MAP(kchamp_io_map)
+	Z80(config, m_maincpu, XTAL(12'000'000)/4);		/* 12MHz / 4 = 3.0 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_map);
+	m_maincpu->set_addrmap(AS_IO, &kchamp_state::kchamp_io_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* 12MHz / 4 = 3.0 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kchamp_sound_map)
-	MCFG_DEVICE_IO_MAP(kchamp_sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(kchamp_state, sound_int,  125) /* Hz */
-											/* irq's triggered from main cpu */
-											/* nmi's from 125 Hz clock */
+	Z80(config, m_audiocpu, XTAL(12'000'000)/4);	/* 12MHz / 4 = 3.0 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchamp_sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_int), attotime::from_hz(125)); /* Hz */
+	/* IRQs triggered from main CPU */
+	/* NMIs from 125Hz clock */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC71
 	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flipscreen_w));
@@ -481,16 +481,16 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchamp)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchamp)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, kchamp_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(kchamp_state::screen_update_kchamp));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(kchamp_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_kchamp)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kchamp);
 	PALETTE(config, m_palette, FUNC(kchamp_state::kchamp_palette), 256);
 
 	/* sound hardware */
@@ -500,13 +500,14 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	AY8910(config, m_ay[0], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); /* Guess based on actual pcb recordings of karatedo */
-
 	AY8910(config, m_ay[1], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); /* Guess based on actual pcb recordings of karatedo */
 
-	MCFG_DEVICE_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // IC11
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC08(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // IC11
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 /***************************************************************************
