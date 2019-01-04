@@ -19,7 +19,6 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
-
 /***************************************************************************
 
     Fixed frequency monitor
@@ -31,7 +30,13 @@ DEFINE_DEVICE_TYPE(FIXFREQ, fixedfreq_device, "fixfreq", "Fixed-Frequency Monoch
 fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_video_interface(mconfig, *this, false),
-		m_htotal(0), m_vtotal(0), m_sync_signal(0), m_last_x(0), m_last_y(0), m_cur_bm(0),
+		m_htotal(0),
+		m_vtotal(0),
+		m_hscale(1),	// FIXME: this should be modified by static initialization
+		m_sync_signal(0),
+		m_last_x(0),
+		m_last_y(0),
+		m_cur_bm(0),
 		// default to NTSC "704x480@30i"
 		m_monitor_clock(13500000),
 		m_hvisible(704),
@@ -146,8 +151,8 @@ void fixedfreq_device::recompute_parameters()
 	m_vsync_filter_timeconst = (double) (m_monitor_clock) / (double) m_htotal * 1.0; // / (3.0 + 3.0);
 	LOG("trigger %f with len %f\n", m_vsync_threshold, 1e6 / m_vsync_filter_timeconst);
 
-	m_bitmap[0] = std::make_unique<bitmap_rgb32>(m_htotal, m_vtotal);
-	m_bitmap[1] = std::make_unique<bitmap_rgb32>(m_htotal, m_vtotal);
+	m_bitmap[0] = std::make_unique<bitmap_rgb32>(m_htotal * m_hscale, m_vtotal);
+	m_bitmap[1] = std::make_unique<bitmap_rgb32>(m_htotal * m_hscale, m_vtotal);
 
 	m_clock_period = 1.0 / m_monitor_clock;
 	update_screen_parameters(m_clock_period * m_vtotal * m_htotal);
@@ -156,13 +161,13 @@ void fixedfreq_device::recompute_parameters()
 void fixedfreq_device::update_screen_parameters(const time_type &refresh)
 {
 	rectangle visarea(
-			m_hbackporch - m_hfrontporch,
-			m_hbackporch - m_hfrontporch + m_hvisible - 1,
+			(m_hbackporch - m_hfrontporch) * m_hscale,
+			(m_hbackporch - m_hfrontporch + m_hvisible) * m_hscale - 1,
 			m_vbackporch - m_vfrontporch,
 			m_vbackporch - m_vfrontporch + m_vvisible - 1);
 
 	m_refresh_period = refresh;
-	screen().configure(m_htotal, m_vtotal, visarea, DOUBLE_TO_ATTOSECONDS(m_refresh_period));
+	screen().configure(m_htotal * m_hscale, m_vtotal, visarea, DOUBLE_TO_ATTOSECONDS(m_refresh_period));
 }
 
 void fixedfreq_device::update_sync_channel(const time_type &time, const double newval)
@@ -198,7 +203,7 @@ void fixedfreq_device::update_sync_channel(const time_type &time, const double n
 		/* TODO - time since last hsync and field detection */
 		LOG("HSYNC up %d\n", m_last_x);
 		// FIXME: pixels > 50 filters some spurious hysnc on line 27 in breakout
-		if (!m_sig_vsync && (m_last_x > 100))
+		if (!m_sig_vsync && (m_last_x > m_hscale * 100))
 		{
 			m_last_y += m_fieldcount;
 			m_last_x = 0;
@@ -218,7 +223,7 @@ void fixedfreq_device::update_sync_channel(const time_type &time, const double n
 
 void fixedfreq_device::update_bm(const time_type &time)
 {
-	const int pixels = round((time - m_line_time) / m_clock_period);
+	const int pixels = round((time - m_line_time) * m_hscale / m_clock_period);
 	const int has_fields = (m_fieldcount > 1) ? 1: 0;
 
 	bitmap_rgb32 *bm = m_bitmap[m_cur_bm].get();

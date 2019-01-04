@@ -124,6 +124,7 @@ private:
 
 	int m_htotal;
 	int m_vtotal;
+	int m_hscale;
 
 	double m_sync_signal;
 	rgb_t m_col;
