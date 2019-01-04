@@ -11,10 +11,11 @@
 		Some games have Checksums listed in the header area that appear to be
 		 like the byte checksums on the Radica games in vii.cpp, however the
 		 calculation doesn't add up correctly.  There is also a checksum in
-		 a footer area at the end of the ROM that does add up correctly in
-		 all cases except for the system BIOS, needless to say this is
-		 confusing.  The ROM carts are marked for 4MByte ROMs at least so
-		 the sizes SHOULD be correct.
+		 a footer area at the end of every ROM that does add up correctly in
+		 all cases.
+		 
+		 The ROM carts are marked for 4MByte ROMs at least so the sizes
+		 should be correct.
 
 		What type of SPG is this?
 
@@ -58,12 +59,6 @@ private:
 
 	DECLARE_READ16_MEMBER(rom_r);
 
-	DECLARE_READ16_MEMBER(unk9a90_r)
-	{
-		// HACK: return a RET so that out of bounds calls go back to where they came from
-		return 0x9a90;
-	};
-
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<spg2xx_device> m_spg;
@@ -99,17 +94,22 @@ DEVICE_IMAGE_LOAD_MEMBER(clickstart_state, cart)
 
 READ16_MEMBER(clickstart_state::rom_r)
 {
-	if (m_cart->exists())
-		return ((uint16_t*)m_cart_region->base())[offset];
+	if (offset < 0x400000 / 2)
+	{
+		if (m_cart->exists())
+			return ((uint16_t*)m_cart_region->base())[offset];
+		else
+			return ((uint16_t*)m_system_region->base())[offset];
+	}
 	else
+	{
 		return ((uint16_t*)m_system_region->base())[offset];
+	}
 }
 
 void clickstart_state::mem_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).r(FUNC(clickstart_state::rom_r));
-	map(0x200000, 0x3fffff).r(FUNC(clickstart_state::unk9a90_r)); // HACK, code jumps here in several places, is this a customized CPU with internal ROM area?
-
+	map(0x000000, 0x3fffff).r(FUNC(clickstart_state::rom_r));
 	map(0x000000, 0x003fff).m(m_spg, FUNC(spg2xx_device::map));
 }
 
@@ -145,10 +145,8 @@ void clickstart_state::clickstart(machine_config &config)
 }
 
 ROM_START( clikstrt )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "clickstartbios.bin", 0x000000, 0x400000, CRC(1d84d88d) SHA1(ea400136449254f0905a14193c6dc573d24413d1) )
-
-	// is there more missing BIOS data? CPU internal ROM?
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "clickstartbios.bin", 0x000000, 0x800000, CRC(7c833bd0) SHA1(2e9ef38e1a7582705920339e6b9944f6404fcf9b) )
 ROM_END
 
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
