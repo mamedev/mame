@@ -141,14 +141,14 @@ s8 nesapu_vt_device::vt3x_pcm(apu_vt_t::vt3x_pcm_t *ch) {
 		{
 			ch->phaseacc += freq;
 			u8 sample = m_rom_read_cb(ch->address);
-			logerror("pcm fetch %06x %d\n", ch->address, int(sample));
+			// logerror("pcm fetch %06x %d\n", ch->address, int(sample));
 			if (sample == 0xFF) {
 				ch->playing = false;
 				ch->enabled = false;
 			} else {
 				ch->address++;
 				ch->curr = s8((s8(sample - 128) * u16(ch->volume)) / 128);
-				logerror("scaled %d\n", int(ch->curr));
+				// logerror("scaled %d\n", int(ch->curr));
 			}
 		}
 		return ch->curr;
@@ -157,7 +157,7 @@ s8 nesapu_vt_device::vt3x_pcm(apu_vt_t::vt3x_pcm_t *ch) {
 }
 
 void nesapu_vt_device::reset_vt03_pcm(apu_vt_t::vt03_pcm_t *ch) {
-	logerror("reset vt03 pwm\n");
+	// logerror("reset vt03 pwm\n");
     ch->address = ((~m_apu_vt.extra_regs[0]) & 0x03) << 14 | m_apu_vt.vt03_pcm.regs[2] << 6;
     ch->remaining_bytes = m_apu_vt.vt03_pcm.regs[3] << 4;
     ch->length = m_apu_vt.vt03_pcm.regs[3] << 4;
@@ -246,7 +246,7 @@ uint8_t nesapu_vt_device::vt_apu_read(uint8_t address) {
 
 u8 nesapu_vt_device::read(offs_t address)
 {
-	logerror("nesapu_vt read %04x\n", 0x4000 + address);
+	// logerror("nesapu_vt read %04x\n", 0x4000 + address);
 	if (address <= 0x0F) {
 		return nesapu_device::read(address);
 	} else if (address >= 0x10 && address <= 0x13) {
@@ -266,7 +266,7 @@ u8 nesapu_vt_device::read(offs_t address)
 
 void nesapu_vt_device::write(offs_t address, u8 value)
 {
-	logerror("nesapu_vt write %04x %02x\n", 0x4000 + address, value);
+	// logerror("nesapu_vt write %04x %02x\n", 0x4000 + address, value);
 	if (address <= 0x0F) {
 		nesapu_device::write(address, value);
 	} else if (address >= 0x10 && address <= 0x13) {
