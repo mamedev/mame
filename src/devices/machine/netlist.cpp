@@ -131,7 +131,7 @@ public:
 		// avoid calls due to noise
 		if (std::fabs(cur - m_last) > 1e-6)
 		{
-			m_cpu_device->update_time_x();
+			m_cpu_device->update_icount();
 			m_callback(cur, m_cpu_device->local_time());
 			m_cpu_device->check_mame_abort_slice();
 			m_last = cur;
@@ -179,7 +179,7 @@ public:
 		// avoid calls due to noise
 		if (cur != m_last)
 		{
-			m_cpu_device->update_time_x();
+			m_cpu_device->update_icount();
 			m_callback(cur, m_cpu_device->local_time());
 			m_cpu_device->check_mame_abort_slice();
 			m_last = cur;
@@ -441,16 +441,15 @@ void netlist_mame_device::register_memregion_source(netlist::setup_t &setup, con
 
 void netlist_mame_analog_input_device::write(const double val)
 {
-	if (is_sound_device())
-	{
-		update_to_current_time();
-		m_param->setTo(val * m_mult + m_offset);
-	}
-	else
-	{
-		// FIXME: use device timer ....
-		m_param->setTo(val * m_mult + m_offset);
-	}
+	m_value_for_device_timer = val * m_mult + m_offset;
+	if (m_value_for_device_timer != (*m_param)())
+		synchronize(0, 0, &m_value_for_device_timer);
+}
+
+void netlist_mame_analog_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	update_to_current_time();
+	m_param->setTo(*((double *) ptr));
 }
 
 void netlist_mame_int_input_device::write(const uint32_t val)
@@ -469,15 +468,13 @@ void netlist_mame_logic_input_device::write(const uint32_t val)
 
 void netlist_mame_int_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (is_sound_device())
-		update_to_current_time();
+	update_to_current_time();
 	m_param->setTo(param);
 }
 
 void netlist_mame_logic_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (is_sound_device())
-		update_to_current_time();
+	update_to_current_time();
 	m_param->setTo(param);
 }
 
@@ -916,7 +913,7 @@ ATTR_COLD void netlist_mame_device::device_pre_save()
 	netlist().state().pre_save();
 }
 
-void netlist_mame_device::update_time_x()
+void netlist_mame_device::update_icount()
 {
 	const netlist::netlist_time newt(netlist().time());
 	const netlist::netlist_time delta(newt - m_old + m_rem);
@@ -1043,13 +1040,13 @@ ATTR_HOT void netlist_mame_cpu_device::execute_run()
 			m_genPC &= 255;
 			debugger_instruction_hook(m_genPC);
 			netlist().process_queue(m_div);
-			update_time_x();
+			update_icount();
 		}
 	}
 	else
 	{
 		netlist().process_queue(m_div * m_icount);
-		update_time_x();
+		update_icount();
 	}
 }
 
@@ -1089,11 +1086,9 @@ offs_t netlist_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 netlist_mame_sound_device::netlist_mame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: netlist_mame_device(mconfig, NETLIST_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_out{nullptr}
 	, m_in(nullptr)
 	, m_stream(nullptr)
 	, m_num_inputs(0)
-	, m_num_outputs(0)
 {
 }
 
@@ -1109,18 +1104,17 @@ void netlist_mame_sound_device::device_start()
 	if (outdevs.size() == 0)
 		fatalerror("No output devices");
 
-	m_num_outputs = outdevs.size();
+	//m_num_outputs = outdevs.size();
 
 	/* resort channels */
-	for (int i=0; i < MAX_OUT; i++) m_out[i] = nullptr;
-	for (int i=0; i < m_num_outputs; i++)
+	for (int i=0; i < outdevs.size(); i++)
 	{
 		int chan = outdevs[i]->m_channel();
 
 		netlist().log().verbose("Output %d on channel %d", i, chan);
 
-		if (chan < 0 || chan >= MAX_OUT || chan >= outdevs.size())
-			fatalerror("illegal channel number");
+		//if (chan < 0 || chan >= MAX_OUT || chan >= outdevs.size())
+		//	fatalerror("illegal channel number");
 		m_out[chan] = outdevs[i];
 		m_out[chan]->m_sample = netlist::netlist_time::from_hz(clock());
 		m_out[chan]->m_buffer = nullptr;
@@ -1142,7 +1136,7 @@ void netlist_mame_sound_device::device_start()
 	}
 
 	/* initialize the stream(s) */
-	m_stream = machine().sound().stream_alloc(*this, m_num_inputs, m_num_outputs, clock());
+	m_stream = machine().sound().stream_alloc(*this, m_num_inputs, m_out.size(), clock());
 
 }
 
@@ -1155,10 +1149,12 @@ void netlist_mame_sound_device::nl_register_devices()
 
 void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	for (int i=0; i < m_num_outputs; i++)
+
+	for (auto &e : m_out)
 	{
-		m_out[i]->m_buffer = outputs[i];
+		e.second->m_buffer = outputs[e.first];
 	}
+
 
 	if (m_num_inputs)
 		m_in->buffer_reset();
@@ -1174,9 +1170,9 @@ void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream
 
 	cur += (m_div * samples);
 
-	for (int i=0; i < m_num_outputs; i++)
+	for (auto &e : m_out)
 	{
-		m_out[i]->sound_update(cur);
-		m_out[i]->buffer_reset(cur);
+		e.second->sound_update(cur);
+		e.second->buffer_reset(cur);
 	}
 }
