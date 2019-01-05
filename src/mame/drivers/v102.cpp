@@ -127,6 +127,7 @@ void v102_state::v102(machine_config &config)
 	vpac.set_character_width(10); // 6 in 132-column mode
 	vpac.int_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	vpac.hs_callback().set(FUNC(v102_state::hs_w));
+	vpac.set_screen("screen");
 
 	EEPROM_2804(config, "eeprom");
 
