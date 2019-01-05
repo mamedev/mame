@@ -967,3 +967,8 @@ void unsp_device::execute_set_input(int irqline, int state)
 			break;
 	}
 }
+
+uint8_t unsp_device::get_csb()
+{
+	return 1 << ((UNSP_LPC >> 20) & 3);
+}

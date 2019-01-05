@@ -3,7 +3,7 @@
 /******************************************************************************
 
     Leapfrog Clickstart Emulation
-	
+
     Status:
 
         Calls to unmapped space
@@ -13,7 +13,7 @@
 		 calculation doesn't add up correctly.  There is also a checksum in
 		 a footer area at the end of every ROM that does add up correctly in
 		 all cases.
-		 
+
 		 The ROM carts are marked for 4MByte ROMs at least so the sizes
 		 should be correct.
 
@@ -59,10 +59,14 @@ private:
 
 	DECLARE_READ16_MEMBER(rom_r);
 
-	DECLARE_READ16_MEMBER(portc_r)
-	{
-		return machine().rand();
-	};
+	DECLARE_WRITE16_MEMBER(porta_w);
+	DECLARE_WRITE16_MEMBER(portb_w);
+	DECLARE_WRITE16_MEMBER(portc_w);
+	DECLARE_READ16_MEMBER(porta_r);
+	DECLARE_READ16_MEMBER(portb_r);
+	DECLARE_READ16_MEMBER(portc_r);
+
+	DECLARE_WRITE8_MEMBER(chip_sel_w);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -70,6 +74,8 @@ private:
 	required_device<generic_slot_device> m_cart;
 	required_memory_region m_system_region;
 	memory_region *m_cart_region;
+
+	uint16_t m_unk_portc_toggle;
 };
 
 
@@ -81,10 +87,13 @@ void clickstart_state::machine_start()
 		std::string region_tag;
 		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	}
+
+	save_item(NAME(m_unk_portc_toggle));
 }
 
 void clickstart_state::machine_reset()
 {
+	m_unk_portc_toggle = 0;
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(clickstart_state, cart)
@@ -110,6 +119,47 @@ READ16_MEMBER(clickstart_state::rom_r)
 	{
 		return ((uint16_t*)m_system_region->base())[offset];
 	}
+}
+
+WRITE16_MEMBER(clickstart_state::porta_w)
+{
+	logerror("%s: porta_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+}
+
+WRITE16_MEMBER(clickstart_state::portb_w)
+{
+	logerror("%s: portb_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+}
+
+WRITE16_MEMBER(clickstart_state::portc_w)
+{
+	//logerror("%s: portc_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+}
+
+READ16_MEMBER(clickstart_state::porta_r)
+{
+	uint16_t data = 0x5000;
+	logerror("%s: porta_r: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+READ16_MEMBER(clickstart_state::portb_r)
+{
+	logerror("%s: portb_r: %04x\n", machine().describe_context(), mem_mask);
+	return 0;
+}
+
+READ16_MEMBER(clickstart_state::portc_r)
+{
+	uint16_t data = m_unk_portc_toggle;
+	m_unk_portc_toggle ^= 0x0400;
+	//logerror("%s: portc_r: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+	return data;
+}
+
+WRITE8_MEMBER(clickstart_state::chip_sel_w)
+{
+	// Seems unused, currently
 }
 
 void clickstart_state::mem_map(address_map &map)
@@ -139,7 +189,14 @@ void clickstart_state::clickstart(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	m_spg->porta_out().set(FUNC(clickstart_state::porta_w));
+	m_spg->portb_out().set(FUNC(clickstart_state::portb_w));
+	m_spg->portc_out().set(FUNC(clickstart_state::portc_w));
+	m_spg->porta_in().set(FUNC(clickstart_state::porta_r));
+	m_spg->portb_in().set(FUNC(clickstart_state::portb_r));
 	m_spg->portc_in().set(FUNC(clickstart_state::portc_r));
+	m_spg->adc_in().set_constant(0x0fff);
+	m_spg->chip_select().set(FUNC(clickstart_state::chip_sel_w));
 	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 

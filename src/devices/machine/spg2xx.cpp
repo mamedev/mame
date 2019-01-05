@@ -48,7 +48,7 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 #define LOG_PPU             (LOG_PPU_READS | LOG_PPU_WRITES | LOG_UNKNOWN_PPU)
 #define LOG_ALL             (LOG_IO | LOG_SPU | LOG_PPU | LOG_VLINES | LOG_SEGMENT)
 
-#define VERBOSE             (LOG_UART | LOG_UNKNOWN_IO)
+#define VERBOSE             (LOG_IO_READS | LOG_IO_WRITES | LOG_UART | LOG_UNKNOWN_IO | LOG_I2C)
 #include "logmacro.h"
 
 #define SPG_DEBUG_VIDEO     (0)
@@ -68,6 +68,7 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 	, m_porta_in(*this)
 	, m_portb_in(*this)
 	, m_portc_in(*this)
+	, m_adc_in(*this)
 	, m_eeprom_w(*this)
 	, m_eeprom_r(*this)
 	, m_uart_tx(*this)
@@ -109,6 +110,7 @@ void spg2xx_device::device_start()
 	m_porta_in.resolve_safe(0);
 	m_portb_in.resolve_safe(0);
 	m_portc_in.resolve_safe(0);
+	m_adc_in.resolve_safe(0x0fff);
 	m_eeprom_w.resolve_safe();
 	m_eeprom_r.resolve_safe(0);
 	m_uart_tx.resolve_safe();
@@ -131,9 +133,60 @@ void spg2xx_device::device_start()
 	m_uart_rx_timer = timer_alloc(TIMER_UART_RX);
 	m_uart_rx_timer->adjust(attotime::never);
 
+	m_4khz_timer = timer_alloc(TIMER_4KHZ);
+	m_4khz_timer->adjust(attotime::never);
+
 	m_stream = stream_alloc(0, 2, 44100);
 
 	m_channel_debug = -1;
+
+	save_item(NAME(m_hide_page0));
+	save_item(NAME(m_hide_page1));
+	save_item(NAME(m_hide_sprites));
+	save_item(NAME(m_debug_sprites));
+	save_item(NAME(m_debug_blit));
+	save_item(NAME(m_sprite_index_to_debug));
+
+	save_item(NAME(m_debug_samples));
+	save_item(NAME(m_debug_rates));
+
+	save_item(NAME(m_audio_regs));
+	save_item(NAME(m_sample_shift));
+	save_item(NAME(m_sample_count));
+	save_item(NAME(m_sample_addr));
+	save_item(NAME(m_channel_rate));
+	save_item(NAME(m_channel_rate_accum));
+	save_item(NAME(m_rampdown_frame));
+	save_item(NAME(m_envclk_frame));
+	save_item(NAME(m_envelope_addr));
+	save_item(NAME(m_channel_debug));
+	save_item(NAME(m_audio_curr_beat_base_count));
+
+	save_item(NAME(m_io_regs));
+	save_item(NAME(m_uart_rx_fifo));
+	save_item(NAME(m_uart_rx_fifo_start));
+	save_item(NAME(m_uart_rx_fifo_end));
+	save_item(NAME(m_uart_rx_fifo_count));
+	save_item(NAME(m_uart_rx_available));
+	save_item(NAME(m_uart_rx_irq));
+	save_item(NAME(m_uart_tx_irq));
+
+	save_item(NAME(m_extint));
+
+	save_item(NAME(m_video_regs));
+	save_item(NAME(m_sprite_limit));
+	save_item(NAME(m_pal_flag));
+
+	save_item(NAME(m_2khz_divider));
+	save_item(NAME(m_1khz_divider));
+	save_item(NAME(m_4hz_divider));
+
+	save_item(NAME(m_uart_baud_rate));
+	for (int i = 0; i < 16; i++)
+	{
+		save_item(NAME(m_adpcm[i].m_signal), i);
+		save_item(NAME(m_adpcm[i].m_step), i);
+	}
 }
 
 void spg2xx_device::device_reset()
@@ -181,6 +234,12 @@ void spg2xx_device::device_reset()
 	m_audio_regs[AUDIO_CHANNEL_ENV_MODE] = 0x3f;
 
 	m_audio_beat->adjust(attotime::from_ticks(4, 281250), 0, attotime::from_ticks(4, 281250));
+
+	m_4khz_timer->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
+
+	m_2khz_divider = 0;
+	m_1khz_divider = 0;
+	m_4hz_divider = 0;
 }
 
 
@@ -880,7 +939,7 @@ READ16_MEMBER(spg2xx_device::io_r)
 
 	case 0x27: // ADC Data
 		m_io_regs[0x27] = 0;
-		LOGMASKED(LOG_IO_READS, "io_r: ADC Data = %04x\n", val);
+		LOGMASKED(LOG_IO_READS, "%s: io_r: ADC Data = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x29: // Wakeup Source
@@ -1206,17 +1265,17 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 
 	case 0x25: // ADC Control
 	{
-		LOGMASKED(LOG_IO_WRITES, "io_w: ADC Control = %04x\n", data);
-		//const uint16_t changed = m_io_regs[offset] ^ data;
+		LOGMASKED(LOG_IO_WRITES, "%s: io_w: ADC Control = %04x\n", machine().describe_context(), data);
+		const uint16_t changed = m_io_regs[offset] ^ data;
 		m_io_regs[offset] = data;
-		//if (BIT(changed, 12) && BIT(data, 12) && !BIT(m_io_regs[offset], 1))
+		if (BIT(changed, 12) && BIT(data, 12) && !BIT(m_io_regs[offset], 1))
 		{
-			//m_io_regs[0x27] = 0x80ff;
-			//const uint16_t old = IO_IRQ_STATUS;
-			//IO_IRQ_STATUS |= 0x2000;
-			//const uint16_t changed = IO_IRQ_STATUS ^ old;
-			//if (changed)
-				//check_irqs(changed);
+			m_io_regs[0x27] = 0x8000 | (m_adc_in() & 0x7fff);
+			const uint16_t old = IO_IRQ_STATUS;
+			IO_IRQ_STATUS |= 0x2000;
+			const uint16_t changed = IO_IRQ_STATUS ^ old;
+			if (changed)
+				check_irqs(changed);
 		}
 		break;
 	}
@@ -1469,7 +1528,49 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		case TIMER_UART_RX:
 			uart_receive_tick();
 			break;
+
+		case TIMER_4KHZ:
+			system_timer_tick();
+			break;
 	}
+}
+
+void spg2xx_device::system_timer_tick()
+{
+	uint16_t check_mask = 0x0040;
+	IO_IRQ_STATUS |= 0x0040;
+
+	if (machine().input().code_pressed_once(KEYCODE_H))
+	{
+		IO_IRQ_STATUS |= 0x4000;
+		check_irqs(0x4000);
+	}
+
+	m_2khz_divider++;
+	if (m_2khz_divider == 2)
+	{
+		m_2khz_divider = 0;
+		IO_IRQ_STATUS |= 0x0020;
+		check_mask |= 0x0020;
+
+		m_1khz_divider++;
+		if (m_1khz_divider == 2)
+		{
+			m_1khz_divider = 0;
+			IO_IRQ_STATUS |= 0x0010;
+			check_mask |= 0x0010;
+
+			m_4hz_divider++;
+			if (m_4hz_divider == 256)
+			{
+				m_4hz_divider = 0;
+				IO_IRQ_STATUS |= 0x0008;
+				check_mask |= 0x0008;
+			}
+		}
+	}
+
+	check_irqs(check_mask);
 }
 
 void spg2xx_device::uart_transmit_tick()
@@ -1583,6 +1684,31 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 	}
 }
 
+uint16_t spg2xx_device::do_special_gpio(uint32_t index, uint16_t mask)
+{
+	uint16_t data = 0;
+	switch (index)
+	{
+		case 0: // Port A
+			if (mask & 0xe000)
+			{
+				const uint8_t csel = m_cpu->get_csb() & 0x0e;
+				data = (csel << 12) & mask;
+			}
+			break;
+		case 1: // Port B
+			// To do
+			break;
+		case 2: // Port C
+			// To do
+			break;
+		default:
+			// Can't happen
+			break;
+	}
+	return data;
+}
+
 void spg2xx_device::do_gpio(uint32_t offset)
 {
 	uint32_t index = (offset - 1) / 5;
@@ -1592,10 +1718,12 @@ void spg2xx_device::do_gpio(uint32_t offset)
 	uint16_t special = m_io_regs[5 * index + 5];
 
 	uint16_t push = dir;
-	uint16_t pull = (~dir) & (~attr);
+	uint16_t pull = ~dir;
 	uint16_t what = (buffer & (push | pull));
 	what ^= (dir & ~attr);
 	what &= ~special;
+	//if (index == 0)
+		//printf("buf:%04x, dir:%04x, pull:%04x, push:%04x\n", buffer, dir, pull, push);
 
 	switch (index)
 	{
@@ -1613,6 +1741,7 @@ void spg2xx_device::do_gpio(uint32_t offset)
 			break;
 	}
 
+	what |= do_special_gpio(index, special);
 	m_io_regs[5 * index + 1] = what;
 }
 
