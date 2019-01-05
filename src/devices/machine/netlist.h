@@ -234,7 +234,6 @@ private:
 	std::map<int, nld_sound_out *> m_out;
 	nld_sound_in *m_in;
 	sound_stream *m_stream;
-	int m_num_inputs;
 };
 
 // ----------------------------------------------------------------------------------------
