@@ -3616,6 +3616,7 @@ files {
 	MAME_DIR .. "src/mame/audio/socrates.h",
 	MAME_DIR .. "src/mame/drivers/inteladv.cpp",
 	MAME_DIR .. "src/mame/drivers/vsmile.cpp",
+	MAME_DIR .. "src/mame/drivers/clickstart.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "wang")
