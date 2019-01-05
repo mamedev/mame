@@ -69,6 +69,8 @@ public:
 
 	void uart_rx(uint8_t data);
 
+	void extint_w(int channel, bool state);
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 
@@ -395,6 +397,8 @@ protected:
 	static const device_timer_id TIMER_TMB2 = 1;
 	static const device_timer_id TIMER_SCREENPOS = 2;
 	static const device_timer_id TIMER_BEAT = 3;
+	static const device_timer_id TIMER_UART_TX = 4;
+	static const device_timer_id TIMER_UART_RX = 5;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -403,6 +407,9 @@ protected:
 	void update_porta_special_modes();
 	void update_portb_special_modes();
 	void do_gpio(uint32_t offset);
+
+	void uart_transmit_tick();
+	void uart_receive_tick();
 
 	void do_i2c();
 	void do_cpu_dma(uint32_t len);
@@ -461,6 +468,10 @@ protected:
 	uint8_t m_uart_rx_fifo_end;
 	uint8_t m_uart_rx_fifo_count;
 	bool m_uart_rx_available;
+	bool m_uart_rx_irq;
+	bool m_uart_tx_irq;
+
+	bool m_extint[2];
 
 	uint16_t m_video_regs[0x100];
 	size_t m_sprite_limit;
@@ -484,6 +495,10 @@ protected:
 	emu_timer *m_tmb2;
 	emu_timer *m_screenpos_timer;
 	emu_timer *m_audio_beat;
+
+	uint32_t m_uart_baud_rate;
+	emu_timer *m_uart_tx_timer;
+	emu_timer *m_uart_rx_timer;
 
 	sound_stream *m_stream;
 	oki_adpcm_state m_adpcm[16];

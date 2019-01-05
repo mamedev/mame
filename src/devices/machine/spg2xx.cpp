@@ -125,6 +125,12 @@ void spg2xx_device::device_start()
 	m_audio_beat = timer_alloc(TIMER_BEAT);
 	m_audio_beat->adjust(attotime::never);
 
+	m_uart_tx_timer = timer_alloc(TIMER_UART_TX);
+	m_uart_tx_timer->adjust(attotime::never);
+
+	m_uart_rx_timer = timer_alloc(TIMER_UART_RX);
+	m_uart_rx_timer->adjust(attotime::never);
+
 	m_stream = stream_alloc(0, 2, 44100);
 
 	m_channel_debug = -1;
@@ -151,6 +157,10 @@ void spg2xx_device::device_reset()
 	m_uart_rx_fifo_start = 0;
 	m_uart_rx_fifo_end = 0;
 	m_uart_rx_fifo_count = 0;
+	m_uart_tx_irq = false;
+	m_uart_rx_irq = false;
+
+	memset(m_extint, 0, sizeof(bool) * 2);
 
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
@@ -808,28 +818,13 @@ void spg2xx_device::check_video_irq()
 
 void spg2xx_device::uart_rx(uint8_t data)
 {
-	if (!m_uart_rx_available)
-	{
-		if (BIT(m_io_regs[0x30], 6))
-		{
-			m_io_regs[0x36] = data;
-			if (BIT(m_io_regs[0x30], 0))
-			{
-				IO_IRQ_STATUS |= 0x0100;
-				check_irqs(0x0100);
-			}
-			m_uart_rx_available = true;
-		}
-	}
-	else if (m_uart_rx_fifo_count == ARRAY_LENGTH(m_uart_rx_fifo))
-	{
-		m_io_regs[0x37] |= 0x4000;
-	}
-	else
+	LOGMASKED(LOG_UART, "uart_rx: Pulling %02x into receive FIFO\n", data);
+	if (BIT(m_io_regs[0x30], 6))
 	{
 		m_uart_rx_fifo[m_uart_rx_fifo_end] = data;
 		m_uart_rx_fifo_end = (m_uart_rx_fifo_end + 1) % ARRAY_LENGTH(m_uart_rx_fifo);
 		m_uart_rx_fifo_count++;
+		m_uart_rx_timer->adjust(attotime::from_ticks(BIT(m_io_regs[0x30], 5) ? 11 : 10, m_uart_baud_rate));
 	}
 }
 
@@ -911,7 +906,6 @@ READ16_MEMBER(spg2xx_device::io_r)
 		break;
 
 	case 0x31: // UART Status
-		val |= (m_uart_rx_available ? 0x81 : 0);
 		LOGMASKED(LOG_UART, "io_r: UART Status = %04x\n", val);
 		break;
 
@@ -923,9 +917,15 @@ READ16_MEMBER(spg2xx_device::io_r)
 				m_io_regs[0x36] = m_uart_rx_fifo[m_uart_rx_fifo_start];
 				m_uart_rx_fifo_start = (m_uart_rx_fifo_start + 1) % ARRAY_LENGTH(m_uart_rx_fifo);
 				m_uart_rx_fifo_count--;
+				if (m_uart_rx_fifo_count == 0)
+				{
+					m_io_regs[0x31] &= ~0x0081;
+					m_uart_rx_available = false;
+				}
 			}
 			else
 			{
+				m_io_regs[0x31] &= ~0x0081;
 				m_uart_rx_available = false;
 			}
 		}
@@ -1146,7 +1146,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 
 	case 0x21: // IRQ Enable
 	{
-		LOGMASKED(LOG_IRQS, "io_w: IRQ Enable = %04x\n", data);
+		LOGMASKED(LOG_UART, "io_w: IRQ Enable = %04x\n", data);
 		const uint16_t old = IO_IRQ_ENABLE & IO_IRQ_STATUS;
 		m_io_regs[offset] = data;
 		const uint16_t changed = old ^ (IO_IRQ_ENABLE & IO_IRQ_STATUS);
@@ -1282,16 +1282,40 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 			m_uart_rx_available = false;
 			m_io_regs[0x36] = 0;
 		}
-		if (BIT(changed, 7) && BIT(data, 7))
+		if (BIT(changed, 7))
 		{
-			m_io_regs[0x31] |= 0x0002;
+			if (BIT(data, 7))
+			{
+				m_io_regs[0x31] |= 0x0002;
+			}
+			else
+			{
+				m_io_regs[0x31] &= ~0x0042;
+				m_uart_tx_timer->adjust(attotime::never);
+			}
 		}
 		break;
 	}
 
 	case 0x31: // UART Status
 		LOGMASKED(LOG_UART, "io_w: UART Status = %04x\n", data);
-		m_io_regs[offset] &= ~data;
+		if (BIT(data, 0))
+		{
+			m_io_regs[0x31] &= ~1;
+			m_uart_rx_irq = false;
+		}
+		if (BIT(data, 1))
+		{
+			m_io_regs[0x31] &= ~2;
+			m_uart_tx_irq = false;
+		}
+		if (!m_uart_rx_irq && !m_uart_tx_irq)
+		{
+			const uint16_t old = IO_IRQ_STATUS;
+			IO_IRQ_STATUS &= ~0x0100;
+			if (IO_IRQ_STATUS != old)
+				check_irqs(0x0100);
+		}
 		break;
 
 	case 0x33: // UART Baud Rate (low byte)
@@ -1300,14 +1324,20 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		m_io_regs[offset] = data;
 		const uint32_t divisor = 16 * (0x10000 - ((m_io_regs[0x34] << 8) | m_io_regs[0x33]));
 		LOGMASKED(LOG_UART, "io_w: UART Baud Rate (%s byte): Baud rate = %d\n", offset == 0x33 ? "low" : "high", 27000000 / divisor);
+		m_uart_baud_rate = 27000000 / divisor;
 		break;
 	}
 
 	case 0x35: // UART TX Data
 		LOGMASKED(LOG_UART, "io_w: UART Tx Data = %02x\n", data & 0x00ff);
 		m_io_regs[offset] = data;
-		m_uart_tx((uint8_t)data);
-		m_io_regs[0x31] |= 2;
+		if (BIT(m_io_regs[0x30], 7))
+		{
+			LOGMASKED(LOG_UART, "io_w: UART Tx: Clearing ready bit, setting busy bit, setting up timer\n");
+			m_uart_tx_timer->adjust(attotime::from_ticks(BIT(m_io_regs[0x30], 5) ? 11 : 10, m_uart_baud_rate));
+			m_io_regs[0x31] &= ~0x0002;
+			m_io_regs[0x31] |= 0x0040;
+		}
 		break;
 
 	case 0x36: // UART RX Data
@@ -1429,9 +1459,75 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		}
 
 		case TIMER_BEAT:
-		{
 			audio_frame_tick();
 			break;
+
+		case TIMER_UART_TX:
+			uart_transmit_tick();
+			break;
+
+		case TIMER_UART_RX:
+			uart_receive_tick();
+			break;
+	}
+}
+
+void spg2xx_device::uart_transmit_tick()
+{
+	LOGMASKED(LOG_UART, "uart_transmit_tick: Transmitting %02x, setting TxReady, clearing TxBusy\n", (uint8_t)m_io_regs[0x35]);
+	m_uart_tx((uint8_t)m_io_regs[0x35]);
+	m_io_regs[0x31] |= 0x0002;
+	m_io_regs[0x31] &= ~0x0040;
+	if (BIT(m_io_regs[0x30], 1))
+	{
+		const uint16_t old = IO_IRQ_STATUS;
+		IO_IRQ_STATUS |= 0x0100;
+		m_uart_tx_irq = true;
+		LOGMASKED(LOG_UART, "uart_transmit_tick: Setting UART IRQ bit\n");
+		if (IO_IRQ_STATUS != old)
+		{
+			LOGMASKED(LOG_UART, "uart_transmit_tick: Bit newly set, checking IRQs\n");
+			check_irqs(0x0100);
+		}
+	}
+}
+
+void spg2xx_device::uart_receive_tick()
+{
+	LOGMASKED(LOG_UART, "uart_receive_tick: Setting RBF and RxRDY\n");
+	m_io_regs[0x31] |= 0x81;
+	m_io_regs[0x36] = m_uart_rx_fifo[m_uart_rx_fifo_start];
+	m_uart_rx_fifo_start = (m_uart_rx_fifo_start + 1) % ARRAY_LENGTH(m_uart_rx_fifo);
+	m_uart_rx_fifo_count--;
+	m_uart_rx_available = true;
+	if (BIT(m_io_regs[0x30], 0))
+	{
+		LOGMASKED(LOG_UART, "uart_receive_tick: RxIntEn is set, setting rx_irq to true and setting UART IRQ\n");
+		m_uart_rx_irq = true;
+		IO_IRQ_STATUS |= 0x0100;
+		check_irqs(0x0100);
+	}
+}
+
+void spg2xx_device::extint_w(int channel, bool state)
+{
+	logerror("Setting extint channel %d to %s\n", channel, state ? "true" : "false");
+	bool old = m_extint[channel];
+	m_extint[channel] = state;
+	if (old != state)
+	{
+		logerror("extint state changed, so %sing interrupt\n", state ? "rais" : "lower");
+		const uint16_t mask = (channel == 0) ? 0x0200 : 0x1000;
+		const uint16_t old_irq = IO_IRQ_STATUS;
+		if (state)
+			IO_IRQ_STATUS |= mask;
+		else
+			IO_IRQ_STATUS &= ~mask;
+
+		if (old_irq != IO_IRQ_STATUS)
+		{
+			logerror("extint IRQ changed, so checking interrupts\n");
+			check_irqs(mask);
 		}
 	}
 }
@@ -1444,13 +1540,13 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 
 	if (changed & 0x0c00) // Timer A, Timer B IRQ
 	{
-		LOGMASKED(LOG_IRQS, "%ssserting IRQ2 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b));
+		LOGMASKED(LOG_IRQS, "%ssserting IRQ2 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00));
 		m_cpu->set_input_line(UNSP_IRQ2_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & 0x2100) // UART, ADC IRQ
 	{
-		LOGMASKED(LOG_IRQS, "%ssserting IRQ3 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b));
+		LOGMASKED(LOG_UART, "%ssserting IRQ3 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100));
 		m_cpu->set_input_line(UNSP_IRQ3_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
@@ -1470,13 +1566,13 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 
 	if (changed & 0x1200) // External IRQ
 	{
-		LOGMASKED(LOG_IRQS, "%ssserting IRQ5 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b));
+		LOGMASKED(LOG_UART, "%ssserting IRQ5 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200));
 		m_cpu->set_input_line(UNSP_IRQ5_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & 0x0070) // 1024Hz, 2048Hz, 4096Hz IRQ
 	{
-		LOGMASKED(LOG_IRQS, "%ssserting IRQ6 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b));
+		LOGMASKED(LOG_IRQS, "%ssserting IRQ6 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070));
 		m_cpu->set_input_line(UNSP_IRQ6_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
