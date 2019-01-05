@@ -9,7 +9,6 @@ Skeleton driver for Visual 102 display terminal.
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/mcs48/mcs48.h"
 #include "machine/eeprompar.h"
 #include "machine/input_merger.h"
 #include "machine/i8251.h"
@@ -20,6 +19,8 @@ Skeleton driver for Visual 102 display terminal.
 #include "video/crt9007.h"
 //#include "video/crt9021.h"
 #include "screen.h"
+
+#include "machine/v102_kbd.h"
 
 class v102_state : public driver_device
 {
@@ -131,6 +132,7 @@ void v102_state::v102(machine_config &config)
 
 	UPD7201_NEW(config, m_mpsc, 18.575_MHz_XTAL / 5); // divider not verified
 	m_mpsc->out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_mpsc->out_txda_callback().set("keyboard", FUNC(v102_keyboard_device::write_rxd));
 	m_mpsc->out_txdb_callback().set("aux", FUNC(rs232_port_device::write_txd));
 	m_mpsc->out_dtrb_callback().set("aux", FUNC(rs232_port_device::write_dtr));
 	m_mpsc->out_rtsb_callback().set("aux", FUNC(rs232_port_device::write_rts));
@@ -154,8 +156,8 @@ void v102_state::v102(machine_config &config)
 
 	I8255(config, "ppi");
 
-	mcs48_cpu_device &kbdcpu(I8039(config, "kbdcpu", 4.608_MHz_XTAL)); // oscillator marked "4608 - 300 107 - KSS4D"
-	kbdcpu.set_addrmap(AS_PROGRAM, &v102_state::kbd_map);
+	v102_keyboard_device &keyboard(V102_KEYBOARD(config, "keyboard"));
+	keyboard.txd_callback().set(m_mpsc, FUNC(upd7201_new_device::rxa_w));
 
 	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	modem.rxd_handler().set("usart", FUNC(i8251_device::write_rxd));
@@ -183,9 +185,6 @@ ROM_START( v102 )
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "260-001.u50", 0x0000, 0x1000, CRC(732f5b99) SHA1(d105bf9f3ed41109d7181bcf0223bb280afe3f0a) )
-
-	ROM_REGION(0x0800, "keyboard", 0)
-	ROM_LOAD( "150.kbd",     0x0000, 0x0800, CRC(afe55cff) SHA1(b26ebdde63ec0e94c08780285def39a282e128b3) )
 ROM_END
 
 COMP( 1984, v102, 0, 0, v102, v102, v102_state, empty_init, "Visual Technology", "Visual 102", MACHINE_IS_SKELETON )
