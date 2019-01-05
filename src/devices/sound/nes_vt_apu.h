@@ -25,7 +25,7 @@
 	engineering this.
 	0x4031,
 	0x4032: select channel 1 or 2 respectively and set volume
-	0x4033: bit 7: global enable, bit 4: ch1 enable, bit3: ch0 enable
+	0x4033: bit 7: global enable, bit 4: ch1 enable, bit3: ch2 enable
 	0x4012: set start address bits 13..6 of selected channel
 	0x4035: set start address bits 20..14 of selected channel
 	0x4036: set start address bits 24..21 of selected channel, and start playing
@@ -43,7 +43,7 @@
 // In "enhanced PCM" mode, direct ROM reads are needed and implemented using
 // this callback
 #define MCFG_NES_VT_APU_ROM_READ_CALLBACK(_devcb) \
-	devcb = downcast<nesapu_device &>(*device).set_rom_read_callback(DEVCB_##_devcb);
+	downcast<nesapu_vt_device &>(*device).set_rom_read_callback(DEVCB_##_devcb);
 
 struct apu_vt_t {
 	struct vt03_pcm_t
@@ -71,10 +71,13 @@ struct apu_vt_t {
 				elem = 0;
 		}
 
+		uint8_t rate = 0;
+		float phaseacc = 0.0;
 		uint32_t address = 0;
 		uint8_t volume = 0;
 		bool enabled = false, playing = false;
 		uint8_t regs[4];
+		int8_t curr = 0;
 	};
 
 	uint8_t extra_regs[7]; //4030 .. 4037
@@ -106,7 +109,7 @@ public:
 	nesapu_vt_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	template <class Object> devcb_base &set_rom_read_callback(device_t &device, Object &&cb) { return m_rom_read_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rom_read_callback(Object &&cb) { return m_rom_read_cb.set_callback(std::forward<Object>(cb)); }
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 

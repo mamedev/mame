@@ -26,16 +26,18 @@ nesapu_vt_device::nesapu_vt_device(const machine_config &mconfig, const char *ta
 void nesapu_vt_device::device_start()
 {
 	apu_init();
+	m_rom_read_cb.resolve_safe(0x00);
 
 	if(!m_xop2->started())
 		throw device_missing_dependencies();
 	for (int i = 0; i < 2; i++)
 	{
-		save_item(NAME(m_apu_vt.vt33_pcm[i].regs), i);
 		save_item(NAME(m_apu_vt.vt33_pcm[i].address), i);
 		save_item(NAME(m_apu_vt.vt33_pcm[i].volume), i);
 		save_item(NAME(m_apu_vt.vt33_pcm[i].enabled), i);
 		save_item(NAME(m_apu_vt.vt33_pcm[i].playing), i);
+		save_item(NAME(m_apu_vt.vt33_pcm[i].phaseacc), i);
+		save_item(NAME(m_apu_vt.vt33_pcm[i].curr), i);
 	}
 
 	save_item(NAME(m_apu_vt.vt03_pcm.phaseacc));
@@ -127,23 +129,26 @@ s8 nesapu_vt_device::vt03_pcm(apu_vt_t::vt03_pcm_t *ch) {
 
 s8 nesapu_vt_device::vt3x_pcm(apu_vt_t::vt3x_pcm_t *ch) {
 	if (ch->enabled && ch->playing) {
-		uint8_t sample = m_rom_read_cb(ch->address);
-		if (sample == 0xFF) {
-			ch->playing = false;
-		} else {
-			ch->address++;
-			return s8(s8(sample) * s16(ch->volume) / 255);
+		const int freq = 0x6F;
+		ch->phaseacc -= 4;
+		while (ch->phaseacc < 0)
+		{
+			ch->phaseacc += freq;
+			u8 sample = m_rom_read_cb(ch->address);
+			logerror("pcm fetch %06x %d\n", ch->address, int(sample));
+			if (sample == 0xFF) {
+				ch->playing = false;
+				ch->enabled = false;
+			} else {
+				ch->address++;
+				ch->curr = s8((s8(sample - 128) * u16(ch->volume)) / 128);
+				logerror("scaled %d\n", int(ch->curr));
+			}
 		}
+		return ch->curr;
 	}
 	return 0;
 }
-
-void nesapu_vt_device::start_vt3x_pcm(apu_vt_t::vt3x_pcm_t *ch) {
-	ch->enabled = true;
-	ch->playing = true;
-	ch->address = (uint32_t(ch->regs[3] & 0x0F) << 21) | (uint32_t(ch->regs[2] & 0x7F) << 14) || (uint32_t(ch->regs[1]) << 6);
-}
-
 
 void nesapu_vt_device::reset_vt03_pcm(apu_vt_t::vt03_pcm_t *ch) {
 	logerror("reset vt03 pwm\n");
@@ -162,8 +167,9 @@ void nesapu_vt_device::vt_apu_write(uint8_t address, uint8_t data) {
         m_apu_vt.extra_regs[0x05] = data;
     } else if (address >= 0x10 && address <= 0x13) {
         m_apu_vt.vt03_pcm.regs[address - 0x10] = data;
-		if (m_apu_vt.use_vt3x_pcm && address == 0x12) {
-			m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].regs[1] = data;
+		if (m_apu_vt.use_vt3x_pcm && (address == 0x12) && !m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].enabled) {
+			m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].address &= ~(0xFF << 6);
+			m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].address |= (data << 6);
 		}
 	} else if(address >= 0x30 && address <= 0x36) {
         if (address == 0x30) {
@@ -175,16 +181,16 @@ void nesapu_vt_device::vt_apu_write(uint8_t address, uint8_t data) {
 		} else if (address == 0x31) {
 			m_apu_vt.vt3x_sel_channel = 0;
 			m_apu_vt.vt33_pcm[0].volume = data;
-			m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].regs[0] = data;
 		} else if (address == 0x32) {
 			m_apu_vt.vt3x_sel_channel = 1;
 			m_apu_vt.vt33_pcm[1].volume = data;
-			m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].regs[0] = data;
-		} else if (address == 0x35) {
-			m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].regs[2] = data;
-		} else if (address == 0x36) {
-			m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].regs[3] = data;
-			start_vt3x_pcm(&(m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel]));
+		} else if (address == 0x35 && !m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].enabled) {
+			m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].address &= ~(0x7F << 14);
+			m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].address |= ((data & 0x7F) << 14);
+		} else if (address == 0x36 && !m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].enabled) {
+			m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].address &= ~(0xFF << 21);
+			m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].address |= (data << 21);
+			m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].playing = true;
 		}
 
 		m_apu_vt.extra_regs[address - 0x30] = data;
@@ -206,6 +212,7 @@ void nesapu_vt_device::vt_apu_write(uint8_t address, uint8_t data) {
 }
 
 uint8_t nesapu_vt_device::vt_apu_read(uint8_t address) {
+
 	if(address >= 0x30 && address <= 0x36)
 	{
 		return m_apu_vt.extra_regs[address - 0x30];
@@ -228,6 +235,7 @@ uint8_t nesapu_vt_device::vt_apu_read(uint8_t address) {
 
 u8 nesapu_vt_device::read(offs_t address)
 {
+	logerror("nesapu_vt read %04x\n", 0x4000 + address);
 	if (address <= 0x0F) {
 		return nesapu_device::read(address);
 	} else if (address >= 0x10 && address <= 0x13) {
