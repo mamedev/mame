@@ -24,13 +24,16 @@ void device_network_interface::interface_pre_start()
 
 int device_network_interface::send(u8 *buf, int len) const
 {
-	if(!m_dev) return 0;
-
 	// TODO: enable this check when other devices implement delayed transmit
 	//assert_always(!m_send_timer->enabled(), "attempted to transmit while transmit already in progress");
 
-	// send the data
-	int result = m_dev->send(buf, len);
+	int result = 0;
+
+	if (m_dev)
+	{
+		// send the data
+		result = m_dev->send(buf, len);
+	}
 
 	// schedule transmit complete callback
 	m_send_timer->adjust(attotime::from_ticks(len, m_bandwidth * 1'000'000 / 8), result);
