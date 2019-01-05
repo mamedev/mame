@@ -1008,10 +1008,10 @@ CONS( 2005, jak_just, 0, 0, walle, jak_gkr,spg2xx_game_state, empty_init, "JAKKS
 // Nicktoons                                   NK (3 keys available)
 // Disney                                      DY (3? keys available)
 // Disney Princess                             DP (? keys available)
-// Spider-Man                                  MV (1? key availale)
+// Spider-Man                                  MV (1? key available)
 // SpongeBob SquarePants: The Fry Cook Games   ?? (1? key available)
 // Dora the Explorer                           ?? (1? key available) 
-// no keys released for the following, some were in develpoment but cancelled
+// no keys released for the following, some were in development but cancelled
 // Dragon Ball Z                               DB (no game-keys released)
 // Capcom 3-in-1                               CC (no game-keys released)
 // Scooby-Doo                                  SD (no game-keys released)
