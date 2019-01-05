@@ -1016,6 +1016,7 @@ CONS( 2005, jak_just, 0, 0, walle, jak_gkr,spg2xx_game_state, empty_init, "JAKKS
 // Scooby-Doo
 // Care Bears
 // Wheel of Fortune
+// Winnie the Pooh
 
 // Radica TV games
 CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,   spg2xx_game_state, init_crc, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
