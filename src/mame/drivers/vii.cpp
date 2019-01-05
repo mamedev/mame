@@ -999,24 +999,25 @@ CONS( 2004, jak_batm, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS
 CONS( 2008, jak_wall, 0, 0, walle, walle,  spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Wall-E (JAKKS Pacific TV Game)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // 'Game-Key-Ready' JAKKS games (these can also take per-game specific expansion cartridges, although not all games had them released)
-CONS( 2005, jak_wwe,  0, 0, walle, jak_gkr,spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "WWE (JAKKS Pacific TV Game)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // no game-leys released
-CONS( 2005, jak_fan4, 0, 0, walle, jak_gkr,spg2xx_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Fantastic Four (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // no game-keys released
-CONS( 2005, jak_just, 0, 0, walle, jak_gkr,spg2xx_game_state, empty_init, "JAKKS Pacific Inc / Taniko",          "Justice League (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // no game-keys released
-// Other Game-Key-Ready systems (not all releases of them?)
-// Namco Ms. Pac-Man
-// Star Wars
-// Nicktoons
-// Disney
-// Disney Princess
-// Spider-Man
-// Dragon Ball Z
-// SpongeBob SquarePants - The Fry Cook Games
-// Dora the Explorer
-// Capcom 3-in-1
-// Scooby-Doo
-// Care Bears
-// Wheel of Fortune
-// Winnie the Pooh
+CONS( 2005, jak_wwe,  0, 0, walle, jak_gkr,spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "WWE (JAKKS Pacific TV Game)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // WW (no game-keys released)
+CONS( 2005, jak_fan4, 0, 0, walle, jak_gkr,spg2xx_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Fantastic Four (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // F4 (no game-keys released)
+CONS( 2005, jak_just, 0, 0, walle, jak_gkr,spg2xx_game_state, empty_init, "JAKKS Pacific Inc / Taniko",          "Justice League (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DC (no game-keys released)
+// Other Game-Key-Ready systems (not all releases of them?, only Sunplus SPG240 [Sunplus PAC300] versions?)
+// Namco Ms. Pac-Man                           NM (3 keys available [Dig Dug, New Rally-X], [Rally-X, Pac-Man, Bosconian], [Pac-Man, Bosconian])
+// Star Wars                                   SW (1 key available)
+// Nicktoons                                   NK (3 keys available)
+// Disney                                      DY (3? keys available)
+// Disney Princess                             DP (? keys available)
+// Spider-Man                                  MV (1? key availale
+// Dragon Ball Z                               DB (no keys available)
+// SpongeBob SquarePants: The Fry Cook Games   ?? (1? key available)
+// Dora the Explorer                           ?? (1? key available) 
+
+// Capcom 3-in-1                               CC (no game-keys released)
+// Scooby-Doo                                  SD (no game-keys released)
+// Care Bears                                  CB (no game-keys released)
+// Wheel of Fortune                            WF (no game-keys released)
+// Winnie the Pooh                             WP (no game-keys released)
 
 // Radica TV games
 CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,   spg2xx_game_state, init_crc, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
