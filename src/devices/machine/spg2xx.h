@@ -424,10 +424,10 @@ protected:
 
 	void apply_saturation(const rectangle &cliprect);
 	void apply_fade(const rectangle &cliprect);
-	void blit(const rectangle &cliprect, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile);
-	void blit_page(const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs);
-	void blit_sprite(const rectangle &cliprect, int depth, uint32_t base_addr);
-	void blit_sprites(const rectangle &cliprect, int depth);
+	void blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile);
+	void blit_page(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t bitmap_addr, uint16_t *regs);
+	void blit_sprite(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t base_addr);
+	void blit_sprites(const rectangle &cliprect, uint32_t scanline, int depth);
 
 	uint8_t expand_rgb5_to_rgb8(uint8_t val);
 	uint8_t mix_channel(uint8_t a, uint8_t b);

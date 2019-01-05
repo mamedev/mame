@@ -51,7 +51,7 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 #define VERBOSE             (LOG_IO_READS | LOG_IO_WRITES | LOG_UART | LOG_UNKNOWN_IO | LOG_I2C)
 #include "logmacro.h"
 
-#define SPG_DEBUG_VIDEO     (0)
+#define SPG_DEBUG_VIDEO     (1)
 #define SPG_DEBUG_AUDIO     (0)
 
 #define IO_IRQ_ENABLE       m_io_regs[0x21]
@@ -274,7 +274,7 @@ void spg2xx_device::set_pixel(uint32_t offset, uint16_t rgb)
 	m_screenbuf[offset].b = expand_rgb5_to_rgb8(rgb);
 }
 
-void spg2xx_device::blit(const rectangle &cliprect, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile)
+void spg2xx_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
 
@@ -289,7 +289,7 @@ void spg2xx_device::blit(const rectangle &cliprect, uint32_t xoff, uint32_t yoff
 	uint32_t palette_offset = (attr & 0x0f00) >> 4;
 	if (m_debug_blit && SPG_DEBUG_VIDEO)
 	{
-		printf("xy:%08x,%08x attr:%08x ctrl:%08x bitmap_addr:%08x tile:%04x\n", xoff, yoff, attr, ctrl, bitmap_addr, tile);
+		printf("line:%d xy:%08x,%08x attr:%08x ctrl:%08x bitmap_addr:%08x tile:%04x\n", line, xoff, yoff, attr, ctrl, bitmap_addr, tile);
 		printf("hw:%d,%d f:%d,%d fm:%d,%d ncols:%d pobs:%02x ", w, h, (attr & TILE_X_FLIP) ? 1 : 0, (attr & TILE_Y_FLIP) ? 1 : 0, xflipmask, yflipmask, nc, palette_offset);
 	}
 	palette_offset >>= nc;
@@ -299,79 +299,79 @@ void spg2xx_device::blit(const rectangle &cliprect, uint32_t xoff, uint32_t yoff
 		printf("poas:%02x\n", palette_offset);
 	}
 
-	uint32_t m = bitmap_addr + nc * w*h / 16 * tile;
+	uint32_t bits_per_row = nc * w / 16;
+	uint32_t words_per_tile = bits_per_row * h;
+	uint32_t m = bitmap_addr + words_per_tile * tile + bits_per_row * line;
 	uint32_t bits = 0;
 	uint32_t nbits = 0;
+	uint32_t y = line;
 
-	for (uint32_t y = 0; y < h; y++)
+	int yy = (yoff + (y ^ yflipmask)) & 0x1ff;
+	if (yy >= 0x01c0)
+		yy -= 0x0200;
+
+	if (m_debug_blit && SPG_DEBUG_VIDEO)
+		printf("%3d:\n", yy);
+
+	for (uint32_t x = 0; x < w; x++)
 	{
-		int yy = (yoff + (y ^ yflipmask)) & 0x1ff;
-		if (yy >= 0x01c0)
-			yy -= 0x0200;
+		int xx = xoff + (x ^ xflipmask);
 
+		bits <<= nc;
 		if (m_debug_blit && SPG_DEBUG_VIDEO)
-			printf("%3d:\n", yy);
-
-		for (uint32_t x = 0; x < w; x++)
+			printf("    %08x:%d ", bits, nbits);
+		if (nbits < nc)
 		{
-			int xx = xoff + (x ^ xflipmask);
-
-			bits <<= nc;
+			uint16_t b = space.read_word(m++ & 0x3fffff);
+			b = (b << 8) | (b >> 8);
+			bits |= b << (nc - nbits);
+			nbits += 16;
 			if (m_debug_blit && SPG_DEBUG_VIDEO)
-				printf("    %08x:%d ", bits, nbits);
-			if (nbits < nc)
+				printf("(%04x:%08x:%d) ", b, bits, nbits);
+		}
+		nbits -= nc;
+
+		uint32_t pal = palette_offset + (bits >> 16);
+		if (m_debug_blit && SPG_DEBUG_VIDEO)
+			printf("%02x:%02x:%04x ", bits >> 16, pal, bits & 0xffff);
+		bits &= 0xffff;
+
+		if ((ctrl & 0x0010) && yy < 240)
+			xx -= (int16_t)m_scrollram[yy + 15];
+
+		xx &= 0x01ff;
+		if (xx >= 0x01c0)
+			xx -= 0x0200;
+
+		if (xx >= 0 && xx < 320 && yy >= 0 && yy < 240)
+		{
+			uint16_t rgb = m_paletteram[pal];
+			if (m_debug_blit && SPG_DEBUG_VIDEO)
+				printf("rgb:%04x ", rgb);
+			if (!(rgb & 0x8000))
 			{
-				uint16_t b = space.read_word(m++ & 0x3fffff);
-				b = (b << 8) | (b >> 8);
-				bits |= b << (nc - nbits);
-				nbits += 16;
-				if (m_debug_blit && SPG_DEBUG_VIDEO)
-					printf("(%04x:%08x:%d) ", b, bits, nbits);
+				if (attr & 0x4000 || ctrl & 0x0100)
+				{
+					if (m_debug_blit && SPG_DEBUG_VIDEO)
+						printf("M\n");
+					mix_pixel(xx + 320 * yy, rgb);
+				}
+				else
+				{
+					if (m_debug_blit && SPG_DEBUG_VIDEO)
+						printf("S\n");
+					set_pixel(xx + 320 * yy, rgb);
+				}
 			}
-			nbits -= nc;
-
-			uint32_t pal = palette_offset + (bits >> 16);
-			if (m_debug_blit && SPG_DEBUG_VIDEO)
-				printf("%02x:%02x:%04x ", bits >> 16, pal, bits & 0xffff);
-			bits &= 0xffff;
-
-			if ((ctrl & 0x0010) && yy < 240)
-				xx -= (int16_t)m_scrollram[yy + 15];
-
-			xx &= 0x01ff;
-			if (xx >= 0x01c0)
-				xx -= 0x0200;
-
-			if (xx >= 0 && xx < 320 && yy >= 0 && yy < 240)
+			else if (m_debug_blit && SPG_DEBUG_VIDEO)
 			{
-				uint16_t rgb = m_paletteram[pal];
-				if (m_debug_blit && SPG_DEBUG_VIDEO)
-					printf("rgb:%04x ", rgb);
-				if (!(rgb & 0x8000))
-				{
-					if (attr & 0x4000 || ctrl & 0x0100)
-					{
-						if (m_debug_blit && SPG_DEBUG_VIDEO)
-							printf("M\n");
-						mix_pixel(xx + 320 * yy, rgb);
-					}
-					else
-					{
-						if (m_debug_blit && SPG_DEBUG_VIDEO)
-							printf("S\n");
-						set_pixel(xx + 320 * yy, rgb);
-					}
-				}
-				else if (m_debug_blit && SPG_DEBUG_VIDEO)
-				{
-					printf("X\n");
-				}
+				printf("X\n");
 			}
 		}
 	}
 }
 
-void spg2xx_device::blit_page(const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs)
+void spg2xx_device::blit_page(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t bitmap_addr, uint16_t *regs)
 {
 	uint32_t xscroll = regs[0];
 	uint32_t yscroll = regs[1];
@@ -391,54 +391,54 @@ void spg2xx_device::blit_page(const rectangle &cliprect, int depth, uint32_t bit
 		return;
 	}
 
-	uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+	uint32_t tile_h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+	uint32_t tile_w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
-	uint32_t hn = 256 / h;
-	uint32_t wn = 512 / w;
+	uint32_t tile_count_x = 512 / tile_w;
 
-	for (uint32_t y0 = 0; y0 < hn; y0++)
+	uint32_t bitmap_y = (scanline + yscroll) & 0xff;
+	uint32_t y0 = bitmap_y / tile_h;
+	uint32_t tile_scanline = bitmap_y % tile_h;
+	uint32_t tile_address = tile_count_x * y0;
+
+	for (uint32_t x0 = 0; x0 < tile_count_x; x0++, tile_address++)
 	{
-		for (uint32_t x0 = 0; x0 < wn; x0++)
+		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & 0xff) - 0x10;
+		uint32_t xx = (tile_w * x0 - xscroll) & 0x1ff;
+
+		uint16_t tile = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
+		uint16_t palette = 0;
+
+		if (!tile)
 		{
-			uint16_t tile = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + x0 + wn * y0);
-			uint16_t palette = 0;
-			uint32_t xx, yy;
-
-			if (!tile)
-			{
-				continue;
-			}
-
-			palette = space.read_word(palette_map + (x0 + wn * y0) / 2);
-			if (x0 & 1)
-			{
-				palette >>= 8;
-			}
-
-			uint32_t tileattr = attr;
-			uint32_t tilectrl = ctrl;
-			if ((ctrl & 2) == 0)
-			{   // -(1) bld(1) flip(2) pal(4)
-				tileattr &= ~0x000c;
-				tileattr |= (palette >> 2) & 0x000c;    // flip
-
-				tileattr &= ~0x0f00;
-				tileattr |= (palette << 8) & 0x0f00;    // palette
-
-				tilectrl &= ~0x0100;
-				tilectrl |= (palette << 2) & 0x0100;    // blend
-			}
-
-			yy = ((h*y0 - yscroll + 0x10) & 0xff) - 0x10;
-			xx = (w*x0 - xscroll) & 0x1ff;
-
-			blit(cliprect, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+			continue;
 		}
+
+		palette = space.read_word(palette_map + tile_address / 2);
+		if (x0 & 1)
+		{
+			palette >>= 8;
+		}
+
+		uint32_t tileattr = attr;
+		uint32_t tilectrl = ctrl;
+		if ((ctrl & 2) == 0)
+		{   // -(1) bld(1) flip(2) pal(4)
+			tileattr &= ~0x000c;
+			tileattr |= (palette >> 2) & 0x000c;    // flip
+
+			tileattr &= ~0x0f00;
+			tileattr |= (palette << 8) & 0x0f00;    // palette
+
+			tilectrl &= ~0x0100;
+			tilectrl |= (palette << 2) & 0x0100;    // blend
+		}
+
+		blit(cliprect, tile_scanline, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
 	}
 }
 
-void spg2xx_device::blit_sprite(const rectangle &cliprect, int depth, uint32_t base_addr)
+void spg2xx_device::blit_sprite(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t base_addr)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
 	uint32_t bitmap_addr = 0x40 * m_video_regs[0x22];
@@ -458,32 +458,37 @@ void spg2xx_device::blit_sprite(const rectangle &cliprect, int depth, uint32_t b
 		return;
 	}
 
+	const uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+	const uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+
 	if (!(m_video_regs[0x42] & SPRITE_COORD_TL_MASK))
 	{
-		x = 160 + x;
-		y = 120 - y;
-
-		uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-		uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
-
-		x -= (w / 2);
-		y -= (h / 2) - 8;
+		x = (160 + x) - w / 2;
+		y = (120 - y) - (h / 2) + 8;
 	}
 
 	x &= 0x01ff;
 	y &= 0x01ff;
 
+	if (y > scanline)
+		return;
+
+	uint32_t tile_line = ((scanline - y) + 0x200) % h;
+
+	if (tile_line >= h)
+		return;
+
 #if SPG_DEBUG_VIDEO
 	if (m_debug_sprites && machine().input().code_pressed(KEYCODE_MINUS))
 		m_debug_blit = true;
-	blit(cliprect, x, y, attr, 0, bitmap_addr, tile);
+	blit(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
 	m_debug_blit = false;
 #else
-	blit(cliprect, x, y, attr, 0, bitmap_addr, tile);
+	blit(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
 #endif
 }
 
-void spg2xx_device::blit_sprites(const rectangle &cliprect, int depth)
+void spg2xx_device::blit_sprites(const rectangle &cliprect, uint32_t scanline, int depth)
 {
 	if (!(m_video_regs[0x42] & SPRITE_ENABLE_MASK))
 	{
@@ -496,13 +501,13 @@ void spg2xx_device::blit_sprites(const rectangle &cliprect, int depth)
 #endif
 		for (uint32_t n = 0; n < m_sprite_limit; n++)
 		{
-			blit_sprite(cliprect, depth, 0x2c00 + 4 * n);
+			blit_sprite(cliprect, scanline, depth, 0x2c00 + 4 * n);
 		}
 #if SPG_DEBUG_VIDEO
 	}
 	else
 	{
-		blit_sprite(cliprect, depth, 0x2c00 + 4 * m_sprite_index_to_debug);
+		blit_sprite(cliprect, scanline, depth, 0x2c00 + 4 * m_sprite_index_to_debug);
 	}
 #endif
 }
@@ -565,14 +570,17 @@ uint32_t spg2xx_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	uint16_t *page1_regs = m_video_regs + 0x10;
 	uint16_t *page2_regs = m_video_regs + 0x16;
 
-	for (int i = 0; i < 4; i++)
+	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
-		if (!m_hide_page0)
-			blit_page(cliprect, i, page1_addr, page1_regs);
-		if (!m_hide_page1)
-			blit_page(cliprect, i, page2_addr, page2_regs);
-		if (!m_hide_sprites)
-			blit_sprites(cliprect, i);
+		for (int i = 0; i < 4; i++)
+		{
+			if (!m_hide_page0)
+				blit_page(cliprect, scanline, i, page1_addr, page1_regs);
+			if (!m_hide_page1)
+				blit_page(cliprect, scanline, i, page2_addr, page2_regs);
+			if (!m_hide_sprites)
+				blit_sprites(cliprect, scanline, i);
+		}
 	}
 
 	if ((m_video_regs[0x3c] & 0x00ff) != 0x0020)
