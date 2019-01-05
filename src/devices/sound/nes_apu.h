@@ -79,6 +79,7 @@ protected:
 	inline void apu_write(int address, u8 value);
 
 	devcb_read8 m_mem_read_cb;
+	devcb_write_line m_irq_handler;
 
 private:
 	/* GLOBAL CONSTANTS */
@@ -94,7 +95,6 @@ private:
 	u32     m_sync_times1[SYNCS_MAX1]; /* Samples per sync table */
 	u32     m_sync_times2[SYNCS_MAX2]; /* Samples per sync table */
 	sound_stream *m_stream;
-	devcb_write_line m_irq_handler;
 
 };
 

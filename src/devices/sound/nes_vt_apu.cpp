@@ -46,6 +46,7 @@ void nesapu_vt_device::device_start()
 	save_item(NAME(m_apu_vt.vt03_pcm.length));
     save_item(NAME(m_apu_vt.vt03_pcm.remaining_bytes));
 	save_item(NAME(m_apu_vt.vt03_pcm.enabled));
+	save_item(NAME(m_apu_vt.vt03_pcm.irq_occurred));
 	save_item(NAME(m_apu_vt.vt03_pcm.vol));
 
 	save_item(NAME(m_apu_vt.extra_regs));
@@ -105,7 +106,7 @@ s8 nesapu_vt_device::vt03_pcm(apu_vt_t::vt03_pcm_t *ch) {
     if (ch->enabled) {
     	int freq = dpcm_clocks[ch->regs[0] & 0x0F];
 		ch->phaseacc -= 4;
-		while (ch->phaseacc < 0)
+		while (ch->phaseacc < 0 && ch->enabled)
 		{
 			ch->phaseacc += freq;
 	        u8 data = u8(m_mem_read_cb(ch->address));
@@ -113,12 +114,17 @@ s8 nesapu_vt_device::vt03_pcm(apu_vt_t::vt03_pcm_t *ch) {
 	        ch->vol = data;
 	        ch->address++;
 	        ch->remaining_bytes--;
-	        if (ch->remaining_bytes == 0) {
-	            if (ch->regs[0] & 0x40) {
+	        if (ch->remaining_bytes == 0)
+	        {
+	        	if (ch->regs[0] & 0x80)
+	        	{
+	        		ch->irq_occurred = true;
+	        		m_irq_handler(true);
+	        	}
+	            if (ch->regs[0] & 0x40)
 	                reset_vt03_pcm(ch);
-	            } else {
+	            else
 	                ch->enabled = false;
-	            }
 	        }
 	    }
         return ch->vol - 128;
@@ -156,6 +162,7 @@ void nesapu_vt_device::reset_vt03_pcm(apu_vt_t::vt03_pcm_t *ch) {
     ch->remaining_bytes = m_apu_vt.vt03_pcm.regs[3] << 4;
     ch->length = m_apu_vt.vt03_pcm.regs[3] << 4;
     ch->enabled = true;
+    ch->irq_occurred = true;
 }
 
 void nesapu_vt_device::vt_apu_write(uint8_t address, uint8_t data) {
@@ -167,6 +174,10 @@ void nesapu_vt_device::vt_apu_write(uint8_t address, uint8_t data) {
         m_apu_vt.extra_regs[0x05] = data;
     } else if (address >= 0x10 && address <= 0x13) {
         m_apu_vt.vt03_pcm.regs[address - 0x10] = data;
+        if (address == 0x10) {
+ 			m_apu_vt.vt03_pcm.irq_occurred = false;
+ 			m_irq_handler(false);
+        }
 		if (m_apu_vt.use_vt3x_pcm && (address == 0x12) && !m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].enabled) {
 			m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].address &= ~(0xFF << 6);
 			m_apu_vt.vt33_pcm[m_apu_vt.vt3x_sel_channel].address |= (data << 6);
@@ -224,7 +235,7 @@ uint8_t nesapu_vt_device::vt_apu_read(uint8_t address) {
 		{
 			base &= 0x4F;
 			base |= (m_apu_vt.vt03_pcm.enabled << 4);
-			// TODO: IRQ status
+			base |= m_apu_vt.vt03_pcm.irq_occurred ? 0x80 : 0x00;
 		}
 		return base;
 	}

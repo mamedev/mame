@@ -109,10 +109,10 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_mem_read_cb(*this)
+	, m_irq_handler(*this)
 	, m_samps_per_sync(0)
 	, m_buffer_size(0)
 	, m_stream(nullptr)
-	, m_irq_handler(*this)
 {
 	for (auto & elem : m_noise_lut)
 	{

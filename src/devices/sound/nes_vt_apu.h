@@ -54,7 +54,7 @@ struct apu_vt_t {
 		uint32_t address = 0;
         uint32_t length = 0;
 		uint32_t remaining_bytes = 0;
-		bool enabled = false;
+		bool enabled = false, irq_occurred = false;
 		uint8_t vol = 0;
 	};
 
