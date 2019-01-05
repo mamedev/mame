@@ -5,7 +5,9 @@
     Short Description:
 
         Systems which run on the SPG243 SoC
-
+		
+		( die markings show "SunPlus QL8041" on JAKKS WWE / Fantastic 4 / Justice League )
+	
     Status:
 
         Mostly working
