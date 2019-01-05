@@ -40,11 +40,6 @@
 
 #include "nes_apu.h"
 
-// In "enhanced PCM" mode, direct ROM reads are needed and implemented using
-// this callback
-#define MCFG_NES_VT_APU_ROM_READ_CALLBACK(_devcb) \
-	downcast<nesapu_vt_device &>(*device).set_rom_read_callback(DEVCB_##_devcb);
-
 struct apu_vt_t {
 	struct vt03_pcm_t
 	{
@@ -110,6 +105,7 @@ public:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	template <class Object> devcb_base &set_rom_read_callback(Object &&cb) { return m_rom_read_cb.set_callback(std::forward<Object>(cb)); }
+	auto rom_read() { return m_rom_read_cb.bind(); }
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
