@@ -5,7 +5,9 @@
     Short Description:
 
         Systems which run on the SPG243 SoC
-
+		
+		( die markings show "SunPlus QL8041" on JAKKS WWE / Fantastic 4 / Justice League )
+	
     Status:
 
         Mostly working
@@ -36,6 +38,14 @@
 	Note:
 		Cricket, Skateboarder, Skannerz and Football 2 list a 32-bit checksum at the start of ROM.
 		This is the byte sum of the file, excluding the first 16 byte (where the checksum is stored)
+
+		Test Modes:
+		Justice League : press UP, DOWN, LEFT, BT3 on the JAKKS logo in that order, quickly, to get test menu
+		WWE : press UP, BT1, BT2 together during startup logos
+
+
+	TODO:
+		Work out how to access the hidden TEST menus for all games (most JAKKS games should have one at least)
 
 *******************************************************************************/
 
@@ -81,6 +91,8 @@ public:
 
 	void init_crc();
 
+	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -99,6 +111,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<spg2xx_device> m_spg;
 	optional_memory_bank m_bank;
+
 
 	DECLARE_READ16_MEMBER(walle_portc_r);
 	DECLARE_WRITE16_MEMBER(walle_portc_w);
@@ -233,10 +246,12 @@ WRITE16_MEMBER(vii_state::vii_portb_w)
 	switch_bank(((data & 0x80) >> 7) | ((data & 0x20) >> 4));
 }
 
-READ16_MEMBER(spg2xx_game_state::walle_portc_r)
+
+CUSTOM_INPUT_MEMBER(spg2xx_game_state::i2c_r)
 {
 	return m_i2cmem->read_sda();
 }
+
 
 WRITE16_MEMBER(spg2xx_game_state::walle_portc_w)
 {
@@ -303,13 +318,78 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( walle )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
+
+	PORT_START("C")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, spg2xx_game_state,i2c_r, nullptr)
+	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( jak_gkr )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	
+	PORT_START("C")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, spg2xx_game_state,i2c_r, nullptr)
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) // this causes WWE to think the unit is a '2nd Controller' and tells you to plug the 1st one in.
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( wirels60 )
 	PORT_START("P1")
@@ -662,7 +742,7 @@ void spg2xx_game_state::walle(machine_config &config)
 {
 	jakks(config);
 
-	m_spg->portc_in().set(FUNC(spg2xx_game_state::walle_portc_r));
+	m_spg->portc_in().set_ioport("C");
 	m_spg->portc_out().set(FUNC(spg2xx_game_state::walle_portc_w));
 }
 
@@ -705,17 +785,35 @@ ROM_START( vii )
 	ROM_LOAD16_WORD_SWAP( "vii.bin", 0x0000, 0x2000000, CRC(04627639) SHA1(f883a92d31b53c9a5b0cdb112d07cd793c95fc43))
 ROM_END
 
-ROM_START( batmantv )
+ROM_START( jak_batm )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "batman.bin", 0x000000, 0x400000, CRC(46f848e5) SHA1(5875d57bb3fe0cac5d20e626e4f82a0e5f9bb94c) )
 ROM_END
 
-ROM_START( walle )
+ROM_START( jak_wall )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, BAD_DUMP CRC(bd554cba) SHA1(6cd06a036ab12e7b0e1fd8003db873b0bb783868) )
-	// Alternate dump, we need to decide which one is correct.
-	//ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, CRC(6bc90b16) SHA1(184d72de059057aae7800da510fcf05ed1da9ec9))
+	// both of these dumps are bad, but in slightly different ways, note the random green pixels around the text
+	//ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, BAD_DUMP CRC(6bc90b16) SHA1(184d72de059057aae7800da510fcf05ed1da9ec9))
 ROM_END
+
+ROM_START( jak_wwe )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkswwegkr.bin", 0x000000, 0x200000, CRC(b078a812) SHA1(7d97c0e2171b3fd91b280480c9ffd5651828195a) )
+ROM_END
+
+ROM_START( jak_fan4 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksffgkr.bin", 0x000000, 0x200000, CRC(8755a1f7) SHA1(7214da15fe61881da27b81575fbdb54cc0f1d6aa) )
+ROM_END
+
+ROM_START( jak_just )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksjlagkr.bin", 0x000000, 0x200000, CRC(182989f0) SHA1(799229c537d6fe629ba9e1e4051d1bb9ca445d44) )
+ROM_END
+
+
+
 
 ROM_START( zone40 )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
@@ -899,8 +997,29 @@ CONS( 2010, zone60,   0, 0, wireless60, wirels60, spg2xx_game_state, empty_init,
 CONS( 2010, wirels60, 0, 0, wireless60, wirels60, spg2xx_game_state, empty_init, "Jungle Soft / Kids Station Toys Inc",      "Wireless 60", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // JAKKS Pacific Inc TV games
-CONS( 2004, batmantv, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Batman", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2008, walle,    0, 0, walle, walle,  spg2xx_game_state, empty_init, "JAKKS Pacific Inc",              "Wall-E",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_batm, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Batman (JAKKS Pacific TV Game)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, jak_wall, 0, 0, walle, walle,  spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Wall-E (JAKKS Pacific TV Game)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// 'Game-Key-Ready' JAKKS games (these can also take per-game specific expansion cartridges, although not all games had them released)
+CONS( 2005, jak_wwe,  0, 0, walle, jak_gkr,spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "WWE (JAKKS Pacific TV Game)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // WW (no game-keys released)
+CONS( 2005, jak_fan4, 0, 0, walle, jak_gkr,spg2xx_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Fantastic Four (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // F4 (no game-keys released)
+CONS( 2005, jak_just, 0, 0, walle, jak_gkr,spg2xx_game_state, empty_init, "JAKKS Pacific Inc / Taniko",          "Justice League (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DC (no game-keys released)
+// Other Game-Key-Ready systems (not all releases of them?, only Sunplus SPG240 [Sunplus PAC300] versions?)
+// Namco Ms. Pac-Man                           NM (3 keys available [Dig Dug, New Rally-X], [Rally-X, Pac-Man, Bosconian], [Pac-Man, Bosconian])
+// Star Wars                                   SW (1 key available)
+// Nicktoons                                   NK (3 keys available)
+// Disney                                      DY (3? keys available)
+// Disney Princess                             DP (? keys available)
+// Spider-Man                                  MV (1? key available)
+// SpongeBob SquarePants: The Fry Cook Games   ?? (1? key available)
+// Dora the Explorer                           ?? (1? key available) 
+// no keys released for the following, some were in development but cancelled
+// Dragon Ball Z                               DB (no game-keys released)
+// Capcom 3-in-1                               CC (no game-keys released)
+// Scooby-Doo                                  SD (no game-keys released)
+// Care Bears                                  CB (no game-keys released)
+// Wheel of Fortune                            WF (no game-keys released)
+// Winnie the Pooh                             WP (no game-keys released)
 
 // Radica TV games
 CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,   spg2xx_game_state, init_crc, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
