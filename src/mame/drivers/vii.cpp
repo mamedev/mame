@@ -37,6 +37,11 @@
 		Cricket, Skateboarder, Skannerz and Football 2 list a 32-bit checksum at the start of ROM.
 		This is the byte sum of the file, excluding the first 16 byte (where the checksum is stored)
 
+		Test Modes:
+		Justice League : press UP, DOWN, LEFT, BT3 on the JAKKS logo in that order, quickly, to get test menu
+		WWE : press UP, BT1, BT2 together during startup logos
+
+
 	TODO:
 		Work out how to access the hidden TEST menus for all games (most JAKKS games should have one at least)
 
