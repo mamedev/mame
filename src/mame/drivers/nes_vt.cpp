@@ -1307,7 +1307,7 @@ void nes_vt_state::prg_map(address_map &map)
 
 WRITE_LINE_MEMBER(nes_vt_state::apu_irq)
 {
-    m_maincpu->set_input_line(N2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(N2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(nes_vt_state::apu_read_mem)

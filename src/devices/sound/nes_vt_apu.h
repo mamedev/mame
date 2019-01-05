@@ -18,7 +18,7 @@
 
 	Newer devices, from the VT09 (?) onwards add new banking registers for PCM,
 	seperate from the CPU's PRG banking registers, located at 0x4125, 0x4126 (high
-  address bank) and 0x4127, 0x4128 (relative high address bank).
+	address bank) and 0x4127, 0x4128 (relative high address bank).
 
 	Even newer devices from the VT33 (??) onwards have a new two-channel PCM mode,
 	limited info known. Possible map below, credit to NewRisingSun for reverse
@@ -52,7 +52,7 @@ struct apu_vt_t {
 		float phaseacc = 0.0;
 		uint8_t regs[4];
 		uint32_t address = 0;
-        uint32_t length = 0;
+		uint32_t length = 0;
 		uint32_t remaining_bytes = 0;
 		bool enabled = false, irq_occurred = false;
 		uint8_t vol = 0;
@@ -109,7 +109,7 @@ public:
 
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-    virtual u8 read(offs_t offset) override;
+	virtual u8 read(offs_t offset) override;
 	virtual void write(offs_t offset, u8 data) override;
 
 protected:
@@ -127,8 +127,8 @@ protected:
 
 	s8 vt03_pcm(apu_vt_t::vt03_pcm_t *ch);
 	s8 vt3x_pcm(apu_vt_t::vt3x_pcm_t *ch);
-    void reset_vt03_pcm(apu_vt_t::vt03_pcm_t *ch);
-    void start_vt3x_pcm(apu_vt_t::vt3x_pcm_t *ch);
+	void reset_vt03_pcm(apu_vt_t::vt03_pcm_t *ch);
+	void start_vt3x_pcm(apu_vt_t::vt3x_pcm_t *ch);
 private:
 	devcb_read8 m_rom_read_cb;
 
