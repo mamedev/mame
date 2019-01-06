@@ -6,8 +6,8 @@
 
  *****************************************************************************/
 
-#include "nes_vt_apu.h"
 #include "emu.h"
+#include "nes_vt_apu.h"
 
 #define VTXX_NTSC_XTAL XTAL(21'477'272)
 #define VTXX_NTSC_APU_CLOCK (VTXX_NTSC_XTAL/12)
