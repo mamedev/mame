@@ -323,7 +323,9 @@ MACHINE_CONFIG_START(capbowl_state::capbowl)
 	MCFG_DEVICE_PROGRAM_MAP(capbowl_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", capbowl_state,  interrupt)
 
-	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5); // ~0.3s
+	// watchdog: 555 timer 16 cycles, edge triggered, ~0.3s
+	attotime period = PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6);
+	WATCHDOG_TIMER(config, m_watchdog).set_time(period * 16 - period / 2);
 
 	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
