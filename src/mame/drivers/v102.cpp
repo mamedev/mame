@@ -43,7 +43,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(hs_w);
 
 	void io_map(address_map &map);
-	void kbd_map(address_map &map);
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -90,11 +89,6 @@ void v102_state::io_map(address_map &map)
 	map(0x60, 0x61).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x80, 0x83).w("pit", FUNC(pit8253_device::write));
 	map(0xa0, 0xa3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-}
-
-void v102_state::kbd_map(address_map &map)
-{
-	map(0x000, 0x7ff).rom().region("keyboard", 0);
 }
 
 void v102_state::machine_start()
