@@ -5,6 +5,23 @@
 #include "emumem_hedw.ipp"
 
 
+template class handler_entry_write_dispatch< 1, 0,  1, ENDIANNESS_LITTLE>;
+template class handler_entry_write_dispatch< 1, 0,  1, ENDIANNESS_BIG>;
+template class handler_entry_write_dispatch< 2, 0,  1, ENDIANNESS_LITTLE>;
+template class handler_entry_write_dispatch< 2, 0,  1, ENDIANNESS_BIG>;
+template class handler_entry_write_dispatch< 3, 0,  1, ENDIANNESS_LITTLE>;
+template class handler_entry_write_dispatch< 3, 0,  1, ENDIANNESS_BIG>;
+template class handler_entry_write_dispatch< 4, 0,  1, ENDIANNESS_LITTLE>;
+template class handler_entry_write_dispatch< 4, 0,  1, ENDIANNESS_BIG>;
+template class handler_entry_write_dispatch< 5, 0,  1, ENDIANNESS_LITTLE>;
+template class handler_entry_write_dispatch< 5, 0,  1, ENDIANNESS_BIG>;
+template class handler_entry_write_dispatch< 6, 0,  1, ENDIANNESS_LITTLE>;
+template class handler_entry_write_dispatch< 6, 0,  1, ENDIANNESS_BIG>;
+template class handler_entry_write_dispatch< 7, 0,  1, ENDIANNESS_LITTLE>;
+template class handler_entry_write_dispatch< 7, 0,  1, ENDIANNESS_BIG>;
+template class handler_entry_write_dispatch< 8, 0,  1, ENDIANNESS_LITTLE>;
+template class handler_entry_write_dispatch< 8, 0,  1, ENDIANNESS_BIG>;
+
 template class handler_entry_write_dispatch< 1, 0,  0, ENDIANNESS_LITTLE>;
 template class handler_entry_write_dispatch< 1, 0,  0, ENDIANNESS_BIG>;
 template class handler_entry_write_dispatch< 2, 0,  0, ENDIANNESS_LITTLE>;
