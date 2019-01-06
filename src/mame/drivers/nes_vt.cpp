@@ -74,6 +74,7 @@
 #include "machine/bankdev.h"
 #include "video/ppu2c0x_vt.h"
 #include "machine/m6502_vtscr.h"
+#include "sound/nes_vt_apu.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -126,6 +127,7 @@ private:
 	/* APU handling */
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
 	DECLARE_READ8_MEMBER(apu_read_mem);
+	DECLARE_READ8_MEMBER(apu_read_rom);
 	DECLARE_READ8_MEMBER(psg1_4014_r);
 	DECLARE_READ8_MEMBER(psg1_4015_r);
 	DECLARE_WRITE8_MEMBER(psg1_4015_w);
@@ -233,7 +235,7 @@ private:
 
 	required_device<screen_device> m_screen;
 	required_device<ppu_vt03_device> m_ppu;
-	required_device<nesapu_device> m_apu;
+	required_device<nesapu_vt_device> m_apu;
 	required_device<address_map_bank_device> m_prg;
 	required_memory_bank m_prgbank0;
 	required_memory_bank m_prgbank1;
@@ -1164,7 +1166,7 @@ void nes_vt_state::nes_vt_map(address_map &map)
 	map(0x0000, 0x07ff).ram();
 	map(0x2000, 0x3fff).mask(0x001F).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));        /* PPU registers */
 
-	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
+	map(0x4000, 0x4036).rw(m_apu, FUNC(nesapu_vt_device::read), FUNC(nesapu_vt_device::write));
 	map(0x4014, 0x4014).r(FUNC(nes_vt_state::psg1_4014_r)).w(FUNC(nes_vt_state::nes_vh_sprite_dma_w));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt_state::psg1_4015_r), FUNC(nes_vt_state::psg1_4015_w)); /* PSG status / first control register */
 	map(0x4016, 0x4016).rw(FUNC(nes_vt_state::nes_in0_r), FUNC(nes_vt_state::nes_in0_w));
@@ -1232,7 +1234,7 @@ void nes_vt_state::nes_vt_hh_map(address_map &map)
 	map(0x0000, 0x1fff).mask(0x0fff).ram();
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));        /* PPU registers */
 
-	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
+	map(0x4000, 0x4036).rw(m_apu, FUNC(nesapu_vt_device::read), FUNC(nesapu_vt_device::write));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt_state::psg1_4015_r), FUNC(nes_vt_state::psg1_4015_w)); /* PSG status / first control register */
 	map(0x4016, 0x4016).rw(FUNC(nes_vt_state::nes_in0_r), FUNC(nes_vt_state::nes_in0_w));
 	map(0x4017, 0x4017).r(FUNC(nes_vt_state::nes_in1_r)).w(FUNC(nes_vt_state::psg1_4017_w));
@@ -1256,7 +1258,7 @@ void nes_vt_state::nes_vt_dg_map(address_map &map)
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));        /* PPU registers */
 
-	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
+	map(0x4000, 0x4036).rw(m_apu, FUNC(nesapu_vt_device::read), FUNC(nesapu_vt_device::write));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt_state::psg1_4015_r), FUNC(nes_vt_state::psg1_4015_w)); /* PSG status / first control register */
 	map(0x4016, 0x4016).rw(FUNC(nes_vt_state::nes_in0_r), FUNC(nes_vt_state::nes_in0_w));
 	map(0x4017, 0x4017).r(FUNC(nes_vt_state::nes_in1_r)).w(FUNC(nes_vt_state::psg1_4017_w));
@@ -1305,12 +1307,17 @@ void nes_vt_state::prg_map(address_map &map)
 
 WRITE_LINE_MEMBER(nes_vt_state::apu_irq)
 {
-//  set_input_line(N2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(N2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(nes_vt_state::apu_read_mem)
 {
-	return 0x00;//mintf->program->read_byte(offset);
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+READ8_MEMBER(nes_vt_state::apu_read_rom)
+{
+	return m_prgrom[offset & (m_romsize - 1)];
 }
 
 /* not strictly needed, but helps us see where things are in ROM to aid with figuring out banking schemes*/
@@ -1383,9 +1390,10 @@ void nes_vt_state::nes_vt_base(machine_config &config)
 	   than just using 2 APUs as registers in the 2nd one affect the PCM channel mode but the
 	   DMA control still comes from the 1st, but in the new mode, sound always outputs via the
 	   2nd.  Probably need to split the APU into interface and sound gen logic. */
-	NES_APU(config, m_apu, NTSC_APU_CLOCK);
+	NES_VT_APU(config, m_apu, NTSC_APU_CLOCK);
 	m_apu->irq().set(FUNC(nes_vt_state::apu_irq));
 	m_apu->mem_read().set(FUNC(nes_vt_state::apu_read_mem));
+	m_apu->rom_read().set(FUNC(nes_vt_state::apu_read_rom));
 	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

@@ -48,7 +48,7 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 #define LOG_PPU             (LOG_PPU_READS | LOG_PPU_WRITES | LOG_UNKNOWN_PPU)
 #define LOG_ALL             (LOG_IO | LOG_SPU | LOG_PPU | LOG_VLINES | LOG_SEGMENT)
 
-#define VERBOSE             (LOG_UART | LOG_UNKNOWN_IO)
+#define VERBOSE             (0)
 #include "logmacro.h"
 
 #define SPG_DEBUG_VIDEO     (0)
@@ -68,6 +68,7 @@ spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, co
 	, m_porta_in(*this)
 	, m_portb_in(*this)
 	, m_portc_in(*this)
+	, m_adc_in(*this)
 	, m_eeprom_w(*this)
 	, m_eeprom_r(*this)
 	, m_uart_tx(*this)
@@ -109,6 +110,7 @@ void spg2xx_device::device_start()
 	m_porta_in.resolve_safe(0);
 	m_portb_in.resolve_safe(0);
 	m_portc_in.resolve_safe(0);
+	m_adc_in.resolve_safe(0x0fff);
 	m_eeprom_w.resolve_safe();
 	m_eeprom_r.resolve_safe(0);
 	m_uart_tx.resolve_safe();
@@ -125,9 +127,66 @@ void spg2xx_device::device_start()
 	m_audio_beat = timer_alloc(TIMER_BEAT);
 	m_audio_beat->adjust(attotime::never);
 
+	m_uart_tx_timer = timer_alloc(TIMER_UART_TX);
+	m_uart_tx_timer->adjust(attotime::never);
+
+	m_uart_rx_timer = timer_alloc(TIMER_UART_RX);
+	m_uart_rx_timer->adjust(attotime::never);
+
+	m_4khz_timer = timer_alloc(TIMER_4KHZ);
+	m_4khz_timer->adjust(attotime::never);
+
 	m_stream = stream_alloc(0, 2, 44100);
 
 	m_channel_debug = -1;
+
+	save_item(NAME(m_hide_page0));
+	save_item(NAME(m_hide_page1));
+	save_item(NAME(m_hide_sprites));
+	save_item(NAME(m_debug_sprites));
+	save_item(NAME(m_debug_blit));
+	save_item(NAME(m_sprite_index_to_debug));
+
+	save_item(NAME(m_debug_samples));
+	save_item(NAME(m_debug_rates));
+
+	save_item(NAME(m_audio_regs));
+	save_item(NAME(m_sample_shift));
+	save_item(NAME(m_sample_count));
+	save_item(NAME(m_sample_addr));
+	save_item(NAME(m_channel_rate));
+	save_item(NAME(m_channel_rate_accum));
+	save_item(NAME(m_rampdown_frame));
+	save_item(NAME(m_envclk_frame));
+	save_item(NAME(m_envelope_addr));
+	save_item(NAME(m_channel_debug));
+	save_item(NAME(m_audio_curr_beat_base_count));
+
+	save_item(NAME(m_io_regs));
+	save_item(NAME(m_uart_rx_fifo));
+	save_item(NAME(m_uart_rx_fifo_start));
+	save_item(NAME(m_uart_rx_fifo_end));
+	save_item(NAME(m_uart_rx_fifo_count));
+	save_item(NAME(m_uart_rx_available));
+	save_item(NAME(m_uart_rx_irq));
+	save_item(NAME(m_uart_tx_irq));
+
+	save_item(NAME(m_extint));
+
+	save_item(NAME(m_video_regs));
+	save_item(NAME(m_sprite_limit));
+	save_item(NAME(m_pal_flag));
+
+	save_item(NAME(m_2khz_divider));
+	save_item(NAME(m_1khz_divider));
+	save_item(NAME(m_4hz_divider));
+
+	save_item(NAME(m_uart_baud_rate));
+	for (int i = 0; i < 16; i++)
+	{
+		save_item(NAME(m_adpcm[i].m_signal), i);
+		save_item(NAME(m_adpcm[i].m_step), i);
+	}
 }
 
 void spg2xx_device::device_reset()
@@ -151,6 +210,10 @@ void spg2xx_device::device_reset()
 	m_uart_rx_fifo_start = 0;
 	m_uart_rx_fifo_end = 0;
 	m_uart_rx_fifo_count = 0;
+	m_uart_tx_irq = false;
+	m_uart_rx_irq = false;
+
+	memset(m_extint, 0, sizeof(bool) * 2);
 
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
@@ -171,6 +234,12 @@ void spg2xx_device::device_reset()
 	m_audio_regs[AUDIO_CHANNEL_ENV_MODE] = 0x3f;
 
 	m_audio_beat->adjust(attotime::from_ticks(4, 281250), 0, attotime::from_ticks(4, 281250));
+
+	m_4khz_timer->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
+
+	m_2khz_divider = 0;
+	m_1khz_divider = 0;
+	m_4hz_divider = 0;
 }
 
 
@@ -205,7 +274,7 @@ void spg2xx_device::set_pixel(uint32_t offset, uint16_t rgb)
 	m_screenbuf[offset].b = expand_rgb5_to_rgb8(rgb);
 }
 
-void spg2xx_device::blit(const rectangle &cliprect, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile)
+void spg2xx_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
 
@@ -220,7 +289,7 @@ void spg2xx_device::blit(const rectangle &cliprect, uint32_t xoff, uint32_t yoff
 	uint32_t palette_offset = (attr & 0x0f00) >> 4;
 	if (m_debug_blit && SPG_DEBUG_VIDEO)
 	{
-		printf("xy:%08x,%08x attr:%08x ctrl:%08x bitmap_addr:%08x tile:%04x\n", xoff, yoff, attr, ctrl, bitmap_addr, tile);
+		printf("line:%d xy:%08x,%08x attr:%08x ctrl:%08x bitmap_addr:%08x tile:%04x\n", line, xoff, yoff, attr, ctrl, bitmap_addr, tile);
 		printf("hw:%d,%d f:%d,%d fm:%d,%d ncols:%d pobs:%02x ", w, h, (attr & TILE_X_FLIP) ? 1 : 0, (attr & TILE_Y_FLIP) ? 1 : 0, xflipmask, yflipmask, nc, palette_offset);
 	}
 	palette_offset >>= nc;
@@ -230,79 +299,79 @@ void spg2xx_device::blit(const rectangle &cliprect, uint32_t xoff, uint32_t yoff
 		printf("poas:%02x\n", palette_offset);
 	}
 
-	uint32_t m = bitmap_addr + nc * w*h / 16 * tile;
+	uint32_t bits_per_row = nc * w / 16;
+	uint32_t words_per_tile = bits_per_row * h;
+	uint32_t m = bitmap_addr + words_per_tile * tile + bits_per_row * line;
 	uint32_t bits = 0;
 	uint32_t nbits = 0;
+	uint32_t y = line;
 
-	for (uint32_t y = 0; y < h; y++)
+	int yy = (yoff + (y ^ yflipmask)) & 0x1ff;
+	if (yy >= 0x01c0)
+		yy -= 0x0200;
+
+	if (m_debug_blit && SPG_DEBUG_VIDEO)
+		printf("%3d:\n", yy);
+
+	for (uint32_t x = 0; x < w; x++)
 	{
-		int yy = (yoff + (y ^ yflipmask)) & 0x1ff;
-		if (yy >= 0x01c0)
-			yy -= 0x0200;
+		int xx = xoff + (x ^ xflipmask);
 
+		bits <<= nc;
 		if (m_debug_blit && SPG_DEBUG_VIDEO)
-			printf("%3d:\n", yy);
-
-		for (uint32_t x = 0; x < w; x++)
+			printf("    %08x:%d ", bits, nbits);
+		if (nbits < nc)
 		{
-			int xx = xoff + (x ^ xflipmask);
-
-			bits <<= nc;
+			uint16_t b = space.read_word(m++ & 0x3fffff);
+			b = (b << 8) | (b >> 8);
+			bits |= b << (nc - nbits);
+			nbits += 16;
 			if (m_debug_blit && SPG_DEBUG_VIDEO)
-				printf("    %08x:%d ", bits, nbits);
-			if (nbits < nc)
+				printf("(%04x:%08x:%d) ", b, bits, nbits);
+		}
+		nbits -= nc;
+
+		uint32_t pal = palette_offset + (bits >> 16);
+		if (m_debug_blit && SPG_DEBUG_VIDEO)
+			printf("%02x:%02x:%04x ", bits >> 16, pal, bits & 0xffff);
+		bits &= 0xffff;
+
+		if ((ctrl & 0x0010) && yy < 240)
+			xx -= (int16_t)m_scrollram[yy + 15];
+
+		xx &= 0x01ff;
+		if (xx >= 0x01c0)
+			xx -= 0x0200;
+
+		if (xx >= 0 && xx < 320 && yy >= 0 && yy < 240)
+		{
+			uint16_t rgb = m_paletteram[pal];
+			if (m_debug_blit && SPG_DEBUG_VIDEO)
+				printf("rgb:%04x ", rgb);
+			if (!(rgb & 0x8000))
 			{
-				uint16_t b = space.read_word(m++ & 0x3fffff);
-				b = (b << 8) | (b >> 8);
-				bits |= b << (nc - nbits);
-				nbits += 16;
-				if (m_debug_blit && SPG_DEBUG_VIDEO)
-					printf("(%04x:%08x:%d) ", b, bits, nbits);
+				if (attr & 0x4000 || ctrl & 0x0100)
+				{
+					if (m_debug_blit && SPG_DEBUG_VIDEO)
+						printf("M\n");
+					mix_pixel(xx + 320 * yy, rgb);
+				}
+				else
+				{
+					if (m_debug_blit && SPG_DEBUG_VIDEO)
+						printf("S\n");
+					set_pixel(xx + 320 * yy, rgb);
+				}
 			}
-			nbits -= nc;
-
-			uint32_t pal = palette_offset + (bits >> 16);
-			if (m_debug_blit && SPG_DEBUG_VIDEO)
-				printf("%02x:%02x:%04x ", bits >> 16, pal, bits & 0xffff);
-			bits &= 0xffff;
-
-			if ((ctrl & 0x0010) && yy < 240)
-				xx -= (int16_t)m_scrollram[yy + 15];
-
-			xx &= 0x01ff;
-			if (xx >= 0x01c0)
-				xx -= 0x0200;
-
-			if (xx >= 0 && xx < 320 && yy >= 0 && yy < 240)
+			else if (m_debug_blit && SPG_DEBUG_VIDEO)
 			{
-				uint16_t rgb = m_paletteram[pal];
-				if (m_debug_blit && SPG_DEBUG_VIDEO)
-					printf("rgb:%04x ", rgb);
-				if (!(rgb & 0x8000))
-				{
-					if (attr & 0x4000 || ctrl & 0x0100)
-					{
-						if (m_debug_blit && SPG_DEBUG_VIDEO)
-							printf("M\n");
-						mix_pixel(xx + 320 * yy, rgb);
-					}
-					else
-					{
-						if (m_debug_blit && SPG_DEBUG_VIDEO)
-							printf("S\n");
-						set_pixel(xx + 320 * yy, rgb);
-					}
-				}
-				else if (m_debug_blit && SPG_DEBUG_VIDEO)
-				{
-					printf("X\n");
-				}
+				printf("X\n");
 			}
 		}
 	}
 }
 
-void spg2xx_device::blit_page(const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs)
+void spg2xx_device::blit_page(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t bitmap_addr, uint16_t *regs)
 {
 	uint32_t xscroll = regs[0];
 	uint32_t yscroll = regs[1];
@@ -322,54 +391,54 @@ void spg2xx_device::blit_page(const rectangle &cliprect, int depth, uint32_t bit
 		return;
 	}
 
-	uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+	uint32_t tile_h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+	uint32_t tile_w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
-	uint32_t hn = 256 / h;
-	uint32_t wn = 512 / w;
+	uint32_t tile_count_x = 512 / tile_w;
 
-	for (uint32_t y0 = 0; y0 < hn; y0++)
+	uint32_t bitmap_y = (scanline + yscroll) & 0xff;
+	uint32_t y0 = bitmap_y / tile_h;
+	uint32_t tile_scanline = bitmap_y % tile_h;
+	uint32_t tile_address = tile_count_x * y0;
+
+	for (uint32_t x0 = 0; x0 < tile_count_x; x0++, tile_address++)
 	{
-		for (uint32_t x0 = 0; x0 < wn; x0++)
+		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & 0xff) - 0x10;
+		uint32_t xx = (tile_w * x0 - xscroll) & 0x1ff;
+
+		uint16_t tile = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
+		uint16_t palette = 0;
+
+		if (!tile)
 		{
-			uint16_t tile = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + x0 + wn * y0);
-			uint16_t palette = 0;
-			uint32_t xx, yy;
-
-			if (!tile)
-			{
-				continue;
-			}
-
-			palette = space.read_word(palette_map + (x0 + wn * y0) / 2);
-			if (x0 & 1)
-			{
-				palette >>= 8;
-			}
-
-			uint32_t tileattr = attr;
-			uint32_t tilectrl = ctrl;
-			if ((ctrl & 2) == 0)
-			{   // -(1) bld(1) flip(2) pal(4)
-				tileattr &= ~0x000c;
-				tileattr |= (palette >> 2) & 0x000c;    // flip
-
-				tileattr &= ~0x0f00;
-				tileattr |= (palette << 8) & 0x0f00;    // palette
-
-				tilectrl &= ~0x0100;
-				tilectrl |= (palette << 2) & 0x0100;    // blend
-			}
-
-			yy = ((h*y0 - yscroll + 0x10) & 0xff) - 0x10;
-			xx = (w*x0 - xscroll) & 0x1ff;
-
-			blit(cliprect, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+			continue;
 		}
+
+		palette = space.read_word(palette_map + tile_address / 2);
+		if (x0 & 1)
+		{
+			palette >>= 8;
+		}
+
+		uint32_t tileattr = attr;
+		uint32_t tilectrl = ctrl;
+		if ((ctrl & 2) == 0)
+		{   // -(1) bld(1) flip(2) pal(4)
+			tileattr &= ~0x000c;
+			tileattr |= (palette >> 2) & 0x000c;    // flip
+
+			tileattr &= ~0x0f00;
+			tileattr |= (palette << 8) & 0x0f00;    // palette
+
+			tilectrl &= ~0x0100;
+			tilectrl |= (palette << 2) & 0x0100;    // blend
+		}
+
+		blit(cliprect, tile_scanline, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
 	}
 }
 
-void spg2xx_device::blit_sprite(const rectangle &cliprect, int depth, uint32_t base_addr)
+void spg2xx_device::blit_sprite(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t base_addr)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
 	uint32_t bitmap_addr = 0x40 * m_video_regs[0x22];
@@ -389,32 +458,37 @@ void spg2xx_device::blit_sprite(const rectangle &cliprect, int depth, uint32_t b
 		return;
 	}
 
+	const uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+	const uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+
 	if (!(m_video_regs[0x42] & SPRITE_COORD_TL_MASK))
 	{
-		x = 160 + x;
-		y = 120 - y;
-
-		uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-		uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
-
-		x -= (w / 2);
-		y -= (h / 2) - 8;
+		x = (160 + x) - w / 2;
+		y = (120 - y) - (h / 2) + 8;
 	}
 
 	x &= 0x01ff;
 	y &= 0x01ff;
 
+	if (y > scanline)
+		return;
+
+	uint32_t tile_line = ((scanline - y) + 0x200) % h;
+
+	if (tile_line >= h)
+		return;
+
 #if SPG_DEBUG_VIDEO
 	if (m_debug_sprites && machine().input().code_pressed(KEYCODE_MINUS))
 		m_debug_blit = true;
-	blit(cliprect, x, y, attr, 0, bitmap_addr, tile);
+	blit(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
 	m_debug_blit = false;
 #else
-	blit(cliprect, x, y, attr, 0, bitmap_addr, tile);
+	blit(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
 #endif
 }
 
-void spg2xx_device::blit_sprites(const rectangle &cliprect, int depth)
+void spg2xx_device::blit_sprites(const rectangle &cliprect, uint32_t scanline, int depth)
 {
 	if (!(m_video_regs[0x42] & SPRITE_ENABLE_MASK))
 	{
@@ -427,13 +501,13 @@ void spg2xx_device::blit_sprites(const rectangle &cliprect, int depth)
 #endif
 		for (uint32_t n = 0; n < m_sprite_limit; n++)
 		{
-			blit_sprite(cliprect, depth, 0x2c00 + 4 * n);
+			blit_sprite(cliprect, scanline, depth, 0x2c00 + 4 * n);
 		}
 #if SPG_DEBUG_VIDEO
 	}
 	else
 	{
-		blit_sprite(cliprect, depth, 0x2c00 + 4 * m_sprite_index_to_debug);
+		blit_sprite(cliprect, scanline, depth, 0x2c00 + 4 * m_sprite_index_to_debug);
 	}
 #endif
 }
@@ -496,14 +570,17 @@ uint32_t spg2xx_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	uint16_t *page1_regs = m_video_regs + 0x10;
 	uint16_t *page2_regs = m_video_regs + 0x16;
 
-	for (int i = 0; i < 4; i++)
+	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
-		if (!m_hide_page0)
-			blit_page(cliprect, i, page1_addr, page1_regs);
-		if (!m_hide_page1)
-			blit_page(cliprect, i, page2_addr, page2_regs);
-		if (!m_hide_sprites)
-			blit_sprites(cliprect, i);
+		for (int i = 0; i < 4; i++)
+		{
+			if (!m_hide_page0)
+				blit_page(cliprect, scanline, i, page1_addr, page1_regs);
+			if (!m_hide_page1)
+				blit_page(cliprect, scanline, i, page2_addr, page2_regs);
+			if (!m_hide_sprites)
+				blit_sprites(cliprect, scanline, i);
+		}
 	}
 
 	if ((m_video_regs[0x3c] & 0x00ff) != 0x0020)
@@ -808,28 +885,13 @@ void spg2xx_device::check_video_irq()
 
 void spg2xx_device::uart_rx(uint8_t data)
 {
-	if (!m_uart_rx_available)
-	{
-		if (BIT(m_io_regs[0x30], 6))
-		{
-			m_io_regs[0x36] = data;
-			if (BIT(m_io_regs[0x30], 0))
-			{
-				IO_IRQ_STATUS |= 0x0100;
-				check_irqs(0x0100);
-			}
-			m_uart_rx_available = true;
-		}
-	}
-	else if (m_uart_rx_fifo_count == ARRAY_LENGTH(m_uart_rx_fifo))
-	{
-		m_io_regs[0x37] |= 0x4000;
-	}
-	else
+	LOGMASKED(LOG_UART, "uart_rx: Pulling %02x into receive FIFO\n", data);
+	if (BIT(m_io_regs[0x30], 6))
 	{
 		m_uart_rx_fifo[m_uart_rx_fifo_end] = data;
 		m_uart_rx_fifo_end = (m_uart_rx_fifo_end + 1) % ARRAY_LENGTH(m_uart_rx_fifo);
 		m_uart_rx_fifo_count++;
+		m_uart_rx_timer->adjust(attotime::from_ticks(BIT(m_io_regs[0x30], 5) ? 11 : 10, m_uart_baud_rate));
 	}
 }
 
@@ -885,7 +947,7 @@ READ16_MEMBER(spg2xx_device::io_r)
 
 	case 0x27: // ADC Data
 		m_io_regs[0x27] = 0;
-		LOGMASKED(LOG_IO_READS, "io_r: ADC Data = %04x\n", val);
+		LOGMASKED(LOG_IO_READS, "%s: io_r: ADC Data = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x29: // Wakeup Source
@@ -911,7 +973,6 @@ READ16_MEMBER(spg2xx_device::io_r)
 		break;
 
 	case 0x31: // UART Status
-		val |= (m_uart_rx_available ? 0x81 : 0);
 		LOGMASKED(LOG_UART, "io_r: UART Status = %04x\n", val);
 		break;
 
@@ -923,9 +984,15 @@ READ16_MEMBER(spg2xx_device::io_r)
 				m_io_regs[0x36] = m_uart_rx_fifo[m_uart_rx_fifo_start];
 				m_uart_rx_fifo_start = (m_uart_rx_fifo_start + 1) % ARRAY_LENGTH(m_uart_rx_fifo);
 				m_uart_rx_fifo_count--;
+				if (m_uart_rx_fifo_count == 0)
+				{
+					m_io_regs[0x31] &= ~0x0081;
+					m_uart_rx_available = false;
+				}
 			}
 			else
 			{
+				m_io_regs[0x31] &= ~0x0081;
 				m_uart_rx_available = false;
 			}
 		}
@@ -941,6 +1008,9 @@ READ16_MEMBER(spg2xx_device::io_r)
 		val |= (m_uart_rx_available ? 7 : 0) << 4;
 		LOGMASKED(LOG_UART, "io_r: UART Rx FIFO Control = %04x\n", val);
 		break;
+
+	case 0x51: // unknown, polled by ClickStart cartridges ( clikstrt )
+		return 0x8000;
 
 	case 0x59: // I2C Status
 		LOGMASKED(LOG_I2C, "io_r: I2C Status = %04x\n", val);
@@ -1143,7 +1213,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 
 	case 0x21: // IRQ Enable
 	{
-		LOGMASKED(LOG_IRQS, "io_w: IRQ Enable = %04x\n", data);
+		LOGMASKED(LOG_UART, "io_w: IRQ Enable = %04x\n", data);
 		const uint16_t old = IO_IRQ_ENABLE & IO_IRQ_STATUS;
 		m_io_regs[offset] = data;
 		const uint16_t changed = old ^ (IO_IRQ_ENABLE & IO_IRQ_STATUS);
@@ -1203,17 +1273,17 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 
 	case 0x25: // ADC Control
 	{
-		LOGMASKED(LOG_IO_WRITES, "io_w: ADC Control = %04x\n", data);
-		//const uint16_t changed = m_io_regs[offset] ^ data;
+		LOGMASKED(LOG_IO_WRITES, "%s: io_w: ADC Control = %04x\n", machine().describe_context(), data);
+		const uint16_t changed = m_io_regs[offset] ^ data;
 		m_io_regs[offset] = data;
-		//if (BIT(changed, 12) && BIT(data, 12) && !BIT(m_io_regs[offset], 1))
+		if (BIT(changed, 12) && BIT(data, 12) && !BIT(m_io_regs[offset], 1))
 		{
-			//m_io_regs[0x27] = 0x80ff;
-			//const uint16_t old = IO_IRQ_STATUS;
-			//IO_IRQ_STATUS |= 0x2000;
-			//const uint16_t changed = IO_IRQ_STATUS ^ old;
-			//if (changed)
-				//check_irqs(changed);
+			m_io_regs[0x27] = 0x8000 | (m_adc_in() & 0x7fff);
+			const uint16_t old = IO_IRQ_STATUS;
+			IO_IRQ_STATUS |= 0x2000;
+			const uint16_t changed = IO_IRQ_STATUS ^ old;
+			if (changed)
+				check_irqs(changed);
 		}
 		break;
 	}
@@ -1279,16 +1349,40 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 			m_uart_rx_available = false;
 			m_io_regs[0x36] = 0;
 		}
-		if (BIT(changed, 7) && BIT(data, 7))
+		if (BIT(changed, 7))
 		{
-			m_io_regs[0x31] |= 0x0002;
+			if (BIT(data, 7))
+			{
+				m_io_regs[0x31] |= 0x0002;
+			}
+			else
+			{
+				m_io_regs[0x31] &= ~0x0042;
+				m_uart_tx_timer->adjust(attotime::never);
+			}
 		}
 		break;
 	}
 
 	case 0x31: // UART Status
 		LOGMASKED(LOG_UART, "io_w: UART Status = %04x\n", data);
-		m_io_regs[offset] &= ~data;
+		if (BIT(data, 0))
+		{
+			m_io_regs[0x31] &= ~1;
+			m_uart_rx_irq = false;
+		}
+		if (BIT(data, 1))
+		{
+			m_io_regs[0x31] &= ~2;
+			m_uart_tx_irq = false;
+		}
+		if (!m_uart_rx_irq && !m_uart_tx_irq)
+		{
+			const uint16_t old = IO_IRQ_STATUS;
+			IO_IRQ_STATUS &= ~0x0100;
+			if (IO_IRQ_STATUS != old)
+				check_irqs(0x0100);
+		}
 		break;
 
 	case 0x33: // UART Baud Rate (low byte)
@@ -1297,14 +1391,20 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		m_io_regs[offset] = data;
 		const uint32_t divisor = 16 * (0x10000 - ((m_io_regs[0x34] << 8) | m_io_regs[0x33]));
 		LOGMASKED(LOG_UART, "io_w: UART Baud Rate (%s byte): Baud rate = %d\n", offset == 0x33 ? "low" : "high", 27000000 / divisor);
+		m_uart_baud_rate = 27000000 / divisor;
 		break;
 	}
 
 	case 0x35: // UART TX Data
 		LOGMASKED(LOG_UART, "io_w: UART Tx Data = %02x\n", data & 0x00ff);
 		m_io_regs[offset] = data;
-		m_uart_tx((uint8_t)data);
-		m_io_regs[0x31] |= 2;
+		if (BIT(m_io_regs[0x30], 7))
+		{
+			LOGMASKED(LOG_UART, "io_w: UART Tx: Clearing ready bit, setting busy bit, setting up timer\n");
+			m_uart_tx_timer->adjust(attotime::from_ticks(BIT(m_io_regs[0x30], 5) ? 11 : 10, m_uart_baud_rate));
+			m_io_regs[0x31] &= ~0x0002;
+			m_io_regs[0x31] |= 0x0040;
+		}
 		break;
 
 	case 0x36: // UART RX Data
@@ -1426,9 +1526,117 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		}
 
 		case TIMER_BEAT:
-		{
 			audio_frame_tick();
 			break;
+
+		case TIMER_UART_TX:
+			uart_transmit_tick();
+			break;
+
+		case TIMER_UART_RX:
+			uart_receive_tick();
+			break;
+
+		case TIMER_4KHZ:
+			system_timer_tick();
+			break;
+	}
+}
+
+void spg2xx_device::system_timer_tick()
+{
+	uint16_t check_mask = 0x0040;
+	IO_IRQ_STATUS |= 0x0040;
+
+	if (machine().input().code_pressed_once(KEYCODE_H))
+	{
+		IO_IRQ_STATUS |= 0x4000;
+		check_irqs(0x4000);
+	}
+
+	m_2khz_divider++;
+	if (m_2khz_divider == 2)
+	{
+		m_2khz_divider = 0;
+		IO_IRQ_STATUS |= 0x0020;
+		check_mask |= 0x0020;
+
+		m_1khz_divider++;
+		if (m_1khz_divider == 2)
+		{
+			m_1khz_divider = 0;
+			IO_IRQ_STATUS |= 0x0010;
+			check_mask |= 0x0010;
+
+			m_4hz_divider++;
+			if (m_4hz_divider == 256)
+			{
+				m_4hz_divider = 0;
+				IO_IRQ_STATUS |= 0x0008;
+				check_mask |= 0x0008;
+			}
+		}
+	}
+
+	check_irqs(check_mask);
+}
+
+void spg2xx_device::uart_transmit_tick()
+{
+	LOGMASKED(LOG_UART, "uart_transmit_tick: Transmitting %02x, setting TxReady, clearing TxBusy\n", (uint8_t)m_io_regs[0x35]);
+	m_uart_tx((uint8_t)m_io_regs[0x35]);
+	m_io_regs[0x31] |= 0x0002;
+	m_io_regs[0x31] &= ~0x0040;
+	if (BIT(m_io_regs[0x30], 1))
+	{
+		const uint16_t old = IO_IRQ_STATUS;
+		IO_IRQ_STATUS |= 0x0100;
+		m_uart_tx_irq = true;
+		LOGMASKED(LOG_UART, "uart_transmit_tick: Setting UART IRQ bit\n");
+		if (IO_IRQ_STATUS != old)
+		{
+			LOGMASKED(LOG_UART, "uart_transmit_tick: Bit newly set, checking IRQs\n");
+			check_irqs(0x0100);
+		}
+	}
+}
+
+void spg2xx_device::uart_receive_tick()
+{
+	LOGMASKED(LOG_UART, "uart_receive_tick: Setting RBF and RxRDY\n");
+	m_io_regs[0x31] |= 0x81;
+	m_io_regs[0x36] = m_uart_rx_fifo[m_uart_rx_fifo_start];
+	m_uart_rx_fifo_start = (m_uart_rx_fifo_start + 1) % ARRAY_LENGTH(m_uart_rx_fifo);
+	m_uart_rx_fifo_count--;
+	m_uart_rx_available = true;
+	if (BIT(m_io_regs[0x30], 0))
+	{
+		LOGMASKED(LOG_UART, "uart_receive_tick: RxIntEn is set, setting rx_irq to true and setting UART IRQ\n");
+		m_uart_rx_irq = true;
+		IO_IRQ_STATUS |= 0x0100;
+		check_irqs(0x0100);
+	}
+}
+
+void spg2xx_device::extint_w(int channel, bool state)
+{
+	logerror("Setting extint channel %d to %s\n", channel, state ? "true" : "false");
+	bool old = m_extint[channel];
+	m_extint[channel] = state;
+	if (old != state)
+	{
+		logerror("extint state changed, so %sing interrupt\n", state ? "rais" : "lower");
+		const uint16_t mask = (channel == 0) ? 0x0200 : 0x1000;
+		const uint16_t old_irq = IO_IRQ_STATUS;
+		if (state)
+			IO_IRQ_STATUS |= mask;
+		else
+			IO_IRQ_STATUS &= ~mask;
+
+		if (old_irq != IO_IRQ_STATUS)
+		{
+			logerror("extint IRQ changed, so checking interrupts\n");
+			check_irqs(mask);
 		}
 	}
 }
@@ -1441,13 +1649,13 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 
 	if (changed & 0x0c00) // Timer A, Timer B IRQ
 	{
-		LOGMASKED(LOG_IRQS, "%ssserting IRQ2 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b));
+		LOGMASKED(LOG_IRQS, "%ssserting IRQ2 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00));
 		m_cpu->set_input_line(UNSP_IRQ2_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & 0x2100) // UART, ADC IRQ
 	{
-		LOGMASKED(LOG_IRQS, "%ssserting IRQ3 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b));
+		LOGMASKED(LOG_UART, "%ssserting IRQ3 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100));
 		m_cpu->set_input_line(UNSP_IRQ3_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
@@ -1467,13 +1675,13 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 
 	if (changed & 0x1200) // External IRQ
 	{
-		LOGMASKED(LOG_IRQS, "%ssserting IRQ5 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b));
+		LOGMASKED(LOG_UART, "%ssserting IRQ5 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200));
 		m_cpu->set_input_line(UNSP_IRQ5_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & 0x0070) // 1024Hz, 2048Hz, 4096Hz IRQ
 	{
-		LOGMASKED(LOG_IRQS, "%ssserting IRQ6 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b));
+		LOGMASKED(LOG_IRQS, "%ssserting IRQ6 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070));
 		m_cpu->set_input_line(UNSP_IRQ6_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
@@ -1482,6 +1690,31 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 		LOGMASKED(LOG_IRQS, "%ssserting IRQ7 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b));
 		m_cpu->set_input_line(UNSP_IRQ7_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? ASSERT_LINE : CLEAR_LINE);
 	}
+}
+
+uint16_t spg2xx_device::do_special_gpio(uint32_t index, uint16_t mask)
+{
+	uint16_t data = 0;
+	switch (index)
+	{
+		case 0: // Port A
+			if (mask & 0xe000)
+			{
+				const uint8_t csel = m_cpu->get_csb() & 0x0e;
+				data = (csel << 12) & mask;
+			}
+			break;
+		case 1: // Port B
+			// To do
+			break;
+		case 2: // Port C
+			// To do
+			break;
+		default:
+			// Can't happen
+			break;
+	}
+	return data;
 }
 
 void spg2xx_device::do_gpio(uint32_t offset)
@@ -1493,10 +1726,12 @@ void spg2xx_device::do_gpio(uint32_t offset)
 	uint16_t special = m_io_regs[5 * index + 5];
 
 	uint16_t push = dir;
-	uint16_t pull = (~dir) & (~attr);
+	uint16_t pull = ~dir;
 	uint16_t what = (buffer & (push | pull));
 	what ^= (dir & ~attr);
 	what &= ~special;
+	//if (index == 0)
+		//printf("buf:%04x, dir:%04x, pull:%04x, push:%04x\n", buffer, dir, pull, push);
 
 	switch (index)
 	{
@@ -1514,6 +1749,7 @@ void spg2xx_device::do_gpio(uint32_t offset)
 			break;
 	}
 
+	what |= do_special_gpio(index, special);
 	m_io_regs[5 * index + 1] = what;
 }
 

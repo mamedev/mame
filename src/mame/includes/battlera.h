@@ -32,6 +32,7 @@ public:
 
 	int m_control_port_select;
 	int m_msm5205next;
+	int m_toggle;
 
 	DECLARE_WRITE8_MEMBER(control_data_w);
 	DECLARE_READ8_MEMBER(control_data_r);

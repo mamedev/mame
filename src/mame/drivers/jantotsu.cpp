@@ -503,38 +503,35 @@ void jantotsu_state::machine_reset()
 	m_adpcm_trigger = 0;
 }
 
-MACHINE_CONFIG_START(jantotsu_state::jantotsu)
-
+void jantotsu_state::jantotsu(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,MAIN_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(jantotsu_map)
-	MCFG_DEVICE_IO_MAP(jantotsu_io)
+	Z80(config, m_maincpu, MAIN_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jantotsu_state::jantotsu_map);
+	m_maincpu->set_addrmap(AS_IO, &jantotsu_state::jantotsu_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(jantotsu_state, screen_update_jantotsu)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); //not accurate
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 240-1);
+	screen.set_screen_update(FUNC(jantotsu_state::screen_update_jantotsu));
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	PALETTE(config, m_palette, FUNC(jantotsu_state::jantotsu_palette), 0x20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, MAIN_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489A(config, "sn1", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489A(config, "sn2", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("sn2", SN76489A, MAIN_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("adpcm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, jantotsu_state, jan_adpcm_int))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6 KHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	MSM5205(config, m_adpcm, XTAL(384'000));
+	m_adpcm->vck_legacy_callback().set(FUNC(jantotsu_state::jan_adpcm_int));  /* interrupt function */
+	m_adpcm->set_prescaler_selector(msm5205_device::S64_4B);  /* 6 KHz */
+	m_adpcm->add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 /*************************************

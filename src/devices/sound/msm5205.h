@@ -7,16 +7,6 @@
 
 /* an interface for the MSM5205 and similar chips */
 
-#define MCFG_MSM5205_PRESCALER_SELECTOR(select) \
-	downcast<msm5205_device &>(*device).set_prescaler_selector((msm5205_device::select));
-
-#define MCFG_MSM5205_VCK_CALLBACK(cb) \
-	downcast<msm5205_device &>(*device).set_vck_callback((DEVCB_##cb));
-
-#define MCFG_MSM5205_VCLK_CB(cb) \
-	downcast<msm5205_device &>(*device).set_vck_legacy_callback((DEVCB_##cb));
-
-
 class msm5205_device : public device_t, public device_sound_interface
 {
 public:

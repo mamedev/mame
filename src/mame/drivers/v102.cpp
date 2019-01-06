@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:AJR
 /***********************************************************************************************************************************
 
 Skeleton driver for Visual 102 display terminal.
@@ -7,8 +7,8 @@ Skeleton driver for Visual 102 display terminal.
 ************************************************************************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/mcs48/mcs48.h"
 #include "machine/eeprompar.h"
 #include "machine/input_merger.h"
 #include "machine/i8251.h"
@@ -20,32 +20,56 @@ Skeleton driver for Visual 102 display terminal.
 //#include "video/crt9021.h"
 #include "screen.h"
 
+#include "machine/v102_kbd.h"
+
 class v102_state : public driver_device
 {
 public:
 	v102_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_p_chargen(*this, "chargen")
+		, m_mpsc(*this, "mpsc")
+		, m_chargen(*this, "chargen")
 	{ }
 
 	void v102(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_WRITE_LINE_MEMBER(hs_w);
 
 	void io_map(address_map &map);
 	void kbd_map(address_map &map);
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_region_ptr<u8> m_p_chargen;
+	required_device<upd7201_new_device> m_mpsc;
+	required_region_ptr<u8> m_chargen;
+
+	bool m_hs_state;
+	bool m_kb_clock;
 };
 
 
 u32 v102_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
+}
+
+WRITE_LINE_MEMBER(v102_state::hs_w)
+{
+	if (state && !m_hs_state)
+	{
+		m_kb_clock = !m_kb_clock;
+		m_mpsc->txca_w(m_kb_clock);
+		m_mpsc->rxca_w(m_kb_clock);
+	}
+
+	m_hs_state = bool(state);
 }
 
 
@@ -73,6 +97,18 @@ void v102_state::kbd_map(address_map &map)
 	map(0x000, 0x7ff).rom().region("keyboard", 0);
 }
 
+void v102_state::machine_start()
+{
+	m_hs_state = false;
+	m_kb_clock = false;
+
+	m_mpsc->ctsa_w(0);
+	m_mpsc->ctsb_w(0);
+
+	save_item(NAME(m_hs_state));
+	save_item(NAME(m_kb_clock));
+}
+
 static INPUT_PORTS_START(v102)
 INPUT_PORTS_END
 
@@ -90,23 +126,48 @@ void v102_state::v102(machine_config &config)
 	crt9007_device &vpac(CRT9007(config, "vpac", 18.575_MHz_XTAL / 10));
 	vpac.set_character_width(10); // 6 in 132-column mode
 	vpac.int_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
+	vpac.hs_callback().set(FUNC(v102_state::hs_w));
+	vpac.set_screen("screen");
 
 	EEPROM_2804(config, "eeprom");
 
-	upd7201_new_device &mpsc(UPD7201_NEW(config, "mpsc", 18.575_MHz_XTAL / 5)); // divider not verified
-	mpsc.out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	UPD7201_NEW(config, m_mpsc, 18.575_MHz_XTAL / 5); // divider not verified
+	m_mpsc->out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_mpsc->out_txda_callback().set("keyboard", FUNC(v102_keyboard_device::write_rxd));
+	m_mpsc->out_txdb_callback().set("aux", FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_dtrb_callback().set("aux", FUNC(rs232_port_device::write_dtr));
+	m_mpsc->out_rtsb_callback().set("aux", FUNC(rs232_port_device::write_rts));
 
 	i8251_device &usart(I8251(config, "usart", 18.575_MHz_XTAL / 5)); // divider not verified
 	usart.rxrdy_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	usart.txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
+	usart.dtr_handler().set("modem", FUNC(rs232_port_device::write_dtr));
+	usart.rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	PIT8253(config, "pit", 0);
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<0>(18.575_MHz_XTAL / 6);
+	pit.set_clk<1>(18.575_MHz_XTAL / 6);
+	pit.set_clk<2>(18.575_MHz_XTAL / 6);
+	pit.out_handler<0>().set("usart", FUNC(i8251_device::write_txc));
+	pit.out_handler<1>().set("usart", FUNC(i8251_device::write_rxc));
+	pit.out_handler<2>().set(m_mpsc, FUNC(upd7201_new_device::txcb_w));
+	pit.out_handler<2>().append(m_mpsc, FUNC(upd7201_new_device::rxcb_w));
 
 	I8255(config, "ppi");
 
-	mcs48_cpu_device &kbdcpu(I8039(config, "kbdcpu", 4.608_MHz_XTAL)); // oscillator marked "4608 - 300 107 - KSS4D"
-	kbdcpu.set_addrmap(AS_PROGRAM, &v102_state::kbd_map);
+	v102_keyboard_device &keyboard(V102_KEYBOARD(config, "keyboard"));
+	keyboard.txd_callback().set(m_mpsc, FUNC(upd7201_new_device::rxa_w));
+
+	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	modem.rxd_handler().set("usart", FUNC(i8251_device::write_rxd));
+	modem.cts_handler().set("usart", FUNC(i8251_device::write_cts));
+	modem.dcd_handler().set("usart", FUNC(i8251_device::write_dsr));
+
+	rs232_port_device &aux(RS232_PORT(config, "aux", default_rs232_devices, nullptr));
+	aux.rxd_handler().set(m_mpsc, FUNC(upd7201_new_device::rxb_w));
+	aux.dcd_handler().set(m_mpsc, FUNC(upd7201_new_device::dcdb_w)); // DTR (printer busy)
 }
 
 
@@ -125,9 +186,6 @@ ROM_START( v102 )
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "260-001.u50", 0x0000, 0x1000, CRC(732f5b99) SHA1(d105bf9f3ed41109d7181bcf0223bb280afe3f0a) )
-
-	ROM_REGION(0x0800, "keyboard", 0)
-	ROM_LOAD( "150.kbd",     0x0000, 0x0800, CRC(afe55cff) SHA1(b26ebdde63ec0e94c08780285def39a282e128b3) )
 ROM_END
 
 COMP( 1984, v102, 0, 0, v102, v102, v102_state, empty_init, "Visual Technology", "Visual 102", MACHINE_IS_SKELETON )

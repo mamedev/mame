@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "machine/pit8253.h"
 #include "xbox_nv2a.h"
 #include "xbox_usb.h"
 
@@ -57,22 +58,47 @@ DECLARE_DEVICE_TYPE(NV2A_RAM, nv2a_ram_device)
  * LPC Bus
  */
 
-class mcpx_lpc_device : public pci_device {
+class mcpx_isalpc_device : public pci_device {
 public:
-	mcpx_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	auto interrupt_output() { return m_interrupt_output.bind(); }
+
+	uint32_t acknowledge();
+	void debug_generate_irq(int irq, int state);
 
 	DECLARE_READ32_MEMBER(lpc_r);
 	DECLARE_WRITE32_MEMBER(lpc_w);
 
+	DECLARE_WRITE_LINE_MEMBER(irq1);
+	DECLARE_WRITE_LINE_MEMBER(irq3);
+	DECLARE_WRITE_LINE_MEMBER(irq11);
+	DECLARE_WRITE_LINE_MEMBER(irq10);
+	DECLARE_WRITE_LINE_MEMBER(irq14);
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+
+	DECLARE_WRITE_LINE_MEMBER(interrupt_ouptut_changed);
+	DECLARE_READ8_MEMBER(get_slave_ack);
+	DECLARE_WRITE_LINE_MEMBER(pit8254_out0_changed);
+	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
 
 private:
+	void internal_io_map(address_map &map);
 	void lpc_io(address_map &map);
+
+	devcb_write_line m_interrupt_output;
+	required_device<pic8259_device> pic8259_1;
+	required_device<pic8259_device> pic8259_2;
+	required_device<pit8254_device> pit8254;
 };
 
-DECLARE_DEVICE_TYPE(MCPX_LPC, mcpx_lpc_device)
+DECLARE_DEVICE_TYPE(MCPX_ISALPC, mcpx_isalpc_device)
 
 /*
  * SMBus

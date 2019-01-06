@@ -914,21 +914,21 @@ static GFXDECODE_START( gfx_gsword )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(gsword_state::gsword)
-
+void gsword_state::gsword(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(18'000'000)/6) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
-	MCFG_DEVICE_IO_MAP(cpu1_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gsword_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(18'000'000)/6);	/* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu1_map);
+	m_maincpu->set_addrmap(AS_IO, &gsword_state::cpu1_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gsword_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD(m_subcpu, Z80, XTAL(18'000'000)/6) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
-	MCFG_DEVICE_IO_MAP(cpu2_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(gsword_state, sound_interrupt, 4*60)
+	Z80(config, m_subcpu, XTAL(18'000'000)/6);	/* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu2_map);
+	m_subcpu->set_addrmap(AS_IO, &gsword_state::cpu2_io_map);
+	m_subcpu->set_periodic_int(FUNC(gsword_state::sound_interrupt), attotime::from_hz(4*60));
 
-	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(18'000'000)/6) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cpu3_map)
+	Z80(config, m_audiocpu, XTAL(18'000'000)/6);	/* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu3_map);
 
 	upi41_cpu_device &mcu1(I8041(config, "mcu1", 12'000'000/2));        // clock unknown, using value from gladiatr
 	mcu1.p1_in_cb().set([this] () { return ioport("MCU1.P1")->read() | BIT(m_mcu2_p1, 0); });
@@ -955,16 +955,16 @@ MACHINE_CONFIG_START(gsword_state::gsword)
 	CLOCK(config, "tclk", 12'000'000/8/128/2).signal_handler().set([this] (int state) { m_tclk_val = state != 0; });
 
 	// lazy way to ensure communication works
-	MCFG_QUANTUM_PERFECT_CPU("mcu1")
+	config.m_perfect_cpu_quantum = subtag("mcu1");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gsword_state, screen_update_gsword)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(gsword_state::screen_update_gsword));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gsword);
 	PALETTE(config, m_palette, FUNC(gsword_state::gsword_palette), 64*4 + 64*4, 256);
@@ -980,23 +980,23 @@ MACHINE_CONFIG_START(gsword_state::gsword)
 	m_ay1->port_a_write_callback().set(FUNC(gsword_state::nmi_set_w));
 	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb */
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	msm5205_device &msm(MSM5205(config, "msm", XTAL(400'000))); /* verified on pcb */
+	msm.set_prescaler_selector(msm5205_device::SEX_4B);  /* vclk input mode    */
+	msm.add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
-MACHINE_CONFIG_START(josvolly_state::josvolly)
-
+void josvolly_state::josvolly(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 18000000/4) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
-	MCFG_DEVICE_IO_MAP(josvolly_cpu1_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(josvolly_state, irq0_line_hold, 2*60)
+	Z80(config, m_maincpu, 18000000/4);		/* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &josvolly_state::cpu1_map);
+	m_maincpu->set_addrmap(AS_IO, &josvolly_state::josvolly_cpu1_io_map);
+	m_maincpu->set_periodic_int(FUNC(josvolly_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/4) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(josvolly_cpu2_map)
-	MCFG_DEVICE_IO_MAP(josvolly_cpu2_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", josvolly_state, irq0_line_assert)
+	Z80(config, m_audiocpu, 12000000/4);	/* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &josvolly_state::josvolly_cpu2_map);
+	m_audiocpu->set_addrmap(AS_IO, &josvolly_state::josvolly_cpu2_io_map);
+	m_audiocpu->set_vblank_int("screen", FUNC(josvolly_state::irq0_line_assert));
 
 	upi41_cpu_device &mcu1(I8741(config, "mcu1", 18000000/2)); /* ? */
 	mcu1.p1_in_cb().set(FUNC(josvolly_state::mcu1_p1_r));
@@ -1019,17 +1019,16 @@ MACHINE_CONFIG_START(josvolly_state::josvolly)
 	ppi.in_pc_callback().set_ioport("IN0");   // START
 
 	// the second MCU polls the first MCU's outputs, so it needs tight sync
-	MCFG_QUANTUM_PERFECT_CPU("mcu2")
-
+	config.m_perfect_cpu_quantum = subtag("mcu2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(josvolly_state, screen_update_gsword)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(josvolly_state::screen_update_gsword));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gsword);
 	PALETTE(config, m_palette, FUNC(josvolly_state::josvolly_palette), 64*4 + 64*4, 256);
@@ -1038,14 +1037,12 @@ MACHINE_CONFIG_START(josvolly_state::josvolly)
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, m_ay0, 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
-
 	AY8910(config, m_ay1, 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 #if 0
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MSM5205(config, "msm", 384000).add_route(ALL_OUTPUTS, "mono", 0.60);
 #endif
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

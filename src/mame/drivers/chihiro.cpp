@@ -1667,7 +1667,7 @@ void chihiro_state::baseboard_ide_event(int type, uint8_t *read_buffer, uint8_t 
 	// clear
 	write_buffer[0] = write_buffer[1] = write_buffer[2] = write_buffer[3] = 0;
 	// irq 10 active
-	xbox_base_devs.pic8259_2->ir2_w(1);
+	mcpxlpc->irq10(1);
 }
 
 uint8_t *chihiro_state::baseboard_ide_dimmboard(uint32_t lba)
@@ -1704,7 +1704,7 @@ WRITE32_MEMBER(chihiro_state::mediaboard_w)
 	logerror("I/O port write %04x mask %08X value %08X\n", offset * 4 + 0x4000, mem_mask, data);
 	// irq 10
 	if ((offset == 0xe0/4) && ACCESSING_BITS_8_15)
-		xbox_base_devs.pic8259_2->ir2_w(0);
+		mcpxlpc->irq10(0);
 }
 
 void chihiro_state::chihiro_map(address_map &map)

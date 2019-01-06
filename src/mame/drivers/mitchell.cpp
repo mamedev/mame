@@ -1161,30 +1161,29 @@ TIMER_DEVICE_CALLBACK_MEMBER(mitchell_state::mitchell_irq)
 	}
 }
 
-MACHINE_CONFIG_START(mitchell_state::mgakuen)
-
+void mitchell_state::mgakuen(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* probably same clock as the other mitchell hardware games */
-	MCFG_DEVICE_PROGRAM_MAP(mgakuen_map)
-	MCFG_DEVICE_IO_MAP(mitchell_io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
+	Z80(config, m_maincpu, XTAL(16'000'000)/2);	/* probably same clock as the other mitchell hardware games */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mitchell_state::mgakuen_map);
+	m_maincpu->set_addrmap(AS_IO, &mitchell_state::mitchell_io_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(mitchell_state::mitchell_irq), "screen", 0, 1);
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(mitchell_state::screen_update_pang));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mgakuen)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mgakuen);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 1024); // less colors than the others
 
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
@@ -1192,39 +1191,37 @@ MACHINE_CONFIG_START(mitchell_state::mgakuen)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* probably same clock as the other mitchell hardware games */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, m_oki, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH); /* probably same clock as the other mitchell hardware games */
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* probably same clock as the other mitchell hardware games */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL(16'000'000)/4)); /* probably same clock as the other mitchell hardware games */
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(mitchell_state::pang)
-
+void mitchell_state::pang(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
-	MCFG_DEVICE_IO_MAP(mitchell_io_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
+	Z80(config, m_maincpu, XTAL(16'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mitchell_state::mitchell_map);
+	m_maincpu->set_addrmap(AS_IO, &mitchell_state::mitchell_io_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &mitchell_state::decrypted_opcodes_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(mitchell_state::mitchell_irq), "screen", 0, 1);
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.42)   /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.42);	/* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(mitchell_state::screen_update_pang));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mitchell)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mitchell);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
@@ -1232,12 +1229,12 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	OKIM6295(config, m_oki, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH); /* verified on pcb */
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("ymsnd",YM2413, XTAL(16'000'000)/4) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL(16'000'000)/4)); /* verified on pcb */
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 void mitchell_state::pangnv(machine_config &config)
 {
@@ -1275,74 +1272,71 @@ WRITE_LINE_MEMBER(mitchell_state::spangbl_adpcm_int)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_sample_select);
 }
 
-
-MACHINE_CONFIG_START(mitchell_state::spangbl)
+void mitchell_state::spangbl(machine_config &config)
+{
 	pangnv(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(spangbl_map)
-	MCFG_DEVICE_IO_MAP(spangbl_io_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mitchell_state::spangbl_map);
+	m_maincpu->set_addrmap(AS_IO, &mitchell_state::spangbl_io_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &mitchell_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mitchell_state::irq0_line_hold));
 
-	MCFG_DEVICE_REMOVE("scantimer")
+	config.device_remove("scantimer");
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // Z80A CPU; clock unknown
-	MCFG_DEVICE_PROGRAM_MAP(spangbl_sound_map)
+	Z80(config, m_audiocpu, 4000000); // Z80A CPU; clock unknown
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mitchell_state::spangbl_sound_map);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spangbl)
+	m_gfxdecode->set_info(gfx_spangbl);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_REMOVE("oki")
-	MCFG_DEVICE_ADD("msm", MSM5205, 400000) // clock and prescaler unknown
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, mitchell_state, spangbl_adpcm_int)) // controls music as well as ADCPM rate
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	config.device_remove("oki");
+	MSM5205(config, m_msm, 400000); // clock and prescaler unknown
+	m_msm->vck_legacy_callback().set(FUNC(mitchell_state::spangbl_adpcm_int));	// controls music as well as ADCPM rate
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	LS157(config, m_adpcm_select, 0);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mitchell_state::pangba)
+void mitchell_state::pangba(machine_config &config)
+{
 	spangbl(config);
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(pangba_sound_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mitchell_state::pangba_sound_map);
 
-	MCFG_DEVICE_REPLACE("ymsnd", YM3812, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM3812(config.replace(), "ymsnd", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(mitchell_state::mstworld)
-
+void mitchell_state::mstworld(machine_config &config)
+{
 	/* basic machine hardware */
 	/* it doesn't glitch with the clock speed set to 4x normal, however this is incorrect..
 	  the interrupt handling (and probably various irq flags / vbl flags handling etc.) is
 	  more likely wrong.. the game appears to run too fast anyway .. */
-	MCFG_DEVICE_ADD("maincpu", Z80, 6000000*4)
-	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
-	MCFG_DEVICE_IO_MAP(mstworld_io_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 6000000*4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mitchell_state::mitchell_map);
+	m_maincpu->set_addrmap(AS_IO, &mitchell_state::mstworld_io_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &mitchell_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mitchell_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,6000000)        /* 6 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(mstworld_sound_map)
+	Z80(config, m_audiocpu, 6000000);	/* 6 MHz? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mitchell_state::mstworld_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
 	MCFG_MACHINE_RESET_OVERRIDE(mitchell_state,mitchell)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(mitchell_state::screen_update_pang));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mstworld)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mstworld);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
@@ -1352,33 +1346,31 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 990000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 990000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-
-MACHINE_CONFIG_START(mitchell_state::marukin)
-
+void mitchell_state::marukin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
-	MCFG_DEVICE_IO_MAP(mitchell_io_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
+	Z80(config, m_maincpu, XTAL(16'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mitchell_state::mitchell_map);
+	m_maincpu->set_addrmap(AS_IO, &mitchell_state::mitchell_io_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &mitchell_state::decrypted_opcodes_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(mitchell_state::mitchell_irq), "screen", 0, 1);
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(mitchell_state::screen_update_pang));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marukin)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_marukin);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
@@ -1386,12 +1378,12 @@ MACHINE_CONFIG_START(mitchell_state::marukin)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	OKIM6295(config, m_oki, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH); /* verified on pcb */
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(16'000'000)/4) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL(16'000'000)/4)); /* verified on pcb */
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /*
 
@@ -1411,28 +1403,27 @@ Vsync is 59.09hz
 
 */
 
-MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
-
+void mitchell_state::pkladiesbl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(mitchell_map)
-	MCFG_DEVICE_IO_MAP(mitchell_io_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mitchell_state::mitchell_map);
+	m_maincpu->set_addrmap(AS_IO, &mitchell_state::mitchell_io_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &mitchell_state::decrypted_opcodes_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(mitchell_state::mitchell_irq), "screen", 0, 1);
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.09) /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(mitchell_state, screen_update_pang)
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.09); /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(mitchell_state::screen_update_pang));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pkladiesbl)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pkladiesbl);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(mitchell_state,pang)
@@ -1440,12 +1431,12 @@ MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH) /* It should be a OKIM5205 with a 384khz resonator */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, m_oki, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH); /* It should be a OKIM5205 with a 384khz resonator */
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3750000) /* verified on pcb, read the comments */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", 3750000)); /* verified on pcb, read the comments */
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /*************************************
  *

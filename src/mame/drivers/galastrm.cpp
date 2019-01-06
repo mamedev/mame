@@ -38,7 +38,6 @@ $300.b debugmode
 $305.b invincibility
 
 TODO:
-- convert to use device implementation of TC0110PCR
 - device-ify TC0610? (no other known users)
 */
 
@@ -61,28 +60,13 @@ INTERRUPT_GEN_MEMBER(galastrm_state::interrupt)
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
-WRITE32_MEMBER(galastrm_state::palette_w)
+template<int Chip>
+WRITE16_MEMBER(galastrm_state::tc0610_w)
 {
-	if (ACCESSING_BITS_16_31)
-		m_tc0110pcr_addr = data >> 16;
-	if ((ACCESSING_BITS_0_15) && (m_tc0110pcr_addr < 4096))
-		m_palette->set_pen_color(m_tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
-}
-
-WRITE32_MEMBER(galastrm_state::tc0610_0_w)
-{
-	if (ACCESSING_BITS_16_31)
-		m_tc0610_0_addr = data >> 16;
-	if ((ACCESSING_BITS_0_15) && (m_tc0610_0_addr < 8))
-		m_tc0610_ctrl_reg[0][m_tc0610_0_addr] = data;
-}
-
-WRITE32_MEMBER(galastrm_state::tc0610_1_w)
-{
-	if (ACCESSING_BITS_16_31)
-		m_tc0610_1_addr = data >> 16;
-	if ((ACCESSING_BITS_0_15) && (m_tc0610_1_addr < 8))
-		m_tc0610_ctrl_reg[1][m_tc0610_1_addr] = data;
+	if (offset == 0)
+		m_tc0610_addr[Chip] = data;
+	else if (m_tc0610_addr[Chip] < 8)
+		m_tc0610_ctrl_reg[Chip][m_tc0610_addr[Chip]] = data;
 }
 
 
@@ -107,7 +91,7 @@ WRITE8_MEMBER(galastrm_state::coin_word_w)
 void galastrm_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x200000, 0x21ffff).ram().share("ram");                             /* main CPUA ram */
+	map(0x200000, 0x21ffff).ram();                             /* main CPU ram */
 	map(0x300000, 0x303fff).ram().share("spriteram");
 	map(0x400000, 0x400007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
 	map(0x40fff0, 0x40fff3).nopw();
@@ -115,9 +99,9 @@ void galastrm_state::main_map(address_map &map)
 	map(0x600000, 0x6007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)); /* Sound shared ram */
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
-	map(0x900000, 0x900003).w(FUNC(galastrm_state::palette_w));                               /* TC0110PCR */
-	map(0xb00000, 0xb00003).w(FUNC(galastrm_state::tc0610_0_w));                              /* TC0610 */
-	map(0xc00000, 0xc00003).w(FUNC(galastrm_state::tc0610_1_w));
+	map(0x900000, 0x900003).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));                               /* TC0110PCR */
+	map(0xb00000, 0xb00003).w(FUNC(galastrm_state::tc0610_w<0>));                              /* TC0610 */
+	map(0xc00000, 0xc00003).w(FUNC(galastrm_state::tc0610_w<1>));
 	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));        /* piv tilemaps */
 	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 }
@@ -249,6 +233,8 @@ void galastrm_state::galastrm(machine_config &config)
 	m_tc0480scp->set_tx_region(2);
 	m_tc0480scp->set_offsets(-40, -3);
 	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
+
+	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
 
 	/* sound hardware */
 	TAITO_EN(config, "taito_en", 0);

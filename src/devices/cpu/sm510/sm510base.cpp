@@ -15,7 +15,6 @@
 
   TODO:
   - source organiziation between files is a mess
-  - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
   - wake up after CEND doesn't work right
 
   for more, see the *core.cpp file notes
@@ -200,7 +199,8 @@ void sm510_base_device::lcd_update()
 		m_write_segs(h | SM510_PORT_SEGC, get_lcd_row(h, m_lcd_ram_c), 0xffff);
 
 		// bs output from L/X and Y regs
-		u8 bs = (m_l >> h & 1) | ((m_x*2) >> h & 2);
+		u8 blink = (m_div & 0x4000) ? m_y : 0;
+		u8 bs = ((m_l & ~blink) >> h & 1) | ((m_x*2) >> h & 2);
 		m_write_segs(h | SM510_PORT_SEGBS, (m_bc || !m_bp) ? 0 : bs, 0xffff);
 	}
 }

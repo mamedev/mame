@@ -938,23 +938,23 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(ppking_state::ppking)
-
+void ppking_state::ppking(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 12_MHz_XTAL/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(ppking_cpu1_map)
-	MCFG_DEVICE_IO_MAP(ppking_cpu1_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ppking_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 12_MHz_XTAL/2);	/* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ppking_state::ppking_cpu1_map);
+	m_maincpu->set_addrmap(AS_IO, &ppking_state::ppking_cpu1_io);
+	m_maincpu->set_vblank_int("screen", FUNC(ppking_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80, 12_MHz_XTAL/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
-	MCFG_DEVICE_IO_MAP(ppking_cpu2_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(ppking_state,  irq0_line_assert, 60)
+	Z80(config, m_subcpu, 12_MHz_XTAL/4);	/* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &ppking_state::cpu2_map);
+	m_subcpu->set_addrmap(AS_IO, &ppking_state::ppking_cpu2_io);
+	m_subcpu->set_periodic_int(FUNC(ppking_state::irq0_line_assert), attotime::from_hz(60));
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(ppking_cpu3_map)
+	MC6809(config, m_audiocpu, 12_MHz_XTAL/4);	/* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ppking_state::ppking_cpu3_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(ppking_state, ppking)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -969,17 +969,17 @@ MACHINE_CONFIG_START(ppking_state::ppking)
 	mainlatch.q_out_cb<7>().set(FUNC(ppking_state::flipscreen_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL/2,384,0,256,264,16,240) // assume same as Arkanoid
-	MCFG_SCREEN_UPDATE_DRIVER(ppking_state, screen_update_ppking)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(12_MHz_XTAL/2,384,0,256,264,16,240); // assume same as Arkanoid
+	screen.set_screen_update(FUNC(ppking_state::screen_update_ppking));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppking)
-	MCFG_PALETTE_ADD("palette", 1024)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ppking);
+	PALETTE(config, m_palette).set_entries(1024);
 
 	MCFG_VIDEO_START_OVERRIDE(ppking_state, ppking)
 
@@ -998,25 +998,25 @@ MACHINE_CONFIG_START(ppking_state::ppking)
 	ymsnd.add_route(2, "mono", 0.60);
 	ymsnd.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 455_kHz_XTAL); /* verified on pcb */
+	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);	/* vclk input mode */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
-MACHINE_CONFIG_START(gladiatr_state::gladiatr)
-
+void gladiatr_state::gladiatr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 12_MHz_XTAL/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(gladiatr_cpu1_map)
-	MCFG_DEVICE_IO_MAP(gladiatr_cpu1_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gladiatr_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 12_MHz_XTAL/2);	/* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gladiatr_state::gladiatr_cpu1_map);
+	m_maincpu->set_addrmap(AS_IO, &gladiatr_state::gladiatr_cpu1_io);
+	m_maincpu->set_vblank_int("screen", FUNC(gladiatr_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80, 12_MHz_XTAL/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
-	MCFG_DEVICE_IO_MAP(gladiatr_cpu2_io)
+	Z80(config, m_subcpu, 12_MHz_XTAL/4);	/* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &gladiatr_state::cpu2_map);
+	m_subcpu->set_addrmap(AS_IO, &gladiatr_state::gladiatr_cpu2_io);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(gladiatr_cpu3_map)
+	MC6809(config, m_audiocpu, 12_MHz_XTAL/4);	/* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gladiatr_state::gladiatr_cpu3_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // NEC uPD449 CMOS SRAM
@@ -1056,22 +1056,22 @@ MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 	m_csnd->t1_in_cb().set(FUNC(gladiatr_state::csnd_t1_r));
 
 	/* lazy way to make polled serial between MCUs work */
-	MCFG_QUANTUM_PERFECT_CPU("ucpu")
+	config.m_perfect_cpu_quantum = subtag("ucpu");
 
-	MCFG_CLOCK_ADD("tclk", 12_MHz_XTAL/8/128/2) /* verified on pcb */
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, gladiatr_state, tclk_w));
+	CLOCK(config, "tclk", 12_MHz_XTAL/8/128/2) /* verified on pcb */
+		.signal_handler().set(FUNC(gladiatr_state::tclk_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gladiatr_state, screen_update_gladiatr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(gladiatr_state::screen_update_gladiatr));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gladiatr)
-	MCFG_PALETTE_ADD("palette", 1024)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gladiatr);
+	PALETTE(config, m_palette).set_entries(1024);
 
 	MCFG_VIDEO_START_OVERRIDE(gladiatr_state,gladiatr)
 
@@ -1089,12 +1089,12 @@ MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 	ymsnd.add_route(2, "mono", 0.60);
 	ymsnd.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MSM5205(config, m_msm, 455_kHz_XTAL);	/* verified on pcb */
+	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);	/* vclk input mode */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("filtlatch", LS259, 0) // 9R - filters on sound output
-MACHINE_CONFIG_END
+	LS259(config, "filtlatch", 0); // 9R - filters on sound output
+}
 
 
 /***************************************************************************

@@ -60,6 +60,8 @@ public:
 	auto portb_in() { return m_portb_in.bind(); }
 	auto portc_in() { return m_portc_in.bind(); }
 
+	auto adc_in() { return m_adc_in.bind(); }
+
 	auto eeprom_w() { return m_eeprom_w.bind(); }
 	auto eeprom_r() { return m_eeprom_r.bind(); }
 
@@ -69,11 +71,13 @@ public:
 
 	void uart_rx(uint8_t data);
 
+	void extint_w(int channel, bool state);
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 
 protected:
-	spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const size_t sprite_limit)
+	spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint32_t sprite_limit)
 		: spg2xx_device(mconfig, type, tag, owner, clock)
 	{
 		m_sprite_limit = sprite_limit;
@@ -395,6 +399,9 @@ protected:
 	static const device_timer_id TIMER_TMB2 = 1;
 	static const device_timer_id TIMER_SCREENPOS = 2;
 	static const device_timer_id TIMER_BEAT = 3;
+	static const device_timer_id TIMER_UART_TX = 4;
+	static const device_timer_id TIMER_UART_RX = 5;
+	static const device_timer_id TIMER_4KHZ = 6;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -403,6 +410,12 @@ protected:
 	void update_porta_special_modes();
 	void update_portb_special_modes();
 	void do_gpio(uint32_t offset);
+	uint16_t do_special_gpio(uint32_t index, uint16_t mask);
+
+	void uart_transmit_tick();
+	void uart_receive_tick();
+
+	void system_timer_tick();
 
 	void do_i2c();
 	void do_cpu_dma(uint32_t len);
@@ -411,10 +424,10 @@ protected:
 
 	void apply_saturation(const rectangle &cliprect);
 	void apply_fade(const rectangle &cliprect);
-	void blit(const rectangle &cliprect, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile);
-	void blit_page(const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs);
-	void blit_sprite(const rectangle &cliprect, int depth, uint32_t base_addr);
-	void blit_sprites(const rectangle &cliprect, int depth);
+	void blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile);
+	void blit_page(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t bitmap_addr, uint16_t *regs);
+	void blit_sprite(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t base_addr);
+	void blit_sprites(const rectangle &cliprect, uint32_t scanline, int depth);
 
 	uint8_t expand_rgb5_to_rgb8(uint8_t val);
 	uint8_t mix_channel(uint8_t a, uint8_t b);
@@ -461,9 +474,13 @@ protected:
 	uint8_t m_uart_rx_fifo_end;
 	uint8_t m_uart_rx_fifo_count;
 	bool m_uart_rx_available;
+	bool m_uart_rx_irq;
+	bool m_uart_tx_irq;
+
+	bool m_extint[2];
 
 	uint16_t m_video_regs[0x100];
-	size_t m_sprite_limit;
+	uint32_t m_sprite_limit;
 	uint16_t m_pal_flag;
 
 	devcb_write16 m_porta_out;
@@ -472,6 +489,8 @@ protected:
 	devcb_read16 m_porta_in;
 	devcb_read16 m_portb_in;
 	devcb_read16 m_portc_in;
+
+	devcb_read16 m_adc_in;
 
 	devcb_write8 m_eeprom_w;
 	devcb_read8 m_eeprom_r;
@@ -484,6 +503,15 @@ protected:
 	emu_timer *m_tmb2;
 	emu_timer *m_screenpos_timer;
 	emu_timer *m_audio_beat;
+
+	emu_timer *m_4khz_timer;
+	uint32_t m_2khz_divider;
+	uint32_t m_1khz_divider;
+	uint32_t m_4hz_divider;
+
+	uint32_t m_uart_baud_rate;
+	emu_timer *m_uart_tx_timer;
+	emu_timer *m_uart_rx_timer;
 
 	sound_stream *m_stream;
 	oki_adpcm_state m_adpcm[16];

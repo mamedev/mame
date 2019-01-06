@@ -20,7 +20,7 @@ nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, cons
 }
 
 nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_full_device(mconfig, type, tag, owner, clock), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
+	nscsi_full_device(mconfig, type, tag, owner, clock), image(*this, "image"), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
 {
 }
 
@@ -37,8 +37,7 @@ void nscsi_harddisk_device::device_start()
 void nscsi_harddisk_device::device_reset()
 {
 	nscsi_full_device::device_reset();
-	harddisk_image_device *hd = subdevice<harddisk_image_device>("image");
-	harddisk = hd->get_hard_disk_file();
+	harddisk = image->get_hard_disk_file();
 	if(!harddisk) {
 		scsi_id = -1;
 		bytes_per_sector = 0;
@@ -46,18 +45,17 @@ void nscsi_harddisk_device::device_reset()
 		const hard_disk_info *hdinfo = hard_disk_get_info(harddisk);
 		bytes_per_sector = hdinfo->sectorbytes;
 
-		chd_file *chd = hd->get_chd_file();
+		chd_file *chd = image->get_chd_file();
 		if(chd != nullptr)
 			chd->read_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, m_inquiry_data);
 	}
 	cur_lba = -1;
 }
 
-MACHINE_CONFIG_START(nscsi_harddisk_device::device_add_mconfig)
-	MCFG_HARDDISK_ADD("image")
-	MCFG_HARDDISK_INTERFACE("scsi_hdd")
-MACHINE_CONFIG_END
-
+void nscsi_harddisk_device::device_add_mconfig(machine_config &config)
+{
+	HARDDISK(config, image).set_interface("scsi_hdd");
+}
 
 uint8_t nscsi_harddisk_device::scsi_get_data(int id, int pos)
 {
@@ -92,9 +90,9 @@ void nscsi_harddisk_device::scsi_put_data(int id, int pos, uint8_t data)
 
 	int offset = pos % bytes_per_sector;
 	block[offset] = data;
-	int clba = lba + pos / bytes_per_sector;
+	cur_lba = lba + pos / bytes_per_sector;
 	if(offset == bytes_per_sector-1) {
-		if(!hard_disk_write(harddisk, clba, block))
+		if(!hard_disk_write(harddisk, cur_lba, block))
 			LOG("HD WRITE ERROR !\n");
 	}
 }

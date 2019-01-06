@@ -48,6 +48,8 @@ protected:
 	virtual void scsi_ctrl_changed() override;
 
 private:
+	static const char *const state_names[];
+	static const char *const substate_names[];
 	static constexpr uint8_t NUM_REGS = 0x20;
 	static constexpr uint8_t REGS_MASK = NUM_REGS - 1;
 	uint8_t m_addr;
@@ -62,7 +64,6 @@ private:
 	uint16_t m_scsi_state;
 	uint8_t m_mode;
 	uint8_t m_xfr_phase;
-	uint8_t m_step_count;
 
 	void load_transfer_count();
 	bool decrement_transfer_count();

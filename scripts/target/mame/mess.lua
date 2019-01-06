@@ -2985,10 +2985,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/mbc200.cpp",
 	MAME_DIR .. "src/mame/drivers/mbc55x.cpp",
 	MAME_DIR .. "src/mame/includes/mbc55x.h",
-	MAME_DIR .. "src/mame/machine/mbc55x.cpp",
 	MAME_DIR .. "src/mame/video/mbc55x.cpp",
 	MAME_DIR .. "src/mame/drivers/phc25.cpp",
 	MAME_DIR .. "src/mame/includes/phc25.h",
+	MAME_DIR .. "src/mame/machine/mbc55x_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/mbc55x_kbd.h",
 }
 
 -- Don't call this project "sega" or it collides with the arcade one
@@ -3574,6 +3575,8 @@ createMESSProjects(_target, _subtarget, "visual")
 files {
 	MAME_DIR .. "src/mame/drivers/v100.cpp",
 	MAME_DIR .. "src/mame/drivers/v102.cpp",
+	MAME_DIR .. "src/mame/machine/v102_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/v102_kbd.h",
 	MAME_DIR .. "src/mame/drivers/v550.cpp",
 	MAME_DIR .. "src/mame/drivers/v1050.cpp",
 	MAME_DIR .. "src/mame/includes/v1050.h",
@@ -3615,6 +3618,7 @@ files {
 	MAME_DIR .. "src/mame/audio/socrates.h",
 	MAME_DIR .. "src/mame/drivers/inteladv.cpp",
 	MAME_DIR .. "src/mame/drivers/vsmile.cpp",
+	MAME_DIR .. "src/mame/drivers/clickstart.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "wang")
