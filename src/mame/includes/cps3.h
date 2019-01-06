@@ -74,8 +74,8 @@ public:
 
 protected:
 	virtual void device_post_load() override;
-
-private:
+	void copy_from_nvram();
+	uint32_t m_current_table_address;
 	required_device<sh2_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -97,6 +97,7 @@ private:
 	optional_memory_region      m_user4_region;
 	optional_memory_region      m_user5_region;
 
+private:
 	uint32_t m_cram_gfxflash_bank;
 	std::unique_ptr<uint32_t[]> m_char_ram;
 	std::unique_ptr<uint32_t[]> m_eeprom;
@@ -122,7 +123,6 @@ private:
 	uint32_t m_paldma_length;
 	uint32_t m_chardma_source;
 	uint32_t m_chardma_other;
-	uint32_t m_current_table_address;
 	int m_rle_length;
 	int m_last_normal_byte;
 	unsigned short m_lastb;
@@ -179,7 +179,6 @@ private:
 	uint32_t ProcessByte8(uint8_t b,uint32_t dst_offset);
 	void cps3_do_alt_char_dma( uint32_t src, uint32_t real_dest, uint32_t real_length );
 	void cps3_process_character_dma(uint32_t address);
-	void copy_from_nvram();
 	inline void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 		unsigned int code, unsigned int color, int flipx, int flipy, int sx, int sy,
 		int transparency, int transparent_color,
