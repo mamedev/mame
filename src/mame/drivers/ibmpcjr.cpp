@@ -641,7 +641,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_DEVICE_ADD("pcvideo_pcjr", PCVIDEO_PCJR, 0)
 	MCFG_VIDEO_SET_SCREEN("pcvideo_pcjr:screen")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_pcjr:palette", gfx_pcjr)
+	GFXDECODE(config, "gfxdecode", "pcvideo_pcjr:palette", gfx_pcjr);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -692,6 +692,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
 	ibmpcjr(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ibmpcjx_map)
 	MCFG_DEVICE_IO_MAP(ibmpcjx_io)
@@ -702,7 +703,8 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats)
 	MCFG_SLOT_FIXED(true)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ibmpcjx)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_ibmpcjx);
+
 	/* internal ram */
 	m_ram->set_default_size("512K").set_extra_options(""); // only boots with 512k currently
 MACHINE_CONFIG_END

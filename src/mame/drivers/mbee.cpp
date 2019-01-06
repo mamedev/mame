@@ -666,7 +666,7 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 19*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_mono)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mono);
 
 	PALETTE(config, m_palette, FUNC(mbee_state::standard_palette), 100);
 
@@ -723,7 +723,7 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 19*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mbee_state, screen_update_mbee)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_standard)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_standard);
 
 	PALETTE(config, m_palette, FUNC(mbee_state::standard_palette), 100);
 
@@ -765,11 +765,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbeeppc)
 	mbeeic(config);
+
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP(mbeeppc_mem)
 	MCFG_DEVICE_IO_MAP(mbeeppc_io)
 	MCFG_VIDEO_START_OVERRIDE(mbee_state, premium)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_premium)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_premium);
 	m_palette->set_init(FUNC(mbee_state::premium_palette));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);

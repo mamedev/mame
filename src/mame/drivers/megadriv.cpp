@@ -753,8 +753,8 @@ MACHINE_CONFIG_START(md_cons_state::genesis_scd)
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_US(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("scd_cdrom")
@@ -771,8 +771,8 @@ MACHINE_CONFIG_START(md_cons_state::md_scd)
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_EUROPE, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("scd_cdrom")
@@ -789,8 +789,8 @@ MACHINE_CONFIG_START(md_cons_state::mdj_scd)
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("scd_cdrom")
@@ -803,8 +803,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_cons_state::genesis_32x_scd)
 	genesis_32x(config);
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_US(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("scd_cdrom")
@@ -823,8 +823,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_cons_state::md_32x_scd)
 	md_32x(config);
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_EUROPE, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("scd_cdrom")
@@ -843,8 +843,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_cons_state::mdj_32x_scd)
 	mdj_32x(config);
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("scd_cdrom")

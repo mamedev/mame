@@ -2677,14 +2677,13 @@ MACHINE_CONFIG_START(calomega_state::sys906)
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::pia1_aout_w));
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::pia1_bout_w));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sys906)
+	m_gfxdecode->set_info(gfx_sys906);
 
 	/* sound hardware */
 	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_ioport("SW2");    /* From PCB pic. Value is stored at $0539 */
 
-	MCFG_DEVICE_REMOVE("acia6850_0")
-
-	MCFG_DEVICE_REMOVE("aciabaud")
+	config.device_remove("acia6850_0");
+	config.device_remove("aciabaud");
 MACHINE_CONFIG_END
 
 

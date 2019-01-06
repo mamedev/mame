@@ -2465,7 +2465,7 @@ MACHINE_CONFIG_START(staraudi_state::staraudi)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
 	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x140-1, 0x000, 0x0f0-1)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_seta2)
+	m_gfxdecode->set_info(gfx_seta2);
 MACHINE_CONFIG_END
 
 

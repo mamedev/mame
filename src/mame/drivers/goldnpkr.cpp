@@ -4403,7 +4403,7 @@ void goldnpkr_state::wildcard(machine_config &config)
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
 
 	/* video hardware */
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wildcard)
+//  m_gfxdecode->set_info(gfx_wildcard);
 	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 
@@ -4447,7 +4447,7 @@ void goldnpkr_state::wildcrdb(machine_config &config)
 	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::wcfalcon_snd_w));
 
 	/* video hardware */
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wildcard)
+//  m_gfxdecode->set_info(gfx_wildcard);
 	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
 //  MCFG_VIDEO_START_OVERRIDE(goldnpkr_state,wildcard)
 

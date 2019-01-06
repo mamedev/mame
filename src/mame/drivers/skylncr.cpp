@@ -1677,8 +1677,8 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 	MCFG_SCREEN_UPDATE_DRIVER(skylncr_state, screen_update_skylncr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skylncr)
-	MCFG_PALETTE_ADD("palette", 0x200)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skylncr);
+	PALETTE(config, m_palette).set_entries(0x200);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &skylncr_state::ramdac_map);
@@ -1705,22 +1705,20 @@ MACHINE_CONFIG_START(skylncr_state::mbutrfly)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(skylncr_state::neraidou)
+void skylncr_state::neraidou(machine_config &config)
+{
 	skylncr(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_neraidou)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_neraidou);
+}
 
 
-MACHINE_CONFIG_START(skylncr_state::sstar97)
+void skylncr_state::sstar97(machine_config &config)
+{
 	skylncr(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sstar97)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_sstar97);
+}
 
 
 MACHINE_CONFIG_START(skylncr_state::bdream97)
@@ -1730,7 +1728,7 @@ MACHINE_CONFIG_START(skylncr_state::bdream97)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_OPCODES_MAP(bdream97_opcode_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bdream97)
+	m_gfxdecode->set_info(gfx_bdream97);
 MACHINE_CONFIG_END
 
 

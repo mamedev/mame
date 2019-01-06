@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80k)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz80k)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_mz80k);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Audio */
@@ -323,18 +323,20 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mz80_state::mz80kj)
+void mz80_state::mz80kj(machine_config &config)
+{
 	mz80k(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80kj)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mz80kj)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mz80_state::mz80a)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(mz80_state::screen_update_mz80kj));
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_mz80kj);
+}
+
+void mz80_state::mz80a(machine_config &config)
+{
 	mz80k(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80a)
-MACHINE_CONFIG_END
+
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(mz80_state::screen_update_mz80a));
+}
 
 
 ROM_START( mz80k )

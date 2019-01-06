@@ -450,7 +450,7 @@ MACHINE_CONFIG_START(shangkid_state::shangkid)
 	MCFG_MACHINE_RESET_OVERRIDE(shangkid_state,shangkid)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shangkid)
+	m_gfxdecode->set_info(gfx_shangkid);
 
 	m_aysnd->port_a_write_callback().set(FUNC(shangkid_state::shangkid_ay8910_porta_w));
 MACHINE_CONFIG_END

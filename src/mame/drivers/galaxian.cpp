@@ -6019,7 +6019,7 @@ MACHINE_CONFIG_START(galaxian_state::sidam_bootleg_base)
 	MCFG_DEVICE_CLOCK(12_MHz_XTAL / 2 / 2)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sidam)
+	m_gfxdecode->set_info(gfx_sidam);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL, SIDAM_HTOTAL, SIDAM_HBEND, SIDAM_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART)
@@ -6150,12 +6150,13 @@ MACHINE_CONFIG_START(galaxian_state::mandingarf)
 	MCFG_DEVICE_PROGRAM_MAP(mandingarf_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(galaxian_state::pacmanbl)
+void galaxian_state::pacmanbl(machine_config &config)
+{
 	galaxian(config);
 
 	/* separate tile/sprite ROMs */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pacmanbl)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_pacmanbl);
+}
 
 MACHINE_CONFIG_START(galaxian_state::tenspot)
 	galaxian(config);
@@ -6166,7 +6167,7 @@ MACHINE_CONFIG_START(galaxian_state::tenspot)
 	//MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* separate tile/sprite ROMs */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_tenspot)
+	m_gfxdecode->set_info(gfx_tenspot);
 	// MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
@@ -6178,7 +6179,7 @@ MACHINE_CONFIG_START(galaxian_state::zigzag)
 	galaxian_base(config);
 
 	/* separate tile/sprite ROMs */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pacmanbl)
+	m_gfxdecode->set_info(gfx_pacmanbl);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -6189,14 +6190,15 @@ MACHINE_CONFIG_START(galaxian_state::zigzag)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(galaxian_state::gmgalax)
+void galaxian_state::gmgalax(machine_config &config)
+{
 	galaxian(config);
 
 	/* banked video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
+	m_gfxdecode->set_info(gfx_gmgalax);
 	m_palette->set_entries(64);
 	m_palette->set_init(FUNC(galaxian_state::galaxian_palette));
-MACHINE_CONFIG_END
+}
 
 
 MACHINE_CONFIG_START(galaxian_state::mooncrst)
@@ -6206,11 +6208,9 @@ MACHINE_CONFIG_START(galaxian_state::mooncrst)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mooncrst_map)
 
-	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
+	GALAXIAN(config, "cust", 0).add_route(ALL_OUTPUTS, "speaker", 0.4);
 
-	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, mooncrst_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	DISCRETE(config, GAL_AUDIO, mooncrst_discrete).add_route(ALL_OUTPUTS, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::moonqsr)
@@ -6735,12 +6735,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::fourplay)
 	galaxian(config);
+
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(fourplay_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
+	m_gfxdecode->set_info(gfx_gmgalax);
 	m_palette->set_entries(64);
 MACHINE_CONFIG_END
 
@@ -6752,7 +6753,7 @@ MACHINE_CONFIG_START(galaxian_state::videight)
 	MCFG_DEVICE_PROGRAM_MAP(videight_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_videight)
+	m_gfxdecode->set_info(gfx_videight);
 	m_palette->set_entries(8 * 32);
 MACHINE_CONFIG_END
 

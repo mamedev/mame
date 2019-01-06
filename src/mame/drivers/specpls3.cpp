@@ -380,12 +380,14 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(spectrum_state::spectrum_plus3)
 	spectrum_128(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(spectrum_plus3_mem)
 	MCFG_DEVICE_IO_MAP(spectrum_plus3_io)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50.01)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", specpls3)
+
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(specpls3);
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_plus3 )
 

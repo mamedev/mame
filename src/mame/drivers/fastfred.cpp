@@ -688,7 +688,7 @@ MACHINE_CONFIG_START(fastfred_state::jumpcoas)
 	MCFG_DEVICE_REMOVE("audiocpu")
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_jumpcoas)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_jumpcoas);
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("soundlatch")
@@ -710,11 +710,10 @@ MACHINE_CONFIG_START(fastfred_state::imago)
 
 	/* video hardware */
 	m_palette->set_entries(256+64+2); // 256 for characters, 64 for the stars and 2 for the web
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_imago)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_imago);
 
 	MCFG_VIDEO_START_OVERRIDE(fastfred_state,imago)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(fastfred_state, screen_update_imago)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(fastfred_state::screen_update_imago));
 MACHINE_CONFIG_END
 
 #undef CLOCK

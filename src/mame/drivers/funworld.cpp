@@ -3093,9 +3093,8 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 	MCFG_SCREEN_UPDATE_DRIVER(funworld_state, screen_update_funworld)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fw1stpal)
-
-	PALETTE(config, "palette", FUNC(funworld_state::funworld_palette), 0x200);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fw1stpal);
+	PALETTE(config, m_palette, FUNC(funworld_state::funworld_palette), 0x200);
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));    /* 2MHz, verified on jollycrd & royalcrd */
 	crtc.set_screen("screen");
@@ -3117,7 +3116,7 @@ MACHINE_CONFIG_START(funworld_state::fw2ndpal)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(funworld_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
+	m_gfxdecode->set_info(gfx_fw2ndpal);
 MACHINE_CONFIG_END
 
 
@@ -3208,7 +3207,7 @@ MACHINE_CONFIG_START(funworld_state::intrgmes)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(intergames_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
+	m_gfxdecode->set_info(gfx_fw2ndpal);
 MACHINE_CONFIG_END
 
 
@@ -3216,7 +3215,7 @@ MACHINE_CONFIG_START(funworld_state::fw_brick_1)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(fw_a7_11_map)
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
+//  m_gfxdecode->set_info(gfx_fw2ndpal);
 MACHINE_CONFIG_END
 
 
@@ -3224,7 +3223,7 @@ MACHINE_CONFIG_START(funworld_state::fw_brick_2)
 	fw2ndpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(fw_a7_11_map)
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
+//  m_gfxdecode->set_info(gfx_fw2ndpal);
 MACHINE_CONFIG_END
 
 

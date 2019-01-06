@@ -1053,7 +1053,7 @@ MACHINE_CONFIG_START(kingdrby_state::cowrace)
 	MCFG_DEVICE_PROGRAM_MAP(cowrace_sound_map)
 	MCFG_DEVICE_IO_MAP(cowrace_sound_io)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cowrace)
+	m_gfxdecode->set_info(gfx_cowrace);
 	m_palette->set_init(FUNC(kingdrby_state::kingdrby_palette));
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

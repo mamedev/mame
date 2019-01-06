@@ -104,7 +104,6 @@
 
 
 #include "emu.h"
-#include "includes/mcr.h"
 #include "includes/mcr3.h"
 
 #include "machine/nvram.h"
@@ -1108,10 +1107,10 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	MCFG_SCREEN_SIZE(32*16, 30*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_mcr3)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_mcr3);
-	PALETTE(config, "palette").set_entries(64);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mcr3);
+	PALETTE(config, m_palette).set_entries(64);
 MACHINE_CONFIG_END
 
 
@@ -1171,7 +1170,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrscroll)
 	MCFG_SCREEN_SIZE(30*16, 30*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_spyhunt)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spyhunt)
+	m_gfxdecode->set_info(gfx_spyhunt);
 	subdevice<palette_device>("palette")->set_entries(64 + 4).set_init(FUNC(mcr3_state::spyhunt_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(mcr3_state,spyhunt)

@@ -1374,7 +1374,7 @@ MACHINE_CONFIG_START(homedata_state::lemnangl)
 	pteacher(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lemnangl)
+	m_gfxdecode->set_info(gfx_lemnangl);
 
 	MCFG_VIDEO_START_OVERRIDE(homedata_state,lemnangl)
 MACHINE_CONFIG_END

@@ -526,9 +526,8 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_deco_mlc)
-	PALETTE(config, m_palette);
-	m_palette->set_format(palette_device::xBGR_555, 2048);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_deco_mlc);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->set_membits(16);
 
 	/* sound hardware */
@@ -559,9 +558,8 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_deco_mlc)
-	PALETTE(config, m_palette);
-	m_palette->set_format(palette_device::xBGR_555, 2048);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_deco_mlc);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->set_membits(16);
 
 	DECO146PROT(config, m_deco146, 0);
@@ -576,14 +574,17 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(deco_mlc_state::mlc_6bpp)
+void deco_mlc_state::mlc_6bpp(machine_config &config)
+{
 	mlc(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_6bpp)
-MACHINE_CONFIG_END
+
+	m_gfxdecode->set_info(gfx_6bpp);
+}
 
 MACHINE_CONFIG_START(deco_mlc_state::mlc_5bpp)
 	mlc(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_5bpp)
+
+	m_gfxdecode->set_info(gfx_5bpp);
 
 	// TODO: mono? ch.0 doesn't output any sound in-game
 	MCFG_DEVICE_MODIFY("ymz")
