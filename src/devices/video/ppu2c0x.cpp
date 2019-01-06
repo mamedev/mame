@@ -229,7 +229,7 @@ void ppu2c0x_device::device_start()
 
 	/* initialize the scanline handling portion */
 	m_scanline_timer->adjust(screen().time_until_pos(1));
-	m_hblank_timer->adjust(m_cpu->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
+	m_hblank_timer->adjust(m_cpu->cycles_to_attotime(260) / 3); // ??? FIXME - hardcoding NTSC, need better calculation
 	m_nmi_timer->adjust(attotime::never);
 
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
@@ -558,7 +558,7 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				next_scanline = 0;
 
 			// Call us back when the hblank starts for this scanline
-			m_hblank_timer->adjust(m_cpu->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
+			m_hblank_timer->adjust(m_cpu->cycles_to_attotime(260) / 3); // ??? FIXME - hardcoding NTSC, need better calculation
 
 			// trigger again at the start of the next scanline
 			m_scanline_timer->adjust(screen().time_until_pos(next_scanline * m_scan_scale));
