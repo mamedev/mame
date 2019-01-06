@@ -481,9 +481,10 @@ WRITE16_MEMBER(cps_state::sf2mdta_layer_w)
 	case 0x09:
 		m_cps_a_regs[0x12 / 2] = data; /* scroll 2y */
 		m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; /* row scroll start */
+		m_cps_a_regs[0x08 / 2] = m_mainram[0x802e / 2];
 		break;
 	case 0x0a:
-		m_cps_a_regs[0x10 / 2] = data + 0xffce; /* scroll 2x */
+		m_cps_a_regs[0x10 / 2] = 0xffce; /* scroll 2x */
 		break;
 	case 0x0b:
 		m_cps_a_regs[0x16 / 2] = data; /* scroll 3y */
@@ -825,7 +826,7 @@ void cps_state::sf2mdt_map(address_map &map)
 	map(0x800100, 0x80013f).ram().share("cps_a_regs");  /* CPS-A custom */
 	map(0x800140, 0x80017f).ram().share("cps_b_regs");  /* CPS-B custom */
 	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
-	map(0xff0000, 0xffffff).ram();
+	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
 void cps_state::sf2b_map(address_map &map)
@@ -858,7 +859,7 @@ void cps_state::sgyxz_map(address_map &map)
 	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
 	map(0xf1c004, 0xf1c005).w(FUNC(cps_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
-	map(0xff0000, 0xffffff).ram();
+	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
 void cps_state::wofabl_map(address_map &map)
