@@ -147,6 +147,7 @@ public:
 
 	void init()
 	{
+		load_base_libraries();
 	}
 
 	void read_netlist(const pstring &filename, const pstring &name,

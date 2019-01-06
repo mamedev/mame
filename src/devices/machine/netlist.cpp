@@ -837,6 +837,8 @@ void netlist_mame_device::device_start()
 
 	m_netlist = global_alloc(netlist_mame_t(*this, "netlist"));
 
+	m_netlist->load_base_libraries();
+
 	// register additional devices
 
 	nl_register_devices();

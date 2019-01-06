@@ -253,14 +253,17 @@ netlist_t::netlist_t(const pstring &aname)
 	state().save_item(this, static_cast<plib::state_manager_t::callback_t &>(m_queue), "m_queue");
 	state().save_item(this, m_time, "m_time");
 	m_setup = plib::make_unique<setup_t>(*this);
-	/* FIXME: doesn't really belong here */
-	NETLIST_NAME(base)(*m_setup);
 }
 
 netlist_t::~netlist_t()
 {
 	m_nets.clear();
 	m_devices.clear();
+}
+
+void netlist_t::load_base_libraries()
+{
+	NETLIST_NAME(base)(*m_setup);
 }
 
 nl_double netlist_t::gmin() const NL_NOEXCEPT

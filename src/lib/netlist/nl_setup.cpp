@@ -78,17 +78,15 @@ void setup_t::register_dev(const pstring &classname, const pstring &name)
 		log().fatal(MF_1_CLASS_1_NOT_FOUND, classname);
 	/* make sure we parse macro library entries */
 	f->macro_actions(netlist(), name);
-	m_device_factory.push_back(std::pair<pstring, factory::element_t *>(build_fqn(name), f));
+	pstring key = build_fqn(name);
+	if (device_exists(key))
+		log().fatal(MF_1_DEVICE_ALREADY_EXISTS_1, name);
+	m_device_factory[key] = f;
 }
 
 bool setup_t::device_exists(const pstring &name) const
 {
-	for (auto e : m_device_factory)
-	{
-		if (e.first == name)
-			return true;
-	}
-	return false;
+	return (m_device_factory.find(name) != m_device_factory.end());
 }
 
 
@@ -160,7 +158,7 @@ double setup_t::get_initial_param_val(const pstring &name, const double def)
 	if (i != m_param_values.end())
 	{
 		double vald = 0;
-		if (sscanf(i->second.c_str(), "%lf", &vald) != 1)
+		if (!plib::pstod_ne(i->second, vald))
 			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
 		return vald;
 	}
@@ -173,9 +171,12 @@ int setup_t::get_initial_param_val(const pstring &name, const int def)
 	auto i = m_param_values.find(name);
 	if (i != m_param_values.end())
 	{
-		double vald = 0;
-		if (sscanf(i->second.c_str(), "%lf", &vald) != 1)
+		long vald = 0;
+		if (!plib::pstod_ne(i->second, vald))
 			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
+		if (vald - std::floor(vald) != 0.0)
+			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
+
 		return static_cast<int>(vald);
 	}
 	else

@@ -291,7 +291,8 @@ namespace netlist
 		plib::plog_base<netlist_t, NL_DEBUG> &log();
 		const plib::plog_base<netlist_t, NL_DEBUG> &log() const;
 
-		std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
+		//std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
+		std::unordered_map<pstring, factory::element_t *> m_device_factory;
 
 		std::unordered_map<pstring, pstring> m_alias;
 		std::unordered_map<pstring, pstring> m_param_values;

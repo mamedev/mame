@@ -1222,6 +1222,14 @@ namespace netlist
 		explicit netlist_t(const pstring &aname);
 		virtual ~netlist_t();
 
+		/**
+		 * @brief Load base libraries for diodes, transistors ...
+		 *
+		 * This must be called after netlist_t is created.
+		 *
+		 */
+		void load_base_libraries();
+
 		/* run functions */
 
 		const netlist_time &time() const NL_NOEXCEPT { return m_time; }

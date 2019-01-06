@@ -375,10 +375,7 @@ double ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start
 ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 {
 	auto idx = m_defines.find(name);
-	if (idx != m_defines.end())
-		return &idx->second;
-	else
-		return nullptr;
+	return (idx != m_defines.end()) ? &idx->second : nullptr;
 }
 
 pstring ppreprocessor::replace_macros(const pstring &line)
@@ -388,10 +385,7 @@ pstring ppreprocessor::replace_macros(const pstring &line)
 	for (auto & elem : elems)
 	{
 		define_t *def = get_define(elem);
-		if (def != nullptr)
-			ret += def->m_replace;
-		else
-			ret += elem;
+		ret += (def != nullptr) ? def->m_replace : elem;
 	}
 	return ret;
 }
@@ -409,11 +403,8 @@ static pstring catremainder(const std::vector<pstring> &elems, std::size_t start
 
 pstring  ppreprocessor::process_line(const pstring &line)
 {
-	//pstring lt = plib::trim(plib::replace_all(line, pstring("\t"), pstring(" ")));
-	pstring a = plib::replace_all(line, pstring("\t"), pstring(" "));
-	pstring lt = plib::trim(a);
+	pstring lt = plib::trim(plib::replace_all(line, pstring("\t"), pstring(" ")));
 	pstring ret;
-	m_lineno++;
 	// FIXME ... revise and extend macro handling
 	if (plib::startsWith(lt, "#"))
 	{
@@ -477,9 +468,7 @@ pstring  ppreprocessor::process_line(const pstring &line)
 	{
 		lt = replace_macros(lt);
 		if (m_ifflag == 0)
-		{
 			ret += lt;
-		}
 	}
 	return ret;
 }
@@ -490,6 +479,7 @@ void ppreprocessor::process(putf8_reader &istrm, putf8_writer &ostrm)
 	pstring line;
 	while (istrm.readline(line))
 	{
+		m_lineno++;
 		line = process_line(line);
 		ostrm.writeline(line);
 	}
