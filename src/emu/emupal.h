@@ -116,15 +116,6 @@
 #define MCFG_PALETTE_FORMAT(_format) \
 	downcast<palette_device &>(*device).set_format(PALETTE_FORMAT_##_format);
 
-#define MCFG_PALETTE_MEMBITS(_width) \
-	downcast<palette_device &>(*device).set_membits(_width);
-
-#define MCFG_PALETTE_ENTRIES(_entries) \
-	downcast<palette_device &>(*device).set_entries(_entries);
-
-#define MCFG_PALETTE_INDIRECT_ENTRIES(_entries) \
-	downcast<palette_device &>(*device).set_indirect_entries(_entries);
-
 
 // not implemented yet
 #if 0
@@ -165,7 +156,7 @@ public:
 	rgb_t operator()(u32 raw) const { return (*m_func)(raw); }
 
 	// generic raw-to-RGB conversion helpers
-	template<int RedBits, int GreenBits, int BlueBits, int RedShift, int GreenShift, int BlueShift>
+	template <int RedBits, int GreenBits, int BlueBits, int RedShift, int GreenShift, int BlueShift>
 	static rgb_t standard_rgb_decoder(u32 raw)
 	{
 		u8 const r = palexpand<RedBits>(raw >> RedShift);
@@ -175,7 +166,7 @@ public:
 	}
 
 	// data-inverted generic raw-to-RGB conversion helpers
-	template<int RedBits, int GreenBits, int BlueBits, int RedShift, int GreenShift, int BlueShift>
+	template <int RedBits, int GreenBits, int BlueBits, int RedShift, int GreenShift, int BlueShift>
 	static rgb_t inverted_rgb_decoder(u32 raw)
 	{
 		u8 const r = palexpand<RedBits>(~raw >> RedShift);
@@ -184,7 +175,7 @@ public:
 		return rgb_t(r, g, b);
 	}
 
-	template<int IntBits, int RedBits, int GreenBits, int BlueBits, int IntShift, int RedShift, int GreenShift, int BlueShift>
+	template <int IntBits, int RedBits, int GreenBits, int BlueBits, int IntShift, int RedShift, int GreenShift, int BlueShift>
 	static rgb_t standard_irgb_decoder(u32 raw)
 	{
 		u8 const i = palexpand<IntBits>(raw >> IntShift);
