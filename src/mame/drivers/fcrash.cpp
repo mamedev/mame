@@ -251,13 +251,25 @@ WRITE16_MEMBER(cps_state::knightsb_layer_w)
 			case 0x0000:
 			case 0x001f:
 			case 0x00ff:
+			case 0x07ff:
 				data = 0x12f2;
 				break;
 			case 0x2000:
-				data = 0x06f2;
+				data = 0x06c0;
+				break;
+			case 0x5800:
+			case 0x5f00:
+				data = 0x12c0;
+				break;
+			case 0x80ff:
+			case 0x87ff:
+				data = 0x1380;
 				break;
 			case 0xa000:
-				data = 0x24d0;
+				data = 0x24c0;
+				break;
+			case 0xd800:
+				data = 0x1380;
 				break;
 			default:
 				printf ("Unknown control word = %X\n",data);
@@ -1635,11 +1647,11 @@ MACHINE_START_MEMBER(cps_state, knightsb)
 
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 
-	m_layer_enable_reg = 0x30;
-	m_layer_mask_reg[0] = 0x28;
-	m_layer_mask_reg[1] = 0x2a;
-	m_layer_mask_reg[2] = 0x2c;
-	m_layer_mask_reg[3] = 0x2e;
+	m_layer_enable_reg = 0x28;
+	m_layer_mask_reg[0] = 0x26;
+	m_layer_mask_reg[1] = 0x24;
+	m_layer_mask_reg[2] = 0x22;
+	m_layer_mask_reg[3] = 0x20;
 	m_layer_scroll1x_offset = 0x3e; //text
 	m_layer_scroll2x_offset = 0x3c; //bricks around scores
 	m_layer_scroll3x_offset = 0x40; //hill with sword going in
