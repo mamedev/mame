@@ -254,17 +254,17 @@ READ8Z_MEMBER(ti_rs232_pio_device::crureadz)
 			if ((m_signals[0] & tms9902_device::CTS)!=0)    reply |= 0x20;
 			if ((m_signals[1] & tms9902_device::CTS)!=0)    reply |= 0x40;
 			if (m_led)                      reply |= 0x80;
-			*value = reply;
+			*value = BIT(reply, (offset>>1) & 7);
 			return;
 		}
 		if ((offset & 0x00c0)==0x0040)
 		{
-			*value = m_uart0->cruread(space, offset>>4, 0xff);
+			*value = m_uart0->cruread(space, offset>>1, 0xff);
 			return;
 		}
 		if ((offset & 0x00c0)==0x0080)
 		{
-			*value = m_uart1->cruread(space, offset>>4, 0xff);
+			*value = m_uart1->cruread(space, offset>>1, 0xff);
 			return;
 		}
 	}

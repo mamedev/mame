@@ -812,13 +812,9 @@ void tm990189_state::tm990_189_v_memmap(address_map &map)
 
 void tm990189_state::tm990_189_cru_map(address_map &map)
 {
-	map(0x0000, 0x003f).r(m_tms9901_usr, FUNC(tms9901_device::read));      /* user I/O tms9901 */
-	map(0x0040, 0x006f).r(m_tms9901_sys, FUNC(tms9901_device::read));      /* system I/O tms9901 */
-	map(0x0080, 0x00cf).r(m_tms9902, FUNC(tms9902_device::cruread));     /* optional tms9902 */
-
-	map(0x0000, 0x01ff).w(m_tms9901_usr, FUNC(tms9901_device::write));    /* user I/O tms9901 */
-	map(0x0200, 0x03ff).w(m_tms9901_sys, FUNC(tms9901_device::write));    /* system I/O tms9901 */
-	map(0x0400, 0x05ff).w(m_tms9902, FUNC(tms9902_device::cruwrite));   /* optional tms9902 */
+	map(0x0000, 0x03ff).rw(m_tms9901_usr, FUNC(tms9901_device::read), FUNC(tms9901_device::write));    /* user I/O tms9901 */
+	map(0x0400, 0x07ff).rw(m_tms9901_sys, FUNC(tms9901_device::read), FUNC(tms9901_device::write));    /* system I/O tms9901 */
+	map(0x0800, 0x0bff).rw(m_tms9902, FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));   /* optional tms9902 */
 }
 
 void tm990189_state::tm990_189(machine_config &config)

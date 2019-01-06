@@ -182,11 +182,11 @@ tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, 
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_BIG, data_width, prg_addr_bits),
 		m_setoffset_config("setoffset", ENDIANNESS_BIG, data_width, prg_addr_bits),
-		m_io_config("cru", ENDIANNESS_BIG, 8, cru_addr_bits),
+		m_io_config("cru", ENDIANNESS_LITTLE, 8, cru_addr_bits + 1, 1),
 		m_prgspace(nullptr),
 		m_cru(nullptr),
 		m_prgaddr_mask((1<<prg_addr_bits)-1),
-		m_cruaddr_mask((1<<cru_addr_bits)-1),
+		m_cruaddr_mask((2<<cru_addr_bits)-2),
 		m_clock_out_line(*this),
 		m_wait_line(*this),
 		m_holda_line(*this),
@@ -1637,55 +1637,45 @@ void tms99xx_device::register_write()
 
 void tms99xx_device::cru_input_operation()
 {
-	int value, value1;
-	int offset, location;
+	offs_t cruaddr = m_cru_address & m_cruaddr_mask;
+	uint16_t value = 0;
 
-	location = (m_cru_address >> 4) & (m_cruaddr_mask>>3);
-	offset   = (m_cru_address>>1) & 0x07;
-
-	// Read 8 bits (containing the desired bits)
-	value = m_cru->read_byte(location);
-
-	if ((offset + m_count) > 8) // spans two 8 bit cluster
+	for (int i = 0; i < m_count; i++)
 	{
-		// Read next 8 bits
-		location = (location + 1) & (m_cruaddr_mask>>3);
-		value1 = m_cru->read_byte(location);
-		value |= (value1 << 8);
+		// Poll one bit at a time
+		bool cruin = BIT(m_cru->read_byte(cruaddr), 0);
+		if (cruin)
+			value |= 1 << i;
 
-		if ((offset + m_count) > 16)    // spans three 8 bit cluster
-		{
-			// Read next 8 bits
-			location = (location + 1) & (m_cruaddr_mask>>3);
-			value1 = m_cru->read_byte(location);
-			value |= (value1 << 16);
-		}
+		if (TRACE_CRU) logerror("CRU input operation, address %04x, value %d\n", cruaddr, cruin ? 1 : 0);
+
+		// Increment the CRU address
+		cruaddr = (cruaddr + 2) & m_cruaddr_mask;
+
+		// On each machine cycle (2 clocks) only one CRU bit is transmitted
+		pulse_clock(2);
 	}
 
-	// On each machine cycle (2 clocks) only one CRU bit is transmitted
-	pulse_clock(m_count<<1);
-
-	// Shift back the bits so that the first bit is at the rightmost place
-	m_value = (value >> offset);
-
-	// Mask out what we want
-	m_value &= (0x0000ffff >> (16-m_count));
+	m_value = value;
 }
 
 void tms99xx_device::cru_output_operation()
 {
-	int value;
-	int location;
-	location = (m_cru_address >> 1) & m_cruaddr_mask;
-	value = m_value;
+	offs_t cruaddr = m_cru_address & m_cruaddr_mask;
+	uint16_t value = m_value;
 
 	// Write m_count bits from cru_address
-	for (int i=0; i < m_count; i++)
+	for (int i = 0; i < m_count; i++)
 	{
-		if (TRACE_CRU) logerror("CRU output operation, address %04x, value %d\n", location<<1, value & 0x01);
-		m_cru->write_byte(location, (value & 0x01));
+		if (TRACE_CRU) logerror("CRU output operation, address %04x, value %d\n", cruaddr, BIT(value, 0));
+
+		// Write one bit at a time
+		m_cru->write_byte(cruaddr, BIT(value, 0));
 		value >>= 1;
-		location = (location + 1) & m_cruaddr_mask;
+
+		// Increment the CRU address
+		cruaddr = (cruaddr + 2) & m_cruaddr_mask;
+
 		pulse_clock(2);
 	}
 }
