@@ -183,12 +183,12 @@ namespace netlist
 
 		for (std::size_t i=0; i < m_NI; i++)
 		{
-			inout[i] = inout[i].trim();
+			inout[i] = plib::trim(inout[i]);
 			m_I.emplace(i, *this, inout[i]);
 		}
 		for (std::size_t i=0; i < m_NO; i++)
 		{
-			out[i] = out[i].trim();
+			out[i] = plib::trim(out[i]);
 			m_Q.emplace(i, *this, out[i]);
 		}
 		// Connect output "Q" to input "_Q" if this exists
@@ -318,21 +318,21 @@ namespace netlist
 void truthtable_parser::parseline(unsigned cur, std::vector<pstring> list,
 		tt_bitset state, uint_least64_t val, std::vector<uint_least8_t> &timing_index)
 {
-	pstring elem = list[cur].trim();
+	pstring elem = plib::trim(list[cur]);
 	uint_least64_t start = 0;
 	uint_least64_t end = 0;
 
-	if (elem.equals("0"))
+	if (elem == "0")
 	{
 		start = 0;
 		end = 0;
 	}
-	else if (elem.equals("1"))
+	else if (elem == "1")
 	{
 		start = 1;
 		end = 1;
 	}
-	else if (elem.equals("X"))
+	else if (elem == "X")
 	{
 		start = 0;
 		end = 1;
@@ -380,7 +380,7 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 	for (int j=0; j < 16; j++)
 		m_timing_nt[j] = netlist_time::zero();
 
-	while (!ttline.equals(""))
+	while (!(ttline == ""))
 	{
 		std::vector<pstring> io(plib::psplit(ttline,"|"));
 		// checks
@@ -402,12 +402,12 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 		 */
 		for (unsigned j=0; j<m_NO; j++)
 		{
-			pstring outs = out[j].trim();
-			if (outs.equals("1"))
+			pstring outs = plib::trim(out[j]);
+			if (outs == "1")
 				val.set(j);
 			else
-				nl_assert_always(outs.equals("0"), "Unknown value (not 0 or 1");
-			netlist_time t = netlist_time::from_nsec(static_cast<unsigned long>(times[j].trim().as_long()));
+				nl_assert_always(outs == "0", "Unknown value (not 0 or 1");
+			netlist_time t = netlist_time::from_nsec(static_cast<unsigned long>(plib::pstol(plib::trim(times[j]))));
 			uint_least8_t k=0;
 			while (m_timing_nt[k] != netlist_time::zero() && m_timing_nt[k] != t)
 				k++;

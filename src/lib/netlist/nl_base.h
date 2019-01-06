@@ -1317,7 +1317,7 @@ namespace netlist
 	private:
 
 		/* helper for save above */
-		static pstring from_utf8(const char *c) { return pstring(c, pstring::UTF8); }
+		static pstring from_utf8(const char *c) { return pstring(c); }
 		static pstring from_utf8(const pstring &c) { return c; }
 
 		core_device_t *get_single_device(const pstring &classname, bool (*cc)(core_device_t *)) const;
@@ -1361,7 +1361,7 @@ namespace netlist
 		object_array_t(core_device_t &dev, init names)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, pstring(names.p[i], pstring::UTF8));
+				this->emplace(i, dev, pstring(names.p[i]));
 		}
 	};
 

@@ -136,7 +136,7 @@ namespace netlist
 				unsigned long total = 0;
 				for (unsigned i=0; i<m_size; i++)
 				{
-					pati[i] = static_cast<unsigned long>(pat[i].as_long());
+					pati[i] = static_cast<unsigned long>(plib::pstol(pat[i]));
 					total += pati[i];
 				}
 				netlist_time ttotal = netlist_time::zero();

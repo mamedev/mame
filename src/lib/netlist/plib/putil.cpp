@@ -36,7 +36,7 @@ namespace plib
 			if (getenv(var.c_str()) == nullptr)
 				return default_val;
 			else
-				return pstring(getenv(var.c_str()), pstring::UTF8);
+				return pstring(getenv(var.c_str()));
 		}
 	}
 
@@ -92,7 +92,7 @@ namespace plib
 			}
 			else
 			{
-				pstring::code_t c = *i;
+				pstring::value_type c = *i;
 				col += c;
 				i++;
 			}
@@ -143,7 +143,7 @@ namespace plib
 				if (*str == ',')
 				{
 					*bufp = 0;
-					return pstring(buf, pstring::UTF8);
+					return pstring(buf);
 				}
 				else if (*str != ' ')
 					*bufp++ = *str;
@@ -156,6 +156,6 @@ namespace plib
 			str++;
 		}
 		*bufp = 0;
-		return pstring(buf, pstring::UTF8);
+		return pstring(buf);
 	}
 } // namespace plib

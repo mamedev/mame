@@ -34,7 +34,7 @@ pstring ptokenizer::currentline_str()
 
 void ptokenizer::skipeol()
 {
-	pstring::code_t c = getc();
+	pstring::value_type c = getc();
 	while (c)
 	{
 		if (c == 10)
@@ -49,11 +49,11 @@ void ptokenizer::skipeol()
 }
 
 
-pstring::code_t ptokenizer::getc()
+pstring::value_type ptokenizer::getc()
 {
 	if (m_unget != 0)
 	{
-		pstring::code_t c = m_unget;
+		pstring::value_type c = m_unget;
 		m_unget = 0;
 		return c;
 	}
@@ -66,11 +66,11 @@ pstring::code_t ptokenizer::getc()
 			return 0;
 		return '\n';
 	}
-	pstring::code_t c = *(m_px++);
+	pstring::value_type c = *(m_px++);
 	return c;
 }
 
-void ptokenizer::ungetc(pstring::code_t c)
+void ptokenizer::ungetc(pstring::value_type c)
 {
 	m_unget = c;
 }
@@ -129,9 +129,9 @@ double ptokenizer::get_number_double()
 	{
 		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	}
-	bool err = false;
-	double ret = tok.str().as_double(&err);
-	if (err)
+	double ret = 0.0;
+
+	if (!plib::pstod_ne(tok.str(), ret))
 		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	return ret;
 }
@@ -143,9 +143,8 @@ long ptokenizer::get_number_long()
 	{
 		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	}
-	bool err = false;
-	long ret = tok.str().as_long(&err);
-	if (err)
+	long ret = 0;
+	if (!plib::pstol_ne(tok.str(), ret))
 		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	return ret;
 }
@@ -182,7 +181,7 @@ ptokenizer::token_t ptokenizer::get_token()
 ptokenizer::token_t ptokenizer::get_token_internal()
 {
 	/* skip ws */
-	pstring::code_t c = getc();
+	pstring::value_type c = getc();
 	while (m_whitespace.find(c) != pstring::npos)
 	{
 		c = getc();
@@ -327,7 +326,7 @@ double ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start
 	else
 	{
 		tok=sexpr[start];
-		val = tok.as_double();
+		val = plib::pstod(tok);
 		start++;
 	}
 	while (start < sexpr.size())
@@ -410,57 +409,59 @@ static pstring catremainder(const std::vector<pstring> &elems, std::size_t start
 
 pstring  ppreprocessor::process_line(const pstring &line)
 {
-	pstring lt = line.replace_all("\t"," ").trim();
+	//pstring lt = plib::trim(plib::replace_all(line, pstring("\t"), pstring(" ")));
+	pstring a = plib::replace_all(line, pstring("\t"), pstring(" "));
+	pstring lt = plib::trim(a);
 	pstring ret;
 	m_lineno++;
 	// FIXME ... revise and extend macro handling
-	if (lt.startsWith("#"))
+	if (plib::startsWith(lt, "#"))
 	{
 		std::vector<pstring> lti(psplit(lt, " ", true));
-		if (lti[0].equals("#if"))
+		if (lti[0] == "#if")
 		{
 			m_level++;
 			std::size_t start = 0;
 			lt = replace_macros(lt);
-			std::vector<pstring> t(psplit(lt.substr(3).replace_all(" ",""), m_expr_sep));
+			std::vector<pstring> t(psplit(replace_all(lt.substr(3), pstring(" "), pstring("")), m_expr_sep));
 			int val = static_cast<int>(expr(t, start, 0));
 			if (val == 0)
 				m_ifflag |= (1 << m_level);
 		}
-		else if (lti[0].equals("#ifdef"))
+		else if (lti[0] == "#ifdef")
 		{
 			m_level++;
 			if (get_define(lti[1]) == nullptr)
 				m_ifflag |= (1 << m_level);
 		}
-		else if (lti[0].equals("#ifndef"))
+		else if (lti[0] == "#ifndef")
 		{
 			m_level++;
 			if (get_define(lti[1]) != nullptr)
 				m_ifflag |= (1 << m_level);
 		}
-		else if (lti[0].equals("#else"))
+		else if (lti[0] == "#else")
 		{
 			m_ifflag ^= (1 << m_level);
 		}
-		else if (lti[0].equals("#endif"))
+		else if (lti[0] == "#endif")
 		{
 			m_ifflag &= ~(1 << m_level);
 			m_level--;
 		}
-		else if (lti[0].equals("#include"))
+		else if (lti[0] == "#include")
 		{
 			// ignore
 		}
-		else if (lti[0].equals("#pragma"))
+		else if (lti[0] == "#pragma")
 		{
-			if (m_ifflag == 0 && lti.size() > 3 && lti[1].equals("NETLIST"))
+			if (m_ifflag == 0 && lti.size() > 3 && lti[1] == "NETLIST")
 			{
-				if (lti[2].equals("warning"))
+				if (lti[2] == "warning")
 					error("NETLIST: " + catremainder(lti, 3, " "));
 			}
 		}
-		else if (lti[0].equals("#define"))
+		else if (lti[0] == "#define")
 		{
 			if (m_ifflag == 0)
 			{

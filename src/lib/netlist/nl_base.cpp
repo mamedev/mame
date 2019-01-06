@@ -341,9 +341,8 @@ void netlist_t::start()
 			if (p != setup().m_param_values.end())
 			{
 				//FIXME: turn this into a proper function
-				bool error;
-				auto v = p->second.as_double(&error);
-				if (error || std::abs(v - std::floor(v)) > 1e-6 )
+				auto v = plib::pstod(p->second);;
+				if (std::abs(v - std::floor(v)) > 1e-6 )
 					log().fatal(MF_1_HND_VAL_NOT_SUPPORTED, p->second);
 				d->set_hint_deactivate(v == 0.0);
 			}

@@ -131,13 +131,13 @@ std::unique_ptr<matrix_solver_t> create_it(netlist_t &nl, pstring name, solver_p
 template <std::size_t m_N, std::size_t storage_N>
 std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
 {
-	if (pstring("SOR_MAT").equals(m_method()))
+	if (m_method() == "SOR_MAT")
 	{
 		return create_it<matrix_solver_SOR_mat_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
 		//typedef matrix_solver_SOR_mat_t<m_N,storage_N> solver_sor_mat;
 		//return plib::make_unique<solver_sor_mat>(netlist(), solvername, &m_params, size);
 	}
-	else if (pstring("MAT_CR").equals(m_method()))
+	else if (m_method() == "MAT_CR")
 	{
 		if (size > 0) // GCR always outperforms MAT solver
 		{
@@ -150,29 +150,29 @@ std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t 
 			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 		}
 	}
-	else if (pstring("MAT").equals(m_method()))
+	else if (m_method() == "MAT")
 	{
 		typedef matrix_solver_direct_t<m_N,storage_N> solver_mat;
 		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 	}
-	else if (pstring("SM").equals(m_method()))
+	else if (m_method() == "SM")
 	{
 		/* Sherman-Morrison Formula */
 		typedef matrix_solver_sm_t<m_N,storage_N> solver_mat;
 		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 	}
-	else if (pstring("W").equals(m_method()))
+	else if (m_method() == "W")
 	{
 		/* Woodbury Formula */
 		typedef matrix_solver_w_t<m_N,storage_N> solver_mat;
 		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 	}
-	else if (pstring("SOR").equals(m_method()))
+	else if (m_method() == "SOR")
 	{
 		typedef matrix_solver_SOR_t<m_N,storage_N> solver_GS;
 		return plib::make_unique<solver_GS>(netlist(), solvername, &m_params, size);
 	}
-	else if (pstring("GMRES").equals(m_method()))
+	else if (m_method() == "GMRES")
 	{
 		typedef matrix_solver_GMRES_t<m_N,storage_N> solver_GMRES;
 		return plib::make_unique<solver_GMRES>(netlist(), solvername, &m_params, size);
@@ -268,7 +268,7 @@ void NETLIB_NAME(solver)::post_start()
 	// Override log statistics
 	pstring p = plib::util::environment("NL_STATS", "");
 	if (p != "")
-		m_params.m_log_stats = p.as_long();
+		m_params.m_log_stats = plib::pstol(p);
 	else
 		m_params.m_log_stats = m_log_stats();
 

@@ -10,13 +10,18 @@
 #include <iterator>
 #include <exception>
 #include <string>
+#include <cstring>
 
 // ----------------------------------------------------------------------------------------
 // pstring: semi-immutable strings ...
 //
 // The only reason this class exists is the absence of support for multi-byte
-// strings in std:: which I would consider usuable for the use-cases I encounter.
+// strings in std:: which I would consider sub-optimal for the use-cases I encounter.
 // ----------------------------------------------------------------------------------------
+
+// enable this to use std::string instead of pstring globally.
+
+#define PSTRING_USE_STD_STRING	(0)
 
 template <typename T>
 class pstring_const_iterator final
@@ -64,6 +69,7 @@ public:
 
 	typedef typename traits_type::mem_t mem_t;
 	typedef typename traits_type::code_t code_t;
+	typedef typename traits_type::code_t value_type;
 	typedef std::size_t     size_type;
 	typedef std::ptrdiff_t difference_type;
 	typedef typename traits_type::string_type string_type;
@@ -83,12 +89,6 @@ public:
 	typedef const ref_value_type& const_reference;
 	typedef const_reference reference;
 
-	enum enc_t
-	{
-		UTF8,
-		UTF16
-	};
-
 	// simple construction/destruction
 	pstring_t()
 	{
@@ -98,12 +98,12 @@ public:
 	}
 
 	// FIXME: Do something with encoding
-	pstring_t(const mem_t *string, const enc_t enc)
+	pstring_t(const mem_t *string)
 	: m_str(string)
 	{
 	}
 
-	pstring_t(const mem_t *string, const size_type len, const enc_t enc)
+	pstring_t(const mem_t *string, const size_type len)
 	: m_str(string, len)
 	{
 	}
@@ -122,7 +122,7 @@ public:
 	: m_str(string.m_str)
 	{ }
 
-	explicit pstring_t(const string_type &string, const enc_t enc)
+	explicit pstring_t(const string_type &string)
 		: m_str(string)
 	{ }
 
@@ -201,48 +201,11 @@ public:
 
 	const_reference at(const size_type pos) const { return *reinterpret_cast<const ref_value_type *>(F::nthcode(m_str.c_str(),pos)); }
 
-	/* The following is not compatible to std::string */
-
-	bool equals(const pstring_t &string) const { return (compare(string) == 0); }
-
-	bool startsWith(const pstring_t &arg) const { return arg.mem_t_size() > mem_t_size() ? false : m_str.compare(0, arg.mem_t_size(), arg.m_str) == 0; }
-	bool endsWith(const pstring_t &arg) const { return arg.mem_t_size() > mem_t_size() ? false : m_str.compare(mem_t_size()-arg.mem_t_size(), arg.mem_t_size(), arg.m_str) == 0; }
-
-	pstring_t replace_all(const pstring_t &search, const pstring_t &replace) const;
-	pstring_t cat(const pstring_t &s) const { return *this + s; }
-	pstring_t cat(code_t c) const { return *this + c; }
-
-	// conversions
-
-	double as_double(bool *error = nullptr) const;
-	long as_long(bool *error = nullptr) const;
-
 	/* the following are extensions to <string> */
 
 	size_type mem_t_size() const { return m_str.size(); }
 
-	pstring_t left(size_type len) const { return substr(0, len); }
-	pstring_t right(size_type nlen) const
-	{
-		return nlen >= length() ? *this : substr(length() - nlen, nlen);
-	}
-
-	pstring_t ltrim(const pstring_t &ws = pstring_t(" \t\n\r")) const
-	{
-		return substr(find_first_not_of(ws));
-	}
-
-	pstring_t rtrim(const pstring_t &ws = pstring_t(" \t\n\r")) const
-	{
-		auto f = find_last_not_of(ws);
-		return f == npos ? pstring_t() : substr(0, f + 1);
-	}
-
-	pstring_t trim(const pstring_t &ws = pstring_t(" \t\n\r")) const { return this->ltrim(ws).rtrim(ws); }
-
 	pstring_t rpad(const pstring_t &ws, const size_type cnt) const;
-
-	pstring_t ucase() const;
 
 	const string_type &cpp_string() const { return m_str; }
 
@@ -519,37 +482,259 @@ extern template struct pstring_t<putf8_traits>;
 extern template struct pstring_t<putf16_traits>;
 extern template struct pstring_t<pwchar_traits>;
 
+#if (PSTRING_USE_STD_STRING)
+typedef std::string pstring;
+#else
 typedef pstring_t<putf8_traits> pstring;
+#endif
+typedef pstring_t<putf8_traits> putf8string;
 typedef pstring_t<putf16_traits> pu16string;
 typedef pstring_t<pwchar_traits> pwstring;
 
 namespace plib
 {
+	template<class T>
+	struct string_info
+	{
+		typedef typename T::mem_t mem_t;
+	};
+
+	template<>
+	struct string_info<std::string>
+	{
+		typedef char mem_t;
+	};
+
 	template<typename T>
 	pstring to_string(const T &v)
 	{
-		return pstring(std::to_string(v), pstring::UTF8);
+		return pstring(std::to_string(v));
 	}
 
 	template<typename T>
 	pwstring to_wstring(const T &v)
 	{
-		return pwstring(std::to_wstring(v), pwstring::UTF16);
+		return pwstring(std::to_wstring(v));
 	}
+
+#if (PSTRING_USE_STD_STRING)
+	inline double pstod(const std::string &str, std::size_t *e = nullptr)
+	{
+		return std::stod(str, e);
+	}
+
+	inline long pstol(const std::string &str, std::size_t *e = nullptr, int base = 10)
+	{
+		return std::stol(str, e, base);
+	}
+#else
+	template<typename T>
+	double pstod(const T &str, std::size_t *e = nullptr)
+	{
+		return std::stod(str.cpp_string(), e);
+	}
+
+	template<typename T>
+	long pstol(const T &str, std::size_t *e = nullptr, int base = 10)
+	{
+		return std::stol(str.cpp_string(), e, base);
+	}
+#endif
+
+	template<typename T, typename R>
+	bool pstol_ne(const T &str, R &ret)
+	{
+		try
+		{
+			std::size_t e = 0;
+			ret = pstol(str, &e);
+			return str.c_str()[e] == 0;
+		}
+		catch (...)
+		{
+			return false;
+		}
+	}
+
+	template<typename T, typename R>
+	bool pstod_ne(const T &str, R &ret)
+	{
+		try
+		{
+			std::size_t e = 0;
+			ret = pstod(str, &e);
+			return str.c_str()[e] == 0;
+		}
+		catch (...)
+		{
+			return false;
+		}
+	}
+
+	template<typename T>
+	typename T::size_type find_first_not_of(const T &str, const T &no)
+	{
+		typename T::size_type pos = 0;
+		for (auto it = str.begin(); it != str.end(); ++it, ++pos)
+		{
+			bool f = true;
+			for (typename T::value_type const jt : no)
+			{
+				if (*it == jt)
+				{
+					f = false;
+					break;
+				}
+			}
+			if (f)
+				return pos;
+		}
+		return T::npos;
+	}
+
+	template<typename T>
+	typename T::size_type find_last_not_of(const T &str, const T &no)
+	{
+		/* FIXME: reverse iterator */
+		typename T::size_type last_found = T::npos;
+		typename T::size_type pos = 0;
+		for (auto it = str.begin(); it != str.end(); ++it, ++pos)
+		{
+			bool f = true;
+			for (typename T::value_type const jt : no)
+			{
+				if (*it == jt)
+				{
+					f = false;
+					break;
+				}
+			}
+			if (f)
+				last_found = pos;
+		}
+		return last_found;
+	}
+
+	template<typename T>
+	T ltrim(const T &str, const T &ws = T(" \t\n\r"))
+	{
+		auto f = find_first_not_of(str, ws);
+		return (f == T::npos) ? T() : str.substr(f);
+	}
+
+	template<typename T>
+	T rtrim(const T &str, const T &ws = T(" \t\n\r"))
+	{
+		auto f = find_last_not_of(str, ws);
+		return (f == T::npos) ? T() : str.substr(0, f + 1);
+	}
+
+	template<typename T>
+	T trim(const T &str, const T &ws = T(" \t\n\r"))
+	{
+		return rtrim(ltrim(str, ws), ws);
+	}
+
+	template<typename T>
+	T left(const T &str, typename T::size_type len)
+	{
+		return str.substr(0, len);
+	}
+
+	template<typename T>
+	T right(const T &str, typename T::size_type nlen)
+	{
+		return nlen >= str.length() ? str : str.substr(str.length() - nlen, nlen);
+	}
+
+	template<typename T>
+	bool startsWith(const T &str, const T &arg)
+	{
+		return (arg == left(str, arg.length()));
+	}
+
+	template<typename T>
+	bool endsWith(const T &str, const T &arg)
+	{
+		return (right(str, arg.length()) == arg);
+	}
+
+	template<typename T>
+	bool startsWith(const T &str, const char *arg)
+	{
+		return (left(str, std::strlen(arg)) == arg);
+	}
+
+	template<typename T>
+	bool endsWith(const T &str, const char *arg)
+	{
+		return (right(str, std::strlen(arg)) == arg);
+	}
+
+	template<typename T>
+	T ucase(const T &str)
+	{
+		T ret;
+		for (const auto &c : str)
+			if (c >= 'a' && c <= 'z')
+				ret += (c - 'a' + 'A');
+			else
+				ret += c;
+		return ret;
+	}
+
+	template<typename T>
+	T rpad(const T &str, const T &ws, const typename T::size_type cnt)
+	{
+		// FIXME: pstringbuffer ret(*this);
+
+		T ret(str);
+		typename T::size_type wsl = ws.length();
+		for (auto i = ret.length(); i < cnt; i+=wsl)
+			ret += ws;
+		return ret;
+	}
+
+	template<typename T>
+	T replace_all(const T &str, const T &search, const T &replace)
+	{
+		T ret;
+		const typename T::size_type slen = search.length();
+
+		typename T::size_type last_s = 0;
+		typename T::size_type s = str.find(search, last_s);
+		while (s != T::npos)
+		{
+			ret += str.substr(last_s, s - last_s);
+			ret += replace;
+			last_s = s + slen;
+			s = str.find(search, last_s);
+		}
+		ret += str.substr(last_s);
+		return ret;
+	}
+
+	template<typename T, typename T1, typename T2>
+	T replace_all(const T &str, const T1 &search, const T2 &replace)
+	{
+		return replace_all(str, T(search), T(replace));
+	}
+
 }
 
 // custom specialization of std::hash can be injected in namespace std
 namespace std
 {
+
 	template<typename T> struct hash<pstring_t<T>>
 	{
 		typedef pstring_t<T> argument_type;
 		typedef std::size_t result_type;
 		result_type operator()(argument_type const& s) const
 		{
-			const pstring::mem_t *string = s.c_str();
+			const typename argument_type::mem_t *string = s.c_str();
 			result_type result = 5381;
-			for (pstring::mem_t c = *string; c != 0; c = *string++)
+			for (typename argument_type::mem_t c = *string; c != 0; c = *string++)
 				result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ static_cast<result_type>(c);
 			return result;
 		}

@@ -65,16 +65,28 @@ namespace plib {
 
 	int option_double::parse(const pstring &argument)
 	{
-		bool err = false;
-		m_val = argument.as_double(&err);
-		return (err ? 1 : 0);
+		try
+		{
+			m_val = plib::pstod(argument);
+			return 0;
+		}
+		catch (...)
+		{
+			return 1;
+		}
 	}
 
 	int option_long::parse(const pstring &argument)
 	{
-		bool err = false;
-		m_val = argument.as_long(&err);
-		return (err ? 1 : 0);
+		try
+		{
+			m_val = plib::pstol(argument);
+			return 0;
+		}
+		catch (...)
+		{
+			return 1;
+		}
 	}
 
 	int option_vec::parse(const pstring &argument)
@@ -110,16 +122,16 @@ namespace plib {
 
 	int options::parse(int argc, char *argv[])
 	{
-		m_app = pstring(argv[0], pstring::UTF8);
+		m_app = pstring(argv[0]);
 
 		for (int i=1; i<argc; )
 		{
-			pstring arg(argv[i], pstring::UTF8);
+			pstring arg(argv[i]);
 			option *opt = nullptr;
 			pstring opt_arg;
 			bool has_equal_arg = false;
 
-			if (arg.startsWith("--"))
+			if (plib::startsWith(arg, "--"))
 			{
 				auto v = psplit(arg.substr(2),"=");
 				opt = getopt_long(v[0]);
@@ -131,7 +143,7 @@ namespace plib {
 					opt_arg += v[v.size()-1];
 				}
 			}
-			else if (arg.startsWith("-"))
+			else if (plib::startsWith(arg, "-"))
 			{
 				std::size_t p = 1;
 				opt = getopt_short(arg.substr(p, 1));
@@ -158,7 +170,7 @@ namespace plib {
 				else
 				{
 					i++; // FIXME: are there more arguments?
-					if (opt->do_parse(pstring(argv[i], pstring::UTF8)) != 0)
+					if (opt->do_parse(pstring(argv[i])) != 0)
 						return i - 1;
 				}
 			}
@@ -181,13 +193,13 @@ namespace plib {
 
 		for (auto &p : paragraphs)
 		{
-			pstring line = pstring("").rpad(" ", firstline_indent);
+			pstring line = plib::rpad(pstring(""), pstring(" "), firstline_indent);
 			for (auto &s : psplit(p, " "))
 			{
 				if (line.length() + s.length() > width)
 				{
 					ret += line + "\n";
-					line = pstring("").rpad(" ", indent);
+					line = plib::rpad(pstring(""), pstring(" "), indent);
 				}
 				line += s + " ";
 			}
@@ -228,13 +240,13 @@ namespace plib {
 							{
 								line += v + "|";
 							}
-							line = line.left(line.length() - 1);
+							line = plib::left(line, line.length() - 1);
 						}
 						else
 							line += "Value";
 					}
 				}
-				line = line.rpad(" ", indent - 2) + "  ";
+				line = plib::rpad(line, pstring(" "), indent - 2) + "  ";
 				if (line.length() > indent)
 				{
 					//ret += "TestGroup abc\n  def gef\nxyz\n\n" ;

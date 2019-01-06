@@ -444,7 +444,7 @@ netlist::setup_t &netlist_mame_device::setup()
 
 void netlist_mame_device::register_memregion_source(netlist::setup_t &setup, const char *name)
 {
-	setup.register_source(plib::make_unique_base<netlist::source_t, netlist_source_memregion_t>(setup, pstring(name, pstring::UTF8)));
+	setup.register_source(plib::make_unique_base<netlist::source_t, netlist_source_memregion_t>(setup, pstring(name)));
 }
 
 void netlist_mame_analog_input_device::write(const double val)
@@ -533,7 +533,7 @@ netlist_mame_analog_input_device::netlist_mame_analog_input_device(const machine
 void netlist_mame_analog_input_device::device_start()
 {
 	LOGDEVCALLS("start\n");
-	netlist::param_t *p = this->nl_owner().setup().find_param(pstring(m_param_name, pstring::UTF8));
+	netlist::param_t *p = this->nl_owner().setup().find_param(pstring(m_param_name));
 	m_param = dynamic_cast<netlist::param_double_t *>(p);
 	if (m_param == nullptr)
 	{
@@ -567,7 +567,7 @@ void netlist_mame_analog_output_device::set_params(const char *in_name, output_d
 
 void netlist_mame_analog_output_device::custom_netlist_additions(netlist::setup_t &setup)
 {
-	const pstring pin(m_in, pstring::UTF8);
+	const pstring pin(m_in);
 	pstring dname = pstring("OUT_") + pin;
 	m_delegate.bind_relative_to(owner()->machine().root_device());
 
@@ -602,7 +602,7 @@ void netlist_mame_logic_output_device::set_params(const char *in_name, output_de
 
 void netlist_mame_logic_output_device::custom_netlist_additions(netlist::setup_t &setup)
 {
-	pstring pin(m_in, pstring::UTF8);
+	pstring pin(m_in);
 	pstring dname = "OUT_" + pin;
 	m_delegate.bind_relative_to(owner()->machine().root_device());
 
@@ -643,7 +643,7 @@ void netlist_mame_int_input_device::set_params(const char *param_name, const uin
 void netlist_mame_int_input_device::device_start()
 {
 	LOGDEVCALLS("start\n");
-	netlist::param_t *p = downcast<netlist_mame_device *>(this->owner())->setup().find_param(pstring(m_param_name, pstring::UTF8));
+	netlist::param_t *p = downcast<netlist_mame_device *>(this->owner())->setup().find_param(pstring(m_param_name));
 	m_param = dynamic_cast<netlist::param_int_t *>(p);
 	if (m_param == nullptr)
 	{
@@ -674,7 +674,7 @@ void netlist_mame_logic_input_device::set_params(const char *param_name, const u
 void netlist_mame_logic_input_device::device_start()
 {
 	LOGDEVCALLS("start\n");
-	netlist::param_t *p = downcast<netlist_mame_device *>(this->owner())->setup().find_param(pstring(m_param_name, pstring::UTF8));
+	netlist::param_t *p = downcast<netlist_mame_device *>(this->owner())->setup().find_param(pstring(m_param_name));
 	m_param = dynamic_cast<netlist::param_logic_t *>(p);
 	if (m_param == nullptr)
 	{
@@ -705,7 +705,7 @@ void netlist_mame_ram_pointer_device::set_params(const char *param_name)
 void netlist_mame_ram_pointer_device::device_start()
 {
 	LOGDEVCALLS("start\n");
-	netlist::param_t *p = downcast<netlist_mame_device *>(this->owner())->setup().find_param(pstring(m_param_name, pstring::UTF8));
+	netlist::param_t *p = downcast<netlist_mame_device *>(this->owner())->setup().find_param(pstring(m_param_name));
 	m_param = dynamic_cast<netlist::param_ptr_t *>(p);
 	if (m_param == nullptr)
 	{
@@ -744,7 +744,7 @@ void netlist_mame_stream_input_device::custom_netlist_additions(netlist::setup_t
 		setup.register_dev("NETDEV_SOUND_IN", "STREAM_INPUT");
 
 	pstring sparam = plib::pfmt("STREAM_INPUT.CHAN{1}")(m_channel);
-	setup.register_param(sparam, pstring(m_param_name, pstring::UTF8));
+	setup.register_param(sparam, pstring(m_param_name));
 	sparam = plib::pfmt("STREAM_INPUT.MULT{1}")(m_channel);
 	setup.register_param(sparam, m_mult);
 	sparam = plib::pfmt("STREAM_INPUT.OFFSET{1}")(m_channel);
@@ -785,7 +785,7 @@ void netlist_mame_stream_output_device::custom_netlist_additions(netlist::setup_
 	setup.register_param(sname + ".CHAN" , m_channel);
 	setup.register_param(sname + ".MULT",  m_mult);
 	setup.register_param(sname + ".OFFSET",  m_offset);
-	setup.register_link(sname + ".IN", pstring(m_out_name, pstring::UTF8));
+	setup.register_link(sname + ".IN", pstring(m_out_name));
 }
 
 
