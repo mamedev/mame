@@ -1264,6 +1264,15 @@ ROM_START( ekaraj )
 	ROM_RELOAD(0x000000, 0x100000)
 ROM_END
 
+ROM_START( ekaraphs )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "ekaraheadset.bin", 0x600000, 0x200000, CRC(dd9b3cd7) SHA1(baaf35d56fa45b6f995b8466331bb30f0035f734) )
+	ROM_RELOAD(0x000000, 0x200000)
+ROM_END
+
+
+
+
 ROM_START( ddrfammt )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekara_ddr_ha010_81947.bin", 0x600000, 0x200000, CRC(737d5d1a) SHA1(a1043047056dd27bca69767ee2044461ec549465) )
@@ -1335,7 +1344,8 @@ CONS( 200?, has_wamg,  0,          0,  xavix,            xavix,    xavix_state, 
 CONS( 2000, ekara,    0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD / Hasbro",            "e-kara (US?, NTSC, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turn it on" without cart
 CONS( 2000, ekaraa,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD / Hasbro",            "e-kara (US?, NTSC, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turning on e-kara" without cart
 CONS( 2000, ekaraj,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows Japanese message without cart
-// there appear to be later e-kara releases for each region with 3 built in songs too
+// the 'e-kara pro headset' has 3 songs built in for the US release.  The Japanese release of this appears to be called 'e-kara H.S.' and it is unclear if it also has built in songs.  The Canadian box says 'cartridge contains' instead of 'songs included' but is likely a printing error.
+CONS( 2002, ekaraphs, 0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara Pro Headset (US, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 
 CONS( 2001, ddrfammt, 0,           0,  xavix_cart_ddrfammt,ddrfammt, xavix_cart_state,   init_xavix,    "Takara / Konami / SSD Company LTD",            "Dance Dance Revolution Family Mat (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ )
 
