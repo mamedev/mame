@@ -843,12 +843,12 @@ void detail::net_t::rebuild_list()
 	m_active = cnt;
 }
 
-void detail::net_t::process(unsigned Mask)
+void detail::net_t::process(const unsigned &mask)
 {
 	for (auto & p : m_list_active)
 	{
 		p.device().m_stat_call_count.inc();
-		if ((p.state() & Mask) != 0)
+		if ((p.state() & mask) != 0)
 		{
 			p.device().m_stat_total_time.start();
 			p.m_delegate();
@@ -861,23 +861,22 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 {
 	nl_assert(this->isRailNet());
 
-	const unsigned mask((m_new_Q << core_terminal_t::INP_LH_SHIFT)
-			| (m_cur_Q<<core_terminal_t::INP_HL_SHIFT));
+	const auto new_Q(m_new_Q);
+
+	const unsigned mask((new_Q << core_terminal_t::INP_LH_SHIFT)
+			| (m_cur_Q << core_terminal_t::INP_HL_SHIFT));
 
 	m_in_queue = QS_DELIVERED; /* mark as taken ... */
 
-	switch (mask)
+	if (mask == core_terminal_t::STATE_INP_HL)
 	{
-		case core_terminal_t::STATE_INP_HL:
-			m_cur_Q = m_new_Q;
-			process(core_terminal_t::STATE_INP_HL | core_terminal_t::STATE_INP_ACTIVE);
-			break;
-		case core_terminal_t::STATE_INP_LH:
-			m_cur_Q = m_new_Q;
-			process(core_terminal_t::STATE_INP_LH | core_terminal_t::STATE_INP_ACTIVE);
-			break;
-		default:
-			break;
+		m_cur_Q = new_Q;
+		process(core_terminal_t::STATE_INP_HL | core_terminal_t::STATE_INP_ACTIVE);
+	}
+	else if (mask == core_terminal_t::STATE_INP_LH)
+	{
+		m_cur_Q = new_Q;
+		process(core_terminal_t::STATE_INP_LH | core_terminal_t::STATE_INP_ACTIVE);
 	}
 }
 

@@ -765,7 +765,7 @@ namespace netlist
 		plib::linkedlist_t<core_terminal_t> m_list_active;
 		core_terminal_t * m_railterminal;
 
-		void process(unsigned Mask);
+		void process(const unsigned &mask);
 	};
 
 	class logic_net_t : public detail::net_t
