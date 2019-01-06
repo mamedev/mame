@@ -24,13 +24,16 @@
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
+#include "includes/xbox_pci.h"
 #include "includes/nforcepc.h"
 
 /*
   Pci devices
 */
 
-DEFINE_DEVICE_TYPE(CRUSH11, crush11_host_device, "crush11", "NVIDIA Corporation nForce CPU bridge")
+// NVIDIA Corporation nForce CPU bridge
+
+DEFINE_DEVICE_TYPE(CRUSH11, crush11_host_device, "CRUSH11", "NVIDIA Corporation nForce CPU bridge")
 
 void crush11_host_device::config_map(address_map &map)
 {
@@ -98,6 +101,36 @@ WRITE8_MEMBER(crush11_host_device::test_w)
 	logerror("test = %02x\n", data);
 }
 
+// device connected to SMBus
+
+DEFINE_DEVICE_TYPE(SMBUS_LOGGER, smbus_logger_device, "smbus_logger", "SMBUS LOGGER")
+
+smbus_logger_device::smbus_logger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SMBUS_LOGGER, tag, owner, clock)
+{
+}
+
+int smbus_logger_device::execute_command(int command, int rw, int data)
+{
+	if (rw == 1) // read
+	{
+		logerror("smbus read  %02x %d %02x\n", command, rw, buffer[command]);
+		return buffer[command];
+	}
+	buffer[command] = (uint8_t)data;
+	logerror("smbus write %02x %d %02d\n", command, rw, data);
+	return 0;
+}
+
+void smbus_logger_device::device_start()
+{
+	memset(buffer, 0, sizeof(buffer));
+}
+
+void smbus_logger_device::device_reset()
+{
+}
+
 /*
   Machine state
 */
@@ -105,7 +138,8 @@ WRITE8_MEMBER(crush11_host_device::test_w)
 class nforcepc_state : public driver_device
 {
 public:
-	struct boot_state_info {
+	struct boot_state_info
+	{
 		uint8_t val;
 		const char *const message;
 	};
@@ -120,12 +154,20 @@ private:
 	void nforce_map(address_map &map);
 	void nforce_map_io(address_map &map);
 	DECLARE_WRITE8_MEMBER(boot_state_award_w);
+	IRQ_CALLBACK_MEMBER(irq_callback);
+	DECLARE_WRITE_LINE_MEMBER(maincpu_interrupt);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<mcpx_isalpc_device> isalpc;
 };
 
-nforcepc_state::nforcepc_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag)
+nforcepc_state::nforcepc_state(const machine_config &mconfig, device_type type, const char *tag) :
+	driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	isalpc(*this, ":pci:01.0")
 {
 }
 
@@ -138,19 +180,31 @@ void nforcepc_state::machine_reset()
 }
 
 const nforcepc_state::boot_state_info nforcepc_state::boot_state_infos_award[] = {
+	{ 0xC0, "Turn off chipset cache" },
 	{ 0, nullptr }
 };
 
 WRITE8_MEMBER(nforcepc_state::boot_state_award_w)
 {
 	const char *desc = "";
-	for(int i=0; boot_state_infos_award[i].message; i++)
-		if(boot_state_infos_award[i].val == data) {
+	for (int i = 0; boot_state_infos_award[i].message; i++)
+		if (boot_state_infos_award[i].val == data)
+		{
 			desc = boot_state_infos_award[i].message;
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
 
+}
+
+IRQ_CALLBACK_MEMBER(nforcepc_state::irq_callback)
+{
+	return isalpc->acknowledge();
+}
+
+WRITE_LINE_MEMBER(nforcepc_state::maincpu_interrupt)
+{
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 void nforcepc_state::nforce_map(address_map &map)
@@ -172,14 +226,30 @@ void nforcepc_state::nforcepc(machine_config &config)
 	athlonxp_device &maincpu(ATHLONXP(config, "maincpu", 90000000));
 	maincpu.set_addrmap(AS_PROGRAM, &nforcepc_state::nforce_map);
 	maincpu.set_addrmap(AS_IO, &nforcepc_state::nforce_map_io);
-	PCI_ROOT(config, ":pci", 0);
-	CRUSH11(config, ":pci:00.0", 0, "maincpu", 2 * 1024 * 1024);
-	/*  maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
-	maincpu.smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
+	maincpu.set_irq_acknowledge_callback(FUNC(nforcepc_state::irq_callback));
 
-	i82371sb_isa_device &isa(I82371SB_ISA(config, ":pci:07.0", 0));
-	isa.boot_state_hook().set(FUNC(nforcepc_state::boot_state_phoenix_ver40_rev6_w));
-	isa.smi().set_inputline(":maincpu", INPUT_LINE_SMI);
+	PCI_ROOT(config, ":pci", 0);
+	CRUSH11(config, ":pci:00.0", 0, "maincpu", 2 * 1024 * 1024); /* 10de:01a4 NVIDIA Corporation nForce CPU bridge
+	10de:01ac NVIDIA Corporation nForce 220/420 Memory Controller
+	10de:01ad NVIDIA Corporation nForce 220/420 Memory Controller
+	10de:01ab NVIDIA Corporation nForce 420 Memory Controller (DDR)*/
+	mcpx_isalpc_device &isa(MCPX_ISALPC(config, ":pci:01.0", 0, 0x10430c11)); // 10de:01b2 NVIDIA Corporation nForce ISA Bridge (LPC bus)
+	isa.boot_state_hook().set(FUNC(nforcepc_state::boot_state_award_w));
+	isa.interrupt_output().set(FUNC(nforcepc_state::maincpu_interrupt));
+	MCPX_SMBUS(config, ":pci:01.1", 0); // 10de:01b4 NVIDIA Corporation nForce PCI System Management (SMBus)
+	SMBUS_LOGGER(config, ":pci:01.1:08", 0);
+	SMBUS_LOGGER(config, ":pci:01.1:2d", 0);
+	SMBUS_LOGGER(config, ":pci:01.1:48", 0);
+	SMBUS_LOGGER(config, ":pci:01.1:49", 0);
+	/*10de:01c2 NVIDIA Corporation nForce USB Controller
+	10de:01c2 NVIDIA Corporation nForce USB Controller
+	10de:01b0 NVIDIA Corporation nForce Audio Processing Unit
+	10de:01b1 NVIDIA Corporation nForce AC'97 Audio Controller
+	10de:01b8 NVIDIA Corporation nForce PCI-to-PCI bridge
+	10de:01bc NVIDIA Corporation nForce IDE
+	10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
+	*/
+	/* maincpu.smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
 
 	i82371sb_ide_device &ide(I82371SB_IDE(config, ":pci:07.1", 0));
 	ide.irq_pri().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
