@@ -432,40 +432,38 @@ void m14_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(m14_state::m14)
-
+void m14_state::m14(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8085A,6000000) //guess: 6 Mhz internally divided by 2
-	MCFG_DEVICE_PROGRAM_MAP(m14_map)
-	MCFG_DEVICE_IO_MAP(m14_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m14_state, m14_irq)
+	I8085A(config, m_maincpu, 6000000); //guess: 6 Mhz internally divided by 2
+	m_maincpu->set_addrmap(AS_PROGRAM, &m14_state::m14_map);
+	m_maincpu->set_addrmap(AS_IO, &m14_state::m14_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(m14_state::m14_irq));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m14_state, screen_update_m14)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); //not accurate
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(m14_state::screen_update_m14));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m14)
-	MCFG_PALETTE_ADD("palette", 0x20)
-	MCFG_PALETTE_INIT_OWNER(m14_state, m14)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m14);
+	PALETTE(config, m_palette, 0x20);
+	m_palette->set_init(FUNC(m14_state::palette_init_m14));
 
 	/* sound hardware */
-
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(5)
-	MCFG_SAMPLES_NAMES(m14_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(5);
+	m_samples->set_samples_names(m14_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.6);
 
-//  MCFG_DEVICE_ADD("discrete", DISCRETE)
-//  MCFG_DISCRETE_INTF(m14)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+//  DISCRETE(config, m_discrete);
+//  m_discrete->set_intf(m14);
+//  m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /***************************************************************************
 

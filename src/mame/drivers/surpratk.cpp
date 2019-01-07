@@ -14,7 +14,6 @@
 #include "includes/surpratk.h"
 #include "includes/konamipt.h"
 
-#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
@@ -168,30 +167,30 @@ WRITE8_MEMBER( surpratk_state::banking_callback )
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-MACHINE_CONFIG_START(surpratk_state::surpratk)
-
+void surpratk_state::surpratk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
-	MCFG_DEVICE_PROGRAM_MAP(surpratk_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", surpratk_state,  surpratk_interrupt)
-	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, surpratk_state, banking_callback))
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4); /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &surpratk_state::surpratk_map);
+	m_maincpu->set_vblank_int("screen", FUNC(surpratk_state::surpratk_interrupt));
+	m_maincpu->line().set(FUNC(surpratk_state::banking_callback));
 
 	ADDRESS_MAP_BANK(config, "bank0000").set_map(&surpratk_state::bank0000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(surpratk_state, screen_update_surpratk)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(surpratk_state::screen_update_surpratk));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette, 2048);
+	m_palette->enable_shadows();
+	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
@@ -211,7 +210,9 @@ MACHINE_CONFIG_START(surpratk_state::surpratk)
 	ymsnd.irq_handler().set_inputline(m_maincpu, KONAMI_FIRQ_LINE);
 	ymsnd.add_route(0, "lspeaker", 1.0);
 	ymsnd.add_route(1, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
+
+
 
 /***************************************************************************
 

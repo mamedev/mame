@@ -12,6 +12,7 @@
 #pragma once
 
 #include "video/mc6845.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"

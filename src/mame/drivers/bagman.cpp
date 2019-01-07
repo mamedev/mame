@@ -474,27 +474,28 @@ void bagman_state::bagman_base(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
-MACHINE_CONFIG_START(bagman_state::bagman)
+void bagman_state::bagman(machine_config &config)
+{
 	bagman_base(config);
 
-	MCFG_DEVICE_ADD("tmsprom", TMSPROM, 640000 / 2)  /* rom clock */
-	MCFG_TMSPROM_REGION("5110ctrl") /* prom memory region - sound region is automatically assigned */
-	MCFG_TMSPROM_ROM_SIZE(0x1000)   /* individual rom_size */
-	MCFG_TMSPROM_PDC_BIT(1)         /* bit # of pdc line */
+	TMSPROM(config, m_tmsprom, 640000 / 2);  /* rom clock */
+	m_tmsprom->set_region("5110ctrl"); /* prom memory region - sound region is automatically assigned */
+	m_tmsprom->set_rom_size(0x1000);   /* individual rom_size */
+	m_tmsprom->set_pdc_bit(1);         /* bit # of pdc line */
 	/* virtual bit 8: constant 0, virtual bit 9:constant 1 */
-	MCFG_TMSPROM_CTL1_BIT(8)        /* bit # of ctl1 line */
-	MCFG_TMSPROM_CTL2_BIT(2)        /* bit # of ctl2 line */
-	MCFG_TMSPROM_CTL4_BIT(8)        /* bit # of ctl4 line */
-	MCFG_TMSPROM_CTL8_BIT(2)        /* bit # of ctl8 line */
-	MCFG_TMSPROM_RESET_BIT(6)       /* bit # of rom reset */
-	MCFG_TMSPROM_STOP_BIT(7)        /* bit # of stop */
-	MCFG_TMSPROM_PDC_CB(WRITELINE("tms", tms5110_device, pdc_w))        /* tms pdc func */
-	MCFG_TMSPROM_CTL_CB(WRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
+	m_tmsprom->set_ctl1_bit(8);        /* bit # of ctl1 line */
+	m_tmsprom->set_ctl2_bit(2);        /* bit # of ctl2 line */
+	m_tmsprom->set_ctl4_bit(8);        /* bit # of ctl4 line */
+	m_tmsprom->set_ctl8_bit(2);        /* bit # of ctl8 line */
+	m_tmsprom->set_reset_bit(6);       /* bit # of rom reset */
+	m_tmsprom->set_stop_bit(7);        /* bit # of stop */
+	m_tmsprom->pdc().set("tms", FUNC(tms5110_device::pdc_w)); /* tms pdc func */
+	m_tmsprom->ctl().set("tms", FUNC(tms5110_device::ctl_w)); /* tms ctl func */
 
-	MCFG_DEVICE_ADD("tms", TMS5110A, 640000)
-	MCFG_TMS5110_M0_CB(WRITELINE("tmsprom", tmsprom_device, m0_w))
-	MCFG_TMS5110_DATA_CB(READLINE("tmsprom", tmsprom_device, data_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	tms5110a_device &tms(TMS5110A(config, "tms", 640000));
+	tms.m0().set("tmsprom", FUNC(tmsprom_device::m0_w));
+	tms.data().set("tmsprom", FUNC(tmsprom_device::data_r));
+	tms.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	LS259(config, m_tmslatch); // 7H
 	m_tmslatch->q_out_cb<0>().set(FUNC(bagman_state::tmsprom_bit_w));
@@ -503,7 +504,7 @@ MACHINE_CONFIG_START(bagman_state::bagman)
 	m_tmslatch->q_out_cb<3>().set("tmsprom", FUNC(tmsprom_device::enable_w));
 	m_tmslatch->q_out_cb<4>().set(FUNC(bagman_state::tmsprom_csq0_w));
 	m_tmslatch->q_out_cb<5>().set(FUNC(bagman_state::tmsprom_csq1_w));
-MACHINE_CONFIG_END
+}
 
 void bagman_state::sbagman(machine_config &config)
 {
@@ -517,12 +518,12 @@ void bagman_state::sbagmani(machine_config &config)
 	m_mainlatch->q_out_cb<3>().set(FUNC(bagman_state::video_enable_w));
 }
 
-MACHINE_CONFIG_START(bagman_state::pickin)
-
+void bagman_state::pickin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, BAGMAN_H0)
-	MCFG_DEVICE_PROGRAM_MAP(pickin_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
+	Z80(config, m_maincpu, BAGMAN_H0);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bagman_state::pickin_map);
+	m_maincpu->set_addrmap(AS_IO, &bagman_state::main_portmap);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(bagman_state::irq_mask_w));
@@ -535,16 +536,14 @@ MACHINE_CONFIG_START(bagman_state::pickin)
 	m_mainlatch->q_out_cb<7>().set_nop();    // ????
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bagman_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(bagman_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(bagman_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pickin)
-	MCFG_PALETTE_ADD("palette", 64)
-
-	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pickin);
+	PALETTE(config, m_palette, 64).set_init(FUNC(bagman_state::palette_init_bagman));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -556,7 +555,7 @@ MACHINE_CONFIG_START(bagman_state::pickin)
 
 	/* maybe */
 	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.40);
-MACHINE_CONFIG_END
+}
 
 /*
 
@@ -576,12 +575,12 @@ z80
 */
 
 
-MACHINE_CONFIG_START(bagman_state::botanic)
-
+void bagman_state::botanic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, BAGMAN_H0)
-	MCFG_DEVICE_PROGRAM_MAP(pickin_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
+	Z80(config, m_maincpu, BAGMAN_H0);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bagman_state::pickin_map);
+	m_maincpu->set_addrmap(AS_IO, &bagman_state::main_portmap);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(bagman_state::irq_mask_w));
@@ -594,16 +593,14 @@ MACHINE_CONFIG_START(bagman_state::botanic)
 	m_mainlatch->q_out_cb<7>().set_nop();    // ????
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bagman_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(bagman_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(bagman_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bagman)
-	MCFG_PALETTE_ADD("palette", 64)
-
-	MCFG_PALETTE_INIT_OWNER(bagman_state,bagman)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bagman);
+	PALETTE(config, m_palette, 64).set_init(FUNC(bagman_state::palette_init_bagman));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -614,7 +611,7 @@ MACHINE_CONFIG_START(bagman_state::botanic)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.40);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

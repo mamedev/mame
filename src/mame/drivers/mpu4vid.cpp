@@ -1277,9 +1277,10 @@ void mpu4_state::mpu4_6809_map(address_map &map)
 
 
 
-MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
-	MCFG_DEVICE_ADD("maincpu", MC6809, MPU4_MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(mpu4_6809_map)
+void mpu4vid_state::mpu4_vid(machine_config &config)
+{
+	MC6809(config, m_maincpu, MPU4_MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_6809_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);               /* confirm */
 
@@ -1291,7 +1292,7 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	// note this directly affects the scanline counters used below, and thus the timing of everything
 	screen.set_screen_update("scn2674_vid", FUNC(scn2674_device::screen_update));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
 	SCN2674(config, m_scn2674, VIDEO_MASTER_CLOCK / 8);
 	m_scn2674->intr_callback().set_inputline("video", M68K_IRQ_3);
@@ -1299,20 +1300,18 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	m_scn2674->set_display_callback(FUNC(mpu4vid_state::display_pixels));
 	m_scn2674->set_addrmap(0, &mpu4vid_state::mpu4_vram);
 
+	M68000(config, m_videocpu, VIDEO_MASTER_CLOCK);
+	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map);
 
-	MCFG_DEVICE_ADD("video", M68000, VIDEO_MASTER_CLOCK )
-	MCFG_DEVICE_PROGRAM_MAP(mpu4_68k_map)
-
-//  MCFG_QUANTUM_TIME(attotime::from_hz(960))
+//  config.m_minimum_quantum = attotime::from_hz(960);
 
 	MCFG_MACHINE_START_OVERRIDE(mpu4vid_state,mpu4_vid)
 	MCFG_MACHINE_RESET_OVERRIDE(mpu4vid_state,mpu4_vid)
 	MCFG_VIDEO_START_OVERRIDE (mpu4vid_state,mpu4_vid)
 
-	MCFG_PALETTE_ADD("palette", ef9369_device::NUMCOLORS)
+	PALETTE(config, m_palette, ef9369_device::NUMCOLORS);
 
-	MCFG_EF9369_ADD("ef9369")
-	MCFG_EF9369_COLOR_UPDATE_CB(mpu4vid_state, ef9369_color_update)
+	EF9369(config, "ef9369").set_color_update_callback(FUNC(mpu4vid_state::ef9369_color_update));
 
 	PTM6840(config, m_ptm, VIDEO_MASTER_CLOCK / 10); /* 68k E clock */
 	m_ptm->set_external_clocks(0, 0, 0);
@@ -1324,9 +1323,9 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	/* Present on all video cards */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_SAA1099_ADD("saa", 8000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
+	saa1099_device &saa(SAA1099(config, "saa", 8000000));
+	saa.add_route(0, "lspeaker", 0.5);
+	saa.add_route(1, "rspeaker", 0.5);
 
 	ACIA6850(config, m_acia_0, 0);
 	m_acia_0->txd_handler().set("acia6850_1", FUNC(acia6850_device::write_rxd));
@@ -1337,44 +1336,45 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	m_acia_1->txd_handler().set("acia6850_0", FUNC(acia6850_device::write_rxd));
 	m_acia_1->rts_handler().set("acia6850_0", FUNC(acia6850_device::write_dcd));
 	m_acia_1->irq_handler().set(FUNC(mpu4vid_state::m68k_acia_irq));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mpu4vid_state::crmaze)
+void mpu4vid_state::crmaze(machine_config &config)
+{
 	mpu4_vid(config);
 	m_pia5->readpa_handler().set(FUNC(mpu4vid_state::pia_ic5_porta_track_r));
 	m_pia5->writepa_handler().set_nop();
 	m_pia5->writepb_handler().set_nop();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mpu4vid_state::mating)
+void mpu4vid_state::mating(machine_config &config)
+{
 	crmaze(config);
-	MCFG_DEVICE_MODIFY("video")
-	MCFG_DEVICE_PROGRAM_MAP(mpu4oki_68k_map)
+	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4oki_68k_map);
 
 	mpu4_common2(config);
 
-	MCFG_DEVICE_ADD("msm6376", OKIM6376, 128000) //?
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
-MACHINE_CONFIG_END
+	okim6376_device &msm6376(OKIM6376(config, "msm6376", 128000)); //?
+	msm6376.add_route(0, "lspeaker", 0.5);
+	msm6376.add_route(1, "rspeaker", 0.5);
+}
 
-MACHINE_CONFIG_START(mpu4vid_state::bwbvid)
+void mpu4vid_state::bwbvid(machine_config &config)
+{
 	mpu4_vid(config);
-	MCFG_DEVICE_MODIFY("video")
-	MCFG_DEVICE_PROGRAM_MAP(bwbvid_68k_map)
-MACHINE_CONFIG_END
+	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::bwbvid_68k_map);
+}
 
-MACHINE_CONFIG_START(mpu4vid_state::bwbvid5)
+void mpu4vid_state::bwbvid5(machine_config &config)
+{
 	bwbvid(config);
-	MCFG_DEVICE_MODIFY("video")
-	MCFG_DEVICE_PROGRAM_MAP(bwbvid5_68k_map)
+	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::bwbvid5_68k_map);
 
 	mpu4_common2(config);
 
-	MCFG_DEVICE_ADD("msm6376", OKIM6376, 128000) //?
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
-MACHINE_CONFIG_END
+	okim6376_device &msm6376(OKIM6376(config, "msm6376", 128000)); //?
+	msm6376.add_route(0, "lspeaker", 0.5);
+	msm6376.add_route(1, "rspeaker", 0.5);
+}
 
 /*
 Characteriser (CHR)

@@ -89,7 +89,7 @@ private:
 	optional_device<generic_latch_8_device> m_soundlatch3;
 	optional_device<generic_latch_8_device> m_soundlatch4;
 #if OLD_SOUND
-	optional_device<discrete_device> m_discrete;
+	optional_device<discrete_sound_device> m_discrete;
 #else
 	optional_device<netlist_mame_logic_input_device> m_audio_snd0;
 	optional_device<netlist_mame_logic_input_device> m_audio_snd1;

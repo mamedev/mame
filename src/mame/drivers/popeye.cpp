@@ -17,7 +17,6 @@ Notes:
 
 #include "emu.h"
 #include "includes/popeye.h"
-#include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/netlist.h"
 #include "netlist/devices/net_lib.h"
@@ -586,67 +585,65 @@ WRITE8_MEMBER(tnx1_state::popeye_portB_w)
 	m_dswbit = (data & 0x0e) >> 1;
 }
 
-MACHINE_CONFIG_START(tnx1_state::config)
+void tnx1_state::config(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2)   /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_program_map)
-	MCFG_DEVICE_IO_MAP(maincpu_io_map)
-	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(*this, tnx1_state, refresh_w))
+	Z80(config, m_maincpu, XTAL(8'000'000)/2); /* 4 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tnx1_state::maincpu_program_map);
+	m_maincpu->set_addrmap(AS_IO, &tnx1_state::maincpu_io_map);
+	m_maincpu->refresh_cb().set(FUNC(tnx1_state::refresh_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 2*16, 30*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tnx1_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tnx1_state, screen_vblank))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*16, 32*16);
+	screen.set_visarea(0*16, 32*16-1, 2*16, 30*16-1);
+	screen.set_screen_update(FUNC(tnx1_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(tnx1_state::screen_vblank));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_popeye)
-	MCFG_PALETTE_ADD("palette", 16+16*2+8*4)
-	MCFG_PALETTE_INIT_OWNER(tnx1_state, palette_init)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_popeye);
+	PALETTE(config, m_palette, 16+16*2+8*4).set_init(FUNC(tnx1_state::palette_init_tnx1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(8'000'000)/4));
-	aysnd.port_a_read_callback().set_ioport("DSW0");
-	aysnd.port_b_write_callback().set(FUNC(tnx1_state::popeye_portB_w));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
+	AY8910(config, m_aysnd, XTAL(8'000'000)/4);
+	m_aysnd->port_a_read_callback().set_ioport("DSW0");
+	m_aysnd->port_b_write_callback().set(FUNC(tnx1_state::popeye_portB_w));
+	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.40);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(tpp2_state::config)
+void tpp2_state::config(machine_config &config)
+{
 	tpp1_state::config(config);
 
-	auto &aysnd(*subdevice<ay8910_device>("aysnd"));
-	aysnd.reset_routes();
-	aysnd.set_flags(AY8910_RESISTOR_OUTPUT); /* Does tnx1, tpp1 & popeyebl have the same filtering? */
-	aysnd.set_resistors_load(2000.0, 2000.0, 2000.0);
-	aysnd.add_route(0, "snd_nl", 1.0, 0);
-	aysnd.add_route(1, "snd_nl", 1.0, 1);
-	aysnd.add_route(2, "snd_nl", 1.0, 2);
+	m_aysnd->reset_routes();
+	m_aysnd->set_flags(AY8910_RESISTOR_OUTPUT); /* Does tnx1, tpp1 & popeyebl have the same filtering? */
+	m_aysnd->set_resistors_load(2000.0, 2000.0, 2000.0);
+	m_aysnd->add_route(0, "snd_nl", 1.0, 0);
+	m_aysnd->add_route(1, "snd_nl", 1.0, 1);
+	m_aysnd->add_route(2, "snd_nl", 1.0, 2);
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
-	MCFG_DEVICE_ADD("snd_nl", NETLIST_SOUND, 48000)
-	MCFG_NETLIST_SETUP(nl_popeye)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	netlist_mame_sound_device &snd_nl(NETLIST_SOUND(config, "snd_nl", 48000));
+	snd_nl.set_constructor(netlist_nl_popeye);
+	snd_nl.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 0, "R_AY1_1.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 1, "R_AY1_2.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 2, "R_AY1_3.R")
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin0", 0, "R_AY1_1.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin1", 1, "R_AY1_2.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin2", 2, "R_AY1_3.R");
 
-	MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "ROUT.1")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(30000.0, -65000.0)
-MACHINE_CONFIG_END
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "ROUT.1").set_mult_offset(30000.0, -65000.0);
+}
 
 
 
 /***************************************************************************
 
-  Game driver(s)
+  Game ROMset(s)
 
 ***************************************************************************/
 

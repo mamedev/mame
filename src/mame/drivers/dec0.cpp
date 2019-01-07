@@ -334,7 +334,6 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
-#include "cpu/mcs51/mcs51.h"
 #include "cpu/m6805/m68705.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
@@ -1622,19 +1621,21 @@ MACHINE_CONFIG_START(dec0_state::dec0_base)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dec0)
 	MCFG_PALETTE_ADD("palette", 1024)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 0, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 1, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen3", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 2, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(0, 0, 0);
+	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(3)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[1], 0);
+	m_tilegen[1]->set_gfx_region_wide(0, 1, 0);
+	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+
+	DECO_BAC06(config, m_tilegen[2], 0);
+	m_tilegen[2]->set_gfx_region_wide(0, 2, 0);
+	m_tilegen[2]->set_gfxdecode_tag("gfxdecode");
+
+	DECO_MXC06(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(3);
+	m_spritegen->set_gfxdecode_tag("gfxdecode");
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -1754,19 +1755,21 @@ MACHINE_CONFIG_START(dec0_automat_state::automat)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_automat_state, screen_update_automat)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 0, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 1, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen3", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 2, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(0, 0, 0);
+	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(3)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[1], 0);
+	m_tilegen[1]->set_gfx_region_wide(0, 1, 0);
+	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+
+	DECO_BAC06(config, m_tilegen[2], 0);
+	m_tilegen[2]->set_gfx_region_wide(0, 2, 0);
+	m_tilegen[2]->set_gfxdecode_tag("gfxdecode");
+
+	DECO_MXC06(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(3);
+	m_spritegen->set_gfxdecode_tag("gfxdecode");
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
@@ -1831,19 +1834,21 @@ MACHINE_CONFIG_START(dec0_automat_state::secretab)
 	MCFG_SCREEN_UPDATE_DRIVER(dec0_automat_state, screen_update_secretab)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 0, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 1, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen3", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 2, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(0, 0, 0);
+	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(3)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[1], 0);
+	m_tilegen[1]->set_gfx_region_wide(0, 1, 0);
+	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+
+	DECO_BAC06(config, m_tilegen[2], 0);
+	m_tilegen[2]->set_gfx_region_wide(0, 2, 0);
+	m_tilegen[2]->set_gfxdecode_tag("gfxdecode");
+
+	DECO_MXC06(config, m_spritegen, 0);
+	m_spritegen->set_gfx_region(3);
+	m_spritegen->set_gfxdecode_tag("gfxdecode");
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
@@ -1886,12 +1891,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec0_state::hbarrel)
 	dec0(config);
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec0_state, dec0_mcu_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port0_w))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port2_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port3_w))
+	i8751_device &mcu(I8751(config, m_mcu, XTAL(8'000'000)));
+	mcu.port_in_cb<0>().set(FUNC(dec0_state::dec0_mcu_port0_r));
+	mcu.port_out_cb<0>().set(FUNC(dec0_state::dec0_mcu_port0_w));
+	mcu.port_out_cb<1>().set(FUNC(dec0_state::dec0_mcu_port1_w));
+	mcu.port_out_cb<2>().set(FUNC(dec0_state::dec0_mcu_port2_w));
+	mcu.port_out_cb<3>().set(FUNC(dec0_state::dec0_mcu_port3_w));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1901,12 +1906,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec0_state::baddudes)
 	dec0(config);
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec0_state, dec0_mcu_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port0_w))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port2_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, dec0_state, dec0_mcu_port3_w))
+	i8751_device &mcu(I8751(config, m_mcu, XTAL(8'000'000)));
+	mcu.port_in_cb<0>().set(FUNC(dec0_state::dec0_mcu_port0_r));
+	mcu.port_out_cb<0>().set(FUNC(dec0_state::dec0_mcu_port0_w));
+	mcu.port_out_cb<1>().set(FUNC(dec0_state::dec0_mcu_port1_w));
+	mcu.port_out_cb<2>().set(FUNC(dec0_state::dec0_mcu_port2_w));
+	mcu.port_out_cb<3>().set(FUNC(dec0_state::dec0_mcu_port3_w));
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2052,22 +2057,21 @@ MACHINE_CONFIG_START(dec0_state::midresb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// bootleg doesn't seem to support row/col scroll (or enable is different)
-//  MCFG_DEVICE_MODIFY("tilegen1")
-//  MCFG_BAC06_BOOTLEG_DISABLE_16x16
-//  MCFG_BAC06_BOOTLEG_DISABLE_RC_SCROLL
-	MCFG_DEVICE_MODIFY("tilegen2")
-//  MCFG_BAC06_BOOTLEG_DISABLE_8x8
-	MCFG_BAC06_BOOTLEG_DISABLE_RC_SCROLL
-	MCFG_DEVICE_MODIFY("tilegen3")
-//  MCFG_BAC06_BOOTLEG_DISABLE_8x8
-	MCFG_BAC06_BOOTLEG_DISABLE_RC_SCROLL
+//  m_tilegen[0]->disable_16x16();
+//  m_tilegen[0]->disable_rc_scroll();
 
+//  m_tilegen[1]->disable_8x8();
+	m_tilegen[1]->disable_rc_scroll();
+
+//  m_tilegen[2]->disable_8x8();
+	m_tilegen[2]->disable_rc_scroll();
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(dec0_state::midresbj)
+void dec0_state::midresbj(machine_config &config)
+{
 	midresb(config);
-	MCFG_DEVICE_REMOVE("mcu")
-MACHINE_CONFIG_END
+	config.device_remove("mcu");
+}
 
 /******************************************************************************/
 

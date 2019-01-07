@@ -293,7 +293,7 @@ private:
 	bool m_hack_self_test_is_second_read; // temp variable for hack below
 
 	required_device<m68000_base_device> m_maincpu;
-	required_device<cpu_device> m_dsp;
+	required_device<tms32010_device> m_dsp;
 	required_device<scn2681_device> m_duart;
 	required_device<x2212_device> m_nvram;
 	required_device<dac_word_interface> m_dac;
@@ -887,10 +887,11 @@ MACHINE_CONFIG_START(dectalk_state::dectalk)
 	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, dectalk_state, duart_input))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, dectalk_state, duart_output))
 
-	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(20'000'000)) /* Y1 20MHz xtal */
-	MCFG_DEVICE_PROGRAM_MAP(tms32010_mem)
-	MCFG_DEVICE_IO_MAP(tms32010_io)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, dectalk_state, spc_semaphore_r)) //read infifo-has-data-in-it fifo readable status
+	TMS32010(config, m_dsp, XTAL(20'000'000)); /* Y1 20MHz xtal */
+	m_dsp->set_addrmap(AS_PROGRAM, &dectalk_state::tms32010_mem);
+	m_dsp->set_addrmap(AS_IO, &dectalk_state::tms32010_io);
+	m_dsp->bio().set(FUNC(dectalk_state::spc_semaphore_r)); //read infifo-has-data-in-it fifo readable status
+
 #ifdef USE_LOOSE_TIMING
 	MCFG_QUANTUM_TIME(attotime::from_hz(100))
 #else

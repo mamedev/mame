@@ -95,7 +95,7 @@ private:
 
 
 	required_device<dac_byte_interface> m_dac;
-	required_device<cpu_device> m_i8021;
+	required_device<i8021_device> m_i8021;
 	required_device<tms1100_cpu_device> m_tms1100;
 	required_device<generic_slot_device> m_cart;
 
@@ -636,18 +636,18 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(microvision_state::microvision)
-	MCFG_DEVICE_ADD("maincpu1", I8021, 2000000)    // approximately
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, microvision_state, i8021_p0_write))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, microvision_state, i8021_p1_write))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, microvision_state, i8021_p2_write))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, microvision_state, i8021_t1_read))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, microvision_state, i8021_bus_read))
+	I8021(config, m_i8021, 2000000);    // approximately
+	m_i8021->bus_out_cb().set(FUNC(microvision_state::i8021_p0_write));
+	m_i8021->p1_out_cb().set(FUNC(microvision_state::i8021_p1_write));
+	m_i8021->p2_out_cb().set(FUNC(microvision_state::i8021_p2_write));
+	m_i8021->t1_in_cb().set(FUNC(microvision_state::i8021_t1_read));
+	m_i8021->bus_in_cb().set(FUNC(microvision_state::i8021_bus_read));
 
-	MCFG_DEVICE_ADD("maincpu2", TMS1100, 500000)   // most games seem to be running at approximately this speed
-	MCFG_TMS1XXX_OUTPUT_PLA( microvision_output_pla_0 )
-	MCFG_TMS1XXX_READ_K_CB( READ8( *this, microvision_state, tms1100_read_k ) )
-	MCFG_TMS1XXX_WRITE_O_CB( WRITE16( *this, microvision_state, tms1100_write_o ) )
-	MCFG_TMS1XXX_WRITE_R_CB( WRITE16( *this, microvision_state, tms1100_write_r ) )
+	TMS1100(config, m_tms1100, 500000);   // most games seem to be running at approximately this speed
+	m_tms1100->set_output_pla(microvision_output_pla_0);
+	m_tms1100->k().set(FUNC(microvision_state::tms1100_read_k));
+	m_tms1100->o().set(FUNC(microvision_state::tms1100_write_o));
+	m_tms1100->r().set(FUNC(microvision_state::tms1100_write_r));
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)

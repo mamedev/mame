@@ -54,6 +54,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
@@ -973,7 +974,7 @@ MACHINE_CONFIG_START(apc_state::apc)
 	NVRAM(config, m_cmos, nvram_device::DEFAULT_ALL_1);
 	UPD1990A(config, m_rtc);
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(m_i8259_s, FUNC(pic8259_device::ir4_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
 	MCFG_FLOPPY_DRIVE_ADD(m_fdc_connector[0], apc_floppies, "8", apc_floppy_formats)

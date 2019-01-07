@@ -24,6 +24,7 @@ ToDo:
 #include "bus/rs232/rs232.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/clock.h"
+#include "machine/i8087.h"
 #include "machine/input_merger.h"
 #include "screen.h"
 #include "softlist.h"
@@ -258,6 +259,14 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbc55x_state::mbc55x_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbc55x_state::mbc55x_io);
 	m_maincpu->set_irq_acknowledge_callback(PIC8259_TAG, FUNC(pic8259_device::inta_cb));
+	m_maincpu->esc_opcode_handler().set("coproc", FUNC(i8087_device::insn_w));
+	m_maincpu->esc_data_handler().set("coproc", FUNC(i8087_device::addr_w));
+
+	i8087_device &i8087(I8087(config, "coproc", 14.318181_MHz_XTAL / 4));
+	i8087.set_addrmap(AS_PROGRAM, &mbc55x_state::mbc55x_mem);
+	i8087.set_data_width(8);
+	i8087.irq().set(m_pic, FUNC(pic8259_device::ir6_w));
+	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
 
 	ADDRESS_MAP_BANK(config, m_iodecode);
 	m_iodecode->endianness(ENDIANNESS_LITTLE);
@@ -331,7 +340,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	/* Software list */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","mbc55x")
 
-	isa8_device &isa(ISA8(config, "isa", 0));
+	isa8_device &isa(ISA8(config, "isa", 14.318181_MHz_XTAL / 4));
 	isa.set_cputag(m_maincpu);
 	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w)); // all other IRQ and DRQ lines are NC
 	//isa.iochck_callback().set_inputline(m_maincpu, INPUT_LINE_NMI));

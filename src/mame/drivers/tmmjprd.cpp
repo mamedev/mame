@@ -739,60 +739,52 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_state::scanline)
 
 }
 
-MACHINE_CONFIG_START(tmmjprd_state::tmpdoki)
-	MCFG_DEVICE_ADD(m_maincpu,M68EC020,24000000) /* 24 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmmjprd_state, scanline, "lscreen", 0, 1)
+void tmmjprd_state::tmpdoki(machine_config &config)
+{
+	M68EC020(config, m_maincpu, 24000000); /* 24 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmmjprd_state::main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(tmmjprd_state::scanline), "lscreen", 0, 1);
 
 	EEPROM_93C46_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_tmmjprd)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tmmjprd);
 
-//  MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update)
-//  MCFG_SCREEN_SIZE(64*16, 64*16)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_PALETTE_ADD(m_palette, 0x1000)
-	MCFG_PALETTE_FORMAT(XGRB)
+	PALETTE(config, m_palette, 0x1000);
+	m_palette->set_format(PALETTE_FORMAT_XGRB);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*16, 64*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update_left)
-	MCFG_SCREEN_PALETTE(m_palette)
-
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(64*16, 64*16);
+	lscreen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	//lscreen.set_visarea(0*8, 64*16-1, 0*8, 64*16-1);
+	lscreen.set_screen_update(FUNC(tmmjprd_state::screen_update_left));
+	lscreen.set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_I5000_SND_ADD("i5000snd", XTAL(40'000'000))
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
-MACHINE_CONFIG_END
+	i5000snd_device &i5000snd(I5000_SND(config, "i5000snd", XTAL(40'000'000)));
+	i5000snd.add_route(0, "rspeaker", 1.0);
+	i5000snd.add_route(1, "lspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
+void tmmjprd_state::tmmjprd(machine_config &config)
+{
 	tmpdoki(config);
 
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*16, 64*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update_right)
-	MCFG_SCREEN_PALETTE(m_palette)
-MACHINE_CONFIG_END
-
-
-
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(64*16, 64*16);
+	rscreen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	//rscreen.set_visarea(0*8, 64*16-1, 0*8, 64*16-1);
+	rscreen.set_screen_update(FUNC(tmmjprd_state::screen_update_right));
+	rscreen.set_palette(m_palette);
+}
 
 ROM_START( tmmjprd )
 	ROM_REGION( 0x200000, "maincpu", 0 )

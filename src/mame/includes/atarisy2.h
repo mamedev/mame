@@ -15,6 +15,7 @@
 #include "sound/ym2151.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
+#include "emupal.h"
 #include "slapstic.h"
 
 class atarisy2_state : public atarigen_state

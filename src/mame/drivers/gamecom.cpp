@@ -257,11 +257,11 @@ INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
 
 MACHINE_CONFIG_START(gamecom_state::gamecom)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", SM8500, XTAL(11'059'200)/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
-	MCFG_DEVICE_PROGRAM_MAP( gamecom_mem_map)
-	MCFG_SM8500_DMA_CB( WRITE8( *this, gamecom_state, gamecom_handle_dma ) )
-	MCFG_SM8500_TIMER_CB( WRITE8( *this, gamecom_state, gamecom_update_timers ) )
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gamecom_state,  gamecom_interrupt)
+	SM8500(config, m_maincpu, XTAL(11'059'200)/2);   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gamecom_state::gamecom_mem_map);
+	m_maincpu->dma_cb().set(FUNC(gamecom_state::gamecom_handle_dma));
+	m_maincpu->timer_cb().set(FUNC(gamecom_state::gamecom_update_timers));
+	m_maincpu->set_vblank_int("screen", FUNC(gamecom_state::gamecom_interrupt));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

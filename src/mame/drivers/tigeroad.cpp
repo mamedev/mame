@@ -648,37 +648,36 @@ static GFXDECODE_START( gfx_tigeroad )
 	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(tigeroad_state::tigeroad)
-
+void tigeroad_state::tigeroad(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tigeroad_state,  irq2_line_hold)
+	M68000(config, m_maincpu, XTAL(10'000'000)); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tigeroad_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tigeroad_state::irq2_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_port_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tigeroad_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &tigeroad_state::sound_port_map);
 
 	/* IRQs are triggered by the YM2203 */
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, "spriteram");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.08)   /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tigeroad_state, screen_update_tigeroad)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60.08);   /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tigeroad_state::screen_update_tigeroad));
+	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tigeroad)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tigeroad);
 
-	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
+	TIGEROAD_SPRITE(config, m_spritegen, 0);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	PALETTE(config, m_palette, 1024).set_format(PALETTE_FORMAT_xxxxRRRRGGGGBBBB);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -686,90 +685,88 @@ MACHINE_CONFIG_START(tigeroad_state::tigeroad)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(3'579'545))); /* verified on pcb */
+	ym1.irq_handler().set_inputline("audiocpu", 0);
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL(3'579'545))); /* verified on pcb */
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
-MACHINE_CONFIG_START(f1dream_state::f1dream)
+void f1dream_state::f1dream(machine_config &config)
+{
 	tigeroad(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(f1dream_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &f1dream_state::f1dream_map);
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(10'000'000)) /* ??? */
-	MCFG_DEVICE_IO_MAP(f1dream_mcu_io)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, f1dream_state, out1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, f1dream_state, out3_w))
-MACHINE_CONFIG_END
+	I8751(config, m_mcu, XTAL(10'000'000)); /* ??? */
+	m_mcu->set_addrmap(AS_IO, &f1dream_state::f1dream_mcu_io);
+	m_mcu->port_out_cb<1>().set(FUNC(f1dream_state::out1_w));
+	m_mcu->port_out_cb<3>().set(FUNC(f1dream_state::out3_w));
+}
 
 /* same as above but with additional Z80 for samples playback */
-MACHINE_CONFIG_START(tigeroad_state::toramich)
+void tigeroad_state::toramich(machine_config &config)
+{
 	tigeroad(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_ADD("sample", Z80, 3579545) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(sample_map)
-	MCFG_DEVICE_IO_MAP(sample_port_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(tigeroad_state, irq0_line_hold, 4000)  /* ? */
+	z80_device &sample(Z80(config, "sample", 3579545)); /* ? */
+	sample.set_addrmap(AS_PROGRAM, &tigeroad_state::sample_map);
+	sample.set_addrmap(AS_IO, &tigeroad_state::sample_port_map);
+	sample.set_periodic_int(FUNC(tigeroad_state::irq0_line_hold), attotime::from_hz(4000));  /* ? */
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* 4KHz playback ?  */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);  /* 4KHz playback ?  */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(tigeroad_state::f1dream_comad)
-
+void tigeroad_state::f1dream_comad(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tigeroad_state,  irq2_line_hold)
+	M68000(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tigeroad_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tigeroad_state::irq2_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(comad_sound_map)
-	MCFG_DEVICE_IO_MAP(comad_sound_io_map)
+	Z80(config, m_audiocpu, 4000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tigeroad_state::comad_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &tigeroad_state::comad_sound_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
+	config.m_minimum_quantum = attotime::from_hz(3600);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, "spriteram");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.08)   /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tigeroad_state, screen_update_tigeroad)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60.08);   /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(tigeroad_state::screen_update_tigeroad));
+	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tigeroad);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tigeroad)
+	TIGEROAD_SPRITE(config, m_spritegen, 0);
 
-	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
-
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	PALETTE(config, m_palette, 1024).set_format(PALETTE_FORMAT_xxxxRRRRGGGGBBBB);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 2000000)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", 2000000));
+	ym1.irq_handler().set_inputline("audiocpu", 0);
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", 2000000));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
+}
 
 
 void pushman_state::machine_start()
@@ -782,23 +779,22 @@ void pushman_state::machine_start()
 	save_item(NAME(m_mcu_latch_ctl));
 }
 
-MACHINE_CONFIG_START(pushman_state::pushman)
+void pushman_state::pushman(machine_config &config)
+{
 	f1dream_comad(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pushman_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pushman_state::pushman_map);
 
-	MCFG_DEVICE_ADD("mcu", M68705R3, 4000000)    /* No idea */
-	MCFG_M68705_PORTA_W_CB(WRITE8(*this, pushman_state, mcu_pa_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(*this, pushman_state, mcu_pb_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(*this, pushman_state, mcu_pc_w))
-MACHINE_CONFIG_END
+	M68705R3(config, m_mcu, 4000000);    /* No idea */
+	m_mcu->porta_w().set(FUNC(pushman_state::mcu_pa_w));
+	m_mcu->portb_w().set(FUNC(pushman_state::mcu_pb_w));
+	m_mcu->portc_w().set(FUNC(pushman_state::mcu_pc_w));
+}
 
-
-MACHINE_CONFIG_START(pushman_state::bballs)
+void pushman_state::bballs(machine_config &config)
+{
 	pushman(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bballs_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &pushman_state::bballs_map);
+}
 
 
 

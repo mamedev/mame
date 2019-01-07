@@ -106,8 +106,8 @@ There's a separate sound board also, but it wasn't available so is not documente
 
 void midxunit_state::main_map(address_map &map)
 {
-	map(0x00000000, 0x003fffff).rw(FUNC(midxunit_state::midtunit_vram_data_r), FUNC(midxunit_state::midtunit_vram_data_w));
-	map(0x00800000, 0x00bfffff).rw(FUNC(midxunit_state::midtunit_vram_color_r), FUNC(midxunit_state::midtunit_vram_color_w));
+	map(0x00000000, 0x003fffff).rw(m_video, FUNC(midxunit_video_device::midtunit_vram_data_r), FUNC(midxunit_video_device::midtunit_vram_data_w));
+	map(0x00800000, 0x00bfffff).rw(m_video, FUNC(midxunit_video_device::midtunit_vram_color_r), FUNC(midxunit_video_device::midtunit_vram_color_w));
 	map(0x20000000, 0x20ffffff).ram();
 	map(0x40800000, 0x4fffffff).w(FUNC(midxunit_state::midxunit_unknown_w));
 	map(0x60400000, 0x6040001f).rw(FUNC(midxunit_state::midxunit_status_r), FUNC(midxunit_state::midxunit_security_clock_w));
@@ -121,10 +121,10 @@ void midxunit_state::main_map(address_map &map)
 	map(0x80800010, 0x8080001f).noprw();
 	map(0x80c00000, 0x80c000ff).rw(FUNC(midxunit_state::midxunit_uart_r), FUNC(midxunit_state::midxunit_uart_w));
 	map(0xa0440000, 0xa047ffff).rw(FUNC(midxunit_state::midxunit_cmos_r), FUNC(midxunit_state::midxunit_cmos_w)).share("nvram");
-	map(0xa0800000, 0xa08fffff).rw(FUNC(midxunit_state::midxunit_paletteram_r), FUNC(midxunit_state::midxunit_paletteram_w)).share("palette");
+	map(0xa0800000, 0xa08fffff).rw(m_video, FUNC(midxunit_video_device::midxunit_paletteram_r), FUNC(midxunit_video_device::midxunit_paletteram_w)).share("palette");
 	map(0xc0000000, 0xc00003ff).rw("maincpu", FUNC(tms34020_device::io_register_r), FUNC(tms34020_device::io_register_w));
-	map(0xc0800000, 0xc08000ff).mirror(0x00400000).rw(FUNC(midxunit_state::midtunit_dma_r), FUNC(midxunit_state::midtunit_dma_w));
-	map(0xf8000000, 0xfeffffff).r(FUNC(midxunit_state::midwunit_gfxrom_r));
+	map(0xc0800000, 0xc08000ff).mirror(0x00400000).rw(m_video, FUNC(midxunit_video_device::midtunit_dma_r), FUNC(midxunit_video_device::midtunit_dma_w));
+	map(0xf8000000, 0xfeffffff).r(m_video, FUNC(midxunit_video_device::midwunit_gfxrom_r));
 	map(0xff000000, 0xffffffff).rom().region("maincpu", 0);
 }
 
@@ -241,34 +241,34 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(midxunit_state::midxunit)
+void midxunit_state::midxunit(machine_config &config)
+{
+	MIDXUNIT_VIDEO(config, m_video, m_maincpu, m_palette, m_gfxrom);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34020, 40000000)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(PIXEL_CLOCK) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(midxunit_state, scanline_update)       /* scanline updater (indexed16) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(midtunit_state, to_shiftreg)           /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(midtunit_state, from_shiftreg)          /* read from shiftreg function */
+	TMS34020(config, m_maincpu, 40000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &midxunit_state::main_map);
+	m_maincpu->set_halt_on_reset(false);        /* halt on reset */
+	m_maincpu->set_pixel_clock(PIXEL_CLOCK);    /* pixel clock */
+	m_maincpu->set_pixels_per_clock(1);         /* pixels per clock */
+	m_maincpu->set_scanline_ind16_callback("video", FUNC(midxunit_video_device::scanline_update));  /* scanline updater (indexed16) */
+	m_maincpu->set_shiftreg_in_callback("video", FUNC(midxunit_video_device::to_shiftreg));         /* write to shiftreg function */
+	m_maincpu->set_shiftreg_out_callback("video", FUNC(midtunit_video_device::from_shiftreg));      /* read from shiftreg function */
+	m_maincpu->set_screen("screen");
 
-	MCFG_MACHINE_RESET_OVERRIDE(midxunit_state,midxunit)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette, 32768).set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 506, 101, 501, 289, 20, 274)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_VIDEO_START_OVERRIDE(midxunit_state,midxunit)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, 506, 101, 501, 289, 20, 274);
+	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_ind16));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("serial_pic", MIDWAY_SERIAL_PIC, 0)
+	MIDWAY_SERIAL_PIC(config, m_midway_serial_pic, 0);
 	/* serial prefixes 419, 420 */
-	MCFG_MIDWAY_SERIAL_PIC_UPPER(419);
+	m_midway_serial_pic->set_upper(419);
 
 	adc0848_device &adc(ADC0848(config, "adc", 0));
 	adc.intr_callback().set(FUNC(midxunit_state::adc_int_w)); // ADC INT passed through PLSI1032
@@ -281,7 +281,7 @@ MACHINE_CONFIG_START(midxunit_state::midxunit)
 
 	/* sound hardware */
 	DCS_AUDIO_2K_UART(config, m_dcs, 0);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -431,5 +431,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, revx,     0,    midxunit, revx, midxunit_state, init_revx, ROT0, "Midway",   "Revolution X (rev 1.0 6/16/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, revxp5,   revx, midxunit, revx, midxunit_state, init_revx, ROT0, "Midway",   "Revolution X (prototype, rev 5.0 5/23/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, revx,     0,    midxunit, revx, midxunit_state, empty_init, ROT0, "Midway",   "Revolution X (rev 1.0 6/16/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, revxp5,   revx, midxunit, revx, midxunit_state, empty_init, ROT0, "Midway",   "Revolution X (prototype, rev 5.0 5/23/94)", MACHINE_SUPPORTS_SAVE )

@@ -604,23 +604,25 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_START(senjyo_state::senjyox_e)
+void senjyo_state::senjyox_e(machine_config &config)
+{
 	senjyo(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(senjyo_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5015_device &maincpu(SEGA_315_5015(config.replace(), m_maincpu, 4000000));   /* 4 MHz? */
+	maincpu.set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_map);
+	maincpu.set_addrmap(AS_OPCODES, &senjyo_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(senjyo_state::irq0_line_assert));
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(senjyo_state::senjyox_a)
+void senjyo_state::senjyox_a(machine_config &config)
+{
 	senjyo(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5018, 4000000)   /* 4 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(senjyo_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, 4000000));   /* 4 MHz? */
+	maincpu.set_addrmap(AS_PROGRAM, &senjyo_state::senjyo_map);
+	maincpu.set_addrmap(AS_OPCODES, &senjyo_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(senjyo_state::irq0_line_assert));
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+}
 
 
 MACHINE_CONFIG_START(senjyo_state::starforb)

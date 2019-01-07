@@ -18,7 +18,7 @@
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "formats/sorc_dsk.h"
 #include "formats/sorc_cas.h"
 #include "machine/micropolis.h"

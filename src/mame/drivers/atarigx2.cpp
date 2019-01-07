@@ -29,6 +29,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -1192,7 +1193,7 @@ void atarigx2_state::main_map(address_map &map)
 	map(0xc80000, 0xc80fff).ram();
 	map(0xd00000, 0xd0000f).r(FUNC(atarigx2_state::a2d_data_r)).umask32(0xff00ff00);
 	map(0xd20000, 0xd20fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
-	map(0xd40000, 0xd40fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xd40000, 0xd40fff).ram().w("palette", FUNC(palette_device::write32)).share("palette");
 	map(0xd70000, 0xd7ffff).ram();
 	map(0xd72000, 0xd75fff).w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
 	map(0xd76000, 0xd76fff).w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
@@ -1531,17 +1532,19 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(atarigx2_state::atarigx2_0x200)
+void atarigx2_state::atarigx2_0x200(machine_config &config)
+{
 	atarigx2(config);
-	MCFG_DEVICE_ADD("xga", ATARI_136094_0072, 0)
-	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
-MACHINE_CONFIG_END
+	ATARI_136094_0072(config, m_xga, 0);
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x200);
+}
 
-MACHINE_CONFIG_START(atarigx2_state::atarigx2_0x400)
+void atarigx2_state::atarigx2_0x400(machine_config &config)
+{
 	atarigx2(config);
-	MCFG_DEVICE_ADD("xga", ATARI_136095_0072, 0)
-	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
-MACHINE_CONFIG_END
+	ATARI_136095_0072(config, m_xga, 0);
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x400);
+}
 
 
 

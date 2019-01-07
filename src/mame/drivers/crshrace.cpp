@@ -436,9 +436,9 @@ MACHINE_CONFIG_START(crshrace_state::crshrace)
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
-	MCFG_K053936_WRAP(1)
-	MCFG_K053936_OFFSETS(-48, -21)
+	K053936(config, m_k053936, 0);
+	m_k053936->set_wrap(1);
+	m_k053936->set_offsets(-48, -21);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

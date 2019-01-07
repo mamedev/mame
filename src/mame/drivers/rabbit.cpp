@@ -901,36 +901,38 @@ INTERRUPT_GEN_MEMBER(rabbit_state::vblank_interrupt)
 	m_maincpu->set_input_line(m_vblirqlevel, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(rabbit_state::rabbit)
-	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(24'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(rabbit_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rabbit_state,  vblank_interrupt)
+void rabbit_state::rabbit(machine_config &config)
+{
+	M68EC020(config, m_maincpu, XTAL(24'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &rabbit_state::rabbit_map);
+	m_maincpu->set_vblank_int("screen", FUNC(rabbit_state::vblank_interrupt));
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rabbit)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rabbit);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*16, 64*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*16, 64*16-1)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 20*16-1, 32*16, 48*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rabbit_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*16, 64*16);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+//  screen.set_visarea(0*8, 64*16-1, 0*16, 64*16-1);
+//  screen.set_visarea(0*8, 20*16-1, 32*16, 48*16-1);
+	screen.set_screen_update(FUNC(rabbit_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x4000)
-	MCFG_PALETTE_FORMAT(XGRB)
+	PALETTE(config, m_palette, 0x4000);
+	m_palette->set_init("palette", FUNC(palette_device::palette_init_all_black));
+	m_palette->set_format(PALETTE_FORMAT_XGRB);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_I5000_SND_ADD("i5000snd", XTAL(40'000'000))
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
-MACHINE_CONFIG_END
+	i5000snd_device &i5000snd(I5000_SND(config, "i5000snd", XTAL(40'000'000)));
+	i5000snd.add_route(0, "rspeaker", 1.0);
+	i5000snd.add_route(1, "lspeaker", 1.0);
+}
 
 
 

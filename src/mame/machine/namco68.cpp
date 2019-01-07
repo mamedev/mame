@@ -96,13 +96,22 @@ void namcoc68_device::c68_default_am(address_map &map)
 
 void namcoc68_device::device_add_mconfig(machine_config &config)
 {
-	m3745x_device* device = &M37450(config, m_mcu, DERIVED_CLOCK(1, 1)); // ugly, needs modernizing
-	MCFG_M3745X_ADC14_CALLBACKS(READ8(*this, namcoc68_device, mcuan0_r), READ8(*this, namcoc68_device, mcuan1_r), READ8(*this, namcoc68_device, mcuan2_r), READ8(*this, namcoc68_device, mcuan3_r))
-	MCFG_M3745X_ADC58_CALLBACKS(READ8(*this, namcoc68_device, mcuan4_r), READ8(*this, namcoc68_device, mcuan5_r), READ8(*this, namcoc68_device, mcuan6_r), READ8(*this, namcoc68_device, mcuan7_r))
-	MCFG_M3745X_PORT3_CALLBACKS(READ8(*this, namcoc68_device, mcuc_r), WRITE8(*this, namcoc68_device, c68_p3_w))    // coins/test/service
-	MCFG_M3745X_PORT5_CALLBACKS(READ8(*this, namcoc68_device, c68_p5_r), NOOP) // muxed player 1/2
-	MCFG_M3745X_PORT6_CALLBACKS(READ8(*this, namcoc68_device, unk_r), NOOP) // unused in sgunner2
-	MCFG_DEVICE_PROGRAM_MAP(c68_default_am)
+	M37450(config, m_mcu, DERIVED_CLOCK(1, 1));
+	m_mcu->read_ad<0>().set(FUNC(namcoc68_device::mcuan0_r));
+	m_mcu->read_ad<1>().set(FUNC(namcoc68_device::mcuan1_r));
+	m_mcu->read_ad<2>().set(FUNC(namcoc68_device::mcuan2_r));
+	m_mcu->read_ad<3>().set(FUNC(namcoc68_device::mcuan3_r));
+	m_mcu->read_ad<4>().set(FUNC(namcoc68_device::mcuan4_r));
+	m_mcu->read_ad<5>().set(FUNC(namcoc68_device::mcuan5_r));
+	m_mcu->read_ad<6>().set(FUNC(namcoc68_device::mcuan6_r));
+	m_mcu->read_ad<7>().set(FUNC(namcoc68_device::mcuan7_r));
+	m_mcu->read_p<3>().set(FUNC(namcoc68_device::mcuc_r)); // coins/test/service
+	m_mcu->write_p<3>().set(FUNC(namcoc68_device::c68_p3_w));
+	m_mcu->read_p<5>().set(FUNC(namcoc68_device::c68_p5_r)); // muxed player 1/2
+	m_mcu->write_p<5>().set_nop();
+	m_mcu->read_p<6>().set(FUNC(namcoc68_device::unk_r)); // unused in sgunner2
+	m_mcu->write_p<6>().set_nop();
+	m_mcu->set_addrmap(AS_PROGRAM, &namcoc68_device::c68_default_am);
 }
 
 void namcoc68_device::device_resolve_objects()

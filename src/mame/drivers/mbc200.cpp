@@ -45,6 +45,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
@@ -352,8 +353,8 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* Keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(mbc200_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(mbc200_state::kbd_put));
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "mbc200")

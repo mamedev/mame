@@ -444,9 +444,9 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	m_spr_old[1]->set_pritype(2);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("k053936", K053936, 0)
-	MCFG_K053936_WRAP(1)
-	MCFG_K053936_OFFSETS(-58, -2)
+	K053936(config, m_k053936, 0);
+	m_k053936->set_wrap(1);
+	m_k053936->set_offsets(-58, -2);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -530,8 +530,7 @@ MACHINE_CONFIG_START(f1gp2_state::f1gp2)
 	m_spr->set_gfx_region(1);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_MODIFY("k053936")
-	MCFG_K053936_OFFSETS(-48, -21)
+	m_k053936->set_offsets(-48, -21);
 MACHINE_CONFIG_END
 
 

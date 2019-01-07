@@ -4079,8 +4079,8 @@ MACHINE_CONFIG_START(nmk16_state::mustang)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4160,8 +4160,8 @@ MACHINE_CONFIG_START(nmk16_state::bioship)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, BIOSHIP_CRYSTAL2 / 8) /* 1.5 Mhz (verified) */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4199,8 +4199,8 @@ MACHINE_CONFIG_START(nmk16_state::vandyke)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4266,8 +4266,8 @@ MACHINE_CONFIG_START(nmk16_state::acrobatm)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000) /* (verified on pcb) */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4345,8 +4345,8 @@ MACHINE_CONFIG_START(nmk16_state::tdragon)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4421,8 +4421,8 @@ MACHINE_CONFIG_START(nmk16_state::strahl)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4460,8 +4460,8 @@ MACHINE_CONFIG_START(nmk16_state::hachamf)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4505,8 +4505,8 @@ MACHINE_CONFIG_START(nmk16_state::macross)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4544,8 +4544,8 @@ MACHINE_CONFIG_START(nmk16_state::blkheart)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", 8000000)
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, 8000000);
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8 ) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -4583,8 +4583,8 @@ MACHINE_CONFIG_START(nmk16_state::gunnail)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_NMK004_ADD("nmk004", XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	NMK004(config, m_nmk004, XTAL(16'000'000)/2); /* verified on pcb */
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
@@ -7873,8 +7873,8 @@ rom13.7     27C040   /
 rom10.112   27C040   \  Main Program
 rom11.107   27C040   /
 
-
-
+NOTE: An original (undumped) PCB has been seen with the program ROM labeled as  B-2000 N U107 v1.2
+      It has not been verified the current set is the same v1.2 or some other revision
 
 ***************************************************************************/
 

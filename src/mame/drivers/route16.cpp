@@ -592,117 +592,110 @@ void route16_state::init_route16()
 	save_item(NAME(m_protection_data));
 }
 
-MACHINE_CONFIG_START(route16_state::route16)
-
+void route16_state::route16(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("cpu1", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
-	MCFG_DEVICE_PROGRAM_MAP(route16_cpu1_map)
-	MCFG_DEVICE_IO_MAP(cpu1_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", route16_state,  irq0_line_hold)
+	Z80(config, m_cpu1, 2500000);  /* 10MHz / 4 = 2.5MHz */
+	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::route16_cpu1_map);
+	m_cpu1->set_addrmap(AS_IO, &route16_state::cpu1_io_map);
+	m_cpu1->set_vblank_int("screen", FUNC(route16_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("cpu2", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
-	MCFG_DEVICE_PROGRAM_MAP(route16_cpu2_map)
+	Z80(config, m_cpu2, 2500000);  /* 10MHz / 4 = 2.5MHz */
+	m_cpu2->set_addrmap(AS_PROGRAM, &route16_state::route16_cpu2_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   /* frames per second, vblank duration */
-	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_route16)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0, 256-1);
+	m_screen->set_refresh_hz(57);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_screen_update(FUNC(route16_state::screen_update_route16));
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, 8).set_init("palette", FUNC(palette_device::palette_init_3bit_rgb));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	AY8910(config, "ay8910", 10000000/8).add_route(ALL_OUTPUTS, "speaker", 0.5);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(route16_state::routex)
+void route16_state::routex(machine_config &config)
+{
 	route16(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(routex_cpu1_map)
-MACHINE_CONFIG_END
+	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::routex_cpu1_map);
+}
 
 
-MACHINE_CONFIG_START(route16_state::stratvox)
+void route16_state::stratvox(machine_config &config)
+{
 	route16(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(stratvox_cpu1_map)
-
-	MCFG_DEVICE_MODIFY("cpu2")
-	MCFG_DEVICE_PROGRAM_MAP(stratvox_cpu2_map)
-
+	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::stratvox_cpu1_map);
+	m_cpu2->set_addrmap(AS_PROGRAM, &route16_state::stratvox_cpu2_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_jongpute)
+	m_screen->set_screen_update(FUNC(route16_state::screen_update_jongpute));
 
 	/* sound hardware */
 	subdevice<ay8910_device>("ay8910")->port_a_write_callback().set(FUNC(route16_state::stratvox_sn76477_w));  /* SN76477 commands (not used in Route 16?) */
 
-	MCFG_DEVICE_ADD("snsnd", SN76477)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(150), CAP_U(0.001)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_M(3.3))                  // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1), RES_K(4.7))    // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(200))                    // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(55))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(5.0 * 2/ (2 + 10), CAP_U(0.022), RES_K(100)) // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(75))      // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(2.2), RES_K(4.7)) // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                            // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(0, 0)                  // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                              // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(RES_K(47), RES_K(150), CAP_U(0.001));
+	m_sn->set_decay_res(RES_M(3.3));
+	m_sn->set_attack_params(CAP_U(1), RES_K(4.7));
+	m_sn->set_amp_res(RES_K(200));
+	m_sn->set_feedback_res(RES_K(55));
+	m_sn->set_vco_params(5.0 * 2/ (2 + 10), CAP_U(0.022), RES_K(100));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(1.0), RES_K(75));
+	m_sn->set_oneshot_params(CAP_U(2.2), RES_K(4.7));
+	m_sn->set_vco_mode(0);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(0, 0);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-
-MACHINE_CONFIG_START(route16_state::speakres)
+void route16_state::speakres(machine_config &config)
+{
 	stratvox(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(speakres_cpu1_map)
+	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::speakres_cpu1_map);
 
 	MCFG_MACHINE_START_OVERRIDE(route16_state, speakres)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(route16_state::spacecho)
+void route16_state::spacecho(machine_config &config)
+{
 	speakres(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu2")
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(route16_state, irq0_line_hold, 48*60)
-MACHINE_CONFIG_END
+	m_cpu2->set_periodic_int(FUNC(route16_state::irq0_line_hold), attotime::from_hz(48*60));
+}
 
-
-MACHINE_CONFIG_START(route16_state::jongpute)
+void route16_state::jongpute(machine_config &config)
+{
 	route16(config);
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(jongpute_cpu1_map)
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
+	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::jongpute_cpu1_map);
+	m_cpu1->set_addrmap(AS_IO, address_map_constructor());
 
 	MCFG_MACHINE_START_OVERRIDE(route16_state, jongpute)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_jongpute)
+	m_screen->set_screen_update(FUNC(route16_state::screen_update_jongpute));
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
-MACHINE_CONFIG_END
+	PALETTE(config.replace(), m_palette, 8).set_init("palette", FUNC(palette_device::palette_init_3bit_bgr));
+}
 
 
 

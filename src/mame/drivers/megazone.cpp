@@ -64,7 +64,6 @@ REAR BOARD      1C026           N/U       (CUSTOM ON ORIGINAL)
 #include "includes/konamipt.h"
 
 #include "cpu/m6809/m6809.h"
-#include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
@@ -304,11 +303,11 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 	MCFG_DEVICE_PROGRAM_MAP(megazone_sound_map)
 	MCFG_DEVICE_IO_MAP(megazone_sound_io_map)
 
-	MCFG_DEVICE_ADD("daccpu", I8039, XTAL(14'318'181)/2)    /* 7.15909MHz */
-	MCFG_DEVICE_PROGRAM_MAP(megazone_i8039_map)
-	MCFG_DEVICE_IO_MAP(megazone_i8039_io_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, megazone_state, i8039_irqen_and_status_w))
+	I8039(config, m_daccpu, XTAL(14'318'181)/2);    /* 7.15909MHz */
+	m_daccpu->set_addrmap(AS_PROGRAM, &megazone_state::megazone_i8039_map);
+	m_daccpu->set_addrmap(AS_IO, &megazone_state::megazone_i8039_io_map);
+	m_daccpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	m_daccpu->p2_out_cb().set(FUNC(megazone_state::i8039_irqen_and_status_w));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(900))
 

@@ -7,12 +7,13 @@
 
 #include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/buffer.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
+#include "machine/z80daisy.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
 #include "sound/samples.h"
@@ -20,7 +21,7 @@
 #include "sound/wave.h"
 #include "video/mc6845.h"
 #include "emupal.h"
-
+#include "screen.h"
 
 /* Bits in m_portf0 variable:
     d5 cassette LED
@@ -34,6 +35,8 @@ public:
 	super80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
@@ -131,6 +134,8 @@ private:
 	void mc6845_cursor_configure();
 	void super80_cassette_motor(bool data);
 	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_ram;
 	optional_region_ptr<u8> m_p_chargen;

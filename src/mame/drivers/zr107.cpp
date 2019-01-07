@@ -331,8 +331,6 @@ WRITE32_MEMBER(zr107_state::paletteram32_w)
 	m_palette->set_pen_color((offset * 2) + 1, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-#define NUM_LAYERS  2
-
 K056832_CB_MEMBER(midnrun_state::tile_callback)
 {
 	*color += layer * 0x40;
@@ -858,7 +856,7 @@ void midnrun_state::midnrun(machine_config &config)
 	m_screen->set_screen_update(FUNC(midnrun_state::screen_update));
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_k056832_callback(k056832_cb_delegate(FUNC(midnrun_state::tile_callback), this));
+	m_k056832->set_tile_callback(FUNC(midnrun_state::tile_callback), this);
 	m_k056832->set_config("gfx2", K056832_BPP_8, 1, 0);
 	m_k056832->set_palette(m_palette);
 }
@@ -1164,9 +1162,9 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1995, midnrun,  0,        midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighters 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, midnrunj, midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighters 2 (JAD, Japan v1.10)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, midnruna, midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighters 2 (AAA, Asia v1.10)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, midnrun,  0,        midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, midnrunj, midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (JAD, Japan v1.10)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, midnruna, midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (AAA, Asia v1.10)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, windheat, 0,        midnrun, windheat, midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, windheatu,windheat, midnrun, windheat, midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, windheatj,windheat, midnrun, windheat, midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS )

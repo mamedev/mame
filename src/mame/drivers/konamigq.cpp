@@ -101,7 +101,8 @@ public:
 
 	void konamigq(machine_config &config);
 
-	void init_konamigq();
+protected:
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -315,55 +316,42 @@ void konamigq_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, i
 {
 }
 
-void konamigq_state::init_konamigq()
-{
-}
-
-MACHINE_START_MEMBER(konamigq_state,konamigq)
+void konamigq_state::machine_start()
 {
 	save_item(NAME(m_sector_buffer));
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_intck));
 }
 
-MACHINE_RESET_MEMBER(konamigq_state,konamigq)
+void konamigq_state::konamigq(machine_config &config)
 {
-}
-
-MACHINE_CONFIG_START(konamigq_state::konamigq)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", CXD8530BQ, XTAL(67'737'600))
-	MCFG_DEVICE_PROGRAM_MAP(konamigq_map)
+	CXD8530BQ(config, m_maincpu, XTAL(67'737'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigq_state::konamigq_map);
+	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&konamigq_state::scsi_dma_read, this));
+	m_maincpu->subdevice<psxdma_device>("dma")->install_write_handler(5, psxdma_device::write_delegate(&konamigq_state::scsi_dma_write, this));
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
 
-	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
+	M68000(config, m_soundcpu, XTAL(32'000'000)/4); /* 8MHz - measured */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &konamigq_state::konamigq_sound_map);
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&konamigq_state::scsi_dma_read, this ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&konamigq_state::scsi_dma_write, this ) )
+	TMS57002(config, m_dasp, XTAL(48'000'000)/2); /* 24MHz - measured */
+	m_dasp->set_addrmap(AS_DATA, &konamigq_state::konamigq_dasp_map);
+	m_dasp->set_periodic_int(FUNC(konamigq_state::tms_sync), attotime::from_hz(48000));
 
-	MCFG_DEVICE_ADD("soundcpu", M68000, XTAL(32'000'000)/4) /* 8MHz - measured */
-	MCFG_DEVICE_PROGRAM_MAP(konamigq_sound_map)
-
-	MCFG_DEVICE_ADD("dasp", TMS57002, XTAL(48'000'000)/2) /* 24MHz - measured */
-	MCFG_DEVICE_DATA_MAP(konamigq_dasp_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(konamigq_state, tms_sync, 48000)
-
-	MCFG_MACHINE_START_OVERRIDE(konamigq_state, konamigq)
-	MCFG_MACHINE_RESET_OVERRIDE(konamigq_state, konamigq)
-
-	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
+	MB89371(config, "mb89371", 0);
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(konamigq_def_eeprom, 128);
 
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 
 	AM53CF96(config, m_am53cf96, 0);
 	m_am53cf96->set_scsi_port("scsi");
 	m_am53cf96->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin10));
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD("maincpu", "gpu", CXD8538Q, 0x200000, XTAL(53'693'175))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CXD8538Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
@@ -374,17 +362,17 @@ MACHINE_CONFIG_START(konamigq_state::konamigq)
 	K056800(config, m_k056800, XTAL(18'432'000));
 	m_k056800->int_callback().set_inputline(m_soundcpu, M68K_IRQ_1);
 
-	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
-	MCFG_DEVICE_ADDRESS_MAP(0, konamigq_k054539_map)
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, konamigq_state, k054539_irq_gen))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	k054539_device &k054539_1(K054539(config, "k054539_1", XTAL(18'432'000)));
+	k054539_1.set_addrmap(0, &konamigq_state::konamigq_k054539_map);
+	k054539_1.timer_handler().set(FUNC(konamigq_state::k054539_irq_gen));
+	k054539_1.add_route(0, "lspeaker", 1.0);
+	k054539_1.add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL(18'432'000))
-	MCFG_DEVICE_ADDRESS_MAP(0, konamigq_k054539_map)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	k054539_device &k054539_2(K054539(config, "k054539_2", XTAL(18'432'000)));
+	k054539_2.set_addrmap(0, &konamigq_state::konamigq_k054539_map);
+	k054539_2.add_route(0, "lspeaker", 1.0);
+	k054539_2.add_route(1, "rspeaker", 1.0);
+}
 
 static INPUT_PORTS_START( konamigq )
 	PORT_START("GUNX1")
@@ -484,4 +472,4 @@ ROM_START( cryptklr )
 	DISK_IMAGE( "420uaa04", 0, SHA1(67cb1418fc0de2a89fc61847dc9efb9f1bebb347) )
 ROM_END
 
-GAME( 1995, cryptklr, 0, konamigq, konamigq, konamigq_state, init_konamigq, ROT0, "Konami", "Crypt Killer (GQ420 UAA)", 0 )
+GAME( 1995, cryptklr, 0, konamigq, konamigq, konamigq_state, empty_init, ROT0, "Konami", "Crypt Killer (GQ420 UAA)", 0 )

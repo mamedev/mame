@@ -61,9 +61,6 @@ protected:
 
 /*----------- devices -----------*/
 
-#define MCFG_N64_PERIPHS_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, N64PERIPH, 0)
-
 #define AUDIO_DMA_DEPTH     2
 
 struct n64_savable_data_t

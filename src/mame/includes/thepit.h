@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
+#ifndef MAME_INCLUDES_THEPIT_H
+#define MAME_INCLUDES_THEPIT_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "emupal.h"
@@ -7,8 +11,8 @@
 class thepit_state : public driver_device
 {
 public:
-	thepit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	thepit_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mainlatch(*this, "mainlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -16,7 +20,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_attributesram(*this, "attributesram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
 	void suprmous(machine_config &config);
 	void desertdn(machine_config &config);
@@ -25,6 +30,10 @@ public:
 	void fitter(machine_config &config);
 
 	void init_rtriv();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -66,8 +75,6 @@ private:
 	TILE_GET_INFO_MEMBER(solid_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(thepit);
 	DECLARE_PALETTE_INIT(suprmous);
 
@@ -83,3 +90,5 @@ private:
 	void intrepid_main_map(address_map &map);
 	void thepit_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_THEPIT_H

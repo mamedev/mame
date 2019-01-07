@@ -1048,36 +1048,36 @@ MACHINE_START_MEMBER(wecleman_state, wecleman)
 	m_led.resolve();
 }
 
-MACHINE_CONFIG_START(wecleman_state::wecleman)
-
+void wecleman_state::wecleman(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* Schems show 10MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wecleman_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wecleman_state, wecleman_scanline, "screen", 0, 1)
+	M68000(config, m_maincpu, 10000000);   /* Schems show 10MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wecleman_state::wecleman_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(wecleman_state::wecleman_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("sub", M68000, 10000000)   /* Schems show 10MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wecleman_sub_map)
+	M68000(config, m_subcpu, 10000000);   /* Schems show 10MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &wecleman_state::wecleman_sub_map);
 
 	/* Schems: can be reset, no nmi, soundlatch, 3.58MHz */
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
-	MCFG_DEVICE_PROGRAM_MAP(wecleman_sound_map)
+	Z80(config, m_audiocpu, 3579545);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wecleman_state::wecleman_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MCFG_MACHINE_START_OVERRIDE(wecleman_state, wecleman)
 	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, wecleman)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320 +16, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0 +8, 320-1 +8, 0 +8, 224-1 +8)
-	MCFG_SCREEN_UPDATE_DRIVER(wecleman_state, screen_update_wecleman)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(320 +16, 256);
+	m_screen->set_visarea(0 +8, 320-1 +8, 0 +8, 224-1 +8);
+	m_screen->set_screen_update(FUNC(wecleman_state::screen_update_wecleman));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wecleman)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wecleman);
 
-	MCFG_PALETTE_ADD("palette", 2048)
+	PALETTE(config, m_palette, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state,wecleman)
 
@@ -1089,11 +1089,11 @@ MACHINE_CONFIG_START(wecleman_state::wecleman)
 
 	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 0.85).add_route(1, "rspeaker", 0.85);
 
-	MCFG_DEVICE_ADD("k007232_1", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, wecleman_state, wecleman_volume_callback))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
-MACHINE_CONFIG_END
+	K007232(config, m_k007232[0], 3579545);
+	m_k007232[0]->port_write().set(FUNC(wecleman_state::wecleman_volume_callback));
+	m_k007232[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.20);
+	m_k007232[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.20);
+}
 
 
 /***************************************************************************
@@ -1124,49 +1124,49 @@ MACHINE_RESET_MEMBER(wecleman_state, hotchase)
 }
 
 
-MACHINE_CONFIG_START(wecleman_state::hotchase)
-
+void wecleman_state::hotchase(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
-	MCFG_DEVICE_PROGRAM_MAP(hotchase_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wecleman_state, hotchase_scanline, "screen", 0, 1)
+	M68000(config, m_maincpu, 10000000);   /* 10 MHz - PCB is drawn in one set's readme */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wecleman_state::hotchase_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(wecleman_state::hotchase_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("sub", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
-	MCFG_DEVICE_PROGRAM_MAP(hotchase_sub_map)
+	M68000(config, m_subcpu, 10000000);   /* 10 MHz - PCB is drawn in one set's readme */
+	m_subcpu->set_addrmap(AS_PROGRAM, &wecleman_state::hotchase_sub_map);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, 3579545 / 2)    /* 3.579/2 MHz - PCB is drawn in one set's readme */
-	MCFG_DEVICE_PROGRAM_MAP(hotchase_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(wecleman_state, hotchase_sound_timer,  496)
+	MC6809E(config, m_audiocpu, 3579545 / 2);    /* 3.579/2 MHz - PCB is drawn in one set's readme */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wecleman_state::hotchase_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(wecleman_state::hotchase_sound_timer), attotime::from_hz(496));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, hotchase)
 	MCFG_MACHINE_START_OVERRIDE(wecleman_state, hotchase)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320 +16, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wecleman_state, screen_update_hotchase)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(320 +16, 256);
+	m_screen->set_visarea(0, 320-1, 0, 224-1);
+	m_screen->set_screen_update(FUNC(wecleman_state::screen_update_hotchase));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hotchase)
-	MCFG_PALETTE_ADD("palette", 8192)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hotchase);
+	PALETTE(config, m_palette, 8192);
 
 	MCFG_VIDEO_START_OVERRIDE(wecleman_state, hotchase)
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(-0xb0 / 2, -16)
-	MCFG_K051316_WRAP(1)
-	MCFG_K051316_CB(wecleman_state, hotchase_zoom_callback_1)
+	K051316(config, m_k051316[0], 0);
+	m_k051316[0]->set_palette(m_palette);
+	m_k051316[0]->set_offsets(-0xb0 / 2, -16);
+	m_k051316[0]->set_wrap(1);
+	m_k051316[0]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_1), this);
 
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_OFFSETS(-0xb0 / 2, -16)
-	MCFG_K051316_CB(wecleman_state, hotchase_zoom_callback_2)
+	K051316(config, m_k051316[1], 0);
+	m_k051316[1]->set_palette(m_palette);
+	m_k051316[1]->set_offsets(-0xb0 / 2, -16);
+	m_k051316[1]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_2), this);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1174,21 +1174,21 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("k007232_1", K007232, 3579545)
+	K007232(config, m_k007232[0], 3579545);
 	// SLEV not used, volume control is elsewhere
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
+	m_k007232[0]->add_route(0, "lspeaker", 0.20);
+	m_k007232[0]->add_route(1, "rspeaker", 0.20);
 
-	MCFG_DEVICE_ADD("k007232_2", K007232, 3579545)
+	K007232(config, m_k007232[1], 3579545);
 	// SLEV not used, volume control is elsewhere
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
+	m_k007232[1]->add_route(0, "lspeaker", 0.20);
+	m_k007232[1]->add_route(1, "rspeaker", 0.20);
 
-	MCFG_DEVICE_ADD("k007232_3", K007232, 3579545)
+	K007232(config, m_k007232[2], 3579545);
 	// SLEV not used, volume control is elsewhere
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
-MACHINE_CONFIG_END
+	m_k007232[2]->add_route(0, "lspeaker", 0.20);
+	m_k007232[2]->add_route(1, "rspeaker", 0.20);
+}
 
 
 /***************************************************************************

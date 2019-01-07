@@ -487,16 +487,17 @@ MACHINE_CONFIG_START(appoooh_state::robowres)
 	MCFG_PALETTE_INIT_OWNER(appoooh_state,robowres)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(appoooh_state::robowrese)
+void appoooh_state::robowrese(machine_config &config)
+{
 	robowres(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5179,18432000/6) /* ??? the main xtal is 18.432 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5179_device &maincpu(SEGA_315_5179(config.replace(), m_maincpu, 18432000/6)); /* ??? the main xtal is 18.432 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &appoooh_state::main_map);
+	maincpu.set_addrmap(AS_IO, &appoooh_state::main_portmap);
+	maincpu.set_vblank_int("screen", FUNC(appoooh_state::vblank_irq));
+	maincpu.set_addrmap(AS_OPCODES, &appoooh_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(m_decrypted_opcodes);
+}
 
 /*************************************
  *

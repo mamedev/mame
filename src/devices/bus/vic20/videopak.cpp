@@ -170,14 +170,12 @@ uint8_t vic20_video_pak_device::vic20_cd_r(address_space &space, offs_t offset, 
 			if (!blk1)
 			{
 				offs_t addr = m_bank_msb << 15 | m_bank_lsb << 14 | offset;
-
 				data = m_ram[addr];
 			}
 
 			if (!blk2)
 			{
 				offs_t addr = m_bank_msb << 15 | m_bank_lsb << 14 | 0x2000 | offset;
-
 				data = m_ram[addr];
 			}
 		}
@@ -186,21 +184,18 @@ uint8_t vic20_video_pak_device::vic20_cd_r(address_space &space, offs_t offset, 
 			if (!blk1)
 			{
 				offs_t addr = m_bank_msb << 15 | offset;
-
 				data = m_ram[addr];
 			}
 
 			if (!blk2)
 			{
 				offs_t addr = m_bank_msb << 15 | 0x2000 | offset;
-
 				data = m_ram[addr];
 			}
 
 			if (!blk3)
 			{
 				offs_t addr = m_bank_msb << 15 | 0x4000 | offset;
-
 				data = m_ram[addr];
 			}
 		}
@@ -211,7 +206,8 @@ uint8_t vic20_video_pak_device::vic20_cd_r(address_space &space, offs_t offset, 
 		switch ((offset >> 11) & 0x03)
 		{
 		case 0:
-			data = m_blk5[offset & 0x7ff];
+			if (m_blk5)
+				data = m_blk5[offset & 0x7ff];
 			break;
 
 		case 3:

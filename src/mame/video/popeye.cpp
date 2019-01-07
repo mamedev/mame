@@ -121,7 +121,7 @@ const res_net_info tnx1_state::obj_mb7052_net_info =
 };
 
 
-PALETTE_INIT_MEMBER(tpp1_state, palette_init)
+PALETTE_INIT_MEMBER(tpp1_state, tnx1)
 {
 	/* Two of the PROM address pins are tied together */
 	for (int i = 0; i < 0x20; i++)
@@ -135,7 +135,7 @@ PALETTE_INIT_MEMBER(tpp1_state, palette_init)
 	update_palette();
 }
 
-PALETTE_INIT_MEMBER(tnx1_state, palette_init)
+PALETTE_INIT_MEMBER(tnx1_state, tnx1)
 {
 	/* Two of the PROM address pins are tied together and one is not connected... */
 	for (int i = 0;i < 0x100;i++)

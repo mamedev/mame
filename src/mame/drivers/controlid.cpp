@@ -144,14 +144,14 @@ PALETTE_INIT_MEMBER(controlidx628_state, controlidx628)
 
 MACHINE_CONFIG_START(controlidx628_state::controlidx628)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", AT89S52, XTAL(11'059'200))
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, controlidx628_state, p0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, controlidx628_state, p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, controlidx628_state, p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, controlidx628_state, p2_r))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, controlidx628_state, p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, controlidx628_state, p3_w))
+	at89s52_device &maincpu(AT89S52(config, "maincpu", XTAL(11'059'200)));
+	maincpu.set_addrmap(AS_IO, &controlidx628_state::io_map);
+	maincpu.port_out_cb<0>().set(FUNC(controlidx628_state::p0_w));
+	maincpu.port_in_cb<1>().set(FUNC(controlidx628_state::p1_r));
+	maincpu.port_out_cb<1>().set(FUNC(controlidx628_state::p1_w));
+	maincpu.port_in_cb<2>().set(FUNC(controlidx628_state::p2_r));
+	maincpu.port_in_cb<3>().set(FUNC(controlidx628_state::p3_r));
+	maincpu.port_out_cb<3>().set(FUNC(controlidx628_state::p3_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", LCD)

@@ -683,32 +683,32 @@ INPUT_PORTS_END
     Machine driver
 ***************************************************************************/
 
-MACHINE_CONFIG_START(srmp6_state::srmp6)
+void srmp6_state::srmp6(machine_config &config)
+{
+	M68000(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &srmp6_state::srmp6_map);
+	m_maincpu->set_vblank_int("screen", FUNC(srmp6_state::irq4_line_assert)); // irq3 is a timer irq, but it's never enabled
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(srmp6_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp6_state, irq4_line_assert) // irq3 is a timer irq, but it's never enabled
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 42*8-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(srmp6_state::screen_update_srmp6));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(srmp6_state, screen_update_srmp6)
+	PALETTE(config, m_palette, 0x800);
+	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
 
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_NILE_ADD("nile", 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	nile_device &nile(NILE(config, "nile", 0));
+	nile.add_route(0, "lspeaker", 1.0);
+	nile.add_route(1, "rspeaker", 1.0);
+}
 
 
 /***************************************************************************

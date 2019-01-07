@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "cpu/mcs48/mcs48.h"
 #include "emupal.h"
 
 class pandoras_state : public driver_device
@@ -47,7 +48,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_mcu;
+	required_device<i8039_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

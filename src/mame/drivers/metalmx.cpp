@@ -674,12 +674,12 @@ MACHINE_CONFIG_START(metalmx_state::metalmx)
 	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
 	MCFG_DEVICE_DATA_MAP(adsp_data_map)
 
-	MCFG_DEVICE_ADD("gsp", TMS34020, 40000000)         /* Unverified */
-	MCFG_DEVICE_PROGRAM_MAP(gsp_map)
-	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(4000000) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_OUTPUT_INT_CB(INPUTLINE("maincpu", 4))
+	TMS34020(config, m_gsp, 40000000);         /* Unverified */
+	m_gsp->set_addrmap(AS_PROGRAM, &metalmx_state::gsp_map);
+	m_gsp->set_halt_on_reset(true);
+	m_gsp->set_pixel_clock(4000000);
+	m_gsp->set_pixels_per_clock(2);
+	m_gsp->output_int().set_inputline("maincpu", 4);
 
 	MCFG_DEVICE_ADD("dsp32c_1", DSP32C, 40000000)      /* Unverified */
 	MCFG_DEVICE_PROGRAM_MAP(dsp32c_1_map)

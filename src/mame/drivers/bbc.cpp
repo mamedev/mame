@@ -962,7 +962,7 @@ void bbc_state::bbcb(machine_config &config)
 	centronics.set_output_latch(latch);
 
 	/* fdc */
-	BBC_FDC_SLOT(config, m_fdc, bbc_fdc_devices, "acorn8271");
+	BBC_FDC_SLOT(config, m_fdc, 16_MHz_XTAL / 2, bbc_fdc_devices, "acorn8271");
 	m_fdc->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(bbc_state::fdc_drq_w));
 
@@ -985,7 +985,7 @@ void bbc_state::bbcb(machine_config &config)
 	m_analog->lpstb_handler().set(FUNC(bbc_state::lpstb_w));
 
 	/* 1mhz bus port */
-	BBC_1MHZBUS_SLOT(config, m_1mhzbus, bbc_1mhzbus_devices, nullptr);
+	BBC_1MHZBUS_SLOT(config, m_1mhzbus, 16_MHz_XTAL / 16, bbc_1mhzbus_devices, nullptr);
 	m_1mhzbus->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
 	m_1mhzbus->nmi_handler().set(FUNC(bbc_state::bus_nmi_w));
 
@@ -1459,7 +1459,7 @@ void bbcm_state::bbcm(machine_config &config)
 	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);
 
 	/* 1mhz bus port */
-	BBC_1MHZBUS_SLOT(config, m_1mhzbus, bbcm_1mhzbus_devices, nullptr);
+	BBC_1MHZBUS_SLOT(config, m_1mhzbus, 16_MHz_XTAL / 16, bbcm_1mhzbus_devices, nullptr);
 	m_1mhzbus->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
 	m_1mhzbus->nmi_handler().set(FUNC(bbc_state::bus_nmi_w));
 
@@ -1707,7 +1707,7 @@ void bbcm_state::bbcmc(machine_config &config)
 	config.device_remove("cart_ls_m");
 
 	/* expansion ports */
-	BBC_EXP_SLOT(config, m_exp, bbc_exp_devices, nullptr);
+	BBC_EXP_SLOT(config, m_exp, 16_MHz_XTAL / 2, bbc_exp_devices, nullptr);
 	m_exp->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
 	m_exp->nmi_handler().set(FUNC(bbc_state::bus_nmi_w));
 

@@ -640,14 +640,16 @@ void vic10_state::machine_reset()
 //  MACHINE_CONFIG( vic10 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vic10_state::vic10)
+void vic10_state::vic10(machine_config &config)
+{
 	// basic hardware
-	MCFG_DEVICE_ADD(M6510_TAG, M6510, XTAL(8'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(vic10_mem)
-	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
-	MCFG_M6510_PORT_CALLBACKS(READ8(*this, vic10_state, cpu_r), WRITE8(*this, vic10_state, cpu_w))
-	MCFG_M6510_PORT_PULLS(0x10, 0x20)
-	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
+	M6510(config, m_maincpu, XTAL(8'000'000)/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vic10_state::vic10_mem);
+	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
+	m_maincpu->read_callback().set(FUNC(vic10_state::cpu_r));
+	m_maincpu->write_callback().set(FUNC(vic10_state::cpu_w));
+	m_maincpu->set_pulls(0x10, 0x20);
+	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
 
@@ -659,32 +661,35 @@ MACHINE_CONFIG_START(vic10_state::vic10)
 	mos8566.set_addrmap(0, &vic10_state::vic_videoram_map);
 	mos8566.set_addrmap(1, &vic10_state::vic_colorram_map);
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(VIC6566_VRETRACERATE)
-	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
-	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
-	MCFG_SCREEN_UPDATE_DEVICE(MOS6566_TAG, mos6566_device, screen_update)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(VIC6566_VRETRACERATE);
+	screen.set_size(VIC6567_COLUMNS, VIC6567_LINES);
+	screen.set_visarea(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
+	screen.set_screen_update(MOS6566_TAG, FUNC(mos6566_device::screen_update));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(8'000'000)/8)
-	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, vic10_state, sid_potx_r))
-	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, vic10_state, sid_poty_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MOS6581(config, m_sid, XTAL(8'000'000)/8);
+	m_sid->potx().set(FUNC(vic10_state::sid_potx_r));
+	m_sid->poty().set(FUNC(vic10_state::sid_poty_r));
+	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// devices
-	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526, XTAL(8'000'000)/8)
-	MCFG_MOS6526_TOD(60)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE("mainirq", input_merger_device, in_w<0>))
-	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, cnt_w))
-	MCFG_MOS6526_SP_CALLBACK(WRITELINE(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, sp_w))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, vic10_state, cia_pa_r))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, vic10_state, cia_pb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, vic10_state, cia_pb_w))
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", WRITELINE(MOS6526_TAG, mos6526_device, flag_w))
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
-	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(MOS6566_TAG, mos6566_device, lp_w))
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
+	MOS6526(config, m_cia, XTAL(8'000'000)/8);
+	m_cia->set_tod_clock(60);
+	m_cia->irq_wr_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_cia->cnt_wr_callback().set(m_exp, FUNC(vic10_expansion_slot_device::cnt_w));
+	m_cia->sp_wr_callback().set(m_exp, FUNC(vic10_expansion_slot_device::sp_w));
+	m_cia->pa_rd_callback().set(FUNC(vic10_state::cia_pa_r));
+	m_cia->pb_rd_callback().set(FUNC(vic10_state::cia_pb_r));
+	m_cia->pb_wr_callback().set(FUNC(vic10_state::cia_pb_w));
+
+	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c1530");
+	m_cassette->read_handler().set(m_cia, FUNC(mos6526_device::flag_w));
+
+	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
+	m_joy1->trigger_wr_callback().set(MOS6566_TAG, FUNC(mos6566_device::lp_w));
+	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
 	VIC10_EXPANSION_SLOT(config, m_exp, XTAL(8'000'000)/8, vic10_expansion_cards, nullptr);
 	m_exp->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
@@ -693,11 +698,11 @@ MACHINE_CONFIG_START(vic10_state::vic10)
 	m_exp->sp_callback().set(m_cia, FUNC(mos6526_device::sp_w));
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "vic10")
+	SOFTWARE_LIST(config, "cart_list").set_original("vic10");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("4K");
-MACHINE_CONFIG_END
+}
 
 
 

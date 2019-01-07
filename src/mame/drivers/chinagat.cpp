@@ -615,13 +615,13 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub1)
 	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(3'579'545))     /* 3.579545 MHz oscillator */
 	MCFG_DEVICE_PROGRAM_MAP(saiyugoub1_sound_map)
 
-	MCFG_DEVICE_ADD("mcu", I8748, 9263750)     /* 9.263750 MHz oscillator, divided by 3*5 internally */
-	MCFG_DEVICE_PROGRAM_MAP(i8748_map)
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, chinagat_state, saiyugoub1_mcu_command_r))
+	i8748_device &mcu(I8748(config, "mcu", 9263750));     /* 9.263750 MHz oscillator, divided by 3*5 internally */
+	mcu.set_addrmap(AS_PROGRAM, &chinagat_state::i8748_map);
+	mcu.bus_in_cb().set(FUNC(chinagat_state::saiyugoub1_mcu_command_r));
 	//MCFG_MCS48_PORT_T0_CLK_CUSTOM(chinagat_state, saiyugoub1_m5205_clk_w)      /* Drives the clock on the m5205 at 1/8 of this frequency */
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, chinagat_state, saiyugoub1_m5205_irq_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, chinagat_state, saiyugoub1_adpcm_rom_addr_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, chinagat_state, saiyugoub1_adpcm_control_w))
+	mcu.t1_in_cb().set(FUNC(chinagat_state::saiyugoub1_m5205_irq_r));
+	mcu.p1_out_cb().set(FUNC(chinagat_state::saiyugoub1_adpcm_rom_addr_w));
+	mcu.p2_out_cb().set(FUNC(chinagat_state::saiyugoub1_adpcm_control_w));
 
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* heavy interleaving to sync up sprite<->main cpu's */

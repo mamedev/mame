@@ -1443,7 +1443,7 @@ MACHINE_CONFIG_START(m5_state::m5)
 	m_ppi->in_pc_callback().set(FUNC(m5_state::ppi_pc_r));
 	m_ppi->out_pc_callback().set(FUNC(m5_state::ppi_pc_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_fd5cpu, INPUT_LINE_IRQ0);
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", m5_floppies, "525dd", m5_state::floppy_formats)
 

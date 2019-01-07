@@ -19,7 +19,6 @@
 
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/timer.h"

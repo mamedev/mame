@@ -2079,11 +2079,11 @@ WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
 		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151_upd7759)
-
-	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_7759_map)
-	MCFG_DEVICE_IO_MAP(sound_7759_io_map)
+void segas1x_bootleg_state::z80_ym2151_upd7759(machine_config &config)
+{
+	Z80(config, m_soundcpu, 4000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::sound_7759_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::sound_7759_io_map);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2091,12 +2091,12 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151_upd7759)
 
 	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
 
-	MCFG_DEVICE_ADD("7759", UPD7759)
-	MCFG_UPD7759_MD(0)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, segas1x_bootleg_state,sound_cause_nmi))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->md_w(0);
+	m_upd7759->drq().set(FUNC(segas1x_bootleg_state::sound_cause_nmi));
+	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.48);
+	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.48);
+}
 
 MACHINE_CONFIG_START(segas1x_bootleg_state::datsu_ym2151_msm5205)
 	/* TODO:

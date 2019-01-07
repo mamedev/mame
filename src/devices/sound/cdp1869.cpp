@@ -578,7 +578,7 @@ void cdp1869_device::draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int 
 
 	data <<= 2;
 
-	for (i = 0; i < CHAR_WIDTH; i++)
+	for (i = 0; i < CH_WIDTH; i++)
 	{
 		if (data & 0x80)
 		{
@@ -972,7 +972,7 @@ uint32_t cdp1869_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 	if (!m_dispoff)
 	{
-		int width = CHAR_WIDTH;
+		int width = CH_WIDTH;
 		int height = get_lines();
 
 		if (!m_freshorz)

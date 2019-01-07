@@ -14,44 +14,6 @@
 
 #define ES5506_MAKE_WAVS 0
 
-#define MCFG_ES5506_REGION0(_region) \
-	downcast<es5506_device &>(*device).set_region0(_region);
-
-#define MCFG_ES5506_REGION1(_region) \
-	downcast<es5506_device &>(*device).set_region1(_region);
-
-#define MCFG_ES5506_REGION2(_region) \
-	downcast<es5506_device &>(*device).set_region2(_region);
-
-#define MCFG_ES5506_REGION3(_region) \
-	downcast<es5506_device &>(*device).set_region3(_region);
-
-#define MCFG_ES5506_CHANNELS(_chan) \
-	downcast<es5506_device &>(*device).set_channels(_chan);
-
-#define MCFG_ES5506_IRQ_CB(_devcb) \
-	downcast<es5506_device &>(*device).set_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_ES5506_READ_PORT_CB(_devcb) \
-	downcast<es5506_device &>(*device).set_read_port_callback(DEVCB_##_devcb);
-
-
-#define MCFG_ES5505_REGION0(_region) \
-	downcast<es5505_device &>(*device).set_region0(_region);
-
-#define MCFG_ES5505_REGION1(_region) \
-	downcast<es5505_device &>(*device).set_region1(_region);
-
-#define MCFG_ES5505_CHANNELS(_chan) \
-	downcast<es5505_device &>(*device).set_channels(_chan);
-
-#define MCFG_ES5505_IRQ_CB(_devcb) \
-	downcast<es5505_device &>(*device).set_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_ES5505_READ_PORT_CB(_devcb) \
-	downcast<es5505_device &>(*device).set_read_port_callback(DEVCB_##_devcb);
-
-
 class es550x_device : public device_t, public device_sound_interface
 {
 public:
@@ -60,8 +22,6 @@ public:
 	void set_region2(const char *region2) { m_region2 = region2; }
 	void set_region3(const char *region3) { m_region3 = region3; }
 	void set_channels(int channels) { m_channels = channels; }
-	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_port_callback(Object &&cb) { return m_read_port_cb.set_callback(std::forward<Object>(cb)); }
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 	auto read_port_cb() { return m_read_port_cb.bind(); }

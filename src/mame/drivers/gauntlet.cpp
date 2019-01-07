@@ -129,6 +129,7 @@
 #include "sound/tms5220.h"
 #include "sound/ym2151.h"
 #include "sound/pokey.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -300,7 +301,7 @@ void gauntlet_state::main_map(address_map &map)
 	map(0x905000, 0x905f7f).mirror(0x2c8000).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
 	map(0x905f6e, 0x905f6f).mirror(0x2c8000).ram().w(FUNC(gauntlet_state::gauntlet_yscroll_w)).share("yscroll");
 	map(0x905f80, 0x905fff).mirror(0x2c8000).ram().share("mob:slip");
-	map(0x910000, 0x9107ff).mirror(0x2cf800).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x910000, 0x9107ff).mirror(0x2cf800).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x930000, 0x930001).mirror(0x2cfffe).w(FUNC(gauntlet_state::gauntlet_xscroll_w)).share("xscroll");
 }
 
@@ -508,8 +509,9 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, gauntlet_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, gauntlet_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", gauntlet_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, gauntlet_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -548,30 +550,32 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(gauntlet_state::gauntlet)
+void gauntlet_state::gauntlet(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 104, true)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic_device, 104, true);
+}
 
 
-MACHINE_CONFIG_START(gauntlet_state::gaunt2p)
+void gauntlet_state::gaunt2p(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 107, true)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic_device, 107, true);
+}
 
 
-MACHINE_CONFIG_START(gauntlet_state::gauntlet2)
+void gauntlet_state::gauntlet2(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 106, true)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic_device, 106, true);
+}
 
 
-MACHINE_CONFIG_START(gauntlet_state::vindctr2)
+void gauntlet_state::vindctr2(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 118, true)
-MACHINE_CONFIG_END
-
-
+	SLAPSTIC(config, m_slapstic_device, 118, true);
+}
 
 
 /*************************************

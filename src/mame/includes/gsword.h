@@ -81,8 +81,12 @@ public:
 		: gsword_state_base(mconfig, type, tag)
 		, m_soundlatch(*this, "soundlatch")
 		, m_msm(*this, "msm")
+		, m_dsw0(*this, "DSW0")
 		, m_protect_hack(false)
 		, m_nmi_enable(false)
+		, m_tclk_val(false)
+		, m_mcu1_p1(0xff)
+		, m_mcu2_p1(0xff)
 	{
 	}
 
@@ -96,8 +100,8 @@ protected:
 	DECLARE_WRITE8_MEMBER(nmi_set_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_READ8_MEMBER(i8741_2_r);
-	DECLARE_READ8_MEMBER(i8741_3_r);
+	DECLARE_READ8_MEMBER(mcu2_p1_r);
+	DECLARE_WRITE8_MEMBER(mcu3_p2_w);
 
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 
@@ -114,9 +118,12 @@ protected:
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<msm5205_device>         m_msm;
+	required_ioport                         m_dsw0;
 
 	bool    m_protect_hack;
 	bool    m_nmi_enable;
+	bool    m_tclk_val;
+	uint8_t m_mcu1_p1, m_mcu2_p1;
 };
 
 

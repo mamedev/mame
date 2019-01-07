@@ -208,7 +208,7 @@ u8 s100_8k_sc_device::s100_smemr_r(address_space &space, offs_t offset)
 	if (board_selected(offset))
 		return m_ram[offset & 0x1fff];
 	else
-		return 0;
+		return 0xff;
 }
 
 

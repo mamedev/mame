@@ -67,7 +67,7 @@ private:
 	DECLARE_READ8_MEMBER(audio_cmd_r);
 	DECLARE_WRITE8_MEMBER(audio_p1_w);
 	DECLARE_WRITE8_MEMBER(audio_p2_w);
-	DECLARE_READ_LINE_MEMBER(audio_T1_r);
+	DECLARE_READ_LINE_MEMBER(audio_t1_r);
 	DECLARE_WRITE8_MEMBER(ay_pa_w);
 
 	void ron_audio_io(address_map &map);
@@ -83,7 +83,7 @@ private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<i8035_device> m_audiocpu;
 	required_device<ay8910_device> m_ay;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint8_t> m_vram;
@@ -476,7 +476,7 @@ WRITE8_MEMBER(ron_state::audio_p2_w)
 //  machine().debug_break();
 }
 
-READ_LINE_MEMBER(ron_state::audio_T1_r )
+READ_LINE_MEMBER(ron_state::audio_t1_r)
 {
 	// TODO: what controls this?
 	return !BIT(m_sound_command, 6);
@@ -493,14 +493,14 @@ MACHINE_CONFIG_START(ron_state::ron)
 	MCFG_DEVICE_PROGRAM_MAP(ron_map)
 	MCFG_DEVICE_IO_MAP(ron_io)
 
-	MCFG_DEVICE_ADD("audiocpu", I8035, SOUND_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(ron_audio_map)
-	MCFG_DEVICE_IO_MAP(ron_audio_io)
-	MCFG_MCS48_PORT_T0_CLK_DEVICE("aysnd")
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, ron_state, audio_cmd_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ron_state, audio_p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ron_state, audio_p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ron_state, audio_T1_r))
+	I8035(config, m_audiocpu, SOUND_CLOCK);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ron_state::ron_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &ron_state::ron_audio_io);
+	m_audiocpu->set_t0_clk_cb("aysnd", FUNC(device_t::set_unscaled_clock));
+	m_audiocpu->p2_in_cb().set(FUNC(ron_state::audio_cmd_r));
+	m_audiocpu->p1_out_cb().set(FUNC(ron_state::audio_p1_w));
+	m_audiocpu->p2_out_cb().set(FUNC(ron_state::audio_p2_w));
+	m_audiocpu->t1_in_cb().set(FUNC(ron_state::audio_t1_r));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

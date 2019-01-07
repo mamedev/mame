@@ -911,7 +911,7 @@ MACHINE_CONFIG_START(sc4_state::sc4_common)
 	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, sc4_state, bfm_sc4_duart_input_r))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, sc4_state, bfm_sc4_duart_output_w))
 
-	MCFG_BFMBDA_ADD("vfd0",0)
+	BFM_BDA(config, m_vfd0, 60, 0);
 
 //  config.set_default_layout(layout_bfm_sc4);
 

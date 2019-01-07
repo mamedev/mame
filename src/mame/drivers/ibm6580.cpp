@@ -882,7 +882,7 @@ static void dw_floppies(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(ibm6580_state::ibm6580)
-	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(14'745'600)/3)
+	MCFG_DEVICE_ADD("maincpu", I8086, 14.7456_MHz_XTAL / 3)
 	MCFG_DEVICE_PROGRAM_MAP(ibm6580_mem)
 	MCFG_DEVICE_IO_MAP(ibm6580_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
@@ -890,7 +890,7 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("160K,192K,224K,256K,320K,384K");
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'000'000)/2, 833, 0, 640, 428, 0, 400)
+	MCFG_SCREEN_RAW_PARAMS(25_MHz_XTAL / 2, 833, 0, 640, 428, 0, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(ibm6580_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ibm6580_state, vblank_w))
@@ -916,7 +916,7 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	m_kbd->out_strobe_handler().set(FUNC(ibm6580_state::kb_strobe_w));
 	m_kbd->out_strobe_handler().append(m_ppi8255, FUNC(i8255_device::pc4_w));
 
-	I8257(config, m_dma8257, XTAL(14'745'600)/3);
+	I8257(config, m_dma8257, 14.7456_MHz_XTAL / 3);
 	m_dma8257->out_hrq_cb().set(FUNC(ibm6580_state::hrq_w));
 	m_dma8257->out_tc_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 	m_dma8257->in_memr_cb().set(FUNC(ibm6580_state::memory_read_byte));
@@ -924,7 +924,7 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	m_dma8257->in_ior_cb<0>().set(m_fdc, FUNC(upd765a_device::mdma_r));
 	m_dma8257->out_iow_cb<0>().set(m_fdc, FUNC(upd765a_device::mdma_w));
 
-	UPD765A(config, m_fdc, false, false);
+	UPD765A(config, m_fdc, 24_MHz_XTAL / 3, false, false);
 	m_fdc->intrq_wr_callback().set(FUNC(ibm6580_state::floppy_intrq));
 //  m_fdc->intrq_wr_callback().append(m_pic8259, FUNC(pic8259_device::ir4_w));
 	m_fdc->drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq0_w));

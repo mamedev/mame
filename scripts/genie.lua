@@ -219,7 +219,27 @@ newoption {
 
 newoption {
 	trigger = "ARCHOPTS",
-	description = "ARCHOPTS.",
+	description = "Additional options for target C/C++/Objective-C/Objective-C++ compilers and linker.",
+}
+
+newoption {
+	trigger = "ARCHOPTS_C",
+	description = "Additional options for target C++ compiler.",
+}
+
+newoption {
+	trigger = "ARCHOPTS_CXX",
+	description = "Additional options for target C++ compiler.",
+}
+
+newoption {
+	trigger = "ARCHOPTS_OBJC",
+	description = "Additional options for target Objective-C compiler.",
+}
+
+newoption {
+	trigger = "ARCHOPTS_OBJCXX",
+	description = "Additional options for target Objective-C++ compiler.",
 }
 
 newoption {
@@ -889,6 +909,30 @@ if _OPTIONS["ARCHOPTS"] then
 	}
 	linkoptions {
 		_OPTIONS["ARCHOPTS"]
+	}
+end
+
+if _OPTIONS["ARCHOPTS_C"] then
+	buildoptions_c {
+		_OPTIONS["ARCHOPTS_C"]
+	}
+end
+
+if _OPTIONS["ARCHOPTS_CXX"] then
+	buildoptions_cpp {
+		_OPTIONS["ARCHOPTS_CXX"]
+	}
+end
+
+if _OPTIONS["ARCHOPTS_OBJC"] then
+	buildoptions_objc {
+		_OPTIONS["ARCHOPTS_OBJC"]
+	}
+end
+
+if _OPTIONS["ARCHOPTS_OBJCXX"] then
+	buildoptions_objcpp {
+		_OPTIONS["ARCHOPTS_OBJCXX"]
 	}
 end
 

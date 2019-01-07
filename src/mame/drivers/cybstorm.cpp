@@ -20,6 +20,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -232,11 +233,12 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_ATARI_VAD_ADD("vad", "screen", INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_ATARI_VAD_PLAYFIELD(cybstorm_state, "gfxdecode", get_playfield_tile_info)
-	MCFG_ATARI_VAD_PLAYFIELD2(cybstorm_state, "gfxdecode", get_playfield2_tile_info)
-	MCFG_ATARI_VAD_ALPHA(cybstorm_state, "gfxdecode", get_alpha_tile_info)
-	MCFG_ATARI_VAD_MOB(cybstorm_state::s_mob_config, "gfxdecode")
+	ATARI_VAD(config, m_vad, 0, m_screen);
+	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(DEVICE_SELF_OWNER, FUNC(cybstorm_state::get_playfield_tile_info));
+	TILEMAP(config, "vad:playfield2", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(DEVICE_SELF_OWNER, FUNC(cybstorm_state::get_playfield2_tile_info));
+	TILEMAP(config, "vad:alpha", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(DEVICE_SELF_OWNER, FUNC(cybstorm_state::get_alpha_tile_info));
+	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, cybstorm_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
 	ADDRESS_MAP_BANK(config, "vadbank").set_map(&cybstorm_state::vadbank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x90000);
 

@@ -98,15 +98,15 @@ void inder_vid_device::ramdac_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(inder_vid_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(m_tms, TMS34010, XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(megaphx_tms_map)
-	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(XTAL(40'000'000)/12) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(inder_vid_device, scanline)     /* scanline updater (RGB32) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(INPUTLINE(":maincpu", 4))
-	MCFG_TMS340X0_TO_SHIFTREG_CB(inder_vid_device, to_shiftreg)  /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(inder_vid_device, from_shiftreg) /* read from shiftreg function */
+	TMS34010(config, m_tms, XTAL(40'000'000));
+	m_tms->set_addrmap(AS_PROGRAM, &inder_vid_device::megaphx_tms_map);
+	m_tms->set_halt_on_reset(true);
+	m_tms->set_pixel_clock(XTAL(40'000'000)/12);
+	m_tms->set_pixels_per_clock(2);
+	m_tms->set_scanline_rgb32_callback(FUNC(inder_vid_device::scanline));
+	m_tms->output_int().set_inputline(":maincpu", 4);
+	m_tms->set_shiftreg_in_callback(FUNC(inder_vid_device::to_shiftreg));
+	m_tms->set_shiftreg_out_callback(FUNC(inder_vid_device::from_shiftreg));
 
 	MCFG_SCREEN_ADD("inder_screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000)/12, 424, 0, 338-1, 262, 0, 246-1)

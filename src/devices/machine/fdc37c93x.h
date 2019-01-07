@@ -16,6 +16,7 @@ SMSC FDC37C93x Plug and Play Compatible Ultra I/O Controller
 #include "machine/8042kbdc.h"
 // floppy disk controller
 #include "machine/upd765.h"
+#include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 // parallel port

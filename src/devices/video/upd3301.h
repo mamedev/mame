@@ -81,6 +81,17 @@ public:
 
 	void set_character_width(int value) { m_width = value; }
 	template <typename... T> void set_display_callback(T &&... args) { m_display_cb = draw_character_delegate(std::forward<T>(args)...); }
+	void set_display_callback(draw_character_delegate callback) { m_display_cb = callback; }
+	template <class FunctionClass> void set_display_callback(const char *devname,
+		void (FunctionClass::*callback)(bitmap_rgb32 &, int, int, uint8_t, uint8_t, int, int, int, int, int, int, int), const char *name)
+	{
+		set_display_callback(draw_character_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_display_callback(
+		void (FunctionClass::*callback)(bitmap_rgb32 &, int, int, uint8_t, uint8_t, int, int, int, int, int, int, int), const char *name)
+	{
+		set_display_callback(draw_character_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return m_write_drq.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_int_wr_callback(Object &&cb) { return m_write_int.set_callback(std::forward<Object>(cb)); }

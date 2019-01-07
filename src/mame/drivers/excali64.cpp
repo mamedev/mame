@@ -35,6 +35,7 @@ ToDo:
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/74123.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"

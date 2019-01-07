@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_INCLUDES_DRGNMST_H
+#define MAME_INCLUDES_DRGNMST_H
+
+#pragma once
 
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"
@@ -22,11 +26,17 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void drgnmst(machine_config &config);
 
 	void init_drgnmst();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	/* memory pointers */
@@ -74,9 +84,6 @@ private:
 	TILEMAP_MAPPER_MEMBER(md_tilemap_scan_cols);
 	TILEMAP_MAPPER_MEMBER(bg_tilemap_scan_cols);
 	DECLARE_PALETTE_DECODER(drgnmst_IIIIRRRRGGGGBBBB);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
 	uint8_t drgnmst_asciitohex( uint8_t data );
@@ -87,3 +94,5 @@ private:
 	void drgnmst_main_map(address_map &map);
 	void drgnmst_oki1_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DRGNMST_H

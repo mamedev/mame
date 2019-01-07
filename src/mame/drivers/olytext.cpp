@@ -23,6 +23,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/keyboard.h"
 #include "emupal.h"
@@ -170,8 +171,8 @@ MACHINE_CONFIG_START( olytext_state::olytext )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(olytext_state, keyboard_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(olytext_state::keyboard_put));
 MACHINE_CONFIG_END
 
 

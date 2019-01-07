@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/floppy.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
@@ -289,7 +290,7 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	m_dmac->in_ior_cb<0>().set("upd765", FUNC(upd765a_device::mdma_r));
 	m_dmac->out_iow_cb<0>().set("upd765", FUNC(upd765a_device::mdma_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set("pic8259_0", FUNC(pic8259_device::ir2_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq0_w));
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)

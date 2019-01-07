@@ -13,9 +13,6 @@
 #include "emu.h"
 #include "includes/z80ne.h"
 
-/* Devices */
-#include "imagedev/flopdrv.h"
-
 //#define VERBOSE 1
 #include "logmacro.h"
 

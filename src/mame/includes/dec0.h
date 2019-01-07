@@ -5,14 +5,15 @@
 
 #pragma once
 
-#include "machine/74157.h"
 #include "cpu/h6280/h6280.h"
+#include "cpu/mcs51/mcs51.h"
+#include "machine/74157.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
+#include "sound/msm5205.h"
 #include "video/bufsprite.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
-#include "sound/msm5205.h"
 #include "emupal.h"
 
 class dec0_state : public driver_device

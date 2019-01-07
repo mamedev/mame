@@ -32,6 +32,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "imagedev/floppy.h"
 #include "machine/mos6530n.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"

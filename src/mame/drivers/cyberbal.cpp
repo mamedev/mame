@@ -27,7 +27,6 @@
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "sound/volt_reg.h"
-#include "diexec.h"
 #include "speaker.h"
 
 #include "rendlay.h"

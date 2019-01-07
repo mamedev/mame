@@ -74,7 +74,7 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<i80c31_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 };
 
@@ -254,14 +254,14 @@ HD44780_PIXEL_UPDATE(icatel_state::icatel_pixel_update)
 
 MACHINE_CONFIG_START(icatel_state::icatel)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(2'097'152))
-	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
-	MCFG_DEVICE_DATA_MAP(i80c31_data)
-	MCFG_DEVICE_IO_MAP(i80c31_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, icatel_state, i80c31_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, icatel_state, i80c31_p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, icatel_state, i80c31_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, icatel_state, i80c31_p3_w))
+	I80C31(config, m_maincpu, XTAL(2'097'152));
+	m_maincpu->set_addrmap(AS_PROGRAM, &icatel_state::i80c31_prg);
+	m_maincpu->set_addrmap(AS_DATA, &icatel_state::i80c31_data);
+	m_maincpu->set_addrmap(AS_IO, &icatel_state::i80c31_io);
+	m_maincpu->port_in_cb<1>().set(FUNC(icatel_state::i80c31_p1_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(icatel_state::i80c31_p1_w));
+	m_maincpu->port_in_cb<3>().set(FUNC(icatel_state::i80c31_p3_r));
+	m_maincpu->port_out_cb<3>().set(FUNC(icatel_state::i80c31_p3_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

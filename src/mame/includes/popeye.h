@@ -2,6 +2,7 @@
 // copyright-holders:smf, Nicola Salmoria, Couriersud
 // thanks-to: Marc Lafontaine
 
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
 #include "emupal.h"
@@ -26,7 +27,7 @@ public:
 	virtual void config(machine_config &config);
 
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<ay8910_device> m_aysnd;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -67,7 +68,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void driver_start() override;
 	virtual void video_start() override;
-	virtual DECLARE_PALETTE_INIT(palette_init);
+	virtual DECLARE_PALETTE_INIT(tnx1);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void update_palette();
@@ -86,7 +87,7 @@ class tpp1_state : public tnx1_state
 {
 	using tnx1_state::tnx1_state;
 protected:
-	virtual DECLARE_PALETTE_INIT(palette_init) override;
+	virtual DECLARE_PALETTE_INIT(tnx1) override;
 	virtual void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	static const res_net_info tpp1_bak_mb7051_net_info;

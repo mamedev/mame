@@ -504,59 +504,57 @@ static void samcoupe_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
-
-MACHINE_CONFIG_START(samcoupe_state::samcoupe)
+void samcoupe_state::samcoupe(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1 / 4) /* 6 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(samcoupe_mem)
-	MCFG_DEVICE_IO_MAP(samcoupe_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", samcoupe_state,  samcoupe_frame_interrupt)
-
+	Z80(config, m_maincpu, SAMCOUPE_XTAL_X1 / 4); /* 6 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &samcoupe_state::samcoupe_mem);
+	m_maincpu->set_addrmap(AS_IO, &samcoupe_state::samcoupe_io);
+	m_maincpu->set_vblank_int("screen", FUNC(samcoupe_state::samcoupe_frame_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(SAMCOUPE_XTAL_X1/2, SAM_TOTAL_WIDTH, 0, SAM_BORDER_LEFT + SAM_SCREEN_WIDTH + SAM_BORDER_RIGHT, SAM_TOTAL_HEIGHT, 0, SAM_BORDER_TOP + SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM)
-	MCFG_SCREEN_UPDATE_DRIVER(samcoupe_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(SAMCOUPE_XTAL_X1/2, SAM_TOTAL_WIDTH,  0, SAM_BORDER_LEFT + SAM_SCREEN_WIDTH + SAM_BORDER_RIGHT,
+										  SAM_TOTAL_HEIGHT, 0, SAM_BORDER_TOP + SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM);
+	m_screen->set_screen_update(FUNC(samcoupe_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 128)
-	MCFG_PALETTE_INIT_OWNER(samcoupe_state, samcoupe)
+	PALETTE(config, "palette", 128).set_init(FUNC(samcoupe_state::palette_init_samcoupe));
 
 	/* devices */
-	MCFG_DEVICE_ADD(m_lpt1, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, samcoupe_state, write_lpt1_busy))
+	CENTRONICS(config, m_lpt1, centronics_devices, "printer");
+	m_lpt1->busy_handler().set(FUNC(samcoupe_state::write_lpt1_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt1_data_out", "lpt1")
+	output_latch_device &lpt1_data_out(OUTPUT_LATCH(config, "lpt1_data_out"));
+	m_lpt1->set_output_latch(lpt1_data_out);
 
-	MCFG_DEVICE_ADD(m_lpt2, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, samcoupe_state, write_lpt2_busy))
+	CENTRONICS(config, m_lpt2, centronics_devices, "printer");
+	m_lpt2->busy_handler().set(FUNC(samcoupe_state::write_lpt2_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt2_data_out", "lpt2")
+	output_latch_device &lpt2_data_out(OUTPUT_LATCH(config, "lpt2_data_out"));
+	m_lpt2->set_output_latch(lpt2_data_out);
 
-	MCFG_DEVICE_ADD("sambus_clock", MSM6242, 32.768_kHz_XTAL)
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(tzx_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("samcoupe_cass")
+	MSM6242(config, m_rtc, 32.768_kHz_XTAL);
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","samcoupe_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(tzx_cassette_formats);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED));
+	m_cassette->set_interface("samcoupe_cass");
+	SOFTWARE_LIST(config, "cass_list").set_original("samcoupe_cass");
 
 	WD1772(config, m_fdc, SAMCOUPE_XTAL_X1/3);
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","samcoupe_flop")
+	FLOPPY_CONNECTOR(config, "wd1772:0", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1772:1", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("samcoupe_flop");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SAA1099_ADD("saa1099", SAMCOUPE_XTAL_X1/3) /* 8 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SAA1099(config, "saa1099", SAMCOUPE_XTAL_X1/3).add_route(ALL_OUTPUTS, "mono", 0.50); /* 8 MHz */
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("256K,1280K,1536K,2304K,2560K,3328K,3584K,4352K,4608K");
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

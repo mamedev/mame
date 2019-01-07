@@ -89,7 +89,7 @@ PALETTE_INIT_MEMBER(quasar_state,quasar)
 }
 
 
-VIDEO_START_MEMBER(quasar_state,quasar)
+void quasar_state::video_start()
 {
 	m_effectram = std::make_unique<uint8_t[]>(0x400);
 

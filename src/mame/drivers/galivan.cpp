@@ -484,7 +484,7 @@ MACHINE_CONFIG_START(dangarj_state::dangarj)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(dangarj_io_map)
 
-	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(8'000'000)) // divided by 2 maybe
+	NB1412M2(config, m_prot, XTAL(8'000'000)); // divided by 2 maybe
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galivan_state::ninjemak)

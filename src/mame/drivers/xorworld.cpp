@@ -152,19 +152,20 @@ static GFXDECODE_START( gfx_xorworld )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(xorworld_state::xorworld)
+void xorworld_state::xorworld(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   // 10 MHz
-	MCFG_DEVICE_PROGRAM_MAP(xorworld_map)
-	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xorworld_state, irq6_line_assert) // irq 4 or 6
-	//MCFG_DEVICE_PERIODIC_INT_DRIVER(xorworld_state, irq2_line_assert, 3*60) //timed irq, unknown timing
+	M68000(config, m_maincpu, 10000000);   // 10 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &xorworld_state::xorworld_map);
+	//m_maincpu->set_vblank_int("screen", FUNC(xorworld_state::irq6_line_assert)); // irq 4 or 6
+	//m_maincpu->set_periodic_int(FUNC(xorworld_state::irq2_line_assert), attotime::from_hz(3*60)); //timed irq, unknown timing
 	// Simple fix - but this sounds good!! -Valley Bell
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xorworld_state, irq2_line_assert) // irq 4 or 6
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(xorworld_state, irq6_line_assert, 3*60) //timed irq, unknown timing
+	m_maincpu->set_vblank_int("screen", FUNC(xorworld_state::irq2_line_assert)); // irq 4 or 6
+	m_maincpu->set_periodic_int(FUNC(xorworld_state::irq6_line_assert), attotime::from_hz(3*60)); //timed irq, unknown timing
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<4>().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)); // CS (active low)
@@ -172,24 +173,22 @@ MACHINE_CONFIG_START(xorworld_state::xorworld)
 	mainlatch.q_out_cb<6>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)); // EEPROM data (DIN)
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(xorworld_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(xorworld_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xorworld)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(xorworld_state, xorworld)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xorworld);
+	PALETTE(config, m_palette, 256);
+	m_palette->set_init(FUNC(xorworld_state::palette_init_xorworld));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_SAA1099_ADD("saa", 8000000 /* guess */)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SAA1099(config, "saa", 8000000 /* guess */).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( xorworld )

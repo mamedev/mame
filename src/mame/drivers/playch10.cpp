@@ -644,7 +644,8 @@ WRITE_LINE_MEMBER(playch10_state::vblank_irq)
 	}
 }
 
-MACHINE_CONFIG_START(playch10_state::playch10)
+void playch10_state::playch10(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, 8000000/2); // 4 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &playch10_state::bios_map);
@@ -669,23 +670,22 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	outlatch2.parallel_out_cb().set(FUNC(playch10_state::cart_sel_w)).rshift(3).mask(0x0f);
 
 	// video hardware
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_playch10)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(playch10_state, playch10)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_playch10);
+	PALETTE(config, "palette", 256).set_init(FUNC(playch10_state::palette_init_playch10));
 	config.set_default_layout(layout_playch10);
 
-	MCFG_SCREEN_ADD("top", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_top)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, playch10_state, vblank_irq))
+	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
+	top.set_refresh_hz(60);
+	top.set_size(32*8, 262);
+	top.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	top.set_screen_update(FUNC(playch10_state::screen_update_playch10_top));
+	top.screen_vblank().set(FUNC(playch10_state::vblank_irq));
 
-	MCFG_SCREEN_ADD("bottom", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_bottom)
+	screen_device &bottom(SCREEN(config, "bottom", SCREEN_TYPE_RASTER));
+	bottom.set_refresh_hz(60);
+	bottom.set_size(32*8, 262);
+	bottom.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	bottom.set_screen_update(FUNC(playch10_state::screen_update_playch10_bottom));
 
 	PPU_2C03B(config, m_ppu, 0);
 	m_ppu->set_screen("bottom");
@@ -696,7 +696,7 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	SPEAKER(config, "mono").front_center();
 
 	RP5H01(config, m_rp5h01, 0);
-MACHINE_CONFIG_END
+}
 
 void playch10_state::playchnv(machine_config &config)
 {
@@ -704,11 +704,12 @@ void playch10_state::playchnv(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
-MACHINE_CONFIG_START(playch10_state::playch10_hboard)
+void playch10_state::playch10_hboard(machine_config &config)
+{
 	playch10(config);
 	MCFG_VIDEO_START_OVERRIDE(playch10_state,playch10_hboard)
 	MCFG_MACHINE_START_OVERRIDE(playch10_state,playch10_hboard)
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 
@@ -725,7 +726,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD_BIOS( 0, "pch1-c__8t_e-2.8t", 0x00000, 0x4000, CRC(d52fa07a) SHA1(55cabf52ae10c050c2229081a80b9fe5454ab8c5) ) \
 	ROM_SYSTEM_BIOS( 1, "single", "Single Monitor Version" ) \
 	ROM_LOAD_BIOS( 1, "pck1-c.8t", 0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0) ) \
-	ROM_SYSTEM_BIOS( 2, "alt", "Alt Bios" ) /* this bios doens't work properly, selecting service mode causes it to hang, is it good? maybe different hw? */ \
+	ROM_SYSTEM_BIOS( 2, "alt", "Alt Bios" ) /* this bios doesn't work properly, selecting service mode causes it to hang, is it good? maybe different hw? */ \
 	ROM_LOAD_BIOS( 2, "pch1-c_8te.8t", 0x00000, 0x4000, CRC(123ffa37) SHA1(3bef754a5a85a8498bb6222ddf5cb9021f264db5) ) \
 	ROM_SYSTEM_BIOS( 3, "singleb", "Single Monitor Version (Newer?)" ) /* Newer single screen? Four bytes different, reported bugfix in freeplay */ \
 	ROM_LOAD_BIOS( 3, "pck1-c_fix.8t", 0x00000, 0x4000, CRC(0be8ceb4) SHA1(45b127a537370226e6b30be2b5a92ad05673ca7f) )

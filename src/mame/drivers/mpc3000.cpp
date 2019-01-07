@@ -216,7 +216,7 @@ void mpc3000_state::mpc3000(machine_config &config)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(mpc3000_state, mpc3000)
 
-	UPD72065(config, m_fdc, 0, true, true); // TODO: upd72068 supports motor control
+	UPD72065(config, m_fdc, 16_MHz_XTAL, true, true); // clocked by V53 CLKOUT (TODO: upd72068 supports motor control)
 	//m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(v53a_device::ir?_w));
 	//m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v53a_device::drq?_w));
 

@@ -23,7 +23,7 @@ the PCB, which go so far as to include the standard 8224 clock generator.
 #include "video/tms9927.h"
 #include "screen.h"
 
-#define CHAR_WIDTH 7
+#define AMPEX_CH_WIDTH 7
 
 class ampex_state : public driver_device
 {
@@ -364,11 +364,11 @@ void ampex_state::ampex(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ampex_state::mem_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(23.814_MHz_XTAL / 2, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 250);
+	screen.set_raw(23.814_MHz_XTAL / 2, 105 * AMPEX_CH_WIDTH, 0, 80 * AMPEX_CH_WIDTH, 270, 0, 250);
 	screen.set_screen_update(FUNC(ampex_state::screen_update));
 
-	CRT5037(config, m_vtac, 23.814_MHz_XTAL / 2 / CHAR_WIDTH);
-	m_vtac->set_char_width(CHAR_WIDTH);
+	CRT5037(config, m_vtac, 23.814_MHz_XTAL / 2 / AMPEX_CH_WIDTH);
+	m_vtac->set_char_width(AMPEX_CH_WIDTH);
 	m_vtac->vsyn_callback().set(FUNC(ampex_state::vsyn_w));
 	m_vtac->set_screen("screen");
 

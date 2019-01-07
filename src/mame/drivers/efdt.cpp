@@ -221,7 +221,7 @@ TILE_GET_INFO_MEMBER(efdt_state::get_tile_info_1)
 	SET_TILE_INFO_MEMBER(1, code, 0x1c, 0);
 }
 
-VIDEO_START_MEMBER(efdt_state, efdt)
+void efdt_state::video_start()
 {
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(efdt_state::get_tile_info_0), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(efdt_state::get_tile_info_1), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -576,8 +576,6 @@ MACHINE_CONFIG_START( efdt_state::efdt )
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_efdt)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(efdt_state, efdt)
-
-	MCFG_VIDEO_START_OVERRIDE(efdt_state, efdt)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

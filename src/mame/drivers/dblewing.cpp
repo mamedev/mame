@@ -94,7 +94,7 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_deco_tilegen1(*this, "tilegen1"),
+		m_deco_tilegen(*this, "tilegen"),
 		m_deco104(*this, "ioprot"),
 		m_sprgen(*this, "spritegen"),
 		m_soundlatch_pending(false)
@@ -114,7 +114,7 @@ private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<deco16ic_device> m_deco_tilegen1;
+	required_device<deco16ic_device> m_deco_tilegen;
 	required_device<deco104_device> m_deco104;
 	required_device<decospr_device> m_sprgen;
 
@@ -139,17 +139,17 @@ private:
 uint32_t dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = generic_space();
-	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(BIT(flip, 7));
-	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
+	m_deco_tilegen->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
 	bitmap.fill(0, cliprect); /* not Confirmed */
 	screen.priority().fill(0);
 
-	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
+	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }
@@ -180,8 +180,8 @@ void dblewing_state::dblewing_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
-	map(0x100000, 0x100fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x102000, 0x102fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x100000, 0x100fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x102000, 0x102fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x104000, 0x104fff).ram().share("pf1_rowscroll");
 	map(0x106000, 0x106fff).ram().share("pf2_rowscroll");
 
@@ -191,7 +191,7 @@ void dblewing_state::dblewing_map(address_map &map)
 
 	map(0x284000, 0x284001).ram();
 	map(0x288000, 0x288001).ram();
-	map(0x28c000, 0x28c00f).ram().w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x28c000, 0x28c00f).ram().w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
 	map(0x300000, 0x3007ff).ram().share("spriteram");
 	map(0x320000, 0x3207ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xff0000, 0xff3fff).mirror(0xc000).ram();
@@ -383,26 +383,26 @@ MACHINE_CONFIG_START(dblewing_state::dblewing)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dblewing)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x10)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(dblewing_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(dblewing_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen, 0);
+	m_deco_tilegen->set_split(0);
+	m_deco_tilegen->set_pf1_size(DECO_64x32);
+	m_deco_tilegen->set_pf2_size(DECO_64x32);
+	m_deco_tilegen->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen->set_pf1_col_bank(0x00);
+	m_deco_tilegen->set_pf2_col_bank(0x10);
+	m_deco_tilegen->set_pf1_col_mask(0x0f);
+	m_deco_tilegen->set_pf2_col_mask(0x0f);
+	m_deco_tilegen->set_bank1_callback(FUNC(dblewing_state::bank_callback), this);
+	m_deco_tilegen->set_bank2_callback(FUNC(dblewing_state::bank_callback), this);
+	m_deco_tilegen->set_pf12_8x8_bank(0);
+	m_deco_tilegen->set_pf12_16x16_bank(1);
+	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(2)
-	MCFG_DECO_SPRITE_PRIORITY_CB(dblewing_state, pri_callback)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(2);
+	m_sprgen->set_pri_callback(FUNC(dblewing_state::pri_callback), this);
+	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	DECO104PROT(config, m_deco104, 0);
 	m_deco104->port_a_cb().set_ioport("INPUTS");

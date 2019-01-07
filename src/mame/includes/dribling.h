@@ -5,6 +5,10 @@
     Model Racing Dribbling hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_DRIBLING_H
+#define MAME_INCLUDES_DRIBLING_H
+
+#pragma once
 
 #include "machine/i8255.h"
 #include "machine/watchdog.h"
@@ -13,16 +17,21 @@
 class dribling_state : public driver_device
 {
 public:
-	dribling_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dribling_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_ppi8255_0(*this, "ppi8255_0"),
 		m_ppi8255_1(*this, "ppi8255_1"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"){ }
+		m_colorram(*this, "colorram")
+	{ }
 
 	void dribling(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	/* devices */
@@ -51,11 +60,11 @@ private:
 	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_WRITE8_MEMBER(shr_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(dribling);
 	uint32_t screen_update_dribling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(dribling_irq_gen);
 	void dribling_map(address_map &map);
 	void io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DRIBLING_H

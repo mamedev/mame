@@ -2928,7 +2928,7 @@ void taitof2_state::taito_f2_te7750(machine_config &config)
 {
 	taito_f2(config);
 
-	te7750_device &te7750(TE7750(config, "te7750", 0));
+	te7750_device &te7750(TE7750(config, "te7750"));
 	te7750.in_port1_cb().set_ioport("DSWA");
 	te7750.in_port2_cb().set_ioport("DSWB");
 	te7750.in_port3_cb().set_ioport("IN2");
@@ -3372,7 +3372,7 @@ MACHINE_CONFIG_START(taitof2_state::ninjak)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ninjak_map)
 
-	te7750_device &te7750(TE7750(config, "te7750", 0));
+	te7750_device &te7750(TE7750(config, "te7750"));
 	te7750.in_port1_cb().set_ioport("DSWA");
 	te7750.in_port2_cb().set_ioport("DSWB");
 	te7750.in_port3_cb().set_ioport("IN0");

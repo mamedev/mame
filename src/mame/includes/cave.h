@@ -100,6 +100,9 @@ private:
 	void (cave_state::*m_get_sprite_info)(int chip);
 	void (cave_state::*m_sprite_draw)(int chip, int priority);
 
+	void add_base_config(machine_config &config);
+	void add_ymz(machine_config &config);
+
 	u16 irq_cause_r(offs_t offset);
 	u8 soundflags_r();
 	DECLARE_READ16_MEMBER(soundflags_ack_r);

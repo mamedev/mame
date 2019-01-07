@@ -535,22 +535,23 @@ uint32_t mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-MACHINE_CONFIG_START(mrgame_state::mrgame)
+void mrgame_state::mrgame(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 6_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mrgame_state, irq1_line_hold, 183)
+	M68000(config, m_maincpu, 6_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mrgame_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(mrgame_state::irq1_line_hold), attotime::from_hz(183));
 
-	MCFG_DEVICE_ADD("videocpu", Z80, 18.432_MHz_XTAL / 6)
-	MCFG_DEVICE_PROGRAM_MAP(video_map)
+	Z80(config, m_videocpu, 18.432_MHz_XTAL / 6);
+	m_videocpu->set_addrmap(AS_PROGRAM, &mrgame_state::video_map);
 
-	MCFG_DEVICE_ADD("audiocpu1", Z80, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(audio1_map)
-	MCFG_DEVICE_IO_MAP(audio1_io)
+	Z80(config, m_audiocpu1, 4_MHz_XTAL);
+	m_audiocpu1->set_addrmap(AS_PROGRAM, &mrgame_state::audio1_map);
+	m_audiocpu1->set_addrmap(AS_IO, &mrgame_state::audio1_io);
 
-	MCFG_DEVICE_ADD("audiocpu2", Z80, 4_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(audio2_map)
-	MCFG_DEVICE_IO_MAP(audio2_io)
+	Z80(config, m_audiocpu2, 4_MHz_XTAL);
+	m_audiocpu2->set_addrmap(AS_PROGRAM, &mrgame_state::audio2_map);
+	m_audiocpu2->set_addrmap(AS_IO, &mrgame_state::audio2_io);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5564 (x2) + battery
 
@@ -565,53 +566,57 @@ MACHINE_CONFIG_START(mrgame_state::mrgame)
 	//watchdog.set_vblank_count("screen", 8);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 8, 248) // If you align with X on test screen some info is chopped off
-	MCFG_SCREEN_UPDATE_DRIVER(mrgame_state, screen_update_mrgame)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mrgame_state, vblank_nmi_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 8, 248); // If you align with X on test screen some info is chopped off
+	screen.set_screen_update(FUNC(mrgame_state::screen_update_mrgame));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(mrgame_state::vblank_nmi_w));
 
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INIT_OWNER(mrgame_state, mrgame)
+	PALETTE(config, m_palette, 64).set_init(FUNC(mrgame_state::palette_init_mrgame));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mrgame)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mrgame);
 
 	/* Sound */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("dacvol", DAC_8BIT_R2R, 0) // unknown DAC
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dacvol", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dacvol", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 
-	MCFG_DEVICE_ADD("tms", TMS5220, 672000) // uses a RC combination. 672k copied from jedi.h
-	MCFG_TMS52XX_READYQ_HANDLER(INPUTLINE("audiocpu2", Z80_INPUT_LINE_BOGUSWAIT))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	dac_8bit_r2r_device &dacvol(DAC_8BIT_R2R(config, "dacvol", 0)); // unknown DAC
+	dacvol.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	dacvol.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	dacvol.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	dacvol.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dacvol", -1.0, DAC_VREF_NEG_INPUT);
+
+	tms5220_device &tms(TMS5220(config, "tms", 672000)); // uses a RC combination. 672k copied from jedi.h
+	tms.ready_cb().set_inputline("audiocpu2", Z80_INPUT_LINE_BOGUSWAIT);
+	tms.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	tms.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	/* Devices */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", mrgame_state, irq_timer, attotime::from_hz(16000)) //ugh
+	TIMER(config, "irq_timer").configure_periodic(FUNC(mrgame_state::irq_timer), attotime::from_hz(16000)); //ugh
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.in_pa_callback().set(FUNC(mrgame_state::porta_r));
 	ppi.out_pb_callback().set(FUNC(mrgame_state::portb_w));
 	ppi.in_pc_callback().set(FUNC(mrgame_state::portc_r));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mrgame_state::wcup90)
+void mrgame_state::wcup90(machine_config &config)
+{
 	mrgame(config);
 
-	MCFG_DEVICE_MODIFY("videocpu")
-	MCFG_DEVICE_PROGRAM_MAP(wcup90_video_map)
+	m_videocpu->set_addrmap(AS_PROGRAM, &mrgame_state::wcup90_video_map);
 
 	m_selectlatch->q_out_cb<1>().set(FUNC(mrgame_state::intst_w)); // U48
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mrgame_state, vblank_int_w))
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(mrgame_state::vblank_int_w));
+}
 
 /*-------------------------------------------------------------------
 / Dakar (06/1988)

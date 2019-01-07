@@ -211,36 +211,36 @@ void mtxl_state::cdrom(device_t *device)
 }
 #endif
 
-MACHINE_CONFIG_START(mtxl_state::at486)
-	MCFG_DEVICE_ADD(m_maincpu, I486DX4, 33000000)
-	MCFG_DEVICE_PROGRAM_MAP(at32_map)
-	MCFG_DEVICE_IO_MAP(at32_io)
+void mtxl_state::at486(machine_config &config)
+{
+	I486DX4(config, m_maincpu, 33000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mtxl_state::at32_map);
+	m_maincpu->set_addrmap(AS_IO, &mtxl_state::at32_io);
 #ifndef REAL_PCI_CHIPSET
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("mb", AT_MB, 0)
+	AT_MB(config, "mb", 0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
-	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ide", true) // FIXME: determine ISA bus clock
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ide", cdrom)
-	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "svga_dm", true) // original is a gd-5440
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "ide", true).set_option_machine_config("ide", cdrom); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_dm", true); // original is a gd-5440
 
 	ns16550_device &uart(NS16550(config, "ns16550", XTAL(1'843'200)));
 	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 	uart.out_int_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir4_w));
 
-	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE(uart, ins8250_uart_device, rx_w))
+	MICROTOUCH(config, "microtouch", 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w));
 
-	MCFG_DEVICE_ADD("cs4231", AD1848, 0)
-	MCFG_AD1848_IRQ_CALLBACK(WRITELINE("mb:pic8259_master", pic8259_device, ir5_w))
-	MCFG_AD1848_DRQ_CALLBACK(WRITELINE("mb:dma8237_1", am9517a_device, dreq1_w))
+	ad1848_device &cs4231(AD1848(config, "cs4231", 0));
+	cs4231.irq().set("mb:pic8259_master", FUNC(pic8259_device::ir5_w));
+	cs4231.drq().set("mb:dma8237_1", FUNC(am9517a_device::dreq1_w));
 
 	subdevice<am9517a_device>("mb:dma8237_1")->out_iow_callback<1>().set("cs4231", FUNC(ad1848_device::dack_w));
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
-	MCFG_DEVICE_REMOVE("mb:keybc");
-	MCFG_DEVICE_REMOVE("mb:pc_kbdc");
+	config.device_remove("mb:keybc");
+	config.device_remove("mb:pc_kbdc");
 	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
 	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_AT386);
 	kbdc.system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
@@ -261,14 +261,15 @@ MACHINE_CONFIG_START(mtxl_state::at486)
 	AMD_29F040(config, "flash");
 
 	/* Security key */
-	MCFG_DS1205_ADD("multikey")
+	DS1205(config, "multikey");
 
 #ifdef REAL_PCI_CHIPSET
 	/* PCI root */
-	MCFG_PCI_ROOT_ADD(":pci")
-	MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
+	PCI_ROOT(config, ":pci");
+	// FIXME: This MCFG fragment does not compile. -R
+	//MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
 #endif
-MACHINE_CONFIG_END
+}
 
 #ifdef REAL_PCI_CHIPSET
 #define MOTHERBOARD_ROMS \

@@ -383,13 +383,12 @@ WRITE_LINE_MEMBER(pengo_state::vblank_irq)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-
-MACHINE_CONFIG_START(pengo_state::pengo)
-
+void pengo_state::pengo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)
-	MCFG_DEVICE_PROGRAM_MAP(pengo_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pengo_state::pengo_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &pengo_state::decrypted_opcodes_map);
 
 	LS259(config, m_latch); // U27
 	m_latch->q_out_cb<0>().set(FUNC(pengo_state::irq_mask_w));
@@ -404,56 +403,56 @@ MACHINE_CONFIG_START(pengo_state::pengo)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pengo)
-	MCFG_PALETTE_ADD("palette", 128*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(pengo_state,pacman)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pengo);
+	PALETTE(config, m_palette, 128*4);
+	m_palette->set_indirect_entries(32);
+	m_palette->set_init(FUNC(pengo_state::palette_init_pacman));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(pengo_state, screen_update_pacman)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pengo_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(pengo_state::screen_update_pacman));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(pengo_state::vblank_irq));
 
 	MCFG_VIDEO_START_OVERRIDE(pengo_state,pengo)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
-	MCFG_NAMCO_AUDIO_VOICES(3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	NAMCO(config, m_namco_sound, MASTER_CLOCK/6/32);
+	m_namco_sound->set_voices(3);
+	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(pengo_state::pengou)
+void pengo_state::pengou(machine_config &config)
+{
 	pengo(config);
+	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
+}
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(pengo_state::pengoe)
+void pengo_state::pengoe(machine_config &config)
+{
 	pengo(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5010, MASTER_CLOCK/6)
-	MCFG_DEVICE_PROGRAM_MAP(pengo_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5010_device &maincpu(SEGA_315_5010(config.replace(), m_maincpu, MASTER_CLOCK/6));
+	maincpu.set_addrmap(AS_PROGRAM, &pengo_state::pengo_map);
+	maincpu.set_addrmap(AS_OPCODES, &pengo_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(pengo_state::jrpacmbl)
+void pengo_state::jrpacmbl(machine_config &config)
+{
 	pengo(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(jrpacmbl_map)
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pengo_state::jrpacmbl_map);
+	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
 
 	m_latch->q_out_cb<4>().set(FUNC(pengo_state::jrpacman_bgpriority_w));
 	m_latch->q_out_cb<5>().set(FUNC(pengo_state::jrpacman_spritebank_w));
 	m_latch->q_out_cb<7>().set(FUNC(pengo_state::jrpacman_charbank_w));
 
 	MCFG_VIDEO_START_OVERRIDE(pengo_state,jrpacman)
-MACHINE_CONFIG_END
+}
 
 
 

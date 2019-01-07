@@ -443,7 +443,7 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	MCFG_HD44780_LCD_SIZE(2, 16)
 
 	/* sound hardware */
-	MCFG_ALESIS_DM3AG_ADD("dm3ag", 12_MHz_XTAL/2)
+	ALESIS_DM3AG(config, "dm3ag", 12_MHz_XTAL/2);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
@@ -467,7 +467,8 @@ MACHINE_CONFIG_START(alesis_state::sr16)
 	MCFG_HD44780_PIXEL_UPDATE_CB(alesis_state, sr16_pixel_update)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(alesis_state::mmt8)
+void alesis_state::mmt8(machine_config &config)
+{
 	hr16(config);
 
 	/* basic machine hardware */
@@ -476,8 +477,8 @@ MACHINE_CONFIG_START(alesis_state::mmt8)
 	m_maincpu->port_in_cb<3>().set(FUNC(alesis_state::mmt8_p3_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(alesis_state::mmt8_p3_w));
 
-	MCFG_DEVICE_REMOVE("dm3ag")
-MACHINE_CONFIG_END
+	config.device_remove("dm3ag");
+}
 
 /* ROM definition */
 ROM_START( hr16 )

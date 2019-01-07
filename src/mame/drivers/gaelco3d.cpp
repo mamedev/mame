@@ -149,7 +149,6 @@ REF. 970429
 #include "includes/gaelco3d.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/tms32031/tms32031.h"
 #include "emupal.h"
 
 #include "speaker.h"
@@ -922,31 +921,31 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
-
+void gaelco3d_state::gaelco3d(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M68000, 15000000)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco3d_state,  vblank_gen)
+	M68000(config, m_maincpu, 15000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco3d_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gaelco3d_state::vblank_gen));
 
-	MCFG_DEVICE_ADD(m_tms, TMS32031, 60000000)
-	MCFG_DEVICE_PROGRAM_MAP(tms_map)
-	MCFG_TMS3203X_MCBL(true)
-	MCFG_TMS3203X_IACK_CB(WRITE8(*this, gaelco3d_state, tms_iack_w))
+	TMS32031(config, m_tms, 60000000);
+	m_tms->set_addrmap(AS_PROGRAM, &gaelco3d_state::tms_map);
+	m_tms->set_mcbl_mode(true);
+	m_tms->iack().set(FUNC(gaelco3d_state::tms_iack_w));
 
-	MCFG_DEVICE_ADD(m_adsp, ADSP2115, 16000000)
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(*this, gaelco3d_state, adsp_tx_callback))
-	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
-	MCFG_DEVICE_DATA_MAP(adsp_data_map)
+	ADSP2115(config, m_adsp, 16000000);
+	m_adsp->sport_tx().set(FUNC(gaelco3d_state::adsp_tx_callback));
+	m_adsp->set_addrmap(AS_PROGRAM, &gaelco3d_state::adsp_program_map);
+	m_adsp->set_addrmap(AS_DATA, &gaelco3d_state::adsp_data_map);
 
 	EEPROM_93C66_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_TIMER_DRIVER_ADD("adsp_timer", gaelco3d_state, adsp_autobuffer_irq)
+	TIMER(config, "adsp_timer").configure_generic(FUNC(gaelco3d_state::adsp_autobuffer_irq));
 
-	MCFG_DEVICE_ADD(m_serial, GAELCO_SERIAL, 0)
-	MCFG_GAELCO_SERIAL_IRQ_HANDLER(WRITELINE(*this, gaelco3d_state, ser_irq))
+	GAELCO_SERIAL(config, m_serial, 0);
+	m_serial->irq_handler().set(FUNC(gaelco3d_state::ser_irq));
 
 	LS259(config, m_mainlatch); // IC5 on bottom board next to EEPROM
 	m_mainlatch->q_out_cb<0>().set(m_serial, FUNC(gaelco_serial_device::tr_w));
@@ -970,46 +969,39 @@ MACHINE_CONFIG_START(gaelco3d_state::gaelco3d)
 	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_adsp, ADSP2115_IRQ2);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(576, 432)
-	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 431)
-	MCFG_SCREEN_UPDATE_DRIVER(gaelco3d_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(576, 432);
+	m_screen->set_visarea(0, 575, 0, 431);
+	m_screen->set_screen_update(FUNC(gaelco3d_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, "palette", 32768).set_init("palette", FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(m_dmadac[0], DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: front mono */
-
-	MCFG_DEVICE_ADD(m_dmadac[1], DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: left rear */
-
-	MCFG_DEVICE_ADD(m_dmadac[2], DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: right rear */
-
-	MCFG_DEVICE_ADD(m_dmadac[3], DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)  /* speedup: seat speaker */
-MACHINE_CONFIG_END
+	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "mono", 1.0);  /* speedup: front mono */
+	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "mono", 1.0);  /* speedup: left rear */
+	DMADAC(config, m_dmadac[2]).add_route(ALL_OUTPUTS, "mono", 1.0);  /* speedup: right rear */
+	DMADAC(config, m_dmadac[3]).add_route(ALL_OUTPUTS, "mono", 1.0);  /* speedup: seat speaker */
+}
 
 
-MACHINE_CONFIG_START(gaelco3d_state::gaelco3d2)
+void gaelco3d_state::gaelco3d2(machine_config &config)
+{
 	gaelco3d(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", M68EC020, 25000000)
-	MCFG_DEVICE_PROGRAM_MAP(main020_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco3d_state,  vblank_gen)
+	M68EC020(config.replace(), m_maincpu, 25000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco3d_state::main020_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gaelco3d_state::vblank_gen));
 
-	MCFG_DEVICE_MODIFY("tms")
-	MCFG_DEVICE_CLOCK(50000000)
+	m_tms->set_clock(50000000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(gaelco3d_state,gaelco3d2)
-MACHINE_CONFIG_END
+}
 
 void gaelco3d_state::footbpow(machine_config &config)
 {

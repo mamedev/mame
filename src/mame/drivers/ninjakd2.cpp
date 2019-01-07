@@ -434,8 +434,8 @@ void mnight_state::mnight_main_cpu(address_map &map)
 	map(0x8000, 0xbfff).bankr("mainbank");
 	map(0xc000, 0xd9ff).ram();
 	map(0xda00, 0xdfff).ram().share("spriteram");
-	map(0xe000, 0xe7ff).ram().w(FUNC(ninjakd2_state::ninjakd2_bgvideoram_w)).share("bg_videoram");
-	map(0xe800, 0xefff).ram().w(FUNC(ninjakd2_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(mnight_state::ninjakd2_bgvideoram_w)).share("bg_videoram");
+	map(0xe800, 0xefff).ram().w(FUNC(mnight_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
 	map(0xf000, 0xf5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf800, 0xf800).portr("KEYCOIN");
 	map(0xf801, 0xf801).portr("PAD1");
@@ -443,10 +443,10 @@ void mnight_state::mnight_main_cpu(address_map &map)
 	map(0xf803, 0xf803).portr("DIPSW1");
 	map(0xf804, 0xf804).portr("DIPSW2");
 	map(0xfa00, 0xfa00).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xfa01, 0xfa01).w(FUNC(ninjakd2_state::ninjakd2_soundreset_w));
-	map(0xfa02, 0xfa02).w(FUNC(ninjakd2_state::ninjakd2_bankselect_w));
-	map(0xfa03, 0xfa03).w(FUNC(ninjakd2_state::ninjakd2_sprite_overdraw_w));
-	map(0xfa08, 0xfa0c).w(FUNC(ninjakd2_state::ninjakd2_bg_ctrl_w));
+	map(0xfa01, 0xfa01).w(FUNC(mnight_state::ninjakd2_soundreset_w));
+	map(0xfa02, 0xfa02).w(FUNC(mnight_state::ninjakd2_bankselect_w));
+	map(0xfa03, 0xfa03).w(FUNC(mnight_state::ninjakd2_sprite_overdraw_w));
+	map(0xfa08, 0xfa0c).w(FUNC(mnight_state::ninjakd2_bg_ctrl_w));
 }
 
 
@@ -455,14 +455,14 @@ void robokid_state::robokid_main_cpu(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("mainbank");
 	map(0xc000, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xc800, 0xcfff).ram().w(FUNC(ninjakd2_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(robokid_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
 	map(0xd000, 0xd3ff).rw(FUNC(robokid_state::robokid_bg_videoram_r<2>), FUNC(robokid_state::robokid_bg_videoram_w<2>));   // banked
 	map(0xd400, 0xd7ff).rw(FUNC(robokid_state::robokid_bg_videoram_r<1>), FUNC(robokid_state::robokid_bg_videoram_w<1>));   // banked
 	map(0xd800, 0xdbff).rw(FUNC(robokid_state::robokid_bg_videoram_r<0>), FUNC(robokid_state::robokid_bg_videoram_w<0>));   // banked
 	map(0xdc00, 0xdc00).portr("KEYCOIN").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xdc01, 0xdc01).portr("PAD1").w(FUNC(ninjakd2_state::ninjakd2_soundreset_w));
-	map(0xdc02, 0xdc02).portr("PAD2").w(FUNC(ninjakd2_state::ninjakd2_bankselect_w));
-	map(0xdc03, 0xdc03).portr("DIPSW1").w(FUNC(ninjakd2_state::ninjakd2_sprite_overdraw_w));
+	map(0xdc01, 0xdc01).portr("PAD1").w(FUNC(robokid_state::ninjakd2_soundreset_w));
+	map(0xdc02, 0xdc02).portr("PAD2").w(FUNC(robokid_state::ninjakd2_bankselect_w));
+	map(0xdc03, 0xdc03).portr("DIPSW1").w(FUNC(robokid_state::ninjakd2_sprite_overdraw_w));
 	map(0xdc04, 0xdc04).portr("DIPSW2");
 	map(0xdd00, 0xdd04).w(FUNC(robokid_state::robokid_bg_ctrl_w<0>));
 	map(0xdd05, 0xdd05).w(FUNC(robokid_state::robokid_bg_bank_w<0>));
@@ -481,9 +481,9 @@ void omegaf_state::omegaf_main_cpu(address_map &map)
 	map(0x8000, 0xbfff).bankr("mainbank");
 	map(0xc000, 0xc000).portr("KEYCOIN").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc001, 0xc003).r(FUNC(omegaf_state::io_protection_r));
-	map(0xc001, 0xc001).w(FUNC(ninjakd2_state::ninjakd2_soundreset_w));
-	map(0xc002, 0xc002).w(FUNC(ninjakd2_state::ninjakd2_bankselect_w));
-	map(0xc003, 0xc003).w(FUNC(ninjakd2_state::ninjakd2_sprite_overdraw_w));
+	map(0xc001, 0xc001).w(FUNC(omegaf_state::ninjakd2_soundreset_w));
+	map(0xc002, 0xc002).w(FUNC(omegaf_state::ninjakd2_bankselect_w));
+	map(0xc003, 0xc003).w(FUNC(omegaf_state::ninjakd2_sprite_overdraw_w));
 	map(0xc004, 0xc006).w(FUNC(omegaf_state::io_protection_w));
 	map(0xc100, 0xc104).w(FUNC(omegaf_state::robokid_bg_ctrl_w<0>));
 	map(0xc105, 0xc105).w(FUNC(omegaf_state::robokid_bg_bank_w<0>));
@@ -495,7 +495,7 @@ void omegaf_state::omegaf_main_cpu(address_map &map)
 	map(0xc400, 0xc7ff).rw(FUNC(omegaf_state::robokid_bg_videoram_r<0>), FUNC(omegaf_state::robokid_bg_videoram_w<0>));   // banked
 	map(0xc800, 0xcbff).rw(FUNC(omegaf_state::robokid_bg_videoram_r<1>), FUNC(omegaf_state::robokid_bg_videoram_w<1>));   // banked
 	map(0xcc00, 0xcfff).rw(FUNC(omegaf_state::robokid_bg_videoram_r<2>), FUNC(omegaf_state::robokid_bg_videoram_w<2>));   // banked
-	map(0xd000, 0xd7ff).ram().w(FUNC(ninjakd2_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(omegaf_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
 	map(0xd800, 0xdfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xe000, 0xf9ff).ram();
 	map(0xfa00, 0xffff).ram().share("spriteram");
@@ -966,133 +966,129 @@ void omegaf_state::machine_reset()
 
 /*****************************************************************************/
 
-MACHINE_CONFIG_START(ninjakd2_state::ninjakd2_core)
-
+void ninjakd2_state::ninjakd2_core(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK_12/2)       /* verified */
-	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_main_cpu)
+	Z80(config, m_maincpu, MAIN_CLOCK_12/2); /* verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ninjakd2_state::ninjakd2_main_cpu);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, MAIN_CLOCK_5)     /* verified */
-	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_sound_cpu)
-	MCFG_DEVICE_IO_MAP(ninjakd2_sound_io)
+	Z80(config, m_soundcpu, MAIN_CLOCK_5);     /* verified */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &ninjakd2_state::ninjakd2_sound_cpu);
+	m_soundcpu->set_addrmap(AS_IO, &ninjakd2_state::ninjakd2_sound_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.61)    /* verified on pcb */
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ninjakd2_state, screen_update_ninjakd2)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ninjakd2_state, screen_vblank_ninjakd2))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.61);    /* verified on pcb */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(ninjakd2_state::screen_update_ninjakd2));
+	m_screen->screen_vblank().set(FUNC(ninjakd2_state::screen_vblank_ninjakd2));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ninjakd2)
-	MCFG_PALETTE_ADD("palette", 0x300)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ninjakd2);
+	PALETTE(config, m_palette, 0x300);
+	m_palette->set_format(PALETTE_FORMAT_RRRRGGGGBBBBxxxx);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("2203.1", YM2203, MAIN_CLOCK_12/8)       /* verified */
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-	MCFG_SOUND_ROUTE(1, "mono", 0.10)
-	MCFG_SOUND_ROUTE(2, "mono", 0.10)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym2203_1(YM2203(config, "2203.1", MAIN_CLOCK_12/8)); /* verified */
+	ym2203_1.irq_handler().set_inputline("soundcpu", 0);
+	ym2203_1.add_route(0, "mono", 0.10);
+	ym2203_1.add_route(1, "mono", 0.10);
+	ym2203_1.add_route(2, "mono", 0.10);
+	ym2203_1.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("2203.2", YM2203, MAIN_CLOCK_12/8)       /* verified */
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-	MCFG_SOUND_ROUTE(1, "mono", 0.10)
-	MCFG_SOUND_ROUTE(2, "mono", 0.10)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym2203_2(YM2203(config, "2203.2", MAIN_CLOCK_12/8)); /* verified */
+	ym2203_2.add_route(0, "mono", 0.10);
+	ym2203_2.add_route(1, "mono", 0.10);
+	ym2203_2.add_route(2, "mono", 0.10);
+	ym2203_2.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("pcm", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_START_CB(ninjakd2_state, ninjakd2_init_samples)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_pcm);
+	m_pcm->set_channels(1);
+	m_pcm->set_samples_start_callback(FUNC(ninjakd2_state::ninjakd2_init_samples));
+	m_pcm->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-MACHINE_CONFIG_START(ninjakd2_state::ninjakd2)
+void ninjakd2_state::ninjakd2(machine_config &config)
+{
 	ninjakd2_core(config);
-	MCFG_DEVICE_REPLACE("soundcpu", MC8123, MAIN_CLOCK_5)     /* verified */
-	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_sound_cpu)
-	MCFG_DEVICE_IO_MAP(ninjakd2_sound_io)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	MC8123(config.replace(), m_soundcpu, MAIN_CLOCK_5); /* verified */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &ninjakd2_state::ninjakd2_sound_cpu);
+	m_soundcpu->set_addrmap(AS_IO, &ninjakd2_state::ninjakd2_sound_io);
+	m_soundcpu->set_addrmap(AS_OPCODES, &ninjakd2_state::decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(ninjakd2_state::ninjakd2b)
+void ninjakd2_state::ninjakd2b(machine_config &config)
+{
 	ninjakd2_core(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_sound_cpu)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_soundcpu->set_addrmap(AS_PROGRAM, &ninjakd2_state::ninjakd2_sound_cpu);
+	m_soundcpu->set_addrmap(AS_OPCODES, &ninjakd2_state::decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(mnight_state::mnight)
+void mnight_state::mnight(machine_config &config)
+{
 	ninjakd2_core(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mnight_main_cpu)
-
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mnight_state::mnight_main_cpu);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &mnight_state::ninjakid_nopcm_sound_cpu);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mnight_state,mnight)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("pcm")
-MACHINE_CONFIG_END
+	config.device_remove("pcm");
+}
 
-MACHINE_CONFIG_START(mnight_state::arkarea)
+void mnight_state::arkarea(machine_config &config)
+{
 	mnight(config);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mnight_state,arkarea)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(robokid_state::robokid)
+void robokid_state::robokid(machine_config &config)
+{
 	mnight(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(robokid_main_cpu)
-
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+	m_maincpu->set_addrmap(AS_PROGRAM, &robokid_state::robokid_main_cpu);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &robokid_state::ninjakid_nopcm_sound_cpu);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_robokid)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x400)  // RAM is this large, but still only 0x300 colors used
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	m_gfxdecode->set_info(gfx_robokid);
+	m_palette->set_entries(0x400);  // RAM is this large, but still only 0x300 colors used
+	m_palette->set_format(PALETTE_FORMAT_RRRRGGGGBBBBxxxx);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	MCFG_VIDEO_START_OVERRIDE(robokid_state,robokid)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(robokid_state,screen_update_robokid)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(omegaf_state::omegaf)
+	m_screen->set_screen_update(FUNC(robokid_state::screen_update_robokid));
+}
+
+void omegaf_state::omegaf(machine_config &config)
+{
 	robokid(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(omegaf_main_cpu)
+	m_maincpu->set_addrmap(AS_PROGRAM, &omegaf_state::omegaf_main_cpu);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &omegaf_state::ninjakid_nopcm_sound_cpu);
 
 //  MCFG_MACHINE_START_OVERRIDE(ninjakd2_state,omegaf)
 //  MCFG_MACHINE_RESET_OVERRIDE(ninjakd2_state,omegaf)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(omegaf_state,omegaf)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(omegaf_state,screen_update_omegaf)
-MACHINE_CONFIG_END
+
+	m_screen->set_screen_update(FUNC(omegaf_state::screen_update_omegaf));
+}
 
 
 

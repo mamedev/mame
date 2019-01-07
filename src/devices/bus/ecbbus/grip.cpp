@@ -458,8 +458,8 @@ MACHINE_CONFIG_START(ecb_grip21_device::device_add_mconfig)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(ecb_grip21_device, kb_w))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(ecb_grip21_device::kb_w));
 MACHINE_CONFIG_END
 
 

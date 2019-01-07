@@ -16,7 +16,7 @@
         * Pairs Redemption (Child's version of pairs)
         * Driver's Edge (1 set)
         * World Class Bowling (13 sets)
-        * Street Fighter: The Movie (4 sets)
+        * Street Fighter: The Movie (5 sets)
         * Shuffleshot (3 sets)
         * Golden Tee 3D Golf (12 sets)
         * Golden Tee Golf '97 (7 sets)
@@ -2886,7 +2886,7 @@ ROM_START( sftm )   /* Version 1.12, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 RO
 ROM_END
 
 
-ROM_START( sftm111 )    /* Version 1.11, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board */
+ROM_START( sftm111 )   /* Version 1.11, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "sfm_0_v1.11.prom0", 0x00000, 0x40000, CRC(28187ddc) SHA1(7e4fa285be9389c913fca849098a7c0d9404df7a) ) /* CAPCOM labels */
 	ROM_LOAD32_BYTE( "sfm_1_v1.11.prom1", 0x00001, 0x40000, CRC(ec2ce6fa) SHA1(b79aebb73ba77c2ebe081142853e81473743ac46) )
@@ -2922,7 +2922,7 @@ ROM_START( sftm111 )    /* Version 1.11, P/N 1064 REV 1 Mainboard, P/N 1073 REV 
 ROM_END
 
 
-ROM_START( sftm110 )    /* Version 1.10, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board */
+ROM_START( sftm110 )   /* Version 1.10, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "sfm_0_v1.1.prom0", 0x00000, 0x40000, CRC(00c0c63c) SHA1(39f614cca51fe7843c2158b6d9abdc52dc1b0bef) ) /* CAPCOM labels */
 	ROM_LOAD32_BYTE( "sfm_1_v1.1.prom1", 0x00001, 0x40000, CRC(d4d2a67e) SHA1(88069caf171bb9c5602bc493f1f1dafa26d2fc78) )
@@ -2958,7 +2958,43 @@ ROM_START( sftm110 )    /* Version 1.10, P/N 1064 REV 1 Mainboard, P/N 1073 REV 
 ROM_END
 
 
-ROM_START( sftmj )  /* Version 1.12N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board  */
+ROM_START( sftmj114 )   /* Version 1.14N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board  */
+	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
+	ROM_LOAD32_BYTE( "sfmn_0_v1.14.prom0", 0x00000, 0x40000, CRC(2a0c0bb7) SHA1(5722a399ed5dff55d47e096fb04a5d5b16de2f9a) )
+	ROM_LOAD32_BYTE( "sfmn_1_v1.14.prom1", 0x00001, 0x40000, CRC(088aa12c) SHA1(3c488068edea7ee726b7b837fedeeb0374a7b1ac) )
+	ROM_LOAD32_BYTE( "sfmn_2_v1.14.prom2", 0x00002, 0x40000, CRC(7120836e) SHA1(219ca837d1396ec39bb08272d2d9060441e45daf) )
+	ROM_LOAD32_BYTE( "sfmn_3_v1.14.prom3", 0x00003, 0x40000, CRC(84eb200d) SHA1(84150d978bd0b9f6363adde35c74fc5c77af6cf1) )
+
+	ROM_REGION( 0x48000, "soundcpu", 0 )
+	ROM_LOAD( "sfm_snd_v1.11.u23", 0x10000, 0x38000, CRC(004854ed) SHA1(7ecb74dc3f45b038cc9904fea5c89d3e74fcbcf3) ) /* Labeled as "SFM SND V1.11 U23" */
+	ROM_CONTINUE(                  0x08000, 0x08000 )
+
+	ROM_REGION( 0x2080000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "rm0-0.grm0_0", 0x0000000, 0x400000, CRC(09ef29cb) SHA1(430da5b00554582391478849d5b1547fe12eedbe) ) /* KM 23C3200AG-12 mask ROMs */
+	ROM_LOAD32_BYTE( "rm0-1.grm0_1", 0x0000001, 0x400000, CRC(6f5910fa) SHA1(1979d19dd36a9118dfaf021e05302982be5dbe69) )
+	ROM_LOAD32_BYTE( "rm0-2.grm0_2", 0x0000002, 0x400000, CRC(b8a2add5) SHA1(62e5bef936f014ac836c0cd5322eaba7018496b4) )
+	ROM_LOAD32_BYTE( "rm0-3.grm0_3", 0x0000003, 0x400000, CRC(6b6ff867) SHA1(72bc95ef361f9238602f0e03aed0adac8b59d227) )
+	ROM_LOAD32_BYTE( "rm1-0.grm1_0", 0x1000000, 0x400000, CRC(d5d65f77) SHA1(0bbb83bb42a442ef157472f3243ab44efa0c0aa0) )
+	ROM_LOAD32_BYTE( "rm1-1.grm1_1", 0x1000001, 0x400000, CRC(90467e27) SHA1(217561664871c60b0193337e34020ddd336b8f15) )
+	ROM_LOAD32_BYTE( "rm1-2.grm1_2", 0x1000002, 0x400000, CRC(903e56c2) SHA1(843ed9855ffdf37b100b3c5614139d552fd9cd6d) )
+	ROM_LOAD32_BYTE( "rm1-3.grm1_3", 0x1000003, 0x400000, CRC(fac35686) SHA1(ba99ab265620575c14c46806dc543d1f9fd24462) )
+
+	/* GROM2_0 through GROM2_3 are unpopulated 23C32000 mask ROM locations */
+
+	ROM_LOAD32_BYTE( "sfm_grm3_0.grm3_0", 0x2000000, 0x020000, CRC(3e1f76f7) SHA1(8aefe376e7248a583a6af02e5f9b2a4b48cc91d7) )
+	ROM_LOAD32_BYTE( "sfm_grm3_1.grm3_1", 0x2000001, 0x020000, CRC(578054b6) SHA1(99201959de28dbfd7692cedea4485751d3d4788f) )
+	ROM_LOAD32_BYTE( "sfm_grm3_2.grm3_2", 0x2000002, 0x020000, CRC(9af2f698) SHA1(e679728d8eba9f09379e503fa380202cd9adfde1) )
+	ROM_LOAD32_BYTE( "sfm_grm3_3.grm3_3", 0x2000003, 0x020000, CRC(cd38d1d6) SHA1(0cea60d6897b34eeb13997030f6ee7e1dfb3c833) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "sfm_srom0.srom0", 0x000000, 0x200000, CRC(6ca1d3fc) SHA1(904f4c55a1bc83531a6d87ff706afd8cdfaee83b) ) /* Custom 42 Pin mask ROM sample set */
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.3", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "sfm_srom3.srom3", 0x000000, 0x080000, CRC(4f181534) SHA1(e858a33b22558665427146ec79dfba48edc20c2c) )
+ROM_END
+
+
+ROM_START( sftmj112 )   /* Version 1.12N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board  */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "sfmn_0_v1.12.prom0", 0x00000, 0x40000, CRC(640a04a8) SHA1(adc7f5880962cbcc5f9f28e72a84070da6e2ec36) ) /* CAPCOM labels */
 	ROM_LOAD32_BYTE( "sfmn_1_v1.12.prom1", 0x00001, 0x40000, CRC(2a27b690) SHA1(f63c3665ec030ecc2d7a10ead182941ade1c79d0) )
@@ -3029,7 +3065,7 @@ ROM_START( shufshot )   /* Version 1.40 (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
-ROM_START( shufshot139 )    /* Version 1.39 (PCB P/N 1083 Rev 2) */
+ROM_START( shufshot139 )   /* Version 1.39 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "shot_prom0_v1.39.prom0", 0x00000, 0x20000, CRC(e811fc4a) SHA1(9e1d8f64ac89ac865929f6a23f66d95eeeda3ac9) )
 	ROM_LOAD32_BYTE( "shot_prom1_v1.39.prom1", 0x00001, 0x20000, CRC(f9d120c5) SHA1(f94216f1fb6d810ddee98479e83f0719b30b768f) )
@@ -3064,7 +3100,7 @@ ROM_START( shufshot139 )    /* Version 1.39 (PCB P/N 1083 Rev 2) */
 ROM_END
 
 
-ROM_START( shufshot137 )    /* Version 1.37 (PCB P/N 1083 Rev 2) */
+ROM_START( shufshot137 )   /* Version 1.37 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "shot_prom0_v1.37.prom0", 0x00000, 0x20000, CRC(6499c76f) SHA1(60fdaefb09088ac609addd40569bd7fab12593bc) )
 	ROM_LOAD32_BYTE( "shot_prom1_v1.37.prom1", 0x00001, 0x20000, CRC(64fb47a4) SHA1(32ce9d91b16b8aaf545c0a22842ad8d806727a17) )
@@ -4660,7 +4696,8 @@ GAME( 1995, wcbowl10,     wcbowl,   bloodstm, wcbowl,   itech32_state,  init_wcb
 GAME( 1995, sftm,         0,        sftm,     sftm,     itech32_state,  init_sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
 GAME( 1995, sftm111,      sftm,     sftm,     sftm,     itech32_state,  init_sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.11)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
 GAME( 1995, sftm110,      sftm,     sftm,     sftm,     itech32_state,  init_sftm110,  ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.10)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
-GAME( 1995, sftmj,        sftm,     sftm,     sftm,     itech32_state,  init_sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12N, Japan)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1995, sftmj114,     sftm,     sftm,     sftm,     itech32_state,  init_sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.14N, Japan)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
+GAME( 1995, sftmj112,     sftm,     sftm,     sftm,     itech32_state,  init_sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12N, Japan)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSF-1 */
 GAME( 1997, shufshot,     0,        sftm,     shufshot, itech32_state,  init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.40)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
 GAME( 1997, shufshot139,  shufshot, sftm,     shufshot, itech32_state,  init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.39)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */
 GAME( 1997, shufshot137,  shufshot, sftm,     shufshto, itech32_state,  init_shufshot, ROT0, "Strata/Incredible Technologies",   "Shuffleshot (v1.37)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITSHF-1 */

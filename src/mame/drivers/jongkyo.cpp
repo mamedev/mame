@@ -513,15 +513,14 @@ void jongkyo_state::machine_reset()
 MACHINE_CONFIG_START(jongkyo_state::jongkyo)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SEGA_315_5084,JONGKYO_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(jongkyo_memmap)
-	MCFG_DEVICE_IO_MAP(jongkyo_portmap)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jongkyo_state,  irq0_line_hold)
-	MCFG_SEGACRPT_SET_SIZE(0x6c00)
-	MCFG_SEGACRPT_SET_NUMBANKS(8)
-	MCFG_SEGACRPT_SET_BANKSIZE(0x400)
-	//  sega_decode(rom, opcodes, 0x6c00, convtable, 8, 0x400);
+	sega_315_5084_device &maincpu(SEGA_315_5084(config, m_maincpu, JONGKYO_CLOCK/4));
+	maincpu.set_addrmap(AS_PROGRAM, &jongkyo_state::jongkyo_memmap);
+	maincpu.set_addrmap(AS_IO, &jongkyo_state::jongkyo_portmap);
+	maincpu.set_addrmap(AS_OPCODES, &jongkyo_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(jongkyo_state::irq0_line_hold));
+	maincpu.set_size(0x6c00);
+	maincpu.set_numbanks(8);
+	maincpu.set_banksize(0x400);
 
 
 	/* video hardware */

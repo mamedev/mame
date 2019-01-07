@@ -313,12 +313,12 @@ MACHINE_CONFIG_START(konmedal68k_state::kzaurus)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(konmedal68k_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(konmedal68k_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4dj, 1, 0);
+	m_k056832->set_palette(m_palette);
 
-	MCFG_K055555_ADD("k055555")
+	K055555(config, m_k055555, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

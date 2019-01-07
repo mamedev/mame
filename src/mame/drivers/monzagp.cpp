@@ -74,7 +74,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(time_tick_timer);
 	DECLARE_PALETTE_INIT(monzagp);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
+	required_device<i8035_device> m_maincpu;
 	required_device<dp8350_device> m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -502,12 +502,12 @@ static GFXDECODE_START( gfx_monzagp )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(monzagp_state::monzagp)
-	MCFG_DEVICE_ADD("maincpu", I8035, 12000000/4) /* 400KHz ??? - Main board Crystal is 12MHz */
-	MCFG_DEVICE_PROGRAM_MAP(monzagp_map)
-	MCFG_DEVICE_IO_MAP(monzagp_io)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, monzagp_state, port1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, monzagp_state, port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, monzagp_state, port2_w))
+	I8035(config, m_maincpu, 12000000/4); /* 400KHz ??? - Main board Crystal is 12MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &monzagp_state::monzagp_map);
+	m_maincpu->set_addrmap(AS_IO, &monzagp_state::monzagp_io);
+	m_maincpu->p1_out_cb().set(FUNC(monzagp_state::port1_w));
+	m_maincpu->p2_in_cb().set(FUNC(monzagp_state::port2_r));
+	m_maincpu->p2_out_cb().set(FUNC(monzagp_state::port2_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

@@ -405,38 +405,37 @@ static const char *const tattack_sample_names[] =
 	nullptr
 };
 
-MACHINE_CONFIG_START(tattack_state::tattack)
-
+void tattack_state::tattack(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 8000000 / 2)   /* 4 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(tattack_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tattack_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 8000000 / 2);   /* 4 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tattack_state::tattack_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tattack_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(24, 256-32-1, 13, 256-11-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tattack_state, screen_update_tattack)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(24, 256-32-1, 13, 256-11-1);
+	screen.set_screen_update(FUNC(tattack_state::screen_update_tattack));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tattack)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(tattack_state, tattack)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_tattack);
+	PALETTE(config, "palette", 16).set_init(FUNC(tattack_state::palette_init_tattack));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(4)
-	MCFG_SAMPLES_NAMES(tattack_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(4);
+	m_samples->set_samples_names(tattack_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.6);
 
 	/* Discrete ???? */
-//  MCFG_DEVICE_ADD("discrete", DISCRETE)
-//  MCFG_DISCRETE_INTF(tattack)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+//  DISCRETE(config, m_discrete);
+//  m_discrete->set_intf(tattack);
+//  m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /***************************************************************************
 

@@ -59,8 +59,8 @@ public:
 	void vt240(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_i8085;
+	required_device<t11_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_i8085;
 	required_device<i8251_device> m_i8251;
 	required_device<scn2681_device> m_duart;
 	required_device<rs232_port_device> m_host;
@@ -654,25 +654,27 @@ static INPUT_PORTS_START( vt240 )
 	PORT_CONFSETTING(0x01, "Color")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(vt240_state::vt240)
-	MCFG_DEVICE_ADD("maincpu", T11, XTAL(7'372'800)) // confirm
-	MCFG_DEVICE_PROGRAM_MAP(vt240_mem)
-	MCFG_T11_INITIAL_MODE(5 << 13)
-	MCFG_T11_RESET(WRITELINE(*this, vt240_state, t11_reset_w))
+void vt240_state::vt240(machine_config &config)
+{
+	T11(config, m_maincpu, XTAL(7'372'800)); // confirm
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt240_state::vt240_mem);
+	m_maincpu->set_initial_mode(5 << 13);
+	m_maincpu->out_reset().set(FUNC(vt240_state::t11_reset_w));
 
-	MCFG_DEVICE_ADD("charcpu", I8085A, XTAL(16'097'280) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(vt240_char_mem)
-	MCFG_DEVICE_IO_MAP(vt240_char_io)
-	MCFG_I8085A_SOD(WRITELINE(*this, vt240_state, i8085_rdy_w))
-	MCFG_I8085A_SID(READLINE(*this, vt240_state, i8085_sid_r))
+	I8085A(config, m_i8085, XTAL(16'097'280) / 2);
+	m_i8085->set_addrmap(AS_PROGRAM, &vt240_state::vt240_char_mem);
+	m_i8085->set_addrmap(AS_IO, &vt240_state::vt240_char_io);
+	m_i8085->out_sod_func().set(FUNC(vt240_state::i8085_rdy_w));
+	m_i8085->in_sid_func().set(FUNC(vt240_state::i8085_sid_r));
 
 	ADDRESS_MAP_BANK(config, "bank").set_map(&vt240_state::bank_map).set_options(ENDIANNESS_LITTLE, 16, 20, 0x1000);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(16'097'280), 1024, 0, 800, 629, 0, 480)
-	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vt240)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(16'097'280), 1024, 0, 800, 629, 0, 480);
+	screen.set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
+
+	PALETTE(config, m_palette, 32);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_vt240);
 
 	UPD7220(config, m_hgdc, XTAL(16'097'280) / 16); // actually /8?
 	m_hgdc->set_addrmap(0, &vt240_state::upd7220_map);
@@ -681,11 +683,11 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	m_hgdc->blank_wr_callback().set_inputline(m_i8085, I8085_RST55_LINE);
 	m_hgdc->set_screen("screen");
 
-	MCFG_DEVICE_ADD(m_duart, SCN2681, XTAL(7'372'800) / 2)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, vt240_state, irq13_w))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(m_host, rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("printer", rs232_port_device, write_txd))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, vt240_state, duartout_w))
+	SCN2681(config, m_duart, XTAL(7'372'800) / 2);
+	m_duart->irq_cb().set(FUNC(vt240_state::irq13_w));
+	m_duart->a_tx_cb().set(m_host, FUNC(rs232_port_device::write_txd));
+	m_duart->b_tx_cb().set("printer", FUNC(rs232_port_device::write_txd));
+	m_duart->outport_cb().set(FUNC(vt240_state::duartout_w));
 
 	I8251(config, m_i8251, 0);
 	m_i8251->txd_handler().set(FUNC(vt240_state::tx_w));
@@ -693,11 +695,10 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	m_i8251->rxrdy_handler().set(FUNC(vt240_state::irq9_w));
 	m_i8251->txrdy_handler().set(FUNC(vt240_state::irq7_w));
 
-	MCFG_DEVICE_ADD("lk201", LK201, 0)
-	MCFG_LK201_TX_HANDLER(WRITELINE("i8251", i8251_device, write_rxd))
+	LK201(config, m_lk201, 0);
+	m_lk201->tx_handler().set(m_i8251, FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800 * 64) // 8251 is set to /64 on the clock input
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, vt240_state, write_keyboard_clock))
+	CLOCK(config, "keyboard_clock", 4800 * 64).signal_handler().set(FUNC(vt240_state::write_keyboard_clock)); // 8251 is set to /64 on the clock input
 
 	RS232_PORT(config, m_host, default_rs232_devices, "null_modem");
 	m_host->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
@@ -709,23 +710,23 @@ MACHINE_CONFIG_START(vt240_state::vt240)
 	printer.dsr_handler().set(m_duart, FUNC(scn2681_device::ip1_w));
 
 	X2212(config, "x2212");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(vt240_state::mc7105)
+void vt240_state::mc7105(machine_config &config)
+{
 	vt240(config);
 
-	MCFG_DEVICE_REMOVE("lk201")
-	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
-	MCFG_MS7004_TX_HANDLER(WRITELINE("i8251", i8251_device, write_rxd))
+	config.device_remove("lk201");
+
+	ms7004_device &ms7004(MS7004(config, "ms7004", 0));
+	ms7004.tx_handler().set(m_i8251, FUNC(i8251_device::write_rxd));
 
 	m_i8251->txd_handler().set_nop();
 	//m_i8251->txd_handler().set("ms7004", FUNC(ms7004_device::rx_w));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
-	MCFG_DEVICE_REMOVE("keyboard_clock")
-	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*64)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, vt240_state, write_keyboard_clock))
-MACHINE_CONFIG_END
+	CLOCK(config.replace(), "keyboard_clock", 4960*64).signal_handler().set(FUNC(vt240_state::write_keyboard_clock));
+}
 
 /* ROM definition */
 ROM_START( mc7105 )

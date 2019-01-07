@@ -18,7 +18,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
-		m_tilegen1(*this, "tilegen1"),
+		m_tilegen(*this, "tilegen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
@@ -28,7 +28,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm;
-	required_device<deco_bac06_device> m_tilegen1;
+	required_device<deco_bac06_device> m_tilegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;

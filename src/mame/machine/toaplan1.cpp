@@ -83,7 +83,7 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_bio_w)
 
 	logerror("DSP PC:%04x IO write %04x at port 3\n", m_dsp->pcbase(), data);
 	if (data & 0x8000) {
-		m_dsp_BIO = CLEAR_LINE;
+		m_dsp_bio = CLEAR_LINE;
 	}
 	if (data == 0) {
 		if (m_dsp_execute) {
@@ -91,13 +91,13 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_bio_w)
 			m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			m_dsp_execute = 0;
 		}
-		m_dsp_BIO = ASSERT_LINE;
+		m_dsp_bio = ASSERT_LINE;
 	}
 }
 
-READ_LINE_MEMBER(toaplan1_state::demonwld_BIO_r)
+READ_LINE_MEMBER(toaplan1_state::demonwld_bio_r)
 {
-	return m_dsp_BIO;
+	return m_dsp_bio;
 }
 
 
@@ -288,7 +288,7 @@ void toaplan1_state::demonwld_driver_savestate()
 	save_item(NAME(m_dsp_on));
 	save_item(NAME(m_dsp_addr_w));
 	save_item(NAME(m_main_ram_seg));
-	save_item(NAME(m_dsp_BIO));
+	save_item(NAME(m_dsp_bio));
 	save_item(NAME(m_dsp_execute));
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan1_state::demonwld_restore_dsp), this));
 }

@@ -5,8 +5,14 @@
     Laser Battle / Lazarian - Cat and Mouse
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_LASERBAT_H
+#define MAME_INCLUDES_LASERBAT_H
+
+#pragma once
 
 #include "audio/zaccaria.h"
+
+#include "cpu/s2650/s2650.h"
 
 #include "machine/6821pia.h"
 #include "machine/pla.h"
@@ -23,7 +29,6 @@
 class laserbat_state_base : public driver_device
 {
 public:
-
 	laserbat_state_base(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_mux_ports(*this, {"ROW0", "ROW1", "SW1", "SW2"})
@@ -102,7 +107,7 @@ protected:
 	required_ioport m_row2;
 
 	// main CPU device
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 
 	// video devices
 	required_device<screen_device>         m_screen;
@@ -164,7 +169,6 @@ public:
 	void laserbat(machine_config &config);
 
 protected:
-
 	// initialisation/startup
 	virtual void machine_start() override;
 
@@ -206,3 +210,5 @@ protected:
 
 	required_device<zac1b11107_audio_device>    m_audiopcb;
 };
+
+#endif // MAME_INCLUDES_LASERBAT_H

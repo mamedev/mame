@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca
+// copyright-holders:Roberto Fresca, Grull Osgo
 /********************************************************************************
 
   AMERICAN POKER 2
@@ -8,8 +8,8 @@
   Company:  Novomatic.
   Year:     1990.
 
-  Driver by Roberto Fresca, with a lot of help of Grull Osgo.
-  Based on a preliminary work of Curt Coder.
+  Driver by Roberto Fresca & Grull Osgo.
+
 
   --- Supported Sets ---
 
@@ -281,6 +281,11 @@
   --- DRIVER UPDATES ---
 
 
+  [2018-12-02]
+
+  - Fixed the NVRAM size to 0x800.
+
+
   [2018-11-10]
 
   Piccolo Poker 100 from Admiral/Novomatic.
@@ -400,6 +405,7 @@
 
 #include "ampoker2.lh"
 #include "sigmapkr.lh"
+
 
 void ampoker2_state::machine_start()
 {
@@ -612,7 +618,7 @@ WRITE8_MEMBER(ampoker2_state::watchdog_reset_w)
 void ampoker2_state::program_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xcfff).ram().share("nvram");
+	map(0xc000, 0xc7ff).ram().share("nvram");
 	map(0xe000, 0xefff).ram().w(FUNC(ampoker2_state::videoram_w)).share("videoram");
 }
 

@@ -47,7 +47,7 @@ public:
 
 protected:
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8048_device> m_maincpu;
 	required_device<i8244_device> m_i8244;
 	required_device<o2_cart_slot_device> m_cart;
 
@@ -689,17 +689,18 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(odyssey2_state::odyssey2)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8048, ( ( XTAL(7'159'090) * 3 ) / 4 ) )
-	MCFG_DEVICE_PROGRAM_MAP(odyssey2_mem)
-	MCFG_DEVICE_IO_MAP(odyssey2_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, odyssey2_state, p1_read))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, odyssey2_state, p1_write))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, odyssey2_state, p2_read))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, odyssey2_state, p2_write))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, odyssey2_state, bus_read))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, odyssey2_state, bus_write))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE("cartslot", o2_cart_slot_device, t0_read))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, odyssey2_state, t1_read))
+	I8048(config, m_maincpu, ((XTAL(7'159'090) * 3) / 4));
+	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey2_state::odyssey2_mem);
+	m_maincpu->set_addrmap(AS_IO, &odyssey2_state::odyssey2_io);
+	m_maincpu->p1_in_cb().set(FUNC(odyssey2_state::p1_read));
+	m_maincpu->p1_out_cb().set(FUNC(odyssey2_state::p1_write));
+	m_maincpu->p2_in_cb().set(FUNC(odyssey2_state::p2_read));
+	m_maincpu->p2_out_cb().set(FUNC(odyssey2_state::p2_write));
+	m_maincpu->bus_in_cb().set(FUNC(odyssey2_state::bus_read));
+	m_maincpu->bus_out_cb().set(FUNC(odyssey2_state::bus_write));
+	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
+	m_maincpu->t1_in_cb().set(FUNC(odyssey2_state::t1_read));
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -723,9 +724,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(odyssey2_state::videopac)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8048, ( XTAL(17'734'470) / 3 ) )
-	MCFG_DEVICE_PROGRAM_MAP(odyssey2_mem)
-	MCFG_DEVICE_IO_MAP(odyssey2_io)
+	I8048(config, m_maincpu, (XTAL(17'734'470) / 3));
+	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey2_state::odyssey2_mem);
+	m_maincpu->set_addrmap(AS_IO, &odyssey2_state::odyssey2_io);
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -749,18 +751,19 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(g7400_state::g7400)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8048, XTAL(5'911'000) )
-	MCFG_DEVICE_PROGRAM_MAP(odyssey2_mem)
-	MCFG_DEVICE_IO_MAP(g7400_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, g7400_state, p1_read))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, g7400_state, p1_write))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, g7400_state, p2_read))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, g7400_state, p2_write))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, g7400_state, bus_read))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, g7400_state, bus_write))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE("cartslot", o2_cart_slot_device, t0_read))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, g7400_state, t1_read))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
+	I8048(config, m_maincpu, XTAL(5'911'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &g7400_state::odyssey2_mem);
+	m_maincpu->set_addrmap(AS_IO, &g7400_state::g7400_io);
+	m_maincpu->p1_in_cb().set(FUNC(g7400_state::p1_read));
+	m_maincpu->p1_out_cb().set(FUNC(g7400_state::p1_write));
+	m_maincpu->p2_in_cb().set(FUNC(g7400_state::p2_read));
+	m_maincpu->p2_out_cb().set(FUNC(g7400_state::p2_write));
+	m_maincpu->bus_in_cb().set(FUNC(g7400_state::bus_read));
+	m_maincpu->bus_out_cb().set(FUNC(g7400_state::bus_write));
+	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
+	m_maincpu->t1_in_cb().set(FUNC(g7400_state::t1_read));
+	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -794,18 +797,19 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(g7400_state::odyssey3)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8048, XTAL(5'911'000) )
-	MCFG_DEVICE_PROGRAM_MAP(odyssey2_mem)
-	MCFG_DEVICE_IO_MAP(g7400_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, g7400_state, p1_read))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, g7400_state, p1_write))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, g7400_state, p2_read))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, g7400_state, p2_write))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, g7400_state, bus_read))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, g7400_state, bus_write))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE("cartslot", o2_cart_slot_device, t0_read))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, g7400_state, t1_read))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(m_i8243, i8243_device, prog_w))
+	I8048(config, m_maincpu, XTAL(5'911'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &g7400_state::odyssey2_mem);
+	m_maincpu->set_addrmap(AS_IO, &g7400_state::g7400_io);
+	m_maincpu->p1_in_cb().set(FUNC(g7400_state::p1_read));
+	m_maincpu->p1_out_cb().set(FUNC(g7400_state::p1_write));
+	m_maincpu->p2_in_cb().set(FUNC(g7400_state::p2_read));
+	m_maincpu->p2_out_cb().set(FUNC(g7400_state::p2_write));
+	m_maincpu->bus_in_cb().set(FUNC(g7400_state::bus_read));
+	m_maincpu->bus_out_cb().set(FUNC(g7400_state::bus_write));
+	m_maincpu->t0_in_cb().set("cartslot", FUNC(o2_cart_slot_device::t0_read));
+	m_maincpu->t1_in_cb().set(FUNC(g7400_state::t1_read));
+	m_maincpu->prog_out_cb().set(m_i8243, FUNC(i8243_device::prog_w));
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */

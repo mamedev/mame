@@ -15,51 +15,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ATARI_VAD_ADD(_tag, _screen, _intcb) \
-	MCFG_DEVICE_ADD(_tag, ATARI_VAD, 0) \
-	MCFG_VIDEO_SET_SCREEN(_screen) \
-	downcast<atari_vad_device &>(*device).set_scanline_int_cb(DEVCB_##_intcb);
-
-#define MCFG_ATARI_VAD_PLAYFIELD(_class, _gfxtag, _getinfo) \
-	{ std::string fulltag(device->tag()); fulltag.append(":playfield"); device_t *device; \
-	MCFG_TILEMAP_ADD(fulltag.c_str()) \
-	MCFG_TILEMAP_GFXDECODE(_gfxtag) \
-	MCFG_TILEMAP_BYTES_PER_ENTRY(2) \
-	MCFG_TILEMAP_INFO_CB_DEVICE(DEVICE_SELF_OWNER, _class, _getinfo) \
-	MCFG_TILEMAP_TILE_SIZE(8,8) \
-	MCFG_TILEMAP_LAYOUT_STANDARD(SCAN_COLS, 64,64) }
-
-#define MCFG_ATARI_VAD_PLAYFIELD2(_class, _gfxtag, _getinfo) \
-	{ std::string fulltag(device->tag()); fulltag.append(":playfield2"); device_t *device; \
-	MCFG_TILEMAP_ADD(fulltag.c_str()) \
-	MCFG_TILEMAP_GFXDECODE(_gfxtag) \
-	MCFG_TILEMAP_BYTES_PER_ENTRY(2) \
-	MCFG_TILEMAP_INFO_CB_DEVICE(DEVICE_SELF_OWNER, _class, _getinfo) \
-	MCFG_TILEMAP_TILE_SIZE(8,8) \
-	MCFG_TILEMAP_LAYOUT_STANDARD(SCAN_COLS, 64,64) \
-	MCFG_TILEMAP_TRANSPARENT_PEN(0) }
-
-#define MCFG_ATARI_VAD_ALPHA(_class, _gfxtag, _getinfo) \
-	{ std::string fulltag(device->tag()); fulltag.append(":alpha"); device_t *device; \
-	MCFG_TILEMAP_ADD(fulltag.c_str()) \
-	MCFG_TILEMAP_GFXDECODE(_gfxtag) \
-	MCFG_TILEMAP_BYTES_PER_ENTRY(2) \
-	MCFG_TILEMAP_INFO_CB_DEVICE(DEVICE_SELF_OWNER, _class, _getinfo) \
-	MCFG_TILEMAP_TILE_SIZE(8,8) \
-	MCFG_TILEMAP_LAYOUT_STANDARD(SCAN_ROWS, 64,32) \
-	MCFG_TILEMAP_TRANSPARENT_PEN(0) }
-
-#define MCFG_ATARI_VAD_MOB(_config, _gfxtag) \
-	{ std::string fulltag(device->tag()); fulltag.append(":mob"); device_t *device; \
-	MCFG_ATARI_MOTION_OBJECTS_ADD(fulltag.c_str(), "screen", _config) \
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE(_gfxtag) }
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -72,10 +27,16 @@ class atari_vad_device : public device_t, public device_video_interface
 {
 public:
 	// construction/destruction
+	template <typename T>
+	atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
+		: atari_vad_device(mconfig, tag, owner, clock)
+	{
+		set_screen(std::forward<T>(screen_tag));
+	}
 	atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template<class Object> devcb_base &set_scanline_int_cb(Object &&cb) { return m_scanline_int_cb.set_callback(std::forward<Object>(cb)); }
+	auto scanline_int_cb() { return m_scanline_int_cb.bind(); }
 
 	// getters
 	tilemap_device &alpha() const { return *m_alpha_tilemap; }

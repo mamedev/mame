@@ -1549,11 +1549,11 @@ MACHINE_CONFIG_START(scramble_state::hunchbks)
 	scramble(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", S2650, 18432000/6)
-	MCFG_DEVICE_PROGRAM_MAP(hunchbks_map)
-	MCFG_DEVICE_IO_MAP(hunchbks_readport)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scramble_state,  hunchbks_vh_interrupt)
+	s2650_device &maincpu(S2650(config.replace(), m_maincpu, 18432000/6));
+	maincpu.set_addrmap(AS_PROGRAM, &scramble_state::hunchbks_map);
+	maincpu.set_addrmap(AS_IO, &scramble_state::hunchbks_readport);
+	maincpu.sense_handler().set("screen", FUNC(screen_device::vblank));
+	maincpu.set_vblank_int("screen", FUNC(scramble_state::hunchbks_vh_interrupt));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))

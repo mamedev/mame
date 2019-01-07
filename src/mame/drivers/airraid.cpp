@@ -406,7 +406,7 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_AIRRAID_VIDEO_ADD("airraid_vid")
+	AIRRAID_VIDEO(config, m_airraid_video, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

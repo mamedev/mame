@@ -1918,40 +1918,40 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 }
 
 
-MACHINE_CONFIG_START(pdp1_state::pdp1)
-
+void pdp1_state::pdp1(machine_config &config)
+{
 	/* basic machine hardware */
 	/* PDP1 CPU @ 200 kHz (no master clock, but the instruction and memory rate is 200 kHz) */
-	MCFG_DEVICE_ADD("maincpu", PDP1, 1000000/*the CPU core uses microsecond counts*/)
-	MCFG_PDP1_RESET_PARAM(pdp1_reset_param)
-	MCFG_DEVICE_PROGRAM_MAP(pdp1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pdp1_state,  pdp1_interrupt)   /* dummy interrupt: handles input */
+	PDP1(config, m_maincpu, 1000000); /* the CPU core uses microsecond counts */
+	m_maincpu->set_reset_param(&pdp1_reset_param);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pdp1_state::pdp1_map);
+	m_maincpu->set_vblank_int("screen", FUNC(pdp1_state::pdp1_interrupt));   /* dummy interrupt: handles input */
 
 	/* video hardware (includes the control panel and typewriter output) */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(refresh_rate)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
-	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pdp1_state, screen_update_pdp1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pdp1_state, screen_vblank_pdp1))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(refresh_rate);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(virtual_width, virtual_height);
+	screen.set_visarea(0, virtual_width-1, 0, virtual_height-1);
+	screen.set_screen_update(FUNC(pdp1_state::screen_update_pdp1));
+	screen.screen_vblank().set(FUNC(pdp1_state::screen_vblank_pdp1));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("crt", CRT, 0)
-	MCFG_CRT_NUM_LEVELS(pen_crt_num_levels)
-	MCFG_CRT_OFFSETS(crt_window_offset_x, crt_window_offset_y)
-	MCFG_CRT_SIZE(crt_window_width, crt_window_height)
+	CRT(config, m_crt, 0);
+	m_crt->set_num_levels(pen_crt_num_levels);
+	m_crt->set_offsets(crt_window_offset_x, crt_window_offset_y);
+	m_crt->set_size(crt_window_width, crt_window_height);
 
-	MCFG_DEVICE_ADD("readt", PDP1_READTAPE, 0)
-	MCFG_DEVICE_ADD("punch", PDP1_PUNCHTAPE, 0)
-	MCFG_DEVICE_ADD("typewriter", PDP1_PRINTER, 0)
-	MCFG_DEVICE_ADD("drum", PDP1_CYLINDER, 0)
+	PDP1_READTAPE(config, "readt", 0);
+	PDP1_PUNCHTAPE(config, "punch", 0);
+	PDP1_PRINTER(config, "typewriter", 0);
+	PDP1_CYLINDER(config, "drum", 0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pdp1)
-	MCFG_PALETTE_ADD("palette", total_colors_needed + sizeof(pdp1_palette))
-	MCFG_PALETTE_INDIRECT_ENTRIES(total_colors_needed)
-	MCFG_PALETTE_INIT_OWNER(pdp1_state, pdp1)
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pdp1);
+	PALETTE(config, m_palette, total_colors_needed + sizeof(pdp1_palette));
+	m_palette->set_indirect_entries(total_colors_needed);
+	m_palette->set_init(FUNC(pdp1_state::palette_init_pdp1));
+}
 
 /*
     pdp1 can address up to 65336 18 bit words when extended (4096 otherwise).

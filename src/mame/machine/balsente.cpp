@@ -11,10 +11,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "includes/balsente.h"
-#include "sound/cem3394.h"
 
-
-#define LOG_CEM_WRITES      0
 
 /*************************************
  *
@@ -69,29 +66,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(balsente_state::interrupt_timer)
 
 void balsente_state::machine_start()
 {
-	/* create the polynomial tables */
-	poly17_init();
-
-	m_acia->write_cts(0);
-	m_acia->write_dcd(0);
-	m_audiouart->write_cts(0);
-	m_audiouart->write_dcd(0);
-
-	save_item(NAME(m_counter_control));
-	save_item(NAME(m_counter_0_ff));
-	save_item(NAME(m_counter_0_out));
-	save_item(NAME(m_counter_0_timer_active));
-
-	save_item(NAME(m_analog_input_data));
-	save_item(NAME(m_adc_value));
-
-	save_item(NAME(m_dac_value));
-	save_item(NAME(m_dac_register));
-	save_item(NAME(m_chip_select));
-
-	save_item(NAME(m_uint));
-
-	save_item(NAME(m_noise_position));
+	if (m_acia.found())
+	{
+		m_acia->write_cts(0);
+		m_acia->write_dcd(0);
+	}
 
 	save_item(NAME(m_nstocker_bits));
 	save_item(NAME(m_spiker_expand_color));
@@ -104,35 +83,19 @@ void balsente_state::machine_start()
 
 void balsente_state::machine_reset()
 {
-	int numbanks;
-
-	/* reset the manual counter 0 clock */
-	m_counter_control = 0x00;
-	m_counter_0_ff = false;
-	m_counter_0_out = false;
-	m_counter_0_timer_active = false;
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	/* create the polynomial tables */
+	poly17_init();
 
 	/* reset the ADC states */
 	m_adc_value = 0;
 
-	/* reset the CEM3394 I/O states */
-	m_dac_value = 0;
-	m_dac_register = 0;
-	m_chip_select = 0x3f;
-
 	/* reset game-specific states */
 	m_grudge_steering_result = 0;
 
-	/* reset the noise generator */
-	memset(m_noise_position, 0, sizeof(m_noise_position));
-
 	/* point the banks to bank 0 */
-	numbanks = (memregion("maincpu")->bytes() > 0x40000) ? 16 : 8;
-	membank("bank1")->configure_entries(0, numbanks, &memregion("maincpu")->base()[0x10000], 0x6000);
-	membank("bank2")->configure_entries(0, numbanks, &memregion("maincpu")->base()[0x12000], 0x6000);
-	membank("bank1")->set_entry(0);
-	membank("bank2")->set_entry(0);
+	m_bankab->set_entry(0);
+	m_bankcd->set_entry(0);
+	m_bankef->set_entry(0);
 	m_maincpu->reset();
 
 	/* start a timer to generate interrupts */
@@ -143,7 +106,7 @@ void balsente_state::machine_reset()
 
 /*************************************
  *
- *  MM5837 noise generator
+ *  Hardware random numbers
  *
  *  NOTE: this is stolen straight from
  *          POKEY.c
@@ -153,54 +116,21 @@ void balsente_state::machine_reset()
 void balsente_state::poly17_init()
 {
 	uint32_t i, x = 0;
-	uint8_t *p, *r;
+	uint8_t *r;
 
 	/* allocate memory */
-	p = m_poly17;
 	r = m_rand17;
 
 	/* generate the polynomial */
 	for (i = 0; i < POLY17_SIZE; i++)
 	{
 		/* store new values */
-		*p++ = x & 1;
 		*r++ = x >> 3;
 
 		/* calculate next bit */
 		x = ((x << POLY17_SHL) + (x >> POLY17_SHR) + POLY17_ADD) & POLY17_SIZE;
 	}
 }
-
-
-inline void balsente_state::noise_gen_chip(int chip, int count, short *buffer)
-{
-	/* noise generator runs at 100kHz */
-	uint32_t step = (100000 << 14) / cem3394_device::SAMPLE_RATE;
-	uint32_t noise_counter = m_noise_position[chip];
-
-	while (count--)
-	{
-		*buffer++ = m_poly17[(noise_counter >> 14) & POLY17_SIZE] << 12;
-		noise_counter += step;
-	}
-
-	/* remember the noise position */
-	m_noise_position[chip] = noise_counter;
-}
-
-CEM3394_EXT_INPUT(balsente_state::noise_gen_0) { noise_gen_chip(0, count, buffer); }
-CEM3394_EXT_INPUT(balsente_state::noise_gen_1) { noise_gen_chip(1, count, buffer); }
-CEM3394_EXT_INPUT(balsente_state::noise_gen_2) { noise_gen_chip(2, count, buffer); }
-CEM3394_EXT_INPUT(balsente_state::noise_gen_3) { noise_gen_chip(3, count, buffer); }
-CEM3394_EXT_INPUT(balsente_state::noise_gen_4) { noise_gen_chip(4, count, buffer); }
-CEM3394_EXT_INPUT(balsente_state::noise_gen_5) { noise_gen_chip(5, count, buffer); }
-
-
-/*************************************
- *
- *  Hardware random numbers
- *
- *************************************/
 
 WRITE8_MEMBER(balsente_state::random_reset_w)
 {
@@ -231,8 +161,9 @@ READ8_MEMBER(balsente_state::random_num_r)
 WRITE8_MEMBER(balsente_state::rombank_select_w)
 {
 	/* the bank number comes from bits 4-6 */
-	membank("bank1")->set_entry((data >> 4) & 7);
-	membank("bank2")->set_entry((data >> 4) & 7);
+	m_bankab->set_entry((data >> 4) & 7);
+	m_bankcd->set_entry((data >> 4) & 7);
+	m_bankef->set_entry(0);
 }
 
 
@@ -242,20 +173,22 @@ WRITE8_MEMBER(balsente_state::rombank2_select_w)
 	int bank = data & 7;
 
 	/* top bit controls which half of the ROMs to use (Name that Tune only) */
-	if (memregion("maincpu")->bytes() > 0x40000) bank |= (data >> 4) & 8;
+	if (memregion("maincpu")->bytes() > 0x20000) bank |= (data >> 4) & 8;
 
 	/* when they set the AB bank, it appears as though the CD bank is reset */
 	if (data & 0x20)
 	{
-		membank("bank1")->set_entry(bank);
-		membank("bank2")->set_entry(6);
+		m_bankab->set_entry(bank);
+		m_bankcd->set_entry(6);
+		m_bankef->set_entry(0);
 	}
 
 	/* set both banks */
 	else
 	{
-		membank("bank1")->set_entry(bank);
-		membank("bank2")->set_entry(bank);
+		m_bankab->set_entry(bank);
+		m_bankcd->set_entry(bank);
+		m_bankef->set_entry(BIT(bank, 3));
 	}
 }
 
@@ -331,12 +264,6 @@ WRITE8_MEMBER(balsente_state::acia_w)
 {
 	// Ugly workaround: suppress soft reset command in order to avert race condition
 	m_acia->write(space, offset, (BIT(offset, 0) && data == 0xe0) ? 0 : data);
-}
-
-WRITE_LINE_MEMBER(balsente_state::uint_propagate_w)
-{
-	if (state && BIT(m_counter_control, 5))
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, m_uint ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -434,236 +361,6 @@ WRITE8_MEMBER(balsente_state::teamht_multiplex_select_w)
 
 }
 
-
-
-
-/*************************************
- *
- *  Sound CPU counter 0 emulation
- *
- *************************************/
-
-WRITE_LINE_MEMBER(balsente_state::counter_0_set_out)
-{
-	/* OUT on counter 0 is hooked to the GATE line on counter 1 through an inverter */
-	m_pit->write_gate1(!state);
-
-	/* remember the out state */
-	m_counter_0_out = state;
-}
-
-
-WRITE_LINE_MEMBER(balsente_state::set_counter_0_ff)
-{
-	/* the flip/flop output is inverted, so if we went high to low, that's a clock */
-	m_pit->write_clk0(!state);
-
-	/* remember the new state */
-	m_counter_0_ff = state;
-}
-
-
-TIMER_DEVICE_CALLBACK_MEMBER(balsente_state::clock_counter_0_ff)
-{
-	/* clock the D value through the flip-flop */
-	set_counter_0_ff(BIT(m_counter_control, 3));
-}
-
-
-void balsente_state::update_counter_0_timer()
-{
-	double maxfreq = 0.0;
-	int i;
-
-	/* if there's already a timer, remove it */
-	if (m_counter_0_timer_active)
-		m_counter_0_timer->reset();
-	m_counter_0_timer_active = false;
-
-	/* find the counter with the maximum frequency */
-	/* this is used to calibrate the timers at startup */
-	for (i = 0; i < 6; i++)
-		if (m_cem_device[i]->get_parameter(cem3394_device::FINAL_GAIN) < 10.0)
-		{
-			double tempfreq;
-
-			/* if the filter resonance is high, then they're calibrating the filter frequency */
-			if (m_cem_device[i]->get_parameter(cem3394_device::FILTER_RESONANCE) > 0.9)
-				tempfreq = m_cem_device[i]->get_parameter(cem3394_device::FILTER_FREQENCY);
-
-			/* otherwise, they're calibrating the VCO frequency */
-			else
-				tempfreq = m_cem_device[i]->get_parameter(cem3394_device::VCO_FREQUENCY);
-
-			if (tempfreq > maxfreq) maxfreq = tempfreq;
-		}
-
-	/* reprime the timer */
-	if (maxfreq > 0.0)
-	{
-		m_counter_0_timer_active = true;
-		m_counter_0_timer->adjust(attotime::from_hz(maxfreq), 0, attotime::from_hz(maxfreq));
-	}
-}
-
-
-
-/*************************************
- *
- *  Sound CPU counter handlers
- *
- *************************************/
-
-READ8_MEMBER(balsente_state::counter_state_r)
-{
-	/* bit D0 is the inverse of the flip-flop state */
-	int result = !m_counter_0_ff;
-
-	/* bit D1 is the OUT value from counter 0 */
-	if (m_counter_0_out) result |= 0x02;
-
-	return result;
-}
-
-
-WRITE8_MEMBER(balsente_state::counter_control_w)
-{
-	uint8_t diff_counter_control = m_counter_control ^ data;
-
-	/* set the new global value */
-	m_counter_control = data;
-
-	/* bit D0 enables/disables audio */
-	if (BIT(diff_counter_control, 0))
-	{
-		for (auto & elem : m_cem_device)
-			elem->set_output_gain(0, BIT(data, 0) ? 1.0 : 0);
-	}
-
-	/* bit D1 is hooked to counter 0's gate */
-	if (BIT(diff_counter_control, 1))
-	{
-		/* if we gate on, start a pulsing timer to clock it */
-		if (BIT(data, 1) && !m_counter_0_timer_active)
-		{
-			update_counter_0_timer();
-		}
-
-		/* if we gate off, remove the timer */
-		else if (!BIT(data, 1) && m_counter_0_timer_active)
-		{
-			m_counter_0_timer->reset();
-			m_counter_0_timer_active = false;
-		}
-	}
-
-	/* set the actual gate */
-	m_pit->write_gate0(BIT(data, 1));
-
-	/* bits D2 and D4 control the clear/reset flags on the flip-flop that feeds counter 0 */
-	if (!BIT(data, 4))
-		set_counter_0_ff(0);
-	else if (!BIT(data, 2))
-		set_counter_0_ff(1);
-
-	/* bit 5 clears the NMI interrupt */
-	if (BIT(diff_counter_control, 5) && !BIT(data, 5))
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-}
-
-
-
-/*************************************
- *
- *  CEM3394 Interfaces
- *
- *************************************/
-
-WRITE8_MEMBER(balsente_state::chip_select_w)
-{
-	static constexpr uint8_t register_map[8] =
-	{
-		cem3394_device::VCO_FREQUENCY,
-		cem3394_device::FINAL_GAIN,
-		cem3394_device::FILTER_RESONANCE,
-		cem3394_device::FILTER_FREQENCY,
-		cem3394_device::MIXER_BALANCE,
-		cem3394_device::MODULATION_AMOUNT,
-		cem3394_device::PULSE_WIDTH,
-		cem3394_device::WAVE_SELECT
-	};
-
-	double voltage = (double)m_dac_value * (8.0 / 4096.0) - 4.0;
-	int diffchip = data ^ m_chip_select, i;
-	int reg = register_map[m_dac_register];
-
-	/* remember the new select value */
-	m_chip_select = data;
-
-	/* check all six chip enables */
-	for (i = 0; i < 6; i++)
-		if ((diffchip & (1 << i)) && (data & (1 << i)))
-		{
-#if LOG_CEM_WRITES
-			double temp = 0;
-
-			/* remember the previous value */
-			temp =
-#endif
-				m_cem_device[i]->get_parameter(reg);
-
-			/* set the voltage */
-			m_cem_device[i]->set_voltage(reg, voltage);
-
-			/* only log changes */
-#if LOG_CEM_WRITES
-			if (temp != m_cem_device[i]->get_parameter(reg))
-			{
-				static const char *const names[] =
-				{
-					"VCO_FREQUENCY",
-					"FINAL_GAIN",
-					"FILTER_RESONANCE",
-					"FILTER_FREQENCY",
-					"MIXER_BALANCE",
-					"MODULATION_AMOUNT",
-					"PULSE_WIDTH",
-					"WAVE_SELECT"
-				};
-				logerror("s%04X:   CEM#%d:%s=%f\n", m_audiocpu->pcbase(), i, names[m_dac_register], voltage);
-			}
-#endif
-		}
-
-	/* if a timer for counter 0 is running, recompute */
-	if (m_counter_0_timer_active)
-		update_counter_0_timer();
-}
-
-
-
-WRITE8_MEMBER(balsente_state::dac_data_w)
-{
-	/* LSB or MSB? */
-	if (offset & 1)
-		m_dac_value = (m_dac_value & 0xfc0) | ((data >> 2) & 0x03f);
-	else
-		m_dac_value = (m_dac_value & 0x03f) | ((data << 6) & 0xfc0);
-
-	/* if there are open channels, force the values in */
-	if ((m_chip_select & 0x3f) != 0x3f)
-	{
-		uint8_t temp = m_chip_select;
-		chip_select_w(space, 0, 0x3f);
-		chip_select_w(space, 0, temp);
-	}
-}
-
-
-WRITE8_MEMBER(balsente_state::register_addr_w)
-{
-	m_dac_register = data & 7;
-}
 
 
 

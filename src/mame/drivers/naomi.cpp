@@ -2896,54 +2896,56 @@ MACHINE_RESET_MEMBER(naomi_state,naomi)
  */
 
  // TODO: merge with Dreamcast base machine
-MACHINE_CONFIG_START(dc_state::naomi_aw_base)
+void dc_state::naomi_aw_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH4LE, CPU_CLOCK) // SH4!!!
-	MCFG_SH4_MD0(1)
-	MCFG_SH4_MD1(0)
-	MCFG_SH4_MD2(1)
-	MCFG_SH4_MD3(0)
-	MCFG_SH4_MD4(0)
-	MCFG_SH4_MD5(1)
-	MCFG_SH4_MD6(0)
-	MCFG_SH4_MD7(1)
-	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(CPU_CLOCK)
+	SH4LE(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_md(0, 1);
+	m_maincpu->set_md(1, 0);
+	m_maincpu->set_md(2, 1);
+	m_maincpu->set_md(3, 0);
+	m_maincpu->set_md(4, 0);
+	m_maincpu->set_md(5, 1);
+	m_maincpu->set_md(6, 0);
+	m_maincpu->set_md(7, 1);
+	m_maincpu->set_md(8, 0);
+	m_maincpu->set_sh4_clock(CPU_CLOCK);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(dc_state::dc_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
-	MCFG_DEVICE_PROGRAM_MAP(dc_audio_map)
+	ARM7(config, m_soundcpu, ((XTAL(33'868'800)*2)/3)/8);   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	m_soundcpu->set_addrmap(AS_PROGRAM, &dc_state::dc_audio_map);
 
-	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
+	MAPLE_DC(config, m_maple, 0, m_maincpu);
+	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(13458568*2, 820, 0, 640, 532, 0, 480) /* TODO: where pclk actually comes? */
-	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 0x1000)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(13458568*2, 820, 0, 640, 532, 0, 480); /* TODO: where does pclk actually come from? */
+	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
+	PALETTE(config, "palette", 0x1000);
 	POWERVR2(config, m_powervr2, 0);
 	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("aica", AICA, (XTAL(33'868'800)*2)/3) // 67.7376MHz(2*33.8688MHz), div 3 for audio block
-	MCFG_AICA_MASTER
-	MCFG_AICA_IRQ_CB(WRITELINE(*this, dc_state, aica_irq))
-	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(*this, dc_state, sh4_aica_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+	AICA(config, m_aica, (XTAL(33'868'800)*2)/3); // 67.7376MHz(2*33.8688MHz), div 3 for audio block
+	m_aica->set_master(true);
+	m_aica->irq().set(FUNC(dc_state::aica_irq));
+	m_aica->main_irq().set(FUNC(dc_state::sh4_aica_irq));
+	m_aica->add_route(0, "lspeaker", 2.0);
+	m_aica->add_route(1, "rspeaker", 2.0);
 
 	AICARTC(config, "aicartc", XTAL(32'768));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(naomi_state::naomi_base)
+void naomi_state::naomi_base(machine_config &config)
+{
 	naomi_aw_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(naomi_map)
-	MCFG_DEVICE_IO_MAP(naomi_port)
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi_state::naomi_map);
+	m_maincpu->set_addrmap(AS_IO, &naomi_state::naomi_port);
 
 	EEPROM_93C46_16BIT(config, "main_eeprom").default_value(0);
 
@@ -2953,80 +2955,141 @@ MACHINE_CONFIG_START(naomi_state::naomi_base)
 	// - using UART as timer - 13.260MHz,
 	// - unrolled NOPs then GPIO toggle - 12.76MHz (or 3.19M NOP instructions per second)
 	// for now we use higher clock, otherwise earlier NAOMI BIOS revisions will not boot (see MT#06552).
-	MCFG_MIE_ADD("mie", 16000000, "maple_dc", 0, nullptr, nullptr, nullptr, ":MIE.3", nullptr, ":MIE.5", nullptr, nullptr)
-	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "mie", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
+	mie_device &mie(MIE(config, "mie" "_maple", 16000000, m_maple, 0, "mie"));
+	mie.set_gpio_name<3>("MIE.3");
+	mie.set_gpio_name<5>("MIE.5");
+	MIE_JVS(config, "mie", 16000000);
+
+	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", 0, "mie"));
+	sega837.set_port_tag<0>("TILT");
+	sega837.set_port_tag<1>("P1");
+	sega837.set_port_tag<2>("P2");
+	sega837.set_port_tag<3>("A0");
+	sega837.set_port_tag<4>("A1");
+	sega837.set_port_tag<5>("A2");
+	sega837.set_port_tag<6>("A3");
+	sega837.set_port_tag<7>("A4");
+	sega837.set_port_tag<8>("A5");
+	sega837.set_port_tag<9>("A6");
+	sega837.set_port_tag<10>("A7");
+	sega837.set_port_tag<11>("OUTPUT");
+
 	EEPROM_93C46_8BIT(config, "mie_eeprom");
 
 	X76F100(config, "naomibd_eeprom");
-	MCFG_M3COMM_ADD("comm_board")
+	M3COMM(config, "comm_board", 0);
 	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 /*
  * Naomi 1, unprotected ROM sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomi)
+void naomi_state::naomi(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_rom_board &rom_board(NAOMI_ROM_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1 GD-Rom
  */
 
-MACHINE_CONFIG_START(naomi_state::naomigd)
+void naomi_state::naomigd(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_gdrom_board &rom_board(NAOMI_GDROM_BOARD(config, "rom_board", 0, "naomibd_eeprom", ":gdrom", "pic"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1, M1 sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomim1)
+void naomi_state::naomim1(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_M1_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_m1_board &rom_board(NAOMI_M1_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1, M2/3 sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomim2)
+void naomi_state::naomim2(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_M2_BOARD_ADD("rom_board", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_m2_board &rom_board(NAOMI_M2_BOARD(config, "rom_board", 0, "naomibd_eeprom"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi 1, M4 sub-board
  */
 
-MACHINE_CONFIG_START(naomi_state::naomim4)
+void naomi_state::naomim4(machine_config &config)
+{
 	naomi_base(config);
-	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(*this, dc_state, g1_irq))
-MACHINE_CONFIG_END
+	naomi_m4_board &rom_board(NAOMI_M4_BOARD(config, "rom_board", 0, "naomibd_eeprom", "pic_readout"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
+}
 
 /*
  * Naomi M2 with Keyboard controllers
  */
 
-MACHINE_CONFIG_START(naomi_state::naomim2_kb)
+void naomi_state::naomim2_kb(machine_config &config)
+{
 	naomim2(config);
-	MCFG_DC_KEYBOARD_ADD("dcctrl0", "maple_dc", 1, ":P1.M", ":P1.LD", ":P1.KC1", ":P1.KC2", ":P1.KC3", ":P1.KC4", ":P1.KC5", ":P1.KC6")
-	MCFG_DC_KEYBOARD_ADD("dcctrl1", "maple_dc", 2, ":P2.M", ":P2.LD", ":P2.KC1", ":P2.KC2", ":P2.KC3", ":P2.KC4", ":P2.KC5", ":P2.KC6")
-MACHINE_CONFIG_END
+	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", 0, m_maple, 1));
+	dcctrl0.set_port_tag<0>("P1.M");
+	dcctrl0.set_port_tag<1>("P1.LD");
+	dcctrl0.set_port_tag<2>("P1.KC1");
+	dcctrl0.set_port_tag<3>("P1.KC2");
+	dcctrl0.set_port_tag<4>("P1.KC3");
+	dcctrl0.set_port_tag<5>("P1.KC4");
+	dcctrl0.set_port_tag<6>("P1.KC5");
+	dcctrl0.set_port_tag<7>("P1.KC6");
+	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", 0, m_maple, 2));
+	dcctrl1.set_port_tag<0>("P2.M");
+	dcctrl1.set_port_tag<1>("P2.LD");
+	dcctrl1.set_port_tag<2>("P2.KC1");
+	dcctrl1.set_port_tag<3>("P2.KC2");
+	dcctrl1.set_port_tag<4>("P2.KC3");
+	dcctrl1.set_port_tag<5>("P2.KC4");
+	dcctrl1.set_port_tag<6>("P2.KC5");
+	dcctrl1.set_port_tag<7>("P2.KC6");
+}
 
 /*
  * Naomi GD with Keyboard controllers
  */
 
-MACHINE_CONFIG_START(naomi_state::naomigd_kb)
+void naomi_state::naomigd_kb(machine_config &config)
+{
 	naomigd(config);
-	MCFG_DC_KEYBOARD_ADD("dcctrl0", "maple_dc", 1, ":P1.M", ":P1.LD", ":P1.KC1", ":P1.KC2", ":P1.KC3", ":P1.KC4", ":P1.KC5", ":P1.KC6")
-	MCFG_DC_KEYBOARD_ADD("dcctrl1", "maple_dc", 2, ":P2.M", ":P2.LD", ":P2.KC1", ":P2.KC2", ":P2.KC3", ":P2.KC4", ":P2.KC5", ":P2.KC6")
-MACHINE_CONFIG_END
+	dc_keyboard_device &dcctrl0(DC_KEYBOARD(config, "dcctrl0", 0, m_maple, 1));
+	dcctrl0.set_port_tag<0>("P1.M");
+	dcctrl0.set_port_tag<1>("P1.LD");
+	dcctrl0.set_port_tag<2>("P1.KC1");
+	dcctrl0.set_port_tag<3>("P1.KC2");
+	dcctrl0.set_port_tag<4>("P1.KC3");
+	dcctrl0.set_port_tag<5>("P1.KC4");
+	dcctrl0.set_port_tag<6>("P1.KC5");
+	dcctrl0.set_port_tag<7>("P1.KC6");
+	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", 0, m_maple, 2));
+	dcctrl1.set_port_tag<0>("P2.M");
+	dcctrl1.set_port_tag<1>("P2.LD");
+	dcctrl1.set_port_tag<2>("P2.KC1");
+	dcctrl1.set_port_tag<3>("P2.KC2");
+	dcctrl1.set_port_tag<4>("P2.KC3");
+	dcctrl1.set_port_tag<5>("P2.KC4");
+	dcctrl1.set_port_tag<6>("P2.KC5");
+	dcctrl1.set_port_tag<7>("P2.KC6");
+}
 
 /*
  * Naomi 2
@@ -3051,74 +3114,109 @@ void naomi2_state::naomi2_base(machine_config &config)
 	// TODO: ELAN device
 }
 
-MACHINE_CONFIG_START(naomi2_state::naomi2gd)
+void naomi2_state::naomi2gd(machine_config &config)
+{
 	naomigd(config);
 	naomi2_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
+}
 
 /*
  * Naomi 2, M1 sub-board
  */
 
-MACHINE_CONFIG_START(naomi2_state::naomi2m1)
+void naomi2_state::naomi2m1(machine_config &config)
+{
 	naomim1(config);
 	naomi2_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
+}
 
 /*
  * Naomi 2, M2/3 sub-board
  */
 
-MACHINE_CONFIG_START(naomi2_state::naomi2m2)
+void naomi2_state::naomi2m2(machine_config &config)
+{
 	naomim2(config);
 	naomi2_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(naomi2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
+}
 
 /*
  * Atomiswave
  */
 
-MACHINE_CONFIG_START(atomiswave_state::aw_base)
+void atomiswave_state::aw_base(machine_config &config)
+{
 	naomi_aw_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(aw_map)
-	MCFG_DEVICE_IO_MAP(aw_port)
+	m_maincpu->set_addrmap(AS_PROGRAM, &atomiswave_state::aw_map);
+	m_maincpu->set_addrmap(AS_IO, &atomiswave_state::aw_port);
 	MACRONIX_29L001MC(config, "awflash");
-	MCFG_AW_ROM_BOARD_ADD("rom_board", "rom_key", WRITE8(*this, dc_state, g1_irq))
+	aw_rom_board &rom_board(AW_ROM_BOARD(config, "rom_board", 0, "rom_key"));
+	rom_board.irq_callback().set(FUNC(dc_state::g1_irq));
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_state,dc_console)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(atomiswave_state::aw1c)
+void atomiswave_state::aw1c(machine_config &config)
+{
 	aw_base(config);
-	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1.0", ":P1.1", ":P1.A0", ":P1.A1", ":P1.A2", ":P1.A3", ":P1.A4", ":P1.A5")
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dcctrl0.set_port_tag<0>("P1.0");
+	dcctrl0.set_port_tag<1>("P1.1");
+	dcctrl0.set_port_tag<2>("P1.A0");
+	dcctrl0.set_port_tag<3>("P1.A1");
+	dcctrl0.set_port_tag<4>("P1.A2");
+	dcctrl0.set_port_tag<5>("P1.A3");
+	dcctrl0.set_port_tag<6>("P1.A4");
+	dcctrl0.set_port_tag<7>("P1.A5");
 	// TODO: isn't it supposed to be just one controller?
-	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2.0", ":P2.1", ":P2.A0", ":P2.A1", ":P2.A2", ":P2.A3", ":P2.A4", ":P2.A5")
-MACHINE_CONFIG_END
+	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
+	dcctrl1.set_port_tag<0>("P2.0");
+	dcctrl1.set_port_tag<1>("P2.1");
+	dcctrl1.set_port_tag<2>("P2.A0");
+	dcctrl1.set_port_tag<3>("P2.A1");
+	dcctrl1.set_port_tag<4>("P2.A2");
+	dcctrl1.set_port_tag<5>("P2.A3");
+	dcctrl1.set_port_tag<6>("P2.A4");
+	dcctrl1.set_port_tag<7>("P2.A5");
+}
 
-MACHINE_CONFIG_START(atomiswave_state::aw2c)
+void atomiswave_state::aw2c(machine_config &config)
+{
 	aw_base(config);
-	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1.0", ":P1.1", ":P1.A0", ":P1.A1", ":P1.A2", ":P1.A3", ":P1.A4", ":P1.A5")
-	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2.0", ":P2.1", ":P2.A0", ":P2.A1", ":P2.A2", ":P2.A3", ":P2.A4", ":P2.A5")
-MACHINE_CONFIG_END
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dcctrl0.set_port_tag<0>("P1.0");
+	dcctrl0.set_port_tag<1>("P1.1");
+	dcctrl0.set_port_tag<2>("P1.A0");
+	dcctrl0.set_port_tag<3>("P1.A1");
+	dcctrl0.set_port_tag<4>("P1.A2");
+	dcctrl0.set_port_tag<5>("P1.A3");
+	dcctrl0.set_port_tag<6>("P1.A4");
+	dcctrl0.set_port_tag<7>("P1.A5");
+	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
+	dcctrl1.set_port_tag<0>("P2.0");
+	dcctrl1.set_port_tag<1>("P2.1");
+	dcctrl1.set_port_tag<2>("P2.A0");
+	dcctrl1.set_port_tag<3>("P2.A1");
+	dcctrl1.set_port_tag<4>("P2.A2");
+	dcctrl1.set_port_tag<5>("P2.A3");
+	dcctrl1.set_port_tag<6>("P2.A4");
+	dcctrl1.set_port_tag<7>("P2.A5");
+}
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
 
 /* BIOS info:
 
-Revisions through C supports only motherboards with X76F100 seral number eeprom
+Revisions through C supports only motherboards with X76F100 serial number eeprom
 Revisions through D can handle game carts only
 Revisions C and later can also handle Multi-board
 Revisions E and later can also handle DIMM board

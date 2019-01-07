@@ -24,6 +24,7 @@
 #include "includes/atarig1.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -191,7 +192,7 @@ void atarig1_state::main_map(address_map &map)
 	map(0xfd0000, 0xfd0000).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
 	map(0xfd8000, 0xfdffff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
-	map(0xfe8000, 0xfe89ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xfe8000, 0xfe89ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xff0000, 0xffffff).ram();
 	map(0xff0000, 0xff0fff).ram().share("rle");
 	map(0xff2000, 0xff2001).w(FUNC(atarig1_state::mo_command_w)).share("mo_command");
@@ -274,7 +275,7 @@ static INPUT_PORTS_START( pitfight )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( pitfightj )
+static INPUT_PORTS_START( pitfightp2 )
 	PORT_START("IN0")       /* fc0000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -437,7 +438,8 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(atarig1_state::hydrap)
+void atarig1_state::hydrap(machine_config &config)
+{
 	atarig1(config);
 
 	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
@@ -445,8 +447,8 @@ MACHINE_CONFIG_START(atarig1_state::hydrap)
 	m_adc->in_callback<1>().set_ioport("ADC1");
 	m_adc->in_callback<2>().set_ioport("ADC2");
 
-	MCFG_ATARIRLE_ADD("rle", modesc_hydra)
-MACHINE_CONFIG_END
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_hydra);
+}
 
 
 void atarig1_state::hydra(machine_config &config)
@@ -456,38 +458,43 @@ void atarig1_state::hydra(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(atarig1_state::pitfight9)
+void atarig1_state::pfslap111(machine_config &config)
+{
 	atarig1(config);
-	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-	SLAPSTIC(config, "slapstic", 114, true);
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(atarig1_state::pitfight7)
-	atarig1(config);
-	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-	SLAPSTIC(config, "slapstic", 112, true);
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(atarig1_state::pitfight)
-	atarig1(config);
-	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
 	SLAPSTIC(config, "slapstic", 111, true);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(atarig1_state::pitfightj)
+void atarig1_state::pfslap112(machine_config &config)
+{
 	atarig1(config);
-	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
+	SLAPSTIC(config, "slapstic", 112, true);
+}
+
+
+void atarig1_state::pfslap113(machine_config &config)
+{
+	atarig1(config);
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
 	SLAPSTIC(config, "slapstic", 113, true);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(atarig1_state::pitfightb)
+void atarig1_state::pfslap114(machine_config &config)
+{
 	atarig1(config);
-	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
-MACHINE_CONFIG_END
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
+	SLAPSTIC(config, "slapstic", 114, true);
+}
+
+
+void atarig1_state::pitfightb(machine_config &config)
+{
+	atarig1(config);
+	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_pitfight);
+}
 
 
 /*************************************
@@ -708,7 +715,7 @@ The chip on the 10P card is labeled 136079-2053
 */
 ROM_START( pitfight )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
-	ROM_LOAD16_BYTE( "136081-9028.05d", 0x00000, 0x10000, CRC(427713e9) SHA1(8b4913188cac9fe3845c812a07c81f5fdb4a2ded) )
+	ROM_LOAD16_BYTE( "136081-9028.05d", 0x00000, 0x10000, CRC(427713e9) SHA1(8b4913188cac9fe3845c812a07c81f5fdb4a2ded) ) /* 01NOV1990 15:07:12 */
 	ROM_LOAD16_BYTE( "136081-9029.05b", 0x00001, 0x10000, CRC(2cdeaeba) SHA1(e02c99d7f5a7080ea75dc2dd59d4678b62f6bd55) )
 	ROM_LOAD16_BYTE( "136081-9030.15d", 0x20000, 0x10000, CRC(3bace9ef) SHA1(29072871b268f343fa1e7fcc9682674df2b2e34f) )
 	ROM_LOAD16_BYTE( "136081-9031.15b", 0x20001, 0x10000, CRC(c717f011) SHA1(3c5d6c12b85285422345a1aba3f8c497f74c6889) )
@@ -803,7 +810,7 @@ The chip on the 10P card is labeled 136079-2053.
 */
 ROM_START( pitfight7 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
-	ROM_LOAD16_BYTE( "136081-7028.05d", 0x00000, 0x10000, CRC(7391dc8b) SHA1(2140b21e71871c2cb81cccd92f536763d955ec97) )
+	ROM_LOAD16_BYTE( "136081-7028.05d", 0x00000, 0x10000, CRC(7391dc8b) SHA1(2140b21e71871c2cb81cccd92f536763d955ec97) ) /* 01OCT1990 16:43:24 */
 	ROM_LOAD16_BYTE( "136081-7029.05b", 0x00001, 0x10000, CRC(b3b88382) SHA1(0a0de330d7261c7eaa5aa705328d6c0c28d27536) )
 	ROM_LOAD16_BYTE( "136081-7030.15d", 0x20000, 0x10000, CRC(5fd5a0b1) SHA1(5d4711e8d10176b6989c4db012dbb4e29860590c) )
 	ROM_LOAD16_BYTE( "136081-7031.15b", 0x20001, 0x10000, CRC(e14a1d0c) SHA1(734fa1cd5ad835fa77c686006993ea9358e3b072) )
@@ -865,7 +872,7 @@ ROM_END
 
 ROM_START( pitfight6 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
-	ROM_LOAD16_BYTE( "136081-6028.05d", 0x00000, 0x10000, CRC(dae1d895) SHA1(d3852b932e318e3f6ab034aba8210d896f9f08da) )
+	ROM_LOAD16_BYTE( "136081-6028.05d", 0x00000, 0x10000, CRC(dae1d895) SHA1(d3852b932e318e3f6ab034aba8210d896f9f08da) ) /* 09OCT1990 11:16:14 */
 	ROM_LOAD16_BYTE( "136081-6029.05b", 0x00001, 0x10000, CRC(4df13418) SHA1(e5469fbdd7263ca651d5cb7518576e4f9c4892e7) )
 	ROM_LOAD16_BYTE( "136081-6030.15d", 0x20000, 0x10000, CRC(72b4b249) SHA1(295c707783ca40d6b68eb36b4511774e889bf447) )
 	ROM_LOAD16_BYTE( "136081-6031.15b", 0x20001, 0x10000, CRC(f0c5d03b) SHA1(53aed44930ebaad98d833bc86837c57ac623937d) )
@@ -915,7 +922,7 @@ ROM_END
 
 ROM_START( pitfight5 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
-	ROM_LOAD16_BYTE( "136081-5028.05d", 0x00000, 0x10000, CRC(dd34b528) SHA1(806e01f3fd6a1335cdcfd2e41f04e9046fe433b5) )
+	ROM_LOAD16_BYTE( "136081-5028.05d", 0x00000, 0x10000, CRC(dd34b528) SHA1(806e01f3fd6a1335cdcfd2e41f04e9046fe433b5) ) /* 22AUG1990 14:08:23 - different slapstic then rev4 below dated 22AUG1990 */
 	ROM_LOAD16_BYTE( "136081-5029.05b", 0x00001, 0x10000, CRC(b0ee9a09) SHA1(df85aeae2c497fbb22732704c2d581a3c195fcfb) )
 	ROM_LOAD16_BYTE( "136081-5030.15d", 0x20000, 0x10000, CRC(6a094723) SHA1(a77046a8c5fab81cf0207122e494c32aab3b220d) )
 	ROM_LOAD16_BYTE( "136081-5031.15b", 0x20001, 0x10000, CRC(47400d94) SHA1(07ba297a9b3ae574bc501a24fb6e46db7a5b3de5) )
@@ -965,7 +972,7 @@ ROM_END
 
 ROM_START( pitfight4 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
-	ROM_LOAD16_BYTE( "136081-4028.05d", 0x00000, 0x10000, CRC(f7cb1a4b) SHA1(024eb80d822559d9f3756710d1988f592639cd5e) )
+	ROM_LOAD16_BYTE( "136081-4028.05d", 0x00000, 0x10000, CRC(f7cb1a4b) SHA1(024eb80d822559d9f3756710d1988f592639cd5e) ) /* 22AUG1990 11:45:49 */
 	ROM_LOAD16_BYTE( "136081-4029.05b", 0x00001, 0x10000, CRC(13ae0d4f) SHA1(1816f40f7e3fee2427e11623c9f1d1b3515cbf72) )
 	ROM_LOAD16_BYTE( "136081-3030.15d", 0x20000, 0x10000, CRC(b053e779) SHA1(f143f0e16850ad98366db208e956f7402d1ca848) )
 	ROM_LOAD16_BYTE( "136081-3031.15b", 0x20001, 0x10000, CRC(2b8c4d13) SHA1(6f1679ef5974bf44848bfa6db0b9b05f71f6e7d6) )
@@ -1027,7 +1034,7 @@ ROM_END
 
 ROM_START( pitfight3 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
-	ROM_LOAD16_BYTE( "136081-3028.05d", 0x00000, 0x10000, CRC(99530da4) SHA1(b542910127553d285f699d2b75e5d6fb071ff046) )
+	ROM_LOAD16_BYTE( "136081-3028.05d", 0x00000, 0x10000, CRC(99530da4) SHA1(b542910127553d285f699d2b75e5d6fb071ff046) ) /* 15AUG1990 12:42:09 */
 	ROM_LOAD16_BYTE( "136081-3029.05b", 0x00001, 0x10000, CRC(78c7afbf) SHA1(7588dfee1e120b69591499ddf2860490b1c66885) )
 	ROM_LOAD16_BYTE( "136081-3030.15d", 0x20000, 0x10000, CRC(b053e779) SHA1(f143f0e16850ad98366db208e956f7402d1ca848) )
 	ROM_LOAD16_BYTE( "136081-3031.15b", 0x20001, 0x10000, CRC(2b8c4d13) SHA1(6f1679ef5974bf44848bfa6db0b9b05f71f6e7d6) )
@@ -1089,7 +1096,7 @@ ROM_END
 
 ROM_START( pitfight2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
-	ROM_LOAD16_BYTE( "136081-2028.05d", 0x00000, 0x10000, CRC(d6dc7a2b) SHA1(d80a07398d5116bc98ed35de223a1cfd6c919576) )
+	ROM_LOAD16_BYTE( "136081-2028.05d", 0x00000, 0x10000, CRC(d6dc7a2b) SHA1(d80a07398d5116bc98ed35de223a1cfd6c919576) ) /* 09AUG1990 16:27:01 */
 	ROM_LOAD16_BYTE( "136081-2029.05b", 0x00001, 0x10000, CRC(56df2a2a) SHA1(0cf683881a272c5115091f063de5f99dd3dd7032) )
 	ROM_LOAD16_BYTE( "136081-2030.15d", 0x20000, 0x10000, CRC(b74a8258) SHA1(779990ed95c25dd0a8e9f30c4d9a8d69162d14fc) )
 	ROM_LOAD16_BYTE( "136081-2031.15b", 0x20001, 0x10000, CRC(40204ecd) SHA1(73d827e119cc1408356e28c1e67f6c8e287eeb15) )
@@ -1149,9 +1156,71 @@ ROM_START( pitfight2 )
 ROM_END
 
 
+ROM_START( pitfight1p2 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
+	ROM_LOAD16_BYTE( "136081-1628.05d", 0x00000, 0x10000, CRC(63bb8d56) SHA1(8ced7f746f58194f0bdd399f6213283c7a9f8f4b) ) /* 10FEB1991 16:15:18 */
+	ROM_LOAD16_BYTE( "136081-1629.05b", 0x00001, 0x10000, CRC(d732b382) SHA1(cb351563fca8304973e12e5b79ab1d528d76a160) )
+	ROM_LOAD16_BYTE( "136081-1630.15d", 0x20000, 0x10000, CRC(8c4a166d) SHA1(9c459f34233d56a185f43ea4556b37df3637b525) )
+	ROM_LOAD16_BYTE( "136081-1631.15b", 0x20001, 0x10000, CRC(69857cc0) SHA1(e7fe39ea8c61c477a7637b418b3d8172c3aa75b3) )
+
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "136081-1060.1b", 0x00000, 0x10000, CRC(231d71d7) SHA1(24622eee5fe873ef81e1df2691bd7a1d3ea7ef6b) )
+
+	ROM_REGION( 0x0a0000, "gfx1", 0 )
+	ROM_LOAD( "136081-1017.130m", 0x000000, 0x10000, CRC(ad3cfea5) SHA1(7b6fec131230e84ab87b7fc95f08989916f30e02) ) /* playfield, planes 0-3 odd */
+	ROM_LOAD( "136081-1018.120m", 0x010000, 0x10000, CRC(1a0f8bcf) SHA1(b965e73246db9507d2ad42dfcb033692b43b9b7a) )
+	ROM_LOAD( "136081-1021.90m",  0x040000, 0x10000, CRC(777efee3) SHA1(07591f11685c4c75c24c55fd242878253d32481b) ) /* playfield, planes 0-3 even */
+	ROM_LOAD( "136081-1022.75m",  0x050000, 0x10000, CRC(524319d0) SHA1(6f47a69d7d4e2a8f79b7470138e8b4edd6d0b2bb) )
+	ROM_LOAD( "136081-1025.45m",  0x080000, 0x10000, CRC(fc41691a) SHA1(4ef2f9093f20d27e1ba7d218b90ff6abb1f33646) ) /* playfield plane 4 */
+
+	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_LOAD( "136081-1027.15l",  0x000000, 0x10000, CRC(a59f381d) SHA1(b14e878340ad2adbf4f6d4fc331c58f62037c7c7) ) /* alphanumerics */
+
+	ROM_REGION16_BE( 0x200000, "rle", 0 )
+	ROM_LOAD16_BYTE( "136081-1001.65r",  0x000001, 0x20000, CRC(3af31444) SHA1(91fc02786b82abdf12ebdbaacdd1f158f8ce6d06) )
+	ROM_LOAD16_BYTE( "136081-1002.65n",  0x000000, 0x20000, CRC(f1d76a4c) SHA1(ca769d2cdd096f4a54f7bcaa4840fc9ffaabf499) )
+	ROM_LOAD16_BYTE( "136081-1003.70r",  0x040001, 0x20000, CRC(28c41c2a) SHA1(75cd527f98c8475e3b880f53c5a355d6c3bd8766) )
+	ROM_LOAD16_BYTE( "136081-1004.70n",  0x040000, 0x20000, CRC(977744da) SHA1(10f388eef999f702863e2b1a02a188df9a0a6086) )
+	ROM_LOAD16_BYTE( "136081-1005.75r",  0x080001, 0x20000, CRC(ae59aef2) SHA1(44eda8a01016f6911b47df973b9427ff9f2ecef0) )
+	ROM_LOAD16_BYTE( "136081-1006.75n",  0x080000, 0x20000, CRC(b6ccd77e) SHA1(f09a829143abd972699f3e671d4a1362fd362b19) )
+	ROM_LOAD16_BYTE( "136081-1007.90r",  0x0c0001, 0x20000, CRC(ba33b0c0) SHA1(be09ba8796d3db2a859a2776336c1e9acbdaee95) )
+	ROM_LOAD16_BYTE( "136081-1008.90n",  0x0c0000, 0x20000, CRC(09bd047c) SHA1(c283d526c7b08ce06e3981d1fc69433ea0dae657) )
+	ROM_LOAD16_BYTE( "136081-1009.100r", 0x100001, 0x20000, CRC(ab85b00b) SHA1(6c60b9b58ff93ffdd1cffc49c3ea67400d56bf61) )
+	ROM_LOAD16_BYTE( "136081-1010.100n", 0x100000, 0x20000, CRC(eca94bdc) SHA1(c474dfc9dc4460cd2f40cc6012214e760b133c0d) )
+	ROM_LOAD16_BYTE( "136081-1011.115r", 0x140001, 0x20000, CRC(a86582fd) SHA1(8b557622c53c8ff388248ea54d3cc85b0d77cafb) )
+	ROM_LOAD16_BYTE( "136081-1012.115n", 0x140000, 0x20000, CRC(efd1152d) SHA1(77d1752b76b079c9e834a8b73e8601873d3afdbe) )
+	ROM_LOAD16_BYTE( "136081-1013.120r", 0x180001, 0x20000, CRC(a141379e) SHA1(d4c98b364495e19e2e7bee5431834f38ba20a514) )
+	ROM_LOAD16_BYTE( "136081-1014.120n", 0x180000, 0x20000, CRC(93bfcc15) SHA1(4d8f6c8c279533b2fc35f87c3eb5ed614cb03248) )
+	ROM_LOAD16_BYTE( "136081-1015.130r", 0x1c0001, 0x20000, CRC(9378ad0b) SHA1(909f9879f5b8fc3ed0622fd27d903ccb1f7a90c6) )
+	ROM_LOAD16_BYTE( "136081-1016.130n", 0x1c0000, 0x20000, CRC(19c3fbe0) SHA1(ba28f71edb04387f009afe39bfe0ffeff8fbf5e9) )
+
+	ROM_REGION( 0x40000, "jsa:oki1", 0 )   /* 256k for ADPCM samples */
+	ROM_LOAD( "136081-1061.7k",  0x00000, 0x10000, CRC(5b0468c6) SHA1(c910344622386e6be336fe04bc0be758ac6c59db) )
+	ROM_LOAD( "136081-1062.7j",  0x10000, 0x10000, CRC(f73fe3cb) SHA1(547b5c4add617237c4c851751a27cda091fb7933) )
+	ROM_LOAD( "136081-1063.7e",  0x20000, 0x10000, CRC(aa93421d) SHA1(f319057dadcb77a489d0bcffb24e0afe88adc769) )
+	ROM_LOAD( "136081-1064.7d",  0x30000, 0x10000, CRC(33f045d5) SHA1(1fc7bedafeb3c1ffa0f115538cc300959c8d4601) )
+
+	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
+	ROM_LOAD( "136081-1040.30s",  0x0000, 0x0200, CRC(9b0f8b95) SHA1(d03987fe2d50a9f7769c600885bd1c7e1dee0789) )
+	ROM_LOAD( "136081-1041.25s",  0x0200, 0x0200, CRC(f7ba6153) SHA1(d58792c9e9ea72d8f53f41ac1b420a86db6da3a3) )
+	ROM_LOAD( "136081-1042.20s",  0x0400, 0x0200, CRC(3572fe68) SHA1(ab34ff337c16cd4d568cd2bd6a5063f5ed97368f) )
+
+	ROM_REGION( 0x1200, "plds", 0 )
+	ROM_LOAD( "gal16v8a-136081-1043.15e",  0x0000, 0x0117, CRC(649d9c0d) SHA1(bba2f3cf4607946340de27157c799f6b84c48584) )
+	ROM_LOAD( "gal16v8a-136079-1045.40p",  0x0200, 0x0117, CRC(535c4d2e) SHA1(a428eef81723546566216e6af0db3baebda9a1f2) )
+	ROM_LOAD( "gal16v8a-136079-1046.65d",  0x0400, 0x0117, CRC(38b22b2c) SHA1(cf9051129a790f3427e1c6d74a5c66f16acbd4be) )
+	ROM_LOAD( "gal16v8a-136079-1047.40s",  0x0600, 0x0117, CRC(20839904) SHA1(134d1b379b7708ce33fbbf75e5c879dad971cd22) )
+	ROM_LOAD( "gal16v8a-136079-1048.125f", 0x0800, 0x0117, CRC(d16e8d6e) SHA1(61cc270d80cb34f63fc407e41b55f95d59717757) )
+	ROM_LOAD( "gal16v8a-136079-1049.120f", 0x0a00, 0x0117, CRC(68440ab1) SHA1(2f4eabac27d9a5778fcba0d9aa47460bcb153378) )
+	ROM_LOAD( "gal16v8a-136079-1050.115f", 0x0c00, 0x0117, CRC(20dc296a) SHA1(9179fca2efcdd0782bb15cbf1923670806755bc8) )
+	ROM_LOAD( "gal16v8a-136079-1051.105f", 0x0e00, 0x0117, CRC(45f0cb5f) SHA1(a7043231f68374871253da50cfd905519f283d9e) )
+	ROM_LOAD( "gal16v8a-136079-1052.30n",  0x1000, 0x0117, CRC(6b3d2669) SHA1(143178d9c36a87aa58034faea2e4d4038ae565e7) )
+ROM_END
+
+
 ROM_START( pitfightj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
-	ROM_LOAD16_BYTE( "136081-3428.05d", 0x00000, 0x10000, CRC(39be5484) SHA1(683ab8cf21f2b82aee11ce21b9dfbdb82083d6b6) )
+	ROM_LOAD16_BYTE( "136081-3428.05d", 0x00000, 0x10000, CRC(39be5484) SHA1(683ab8cf21f2b82aee11ce21b9dfbdb82083d6b6) ) /* 12OCT1990 14:16:00 */
 	ROM_LOAD16_BYTE( "136081-3429.05b", 0x00001, 0x10000, CRC(2cb14a58) SHA1(004178b4869766c11904d1fdf72725ba481bc8cc) )
 	ROM_LOAD16_BYTE( "136081-3430.15d", 0x20000, 0x10000, CRC(80707ac0) SHA1(39ddd228bb630bbdf32c76c7906e54f6a62c06ad) )
 	ROM_LOAD16_BYTE( "136081-3431.15b", 0x20001, 0x10000, CRC(9bf43aa6) SHA1(b41c30118a0c0032303d1b1de471aac292a4968a) )
@@ -1213,10 +1282,10 @@ ROM_END
 
 ROM_START( pitfightb )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
-	ROM_LOAD16_BYTE( "pit9.bin", 0x00000, 0x10000, CRC(946fb15b) SHA1(dbde8daf60a6bda242ea0d627c1fe5034de18090) )
+	ROM_LOAD16_BYTE( "pit9.bin", 0x00000, 0x10000, CRC(946fb15b) SHA1(dbde8daf60a6bda242ea0d627c1fe5034de18090) ) /* 09AUG1990 16:27:01 - based on Pit Fighter revision 2 code */
 	ROM_LOAD16_BYTE( "pit7.bin", 0x00001, 0x10000, CRC(a9e7163a) SHA1(d1536bde0df20fb5f78e5ce55d453cb0c2c0b663) )
-	ROM_LOAD16_BYTE( "pit8.bin", 0x20000, 0x10000, CRC(b74a8258) SHA1(779990ed95c25dd0a8e9f30c4d9a8d69162d14fc) )
-	ROM_LOAD16_BYTE( "pit6.bin", 0x20001, 0x10000, CRC(40204ecd) SHA1(73d827e119cc1408356e28c1e67f6c8e287eeb15) )
+	ROM_LOAD16_BYTE( "pit8.bin", 0x20000, 0x10000, CRC(b74a8258) SHA1(779990ed95c25dd0a8e9f30c4d9a8d69162d14fc) ) /* == 136081-2030.15d */
+	ROM_LOAD16_BYTE( "pit6.bin", 0x20001, 0x10000, CRC(40204ecd) SHA1(73d827e119cc1408356e28c1e67f6c8e287eeb15) ) /* == 136081-2031.15b */
 
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "136081-1060.1b", 0x00000, 0x10000, CRC(231d71d7) SHA1(24622eee5fe873ef81e1df2691bd7a1d3ea7ef6b) )
@@ -1301,16 +1370,17 @@ void atarig1_state::init_pitfightb()
  *
  *************************************/
 
-GAME( 1990, hydra,     0,        hydra,     hydra,     atarig1_state, init_hydra,     ROT0, "Atari Games", "Hydra", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hydrap,    hydra,    hydrap,    hydra,     atarig1_state, init_hydrap,    ROT0, "Atari Games", "Hydra (prototype 5/14/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hydrap2,   hydra,    hydrap,    hydra,     atarig1_state, init_hydrap,    ROT0, "Atari Games", "Hydra (prototype 5/25/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hydra,       0,        hydra,     hydra,      atarig1_state, init_hydra,     ROT0, "Atari Games", "Hydra", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hydrap,      hydra,    hydrap,    hydra,      atarig1_state, init_hydrap,    ROT0, "Atari Games", "Hydra (prototype 5/14/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hydrap2,     hydra,    hydrap,    hydra,      atarig1_state, init_hydrap,    ROT0, "Atari Games", "Hydra (prototype 5/25/90)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, pitfight,  0,        pitfight9, pitfight,  atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 9)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight7, pitfight, pitfight7, pitfight,  atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 7)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight6, pitfight, pitfightj, pitfight,  atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight5, pitfight, pitfight7, pitfight,  atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight4, pitfight, pitfight,  pitfight,  atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight3, pitfight, pitfight,  pitfight,  atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfight2, pitfight, pitfight,  pitfight,  atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfightj, pitfight, pitfightj, pitfightj, atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (Japan rev 3, 2 players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pitfightb, pitfight, pitfightb, pitfight,  atarig1_state, init_pitfightb, ROT0, "bootleg",     "Pit Fighter (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight,    0,        pfslap114, pitfight,   atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 9)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight7,   pitfight, pfslap112, pitfight,   atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight6,   pitfight, pfslap113, pitfight,   atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight5,   pitfight, pfslap112, pitfight,   atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight4,   pitfight, pfslap111, pitfight,   atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight3,   pitfight, pfslap111, pitfight,   atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight2,   pitfight, pfslap111, pitfight,   atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfight1p2, pitfight, pfslap114, pitfightp2, atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 1, 2 players)", MACHINE_SUPPORTS_SAVE ) /* revision 1, but newest code base */
+GAME( 1990, pitfightj,   pitfight, pfslap113, pitfightp2, atarig1_state, init_pitfight,  ROT0, "Atari Games", "Pit Fighter (Japan rev 3, 2 players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pitfightb,   pitfight, pitfightb, pitfight,   atarig1_state, init_pitfightb, ROT0, "bootleg",     "Pit Fighter (bootleg)", MACHINE_SUPPORTS_SAVE )

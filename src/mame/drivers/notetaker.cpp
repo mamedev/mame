@@ -102,6 +102,7 @@ DONE:
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/floppy.h"
 #include "machine/ay31015.h"
 #include "machine/pic8259.h"
 #include "machine/wd_fdc.h"

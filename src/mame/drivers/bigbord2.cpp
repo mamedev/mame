@@ -72,6 +72,7 @@ X - change banks
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/74259.h"
 #include "machine/clock.h"
@@ -620,8 +621,8 @@ MACHINE_CONFIG_START(bigbord2_state::bigbord2)
 	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // U96
 
 	/* keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(bigbord2_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(bigbord2_state::kbd_put));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

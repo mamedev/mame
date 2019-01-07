@@ -5,10 +5,11 @@
 
 #pragma once
 
+#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/bankdev.h"
-#include "video/k053246_k053247_k055673.h"
 #include "video/k052109.h"
 #include "video/k053251.h"
+#include "video/k053246_k053247_k055673.h"
 #include "video/konami_helper.h"
 
 class simpsons_state : public driver_device
@@ -47,7 +48,7 @@ private:
 	//int        m_nmi_enabled;
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<address_map_bank_device> m_bank0000;
 	required_device<address_map_bank_device> m_bank2000;

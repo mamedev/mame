@@ -56,7 +56,7 @@ static void isbc_218a_floppies(device_slot_interface &device)
 
 void isbc_218a_device::device_add_mconfig(machine_config &config)
 {
-	I8272A(config, m_fdc, true);
+	I8272A(config, m_fdc, 8_MHz_XTAL, true);
 	m_fdc->intrq_wr_callback().set(FUNC(isbc_218a_device::fdc_irq));
 	m_fdc->drq_wr_callback().set(FUNC(isbc_218a_device::fdc_drq));
 	FLOPPY_CONNECTOR(config, m_floppy0, isbc_218a_floppies, "525dd", isbc_218a_device::floppy_formats);

@@ -405,8 +405,7 @@ MACHINE_CONFIG_START(pastelg_state::pastelg)
 	MCFG_DEVICE_IO_MAP(pastelg_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert) // nmiclock not written, chip is 1411M1 instead of 1413M3
 
-	MCFG_NB1413M3_ADD("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_PASTELG )
+	NB1413M3(config, m_nb1413m3, 0, NB1413M3_PASTELG);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -466,7 +465,7 @@ MACHINE_CONFIG_START(pastelg_state::threeds)
 	MCFG_DEVICE_IO_MAP(threeds_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert)
 
-	MCFG_NB1413M3_ADD("nb1413m3")
+	NB1413M3(config, m_nb1413m3, 0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */

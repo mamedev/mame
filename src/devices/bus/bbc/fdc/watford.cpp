@@ -67,7 +67,7 @@ ROM_END
 
 void bbc_weddb2_device::device_add_mconfig(machine_config &config)
 {
-	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
+	WD1772(config, m_fdc, 8_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
 	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
 
@@ -77,7 +77,7 @@ void bbc_weddb2_device::device_add_mconfig(machine_config &config)
 
 void bbc_weddb3_device::device_add_mconfig(machine_config &config)
 {
-	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
+	WD1770(config, m_fdc, DERIVED_CLOCK(1, 1));
 	m_fdc->intrq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::intrq_w));
 	m_fdc->drq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_fdc_slot_device::drq_w));
 

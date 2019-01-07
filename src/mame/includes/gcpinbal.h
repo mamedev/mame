@@ -11,6 +11,8 @@
 #include "sound/okim6295.h"
 #include "video/excellent_spr.h"
 #include "emupal.h"
+#include "machine/timer.h"
+#include "screen.h"
 
 class gcpinbal_state : public driver_device
 {
@@ -28,15 +30,12 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_sprgen(*this, "spritegen")
+		, m_screen(*this, "screen")
 	{ }
 
 	void gcpinbal(machine_config &config);
 
 private:
-	enum
-	{
-		TIMER_GCPINBAL_INTERRUPT1
-	};
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -53,8 +52,6 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	emu_timer *m_int1_timer;
-
 	/* video-related */
 	tilemap_t     *m_tilemap[3];
 	uint16_t      m_scrollx[3];
@@ -67,6 +64,7 @@ private:
 
 	/* sound-related */
 	uint32_t      m_msm_bank;
+
 
 	DECLARE_WRITE16_MEMBER(d80010_w);
 	DECLARE_WRITE8_MEMBER(d80040_w);
@@ -83,14 +81,13 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_gcpinbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(gcpinbal_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 	void gcpinbal_core_vh_start(  );
 	DECLARE_WRITE_LINE_MEMBER(gcp_adpcm_int);
 	required_device<excellent_spr_device> m_sprgen;
+	required_device<screen_device> m_screen;
 
 	void gcpinbal_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif // MAME_INCLUDES_GCPINBAL_H

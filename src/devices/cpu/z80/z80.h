@@ -7,15 +7,6 @@
 
 #include "machine/z80daisy.h"
 
-#define MCFG_Z80_SET_IRQACK_CALLBACK(_devcb) \
-	downcast<z80_device &>(*device).set_irqack_cb(DEVCB_##_devcb);
-
-#define MCFG_Z80_SET_REFRESH_CALLBACK(_devcb) \
-	downcast<z80_device &>(*device).set_refresh_cb(DEVCB_##_devcb);
-
-#define MCFG_Z80_SET_HALT_CALLBACK(_devcb) \
-	downcast<z80_device &>(*device).set_halt_cb(DEVCB_##_devcb);
-
 enum
 {
 	NSC800_RSTA = INPUT_LINE_IRQ0 + 1,
@@ -45,9 +36,6 @@ public:
 	template <typename... T> void set_memory_map(T &&... args) { set_addrmap(AS_PROGRAM, std::forward<T>(args)...); }
 	template <typename... T> void set_m1_map(T &&... args) { set_addrmap(AS_OPCODES, std::forward<T>(args)...); }
 	template <typename... T> void set_io_map(T &&... args) { set_addrmap(AS_IO, std::forward<T>(args)...); }
-	template<class Object> devcb_base &set_irqack_cb(Object &&cb) { return m_irqack_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_refresh_cb(Object &&cb) { return m_refresh_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_halt_cb(Object &&cb) { return m_halt_cb.set_callback(std::forward<Object>(cb)); }
 	auto irqack_cb() { return m_irqack_cb.bind(); }
 	auto refresh_cb() { return m_refresh_cb.bind(); }
 	auto halt_cb() { return m_halt_cb.bind(); }

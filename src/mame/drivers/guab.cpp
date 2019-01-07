@@ -48,6 +48,7 @@
 #include "cpu/m68000/m68000.h"
 #include "bus/rs232/rs232.h"
 #include "formats/guab_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
@@ -472,36 +473,36 @@ static void guab_floppies(device_slot_interface &device)
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(guab_state::guab)
+void guab_state::guab(machine_config &config)
+{
 	/* TODO: Verify clock */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(guab_map)
+	M68000(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &guab_state::guab_map);
 
 	/* TODO: Use real video timings */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(guab_state, screen_update_guab)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(guab_state::screen_update_guab));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", ef9369_device::NUMCOLORS)
+	PALETTE(config, m_palette, ef9369_device::NUMCOLORS);
 
-	MCFG_EF9369_ADD("ef9369")
-	MCFG_EF9369_COLOR_UPDATE_CB(guab_state, ef9369_color_update)
+	EF9369(config, "ef9369").set_color_update_callback(FUNC(guab_state::ef9369_color_update));
 
-	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
-	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
-	MCFG_TMS34061_VRAM_SIZE(0x40000)
-	MCFG_TMS34061_INTERRUPT_CB(INPUTLINE("maincpu", 5))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	TMS34061(config, m_tms34061, 0);
+	m_tms34061->set_rowshift(8);  /* VRAM address is (row << rowshift) | col */
+	m_tms34061->set_vram_size(0x40000);
+	m_tms34061->int_callback().set_inputline("maincpu", 5);
+	m_tms34061->set_screen("screen");
 
 	SPEAKER(config, "mono").front_center();
 
 	/* TODO: Verify clock */
-	MCFG_DEVICE_ADD("snsnd", SN76489, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489(config, m_sn, 2000000);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	ptm6840_device &ptm(PTM6840(config, "6840ptm", 1000000));
 	ptm.set_external_clocks(0, 0, 0);
@@ -548,14 +549,12 @@ MACHINE_CONFIG_START(guab_state::guab)
 	// floppy
 	WD1773(config, m_fdc, 8000000);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, 6);
+	FLOPPY_CONNECTOR(config, "fdc:0", guab_floppies, "dd", guab_state::floppy_formats).set_fixed(true);
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", guab_floppies, "dd", guab_state::floppy_formats)
-	MCFG_SLOT_FIXED(true)
-
-	MCFG_SOFTWARE_LIST_ADD("floppy_list", "guab")
+	SOFTWARE_LIST(config, "floppy_list").set_original("guab");
 
 	config.set_default_layout(layout_guab);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

@@ -528,15 +528,15 @@ MACHINE_CONFIG_START(moo_state::moo)
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(moo_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48+1, 23)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48+1, 23);
+	m_k053246->set_palette("palette");
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(moo_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_palette("palette");
 
 	K053251(config, m_k053251, 0);
 
@@ -583,15 +583,15 @@ MACHINE_CONFIG_START(moo_state::moobl)
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(moo_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48+1, 23)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48+1, 23);
+	m_k053246->set_palette("palette");
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(moo_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(moo_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_palette("palette");
 
 	K053251(config, m_k053251, 0);
 
@@ -612,10 +612,9 @@ MACHINE_CONFIG_START(moo_state::bucky)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bucky_map)
 
-	MCFG_K054000_ADD("k054000")
+	K054000(config, "k054000", 0);
 
-	MCFG_DEVICE_MODIFY("k053246")
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48, 23)
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48, 23);
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")

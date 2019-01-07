@@ -1711,9 +1711,9 @@ MACHINE_CONFIG_START(megasys1_state::system_A)
 	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*1)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 256*2)
+	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
+	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
+	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 256*2);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1743,24 +1743,24 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megasys1_state::system_A_iganinju)
 	system_A(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_REMOVE("scantimer")
+	config.device_remove("scantimer");
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_iganinju_scanline, "screen", 0, 1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(megasys1_state::system_A_soldam)
+void megasys1_state::system_A_soldam(machine_config &config)
+{
 	system_A(config);
-	MCFG_DEVICE_MODIFY("scroll1")
-	MCFG_MEGASYS1_TILEMAP_8X8_SCROLL_FACTOR(4)
-MACHINE_CONFIG_END
+
+	m_tmap[1]->set_8x8_scroll_factor(4);
+}
 
 MACHINE_CONFIG_START(megasys1_state::kickoffb)
 	system_A(config);
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(kickoffb_sound_map)
 
-	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_DEVICE_REMOVE("oki2")
+	config.device_remove("ymsnd");
+	config.device_remove("oki2");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, SOUND_CPU_CLOCK / 2)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, megasys1_state, sound_irq)) // TODO: needs to be checked
@@ -1816,9 +1816,9 @@ MACHINE_CONFIG_START(megasys1_state::system_Bbl)
 	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*1)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 256*2)
+	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
+	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
+	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 256*2);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1896,8 +1896,8 @@ MACHINE_CONFIG_START(megasys1_state::system_D)
 	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*1)
+	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
+	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1947,8 +1947,8 @@ MACHINE_CONFIG_START(megasys1_state::system_Z)
 
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
-	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*2)
+	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
+	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3063,6 +3063,57 @@ ROM_START( iganinju )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
 	ROM_LOAD( "iga.131",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
+ROM_END
+
+ROM_START( iganinjub )
+	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code, c and b identical to the original */
+	ROM_LOAD16_BYTE( "19.a12", 0x000000, 0x010000, CRC(6b4c16ac) SHA1(edb5fe3b3e4e94e59348c0a7034df9df6ef157d3) )
+	ROM_LOAD16_BYTE( "23.13",  0x000001, 0x010000, CRC(03bfda29) SHA1(ced6ddcbb86d3109bcfb8e1982a5f666ca7dc10e) )
+	ROM_LOAD16_BYTE( "20.a13", 0x020000, 0x010000, CRC(fa0705fb) SHA1(110ebca62a57f9d8e355a339a99819faf1fe57f1) )
+	ROM_LOAD16_BYTE( "24.12",  0x020001, 0x010000, CRC(2de40303) SHA1(5c841295c0d804163a7da3c122dd40af7780d1f2) )
+	ROM_LOAD16_BYTE( "c",      0x040000, 0x010000, CRC(de5937ad) SHA1(d3039e5391feb925ea10f33a1363bf3ffc1ebb3d) )
+	ROM_LOAD16_BYTE( "b",      0x040001, 0x010000, CRC(afaf0480) SHA1(b8d0ec859a94941650bdd2b01e98d054d49fef67) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code, identical to the original */
+	ROM_LOAD16_BYTE( "5.9.c", 0x000000, 0x010000, CRC(13580868) SHA1(bfcd11b294b64af81a0403a3e9370c42a9859b6b) )
+	ROM_LOAD16_BYTE( "4.6.c", 0x000001, 0x010000, CRC(7904d5dd) SHA1(4cd9fdab601a90c997a041a9f7966a9a233e897b) )
+
+	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0, identical to the original but half size ROMs */
+	ROM_LOAD( "15.20", 0x000000, 0x010000, CRC(e2583bcd) SHA1(1401007196b2211c6d155a0cc73b63c38fae7183) )
+	ROM_LOAD( "16.a21",0x010000, 0x010000, CRC(2f9fd524) SHA1(ece514b72644c72e0193f6c2dd152ccd90ccb9ce) )
+	ROM_LOAD( "14.19", 0x020000, 0x010000, CRC(ec835d5c) SHA1(fad4da044e74240d702148e569e8f4e9ebe6664c) )
+	ROM_LOAD( "17",    0x030000, 0x010000, CRC(24751b73) SHA1(eb8f618ca91c73d1c613dedf4e8a5d1fa635abfe) )
+
+	ROM_REGION( 0x080000, "scroll1", 0 ) /* Scroll 1, identical to the original but half size ROMs except 21.a16 */
+	ROM_LOAD( "25.a12", 0x000000, 0x010000, CRC(c41a4c20) SHA1(35cc21fda02aa318eda3a5f6c3e061c07c8c10a3) )
+	ROM_LOAD( "a.a15",  0x010000, 0x010000, CRC(69b3716b) SHA1(d444591a61f6ad86c013ff2bfa56a29cfd1f5b1d) )
+	ROM_LOAD( "d",      0x020000, 0x010000, CRC(71941062) SHA1(d29e627d12d1dd4976b0380009305f6a82177bb9) )
+	ROM_LOAD( "e",      0x030000, 0x010000, CRC(89c4d42b) SHA1(b8a2348318877a9f8d50256ec1b96bc5afa4b4ba) )
+	ROM_LOAD( "22.a17", 0x040000, 0x010000, CRC(5589325d) SHA1(35356106f7301147b049c104c36f58278760bcf4) )
+	ROM_LOAD( "21.a16", 0x050000, 0x010000, CRC(5c42be93) SHA1(e01dbeab85ba205086f0512745f096493ed66ee2) ) // 94.371033% kazan.17 [2/2], 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "f",      0x060000, 0x010000, CRC(a7a2aea7) SHA1(68df0f8351aa3da8bca8347bda2f62ba53ab86fa) )
+	ROM_LOAD( "h",      0x070000, 0x010000, CRC(d609e379) SHA1(b83fc8922967702fbb2b6576b8787913c13a5640) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x020000, "scroll2", 0 ) /* Scroll 2, identical to the original */
+	ROM_LOAD( "18.18", 0x000000, 0x010000, CRC(b3a9a4ae) SHA1(bccef0f6ea17c2f0f8d61da4d174389084252d13) )
+
+	ROM_REGION( 0x080000, "sprites", 0 ) /* Sprites, identical to the original but half size ROMs */
+	ROM_LOAD( "7.2.q",  0x000000, 0x010000, CRC(db4e04c7) SHA1(4285f4fa9fe2e1b957b96ef51ea3388e303d7c55) )
+	ROM_LOAD( "8.1.r",  0x010000, 0x010000, CRC(1b7a0c3f) SHA1(6d5fd07e9f84f4a0a06d5427f111ff4d48e5c2fa) )
+	ROM_LOAD( "10.5.q", 0x020000, 0x010000, CRC(0f8e66d6) SHA1(aff1c51928d2689a274960f4e680ae3201271d5d) )
+	ROM_LOAD( "11.4.r", 0x030000, 0x010000, CRC(37f6277f) SHA1(b9737e248c9b92bc72be3e5335d8ef7bf38a7e9c) )
+	ROM_LOAD( "6.p",    0x040000, 0x010000, CRC(41d7ccaf) SHA1(ae79c91ca12ecb766d5cd9ce4f1d8c9ef0aba10a) )
+	ROM_LOAD( "9.p",    0x050000, 0x010000, CRC(3178fac1) SHA1(4574a5956920feb31b95bbb4c8a5dc023e7d793a) )
+	ROM_LOAD( "12.8.q", 0x060000, 0x010000, CRC(b8bdc11d) SHA1(f9ffe998021fabde382aae4ee7bb4b93cc60c788) )
+	ROM_LOAD( "13.7.r", 0x070000, 0x010000, CRC(78449e50) SHA1(0e42e31570fd5923a26e7d5f143172ee9a713cbb) )
+
+	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples, only 1 OKI present even though PCB can host 2 */
+	ROM_LOAD( "1.a",  0x000000, 0x010000, CRC(64f13da0) SHA1(d47e0032f852f11b38b3c052fa2b82decd02e7a3) )
+	ROM_LOAD( "2.a",  0x010000, 0x010000, CRC(d33a8268) SHA1(4511c3f6baf0d193c028cc7e863c72dbc33baebe) )
+	ROM_LOAD( "3.a",  0x030000, 0x010000, CRC(e7268807) SHA1(a20a352ee021e2f066c72d9d9784092ab76e6177) ) // identical to kazan.8 [2/2], where's the first half?
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM, not dumped for this set */
+	ROM_LOAD( "kazan.14m",    0x0000, 0x0200, BAD_DUMP CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
 ROM_END
 
 ROM_START( inyourfa )
@@ -4838,6 +4889,7 @@ GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, ini
 GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kazan,    0,        system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, iganinju, kazan,    system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, iganinjub,kazan,    system_A_iganinju, kazan,    megasys1_state, empty_init   , ROT0,   "bootleg","Iga Ninjyutsuden (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, astyanax, 0,        system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lordofk,  astyanax, system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   megasys1_state, init_astyanax, ROT0,   "Jaleco", "Hachoo!", MACHINE_SUPPORTS_SAVE )

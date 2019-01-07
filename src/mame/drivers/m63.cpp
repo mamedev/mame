@@ -185,7 +185,7 @@ private:
 	optional_device<ay8910_device> m_ay2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_soundcpu;
+	required_device<i8039_device> m_soundcpu;
 	optional_device<samples_device> m_samples;
 	required_device<generic_latch_8_device> m_soundlatch;
 
@@ -759,9 +759,9 @@ INTERRUPT_GEN_MEMBER(m63_state::vblank_irq)
 MACHINE_CONFIG_START(m63_state::m63)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,XTAL(12'000'000)/4)     /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(m63_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
+	Z80(config, m_maincpu, XTAL(12'000'000)/4); /* 3 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &m63_state::m63_map);
+	m_maincpu->set_vblank_int("screen", FUNC(m63_state::vblank_irq));
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // probably chip at E7 obscured by pulldown resistor
 	outlatch.q_out_cb<0>().set(FUNC(m63_state::nmi_mask_w));
@@ -770,30 +770,30 @@ MACHINE_CONFIG_START(m63_state::m63)
 	outlatch.q_out_cb<6>().set(FUNC(m63_state::coin1_w));
 	outlatch.q_out_cb<7>().set(FUNC(m63_state::coin2_w));
 
-	MCFG_DEVICE_ADD("soundcpu",I8039,XTAL(12'000'000)/4) /* ????? */
-	MCFG_DEVICE_PROGRAM_MAP(i8039_map)
-	MCFG_DEVICE_IO_MAP(i8039_port_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, m63_state, p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, m63_state, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, m63_state, irq_r))
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60)
+	I8039(config, m_soundcpu, XTAL(12'000'000)/4); /* ????? */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m63_state::i8039_map);
+	m_soundcpu->set_addrmap(AS_IO, &m63_state::i8039_port_map);
+	m_soundcpu->p1_out_cb().set(FUNC(m63_state::p1_w));
+	m_soundcpu->p2_out_cb().set(FUNC(m63_state::p2_w));
+	m_soundcpu->t1_in_cb().set(FUNC(m63_state::irq_r));
+	m_soundcpu->set_periodic_int(FUNC(m63_state::snd_irq), attotime::from_hz(60));
 
 	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
 	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(m63_state::screen_update_m63));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m63)
-	MCFG_PALETTE_ADD("palette", 256+4)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m63);
+	PALETTE(config, m_palette, 256+4);
+	m_palette->set_init(FUNC(m63_state::palette_init_m63));
 
-	MCFG_PALETTE_INIT_OWNER(m63_state,m63)
 	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 
 	/* sound hardware */
@@ -802,47 +802,49 @@ MACHINE_CONFIG_START(m63_state::m63)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, m_ay1, XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);
-
 	AY8910(config, m_ay2, XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 1.00); /* ????? */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(m63_state::atomboy)
+void m63_state::atomboy(machine_config &config)
+{
 	m63(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
-MACHINE_CONFIG_END
+	m_soundcpu->set_periodic_int(FUNC(m63_state::snd_irq), attotime::from_hz(60/2));
+}
 
-MACHINE_CONFIG_START(m63_state::fghtbskt)
-
+void m63_state::fghtbskt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)     /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fghtbskt_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
+	Z80(config, m_maincpu, XTAL(12'000'000)/4); /* 3 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &m63_state::fghtbskt_map);
+	m_maincpu->set_vblank_int("screen", FUNC(m63_state::vblank_irq));
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
 	outlatch.q_out_cb<1>().set(FUNC(m63_state::nmi_mask_w));
 	outlatch.q_out_cb<2>().set(FUNC(m63_state::fghtbskt_flipscreen_w));
 	//outlatch.q_out_cb<7>().set(FUNC(m63_state::fghtbskt_samples_w));
 
-	MCFG_DEVICE_ADD("soundcpu", I8039,XTAL(12'000'000)/4)    /* ????? */
-	MCFG_DEVICE_PROGRAM_MAP(i8039_map)
-	MCFG_DEVICE_IO_MAP(i8039_port_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
+	I8039(config, m_soundcpu, XTAL(12'000'000)/4); /* ????? */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m63_state::i8039_map);
+	m_soundcpu->set_addrmap(AS_IO, &m63_state::i8039_port_map);
+	m_soundcpu->set_periodic_int(FUNC(m63_state::snd_irq), attotime::from_hz(60/2));
 
 	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
 	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(m63_state::screen_update_m63));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fghtbskt)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fghtbskt);
+	PALETTE(config, m_palette, 256);
+	m_palette->set_prom_region("proms");
+	m_palette->set_init("palette", FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms));
+
 	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 
 	/* sound hardware */
@@ -852,11 +854,11 @@ MACHINE_CONFIG_START(m63_state::fghtbskt)
 
 	AY8910(config, m_ay1, XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_START_CB(m63_state, fghtbskt_sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_start_callback(FUNC(m63_state::fghtbskt_sh_start));
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /***************************************************************************

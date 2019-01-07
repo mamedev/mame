@@ -30,6 +30,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
@@ -826,7 +827,7 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 	ppi.out_pb_callback().set(FUNC(mz3500_state::mz3500_pb_w));
 	ppi.out_pc_callback().set(FUNC(mz3500_state::mz3500_pc_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_master, INPUT_LINE_IRQ0);
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)

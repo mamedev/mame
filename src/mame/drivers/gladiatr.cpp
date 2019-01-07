@@ -1041,19 +1041,19 @@ MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 	m_ccpu->t0_in_cb().set_ioport("COINS").bit(1);
 	m_ccpu->t1_in_cb().set_ioport("COINS").bit(0);
 
-	MCFG_DEVICE_ADD("ucpu", I8741, 12_MHz_XTAL/2) /* verified on pcb */
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, gladiatr_state, ucpu_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, gladiatr_state, ucpu_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, gladiatr_state, ucpu_p2_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, gladiatr_state, tclk_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, gladiatr_state, ucpu_t1_r))
+	I8741(config, m_ucpu, 12_MHz_XTAL/2); /* verified on pcb */
+	m_ucpu->p1_in_cb().set(FUNC(gladiatr_state::ucpu_p1_r));
+	m_ucpu->p1_out_cb().set(FUNC(gladiatr_state::ucpu_p1_w));
+	m_ucpu->p2_in_cb().set(FUNC(gladiatr_state::ucpu_p2_r));
+	m_ucpu->t0_in_cb().set(FUNC(gladiatr_state::tclk_r));
+	m_ucpu->t1_in_cb().set(FUNC(gladiatr_state::ucpu_t1_r));
 
-	MCFG_DEVICE_ADD("csnd", I8741, 12_MHz_XTAL/2) /* verified on pcb */
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, gladiatr_state, csnd_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, gladiatr_state, csnd_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, gladiatr_state, csnd_p2_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, gladiatr_state, tclk_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, gladiatr_state, csnd_t1_r))
+	I8741(config, m_csnd, 12_MHz_XTAL/2); /* verified on pcb */
+	m_csnd->p1_in_cb().set(FUNC(gladiatr_state::csnd_p1_r));
+	m_csnd->p1_out_cb().set(FUNC(gladiatr_state::csnd_p1_w));
+	m_csnd->p2_in_cb().set(FUNC(gladiatr_state::csnd_p2_r));
+	m_csnd->t0_in_cb().set(FUNC(gladiatr_state::tclk_r));
+	m_csnd->t1_in_cb().set(FUNC(gladiatr_state::csnd_t1_r));
 
 	/* lazy way to make polled serial between MCUs work */
 	MCFG_QUANTUM_PERFECT_CPU("ucpu")

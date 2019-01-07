@@ -77,6 +77,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
@@ -462,7 +463,7 @@ MACHINE_CONFIG_START(amust_state::amust)
 	crtc.out_hsync_callback().set(FUNC(amust_state::hsync_w));
 	crtc.out_vsync_callback().set(FUNC(amust_state::vsync_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->drq_wr_callback().set(FUNC(amust_state::drq_w));
 	m_fdc->intrq_wr_callback().set(FUNC(amust_state::intrq_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amust_floppies, "525qd", floppy_image_device::default_floppy_formats)
