@@ -251,19 +251,23 @@ void neogeo_cmc_kof2000n_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 DEFINE_DEVICE_TYPE(NEOGEO_CMC_JOCKEYGP_CART, neogeo_cmc_jockeygp_cart_device, "neocart_jockeygp", "Neo Geo Jockey GP CMC50 Cart")
 
 neogeo_cmc_jockeygp_cart_device::neogeo_cmc_jockeygp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	neogeo_cmc_cart_device(mconfig, NEOGEO_CMC_JOCKEYGP_CART, tag, owner, clock)
+	neogeo_cmc_cart_device(mconfig, NEOGEO_CMC_JOCKEYGP_CART, tag, owner, clock),
+	m_nvram(*this, "nvram")
 {
 }
 
 
 void neogeo_cmc_jockeygp_cart_device::device_start()
 {
-	save_item(NAME(m_ram));
+	m_ram = make_unique_clear<uint16_t[]>(0x2000/2);
+	m_nvram->set_base(m_ram.get(), 0x2000);
+	save_pointer(NAME(m_ram), 0x2000/2);
 }
 
-void neogeo_cmc_jockeygp_cart_device::device_reset()
+void neogeo_cmc_jockeygp_cart_device::device_add_mconfig(machine_config &config)
 {
-	memset(m_ram, 0, 0x2000);
+	neogeo_cmc_cart_device::device_add_mconfig(config);
+	NVRAM(config, m_nvram);
 }
 
 void neogeo_cmc_jockeygp_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
