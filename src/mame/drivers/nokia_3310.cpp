@@ -262,7 +262,7 @@ void noki3310_state::machine_reset()
 	m_timer_fiq8->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
 
 	// simulate power-on input
-	if (machine().system().name && (machine().system().name[4] == '8' || machine().system().name[4] == '5'))
+	if (machine().system().name[4] == '8' || machine().system().name[4] == '5')
 		m_power_on = ~0x10;
 	else
 		m_power_on = ~0x02;
