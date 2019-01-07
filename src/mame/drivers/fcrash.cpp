@@ -494,6 +494,37 @@ WRITE16_MEMBER(cps_state::sf2mdta_layer_w)
 	}
 }
 
+WRITE16_MEMBER(cps_state::sf2b_layer_w)
+{
+	switch (offset)
+	{
+	case 0x06:
+		m_cps_a_regs[0x0c / 2] = data + 0xffbe; /* scroll 1x */
+		break;
+	case 0x07:
+		m_cps_a_regs[0x0e / 2] = data; /* scroll 1y */
+		break;
+	case 0x08:
+		m_cps_a_regs[0x14 / 2] = data + 0xffce; /* scroll 3x */
+		break;
+	case 0x09:
+		m_cps_a_regs[0x12 / 2] = data; /* scroll 2y */
+		m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; /* row scroll start */
+		break;
+	case 0x0a:
+		m_cps_a_regs[0x10 / 2] = data + 0xffce; /* scroll 2x */
+		break;
+	case 0x0b:
+		m_cps_a_regs[0x16 / 2] = data; /* scroll 3y */
+		break;
+	case 0x26:
+		m_cps_b_regs[m_layer_enable_reg / 2] = data;
+		break;
+	default:
+		printf("%X:%X ",offset,data);
+	}
+}
+
 WRITE16_MEMBER(cps_state::slampic_layer_w)
 {
 	switch (offset)
@@ -725,7 +756,7 @@ void cps_state::knightsb_map(address_map &map)
 	map(0x900000, 0x93ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
 	map(0x980000, 0x98002f).w(FUNC(cps_state::knightsb_layer_w));
 	map(0x990000, 0x990001).nopw(); // same as 880000
-	map(0xff0000, 0xffffff).ram();
+	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
 void cps_state::dinopic_map(address_map &map)
@@ -745,7 +776,7 @@ void cps_state::dinopic_map(address_map &map)
 	map(0xf1c000, 0xf1c001).portr("IN2");            /* Player 3 controls (later games) */
 	map(0xf1c004, 0xf1c005).w(FUNC(cps_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
-	map(0xff0000, 0xffffff).ram();
+	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
 void cps_state::fcrash_map(address_map &map)
@@ -759,7 +790,7 @@ void cps_state::fcrash_map(address_map &map)
 	map(0x880008, 0x88000f).r(FUNC(cps_state::cps1_dsw_r));                /* System input ports / Dip Switches */
 	map(0x890000, 0x890001).nopw();    // palette related?
 	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
-	map(0xff0000, 0xffffff).ram();
+	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
 void cps_state::mtwinsb_map(address_map &map)
@@ -810,7 +841,7 @@ void cps_state::sf2m1_map(address_map &map)
 	map(0x900000, 0x93ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
 	map(0x980000, 0x9801ff).w(FUNC(cps_state::sf2m1_layer_w));
 	map(0x990000, 0x990001).nopw(); // same as 880000
-	map(0xff0000, 0xffffff).ram();
+	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
 void cps_state::sf2mdt_map(address_map &map)
@@ -832,7 +863,7 @@ void cps_state::sf2mdt_map(address_map &map)
 void cps_state::sf2b_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
-	map(0x708100, 0x7081ff).w(FUNC(cps_state::sf2mdta_layer_w));
+	map(0x708100, 0x7081ff).w(FUNC(cps_state::sf2b_layer_w));
 	map(0x70c000, 0x70c001).portr("IN1");
 	map(0x70c008, 0x70c009).portr("IN2");
 	map(0x70c018, 0x70c01f).r(FUNC(cps_state::cps1_hack_dsw_r));
@@ -842,7 +873,7 @@ void cps_state::sf2b_map(address_map &map)
 	map(0x800100, 0x80013f).ram().share("cps_a_regs");  /* CPS-A custom */
 	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");  /* CPS-B custom */
 	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
-	map(0xff0000, 0xffffff).ram();
+	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
 void cps_state::sgyxz_map(address_map &map)
@@ -876,7 +907,7 @@ void cps_state::wofabl_map(address_map &map)
 	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
 	map(0xf1c004, 0xf1c005).w(FUNC(cps_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
-	map(0xff0000, 0xffffff).ram();
+	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
 void cps_state::slampic_map(address_map &map)
@@ -897,7 +928,7 @@ void cps_state::slampic_map(address_map &map)
 	map(0xf1c004, 0xf1c005).w(FUNC(cps_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
 	map(0xf1f000, 0xf1ffff).noprw(); // writes 0 to range, then reads F1F6EC
-	map(0xff0000, 0xffffff).ram();
+	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
 void cps_state::sound_map(address_map &map)
