@@ -158,7 +158,7 @@ detail::queue_t::queue_t(netlist_t &nl)
 
 void detail::queue_t::register_state(plib::state_manager_t &manager, const pstring &module)
 {
-	netlist().log().debug("register_state\n");
+	//netlist().log().debug("register_state\n");
 	manager.save_item(this, m_qsize, module + "." + "qsize");
 	manager.save_item(this, &m_times[0], module + "." + "times", m_times.size());
 	manager.save_item(this, &m_net_ids[0], module + "." + "names", m_net_ids.size());
@@ -890,7 +890,10 @@ void detail::net_t::reset()
 
 	m_list_active.clear();
 	for (core_terminal_t *ct : m_core_terms)
-		if (ct->state() != logic_t::STATE_INP_PASSIVE)
+		//FIXME: if below causes mario to crash because it tries to
+		// remove a non-existing terminal (i.e., STATE_INP_PASSIVE)
+		// from the deactivate list.
+		//if (ct->state() != logic_t::STATE_INP_PASSIVE)
 			m_list_active.push_back(ct);
 
 	for (core_terminal_t *ct : m_core_terms)
