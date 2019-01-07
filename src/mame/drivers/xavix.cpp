@@ -1231,6 +1231,12 @@ ROM_START( epo_efdx )
 	ROM_LOAD("excitefishing.bin", 0x000000, 0x400000, CRC(9c85b261) SHA1(6a363faed2ec89c5176e46554a98ca1e20132579) )
 ROM_END
 
+ROM_START( epo_sdb )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("superdashball.bin", 0x000000, 0x400000, CRC(a004a764) SHA1(47a96822d4d7d6a0f6be5cd729c3747dbab65979) )
+ROM_END
+
+
 ROM_START( rad_rh )
 	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("rescueheroes.bin", 0x000000, 0x200000, CRC(38c391a7) SHA1(120334d4ce89d98438c2a35bf7e53af5096cc878) )
@@ -1333,6 +1339,9 @@ CONS( 200?, rad_fb,    0,          0,  xavix_madfb,      rad_fb,   xavix_madfb_s
 CONS( 200?, rad_rh,    0,          0,  xavix,            rad_rh,   xavix_state,          init_xavix,    "Radioa / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 200?, epo_efdx,  0,          0,  xavix_i2c_24c08,  epo_efdx, xavix_i2c_state,      init_epo_efdx, "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// this was an 8-bit ROM but uses opcodes that were believed to be XaviX 2000 specific..
+CONS( 2005, epo_sdb,   0,          0,  xavix2000_i2c_24c04,  epo_efdx, xavix_i2c_state,      init_xavix,    "Epoch / SSD Company LTD",                      "Super Dash Ball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 200?, has_wamg,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
