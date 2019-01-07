@@ -506,6 +506,7 @@ void netlist_t::reset()
 		break;
 		case 1:     // brute force backward
 		{
+			log().verbose("Using brute force backward startup strategy");
 			std::size_t i = m_devices.size();
 			while (i>0)
 				m_devices[--i]->update_dev();
@@ -513,6 +514,7 @@ void netlist_t::reset()
 		break;
 		case 2:     // brute force forward
 		{
+			log().verbose("Using brute force forward startup strategy");
 			for (auto &d : m_devices)
 				d->update_dev();
 		}
@@ -886,19 +888,15 @@ void detail::net_t::reset()
 	if (p != nullptr)
 		p->m_cur_Analog = 0.0;
 
-	/* rebuild m_list */
+	/* rebuild m_list and reset terminals to active or analog out state */
 
 	m_list_active.clear();
 	for (core_terminal_t *ct : m_core_terms)
-		//FIXME: if below causes mario to crash because it tries to
-		// remove a non-existing terminal (i.e., STATE_INP_PASSIVE)
-		// from the deactivate list.
-		//if (ct->state() != logic_t::STATE_INP_PASSIVE)
-			m_list_active.push_back(ct);
-
-	for (core_terminal_t *ct : m_core_terms)
+	{
 		ct->reset();
-
+		if (ct->state() != logic_t::STATE_INP_PASSIVE)
+			m_list_active.push_back(ct);
+	}
 }
 
 void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
