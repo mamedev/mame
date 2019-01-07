@@ -34,7 +34,7 @@ const options_entry emu_options::s_option_entries[] =
 
 	// search path options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE SEARCH PATH OPTIONS" },
-<
+
 	{ OPTION_HOMEPATH,                                   "system/mame",         OPTION_STRING,     "path to home directory (read/write) location" },
 	{ OPTION_MEDIAPATH ";rp;biospath;bp",                "content/mame",      OPTION_STRING,     "path to ROMsets and hard disk images" },
 	{ OPTION_HASHPATH ";hash_directory;hash",            "system/mame/hash",      OPTION_STRING,     "path to hash files" },
