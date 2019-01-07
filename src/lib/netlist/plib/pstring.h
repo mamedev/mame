@@ -7,10 +7,11 @@
 #ifndef PSTRING_H_
 #define PSTRING_H_
 
-#include <iterator>
-#include <exception>
-#include <string>
 #include <cstring>
+#include <exception>
+#include <iterator>
+#include <string>
+#include <type_traits>
 
 // ----------------------------------------------------------------------------------------
 // pstring: semi-immutable strings ...
