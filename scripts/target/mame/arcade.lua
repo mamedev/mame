@@ -4885,5 +4885,8 @@ files {
 	MAME_DIR .. "src/mame/includes/xyonix.h",
 	MAME_DIR .. "src/mame/video/xyonix.cpp",
 	MAME_DIR .. "src/mame/drivers/yuvomz80.cpp",
+	MAME_DIR .. "src/mame/drivers/testpat.cpp",
+	MAME_DIR .. "src/mame/machine/nl_tp1983.cpp",
+	MAME_DIR .. "src/mame/machine/nl_tp1985.cpp",
 }
 end

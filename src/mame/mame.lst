@@ -40117,6 +40117,10 @@ zx80                            // 1980 Sinclair ZX-80
 zx81                            // 1981 Sinclair ZX-81
 zx97                            //
 
+@source:testpat.cpp
+tp1983
+tp1985
+
 @source:vgmplay.cpp
 vgmplay
 

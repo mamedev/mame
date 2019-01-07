@@ -117,13 +117,13 @@ namespace netlist
 			sub.m_nextD = m_D();
 			sub.m_CLK.activate_lh();
 		}
-		else if (!m_PREQ())
+		else if (!m_PREQ() && m_CLRQ())
 		{
 			sub.newstate(1, 0);
 			sub.m_CLK.inactivate();
 			m_D.inactivate();
 		}
-		else if (!m_CLRQ())
+		else if (!m_CLRQ() && m_PREQ())
 		{
 			sub.newstate(0, 1);
 			sub.m_CLK.inactivate();
