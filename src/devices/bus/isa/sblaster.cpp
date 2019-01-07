@@ -66,7 +66,7 @@ static const int m_cmd_fifo_length[256] =
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 6x */
 	-1, -1, -1, -1,  3,  3,  3,  3, -1, -1, -1, -1, -1,  1, -1,  1, /* 7x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 8x */
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 9x */
+	1,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 9x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* Ax */
 		4, -1, -1, -1, -1, -1,  4, -1,  4, -1, -1,  -1, -1, -1,  4, -1, /* Bx */
 		4, -1, -1, -1, -1, -1,  4, -1,  4, -1, -1,  -1, -1, -1,  4, -1, /* Cx */
@@ -356,6 +356,7 @@ void sb_device::process_fifo(uint8_t cmd)
 				break;
 
 			case 0x1c:  // 8-bit DMA with autoinit
+			case 0x90:  // 8-bit DMA with autoinit, high speed. XXX only on DSP 3.xx
 				//              printf("Start DMA (autoinit, size = %x)\n", m_dsp.dma_length);
 				m_dsp.dma_transferred = 0;
 				m_dsp.dma_autoinit = 1;
@@ -583,6 +584,12 @@ void sb_device::process_fifo(uint8_t cmd)
 							mode = m_dsp.fifo[1];
 							m_dsp.flags = 0;
 							m_dsp.dma_length = (m_dsp.fifo[2] + (m_dsp.fifo[3]<<8)) + 1;
+							if(cmd & 0x04)
+								m_dsp.dma_autoinit = 1;
+							if(mode & 0x10)
+								m_dsp.flags |= SIGNED;
+							if(mode & 0x20)
+								m_dsp.flags |= STEREO;
 							if((cmd & 0xf0) == 0xb0)
 							{
 								m_dsp.flags |= SIXTEENBIT;
@@ -591,15 +598,6 @@ void sb_device::process_fifo(uint8_t cmd)
 							}
 							else
 								drq_w(1);
-							if(cmd & 0x04)
-								m_dsp.dma_autoinit = 1;
-							if(mode & 0x10)
-								m_dsp.flags |= SIGNED;
-							if(mode & 0x20)
-							{
-								m_dsp.flags |= STEREO;
-								m_dsp.dma_length <<= 1;
-							}
 							m_dsp.dma_transferred = 0;
 							m_dsp.dma_timer_started = false;
 							m_dsp.dma_throttled = false;
