@@ -89,8 +89,8 @@ namespace netlist
 
 	NETLIB_UPDATE(7483)
 	{
-		netlist_sig_t a = (m_A1() << 0) | (m_A2() << 1) | (m_A3() << 2) | (m_A4() << 3);
-		netlist_sig_t b = (m_B1() << 0) | (m_B2() << 1) | (m_B3() << 2) | (m_B4() << 3);
+		unsigned a = (m_A1() << 0) | (m_A2() << 1) | (m_A3() << 2) | (m_A4() << 3);
+		unsigned b = (m_B1() << 0) | (m_B2() << 1) | (m_B3() << 2) | (m_B4() << 3);
 
 		unsigned r = a + b + m_C0();
 

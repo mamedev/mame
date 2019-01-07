@@ -29,7 +29,7 @@ namespace netlist
 		logic_input_t m_CLK;
 		logic_output_t m_Q;
 		logic_output_t m_QQ;
-		state_var<unsigned> m_nextD;
+		state_var<netlist_sig_t> m_nextD;
 
 		inline void newstate(const netlist_sig_t stateQ, const netlist_sig_t stateQQ);
 

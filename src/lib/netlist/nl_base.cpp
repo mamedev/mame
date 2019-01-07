@@ -313,7 +313,7 @@ void netlist_t::start()
 		}
 	}
 
-	log().debug("Searching for mainclock and solver ...\n");
+	log().debug("Searching for solver and parameters ...\n");
 
 	m_solver = get_single_device<devices::NETLIB_NAME(solver)>("solver");
 	m_params = get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
@@ -784,7 +784,6 @@ detail::net_t::net_t(netlist_t &nl, const pstring &aname, core_terminal_t *mr)
 	, m_new_Q(*this, "m_new_Q", 0)
 	, m_cur_Q (*this, "m_cur_Q", 0)
 	, m_in_queue(*this, "m_in_queue", QS_DELIVERED)
-	, m_active(*this, "m_active", 0)
 	, m_time(*this, "m_time", netlist_time::zero())
 	, m_railterminal(mr)
 {
@@ -797,10 +796,9 @@ detail::net_t::~net_t()
 
 void detail::net_t::inc_active(core_terminal_t &term) NL_NOEXCEPT
 {
+	const bool was_empty = m_list_active.empty();
 	m_list_active.push_front(&term);
-	++m_active;
-	nl_assert(m_active <= static_cast<int>(num_cons()));
-	if (m_active == 1)
+	if (was_empty)
 	{
 		railterminal().device().do_inc_active();
 		if (m_in_queue == QS_DELAYED_DUE_TO_INACTIVE)
@@ -821,10 +819,8 @@ void detail::net_t::inc_active(core_terminal_t &term) NL_NOEXCEPT
 
 void detail::net_t::dec_active(core_terminal_t &term) NL_NOEXCEPT
 {
-	--m_active;
-	nl_assert(m_active >= 0);
 	m_list_active.remove(&term);
-	if (m_active == 0)
+	if (m_list_active.empty())
 		railterminal().device().do_dec_active();
 }
 
@@ -832,15 +828,12 @@ void detail::net_t::rebuild_list()
 {
 	/* rebuild m_list */
 
-	int cnt = 0;
 	m_list_active.clear();
 	for (auto & term : m_core_terms)
 		if (term->state() != logic_t::STATE_INP_PASSIVE)
 		{
 			m_list_active.push_back(term);
-			cnt++;
 		}
-	m_active = cnt;
 }
 
 void detail::net_t::process(const unsigned &mask)
@@ -883,7 +876,6 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 void detail::net_t::reset()
 {
 	m_time = netlist_time::zero();
-	m_active = 0;
 	m_in_queue = QS_DELIVERED;
 
 	m_new_Q = 0;
@@ -898,14 +890,12 @@ void detail::net_t::reset()
 
 	m_list_active.clear();
 	for (core_terminal_t *ct : m_core_terms)
-		m_list_active.push_back(ct);
+		if (ct->state() != logic_t::STATE_INP_PASSIVE)
+			m_list_active.push_back(ct);
 
 	for (core_terminal_t *ct : m_core_terms)
 		ct->reset();
 
-	for (core_terminal_t *ct : m_core_terms)
-		if (ct->state() != logic_t::STATE_INP_PASSIVE)
-			m_active++;
 }
 
 void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
@@ -918,9 +908,6 @@ void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
 	terminal.set_net(this);
 
 	m_core_terms.push_back(&terminal);
-
-	if (terminal.state() != logic_t::STATE_INP_PASSIVE)
-		m_active++;
 }
 
 void detail::net_t::remove_terminal(detail::core_terminal_t &terminal)
@@ -933,8 +920,6 @@ void detail::net_t::remove_terminal(detail::core_terminal_t &terminal)
 	else
 		netlist().log().fatal(MF_2_REMOVE_TERMINAL_1_FROM_NET_2, terminal.name(),
 				this->name());
-	if (terminal.state() != logic_t::STATE_INP_PASSIVE)
-		m_active--;
 }
 
 void detail::net_t::move_connections(detail::net_t &dest_net)
@@ -942,7 +927,6 @@ void detail::net_t::move_connections(detail::net_t &dest_net)
 	for (auto &ct : m_core_terms)
 		dest_net.add_terminal(*ct);
 	m_core_terms.clear();
-	m_active = 0;
 }
 
 // ----------------------------------------------------------------------------------------

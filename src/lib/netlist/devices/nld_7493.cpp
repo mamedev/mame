@@ -63,7 +63,7 @@ namespace netlist
 
 		state_var_sig m_reset;
 		state_var_sig m_a;
-		state_var_sig m_bcd;
+		state_var_u8  m_bcd;
 
 		logic_input_t m_CLKA;
 		logic_input_t m_CLKB;

@@ -95,14 +95,8 @@
 //#define nl_double float
 //#define NL_FCONST(x) (x ## f)
 
-//#define nl_double double
 #define NL_FCONST(x) x
 using nl_double = double;
-
-/* The following option determines how object::update is called.
- * If set to 1, a virtual call is used. If it is left undefined, the best
- * approach will be automatically selected.
- */
 
 //============================================================
 //  WARNINGS

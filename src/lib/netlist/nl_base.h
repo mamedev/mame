@@ -28,7 +28,11 @@
 // Type definitions
 // ----------------------------------------------------------------------------------------
 
-/*! netlist_sig_t is the type used for logic signals. */
+/*! @brief netlist_sig_t is the type used for logic signals.
+ *
+ *  This may be any of bool, uint8_t, uint16_t, uin32_t and uint64_t.
+ *  The choice has little to no impact on performance.
+ */
 using netlist_sig_t = std::uint32_t;
 
 //============================================================
@@ -649,7 +653,7 @@ namespace netlist
 				nldelegate delegate = nldelegate());
 		virtual ~logic_input_t();
 
-		netlist_sig_t operator()() const NL_NOEXCEPT
+		inline netlist_sig_t operator()() const NL_NOEXCEPT
 		{
 			return Q();
 		}
@@ -757,7 +761,6 @@ namespace netlist
 		state_var<netlist_sig_t> m_new_Q;
 		state_var<netlist_sig_t> m_cur_Q;
 		state_var<queue_status>  m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
-		state_var_s32            m_active;
 
 		state_var<netlist_time>  m_time;
 
@@ -775,7 +778,7 @@ namespace netlist
 		logic_net_t(netlist_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
 		virtual ~logic_net_t();
 
-		netlist_sig_t Q() const NL_NOEXCEPT { return m_cur_Q; }
+		inline netlist_sig_t Q() const NL_NOEXCEPT { return m_cur_Q; }
 		void initial(const netlist_sig_t val) NL_NOEXCEPT { m_cur_Q = m_new_Q = val; }
 
 		void set_Q_and_push(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
@@ -1431,7 +1434,7 @@ namespace netlist
 			if (is_queued())
 				netlist().queue().remove(this);
 			m_time = netlist().time() + delay;
-			m_in_queue = (m_active > 0) ? QS_QUEUED : QS_DELAYED_DUE_TO_INACTIVE;    /* queued ? */
+			m_in_queue = (!m_list_active.empty()) ? QS_QUEUED : QS_DELAYED_DUE_TO_INACTIVE;    /* queued ? */
 			if (m_in_queue == QS_QUEUED)
 				netlist().queue().push(queue_t::entry_t(m_time, this));
 		}
