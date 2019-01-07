@@ -6746,97 +6746,6 @@ void tgoldeye_state::tgoldeye(machine_config &config)
 
 /***************************************************************************
 
-  Tiger Independence Day (model 78-???)
-  * Sharp SM510 under epoxy (die label 10 16)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class tinday_state : public hh_sm510_state
-{
-public:
-	tinday_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_sm510_state(mconfig, type, tag)
-	{
-		m_inp_lines = 5;
-		m_inp_fixed = 5;
-	}
-
-	void tinday(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( tinday )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Shield")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Fire")
-	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
-	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alert")
-	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.3") // S4
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Velocity")
-	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.4") // S5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Pause")
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.5") // GND!
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Power On/Start")
-
-	PORT_START("BA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
-
-	PORT_START("B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
-INPUT_PORTS_END
-
-void tinday_state::tinday(machine_config &config)
-{
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
-	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
-	m_maincpu->read_ba().set_ioport("BA");
-	m_maincpu->read_b().set_ioport("B");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
-	screen.set_size(1463, 1080);
-	screen.set_visarea(0, 1463-1, 0, 1080-1);
-
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-
-
-
-
-/***************************************************************************
-
   Tiger Space Jam (model 78-621)
   * Sharp SM510 under epoxy (die label KMS10, 23)
   * lcd screen with custom segments, 1-bit sound
@@ -6913,6 +6822,97 @@ void tsjam_state::tsjam(machine_config &config)
 	screen.set_refresh_hz(50);
 	screen.set_size(1421, 1080);
 	screen.set_visarea(0, 1421-1, 0, 1080-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+
+
+
+
+/***************************************************************************
+
+  Tiger Independence Day (model 78-624)
+  * Sharp SM510 under epoxy (die label 10 16)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class tinday_state : public hh_sm510_state
+{
+public:
+	tinday_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 5;
+		m_inp_fixed = 5;
+	}
+
+	void tinday(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( tinday )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Shield")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Fire")
+	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alert")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Velocity")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Pause")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void tinday_state::tinday(machine_config &config)
+{
+	/* basic machine hardware */
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1463, 1080);
+	screen.set_visarea(0, 1463-1, 0, 1080-1);
 
 	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
@@ -7983,21 +7983,21 @@ ROM_START( tgoldeye )
 ROM_END
 
 
-ROM_START( tinday )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "10_16", 0x0000, 0x1000, CRC(77c2c2f7) SHA1(06326b26d0f6757180724ba0bdeb4110cc7e29d6) )
-
-	ROM_REGION( 1162672, "svg", 0)
-	ROM_LOAD( "tinday.svg", 0, 1162672, CRC(9b9a8047) SHA1(2aeaa71a54cf897d2a5d91133c733613ca229aae) )
-ROM_END
-
-
 ROM_START( tsjam )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "10_23", 0x0000, 0x1000, CRC(6eaabfbd) SHA1(f0ecbd6f65fe72ce2d8a452685be2e77a63fc9f0) )
 
 	ROM_REGION( 1046147, "svg", 0)
 	ROM_LOAD( "tsjam.svg", 0, 1046147, CRC(6d24e1c9) SHA1(ddbfbd85f70ec964c68f982a8ee8070e3786a85e) )
+ROM_END
+
+
+ROM_START( tinday )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "10_16", 0x0000, 0x1000, CRC(77c2c2f7) SHA1(06326b26d0f6757180724ba0bdeb4110cc7e29d6) )
+
+	ROM_REGION( 1162672, "svg", 0)
+	ROM_LOAD( "tinday.svg", 0, 1162672, CRC(9b9a8047) SHA1(2aeaa71a54cf897d2a5d91133c733613ca229aae) )
 ROM_END
 
 
@@ -8124,8 +8124,8 @@ CONS( 1995, tbatfor,     0,          0, tbatfor,     tbatfor,     tbatfor_state,
 CONS( 1995, tjdredd,     0,          0, tjdredd,     tjdredd,     tjdredd_state,     empty_init, "Tiger Electronics", "Judge Dredd (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1995, tapollo13,   0,          0, tapollo13,   tapollo13,   tapollo13_state,   empty_init, "Tiger Electronics", "Apollo 13 (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1995, tgoldeye,    0,          0, tgoldeye,    tgoldeye,    tgoldeye_state,    empty_init, "Tiger Electronics", "007: GoldenEye (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1996, tinday,      0,          0, tinday,      tinday,      tinday_state,      empty_init, "Tiger Electronics", "Independence Day (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1996, tsjam,       0,          0, tsjam,       tsjam,       tsjam_state,       empty_init, "Tiger Electronics", "Space Jam (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1996, tinday,      0,          0, tinday,      tinday,      tinday_state,      empty_init, "Tiger Electronics", "Independence Day (handheld)", MACHINE_SUPPORTS_SAVE )
 
 // Tiger 72-xxx models
 CONS( 1992, tbatmana,    0,          0, tbatmana,    tbatmana,    tbatmana_state,    empty_init, "Tiger Electronics", "Batman: The Animated Series (handheld)", MACHINE_SUPPORTS_SAVE )
