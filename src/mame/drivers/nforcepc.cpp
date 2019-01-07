@@ -4,7 +4,7 @@
 /*
   Computer based on a motherboard utilizing the nForce chipset (also known as CRUSH11 or CRUSH12)
 
-  Start with the following compoents:
+  Start with the following components:
   - An Asus A7N266-C motherboard using:
     - nForce 415-D northbridge
     - nForce MCP-D southbridge (with integrated APU)
@@ -259,9 +259,9 @@ void nforcepc_state::nforcepc(machine_config &config)
 ROM_START(nforcepc)
 	ROM_REGION32_LE(0x40000, ":pci:00.0", 0) /* PC bios */
 	ROM_SYSTEM_BIOS(0, "a7n266c", "a7n266c") // Motherboard dump. Chip: SST49LF020 Package: PLCC32 Label had 3 lines of text: "A7NC3" "1001.D" "GSQ98"
-	ROMX_LOAD("a7n266c.bin", 0, 0x40000, CRC(F4F0E4FC) SHA1(87f11545db178914623e41fb51e328da479a2efc), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "a7n266c1001d", "a7n266c1001d") // bios version 1001.D dwonloaded from Asus website
-	ROMX_LOAD("a7nc101d.awd", 0, 0x40000, CRC(EAD1147C) SHA1(27227df98e0c5fb9fecdb4bb6ef72df19766c330), ROM_BIOS(1))
+	ROMX_LOAD("a7n266c.bin", 0, 0x40000, CRC(f4f0e4fc) SHA1(87f11545db178914623e41fb51e328da479a2efc), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "a7n266c1001d", "a7n266c1001d") // bios version 1001.D downloaded from Asus website
+	ROMX_LOAD("a7nc101d.awd", 0, 0x40000, CRC(ead1147c) SHA1(27227df98e0c5fb9fecdb4bb6ef72df19766c330), ROM_BIOS(1))
 ROM_END
 
 static INPUT_PORTS_START(nforcepc)
