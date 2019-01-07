@@ -424,7 +424,7 @@ MACHINE_CONFIG_START(truco_state::truco)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", truco_state,  interrupt)
 
-	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(1.6));    /* 1.6 seconds */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1600));    /* 1.6 seconds */
 
 	pia6821_device &pia(PIA6821(config, "pia0", 0));
 	pia.readpa_handler().set_ioport("P1");
