@@ -7,21 +7,12 @@
 
 #include "machine/nscsi_bus.h"
 
-#define MCFG_NCR5390_IRQ_HANDLER(_devcb) \
-	downcast<ncr5390_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_NCR5390_DRQ_HANDLER(_devcb) \
-	downcast<ncr5390_device &>(*device).set_drq_handler(DEVCB_##_devcb);
-
 class ncr5390_device : public nscsi_device
 {
 public:
 	ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
-
 	auto irq_handler_cb() { return m_irq_handler.bind(); }
 	auto drq_handler_cb() { return m_drq_handler.bind(); }
 
@@ -55,10 +46,6 @@ public:
 
 	uint8_t dma_r();
 	void dma_w(uint8_t val);
-
-	// memory mapped wrappers for dma read/write
-	DECLARE_READ8_MEMBER(mdma_r) { return dma_r(); }
-	DECLARE_WRITE8_MEMBER(mdma_w) { dma_w(data); }
 
 protected:
 	ncr5390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

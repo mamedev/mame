@@ -1839,11 +1839,11 @@ static void sun_scsi_devices(device_slot_interface &device)
 
 void sun4_state::ncr53c90a(device_t *device)
 {
-	devcb_base *devcb;
-	(void)devcb;
-	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5390_IRQ_HANDLER(WRITELINE(*this, sun4_state, scsi_irq))
-	MCFG_NCR5390_DRQ_HANDLER(WRITELINE(*this, sun4_state, scsi_drq))
+	ncr53c90a_device &adapter = downcast<ncr53c90a_device &>(*device);
+
+	adapter.set_clock(10000000);
+	adapter.irq_handler_cb().set(*this, FUNC(sun4_state::scsi_irq));
+	adapter.drq_handler_cb().set(*this, FUNC(sun4_state::scsi_drq));
 }
 
 MACHINE_CONFIG_START(sun4_state::sun4)

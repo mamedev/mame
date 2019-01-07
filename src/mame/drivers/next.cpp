@@ -995,11 +995,11 @@ static void next_scsi_devices(device_slot_interface &device)
 
 void next_state::ncr5390(device_t *device)
 {
-	devcb_base *devcb;
-	(void)devcb;
-	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5390_IRQ_HANDLER(WRITELINE(*this, next_state, scsi_irq))
-	MCFG_NCR5390_DRQ_HANDLER(WRITELINE(*this, next_state, scsi_drq))
+	ncr5390_device &adapter = downcast<ncr5390_device &>(*device);
+
+	adapter.set_clock(10000000);
+	adapter.irq_handler_cb().set(*this, FUNC(next_state::scsi_irq));
+	adapter.drq_handler_cb().set(*this, FUNC(next_state::scsi_drq));
 }
 
 MACHINE_CONFIG_START(next_state::next_base)
