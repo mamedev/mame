@@ -24,18 +24,18 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(7497)
 		, m_B(*this, {{"B0", "B1", "B2", "B3", "B4", "B5"}})
-		, m_CLK(*this, "CLK", NETLIB_DELEGATE(7497, clk))
-		, m_STRB(*this, "STRB")
+		, m_CLK(*this, "CLK", NETLIB_DELEGATE(7497, clk_strb))
+		, m_STRB(*this, "STRB", NETLIB_DELEGATE(7497, clk_strb))
 		, m_EN(*this, "EN")
 		, m_UNITY(*this, "UNITY", NETLIB_DELEGATE(7497, unity))
 		, m_CLR(*this, "CLR", NETLIB_DELEGATE(7497, clr))
 		, m_Y(*this, "Y")
 		, m_Z(*this, "Z")
 		, m_ENOUT(*this, "ENOUT")
-		, m_reset(*this, "_m_reset", 0)
-		, m_a(*this, "_m_a", 0)
+		, m_cnt(*this, "_m_cnt", 0)
 		, m_rate(*this, "_m_rate", 0)
 		, m_state(*this, "_m_state", 0)
+		, m_lastclock(*this, "_m_lastclock", 0)
 		{
 		}
 
@@ -46,7 +46,7 @@ namespace netlist
 		NETLIB_HANDLERI(noop) { }
 		NETLIB_HANDLERI(unity);
 		NETLIB_HANDLERI(clr);
-		NETLIB_HANDLERI(clk);
+		NETLIB_HANDLERI(clk_strb);
 
 		object_array_t<logic_input_t, 6> m_B;
 		logic_input_t m_CLK;
@@ -59,24 +59,17 @@ namespace netlist
 		logic_output_t m_Z;
 		logic_output_t m_ENOUT;
 
-		state_var_sig m_reset;
-		state_var_sig m_a;
-		state_var_sig m_rate;
+		state_var_u8 m_cnt;
+		state_var_u8 m_rate;
 		state_var_sig m_state;
+		state_var_sig m_lastclock;
 
 		void newstate(const netlist_sig_t state)
 		{
 			m_state = state;
-			m_Z.push(state ^ 1, out_delay_CLK_Z[state ^ 1]);
-			if (m_UNITY())
-				m_Y.push(state, out_delay_CLK_Y[state]);
-			else
-				m_Y.push(1, out_delay_CLK_Y[1]);
-
-			if (m_CLK())
-				m_CLK.set_state(logic_t::STATE_INP_HL);
-			else
-				m_CLK.set_state(logic_t::STATE_INP_LH);
+			m_Z.push(state, out_delay_CLK_Z[state]);
+			netlist_sig_t y = (state ^ 1) | (m_UNITY() ^ 1); // OR with negated inputs == NAND
+			m_Y.push(y, out_delay_CLK_Y[y]);
 		}
 
 		int rate()
@@ -92,38 +85,14 @@ namespace netlist
 
 	NETLIB_RESET(7497)
 	{
-		m_reset = 1;
-		m_a = 0;
+		m_cnt = 0;
 		m_rate = 0;
-		m_CLK.set_state(logic_t::STATE_INP_HL);
-		m_B[0].set_state(logic_t::STATE_INP_LH);
-		m_B[1].set_state(logic_t::STATE_INP_LH);
-		m_B[2].set_state(logic_t::STATE_INP_LH);
-		m_B[3].set_state(logic_t::STATE_INP_LH);
-		m_B[4].set_state(logic_t::STATE_INP_LH);
-		m_B[5].set_state(logic_t::STATE_INP_LH);
-		m_STRB.set_state(logic_t::STATE_INP_HL);
-#if 0
-		m_EN.set_state(logic_t::STATE_INP_HL);
-#endif
-		m_UNITY.set_state(logic_t::STATE_INP_LH);
-		m_CLR.set_state(logic_t::STATE_INP_LH);
-		newstate(0);
-		m_ENOUT.push(1, out_delay_CLK_Y[1]);
+		m_lastclock = 0;
 	}
 
 	NETLIB_UPDATE(7497)
 	{
-//		m_reset = m_CLR() ^ 1;
-
-		// m_reset = 1 -- normal operation
-		if (!m_reset)
-		{
-			m_CLK.inactivate();
-			m_Y.push_force(0, NLTIME_FROM_NS(24));
-			m_Z.push_force(1, NLTIME_FROM_NS(15));
-			m_ENOUT.push_force(1, NLTIME_FROM_NS(15)); // XXX
-		}
+		m_rate = rate();
 	}
 
 	NETLIB_HANDLER(7497, unity)
@@ -133,51 +102,39 @@ namespace netlist
 
 	NETLIB_HANDLER(7497, clr)
 	{
-		m_a = 0;
-		newstate (0);
+		m_cnt = 0;
+		clk_strb();
 	}
 
-	NETLIB_HANDLER(7497, clk)
+	NETLIB_HANDLER(7497, clk_strb)
 	{
 		netlist_sig_t clk = m_CLK();
 
-		if (m_reset)
+		if (!m_lastclock && clk && !m_EN() && !m_CLR())
 		{
-			// lock rate on falling edge of CLK
-			if (!clk) m_rate = rate();
-
-			if (m_rate && !m_STRB())
-			{
-				if (
-					((m_a & 1)  == 0  && (m_rate & 32)) ||
-					((m_a & 3)  == 1  && (m_rate & 16)) ||
-					((m_a & 7)  == 3  && (m_rate & 8))  ||
-					((m_a & 15) == 7  && (m_rate & 4))  ||
-					((m_a & 31) == 15 && (m_rate & 2))  ||
-					((m_a & 63) == 31 && (m_rate & 1)))
-					newstate(clk);
-			}
-			else
-			{
-				newstate(0);
-			}
-
-			if (m_a == 62)
-				m_ENOUT.push(0, out_delay_CLK_Y[0]); // XXX timing
-			else
-				m_ENOUT.push(1, out_delay_CLK_Y[1]);
-
-			if (clk)
-			{
-				m_CLK.set_state(logic_t::STATE_INP_HL);
-				m_a++;
-				m_a &= 63;
-			}
-			else
-			{
-				m_CLK.set_state(logic_t::STATE_INP_LH);
-			}
+			m_cnt++;
+			m_cnt &= 63;
 		}
+
+		const netlist_sig_t clk_strb = (clk ^ 1) & (m_STRB() ^ 1);
+
+		const netlist_sig_t cntQ = m_cnt;
+		netlist_sig_t p1 = ((cntQ & 63)  == 31  && (m_rate & 32)) ||
+			((cntQ & 31)  == 15  && (m_rate & 16)) ||
+			((cntQ & 15)  == 7  && (m_rate & 8))  ||
+			((cntQ & 7) == 3  && (m_rate & 4))  ||
+			((cntQ & 3) == 1 && (m_rate & 2))  ||
+			((cntQ & 1) == 0 && (m_rate & 1));
+
+		p1 = (p1 & clk_strb) ^ 1;
+
+		newstate(p1);
+
+		if (m_cnt == 63 && !m_EN())
+			m_ENOUT.push(0, out_delay_CLK_Y[0]); // XXX timing
+		else
+			m_ENOUT.push(1, out_delay_CLK_Y[1]);
+
 	}
 
 	NETLIB_DEVICE_IMPL(7497)

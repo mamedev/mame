@@ -235,9 +235,10 @@ NETLIST_START(tp1985)
 	ALIAS(videomix, C3.1)
 #else
 	ALIAS(videomix, R18.2)
+	//LOG(logV, R18.2)
 #endif
 
-#if 1
+#if 0
 	HINT(clk, NO_DEACTIVATE)
 #endif
 
