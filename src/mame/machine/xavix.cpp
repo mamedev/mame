@@ -366,7 +366,23 @@ WRITE8_MEMBER(xavix_state::dispctrl_6ff8_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
+	uint8_t old_vid = m_video_ctrl;
+
 	m_video_ctrl = data & 0x3f;
+
+	// epo_guru needs something like this, otherwise raster IRQ ends up blocking all other IRQs forever
+	if ((old_vid & 0x10) != (m_video_ctrl & 0x10))
+	{
+		if (!(m_video_ctrl & 0x10))
+		{
+			//printf("callback on scanline %d %d with IRQ enabled\n", m_screen->vpos(), m_screen->hpos());
+			m_video_ctrl &= ~0x40;
+			m_irqsource &= ~0x40;
+			update_irqs();
+		}
+	}
+
+
 	//  printf("%s: dispctrl_6ff8_w %02x\n", machine().describe_context(), data);
 }
 
