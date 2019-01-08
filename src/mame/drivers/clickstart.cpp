@@ -6,8 +6,6 @@
 
     Status:
 
-        Calls to unmapped space
-
 		Some games have Checksums listed in the header area that appear to be
 		 like the byte checksums on the Radica games in vii.cpp, however the
 		 calculation doesn't add up correctly.  There is also a checksum in
@@ -44,12 +42,29 @@ public:
 		, m_spg(*this, "spg")
 		, m_cart(*this, "cartslot")
 		, m_system_region(*this, "maincpu")
+		, m_io_mouse_x(*this, "MOUSEX")
+		, m_io_mouse_y(*this, "MOUSEY")
 		, m_cart_region(nullptr)
+		, m_mouse_x(0)
+		, m_mouse_y(0)
+		, m_mouse_dx(0)
+		, m_mouse_dy(0)
+		, m_uart_tx_fifo_start(0)
+		, m_uart_tx_fifo_end(0)
+		, m_uart_tx_fifo_count(0)
+		, m_uart_tx_timer(nullptr)
+		, m_unk_portc_toggle(0)
 	{ }
 
 	void clickstart(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(mouse_update);
+
 private:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	static const device_timer_id TIMER_UART_TX = 0;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -68,16 +83,34 @@ private:
 
 	DECLARE_WRITE8_MEMBER(chip_sel_w);
 
+	void handle_uart_tx();
+	void uart_tx_fifo_push(uint8_t value);
+
+	void update_mouse_buffer();
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<spg2xx_device> m_spg;
 	required_device<generic_slot_device> m_cart;
 	required_memory_region m_system_region;
+	required_ioport m_io_mouse_x;
+	required_ioport m_io_mouse_y;
 	memory_region *m_cart_region;
+
+	uint16_t m_mouse_x;
+	uint16_t m_mouse_y;
+	int16_t m_mouse_dx;
+	int16_t m_mouse_dy;
+	uint8_t m_mouse_buffer[16];
+
+	uint8_t m_uart_tx_fifo[32]; // arbitrary size
+	uint8_t m_uart_tx_fifo_start;
+	uint8_t m_uart_tx_fifo_end;
+	uint8_t m_uart_tx_fifo_count;
+	emu_timer *m_uart_tx_timer;
 
 	uint16_t m_unk_portc_toggle;
 };
-
 
 void clickstart_state::machine_start()
 {
@@ -88,11 +121,37 @@ void clickstart_state::machine_start()
 		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	}
 
+	save_item(NAME(m_mouse_x));
+	save_item(NAME(m_mouse_y));
+	save_item(NAME(m_mouse_dx));
+	save_item(NAME(m_mouse_dy));
+	save_item(NAME(m_mouse_buffer));
+
+	save_item(NAME(m_uart_tx_fifo));
+	save_item(NAME(m_uart_tx_fifo_start));
+	save_item(NAME(m_uart_tx_fifo_end));
+	save_item(NAME(m_uart_tx_fifo_count));
+
 	save_item(NAME(m_unk_portc_toggle));
+
+	m_uart_tx_timer = timer_alloc(TIMER_UART_TX);
+	m_uart_tx_timer->adjust(attotime::never);
 }
 
 void clickstart_state::machine_reset()
 {
+	m_mouse_x = 0xffff;
+	m_mouse_y = 0xffff;
+	m_mouse_dx = 0;
+	m_mouse_dy = 0;
+	memset(m_mouse_buffer, 0, ARRAY_LENGTH(m_mouse_buffer));
+
+	memset(m_uart_tx_fifo, 0, ARRAY_LENGTH(m_uart_tx_fifo));
+	m_uart_tx_fifo_start = 0;
+	m_uart_tx_fifo_end = 0;
+	m_uart_tx_fifo_count = 0;
+	m_uart_tx_timer->adjust(attotime::from_hz(3200/10), 0, attotime::from_hz(3200/10));
+
 	m_unk_portc_toggle = 0;
 }
 
@@ -104,6 +163,95 @@ DEVICE_IMAGE_LOAD_MEMBER(clickstart_state, cart)
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	return image_init_result::PASS;
+}
+
+void clickstart_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_UART_TX)
+	{
+		handle_uart_tx();
+	}
+}
+
+void clickstart_state::handle_uart_tx()
+{
+	if (m_uart_tx_fifo_count == 0)
+		return;
+
+	m_spg->uart_rx(m_uart_tx_fifo[m_uart_tx_fifo_start]);
+	m_uart_tx_fifo_start = (m_uart_tx_fifo_start + 1) % ARRAY_LENGTH(m_uart_tx_fifo);
+	m_uart_tx_fifo_count--;
+}
+
+void clickstart_state::uart_tx_fifo_push(uint8_t value)
+{
+	if (m_uart_tx_fifo_count >= ARRAY_LENGTH(m_uart_tx_fifo))
+	{
+		logerror("Warning: Trying to push too much data onto the mouse Tx FIFO, data will be lost.\n");
+	}
+
+	m_uart_tx_fifo[m_uart_tx_fifo_end] = value;
+	m_uart_tx_fifo_end = (m_uart_tx_fifo_end + 1) % ARRAY_LENGTH(m_uart_tx_fifo);
+	m_uart_tx_fifo_count++;
+}
+
+INPUT_CHANGED_MEMBER(clickstart_state::mouse_update)
+{
+	uint16_t x = m_io_mouse_x->read();
+	uint16_t y = m_io_mouse_y->read();
+	uint16_t old_mouse_x = m_mouse_x;
+	uint16_t old_mouse_y = m_mouse_y;
+
+	if (m_mouse_x == 0xffff)
+	{
+		old_mouse_x = x;
+		old_mouse_y = y;
+	}
+
+	m_mouse_x = x;
+	m_mouse_y = y;
+
+	m_mouse_dx += (m_mouse_x - old_mouse_x);
+	m_mouse_dy += (m_mouse_y - old_mouse_y);
+
+	if (m_mouse_dx < -63)
+		m_mouse_dx = -63;
+	else if (m_mouse_dx > 62)
+		m_mouse_dx = 62;
+
+	if (m_mouse_dy < -63)
+		m_mouse_dy = -63;
+	else if (m_mouse_dy > 62)
+		m_mouse_dy = 62;
+
+	update_mouse_buffer();
+
+	m_mouse_dx = 0;
+	m_mouse_dy = 0;
+}
+
+void clickstart_state::update_mouse_buffer()
+{
+	if (m_mouse_dx == 0 && m_mouse_dy == 0)
+		return;
+
+	m_mouse_buffer[0] = 0x03;
+	m_mouse_buffer[1] = (m_mouse_x + 1) & 0x3f;
+	m_mouse_buffer[2] = (m_mouse_y + 1) & 0x3f;
+	m_mouse_buffer[3] = (m_mouse_dx + 1) & 0x3f;
+	m_mouse_buffer[4] = (m_mouse_dy + 1) & 0x3f;
+
+	//printf("Queueing: ");
+	uint16_t sum = 0;
+	for (int i = 0; i < 5; i++)
+	{
+		uart_tx_fifo_push(m_mouse_buffer[i] ^ 0xff);
+		sum += m_mouse_buffer[i];
+		//printf("%02x ", m_mouse_buffer[i] ^ 0xff);
+	}
+	sum = (sum & 0xff) ^ 0xff;
+	uart_tx_fifo_push((uint8_t)sum);
+	//printf("%02x\n", (uint8_t)sum);
 }
 
 READ16_MEMBER(clickstart_state::rom_r)
@@ -123,7 +271,7 @@ READ16_MEMBER(clickstart_state::rom_r)
 
 WRITE16_MEMBER(clickstart_state::porta_w)
 {
-	logerror("%s: porta_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+	//logerror("%s: porta_w: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 }
 
 WRITE16_MEMBER(clickstart_state::portb_w)
@@ -138,8 +286,8 @@ WRITE16_MEMBER(clickstart_state::portc_w)
 
 READ16_MEMBER(clickstart_state::porta_r)
 {
-	uint16_t data = 0x5000;
-	logerror("%s: porta_r: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+	uint16_t data = 0x4000;
+	//logerror("%s: porta_r: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
@@ -169,6 +317,11 @@ void clickstart_state::mem_map(address_map &map)
 }
 
 static INPUT_PORTS_START( clickstart )
+	PORT_START("MOUSEX")
+	PORT_BIT(0x3e, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, mouse_update, 0)
+
+	PORT_START("MOUSEY")
+	PORT_BIT(0x3e, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, mouse_update, 0)
 INPUT_PORTS_END
 
 // There is a SEEPROM on the motherboard (type?)
@@ -188,7 +341,7 @@ void clickstart_state::clickstart(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	SPG28X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
 	m_spg->porta_out().set(FUNC(clickstart_state::porta_w));
 	m_spg->portb_out().set(FUNC(clickstart_state::portb_w));
 	m_spg->portc_out().set(FUNC(clickstart_state::portc_w));

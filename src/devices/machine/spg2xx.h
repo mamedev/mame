@@ -387,8 +387,8 @@ protected:
 	DECLARE_WRITE16_MEMBER(video_w);
 	DECLARE_READ16_MEMBER(audio_r);
 	DECLARE_WRITE16_MEMBER(audio_w);
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(io_w);
+	virtual DECLARE_READ16_MEMBER(io_r);
+	virtual DECLARE_WRITE16_MEMBER(io_w);
 
 	void check_irqs(const uint16_t changed);
 	inline void check_video_irq();
@@ -552,6 +552,8 @@ public:
 	}
 
 	spg28x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual DECLARE_WRITE16_MEMBER(io_w) override;
 };
 
 DECLARE_DEVICE_TYPE(SPG24X, spg24x_device)
