@@ -60,7 +60,7 @@ bool apridisk_format::load(io_generic *io, uint32_t form_factor, floppy_image *i
 		uint8_t sector_header[16];
 		io_generic_read(io, sector_header, file_offset, 16);
 
-		int32_t type = pick_integer_le(&sector_header, 0, 4);
+		uint32_t type = pick_integer_le(&sector_header, 0, 4);
 		uint16_t compression = pick_integer_le(&sector_header, 4, 2);
 		uint16_t header_size = pick_integer_le(&sector_header, 6, 2);
 		uint32_t data_size = pick_integer_le(&sector_header, 8, 4);
