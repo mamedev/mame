@@ -1482,7 +1482,9 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 
 	case 0x102: // DMA Length
 		LOGMASKED(LOG_DMA, "io_w: DMA Length = %04x\n", data);
-		do_cpu_dma(data);
+		if (!(data & 0xc000))  // jak_dora writes 0xffff here which ends up trashing registers etc. why? such writes can't be valid
+			do_cpu_dma(data);
+
 		break;
 
 	default:

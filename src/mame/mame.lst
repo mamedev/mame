@@ -38548,6 +38548,7 @@ jak_wall                        //
 jak_wwe                         //
 jak_fan4                        //
 jak_just                        //
+jak_dora                        //
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 wrlshunt                        // Wireless: Hunting Video Game System
 wirels60                        // Wireless 60
@@ -38559,6 +38560,7 @@ rad_skatp                       //
 rad_sktv                        //
 rad_crik                        //
 rad_fb2                         //
+mattelcs                        //
 
 @source:vsmile.cpp
 vsmile                          //
@@ -39703,11 +39705,14 @@ rad_snowp                       //
 rad_madf                        //
 rad_fb                          //
 epo_efdx                        //
+epo_sdb                         //
+epo_guru                        //
 rad_rh                          //
 has_wamg                        //
 ekara                           //
 ekaraa                          //
 ekaraj                          //
+ekaraphs                        //
 ddrfammt                        //
 popira                          //
 taikodp                         //
