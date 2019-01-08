@@ -366,7 +366,23 @@ WRITE8_MEMBER(xavix_state::dispctrl_6ff8_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
+	uint8_t old_vid = m_video_ctrl;
+
 	m_video_ctrl = data & 0x3f;
+
+	// epo_guru needs something like this, otherwise raster IRQ ends up blocking all other IRQs forever
+	if ((old_vid & 0x10) != (m_video_ctrl & 0x10))
+	{
+		if (!(m_video_ctrl & 0x10))
+		{
+			//printf("callback on scanline %d %d with IRQ enabled\n", m_screen->vpos(), m_screen->hpos());
+			m_video_ctrl &= ~0x40;
+			m_irqsource &= ~0x40;
+			update_irqs();
+		}
+	}
+
+
 	//  printf("%s: dispctrl_6ff8_w %02x\n", machine().describe_context(), data);
 }
 
@@ -799,6 +815,49 @@ TIMER_CALLBACK_MEMBER(xavix_state::adc_timer_done)
 	//update_irqs();
 }
 
+// epo_guru uses this for ground movement in 3d stages (and other places)
+READ8_MEMBER(xavix_state::barrel_r)
+{
+	if (offset == 0)
+	{
+		// or upper bits of result?
+		logerror("%s: reading shift trigger?!\n", machine().describe_context());
+		return 0x00;
+	}
+	else
+	{
+		uint8_t retdata = m_barrel_params[1];
+		logerror("%s: reading shift results/data %02x\n", machine().describe_context(), retdata);
+		return retdata;
+	}
+}
+
+WRITE8_MEMBER(xavix_state::barrel_w)
+{
+	m_barrel_params[offset] = data;
+
+	if (offset == 0)
+	{
+		int shift_data = m_barrel_params[1];
+		int shift_amount = data & 0x0f;
+		int shift_param = (data & 0xf0)>>4;
+
+		// this can't be right, shift amount would allow us to shift 16 places this way, this is an 8-bit register, uneless it can shift in and out of a private register?
+
+		if (shift_param & 0x8)
+		{
+			m_barrel_params[1] = shift_data >> shift_amount;
+		}
+		else
+		{
+			m_barrel_params[1] = shift_data << shift_amount;
+		}
+
+		// offset 0 = trigger
+		logerror("%s: shifting value %02x by %01x with params %01x\n", machine().describe_context(), shift_data, shift_amount, shift_param);
+	}
+}
+
 
 
 READ8_MEMBER(xavix_state::mult_r)
@@ -958,6 +1017,7 @@ void xavix_state::machine_start()
 	save_item(NAME(m_sndtimer));
 	save_item(NAME(m_timer_baseval));
 	save_item(NAME(m_spritereg));
+	save_item(NAME(m_barrel_params));
 }
 
 void xavix_state::machine_reset()
@@ -1032,6 +1092,9 @@ void xavix_state::machine_reset()
 	m_extbusctrl[0] = 0x00;
 	m_extbusctrl[1] = 0x00;
 	m_extbusctrl[2] = 0x00;
+
+	m_barrel_params[0] = 0x00;
+	m_barrel_params[1] = 0x00;
 
 }
 
