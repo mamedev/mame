@@ -1340,7 +1340,7 @@ CONS( 200?, rad_rh,    0,          0,  xavix,            rad_rh,   xavix_state, 
 
 CONS( 200?, epo_efdx,  0,          0,  xavix_i2c_24c08,  epo_efdx, xavix_i2c_state,      init_epo_efdx, "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, epo_guru,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Gururin World (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, epo_guru,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Epoch / SSD Company LTD",                      "Gururin World (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 200?, has_wamg,  0,          0,  xavix,            xavix,    xavix_state,          init_xavix,    "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
@@ -1391,7 +1391,7 @@ ROM_START( drgqst )
 	ROM_LOAD( "dragonquest.bin", 0x000000, 0x800000, CRC(3d24413f) SHA1(1677e81cedcf349de7bf091a232dc82c6424efba) )
 ROM_END
 
-CONS( 2005, epo_sdb,  0, 0, xavix2000,           xavix,    xavix_state,          init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, epo_sdb,  0, 0, xavix2000,           xavix,    xavix_state,          init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, xavix,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, xavix,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

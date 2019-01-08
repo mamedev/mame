@@ -815,7 +815,7 @@ TIMER_CALLBACK_MEMBER(xavix_state::adc_timer_done)
 	//update_irqs();
 }
 
-// epo_guru uses this
+// epo_guru uses this for ground movement in 3d stages (and other places)
 READ8_MEMBER(xavix_state::barrel_r)
 {
 	if (offset == 0)
@@ -840,9 +840,18 @@ WRITE8_MEMBER(xavix_state::barrel_w)
 	{
 		int shift_data = m_barrel_params[1];
 		int shift_amount = data & 0x0f;
-		int shift_param = data & 0xf0;
+		int shift_param = (data & 0xf0)>>4;
 
-		m_barrel_params[1] = shift_data >> 3;
+		// this can't be right, shift amount would allow us to shift 16 places this way, this is an 8-bit register, uneless it can shift in and out of a private register?
+
+		if (shift_param & 0x8)
+		{
+			m_barrel_params[1] = shift_data >> shift_amount;
+		}
+		else
+		{
+			m_barrel_params[1] = shift_data << shift_amount;
+		}
 
 		// offset 0 = trigger
 		logerror("%s: shifting value %02x by %01x with params %01x\n", machine().describe_context(), shift_data, shift_amount, shift_param);
