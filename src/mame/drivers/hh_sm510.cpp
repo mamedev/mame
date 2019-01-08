@@ -2333,6 +2333,7 @@ void gnw_smb_state::gnw_smb(machine_config &config)
 /***************************************************************************
 
   Nintendo Game & Watch: Climber (model: see below)
+  * PCB label DR-106
   * Sharp SM511 label DR-106 9038B (new wide screen version) (no decap)
   * lcd screen with custom segments, 1-bit sound
 
