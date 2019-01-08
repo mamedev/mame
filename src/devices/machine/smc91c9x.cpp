@@ -71,6 +71,7 @@ smc91c9x_device::smc91c9x_device(const machine_config &mconfig, device_type type
 }
 
 const u8 smc91c9x_device::ETH_BROADCAST[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+const u8 smc91c9x_device::WMS_OUI[] = { 0x00, 0xA0, 0xAF };
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -338,15 +339,21 @@ int smc91c9x_device::address_filter(u8 *buf)
 			return ADDR_MULTICAST;
 
 		u32 const crc = util::crc32_creator::simple(buf, 6);
-		m_rx_hash = (crc >> 26);
+		// The hash is based on the top 6 MSBs of the CRC
+		// The CRC needs to be inverted and reflected
+		m_rx_hash = 0x0;
+		for (int i = 0; i < 6; i++)
+			m_rx_hash |= (((~crc) >> i) & 1) << (5 - i);
 		u64 multicast_addr = *(u64*)&m_reg[B3_MT0_1];
-		if (BIT(multicast_addr, 63 - m_rx_hash))
+		if (BIT(multicast_addr, m_rx_hash))
 		{
-			LOGMASKED(LOG_FILTER, "address_filter accepted (logical address match) %02x-%02x-%02x-%02x-%02x-%02x\n",
+			LOGMASKED(LOG_FILTER, "address_filter accepted (multicast address match) %02x-%02x-%02x-%02x-%02x-%02x\n",
 				buf[0], buf[1], buf[2], buf[3], buf[4], buf[5]);
 
 			return ADDR_MULTICAST;
 		}
+		LOGMASKED(LOG_FILTER, "address_filter rejected multicast  %02x-%02x-%02x-%02x-%02x-%02x crc: %08x hash: %02x multi: %16ullx\n",
+			buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], crc, m_rx_hash, *(u64*)&m_reg[B3_MT0_1]);
 	}
 	else
 	{
@@ -381,6 +388,14 @@ int smc91c9x_device::recv_start_cb(u8 *buf, int length)
 	if (length < 64 || length > 256*6 - 6)
 	{
 		LOGMASKED(LOG_RX, "received bad length packet length %d discarded\n", length);
+
+		return 0;
+	}
+
+	// discard packets not from WMS
+	if (memcmp(WMS_OUI, &buf[6], 3))
+	{
+		LOGMASKED(LOG_RX, "received non-WMS packet OUI: %02x:%02x:%02x length %d discarded\n", buf[6], buf[7], buf[8], length);
 
 		return 0;
 	}

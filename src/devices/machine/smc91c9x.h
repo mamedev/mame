@@ -217,6 +217,7 @@ private:
 
 	static constexpr unsigned ETHER_BUFFER_SIZE = 256 * 6;
 	static const u8 ETH_BROADCAST[];
+	static const u8 WMS_OUI[];
 
 	// mmu
 
@@ -275,8 +276,8 @@ private:
 	void reset_queued_tx() { m_queued_tx_t = m_queued_tx_h = 0; };
 	void push_queued_tx(const u8 &data) { m_queued_tx[m_queued_tx_h++] = data; m_queued_tx_h &= FIFO_SIZE - 1; };
 	u8 pop_queued_tx() { u8 val = m_queued_tx[m_queued_tx_t++]; m_queued_tx_t &= FIFO_SIZE - 1; return val; };
-	bool empty_queued_tx() { return m_queued_tx_h == m_queued_tx_t; };
-	u8 curr_queued_tx() { return m_queued_tx[m_queued_tx_t]; };
+	bool empty_queued_tx() const { return m_queued_tx_h == m_queued_tx_t; };
+	u8 curr_queued_tx() const { return m_queued_tx[m_queued_tx_t]; };
 
 	// FIFO for completed transmit packets
 	u8 m_completed_tx[FIFO_SIZE];
@@ -284,8 +285,8 @@ private:
 	void reset_completed_tx() { m_completed_tx_t = m_completed_tx_h = 0; };
 	void push_completed_tx(const u8 &data) { m_completed_tx[m_completed_tx_h++] = data; m_completed_tx_h &= FIFO_SIZE - 1; };
 	u8 pop_completed_tx() { u8 val = m_completed_tx[m_completed_tx_t++]; m_completed_tx_t &= FIFO_SIZE - 1; return val; };
-	bool empty_completed_tx() { return m_completed_tx_h == m_completed_tx_t; };
-	u8 curr_completed_tx() { return m_completed_tx[m_completed_tx_t]; };
+	bool empty_completed_tx() const { return m_completed_tx_h == m_completed_tx_t; };
+	u8 curr_completed_tx() const { return m_completed_tx[m_completed_tx_t]; };
 
 	// FIFO for completed receive packets
 	u8 m_completed_rx[FIFO_SIZE];
@@ -293,8 +294,8 @@ private:
 	void reset_completed_rx() { m_completed_rx_t = m_completed_rx_h = 0; };
 	void push_completed_rx(const u8 &data) { m_completed_rx[m_completed_rx_h++] = data; m_completed_rx_h &= FIFO_SIZE - 1; };
 	u8 pop_completed_rx() { u8 val = m_completed_rx[m_completed_rx_t++]; m_completed_rx_t &= FIFO_SIZE - 1; return val; };
-	bool empty_completed_rx() { return m_completed_rx_h == m_completed_rx_t; };
-	u8 curr_completed_rx() { return m_completed_rx[m_completed_rx_t]; };
+	bool empty_completed_rx() const { return m_completed_rx_h == m_completed_rx_t; };
+	u8 curr_completed_rx() const { return m_completed_rx[m_completed_rx_t]; };
 
 };
 
