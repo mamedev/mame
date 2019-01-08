@@ -347,7 +347,10 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7a81, 0x7a81).rw(FUNC(xavix_state::ioevent_irqstate_r), FUNC(xavix_state::ioevent_irqack_w));
 
 	// Mouse?
-	map(0x7b00, 0x7b00).w(FUNC(xavix_state::adc_7b00_w)); // rad_snow (not often, why?)
+	map(0x7b00, 0x7b00).rw(FUNC(xavix_state::mouse_7b00_r), FUNC(xavix_state::mouse_7b00_w));
+	map(0x7b01, 0x7b01).rw(FUNC(xavix_state::mouse_7b01_r), FUNC(xavix_state::mouse_7b01_w));
+	map(0x7b10, 0x7b10).rw(FUNC(xavix_state::mouse_7b10_r), FUNC(xavix_state::mouse_7b10_w));
+	map(0x7b11, 0x7b11).rw(FUNC(xavix_state::mouse_7b11_r), FUNC(xavix_state::mouse_7b11_w));
 
 	// Lightgun / pen 2 control
 	//map(0x7b18, 0x7b1b)
@@ -463,6 +466,15 @@ static INPUT_PORTS_START( xavix )
 	PORT_START("AN7")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
+	PORT_START("MOUSE0X")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("MOUSE0Y")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("MOUSE1X")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("MOUSE1Y")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_START("REGION") // PAL/NTSC flag
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )
 INPUT_PORTS_END
@@ -488,6 +500,27 @@ static INPUT_PORTS_START( xavix_an )
 	PORT_MODIFY("AN7") // 13
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( epo_sdb )
+    PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("MOUSE0X")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
+	PORT_MODIFY("MOUSE0Y")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
+	PORT_MODIFY("MOUSE1X")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(2)
+	PORT_MODIFY("MOUSE1Y")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(2)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+INPUT_PORTS_END
+
 
 // left + right drums together = select / forward (needed on initial screen).  left drum = left in menus   right drum  = right in menus
 // analog reading depends heavily on timers, they're too fast right now so drum hits are too hard and register multiple times
@@ -1013,6 +1046,13 @@ void xavix_state::xavix2000(machine_config &config)
 	m_palette->set_entries(512);
 }
 
+void xavix_state::xavix2000_nv(machine_config &config)
+{
+	xavix2000(config);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+}
+
 void xavix_i2c_state::xavix2000_i2c_24c04(machine_config &config)
 {
 	xavix2000(config);
@@ -1391,7 +1431,7 @@ ROM_START( drgqst )
 	ROM_LOAD( "dragonquest.bin", 0x000000, 0x800000, CRC(3d24413f) SHA1(1677e81cedcf349de7bf091a232dc82c6424efba) )
 ROM_END
 
-CONS( 2004, epo_sdb,  0, 0, xavix2000,           xavix,    xavix_state,          init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, epo_sdb,  0, 0, xavix2000_nv,        epo_sdb,  xavix_state,          init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)",  MACHINE_IMPERFECT_SOUND )
 
 CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, xavix,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, xavix,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
