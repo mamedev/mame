@@ -445,6 +445,12 @@ private:
 	DECLARE_READ8_MEMBER(mult_param_r);
 	DECLARE_WRITE8_MEMBER(mult_param_w);
 
+	uint8_t m_barrel_params[2];
+
+	DECLARE_READ8_MEMBER(barrel_r);
+	DECLARE_WRITE8_MEMBER(barrel_w);
+
+
 	void update_irqs();
 	uint8_t m_irqsource;
 
