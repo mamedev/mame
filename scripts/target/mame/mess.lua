@@ -811,6 +811,7 @@ BUSES["TI99"] = true
 BUSES["TI99X"] = true
 BUSES["TIKI100"] = true
 BUSES["TVC"] = true
+BUSES["UTS_KBD"] = true
 BUSES["VBOY"] = true
 BUSES["VC4000"] = true
 BUSES["VCS"] = true
