@@ -165,7 +165,7 @@ MACHINE_CONFIG_START(cchasm_state::cchasm)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
+	VECTOR(config, m_vector, 0);
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(40)
 	MCFG_SCREEN_SIZE(400, 300)

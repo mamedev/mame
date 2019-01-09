@@ -617,10 +617,10 @@ MACHINE_CONFIG_START(jpmsys5v_state::jpmsys5v)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000) / 4, 676, 20*4, 147*4, 256, 0, 254)
 	MCFG_SCREEN_UPDATE_DRIVER(jpmsys5v_state, screen_update_jpmsys5v)
 
-	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
-	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
-	MCFG_TMS34061_VRAM_SIZE(0x40000) /* size of video RAM */
-	MCFG_TMS34061_INTERRUPT_CB(WRITELINE(*this, jpmsys5v_state, generate_tms34061_interrupt))      /* interrupt gen callback */
+	TMS34061(config, m_tms34061, 0);
+	m_tms34061->set_rowshift(8);  /* VRAM address is (row << rowshift) | col */
+	m_tms34061->set_vram_size(0x40000);
+	m_tms34061->int_callback().set(FUNC(jpmsys5v_state::generate_tms34061_interrupt));
 
 	MCFG_PALETTE_ADD("palette", 16)
 

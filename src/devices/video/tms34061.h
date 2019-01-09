@@ -15,17 +15,6 @@
 #pragma once
 
 
-#define MCFG_TMS34061_ROWSHIFT(_shift) \
-	downcast<tms34061_device &>(*device).set_rowshift(_shift);
-
-#define MCFG_TMS34061_VRAM_SIZE(_size) \
-	downcast<tms34061_device &>(*device).set_vram_size(_size);
-
-#define MCFG_TMS34061_INTERRUPT_CB(_devcb) \
-	downcast<tms34061_device &>(*device).set_interrupt_callback(DEVCB_##_devcb);
-
-
-
 // ======================> tms34061_device
 
 class tms34061_device :  public device_t, public device_video_interface
@@ -46,7 +35,6 @@ public:
 
 	void set_rowshift(uint8_t rowshift) { m_rowshift = rowshift; }
 	void set_vram_size(uint32_t vramsize) { m_vramsize = vramsize; }
-	template <class Object> devcb_base &set_interrupt_callback(Object &&cb) { return m_interrupt_cb.set_callback(std::forward<Object>(cb)); }
 	auto int_callback() { return m_interrupt_cb.bind(); }
 
 	/* reads/writes to the 34061 */
