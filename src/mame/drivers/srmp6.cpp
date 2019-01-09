@@ -26,6 +26,8 @@ TODO:
  - fix DMA operations
  - fix video emulation
 
+Video reference : https://youtu.be/wNm3tu1iGvM
+
 Are there other games on this 'System S12' hardware ???
 
 ---------------- dump infos ----------------
