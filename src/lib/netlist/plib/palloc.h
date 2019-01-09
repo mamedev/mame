@@ -153,19 +153,19 @@ private:
 		char *data;
 	};
 
-	size_t new_block();
+	block * new_block();
 	size_t mininfosize();
 
 	struct info
 	{
-		info() : m_block(0) { }
-		size_t m_block;
+		info() : m_block(nullptr) { }
+		block * m_block;
 	};
 
 	size_t m_min_alloc;
 	size_t m_min_align;
 
-	std::vector<block> m_blocks;
+	std::vector<block *> m_blocks;
 
 public:
 	mempool(size_t min_alloc, size_t min_align);

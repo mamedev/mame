@@ -1004,17 +1004,18 @@ void netlist_mame_cpu_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_genPC).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_genPC).noshow();
 
-	for (int i=0; i < netlist().m_nets.size(); i++)
+	int index = 0;
+	for (auto &n : netlist().m_nets)
 	{
-		netlist::detail::net_t *n = netlist().m_nets[i].get();
 		if (n->is_logic())
 		{
-			state_add(i*2, n->name().c_str(), *downcast<netlist::logic_net_t *>(n)->Q_state_ptr());
+			state_add(index, n->name().c_str(), *(downcast<netlist::logic_net_t &>(*n).Q_state_ptr()));
 		}
 		else
 		{
-			state_add(i*2+1, n->name().c_str(), *downcast<netlist::analog_net_t *>(n)->Q_Analog_state_ptr());
+			state_add(index, n->name().c_str(), *(downcast<netlist::analog_net_t &>(*n).Q_Analog_state_ptr()));
 		}
+		index++;
 	}
 
 	// set our instruction counter
@@ -1116,15 +1117,15 @@ void netlist_mame_sound_device::device_start()
 	//m_num_outputs = outdevs.size();
 
 	/* resort channels */
-	for (int i=0; i < outdevs.size(); i++)
+	for (auto &outdev : outdevs)
 	{
-		int chan = outdevs[i]->m_channel();
+		int chan = outdev->m_channel();
 
-		netlist().log().verbose("Output %d on channel %d", i, chan);
+		netlist().log().verbose("Output %s on channel %d", outdev->name(), chan);
 
-		//if (chan < 0 || chan >= MAX_OUT || chan >= outdevs.size())
-		//	fatalerror("illegal channel number");
-		m_out[chan] = outdevs[i];
+		if (chan < 0 || chan >= outdevs.size())
+			fatalerror("illegal channel number");
+		m_out[chan] = outdev;
 		m_out[chan]->m_sample_time = netlist::netlist_time::from_hz(clock());
 		m_out[chan]->m_buffer = nullptr;
 		m_out[chan]->m_bufsize = 0;

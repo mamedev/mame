@@ -40,7 +40,7 @@ namespace netlist
 
 		NETLIB_HANDLERI(updA)
 		{
-			if (m_reset)
+			//if (m_reset)
 			{
 				m_a ^= 1;
 				m_QA.push(m_a, out_delay);
@@ -49,7 +49,7 @@ namespace netlist
 
 		NETLIB_HANDLERI(updB)
 		{
-			if (m_reset)
+			//if (m_reset)
 			{
 				++m_bcd &= static_cast<std::uint8_t>(0x07);
 				m_QD.push((m_bcd >> 2) & 1, out_delay3);
@@ -101,8 +101,8 @@ namespace netlist
 	{
 		m_reset = 1;
 		m_a = m_bcd = 0;
-		m_CLKA.set_state(logic_t::STATE_INP_HL);
-		m_CLKB.set_state(logic_t::STATE_INP_HL);
+		m_CLKA.activate_hl();
+		m_CLKB.activate_hl();
 	}
 
 	NETLIB_UPDATE(7493)

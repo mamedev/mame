@@ -653,7 +653,7 @@ namespace netlist
 				nldelegate delegate = nldelegate());
 		virtual ~logic_input_t();
 
-		inline netlist_sig_t operator()() const NL_NOEXCEPT
+		const netlist_sig_t &operator()() const NL_NOEXCEPT
 		{
 			return Q();
 		}
@@ -663,7 +663,7 @@ namespace netlist
 		void activate_hl() NL_NOEXCEPT;
 		void activate_lh() NL_NOEXCEPT;
 	private:
-		netlist_sig_t Q() const NL_NOEXCEPT;
+		const netlist_sig_t &Q() const NL_NOEXCEPT;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -778,10 +778,10 @@ namespace netlist
 		logic_net_t(netlist_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
 		virtual ~logic_net_t();
 
-		inline netlist_sig_t Q() const NL_NOEXCEPT { return m_cur_Q; }
+		inline const netlist_sig_t & Q() const NL_NOEXCEPT { return m_cur_Q; }
 		void initial(const netlist_sig_t val) NL_NOEXCEPT { m_cur_Q = m_new_Q = val; }
 
-		void set_Q_and_push(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
+		inline void set_Q_and_push(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q )
 			{
@@ -789,7 +789,7 @@ namespace netlist
 				push_to_queue(delay);
 			}
 		}
-		void set_Q_and_push_force(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
+		inline void set_Q_and_push_force(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q || is_queued())
 			{
@@ -798,7 +798,7 @@ namespace netlist
 			}
 		}
 
-		void set_Q_time(const netlist_sig_t newQ, const netlist_time &at) NL_NOEXCEPT
+		inline void set_Q_time(const netlist_sig_t newQ, const netlist_time &at) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q)
 			{
@@ -1462,7 +1462,7 @@ namespace netlist
 		return static_cast<const logic_net_t &>(core_terminal_t::net());
 	}
 
-	inline netlist_sig_t logic_input_t::Q() const NL_NOEXCEPT
+	inline const netlist_sig_t & logic_input_t::Q() const NL_NOEXCEPT
 	{
 		nl_assert(state() != STATE_INP_PASSIVE);
 		return net().Q();
