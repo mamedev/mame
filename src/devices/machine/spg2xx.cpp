@@ -220,6 +220,7 @@ void spg2xx_device::device_reset()
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
 	m_video_regs[0x3c] = 0x0020;
+	m_video_regs[0x42] = 0x0001;
 
 	m_hide_page0 = false;
 	m_hide_page1 = false;
@@ -832,9 +833,12 @@ WRITE16_MEMBER(spg2xx_device::video_w)
 		break;
 
 	case 0x72: // Sprite DMA Length
+	{
 		LOGMASKED(LOG_DMA, "video_w: Sprite DMA Length = %04x\n", data & 0x03ff);
-		do_sprite_dma(data & 0x3ff);
+		uint16_t length = data & 0x3ff;
+		do_sprite_dma(length ? length : 0x400);
 		break;
+	}
 
 	default:
 		LOGMASKED(LOG_UNKNOWN_PPU, "video_w: Unknown register %04x = %04x\n", 0x2800 + offset, data);
