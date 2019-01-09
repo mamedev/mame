@@ -41,6 +41,7 @@ public:
 
 	TIMER_CALLBACK_MEMBER(process_snapshot_or_quickload);
 	void set_handler(snapquick_load_delegate load, const char *ext, seconds_t sec) { m_load = load; m_file_extensions = ext; m_delay_seconds = sec; };
+    void set_handler(snapquick_load_delegate load, const char *ext, seconds_t sec, attoseconds_t asec) { m_load = load; m_file_extensions = ext; m_delay_seconds = sec; m_delay_attoseconds = asec; };
 
 protected:
 	snapshot_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
