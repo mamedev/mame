@@ -139,12 +139,12 @@ namespace netlist
 
 	NETLIB_RESET(7474)
 	{
-		sub.do_reset();
+		//sub.do_reset();
 	}
 
 	NETLIB_RESET(7474sub)
 	{
-		m_CLK.set_state(logic_t::STATE_INP_LH);
+		m_CLK.activate_lh();
 
 		m_nextD = 0;
 	}

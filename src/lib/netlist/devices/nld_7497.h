@@ -40,9 +40,9 @@
 #define TTL_7497(name, cCLK, cSTRB, cEN, cUNITY, cCLR, cB0, cB1, cB2, cB3, cB4, cB5) \
 		NET_REGISTER_DEV(TTL_7497, name)                                             \
 		NET_CONNECT(name, CLK,   cCLK)                                               \
-		NET_CONNECT(name, STRB,  cSTRB)                                              \
-		NET_CONNECT(name, EN,    cEN)                                                \
-		NET_CONNECT(name, UNITY, cUNITY)                                             \
+		NET_CONNECT(name, STRBQ, cSTRB)                                              \
+		NET_CONNECT(name, ENQ,   cEN)                                                \
+		NET_CONNECT(name, UNITYQ,cUNITY)                                             \
 		NET_CONNECT(name, CLR,   cCLR)                                               \
 		NET_CONNECT(name, B0,    cB0)                                                \
 		NET_CONNECT(name, B1,    cB1)                                                \

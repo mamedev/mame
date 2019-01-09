@@ -127,7 +127,7 @@ namespace netlist
 	ENTRYX(7485_dip,            TTL_7485_DIP,           "")
 	ENTRYX(7490_dip,            TTL_7490_DIP,           "")
 	ENTRYX(7493_dip,            TTL_7493_DIP,           "")
-//	ENTRYX(7497_dip,            TTL_7497_DIP,           "")
+	ENTRYX(7497_dip,            TTL_7497_DIP,           "")
 	ENTRYX(74107_dip,           TTL_74107_DIP,          "")
 	ENTRYX(74123_dip,           TTL_74123_DIP,          "")
 	ENTRYX(74153_dip,           TTL_74153_DIP,          "")

@@ -40,7 +40,7 @@ NETLIST_START(tp1985)
 //	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
 	PARAM(Solver.ACCURACY, 1e-5) // ???
 //	PARAM(Solver.LTE,     1e-4) // Default is not enough for paddle control if using LTE
-	PARAM(NETLIST.USE_DEACTIVATE, 1)
+	PARAM(NETLIST.USE_DEACTIVATE, 0)
 
 	ANALOG_INPUT(V5, 5)
 
@@ -133,8 +133,8 @@ NETLIST_START(tp1985)
 //	TTL_7497(DD4, DD3_1.QQ, low, low, low, DD5_4.Q,  low, DD4.Y, low, low, low, low) 
 	TTL_7400_NAND(DD5_3, R13.2, DD4.Y)
 //	TTL_7400_NAND(DD5_3, high, DD4.Y)
-	TTL_7400_NAND(DD5_4, DD4.ENOUT, DD4.ENOUT)
-	TTL_7493(DD6, DD4.Z, DD4.ENOUT, DD6.QD, DD6.QB) // CLK1, CLK2, R1, R2  [14, 1, 2, 3]
+	TTL_7400_NAND(DD5_4, DD4.ENOUTQ, DD4.ENOUTQ)
+	TTL_7493(DD6, DD4.ZQ, DD4.ENOUTQ, DD6.QD, DD6.QB) // CLK1, CLK2, R1, R2  [14, 1, 2, 3]
 #else
 	TTL_7497(DD4, DD3_1.QQ, low, low, low, low,  low, high, low, low, low, low) 
 //	TTL_7493(DDx, DD3_1.QQ, DD3_1.QQ, low, low)

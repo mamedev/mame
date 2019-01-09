@@ -29,7 +29,7 @@
 
 NETLIST_START(tp1983)
 
-	SOLVER(Solver, 48000)
+	SOLVER(Solver, 480000)
 //	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
 	PARAM(Solver.ACCURACY, 1e-5) // ???
 //	PARAM(Solver.LTE,     1e-4) // Default is not enough for paddle control if using LTE
@@ -56,12 +56,13 @@ NETLIST_START(tp1983)
 	NET_C(DD6_2.Q, C6.1)
 #endif
 	NET_C(C6.2, R19.1)
-	NET_C(R19.2, GND)
+	//NET_C(R19.2, GND)
+	NET_C(R19.2, V5)
 
 	// CLK, STROBE, ENABLE, UNITY, CLR,  Bx  [9, 10, 11, 12, 13, ...]
 	TTL_7497(DD4, clk, low, low, low, DD5.Y,  high, vsync, low, vsync, vsync, low) 
 #if 1
-	TTL_7497(DD5, DD4.Z, DD6_2.QQ, low, DD5.ENOUT, DD5.Y,  high, DD6_1.QQ, low, low, low, low) 
+	TTL_7497(DD5, DD4.ZQ, DD6_2.QQ, low, DD5.ENOUTQ, DD5.Y,  high, DD6_1.QQ, low, low, low, low)
 #else
 	TTL_7497(DD5, DD4.Z, low, low, DD5.ENOUT, DD5.Y,  high, DD6_1.QQ, low, low, low, low) 
 #endif
@@ -110,6 +111,9 @@ NETLIST_START(tp1983)
 #else
 	ALIAS(videomix, vsync)
 #endif
+
+	//LOG(log_V0, vsync)
+	//LOG(log_V1, DD6_2.Q)
 
 #if 1
 	HINT(clk, NO_DEACTIVATE)
