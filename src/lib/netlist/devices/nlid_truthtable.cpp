@@ -407,7 +407,8 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 				val.set(j);
 			else
 				nl_assert_always(outs == "0", "Unknown value (not 0 or 1");
-			netlist_time t = netlist_time::from_nsec(static_cast<unsigned long>(plib::pstol(plib::trim(times[j]))));
+			// FIXME: error handling
+			netlist_time t = netlist_time::from_nsec(plib::pstonum<unsigned long>(plib::trim(times[j])));
 			uint_least8_t k=0;
 			while (m_timing_nt[k] != netlist_time::zero() && m_timing_nt[k] != t)
 				k++;

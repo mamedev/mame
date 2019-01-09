@@ -26,7 +26,6 @@
  * linear memory pool. This is based of the assumption that
  * due to enhanced locality there will be less cache misses.
  * Your mileage may vary.
- * This will cause crashes on OSX and thus is ignored on OSX.
  *
  */
 #define USE_MEMPOOL                 (0)

@@ -16,6 +16,11 @@
 
 namespace plib
 {
+
+	// Avoid unused variable warnings
+	template<typename... Ts>
+	inline void unused_var(Ts&&...) {}
+
 	namespace util
 	{
 		const pstring buildpath(std::initializer_list<pstring> list );

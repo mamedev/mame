@@ -46,47 +46,11 @@ namespace plib {
 		return 0;
 	}
 
-	int option_str_limit::parse(const pstring &argument)
-	{
-		if (plib::container::contains(m_limit, argument))
-		{
-			m_val = argument;
-			return 0;
-		}
-		else
-			return 1;
-	}
-
 	int option_bool::parse(const pstring &argument)
 	{
+		unused_var(argument);
 		m_val = true;
 		return 0;
-	}
-
-	int option_double::parse(const pstring &argument)
-	{
-		try
-		{
-			m_val = plib::pstod(argument);
-			return 0;
-		}
-		catch (...)
-		{
-			return 1;
-		}
-	}
-
-	int option_long::parse(const pstring &argument)
-	{
-		try
-		{
-			m_val = plib::pstol(argument);
-			return 0;
-		}
-		catch (...)
-		{
-			return 1;
-		}
 	}
 
 	int option_vec::parse(const pstring &argument)
@@ -233,7 +197,7 @@ namespace plib {
 					if (opt->has_argument())
 					{
 						line += "=";
-						option_str_limit *ol = dynamic_cast<option_str_limit *>(opt);
+						option_str_limit_base *ol = dynamic_cast<option_str_limit_base *>(opt);
 						if (ol)
 						{
 							for (auto &v : ol->limit())

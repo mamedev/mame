@@ -64,6 +64,36 @@ namespace plib
 		return ret;
 	}
 
+	std::vector<std::string> psplit_r(const std::string &stri,
+			const std::string &token,
+			const std::size_t maxsplit)
+	{
+		std::string str(stri);
+		std::vector<std::string> result;
+		std::size_t splits = 0;
+
+		while(str.size())
+		{
+			std::size_t index = str.rfind(token);
+			bool found = index!=std::string::npos;
+			if (found)
+				splits++;
+			if ((splits <= maxsplit || maxsplit == 0) && found)
+			{
+				result.push_back(str.substr(index+token.size()));
+				str = str.substr(0, index);
+				if (str.size()==0)
+					result.push_back(str);
+			}
+			else
+			{
+				result.push_back(str);
+				str = "";
+			}
+		}
+		return result;
+	}
+
 	std::vector<pstring> psplit(const pstring &str, const std::vector<pstring> &onstrl)
 	{
 		pstring col = "";

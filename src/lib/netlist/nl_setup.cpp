@@ -159,8 +159,9 @@ double setup_t::get_initial_param_val(const pstring &name, const double def)
 	auto i = m_param_values.find(name);
 	if (i != m_param_values.end())
 	{
-		double vald = 0;
-		if (!plib::pstod_ne(i->second, vald))
+		bool err = false;
+		double vald = plib::pstonum_ne<double>(i->second, err);
+		if (err)
 			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
 		return vald;
 	}
@@ -173,8 +174,9 @@ int setup_t::get_initial_param_val(const pstring &name, const int def)
 	auto i = m_param_values.find(name);
 	if (i != m_param_values.end())
 	{
-		long vald = 0;
-		if (!plib::pstod_ne(i->second, vald))
+		bool err;
+		double vald = plib::pstonum_ne<double>(i->second, err);
+		if (err)
 			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
 		if (vald - std::floor(vald) != 0.0)
 			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
@@ -872,7 +874,8 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 	}
 	if (factor != NL_FCONST(1.0))
 		tmp = plib::left(tmp, tmp.size() - 1);
-	return plib::pstod(tmp) * factor;
+	// FIXME: check for errors
+	return plib::pstonum<nl_double>(tmp) * factor;
 }
 
 class logic_family_std_proxy_t : public logic_family_desc_t

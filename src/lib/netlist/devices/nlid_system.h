@@ -136,7 +136,9 @@ namespace netlist
 				unsigned long total = 0;
 				for (unsigned i=0; i<m_size; i++)
 				{
-					pati[i] = static_cast<unsigned long>(plib::pstol(pat[i]));
+					// FIXME: use pstonum_ne
+					//pati[i] = plib::pstonum<decltype(pati[i])>(pat[i]);
+					pati[i] = plib::pstonum<unsigned long>(pat[i]);
 					total += pati[i];
 				}
 				netlist_time ttotal = netlist_time::zero();

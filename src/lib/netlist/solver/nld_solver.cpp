@@ -268,7 +268,7 @@ void NETLIB_NAME(solver)::post_start()
 	// Override log statistics
 	pstring p = plib::util::environment("NL_STATS", "");
 	if (p != "")
-		m_params.m_log_stats = plib::pstol(p);
+		m_params.m_log_stats = plib::pstonum<decltype(m_params.m_log_stats)>(p);
 	else
 		m_params.m_log_stats = m_log_stats();
 

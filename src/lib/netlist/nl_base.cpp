@@ -343,8 +343,8 @@ void netlist_t::start()
 			auto p = setup().m_param_values.find(d->name() + ".HINT_NO_DEACTIVATE");
 			if (p != setup().m_param_values.end())
 			{
-				//FIXME: turn this into a proper function
-				auto v = plib::pstod(p->second);;
+				//FIXME: check for errors ...
+				double v = plib::pstonum<double>(p->second);;
 				if (std::abs(v - std::floor(v)) > 1e-6 )
 					log().fatal(MF_1_HND_VAL_NOT_SUPPORTED, p->second);
 				d->set_hint_deactivate(v == 0.0);

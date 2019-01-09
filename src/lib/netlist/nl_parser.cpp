@@ -403,7 +403,6 @@ nl_double parser_t::eval_param(const token_t tok)
 	int i;
 	int f=0;
 	nl_double ret;
-	pstring val;
 
 	for (i=1; i<6;i++)
 		if (tok.str() == macs[i])
@@ -416,9 +415,10 @@ nl_double parser_t::eval_param(const token_t tok)
 	}
 	else
 	{
-		val = tok.str();
-		if (!plib::pstod_ne(val, ret))
-			error(plib::pfmt("Parameter value <{1}> not double \n")(val));
+		bool err;
+		ret = plib::pstonum_ne<nl_double>(tok.str(), err);
+		if (err)
+			error(plib::pfmt("Parameter value <{1}> not double \n")(tok.str()));
 	}
 	return ret * facs[f];
 

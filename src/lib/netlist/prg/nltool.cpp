@@ -23,7 +23,7 @@ public:
 	tool_app_t() :
 		plib::app(),
 		opt_grp1(*this,     "General options",              "The following options apply to all commands."),
-		opt_cmd (*this,     "c", "cmd",         "run",      "run:convert:listdevices:static:header:docheader", "run|convert|listdevices|static|header"),
+		opt_cmd (*this,     "c", "cmd",         0,		    std::vector<pstring>({"run","convert","listdevices","static","header","docheader"}), "run|convert|listdevices|static|header|docheader"),
 		opt_file(*this,     "f", "file",        "-",        "file to process (default is stdin)"),
 		opt_defines(*this,  "D", "define",                  "predefine value as macro, e.g. -Dname=value. If '=value' is omitted predefine it as 1. This option may be specified repeatedly."),
 		opt_rfolders(*this, "r", "rom",                     "where to look for data files"),
@@ -40,7 +40,7 @@ public:
 		opt_loadstate(*this,"",  "loadstate",   "",         "load state from file and continue from there"),
 		opt_savestate(*this,"",  "savestate",   "",         "save state to file at end of run"),
 		opt_grp4(*this,     "Options for convert command",  "These options are only used by the convert command."),
-		opt_type(*this,     "y", "type",        "spice",    "spice:eagle:rinf", "type of file to be converted: spice,eagle,rinf"),
+		opt_type(*this,     "y", "type",        0,          std::vector<pstring>({"spice","eagle","rinf"}), "type of file to be converted: spice,eagle,rinf"),
 
 		opt_ex1(*this,     "nltool -c run -t 3.5 -f nl_examples/cdelay.c -n cap_delay",
 				"Run netlist \"cap_delay\" from file nl_examples/cdelay.c for 3.5 seconds"),
@@ -49,7 +49,7 @@ public:
 		{}
 
 	plib::option_group  opt_grp1;
-	plib::option_str_limit opt_cmd;
+	plib::option_str_limit<unsigned> opt_cmd;
 	plib::option_str    opt_file;
 	plib::option_vec    opt_defines;
 	plib::option_vec    opt_rfolders;
@@ -60,13 +60,13 @@ public:
 	plib::option_group  opt_grp2;
 	plib::option_str    opt_name;
 	plib::option_group  opt_grp3;
-	plib::option_double opt_ttr;
+	plib::option_num<double> opt_ttr;
 	plib::option_vec    opt_logs;
 	plib::option_str    opt_inp;
 	plib::option_str    opt_loadstate;
 	plib::option_str    opt_savestate;
 	plib::option_group  opt_grp4;
-	plib::option_str_limit opt_type;
+	plib::option_str_limit<unsigned> opt_type;
 	plib::option_example opt_ex1;
 	plib::option_example opt_ex2;
 
@@ -706,7 +706,7 @@ int tool_app_t::execute()
 
 	try
 	{
-		pstring cmd = opt_cmd();
+		pstring cmd = opt_cmd.as_string();
 		if (cmd == "listdevices")
 			listdevices();
 		else if (cmd == "run")
@@ -734,19 +734,19 @@ int tool_app_t::execute()
 			contents = ostrm.str();
 
 			pstring result;
-			if (opt_type() == "spice")
+			if (opt_type.as_string() == "spice")
 			{
 				nl_convert_spice_t c;
 				c.convert(contents);
 				result = c.result();
 			}
-			else if (opt_type() == "eagle")
+			else if (opt_type.as_string() == "eagle")
 			{
 				nl_convert_eagle_t c;
 				c.convert(contents);
 				result = c.result();
 			}
-			else if (opt_type() == "rinf")
+			else if (opt_type.as_string() == "rinf")
 			{
 				nl_convert_rinf_t c;
 				c.convert(contents);

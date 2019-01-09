@@ -122,6 +122,7 @@ pstring ptokenizer::get_identifier_or_number()
 	return tok.str();
 }
 
+// FIXME: combine into template
 double ptokenizer::get_number_double()
 {
 	token_t tok = get_token();
@@ -129,9 +130,9 @@ double ptokenizer::get_number_double()
 	{
 		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	}
-	double ret = 0.0;
-
-	if (!plib::pstod_ne(tok.str(), ret))
+	bool err;
+	double ret = plib::pstonum_ne<double>(tok.str(), err);
+	if (err)
 		error(pfmt("Expected a number, got <{1}>")(tok.str()) );
 	return ret;
 }
@@ -143,8 +144,9 @@ long ptokenizer::get_number_long()
 	{
 		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	}
-	long ret = 0;
-	if (!plib::pstol_ne(tok.str(), ret))
+	bool err;
+	long ret = plib::pstonum_ne<long>(tok.str(), err);
+	if (err)
 		error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
 	return ret;
 }
@@ -326,7 +328,8 @@ double ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start
 	else
 	{
 		tok=sexpr[start];
-		val = plib::pstod(tok);
+		// FIXME: error handling
+		val = plib::pstonum<decltype(val)>(tok);
 		start++;
 	}
 	while (start < sexpr.size())

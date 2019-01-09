@@ -9,8 +9,10 @@
 
 #include <cstring>
 #include <exception>
+#include <stdexcept>
 #include <iterator>
 #include <string>
+#include <limits>
 #include <type_traits>
 
 // ----------------------------------------------------------------------------------------
@@ -518,57 +520,72 @@ namespace plib
 		return pwstring(std::to_wstring(v));
 	}
 
-#if (PSTRING_USE_STD_STRING)
-	inline double pstod(const std::string &str, std::size_t *e = nullptr)
-	{
-		return std::stod(str, e);
-	}
-
-	inline long pstol(const std::string &str, std::size_t *e = nullptr, int base = 10)
-	{
-		return std::stol(str, e, base);
-	}
-#else
-	template<typename T>
-	double pstod(const T &str, std::size_t *e = nullptr)
-	{
-		return std::stod(str.cpp_string(), e);
-	}
+	template <typename T, typename E = void>
+	struct pstonum_helper;
 
 	template<typename T>
-	long pstol(const T &str, std::size_t *e = nullptr, int base = 10)
+	struct pstonum_helper<T, typename std::enable_if<std::is_integral<T>::value
+		&& std::is_signed<T>::value>::type>
 	{
-		return std::stol(str.cpp_string(), e, base);
-	}
-#endif
+		template <typename S>
+		long long operator()(const S &arg, std::size_t *idx)
+		{
+			return std::stoll(arg, idx);
+		}
+	};
 
-	template<typename T, typename R>
-	bool pstol_ne(const T &str, R &ret)
+	template<typename T>
+	struct pstonum_helper<T, typename std::enable_if<std::is_integral<T>::value
+		&& !std::is_signed<T>::value>::type>
+	{
+		template <typename S>
+		unsigned long long operator()(const S &arg, std::size_t *idx)
+		{
+			return std::stoull(arg, idx);
+		}
+	};
+
+	template<typename T>
+	struct pstonum_helper<T, typename std::enable_if<std::is_floating_point<T>::value>::type>
+	{
+		template <typename S>
+		long double operator()(const S &arg, std::size_t *idx)
+		{
+			return std::stold(arg, idx);
+		}
+	};
+
+	template<typename T, typename S>
+	T pstonum(const S &arg)
+	{
+		decltype(arg.c_str()) cstr = arg.c_str();
+		std::size_t idx(0);
+		auto ret = pstonum_helper<T>()(cstr, &idx);
+		if (ret >= std::numeric_limits<T>::lowest() && ret <= std::numeric_limits<T>::max())
+			//&& (ret == T(0) || std::abs(ret) >= std::numeric_limits<T>::min() ))
+		{
+			if (cstr[idx] != 0)
+				throw std::invalid_argument(std::string("Continuation after numeric value ends: ") + cstr);
+		}
+		else
+		{
+			throw std::out_of_range(std::string("Out of range: ") + cstr);
+		}
+		return static_cast<T>(ret);
+	}
+
+	template<typename R, typename T>
+	R pstonum_ne(const T &str, bool &err) noexcept
 	{
 		try
 		{
-			std::size_t e = 0;
-			ret = pstol(str, &e);
-			return str.c_str()[e] == 0;
+			err = false;
+			return pstonum<R>(str);
 		}
 		catch (...)
 		{
-			return false;
-		}
-	}
-
-	template<typename T, typename R>
-	bool pstod_ne(const T &str, R &ret)
-	{
-		try
-		{
-			std::size_t e = 0;
-			ret = pstod(str, &e);
-			return str.c_str()[e] == 0;
-		}
-		catch (...)
-		{
-			return false;
+			err = true;
+			return R(0);
 		}
 	}
 

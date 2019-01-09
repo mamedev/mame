@@ -24,8 +24,8 @@ public:
 	{}
 	plib::option_str    opt_inp;
 	plib::option_str    opt_out;
-	plib::option_double opt_amp;
-	plib::option_long   opt_rate;
+	plib::option_num<double> opt_amp;
+	plib::option_num<long>   opt_rate;
 	plib::option_bool   opt_verb;
 	plib::option_bool   opt_quiet;
 	plib::option_bool   opt_version;
