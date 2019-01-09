@@ -36,7 +36,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	void generate_serial_data(int upper);
+	void generate_serial_data(int upper, uint32_t serial_number = 123456);
 	void serial_register_state();
 
 	uint8_t   m_data[16]; // reused by other devices
