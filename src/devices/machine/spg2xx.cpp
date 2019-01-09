@@ -291,7 +291,7 @@ void spg2xx_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff
 	uint32_t palette_offset = (attr & 0x0f00) >> 4;
 	if (m_debug_blit && SPG_DEBUG_VIDEO)
 	{
-		printf("line:%d xy:%08x,%08x attr:%08x ctrl:%08x bitmap_addr:%08x tile:%04x\n", line, xoff, yoff, attr, ctrl, bitmap_addr, tile);
+		printf("s:%d line:%d xy:%08x,%08x attr:%08x ctrl:%08x bitmap_addr:%08x tile:%04x\n", cliprect.min_x, line, xoff, yoff, attr, ctrl, bitmap_addr, tile);
 		printf("hw:%d,%d f:%d,%d fm:%d,%d ncols:%d pobs:%02x ", w, h, (attr & TILE_X_FLIP) ? 1 : 0, (attr & TILE_Y_FLIP) ? 1 : 0, xflipmask, yflipmask, nc, palette_offset);
 	}
 	palette_offset >>= nc;
@@ -303,12 +303,12 @@ void spg2xx_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff
 
 	uint32_t bits_per_row = nc * w / 16;
 	uint32_t words_per_tile = bits_per_row * h;
-	uint32_t m = bitmap_addr + words_per_tile * tile + bits_per_row * line;
+	uint32_t m = bitmap_addr + words_per_tile * tile + bits_per_row * (line ^ yflipmask);
 	uint32_t bits = 0;
 	uint32_t nbits = 0;
 	uint32_t y = line;
 
-	int yy = (yoff + (y ^ yflipmask)) & 0x1ff;
+	int yy = (yoff + y) & 0x1ff;
 	if (yy >= 0x01c0)
 		yy -= 0x0200;
 
@@ -402,7 +402,11 @@ void spg2xx_device::blit_page(const rectangle &cliprect, uint32_t scanline, int 
 	uint32_t y0 = bitmap_y / tile_h;
 	uint32_t tile_scanline = bitmap_y % tile_h;
 	uint32_t tile_address = tile_count_x * y0;
+	if (SPG_DEBUG_VIDEO && machine().input().code_pressed(KEYCODE_H))
+		printf("s:%3d | baddr:%08x | yscr:%3d | bity:%3d | y0:%2d | ts:%2d\n", scanline, bitmap_addr, yscroll, bitmap_y, y0, tile_scanline);
 
+	if (SPG_DEBUG_VIDEO && machine().input().code_pressed(KEYCODE_EQUALS))
+		m_debug_blit = true;
 	for (uint32_t x0 = 0; x0 < tile_count_x; x0++, tile_address++)
 	{
 		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & 0xff) - 0x10;
@@ -438,6 +442,8 @@ void spg2xx_device::blit_page(const rectangle &cliprect, uint32_t scanline, int 
 
 		blit(cliprect, tile_scanline, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
 	}
+	if (SPG_DEBUG_VIDEO && machine().input().code_pressed(KEYCODE_EQUALS))
+		m_debug_blit = false;
 }
 
 void spg2xx_device::blit_sprite(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t base_addr)
@@ -472,13 +478,22 @@ void spg2xx_device::blit_sprite(const rectangle &cliprect, uint32_t scanline, in
 	x &= 0x01ff;
 	y &= 0x01ff;
 
-	if (y > scanline)
-		return;
+	static bool check_y = true;
+
+	if (SPG_DEBUG_VIDEO && machine().input().code_pressed_once(KEYCODE_J))
+		check_y = !check_y;
 
 	uint32_t tile_line = ((scanline - y) + 0x200) % h;
+	int16_t test_y = (y + tile_line) & 0x1ff;
+	if (test_y >= 0x01c0)
+		test_y -= 0x0200;
 
-	if (tile_line >= h)
+	if (test_y > scanline && check_y)
+	{
+		if (SPG_DEBUG_VIDEO && machine().input().code_pressed(KEYCODE_L))
+			printf("Rejecting because %d > %d\n", test_y, scanline);
 		return;
+	}
 
 #if SPG_DEBUG_VIDEO
 	if (m_debug_sprites && machine().input().code_pressed(KEYCODE_MINUS))
@@ -1606,12 +1621,6 @@ void spg2xx_device::system_timer_tick()
 {
 	uint16_t check_mask = 0x0040;
 	IO_IRQ_STATUS |= 0x0040;
-
-	if (machine().input().code_pressed_once(KEYCODE_H))
-	{
-		IO_IRQ_STATUS |= 0x4000;
-		check_irqs(0x4000);
-	}
 
 	m_2khz_divider++;
 	if (m_2khz_divider == 2)

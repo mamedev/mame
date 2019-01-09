@@ -5,9 +5,9 @@
     Short Description:
 
         Systems which run on the SPG243 SoC
-		
+
 		( die markings show "SunPlus QL8041" on JAKKS WWE / Fantastic 4 / Justice League, Dora the Explorer, Mattel Classic Sports )
-	
+
     Status:
 
         Mostly working
@@ -361,7 +361,7 @@ static INPUT_PORTS_START( jak_gkr )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	
+
 	PORT_START("C")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, spg2xx_game_state,i2c_r, nullptr)
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -1230,9 +1230,10 @@ CONS( 2008, jak_wall, 0, 0, walle, walle,  spg2xx_game_state, empty_init, "JAKKS
 
 // 'Game-Key-Ready' JAKKS games (these can also take per-game specific expansion cartridges, although not all games had them released)
 CONS( 2005, jak_wwe,  0, 0, jakks_gkr,    jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "WWE (JAKKS Pacific TV Game)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // WW (no game-keys released)
-CONS( 2005, jak_fan4, 0, 0, jakks_gkr,    jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Fantastic Four (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // F4 (no game-keys released)
+CONS( 2005, jak_fan4, 0, 0, jakks_gkr,    jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Fantastic Four (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // F4 (no game-keys released)
 CONS( 2005, jak_just, 0, 0, jakks_gkr,    jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Taniko",          "Justice League (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DC (no game-keys released)
-CONS( 2005, jak_dora, 0, 0, jakks_gkr_nk, jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dora the Explorer (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3+ released)																																																								// Other Game-Key-Ready systems (not all releases of them?, only Sunplus SPG240 [Sunplus PAC300] versions?)
+CONS( 2005, jak_dora, 0, 0, jakks_gkr_nk, jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dora the Explorer (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3+ released)
+// Other Game-Key-Ready systems (not all releases of them?, only Sunplus SPG240 [Sunplus PAC300] versions?)
 // Nicktoons                                   NK (3? keys available) (same keys as Dora the Explorer)
 // SpongeBob SquarePants: The Fry Cook Games   NK (3? keys available)  ^^
 // Namco Ms. Pac-Man                           NM (3 keys available [Dig Dug, New Rally-X], [Rally-X, Pac-Man, Bosconian], [Pac-Man, Bosconian])
@@ -1258,7 +1259,7 @@ CONS( 2007, rad_fb2,   0,        0, rad_skat, rad_fb2,    spg2xx_game_state, ini
 // Mattel games
 CONS( 2005, mattelcs,  0,        0, rad_skat, mattelcs,   spg2xx_game_state, empty_init, "Mattel", "Mattel Classic Sports",          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-// might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least 
+// might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least
 // could be later model VT based instead? even after decrypting (simple word xor) the vectors have a different format and are at a different location to the SunPlus titles
 CONS( 2009, zone40,    0,       0,        non_spg_base, wirels60, spg2xx_game_state, empty_init, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
