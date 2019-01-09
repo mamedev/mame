@@ -352,8 +352,8 @@ int smc91c9x_device::address_filter(u8 *buf)
 
 			return ADDR_MULTICAST;
 		}
-		LOGMASKED(LOG_FILTER, "address_filter rejected multicast  %02x-%02x-%02x-%02x-%02x-%02x crc: %08x hash: %02x multi: %08x%08x\n",
-			buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], crc, m_rx_hash, *(u32*)&m_reg[B3_MT2_3], *(u32*)&m_reg[B3_MT0_1]);
+		LOGMASKED(LOG_FILTER, "address_filter rejected multicast  %02x-%02x-%02x-%02x-%02x-%02x crc: %08x hash: %02x multi: %16ullx\n",
+			buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], crc, m_rx_hash, *(u64*)&m_reg[B3_MT0_1]);
 	}
 	else
 	{

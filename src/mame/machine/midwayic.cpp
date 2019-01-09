@@ -32,12 +32,13 @@
  *
  *************************************/
 
-void midway_serial_pic_device::generate_serial_data(int upper, uint32_t serial_number)
+void midway_serial_pic_device::generate_serial_data(int upper)
 {
 	int year = atoi(machine().system().year), month = 12, day = 11;
-	uint32_t temp;
+	uint32_t serial_number, temp;
 	uint8_t serial_digit[9];
 
+	serial_number = 123456;
 	serial_number += upper * 1000000;
 
 	serial_digit[0] = (serial_number / 100000000) % 10;
@@ -319,9 +320,6 @@ void midway_serial_pic2_device::device_start()
 	m_time_just_written = 0;
 	m_time_write_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midway_serial_pic2_device::reset_timer),this));
 	memset(m_default_nvram, 0xff, sizeof(m_default_nvram));
-	// Set the first four bytes to random serial number
-	u32 rand_serial = rand() & 0x7ffff;
-	memcpy(m_default_nvram, &rand_serial, 4);
 }
 
 
@@ -582,17 +580,11 @@ WRITE8_MEMBER(midway_serial_pic2_device::write)
 void midway_serial_pic2_device::nvram_default()
 {
 	memcpy(m_nvram, m_default_nvram, sizeof(m_nvram));
-
-	// Create serial number from first 4 bytes of nvram memory
-	generate_serial_data(m_upper, (*(uint32_t*)m_nvram) & 0x7ffff);
 }
 
 void midway_serial_pic2_device::nvram_read(emu_file &file)
 {
 	file.read(m_nvram, sizeof(m_nvram));
-
-	// Create serial number from first 4 bytes of nvram memory
-	generate_serial_data(m_upper, (*(uint32_t*)m_nvram) & 0x7ffff);
 }
 
 void midway_serial_pic2_device::nvram_write(emu_file &file)
