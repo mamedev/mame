@@ -1381,15 +1381,7 @@ static INPUT_PORTS_START( aristmk5_usa )
 	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, nullptr)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( aristmk5 ) // TODO: Remove ROM swap code as it is not needed for non-US hardware
-	/* This simulates the ROM swap */
-	PORT_START("ROM_LOAD")
-	PORT_CONFNAME( 0x07, 0x04, "System Mode" )
-	PORT_CONFSETTING(    0x00, "USA Set Chip v4.04.09 Mode" )
-	PORT_CONFSETTING(    0x01, "USA Set Chip v4.04.08 Mode" )
-	PORT_CONFSETTING(    0x02, "USA Set Chip v4.04.00 Mode" )
-	PORT_CONFSETTING(    0x03, "USA Set Chip v4.02.04 Mode" )
-	PORT_CONFSETTING(    0x04, "Game Mode" )
+static INPUT_PORTS_START( aristmk5 )
 
 	PORT_START("P1")
 	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_CODE(KEYCODE_Q) PORT_NAME("Collect")
@@ -2242,21 +2234,23 @@ void aristmk5_state::machine_reset()
 
 	m_ioc_regs[IRQ_STATUS_B] |= 0x40; //hack, set keyboard irq empty to be ON
 
-	/* load the roms according to what the operator wants */
 	{
+		/* for US sets, load the roms according to what the operator wants */
 		uint8_t *ROM = memregion("maincpu")->base();
-		uint8_t *PRG;// = memregion("prg_code")->base();
-		int i;
-		uint8_t op_mode;
-		static const char *const rom_region[] = { "set_4.04.09", "set_4.04.08", "set_4.04.00", "set_4.02.04", "game_prg" };
+		uint8_t *PRG;
 
-		op_mode = ioport("ROM_LOAD")->read();
+		if (ioport("ROM_LOAD") != nullptr)
+		{
+			static const char *const rom_region[] = { "set_4.04.09", "set_4.04.08", "set_4.04.00", "set_4.02.04", "game_prg" };
 
-		PRG = memregion(rom_region[op_mode & 7])->base();
+			uint8_t op_mode = ioport("ROM_LOAD")->read();
 
-		if(PRG != nullptr)
+			PRG = memregion(rom_region[op_mode & 7])->base();
+		}
+		else // non-US sets don't have set chips
+			PRG = memregion("game_prg")->base();
 
-		for(i = 0; i < 0x400000; i++)
+		for(int i = 0; i < 0x400000; i++)
 			ROM[i] = PRG[i];
 	}
 
@@ -2367,7 +2361,7 @@ void aristmk5_state::aristmk5_usa_touch(machine_config &config)
 	microtouch.stx().set("uart_0a", FUNC(ins8250_uart_device::rx_w));
 }
 
-#define ARISTOCRAT_MK5_BIOS \
+#define ARISTOCRAT_MK5_USA_SETCHIPS \
 	ROM_REGION( 0x400000, "set_4.04.09", ROMREGION_ERASEFF ) /* setchip v4.04.09 4meg */ \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u7",  0x000000, 0x80000, CRC(e8e8dc75) SHA1(201fe95256459ce34fdb6f7498135ab5016d07f3) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u11", 0x000002, 0x80000, CRC(ff7a9035) SHA1(4352c4336e61947c555fdc80c61f944076f64b64) ) \
@@ -2379,37 +2373,23 @@ void aristmk5_state::aristmk5_usa_touch(machine_config &config)
 	ROM_LOAD32_WORD( "setchip v4.04.00.u11", 0x000002, 0x80000, CRC(82dfa12a) SHA1(86fd0f0ad8d5d1bc503392a40bbcdadb055b2765) ) \
 	ROM_REGION( 0x400000, "set_4.02.04", ROMREGION_ERASEFF ) /* setchip v4.02.04 */ \
 	ROM_LOAD32_WORD( "setchip v4.02.04.u7",  0x000000, 0x80000, CRC(5a254b22) SHA1(8444f237b392df2a3cb42ea349e7af32f47dd544) ) \
-	ROM_LOAD32_WORD( "setchip v4.02.04.u11", 0x000002, 0x80000, CRC(def36617) SHA1(c7ba5b08e884a8fb36c9fb51c08e243e32c81f89) ) \
-	/* GALs */ \
-	ROM_REGION( 0x600, "gals", 0 ) \
-	ROM_LOAD( "a562837.u36",  0x000000, 0x000157, CRC(1f269234) SHA1(29940dd50fb55c632935f62ff44ca724379c7a43) ) \
-	ROM_LOAD( "a562838.u65",  0x000200, 0x000157, CRC(f2f3c40a) SHA1(b795dfa5cc4e8127c3f3a0906664910d1325ec92) ) \
-	ROM_LOAD( "a562840.u22",  0x000400, 0x000157, CRC(941d4cdb) SHA1(1ca091fba69e92f262dbb3d40f515703c8981793) ) \
-	ROM_REGION16_BE( 0x100, "eeprom0", ROMREGION_ERASEFF ) \
-	ROM_REGION16_BE( 0x100, "eeprom1", ROMREGION_ERASEFF ) \
+	ROM_LOAD32_WORD( "setchip v4.02.04.u11", 0x000002, 0x80000, CRC(def36617) SHA1(c7ba5b08e884a8fb36c9fb51c08e243e32c81f89) )
 
-#define ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS \
-	ROM_REGION( 0x400000, "set_4.04.09", ROMREGION_ERASEFF ) /* setchip v4.04.09 4meg */ \
-	ROM_LOAD32_WORD( "setchip v4.04.09.u7",  0x000000, 0x80000, CRC(e8e8dc75) SHA1(201fe95256459ce34fdb6f7498135ab5016d07f3) ) \
-	ROM_LOAD32_WORD( "setchip v4.04.09.u11", 0x000002, 0x80000, CRC(ff7a9035) SHA1(4352c4336e61947c555fdc80c61f944076f64b64) ) \
-	ROM_REGION( 0x400000, "set_4.04.08", ROMREGION_ERASEFF ) /* setchip v4.04.08 4meg */ \
-	ROM_LOAD32_WORD( "setchip v4.04.08.u7",  0x000000, 0x80000, CRC(7c4b7fe4) SHA1(39dd39c794c0cb6abc1b7503650643a8131468d1) ) \
-	ROM_LOAD32_WORD( "setchip v4.04.08.u11", 0x000002, 0x80000, CRC(d3234a28) SHA1(8ff112ee4aadf1d359ca8ffe0cfa9c7400aa0595) ) \
-	ROM_REGION( 0x400000, "set_4.04.00", ROMREGION_ERASEFF ) /* setchip v4.04.00 4meg 42pin */ \
-	ROM_LOAD32_WORD( "setchip v4.04.00.u7",  0x000000, 0x80000, CRC(2453137e) SHA1(b59998e75ae3924da16faf47b9cfe9afd60d810c) ) \
-	ROM_LOAD32_WORD( "setchip v4.04.00.u11", 0x000002, 0x80000, CRC(82dfa12a) SHA1(86fd0f0ad8d5d1bc503392a40bbcdadb055b2765) ) \
-	ROM_REGION( 0x400000, "set_4.02.04", ROMREGION_ERASEFF ) /* setchip v4.02.04 */ \
-	ROM_LOAD32_WORD( "setchip v4.02.04.u7",  0x000000, 0x80000, CRC(5a254b22) SHA1(8444f237b392df2a3cb42ea349e7af32f47dd544) ) \
-	ROM_LOAD32_WORD( "setchip v4.02.04.u11", 0x000002, 0x80000, CRC(def36617) SHA1(c7ba5b08e884a8fb36c9fb51c08e243e32c81f89) ) \
-	/* GALs */ \
+#define ARISTOCRAT_MK5_GALS \
 	ROM_REGION( 0x600, "gals", 0 ) \
 	ROM_LOAD( "a562837.u36",  0x000000, 0x000157, CRC(1f269234) SHA1(29940dd50fb55c632935f62ff44ca724379c7a43) ) \
 	ROM_LOAD( "a562838.u65",  0x000200, 0x000157, CRC(f2f3c40a) SHA1(b795dfa5cc4e8127c3f3a0906664910d1325ec92) ) \
-	ROM_LOAD( "a562840.u22",  0x000400, 0x000157, CRC(941d4cdb) SHA1(1ca091fba69e92f262dbb3d40f515703c8981793) ) \
+	ROM_LOAD( "a562840.u22",  0x000400, 0x000157, CRC(941d4cdb) SHA1(1ca091fba69e92f262dbb3d40f515703c8981793) )
+
+#define ARISTOCRAT_MK5_EEPROM \
+	ROM_REGION16_BE( 0x100, "eeprom0", ROMREGION_ERASEFF ) \
+	ROM_REGION16_BE( 0x100, "eeprom1", ROMREGION_ERASEFF )
 
 
 ROM_START( aristmk5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 
@@ -2424,7 +2404,8 @@ ROM_END
 // 0200751V / 602/9 / 10 Credit Multiplier / 20 Line Multiline
 // ADONIS / NSW/ACT / A - 25/05/98
 ROM_START( adonis )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bf8
 	    0x000000-0x05eb1b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2448,7 +2429,8 @@ ROM_END
 // 0100751V / 602/9 / 10 Credit Multiplier / 20 Line Multiline
 // ADONIS / NSW/ACT / A - 25/05/98
 ROM_START( adonisa )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bf8
 	    0x000000-0x05cdc3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2473,7 +2455,9 @@ ROM_END
 // ADONIS / Export / B - 31/07/01
 // Requires set chips 4.04.xx
 ROM_START( adonisu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e8a7b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2498,7 +2482,9 @@ ROM_END
 // ADONIS / NSW/ACT / C - 06/07/99
 // Cash Express Hyperlink game
 ROM_START( adonisce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	/*
 	    Checksum code found at 0x000c44
@@ -2526,7 +2512,8 @@ ROM_END
 // Venezuela is spelled as 'Venezuila' in the ROM
 // Game is in Spanish, however audit mode is in English
 ROM_START( alchemst )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bb8
 	    0x000000-0x08e937 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2552,7 +2539,8 @@ ROM_END
 // 0200428V / 386/56 / CARD POKER
 // BAD DOG POKER / NSW HOTEL / A 17/12/96
 ROM_START( baddog )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae4
 	    0x000000-0x056f3f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2578,7 +2566,8 @@ ROM_END
 // 0200818V / 594/1 / 3 Credit Multiplier/3 Line Multiline
 // Black Panther / Victoria / A - 30/07/96
 ROM_START( blackpnt )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bb0
 	    0x000000-0x056d8b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2603,7 +2592,8 @@ ROM_END
 // 0100812V / 616/1 / 25 Credit Multiplier/20 Line Multiline
 // Boot Scootin' 500cm / NSW/ACT / B - 11/12/98
 ROM_START( bootsctn )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    0x000000-0x06c177 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
 	        Expected Checksum   0xb0980753
@@ -2633,7 +2623,9 @@ ROM_END
 // Marked as GHG101202 and 92.767%
 // No set chips required
 ROM_START( bootsctnu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0941ab is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2661,7 +2653,9 @@ ROM_END
 // GHG1008-03 / MV4098/1 / 10 Credit Multiplier/20 Line Multiline
 // BOOT SCOOTIN' / Export / A - 27/07/99
 ROM_START( bootsctnua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0944bf is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2689,7 +2683,9 @@ ROM_END
 // BOOT SCOOTIN' / Export / B - 22/03/01
 // Requires set chip version: 4.04.xx
 ROM_START( bootsctnub )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f47a7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2719,7 +2715,9 @@ ROM_END
 // Touchscreen game
 // Game requires set chip version: 4.01.xx
 ROM_START( bparty )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0a693f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2747,7 +2745,9 @@ ROM_END
 // Bachelorette Party / Export / B - 25/08/2000
 // Touchscreen game
 ROM_START( bpartya )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "bhg1579.u7",  0x000000, 0x7f01b, BAD_DUMP CRC(da30ade2) SHA1(0a19181ae3968134a5731aa9eadde8c7a12798c1) )
@@ -2768,7 +2768,8 @@ ROM_END
 // 0200510V / 593 / 10 Credit Multiplier / 9 Line Multiline
 // Bumble Bugs / Local / D - 5/07/96
 ROM_START( bumblbug )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05b94b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2789,7 +2790,8 @@ ROM_END
 // 0200546V / 593 / 10 Credit Multiplier / 9 Line Multiline
 // Bumble Bugs / QLD CLUB & HOTEL / D - 05/07/96
 ROM_START( bumblbugql )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ac8
 	    0x000000-0x05554b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2816,7 +2818,9 @@ ROM_END
 // Marked as CHG047903 and 92.691%
 // No set chips required
 ROM_START( bumblbugu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b1f47 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2844,7 +2848,9 @@ ROM_END
 // Variation (% and NO): 87.006% 99
 // No set chips required
 ROM_START( bumblbugua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b1f47 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2868,7 +2874,8 @@ ROM_END
 // 0200143V / 571/4 / 10 Credit Multiplier/9 Line Multiline
 // Butterfly Delight / Local / A - 19/12/95
 ROM_START( buttdeli )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x04477f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2892,7 +2899,9 @@ ROM_END
 // AHG1463 / 603(a) / 3,5,10,25,50 Credit Multiplier / 20 Line Multiline
 // Canyon Rose 100cm / Export / B - 06/12/96
 ROM_START( canrose )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ahg1463.u7",  0x000000, 0x7f06d, CRC(d866097c) SHA1(2bd2c6200986b27a35329aa0c43e5afd22becbfc) )
@@ -2909,7 +2918,8 @@ ROM_END
 // 0100676V / 614/3 / 10 Credit Multiplier/20 Line Multiline
 // Cash Cat 200cm / NSW/ACT / A - 3/04/98
 ROM_START( cashcat )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	/*
 	    Checksum code found at 0x000b68
@@ -2933,7 +2943,8 @@ ROM_END
 // 0100557V / 614/1 / 10 Credit Multiplier/9 Line Multiline
 // Cash Cat 90cm / NSW/ACT / B - 1/12/97
 ROM_START( cashcata )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	/*
 	    Checksum code found at 0x000b68
@@ -2957,7 +2968,8 @@ ROM_END
 // 0300863V / MV4089 / 5 Credit Multiplier/9 Line Multiline
 // Cash Cat / New Zealand / A- 4/1/99
 ROM_START( cashcatnz )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// checksum code not found (uses different startup sequence)
 	ROM_LOAD32_WORD( "0300863v.u7",  0x000000, 0x80000, CRC(de0f0202) SHA1(994f6c47b1e2e0e133853dc69b189752104486e4) )
@@ -2974,7 +2986,8 @@ ROM_END
 // 0100438V / 603/1 / 25 Credit Multiplier / 20 Line Multiline
 // Cash Chameleon / NSW/ACT / C - 15/4/97
 ROM_START( cashcham )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae0
 	    0x000000-0x055f83 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2998,7 +3011,8 @@ ROM_END
 // 0200437V / 603(a) / 5 Credit Multiplier / 20 Line Multiline
 // Cash Chameleon 100cm / NSW/ACT / D - 18/02/98
 ROM_START( cashchama )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b00
 	    0x000000-0x05ca1b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3022,7 +3036,8 @@ ROM_END
 // 0300781V / MV4067 / 5 Credit Multiplier/20 Line Multiline
 // Cash Chameleon / New Zealand / A - 31/08/98
 ROM_START( cashchamnz )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0300781v.u7",  0x000000, 0x80000, CRC(009e109e) SHA1(b912b474a226af17bef554f4db6fade7cd2e558f) )
@@ -3041,7 +3056,9 @@ ROM_END
 // Marked as DHG4078.
 // Game requires set chip version: 4.00.xx
 ROM_START( cashchamu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x09b413 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3065,7 +3082,8 @@ ROM_END
 // 0300467V / 607 / 10 Credit Multiplier/20 Line Multiline
 // Cash Crop / Local / C - 14/07/97
 ROM_START( cashcra5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x06076b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3089,7 +3107,8 @@ ROM_END
 // 0300447V / 607/2 / 10 Credit Multiplier/9 Line Multiline
 // Cash Crop / Local / C - 29/08/97
 ROM_START( cashcra5a )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0300447v.u7",  0x000000, 0x7f992, BAD_DUMP CRC(421ac2af) SHA1(552e98a0d3f969d702dd0aafcb4cb8f697a56b47) )
@@ -3106,7 +3125,8 @@ ROM_END
 // 0100787V / 630/1 / 10 Credit Multiplier / 20 Line Multiline
 // The Chariot Challenge / NSW/ACT / A - 10/08/98
 ROM_START( chariotc )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x0603fb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3132,7 +3152,8 @@ ROM_END
 // ROM contains unaltered NSW/ACT region string and date, but game is for the Venezuelan market
 // Game is in Spanish, however audit mode is in English
 ROM_START( chariotcv )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x07dbb7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3157,7 +3178,8 @@ ROM_END
 // Ckeckmate / NSW/ACT / B - 06/07/01
 // Checkmate is misspelled as 'Ckeckmate' in the ROM
 ROM_START( checkma5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000c38
 	    0x000000-0x071847 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3183,7 +3205,8 @@ ROM_END
 // 0100351V / 596 / 10 Credit Multiplier/9 Line Multiline
 // Chicken / Local / A - 27/08/96
 ROM_START( chickna5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x053fb7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3208,7 +3231,8 @@ ROM_END
 // 0200530V / 596 / 10 Credit Multiplier/9 Line Multiline
 // Chicken / QLD Club & Hotels / C - 23/02/98
 ROM_START( chickna5ql )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ac8
 	    0x000000-0x05f193 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3242,7 +3266,9 @@ ROM_END
 // No set chips required
 // Variation (% and NO): 92.588% 03
 ROM_START( chickna5u )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0a6917 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3273,7 +3299,9 @@ ROM_END
 // No set chips required
 // All devices are 27c4002 instead of 27c4096.
 ROM_START( chickna5ua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0a6917 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3302,7 +3330,8 @@ ROM_END
 // ROM contains unaltered NSW/ACT "Local" region string, but game is for the Venezuelan market
 // Game is in Spanish, however audit mode is in English
 ROM_START( chickna5v )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x07c3e7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3328,7 +3357,8 @@ ROM_END
 // 0100919V / 577/7 / 25 Credit Multiplier/20 Line Multiline
 // Coral Riches II / Local / A - 29/12/98
 ROM_START( coralrc2 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000be8
 	    0x000000-0x05ba63 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3352,7 +3382,8 @@ ROM_END
 // 0200753V / 615/1 / 10 Credit Multiplier / 20 Line Multiline
 // Cuckoo / Local / D - 03/07/98
 ROM_START( cuckoo )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b10
 	    0x000000-0x05f63f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3379,7 +3410,8 @@ ROM_END
 // All devices are 27c4002 instead of 27c4096
 // Requires set chips 4.01.xx
 ROM_START( cuckoou )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0a588b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3415,7 +3447,8 @@ ROM_END
 // 0300111V / 577/2 / 20 Credit Multiplier/9 Line Multiline
 // Desert Bloom / Local / A - 12/10/95
 ROM_START( dstbloom )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x044573 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3440,7 +3473,8 @@ ROM_END
 // Desert Bloom / Local / A - 12/10/95
 // Same strings as dstbloom but earlier version
 ROM_START( dstblooma )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x0431d3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3464,7 +3498,9 @@ ROM_END
 // AHG1533 / MV4115_5 / 5, 10, 25, 50 Credit Multiplier / 20 Line Multiline
 // Diamond Destiny / Export / A - 09/05/2000
 ROM_START( diamdest )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ahg1533.u7",  0x000000, 0x7efb1, BAD_DUMP CRC(b228ed66) SHA1(a92e403b4df2054693787f48e988613843731f9e) )
@@ -3484,7 +3520,8 @@ ROM_END
 // Diamond Dove / NSW/ACT / B - 19/05/99
 // ROM says '9 Credit Multiplier' but game has a 3 credit multiplier
 ROM_START( diamdove )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b78
 	    0x000000-0x063a9f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3510,7 +3547,8 @@ ROM_END
 // 0200302V / 483/7 / 3 Credit Multiplier/3 Line Multiline
 // Diamond Fever / Local / E - 05/09/96
 ROM_START( dmdfever )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ad8
 	    0x000000-0x054f3f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3532,7 +3570,8 @@ ROM_END
 // Diamond Touch / Local / E - 30/06/97
 // Touchscreen game
 ROM_START( dimtouch )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0400433v.u7",  0x000000, 0x80000, CRC(71b19365) SHA1(5a8ba1806af544d33e9acbcbbc0555805b4074e6) )
@@ -3549,7 +3588,8 @@ ROM_END
 // 0200424V / 602/1 / 10 Credit Multiplier / 20 Line Multiline
 // Dolphin Treasure / NSW/ACT / B - 06/12/96
 ROM_START( dolphntr )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b08
 	    0x000000-0x05c367 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3571,7 +3611,8 @@ ROM_END
 // Dolphin Treasure / NSW/ACT / B - 06/12/96
 // Same strings as dolphntr but earlier version
 ROM_START( dolphntra )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b08
 	    0x000000-0x053897 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3595,7 +3636,8 @@ ROM_END
 // 0100388V / 602 / 10 Credit Multiplier / 9 Line Multiline
 // Dolphin Treasure / NSW/ACT / B - 10/12/96
 ROM_START( dolphntrb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b20
 	    0x000000-0x0536c3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3622,7 +3664,9 @@ ROM_END
 // ROM says '9 & 20 Line Multiline' but game only has 20 lines with a 5, 10, 25 or 50 credit multiplier
 // Requires set chips 4.04.xx
 ROM_START( dolphntrce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f24a3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3652,7 +3696,9 @@ ROM_END
 // ROM says '9 & 20 Line Multiline' but game only has 9 lines with a 5, 10 or 20 credit multiplier
 // Requires set chips 4.04.xx
 ROM_START( dolphntrcea )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f2307 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3682,7 +3728,9 @@ ROM_END
 // ROM says '9 & 20 Line Multiline' but game only has 20 lines
 // Requires set chips 4.04.xx
 ROM_START( dolphntrceb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0eeb03 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3711,7 +3759,8 @@ ROM_END
 // All devices are 27c4002 instead of 27c4096
 // No set chips required
 ROM_START( dolphntru )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x08ec8b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3748,7 +3797,8 @@ ROM_END
 // Dragon's Eye / Local / A - 09/05/97
 // ROM says '10 Line Multiline' but game only has 9 lines
 ROM_START( drgneye )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000af8
 	    0x000000-0x05891b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3770,7 +3820,8 @@ ROM_END
 // Dream Weaver / Local / A- 20/06/97
 // Touchscreen game
 ROM_START( dreamwv )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200586v.u7",  0x000000, 0x80000, CRC(6d52fcd1) SHA1(136cb89037a96bf6824ed5754fc67167f0287684) )
@@ -3787,7 +3838,8 @@ ROM_END
 // 01J00081 / JB004 / Multi credit / Multi line
 // Dynamite Jack / NSW/ACT / A - 12/07/2000
 ROM_START( dynajack )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b78
 	    0x000000-0x07031b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3813,7 +3865,9 @@ ROM_END
 // CHG1562 / US002 / 5,10,20, Credit Multiplier / 9 Line Multiline
 // Dynamite Jack / Export / A - 11/07/01
 ROM_START( dynajacku )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, first 4 files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "chg1562.u7",  0x000000, 0x7f023, BAD_DUMP CRC(c69c989c) SHA1(6eeadf185a38944c6c0c32777c006f27505eaa73) )
@@ -3832,7 +3886,8 @@ ROM_END
 // 0100652V / 623 / 8 Credit Multiplier / 25 Credit Multiway
 // El Dorado / Local / B - 24/03/98
 ROM_START( eldorda5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x06328b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3853,7 +3908,8 @@ ROM_END
 // 0400122V / 570/3 / 10 Credit Multiplier/9 Line Multiline
 // Enchanted Forest / Local / E - 23/06/95
 ROM_START( eforsta5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae4
 	    0x000000-0x045da3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3875,7 +3931,9 @@ ROM_END
 // Enchanted Forest / Export / C - 17/01/00
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 ROM_START( eforsta5ce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, first 6 files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "chg1536.u7",  0x000000, 0x7efd4, BAD_DUMP CRC(d29185cc) SHA1(26154f3d99907461cff4a44fe02929fae66e6963) )
@@ -3900,7 +3958,9 @@ ROM_END
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 // Requires set chips 4.04.xx
 ROM_START( eforsta5cea )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f29e7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3930,7 +3990,9 @@ ROM_END
 // All devices are 27c4002 instead of 27c4096.
 // No set chips required
 ROM_START( eforsta5u )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0a5233 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3957,7 +4019,9 @@ ROM_END
 // All devices are 27c4002 instead of 27c4096.
 // No set chips required
 ROM_START( eforsta5ua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0a5233 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3981,7 +4045,8 @@ ROM_END
 // 0100651V / 624 / 3 Credit Multiplier / 3 Line Multiline
 // Fast Fortune / Local / D - 07/05/98
 ROM_START( fastfort )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x05c0e7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4005,7 +4070,8 @@ ROM_END
 // 01J00131 / JB006 / Multi credit / Multi line
 // Fortune Teller / NSW/ACT / D - 24/11/2000
 ROM_START( fortellr )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b78
 	    0x000000-0x07038b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4033,7 +4099,9 @@ ROM_END
 // BHG1566 / MV4122/2 / 9 Line Multiline / 5, 10, 20 Credit Multiplier
 // Fortune Fever / Export / A - 13/05/01
 ROM_START( fortfvr )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, 7 out of 8 files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "bhg1566.u7",  0x000000, 0x7f050, BAD_DUMP CRC(07c896ae) SHA1(5d275f3759253d2aa3eeef4d6ce973e9a3b5e421) )
@@ -4057,7 +4125,9 @@ ROM_END
 // All devices are 27c4002 instead of 27c4096
 // No set chips required
 ROM_START( gambler )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x08f46b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4082,7 +4152,8 @@ ROM_END
 // Geisha / New Zealand / A- 05/03/01
 // This game is downported from the MK6 version for the New Zealand market only, no other MK5 version exists
 ROM_START( geisha )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0101408v.u7",  0x000000, 0x80000, CRC(ebdde248) SHA1(83f4f4deb5c6f5b33ae066d50e043a24cb0cbfe0) )
@@ -4102,7 +4173,8 @@ ROM_END
 // Genie Magic / Local / C- 15/02/99
 // Touchscreen game
 ROM_START( genmagi )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200894v.u7",  0x000000, 0x80000, CRC(20ec3b50) SHA1(400ad7f86077184fee63690060fe2a51ba888e1b) )
@@ -4125,7 +4197,9 @@ ROM_END
 // Requires set chip version: 4.04.xx
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 ROM_START( glizrdce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f19bf is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4152,7 +4226,8 @@ ROM_END
 // 0100767V / 625 / 10 Credit Multiplier/20 Line Multiline
 // Gnome Around The World 200cm / NSW/ACT / C - 18/12/98
 ROM_START( gnomeatw )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05ebcb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4179,7 +4254,9 @@ ROM_END
 // Marked as AHG1205-03, Golden Pyramids, and 94.941%
 // No set chips required
 ROM_START( goldpyr )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x08ec83 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4206,7 +4283,9 @@ ROM_END
 // Marked as AHG1206-99, Golden Pyramids, and 87.928%
 // No set chips required
 ROM_START( goldpyra )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x08ef13 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4232,7 +4311,8 @@ ROM_END
 // ROM says 'Golden Pyramid' with three trailing spaces, artwork says 'Golden Pyramids'
 // Original casino BIOS is not dumped, using New Zealand 0700474V BIOS until an Australian version is dumped
 ROM_START( goldpyrb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    note, this actually contains a 2nd checksum for the game, this is the base/bios check only.
 
@@ -4261,7 +4341,8 @@ ROM_END
 // 0101164V / 661 / 50 Credit Multiplier / 20 Line Multiline
 // Golden Ra / NSW/ACT / A - 10/04/00
 ROM_START( goldenra )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b98
 	    0x000000-0x068297 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4287,7 +4368,8 @@ ROM_END
 // 03J00241 / JB008 / Multi credit / Multi line
 // Honey Pot / NSW/ACT / A - 21/11/2000
 ROM_START( honeypot )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bb8
 	    0x000000-0x06f02b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4317,7 +4399,9 @@ ROM_END
 // Variation (% and NO)
 // The game shares reel graphics with Boot Scootin', but the game plays identically to Penguin Pays therefore it doesn't have the double wild feature.
 ROM_START( hnktonku )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0ed4ff is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4342,7 +4426,8 @@ ROM_END
 // 0100872V / 631/3 B / 25 Credit Multiplier / 20 Line Multiline
 // INCA SUN / NSW/ACT / B- 03/05/99
 ROM_START( incasun )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bf8
 	    0x000000-0x05f56b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4368,7 +4453,8 @@ ROM_END
 // INCA SUN / NSW/ACT / B- 03/05/99
 // SHOW PROGRAM
 ROM_START( incasunsp )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	/*
 	    Checksum code found at 0x000bf8
@@ -4393,7 +4479,8 @@ ROM_END
 // 0101108V / MV4113 / 5 Credit Multiplier/20 Line Multiline
 // Inca Sun / New Zealand / A- 6/3/00
 ROM_START( incasunnz )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0101108v.u7",  0x000000, 0x80000, CRC(1e7be5ca) SHA1(333b7665fab8f60fb60e9d3b44de96725763ca17) )
@@ -4413,7 +4500,8 @@ ROM_END
 // Inca Sun / Export / A - 05/09/00
 // Requires set chips 4.03.xx
 ROM_START( incasunu )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e847f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4452,7 +4540,9 @@ ROM_END
 // Same strings as incasunu but different version
 // Requires set chips 4.04.xx
 ROM_START( incasunua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0ec3a7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4478,7 +4568,8 @@ ROM_END
 // INCA SUN / VENEZUELA / B- 03/05/99
 // Game is in Spanish, however audit mode is in English
 ROM_START( incasunv )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000c10
 	    0x000000-0x082163 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4503,7 +4594,8 @@ ROM_END
 // 0100845V / 628/1 / 25 Credit Multiway / 20 Credit Multiplier
 // Indian Dreaming / Local / B - 15/12/98
 ROM_START( indrema5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x06323f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4527,7 +4619,8 @@ ROM_END
 // 0100161V / 586/2 / 10 Credit Multiplier/9 Line Multiline
 // Jumping Beans / Local / A - 25/1/96
 ROM_START( jumpbean )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0100161v.u7",  0x000000, 0x7fa4c, BAD_DUMP CRC(6994c968) SHA1(7896a93aeec9c2d815c49d203ca594644e5df8a6) )
@@ -4544,7 +4637,8 @@ ROM_END
 // 0100383V / 586/6 / 25 Credit Multiplier / 20 Line Multiline
 // JUMPIN' JOEY 500cm / NSW/ACT / C - 13/11/96
 ROM_START( jumpjoey )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae8
 	    0x000000-0x0562cb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4569,7 +4663,8 @@ ROM_END
 // Jungle Juice / Crown / F - 06/03/96
 // ROM says 'Crown' as region (Crown Casino), but game was from Dunedin Casino with New Zealand base chips
 ROM_START( jungjuic )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    note, this actually contains a 2nd checksum for the game, this is the base/bios check only.
 
@@ -4597,7 +4692,8 @@ ROM_END
 // King Galah / Local / A - 21/07/95
 // ROM says 1995 but artwork says 1997; game has a 1998+ style denomination sign
 ROM_START( kgalah )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b28
 	    0x000000-0x05af27 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4622,7 +4718,8 @@ ROM_END
 // King Galah / Local / A - 21/07/95
 // ROM says 1995 but artwork says 1997; game has the newer style music introduced in 1997
 ROM_START( kgalaha )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b28
 	    0x000000-0x058863 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4649,7 +4746,9 @@ ROM_END
 // Variation (% and NO):
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 ROM_START( kgalahce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f19b3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4676,7 +4775,8 @@ ROM_END
 // 0200024V / 540/3 / 10 Credit Multiplier/5 Line Multiline
 // K. G. Bird / Local / D - 10/10/94
 ROM_START( kgbirda5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae0
 	    0x000000-0x0435af is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4701,7 +4801,9 @@ ROM_END
 // Koala Mint / Export / A - 12/09/01
 // Requires set chips 4.04.xx
 ROM_START( koalamnt )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0ec32b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4728,7 +4830,8 @@ ROM_END
 // 0100677V / 614/2 / 10 Credit Multiplier/20 Line Multiline
 // Kooka Bucks 200cm / NSW/ACT / A - 03/04/98
 ROM_START( kookabuk )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x061857 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4755,7 +4858,9 @@ ROM_END
 // Variation (% and NO)
 // Touchscreen game
 ROM_START( kyhatonu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0a6927 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4782,7 +4887,8 @@ ROM_END
 // 0100473V / 599/3 / 25 Credit Multiplier / 20 Line Multiline
 // Loco Loot / Local / C - 17/06/97
 ROM_START( locoloot )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b20
 	    0x000000-0x05633b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4803,7 +4909,8 @@ ROM_END
 // 0100472V / 599/2 / 20 Credit Multiplier / 9 Line Multiline
 // Loco Loot / Local / C - 17/06/97
 ROM_START( locoloota )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b20
 	    0x000000-0x055e93 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4824,7 +4931,8 @@ ROM_END
 // 0600725V / MV4064 / 5 Credit Multiplier / 20 Line Multiline
 // Loco Loot / New Zealand / A - 8/7/98
 ROM_START( locolootnz )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0600725v.u7",  0x000000, 0x80000, CRC(164dd049) SHA1(c99c56af72cb1eb69591cb8f7bacbd06bdb6494d) )
@@ -4842,7 +4950,9 @@ ROM_END
 // Loco Loot / Export / A - 30/07/01
 // Requires set chips 4.04.xx
 ROM_START( locolootu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e94fb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4866,7 +4976,8 @@ ROM_END
 // 0100587V / 621 / 3 Credit Multiplier/3 Line Multiline
 // Lone Wolf / Local / A - 29/10/97
 ROM_START( lonewolf )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b48
 	    0x000000-0x0580f3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4887,7 +4998,8 @@ ROM_END
 // 0300109V / 570/6 / 20 Credit Multiplier/9 Line Multiline
 // Lucky Clover / Local / A - 12/10/95
 ROM_START( luckyclo )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae8
 	    0x000000-0x055e07 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4910,7 +5022,9 @@ ROM_END
 // Marked as AHG1211 and 88.26%
 // No set chips required
 ROM_START( mgarden )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0a522b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4936,7 +5050,9 @@ ROM_END
 // Requires set chips 4.04.xx
 // Touchscreen game
 ROM_START( magimask )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e95fb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -4962,7 +5078,8 @@ ROM_END
 // Requires set chips 4.04.xx
 // Touchscreen game
 ROM_START( magimaska )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e9597 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5002,7 +5119,8 @@ ROM_END
 // Requires set chips 4.03.xx
 // Touchscreen game
 ROM_START( magimaskb )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e8527 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5039,7 +5157,8 @@ ROM_END
 // Magic Touch / Local / A- 06/03/97
 // Touchscreen game
 ROM_START( magtcha5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0300455v.u7",  0x000000, 0x80000, CRC(a1568e3b) SHA1(842c1aa3f9765f7ba9f2587cb94b6ef03c74e8b9) )
@@ -5060,7 +5179,8 @@ ROM_END
 // Same strings as magtcha5 but earlier version
 // Touchscreen game
 ROM_START( magtcha5a )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200455v.u7",  0x000000, 0x80000, CRC(9fa3ee86) SHA1(ce7546b8d1dbf90eb8f4f8d3255dc1c215c966a7) )
@@ -5079,7 +5199,8 @@ ROM_END
 // 0100425V / 595/5 / 10 Credit Multiplier/20 Line Multiline
 // Mammoth Money / Local / D - 07/04/97
 ROM_START( mammothm )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x053623 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5103,7 +5224,8 @@ ROM_END
 // 01J00101 / JB005 / Multi credit / Multi line
 // Margarita Magic / NSW/ACT / A - 07/07/2000
 ROM_START( marmagic )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b78
 	    0x000000-0x06d93b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5131,7 +5253,9 @@ ROM_END
 // ROM has NSW/ACT strings but it is for US platform
 // Requires set chips 4.04.xx
 ROM_START( marmagicu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0ed9f3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5160,7 +5284,9 @@ ROM_END
 // ROM has NSW/ACT strings but it is for US platform
 // Requires set chips 4.04.xx
 ROM_START( marmagicua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0eda53 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5188,7 +5314,8 @@ ROM_END
 // 0400115V / 559/2 / 10 Credit Multiplier/9 Line Multiline
 // Mine, Mine, Mine / Local / D - 16/01/96
 ROM_START( minemine )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x0446e3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5214,7 +5341,8 @@ ROM_END
 // All devices are 27c4002 instead of 27c4096
 // No set chips required
 ROM_START( minemineu )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d10
 	    0x000000-0x0a7203 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5253,7 +5381,9 @@ ROM_END
 // All eproms are 27C4002.
 // No set chips required
 ROM_START( minemineua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d10
 	    0x000000-0x0a7183 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5277,7 +5407,8 @@ ROM_END
 // 0400469V / 607/1 / 25 Credit Multiplier/20 Line Multiline
 // Money Mouse / Local / B - 08/04/97
 ROM_START( monmouse )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x066077 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5302,7 +5433,8 @@ ROM_END
 // Money Mouse / Local / B - 08/04/97
 // Same strings as monmouse but earlier version
 ROM_START( monmousea )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x05dc0b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5326,7 +5458,8 @@ ROM_END
 // 0201397V / MV4126 / 12 Credit Multiplier/20 Line Multiline
 // Money Tree / New Zealand / C- 12/04/01
 ROM_START( montree )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0201397v.u7",  0x000000, 0x80000, CRC(982a0078) SHA1(163c15aebd2be623c0f2c7641360336399bc1f4f) )
@@ -5345,7 +5478,8 @@ ROM_END
 // 0100294V / 595/3 / 50 Credit Multiplier/20 Line Multiline
 // Mountain Money / Local / B - 11/06/96
 ROM_START( mountmon )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae4
 	    0x000000-0x04ee9b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5366,7 +5500,8 @@ ROM_END
 // 0100289V / 595/2 / 5 Credit Multiplier/20 Line Multiline
 // Mountain Money / Local / C - 11/06/96
 ROM_START( mountmona )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae4
 	    0x000000-0x04eea3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5388,7 +5523,9 @@ ROM_END
 // Mountain Money / Export / A - 10/03/01
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 ROM_START( mountmonce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files except U10 are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ahg1629.u7",  0x000000, 0x7efa7, BAD_DUMP CRC(8e5b5354) SHA1(519c5af995d75c3035c0a3832956d94a989163de) )
@@ -5409,7 +5546,9 @@ ROM_END
 // BHG1465 / MV4108/5 / 5,10,25,50 Credit Multiplier / 20 Line Multiline
 // Mountain Money / Export / A - 10/03/01
 ROM_START( mountmonu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, first 6 files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "bhg1465.u7",  0x000000, 0x7f026, BAD_DUMP CRC(9a176a6b) SHA1(a86213020f6cf0c99271ae4e5768453578ade4c3) )
@@ -5432,7 +5571,9 @@ ROM_END
 // Requires set chip version: 4.04.xx
 // Variation (% and NO):
 ROM_START( mountmonua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e8e57 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5459,7 +5600,8 @@ ROM_END
 // 0200956V / 386/64 / 200 Credits per Draw / 3 Draws(1 cent) / 2 Credits per Draw / 3 Draws ($1.00)
 // MULTIDRAW - FREE GAMES / NSW/ACT / E - 08/05/00
 ROM_START( multidrw )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b98
 	    0x000000-0x07477f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5485,7 +5627,8 @@ ROM_END
 // 0100275V / 595/1 / 5 Credit Multiplier/20 Line Multiline
 // Mystic Garden / Local / B - 11/06/96
 ROM_START( mystgard )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae4
 	    0x000000-0x04eea7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5506,7 +5649,8 @@ ROM_END
 // 0101503V / MV4141 / 6 Credit Multiplier/20 Line Multiline
 // One For All / New Zealand / A- 28/05/01
 ROM_START( one4all )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0101503v.u7",  0x000000, 0x80000, CRC(edf50554) SHA1(302737220c4b7d60db77074429d6f360c55494a6) )
@@ -5526,7 +5670,8 @@ ROM_END
 // Orchid Mist 500cm / Local / C - 03/02/99
 // ROM says '10 Credit Multiplier' but game has a 50 credit multiplier
 ROM_START( orchidms )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b20
 	    0x000000-0x0677c7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5552,7 +5697,8 @@ ROM_END
 // Same strings as orchidms but earlier version
 // ROM says '10 Credit Multiplier' but game has a 50 credit multiplier
 ROM_START( orchidmsa )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b08
 	    0x000000-0x05f753 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5576,7 +5722,8 @@ ROM_END
 // 0101241V / MV4118 / 25 Credit Multiplier/10 Line Multiline
 // Orchid Mist / New Zealand / A- 3/7/00
 ROM_START( orchidmsnz )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0101241v.u7",  0x000000, 0x80000, CRC(e4183d54) SHA1(c5829448450dff212e76b5571fc1bf0ba681afdf) )
@@ -5593,7 +5740,8 @@ ROM_END
 // 0200348V / 593/2 / 10 Credit Multiplier / 9 Line Multiline
 // Oscar / Local / C - 20/09/96
 ROM_START( oscara5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x05d187 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5615,7 +5763,8 @@ ROM_END
 // Oscar / Local / C - 20/09/96
 // Same strings as oscara5 but earlier version
 ROM_START( oscara5a )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x054093 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5639,7 +5788,8 @@ ROM_END
 // 0101046V / 594/7 / 10 Credit Multiplier/9 && 20 Line Multiline
 // Panther Magic / NSW/ACT / A - 06/10/99
 ROM_START( pantmag )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x06d1ff is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5663,7 +5813,8 @@ ROM_END
 // 0100716V / 594/4 / 2 Credit Multiplier/5 Line Multiline
 // Panther Magic / Local / A - 13/05/98
 ROM_START( pantmaga )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000c00
 	    0x000000-0x0583f7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5691,7 +5842,8 @@ ROM_END
 // Requires set chips 4.04.xx
 // Touchscreen game
 ROM_START( partygrs )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e9b47 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5729,7 +5881,9 @@ ROM_END
 // Requires set chips 4.01.xx
 // Touchscreen game
 ROM_START( partygrsa )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0a69d3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5754,7 +5908,9 @@ ROM_END
 // Party Gras / Export / A - 10/11/2001
 // Touchscreen game
 ROM_START( partygrsb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ahg1568.u7",  0x000000, 0x7efb7, BAD_DUMP CRC(69ab6487) SHA1(d7147f78dc098d142e857687e6cbdb8a8762371a) )
@@ -5771,7 +5927,8 @@ ROM_END
 // 02J00011 / JB001 / 25 Credit Multiplier / 20 Line Multiline
 // Peacock Flutter / NSW/ACT / A - 10/03/00
 ROM_START( peaflut )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b98
 	    0x000000-0x0638d3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5795,7 +5952,8 @@ ROM_END
 // 0200460V / 586/4(a) / 5 Credit Multiplier / 20 Line Multiline
 // Penguin Pays 100cm / NSW/ACT / D - 03/06/97
 ROM_START( pengpay )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05c71f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5819,7 +5977,8 @@ ROM_END
 // 0200357V / 586/4 / 5 Credit Multiplier / 20 Line Multiline
 // Penguin Pays 100cm / NSW/ACT / C - 12/11/96
 ROM_START( pengpaya )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b60
 	    0x000000-0x05644f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5844,7 +6003,8 @@ ROM_END
 // Penguin Pays 90cm / NSW/ACT / D - 03/06/97
 // ROM says '100 Credit Multiplier' but game has a 10 credit multiplier
 ROM_START( pengpayb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05d7b7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5868,7 +6028,8 @@ ROM_END
 // 0200113V / 586 / 20 Credit Multiplier/9 Line Multiline
 // Penguin Pays / Local / A - 12/10/95
 ROM_START( pengpayc )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x0537d7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5892,7 +6053,8 @@ ROM_END
 // 0300113V / 586 / 20 Credit Multiplier/9 Line Multiline
 // Penguin Pays 180cm / NSW/ACT / A - 12/10/95
 ROM_START( pengpayd )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0300113v.u7",  0x000000, 0x7f909, BAD_DUMP CRC(30c6c635) SHA1(9a31f99c8a7fb0a909b101b2c5767f39930934e9) )
@@ -5912,7 +6074,8 @@ ROM_END
 // marked as 92.130%
 // No set chips required
 ROM_START( pengpayu )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0cd21b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5951,7 +6114,8 @@ ROM_END
 // marked as 92.130%
 // No set chips required
 ROM_START( pengpayua )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0a898f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -5978,7 +6142,8 @@ ROM_END
 // marked as 90.45%
 // No set chips required
 ROM_START( pengpayub )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0a898f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6006,7 +6171,9 @@ ROM_END
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 // Requires set chips 4.04.xx
 ROM_START( pengpayce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f368f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6035,7 +6202,9 @@ ROM_END
 // Penguin Pucks Hyperlink game, but can also run standalone without progressive jackpot
 // Requires set chips 4.03.xx
 ROM_START( pengpuck )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f29ef is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6062,7 +6231,8 @@ ROM_END
 // 0100674V / 619/1 / 10 Credit Multiplier/20 Line Multiline
 // Penguin Pirate 200cm / NSW/ACT / A - 31/03/98
 ROM_START( penpir )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05d27b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6086,7 +6256,8 @@ ROM_END
 // 0200578V / 619 / 10 Credit Multiplier/9 Line Multiline
 // Penguin Pirate 90cm / NSW/ACT / C - 27/02/98
 ROM_START( penpira )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05feeb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6112,7 +6283,8 @@ ROM_END
 // ROM says 'Penguin Pirate 2', artwork says 'Penguin Pirate II'
 // Original casino BIOS is not dumped, using New Zealand 0700474V BIOS until an Australian version is dumped
 ROM_START( penpir2 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    note, this actually contains a 2nd checksum for the game, this is the base/bios check only.
 
@@ -6142,7 +6314,8 @@ ROM_END
 // 0100731V / 618/1 / 10 Credit Multiplier / 20 Line Multiline
 // Pet Shop / Local / A - 17/04/98
 ROM_START( petshop )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x05f127 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6165,7 +6338,8 @@ ROM_END
 // 0100679V / 618 / 10 Credit Multiplier / 9 Line Multiline
 // Pet Shop / Local / A - 09/03/98
 ROM_START( petshopa )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to bad ROMs, all 4 ROMs have stuck bits (0x20)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0100679v.u7",  0x000000, 0x80000, BAD_DUMP CRC(cf4a24fa) SHA1(b510de9199d16ba7319e1b692d7c6c09fcb735dc) )
@@ -6182,7 +6356,8 @@ ROM_END
 // 0500005V / 570/1 / 10 Credit Multiplier/9 Line Multiline
 // Phantom Pays / Local / E - 12/09/95
 ROM_START( phantpay )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x044713 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6206,7 +6381,8 @@ ROM_END
 // 0100299V / 578/4 / 3 Credit Multiplier/3 Line Multiline
 // Prize Fight / Local / B - 08/08/96
 ROM_START( przfight )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b48
 	    0x000000-0x053def is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6232,7 +6408,8 @@ ROM_END
 // 0100706V / 603/6 / 10 Credit Multiplier / 20 Line Multiline
 // Queens of Cash / NSW/ACT / C  - 23/07/98
 ROM_START( qcash )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000af4
 	    0x000000-0x05d55b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6257,7 +6434,8 @@ ROM_END
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
 // EPROM labels have "Golden Pyramid 500" (no trailing 's') and 2001 for the year
 ROM_START( qnile )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x062913 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6282,7 +6460,8 @@ ROM_END
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
 // Same strings as qnile but earlier version
 ROM_START( qnilea )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x059dff is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6307,7 +6486,8 @@ ROM_END
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
 // Same strings as qnile and qnilea but earlier version
 ROM_START( qnileb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x055c83 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6334,7 +6514,8 @@ ROM_END
 // 3 = Nine, 4 = Ten, 5 = Jack, 6 = Queen, 7 = King, 8 = Ace
 // Game and BIOS are in Portuguese
 ROM_START( qnilebr )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    note, this actually contains a 2nd checksum for the game, this is the base/bios check only.
 
@@ -6364,7 +6545,8 @@ ROM_END
 // 0300440V / 602/3 / 20 Credit Multiplier / 9 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
 ROM_START( qnilec )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x064c4b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6390,7 +6572,9 @@ ROM_END
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 // Requires set chips 4.04.xx
 ROM_START( qnilece )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f2453 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6420,7 +6604,9 @@ ROM_END
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 // Requires set chips 4.04.xx
 ROM_START( qnilecea )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0ee84f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6451,7 +6637,9 @@ ROM_END
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 // Requires set chips 4.04.xx
 ROM_START( qnileceb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0f237f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6478,7 +6666,8 @@ ROM_END
 // 0101139V / 602/16 / 3 Credit Multiplier / 3 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / A - 11/10/99
 ROM_START( qniled )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b78
 	    0x000000-0x068183 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6505,7 +6694,8 @@ ROM_END
 // QUEEN OF THE NILE / NSW/ACT / D - 18/06/99
 // Maximillions Hyperlink game
 ROM_START( qnilemax )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bb8
 	    0x000000-0x06fd6f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6532,7 +6722,8 @@ ROM_END
 // 0301059V / 602/5 / 10 Credit Multiplier / 9 Line Multiline
 // QUEEN OF THE NILE / HOLLAND / G - 10/04/00
 ROM_START( qnilenl )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x00104c
 	    0x000000-0x05d1cb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6557,7 +6748,8 @@ ROM_END
 // Queen of the nile / New Zealand / A- 31/8/98
 // ROM has "nile" in lowercase
 ROM_START( qnilenz )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0300785v.u7",  0x000000, 0x80000, CRC(c327d801) SHA1(4721d87a7a759bd437d0d93dc6c415e7a8e60ea5) )
@@ -6579,7 +6771,8 @@ ROM_END
 // ROM contains unaltered NSW/ACT region string and date, but game is for the US platform
 // No set chips required
 ROM_START( qnileu )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x08ec87 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6620,7 +6813,9 @@ ROM_END
 // Note: The game has GHG4090-03 in the stickers, but the strings inside are GHG4091-03 instead. Also the base is GHG4091.
 // No set chips required
 ROM_START( qnileua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x08ec87 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6646,7 +6841,8 @@ ROM_END
 // ROM contains unaltered NSW/ACT region string and date, but game is for the Venezuelan market
 // Game is in Spanish, however audit mode is in English
 ROM_START( qnilev )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x081a0b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6670,7 +6866,8 @@ ROM_END
 // 0500009V / 581 / 5 Credit Multiplier/9 Line Multiline
 // Q.T. Bird / Local / A - 27/10/94
 ROM_START( qtbird )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae0
 	    0x000000-0x0454af is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6695,7 +6892,8 @@ ROM_END
 // Rainbow Warriors / NSW/ACT / B - 02/03/00
 // Cash Express Hyperlink game
 ROM_START( rainwrce )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bf8
 	    0x000000-0x06bb13 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6723,7 +6921,8 @@ ROM_END
 // 0100400V / 598/2 / 20 Credit Multiplier / 25 Credit Multiway
 // Reel Power / Local / A - 01/11/96
 ROM_START( reelpwr )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x059d1b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6748,7 +6947,8 @@ ROM_END
 // Reelin'n Rockin / Local / A - 13/07/98
 // ROM says 'Reelin'n Rockin', artwork says 'Reelin-n-Rockin'
 ROM_START( reelrock )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x062f6f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6772,7 +6972,8 @@ ROM_END
 // 0400549V / 608 / 3 Credit Multiplier/3 Line Multiline
 // Return of the Samurai / Local / A - 17/04/97
 ROM_START( retrsam )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x06445b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6797,7 +6998,8 @@ ROM_END
 // Return of the Samurai / Local / A - 17/04/97
 // Same strings as retrsam but earlier version
 ROM_START( retrsama )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x0590b7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6818,7 +7020,8 @@ ROM_END
 // 0200506V / 608/1 / 10 Credit Multiplier/9 Line Multiline
 // Return of the Samurai / Local / A - 28/04/97
 ROM_START( retrsamb )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x05889b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6840,7 +7043,8 @@ ROM_END
 // Rushin Rooster / Local / C - 25/06/97
 // ROM says '10 Credit Multiplier' but game has a 5 credit multiplier
 ROM_START( rushrst )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05a0c3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6866,7 +7070,8 @@ ROM_END
 // SUPER BUCKS II / NSW/ACT / G 26/07/99
 // Sound data is damaged due to bad u8 ROM
 ROM_START( sbuk2 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b98
 	    0x000000-0x06ab7f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6891,7 +7096,8 @@ ROM_END
 // No combination data due to missing u11 ROM
 // This version had Superman-style reel symbols, whereas sbuk2 has similar graphics to Super Bucks III
 ROM_START( sbuk2a )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to missing ROMs
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0300006v.u7",  0x000000, 0x80000, CRC(d1833c73) SHA1(1576a7877877569438571a16c51fdd56a172c60d) )
@@ -6908,7 +7114,8 @@ ROM_END
 // 0200711V / 626 / 3 Credit Multiplier / 3 Line Multiline
 // Super Bucks III / NSW/ACT / A-22/04/98
 ROM_START( sbuk3 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x05ead3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6933,7 +7140,8 @@ ROM_END
 // Super Bucks III / NSW/ACT / A-22/04/98
 // Same strings as sbuk3 but earlier version
 ROM_START( sbuk3a )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x05eaff is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6958,7 +7166,9 @@ ROM_END
 // Sweet Liberty Deluxe / Export / A - 11/02/01
 // Requires set chips 4.04.xx
 ROM_START( sldeluxe )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0ec207 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -6985,7 +7195,8 @@ ROM_END
 // 0100673V / 621/2 / 10 Credit Multiplier
 // Silver Wolf / Local / A - 23/03/98
 ROM_START( slvrwolf )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ba8
 	    0x000000-0x05bd47 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7009,7 +7220,8 @@ ROM_END
 // 0100405V / 599 / 10 Credit Multiplier / 9 Line Multiline
 // Snow Cat / Local / B - 23/12/96
 ROM_START( snowcat )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b80
 	    0x000000-0x0553db is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7030,7 +7242,8 @@ ROM_END
 // 0200606V / 622 / 10 Credit Multiplier / 9 Line Multiline
 // Sumo Spins / Local / A - 08/12/97
 ROM_START( sumospin )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x05d92b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7054,7 +7267,8 @@ ROM_END
 // 0200465V / 577/1 / 10 Credit Multiplier/9 Line Multiline
 // Sweethearts II / Local / C - 07/09/95
 ROM_START( swhr2 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	        Checksum code found at 0x000b68
 	        0x000000-0x05b507 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7076,7 +7290,8 @@ ROM_END
 // Sweethearts II / Local / C - 07/09/95
 // Same strings as swhr2 but earlier version
 ROM_START( swhr2a )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae0
 	    0x000000-0x041803 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7100,7 +7315,9 @@ ROM_END
 // All devices are 27c4002 instead of 27c4096
 // No set chips required
 ROM_START( swhr2u )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b31cb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7125,7 +7342,8 @@ ROM_END
 // Sweethearts II / VENEZUELA / C - 07/09/95
 // Game is in Spanish, however audit mode is in English
 ROM_START( swhr2v )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x07a763 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7146,7 +7364,8 @@ ROM_END
 // 0200319V / 569/12 / 25 Credit Multiplier / 20 Line Multiline
 // Thor / Local / B - 14/08/96
 ROM_START( thor )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x052b07 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7170,7 +7389,8 @@ ROM_END
 // 0200333V / 570/9 / 10 Credit Multiplier/9 Line Multiline
 // Thunder Heart / Local / A - 14/08/96
 ROM_START( thndh )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae0
 	    0x000000-0x054c6f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7194,7 +7414,8 @@ ROM_END
 // 0200334V / 597/1 / 3 Credit Multiplier/3 Line Multiline
 // Thunder Heart / Local / A - 14/08/96
 ROM_START( thndha )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b38
 	    0x000000-0x053c2b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7218,7 +7439,8 @@ ROM_END
 // 0100550V / 594/3 / 3 Credit Multiplier/3 Line Multiline
 // Top Banana / Local / A - 18/08/97
 ROM_START( topbana )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05851f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7239,7 +7461,8 @@ ROM_END
 // 0100782V / 616/1 / 10 Credit Multiplier/20 Line Multiline
 // Toucan Tango 200cm / NSW/ACT / A - 17/06/98
 ROM_START( toutango )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x06766b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7267,7 +7490,8 @@ ROM_END
 // 0301388V / 616 / 10 Credit Multiplier / 9 Line Multiline
 // Toucan Tango 90cm / Holland / C - 11/05/99
 ROM_START( toutangonl )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x00104c
 	    0x000000-0x060dbf is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7294,7 +7518,8 @@ ROM_END
 // 01J00161 / JB001/3 / 25 Credit Multiplier / 20 Line Multiline
 // TREASURE TROVE / NSW/ACT / A - 5/10/00
 ROM_START( trstrove )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b98
 	    0x000000-0x0638d7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7318,7 +7543,8 @@ ROM_END
 // 0201692V / 692 / 10 or 25 Credit Multiplier/9 or 20 Line Multiline
 // Triple Treat / NSW/ACT / A - 17/05/02
 ROM_START( tritreat )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x07089b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7344,7 +7570,8 @@ ROM_END
 // 01J00851 / JB001/5 / Multi credit / Multi line
 // TROJAN HORSE / NSW/ACT / A - 30/10/01
 ROM_START( trojhors )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bb8
 	    0x000000-0x06e9f7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7370,7 +7597,8 @@ ROM_END
 // 0100269V / 577/3 / 10 Credit Multiplier/9 Line Multiline
 // Tropical Delight / Local / B - 15/05/96
 ROM_START( trpdlght )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x04ea87 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7397,7 +7625,9 @@ ROM_END
 // All devices are 27c4002 instead of 27c4096
 // No set chips required
 ROM_START( trpdlghtu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b2d1f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7421,7 +7651,8 @@ ROM_END
 // 0100791V / 631/1 A / 10 Credit Multiplier / 20 Line Multiline
 // UNICORN DREAMING / NSW/ACT / A - 31/08/98
 ROM_START( unicornd )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bf8
 	    0x000000-0x05f36f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7445,7 +7676,8 @@ ROM_END
 // 0100813V / 631  A / 10 Credit Multiplier / 9 Line Multiline
 // UNICORN DREAMING / NSW/ACT / A - 02/09/98
 ROM_START( unicornda )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bf8
 	    0x000000-0x05f087 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7469,7 +7701,8 @@ ROM_END
 // 0101228V / MV4113/1 / 10 Credit Multiplier/20 Line Multiline
 // Unicorn Dreaming / New Zealand / A- 5/4/00
 ROM_START( unicorndnz )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found (uses different startup sequence)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0101228v.u7",  0x000000, 0x80000, CRC(54d55ecb) SHA1(0afb2d6489f01ae55563030e228e1d5443738af1) )
@@ -7487,7 +7720,9 @@ ROM_END
 // Unicorn Dreaming / Export / C - 10/17/01
 // Requires set chips 4.04.xx
 ROM_START( unicorndu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0ec547 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7514,7 +7749,8 @@ ROM_END
 // Venezuela is spelled as 'Venezuila' in the ROM
 // Game is in Spanish, however audit mode is in English
 ROM_START( venicea5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code needs to be done
 	*/
@@ -7539,7 +7775,9 @@ ROM_END
 // All devices are 27c4096
 // Requires set chips 4.04.xx
 ROM_START( wafricau )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e77e7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7563,7 +7801,8 @@ ROM_END
 // 0200507V / 506/8 / 3 Credit Multiplier/3 Line Multiline
 // Wild Amazon / Local / A - 10/10/96
 ROM_START( wamazon )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x05c043 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7584,7 +7823,8 @@ ROM_END
 // 0200285V / 506/6 / 10 Credit Multiplier
 // Wild Amazon / Local / A - 7/5/96
 ROM_START( wamazona )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x052b8b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7609,7 +7849,8 @@ ROM_END
 // Wild Amazon / VENEZUELA / A - 10/10/96
 // Game is in Spanish, however audit mode is in English
 ROM_START( wamazonv )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b68
 	    0x000000-0x07b2f3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7633,7 +7874,8 @@ ROM_END
 // 0100553V / 609 / 4 Credit Multiplier / 25 Credit Multiway
 // Wicked Winnings / Local / B - 01/07/97
 ROM_START( wikwin )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x07237f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7657,7 +7899,8 @@ ROM_END
 // 0100297V / 543/8 / 3 Credit Multiplier/3 Line Multiline
 // Wild Bill / Local / C - 15/08/96
 ROM_START( wildbill )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ad8
 	    0x000000-0x054e6b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7678,7 +7921,8 @@ ROM_END
 // 0100167V / 569/9 / 20 Credit Multiplier / 9 Line Multiline
 // Wild Cougar / Local / B - 27/2/96
 ROM_START( wcougar )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000adc
 	    0x000000-0x043573 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7704,7 +7948,8 @@ ROM_END
 // All devices are 27c4002 instead of 27c4096
 // No set chips required
 ROM_START( wcougaru )
-	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b0d5b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7743,7 +7988,9 @@ ROM_END
 // All devices are 27C4002 instead of 27C4096
 // No set chips required
 ROM_START( wcougarua )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b0d5b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7769,7 +8016,9 @@ ROM_END
 // Variation (% and NO): 87,836% 99
 // No set chips required
 ROM_START( wcougarub )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b0d5b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7796,7 +8045,9 @@ ROM_END
 // ROM says '5 Line / 10 Credit Multiplier' but this game has 9 lines with a 5, 10 or 20 credit multiplier
 // Requires set chips 4.04.xx
 ROM_START( wcougaruc )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e783b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7820,7 +8071,9 @@ ROM_END
 // AHG1515 / MV4134 / 5,10,25,50 Credit Multiplier / 20 Line Multiline
 // Wild Coyote / Export / A - 30/07/01
 ROM_START( wcoyote )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ahg1515.u7",  0x000000, 0x7f070, BAD_DUMP CRC(045858cd) SHA1(232a9631bcdbbd2e60970eca62bdc540e537e1f2) )
@@ -7838,7 +8091,8 @@ ROM_END
 // Wizard Ways / Local / A - 04/11/96
 // ROM says 1996 but game has newer style music and a 1998+ style denomination sign
 ROM_START( wizways )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b88
 	    0x000000-0x05ee9b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7862,7 +8116,8 @@ ROM_END
 // 0100337V / 600 / 10 Credit Multiplier/9 Line Multiline
 // Wild Angels / Local / B - 24/09/96
 ROM_START( wldangel )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000ae0
 	    0x000000-0x05259f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7887,7 +8142,9 @@ ROM_END
 // Winning Post / Export / G - 11/02/97
 // No set chips required
 ROM_START( wnpost )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_USA_SETCHIPS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0c3697 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7911,7 +8168,8 @@ ROM_END
 // 0101158V / 608/4 / 3 Credit Multiplier/3 Line Multiline
 // Wild Thing / NSW/ACT / B - 14/12/99
 ROM_START( wthing )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000b74
 	    0x000000-0x0673cb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7935,7 +8193,8 @@ ROM_END
 // 0201176V / 608/5 / 25 Credit Multiplier/20 Line Multiline
 // Wild Thing / NSW/ACT / B - 25/02/00
 ROM_START( wthinga )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0201176v.u7",  0x000000, 0x7f44a, BAD_DUMP CRC(e2632da7) SHA1(ff53d87d8f45c3bcece358d0ecfa89e6912e1ccf) )
@@ -7954,7 +8213,8 @@ ROM_END
 // 0200954V / 638/1 / 10 Credit Multiplier / 20 Line Multiline
 // White Tiger Classic / NSW/ACT / B - 08/07/99
 ROM_START( wtiger )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000d30
 	    0x000000-0x060227 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -7975,7 +8235,8 @@ ROM_END
 // 03J00191 / JB005/1 / Multi credit / Multi line
 // Yukon Gold / NSW/ACT / A - 30/10/2000
 ROM_START( yukongl5 )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
 	/*
 	    Checksum code found at 0x000bb8
 	    0x000000-0x06dbc3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
