@@ -365,7 +365,7 @@ MACHINE_CONFIG_START(micronic_state::micronic)
 
 	PALETTE(config, "palette", FUNC(micronic_state::micronic_palette), 2);
 
-	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, 4.9152_MHz_XTAL / 2 / 2)
+	HD61830(config, m_lcdc, 4.9152_MHz_XTAL / 2 / 2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -585,8 +585,8 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	PALETTE(config, "palette", FUNC(psion_state::psion_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_psion);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16)
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -613,9 +613,8 @@ MACHINE_CONFIG_START(psion_state::psion_4lines)
 	MCFG_SCREEN_SIZE(6*20, 9*4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*20-1, 0, 9*4-1)
 
-	MCFG_DEVICE_MODIFY("hd44780")
-	MCFG_HD44780_LCD_SIZE(4, 20)
-	MCFG_HD44780_PIXEL_UPDATE_CB(psion_state,lz_pixel_update)
+	m_lcdc->set_lcd_size(4, 20);
+	m_lcdc->set_pixel_update_cb(FUNC(psion_state::lz_pixel_update), this);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psion1_state::psion1)
@@ -630,9 +629,8 @@ MACHINE_CONFIG_START(psion1_state::psion1)
 	MCFG_SCREEN_SIZE(6*16, 1*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 8*1-1)
 
-	MCFG_DEVICE_MODIFY("hd44780")
-	MCFG_HD44780_LCD_SIZE(1, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(psion1_state,psion1_pixel_update)
+	m_lcdc->set_lcd_size(1, 16);
+	m_lcdc->set_pixel_update_cb(FUNC(psion1_state::psion1_pixel_update), this);
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_REMOVE("pack_list")

@@ -626,7 +626,7 @@ MACHINE_CONFIG_START(dbox_state::dbox)
 	AMD_29F800B_16BIT(config, "flash");
 
 	/* LED Matrix Display */
-	MCFG_SDA5708_ADD("display")
+	SDA5708(config, m_display, 0);
 	config.set_default_layout(layout_sda5708);
 
 	/* IP16 74256 8 bit latch */

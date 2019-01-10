@@ -724,8 +724,7 @@ MACHINE_CONFIG_START(mtech_state::megatech)
 	MCFG_SCREEN_UPDATE_DRIVER(mtech_state, screen_update_main)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mtech_state, screen_vblank_main))
 
-	MCFG_DEVICE_MODIFY("gen_vdp")
-	MCFG_SEGA315_5313_INT_CB(INPUTLINE("genesis_snd_z80", 0))
+	m_vdp->irq().set_inputline(m_z80snd, 0);
 
 	MCFG_SCREEN_ADD("menu", RASTER)
 	// check frq
@@ -734,10 +733,10 @@ MACHINE_CONFIG_START(mtech_state::megatech)
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mtech_state, screen_update_menu)
 
-	MCFG_DEVICE_ADD("vdp1", SEGA315_5246, 0)
-	MCFG_SEGA315_5246_SET_SCREEN("menu")
-	MCFG_SEGA315_5246_IS_PAL(false)
-	MCFG_SEGA315_5246_INT_CB(INPUTLINE("mtbios", 0))
+	SEGA315_5246(config, m_vdp1, 0);
+	m_vdp1->set_screen("menu");
+	m_vdp1->set_is_pal(false);
+	m_vdp1->irq().set_inputline(m_bioscpu, 0);
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("sn2", SN76496, MASTER_CLOCK/15)

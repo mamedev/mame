@@ -330,8 +330,8 @@ MACHINE_CONFIG_START(mephisto_display_modul_device::device_add_mconfig)
 	MCFG_SCREEN_PALETTE("palette")
 	PALETTE(config, "palette", FUNC(mephisto_display_modul_device::lcd_palette), 2);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16)
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -198,9 +198,9 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 
 	PALETTE(config, "palette", FUNC(fb01_state::fb01_palette), 2);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 8)   // 2x8 displayed as 1x16
-	MCFG_HD44780_PIXEL_UPDATE_CB(fb01_state,fb01_pixel_update)
+	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
+	hd44780.set_lcd_size(2, 8);   // 2x8 displayed as 1x16
+	hd44780.set_pixel_update_cb(FUNC(fb01_state::fb01_pixel_update), this);
 
 	I8251(config, m_upd71051, XTAL(4'000'000));
 	m_upd71051->rxrdy_handler().set(FUNC(fb01_state::upd71051_rxrdy_w));

@@ -717,8 +717,8 @@ MACHINE_CONFIG_START(noki3310_state::noki3310)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	MCFG_PCD8544_ADD("pcd8544")
-	MCFG_PCD8544_SCREEN_UPDATE_CALLBACK(noki3310_state, pcd8544_screen_update)
+	PCD8544(config, m_pcd8544, 0);
+	m_pcd8544->set_screen_update_cb(FUNC(noki3310_state::pcd8544_screen_update), this);
 
 	INTEL_TE28F160(config, "flash");
 

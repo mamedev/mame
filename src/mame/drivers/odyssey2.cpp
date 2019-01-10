@@ -772,7 +772,7 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 	m_i8243->p6_out_cb().set(FUNC(g7400_state::i8243_p6_w));
 	m_i8243->p7_out_cb().set(FUNC(g7400_state::i8243_p7_w));
 
-	MCFG_EF9340_1_ADD("ef9340_1", 3540000, "screen")
+	EF9340_1(config, m_ef9340_1, 3540000, "screen");
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_I8245_ADD("i8244", 3540000 * 2, "screen", INPUTLINE("maincpu", 0), WRITE16(*this, g7400_state, scanline_postprocess))
@@ -817,7 +817,7 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 	m_i8243->p6_out_cb().set(FUNC(g7400_state::i8243_p6_w));
 	m_i8243->p7_out_cb().set(FUNC(g7400_state::i8243_p7_w));
 
-	MCFG_EF9340_1_ADD("ef9340_1", 3540000, "screen")
+	EF9340_1(config, m_ef9340_1, 3540000, "screen");
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_I8244_ADD("i8244", 3540000 * 2, "screen", INPUTLINE("maincpu", 0), WRITE16(*this, g7400_state, scanline_postprocess))

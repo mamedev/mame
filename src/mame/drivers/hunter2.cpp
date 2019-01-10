@@ -393,8 +393,8 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	MCFG_SCREEN_PALETTE("palette")
 
 	PALETTE(config, "palette", FUNC(hunter2_state::hunter2_palette), 2);
-	MCFG_DEVICE_ADD("lcdc", HD61830, XTAL(4'915'200)/2/2) // unknown clock
-	MCFG_VIDEO_SET_SCREEN("screen")
+	hd61830_device &hd61830(HD61830(config, "lcdc", XTAL(4'915'200)/2/2)); // unknown clock
+	hd61830.set_screen("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

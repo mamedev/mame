@@ -824,10 +824,10 @@ MACHINE_CONFIG_START(squale_state::squale)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_PALETTE_ADD("palette", 16)
 
-	MCFG_DEVICE_ADD("ef9365", EF9365, VIDEO_CLOCK)
-	MCFG_EF936X_PALETTE("palette")
-	MCFG_EF936X_BITPLANES_CNT(4);
-	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_256x256);
+	EF9365(config, m_ef9365, VIDEO_CLOCK);
+	m_ef9365->set_palette_tag("palette");
+	m_ef9365->set_nb_bitplanes(4);
+	m_ef9365->set_display_mode(ef9365_device::DISPLAY_MODE_256x256);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("squale_sl", squale_state, squale_scanline, "screen", 0, 10)
 
 	/* Floppy */
