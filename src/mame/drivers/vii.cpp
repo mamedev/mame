@@ -112,7 +112,6 @@ protected:
 	required_device<spg2xx_device> m_spg;
 	optional_memory_bank m_bank;
 
-
 	DECLARE_READ16_MEMBER(walle_portc_r);
 	DECLARE_WRITE16_MEMBER(walle_portc_w);
 
@@ -763,6 +762,8 @@ void vii_state::machine_start()
 
 	m_ctrl_poll_timer = timer_alloc(TIMER_CTRL_POLL);
 	m_ctrl_poll_timer->adjust(attotime::never);
+
+	save_item(NAME(m_controller_input));
 }
 
 void vii_state::machine_reset()
@@ -785,6 +786,11 @@ void spg2xx_game_state::machine_start()
 	m_serial_eeprom = std::make_unique<uint8_t[]>(0x400);
 	if (m_nvram)
 		m_nvram->set_base(&m_serial_eeprom[0], 0x400);
+
+	save_item(NAME(m_current_bank));
+	save_item(NAME(m_w60_controller_input));
+	save_item(NAME(m_w60_porta_data));
+	save_item(NAME(m_walle_portc_data));
 }
 
 void spg2xx_game_state::machine_reset()
