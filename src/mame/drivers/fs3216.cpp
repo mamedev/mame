@@ -297,7 +297,7 @@ void fs3216_state::fs3216(machine_config &config)
 	screen.set_raw(14.58_MHz_XTAL, 900, 0, 720, 270, 0, 250);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	n8x300_cpu_device &wdcpu(N8X300(config, "wdcpu", 20_MHz_XTAL / 2)); // N8X305I
+	n8x305_cpu_device &wdcpu(N8X305(config, "wdcpu", 8_MHz_XTAL)); // N8X305I
 	wdcpu.set_addrmap(AS_PROGRAM, &fs3216_state::wdcpu_prog_map);
 	wdcpu.set_addrmap(AS_IO, &fs3216_state::wdcpu_bank_map);
 }
