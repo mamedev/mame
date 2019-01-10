@@ -71,13 +71,13 @@ device_memory_interface::space_config_vector n8x300_cpu_device::memory_space_con
 void n8x300_cpu_device::xmit_lb(uint8_t dst, uint8_t mask)
 {
 	m_IV_latch = (m_IV_latch & ~mask) | (dst & mask);
-	WRITEPORT(m_IVL, dst);
+	WRITEPORT(m_IVL, m_IV_latch);
 }
 
 void n8x300_cpu_device::xmit_rb(uint8_t dst, uint8_t mask)
 {
 	m_IV_latch = (m_IV_latch & ~mask) | (dst & mask);
-	WRITEPORT(m_IVR + 0x100, dst);
+	WRITEPORT(m_IVR + 0x100, m_IV_latch);
 }
 
 void n8x300_cpu_device::set_reg(uint8_t reg, uint8_t val, bool xmit)
