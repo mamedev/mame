@@ -1369,10 +1369,11 @@ namespace netlist
 		{
 			const char *p[N];
 		};
-		object_array_t(core_device_t &dev, init names)
+		template<typename... Args>
+		object_array_t(core_device_t &dev, init names, Args&&... args)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, pstring(names.p[i]));
+				this->emplace(i, dev, pstring(names.p[i]), std::forward<Args>(args)...);
 		}
 	};
 
