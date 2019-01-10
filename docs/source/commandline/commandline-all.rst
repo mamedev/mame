@@ -409,7 +409,7 @@ OSD-related Options
 
 **\-joystickprovider**
 
-	Chooses how MAME will get joystick input.
+    Chooses how MAME will get joystick input.
 
 | On Windows, you can choose from: ``auto, ``winhybrid``, ``dinput``, ``xinput``, or ``none``
 | On SDL, you can choose from: ``auto``, ``sdl``, ``none``
@@ -787,9 +787,13 @@ Core State/Playback Options
 
 .. _mame-commandline-exitafterplayback:
 
-**-exit_after_playback**
+**-[no]exit_after_playback**
 
-    Tells MAME to exit after finishing playback of the input file.
+    When used in conjunction with the **-playback** option, MAME will exit after
+    playing back the input file.  By default, MAME continues to run the emulated
+    system after playback completes.
+
+    The default is OFF (**-noexit_after_playback**).
 
 .. _mame-commandline-record:
 
@@ -821,8 +825,9 @@ Core State/Playback Options
 
     Writes each video frame to the given <filename> in MNG format, producing an
     animation of the session.  Note that **-mngwrite** only writes video frames;
-    it does not save any audio data.  Use **-wavwrite** for that, and
-    reassemble the audio/video using offline tools.
+    it does not save any audio data.  Either use **-wavwrite** to record audio
+    and combine the audio and video tracks using video editing software, or use
+    **-aviwrite** to record audio and video to a single file.
 
     The default is ``NULL`` (no recording).
 
@@ -830,8 +835,14 @@ Core State/Playback Options
 
 **-aviwrite** *<filename>*
 
-    Stream video and sound data to the given <filename> in AVI format, producing
-    an animation of the session complete with sound.
+    Stream video and sound data to the given <filename> in uncompressed AVI
+    format, producing an animation of the session complete with sound.  Note
+    that the AVI format does not changes to resolution or frame rate,
+    uncompressed video consumes a lot of disk space, and recording uncompressed
+    video in realtime requires a fast disk.  It may be more practical to record
+    an emulation session using **-record** then make a video of it with
+    **-aviwrite** in combination with **-playback** and **-exit_after_playback**
+    options.
 
     The default is ``NULL`` (no recording).
 
@@ -1219,24 +1230,30 @@ Core Video Options
 **-[no]keepaspect** / **-[no]ka**
 
     When enabled, MAME preserves the correct aspect ratio for the emulated
-    system's screen(s).  For instance, this can be usually 4:3 or 3:4 on CRT
-    monitors, though some systems may have ratios such as 3:2 (Nintendo Game
-    Boy), 5:4 (some workstations) or various other ratios.
+    system's screen(s).  This is most often 4:3 or 3:4 for CRT monitors
+    (depending on the orientation), though many other aspect ratios have been
+    used, such as 3:2 (Nintendo Game Boy), 5:4 (some workstations), and various
+    other ratios.  If the emulated screen and/or artwork does not fill MAME's
+    screen or Window, the image will be centred and black bars will be added
+    as necessary to fill unused space (either above/below or to the left and
+    right).
 
-    When running in a window with this option on, you can only resize the window
-    to the proper aspect ratio, unless you are holding down the CONTROL key.  By
-    turning the option off, the aspect ratio is allowed to float.  In full
-    screen mode, this means that all systems will stretch to the full screen
-    size (even vertical systems).
+    When this option is disabled, the emulated screen and/or artwork will be
+    stretched to fill MAME's screen or window.  The image will be distorted by
+    non-proportional scaling if the aspect ratio does not match.  This is very
+    pronounced when the emulated system uses a vertically-oriented screen and
+    MAME stretches the image to fill a horizontally-oriented screen.
 
-    In window mode, it means that you can freely resize the window without any
-    constraints.
+    On Windows, when this option is enabled and MAME is running in a window (not
+    full screen), the aspect ratio will be maintained when you resize the window
+    unless you hold the **Control** (or **Ctrl**) key on your keyboard.  The
+    window size will not be restricted when this option is disabled.
 
     The default is ON (**-keepaspect**).
 
-    The MAME team heavily suggests you leave this at default. Stretching systems
-    beyond their original aspect ratio will mangle the appearance of the system
-    in ways that no filtering or HLSL can repair.
+    The MAME team strongly recommends leaving this option enabled.  Stretching
+    systems beyond their original aspect ratio will mangle the appearance of the
+    system in ways that no filtering or shaders can repair.
 
 .. _mame-commandline-waitvsync:
 
@@ -1479,11 +1496,10 @@ Core Artwork Options
 
 **-[no]artwork_crop** / **-[no]artcrop**
 
-    Enable cropping of artwork to the system screen area only.  This works best
-    with **-video gdi** or **-video d3d**, and means that vertically oriented
-    systems running full screen can display their artwork to the left and right
-    sides of the screen.  This option can also be controlled via the Video
-    Options menu in the user interface.
+    Enable cropping of artwork to the system screen area only.  This means that
+    vertically oriented systems running full screen can display their artwork to
+    the left and right sides of the screen.  This option can also be controlled
+    via the Video Options menu in the user interface.
 
     The default is OFF **-noartwork_crop**.
 
@@ -1957,7 +1973,7 @@ Core Input Options
     of the current system.
 
     Maps are defined as a string of numbers and characters. Since the grid is
-    9x9, there are a total of 81 characters necessary to define a	complete map.
+    9x9, there are a total of 81 characters necessary to define a complete map.
     Below is an example map for an 8-way joystick:
 
 		+-------------+---------------------------------------------------------+
@@ -2234,7 +2250,7 @@ Core Communication Options
     address or a string containing a resolvable hostname.
 
     The default is value is "``0.0.0.0``" (which binds to all local IPv4
-    addresses)
+    addresses).
 
 .. _mame-commandline-commlocalport:
 
@@ -2253,7 +2269,7 @@ Core Communication Options
     address or a string containing a resolvable hostname.
 
     The default is value is "``0.0.0.0``" (which binds to all local IPv4
-    addresses)
+    addresses).
 
 .. _mame-commandline-commremoteport:
 
