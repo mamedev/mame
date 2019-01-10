@@ -379,7 +379,7 @@ int nlwav_app::execute()
 	{
 		pout(
 			"nlwav (netlist) 0.1\n"
-			"Copyright (C) 2018 Couriersud\n"
+			"Copyright (C) 2019 Couriersud\n"
 			"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 			"This is free software: you are free to change and redistribute it.\n"
 			"There is NO WARRANTY, to the extent permitted by law.\n\n"
