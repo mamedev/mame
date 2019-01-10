@@ -796,7 +796,7 @@ detail::net_t::~net_t()
 	netlist().state().remove_save_items(this);
 }
 
-void detail::net_t::inc_active(core_terminal_t &term) NL_NOEXCEPT
+void detail::net_t::add_to_active_list(core_terminal_t &term) NL_NOEXCEPT
 {
 	const bool was_empty = m_list_active.empty();
 	m_list_active.push_front(&term);
@@ -819,7 +819,7 @@ void detail::net_t::inc_active(core_terminal_t &term) NL_NOEXCEPT
 	}
 }
 
-void detail::net_t::dec_active(core_terminal_t &term) NL_NOEXCEPT
+void detail::net_t::remove_from_active_list(core_terminal_t &term) NL_NOEXCEPT
 {
 	m_list_active.remove(&term);
 	if (m_list_active.empty())

@@ -741,8 +741,8 @@ namespace netlist
 
 		std::size_t num_cons() const NL_NOEXCEPT { return m_core_terms.size(); }
 
-		void inc_active(core_terminal_t &term) NL_NOEXCEPT;
-		void dec_active(core_terminal_t &term) NL_NOEXCEPT;
+		void add_to_active_list(core_terminal_t &term) NL_NOEXCEPT;
+		void remove_from_active_list(core_terminal_t &term) NL_NOEXCEPT;
 
 		/* setup stuff */
 
@@ -1396,7 +1396,7 @@ namespace netlist
 		if (!is_state(STATE_INP_PASSIVE))
 		{
 			set_state(STATE_INP_PASSIVE);
-			net().dec_active(*this);
+			net().remove_from_active_list(*this);
 		}
 	}
 
@@ -1404,7 +1404,7 @@ namespace netlist
 	{
 		if (is_state(STATE_INP_PASSIVE))
 		{
-			net().inc_active(*this);
+			net().add_to_active_list(*this);
 			set_state(STATE_INP_ACTIVE);
 		}
 	}
@@ -1413,7 +1413,7 @@ namespace netlist
 	{
 		if (is_state(STATE_INP_PASSIVE))
 		{
-			net().inc_active(*this);
+			net().add_to_active_list(*this);
 			set_state(STATE_INP_HL);
 		}
 	}
@@ -1422,7 +1422,7 @@ namespace netlist
 	{
 		if (is_state(STATE_INP_PASSIVE))
 		{
-			net().inc_active(*this);
+			net().add_to_active_list(*this);
 			set_state(STATE_INP_LH);
 		}
 	}

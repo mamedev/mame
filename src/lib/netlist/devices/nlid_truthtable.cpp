@@ -122,8 +122,18 @@ namespace netlist
 			}
 		}
 
-		uint_least64_t mask() const { return static_cast<uint_least64_t>(-1); }
-
+		uint_least64_t mask() const
+		{
+			switch (m_size)
+			{
+				case 8: return static_cast<uint_least8_t>(-1);
+				case 16: return static_cast<uint_least16_t>(-1);
+				case 32: return static_cast<uint_least32_t>(-1);
+				case 64: return static_cast<uint_least64_t>(-1);
+				default:
+					return 0; //should never happen
+			}
+		}
 	private:
 		void *m_data;
 		size_t m_size;
@@ -134,7 +144,7 @@ namespace netlist
 		truthtable_parser(unsigned NO, unsigned NI, bool *initialized,
 				packed_int outs, uint_least8_t *timing, netlist_time *timing_nt)
 		: m_NO(NO), m_NI(NI),  m_initialized(initialized),
-			m_outs(outs), m_timing(timing), m_timing_nt(timing_nt),
+			m_out_state(outs), m_timing(timing), m_timing_nt(timing_nt),
 			m_num_bits(m_NI),
 			m_size(1 << (m_num_bits))
 		{
@@ -151,7 +161,7 @@ namespace netlist
 		unsigned m_NO;
 		unsigned m_NI;
 		bool *m_initialized;
-		packed_int m_outs;
+		packed_int m_out_state;
 		uint_least8_t  *m_timing;
 		netlist_time *m_timing_nt;
 
@@ -178,8 +188,8 @@ namespace netlist
 		nl_assert_always(io.size() == 2, "too many '|'");
 		std::vector<pstring> inout(plib::psplit(io[0], ","));
 		nl_assert_always(inout.size() == m_num_bits, "bitcount wrong");
-		std::vector<pstring> out(plib::psplit(io[1], ","));
-		nl_assert_always(out.size() == m_NO, "output count wrong");
+		std::vector<pstring> outputs(plib::psplit(io[1], ","));
+		nl_assert_always(outputs.size() == m_NO, "output count wrong");
 
 		for (std::size_t i=0; i < m_NI; i++)
 		{
@@ -188,38 +198,23 @@ namespace netlist
 		}
 		for (std::size_t i=0; i < m_NO; i++)
 		{
-			out[i] = plib::trim(out[i]);
-			m_Q.emplace(i, *this, out[i]);
-		}
-		// Connect output "Q" to input "_Q" if this exists
-		// This enables timed state without having explicit state ....
-		tt_bitset disabled_ignore = 0;
-		for (std::size_t i=0; i < m_NO; i++)
-		{
-			pstring tmp = "_" + out[i];
+			outputs[i] = plib::trim(outputs[i]);
+			m_Q.emplace(i, *this, outputs[i]);
+			// Connect output "Q" to input "_Q" if this exists
+			// This enables timed state without having explicit state ....
+			pstring tmp = "_" + outputs[i];
 			const std::size_t idx = plib::container::indexof(inout, tmp);
 			if (idx != plib::container::npos)
-			{
 				connect(m_Q[i], m_I[idx]);
-				// disable ignore for theses inputs altogether.
-				// FIXME: This shouldn't be necessary
-				disabled_ignore.set(idx);
-			}
 		}
 
 		m_ign = 0;
 
 #if 0
-		for (size_t i=0; i<m_size; i++)
-		{
-			m_ttp.m_outs[i] &= ~(disabled_ignore << m_NO);
-		}
-#endif
-#if 0
 		printf("%s\n", name().c_str());
 		for (int j=0; j < m_size; j++)
-			printf("%05x %04x %04x %04x\n", j, m_ttp->m_outs[j] & ((1 << m_NO)-1),
-					m_ttp->m_outs[j] >> m_NO, m_ttp->m_timing[j * m_NO + 0]);
+			printf("%05x %04x %04x %04x\n", j, m_ttp->m_out_state[j] & ((1 << m_NO)-1),
+					m_ttp->m_out_state[j] >> m_NO, m_ttp->m_timing[j * m_NO + 0]);
 		for (int k=0; m_ttp->m_timing_nt[k] != netlist_time::zero(); k++)
 			printf("%d %f\n", k, m_ttp->m_timing_nt[k].as_double() * 1000000.0);
 #endif
@@ -242,8 +237,8 @@ namespace netlist
 		{
 			typedef nld_truthtable_t<m_NI, m_NO> tt_type;
 			truthtable_parser desc_s(m_NO, m_NI, &m_ttbl.m_initialized,
-					packed_int(m_ttbl.m_outs, sizeof(m_ttbl.m_outs[0]) * 8),
-					m_ttbl.m_timing, m_ttbl.m_timing_nt);
+					packed_int(m_ttbl.m_out_state, sizeof(m_ttbl.m_out_state[0]) * 8),
+					m_ttbl.m_timing_index, m_ttbl.m_timing_nt);
 
 			desc_s.parse(m_desc);
 			return plib::owned_ptr<device_t>::Create<tt_type>(anetlist, name, m_family, m_ttbl, m_desc);
@@ -259,7 +254,7 @@ namespace netlist
 		for (std::size_t j=0; j<m_NI; j++)
 		{
 			// if changing the input directly doesn't change outputs we can ignore
-			if (m_outs[state] == m_outs[tt_bitset(state).set(j)])
+			if (m_out_state[state] == m_out_state[tt_bitset(state).set(j)])
 				ignore.set(j);
 		}
 
@@ -285,7 +280,7 @@ namespace netlist
 			{
 				tt_bitset b = tign.expand_and(k);
 				// will any of the inputs ignored change the output if changed?
-				if (m_outs[state] != m_outs[(state & tign.invert()) | b])
+				if (m_out_state[state] != m_out_state[(state & tign.invert()) | b])
 				{
 					t[j] = true;
 					break;
@@ -352,10 +347,10 @@ void truthtable_parser::parseline(unsigned cur, std::vector<pstring> list,
 		else
 		{
 			// cutoff previous inputs and outputs for ignore
-			if (m_outs[nstate] != m_outs.mask() &&  m_outs[nstate] != val)
-				nl_exception(plib::pfmt("Error in truthtable: State {1:04} already set, {2} != {3}\n")
-						.x(nstate.as_uint())(m_outs[nstate])(val) );
-			m_outs.set(nstate, val);
+			if (m_out_state[nstate] != m_out_state.mask() &&  m_out_state[nstate] != val)
+				throw nl_exception(plib::pfmt("Error in truthtable: State {1:04} already set, {2} != {3}\n")
+						.x(nstate.as_uint())(m_out_state[nstate])(val) );
+			m_out_state.set(nstate, val);
 			for (std::size_t j=0; j<m_NO; j++)
 				m_timing[nstate * m_NO + j] = timing_index[j];
 		}
@@ -375,7 +370,7 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 	line++;
 
 	for (unsigned j=0; j < m_size; j++)
-		m_outs.set(j, tt_bitset::all_bits());
+		m_out_state.set(j, tt_bitset::all_bits());
 
 	for (int j=0; j < 16; j++)
 		m_timing_nt[j] = netlist_time::zero();
@@ -451,9 +446,9 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 	}
 	for (size_t i=0; i<m_size; i++)
 	{
-		if (m_outs[i] == m_outs.mask())
+		if (m_out_state[i] == m_out_state.mask())
 			throw nl_exception(plib::pfmt("truthtable: found element not set {1}\n").x(i) );
-		m_outs.set(i, m_outs[i] | (ign[i] << m_NO));;
+		m_out_state.set(i, m_out_state[i] | (ign[i] << m_NO));;
 	}
 	*m_initialized = true;
 

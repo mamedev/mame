@@ -16,14 +16,16 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(7483)
 		, m_C0(*this, "C0")
-		, m_A1(*this, "A1")
-		, m_A2(*this, "A2")
-		, m_A3(*this, "A3")
-		, m_A4(*this, "A4")
-		, m_B1(*this, "B1")
-		, m_B2(*this, "B2")
-		, m_B3(*this, "B3")
-		, m_B4(*this, "B4")
+		, m_A1(*this, "A1", NETLIB_DELEGATE(7483, upd_a))
+		, m_A2(*this, "A2", NETLIB_DELEGATE(7483, upd_a))
+		, m_A3(*this, "A3", NETLIB_DELEGATE(7483, upd_a))
+		, m_A4(*this, "A4", NETLIB_DELEGATE(7483, upd_a))
+		, m_B1(*this, "B1", NETLIB_DELEGATE(7483, upd_b))
+		, m_B2(*this, "B2", NETLIB_DELEGATE(7483, upd_b))
+		, m_B3(*this, "B3", NETLIB_DELEGATE(7483, upd_b))
+		, m_B4(*this, "B4", NETLIB_DELEGATE(7483, upd_b))
+		, m_a(*this, "m_a", 0)
+		, m_b(*this, "m_b", 0)
 		, m_lastr(*this, "m_lastr", 0)
 		, m_S1(*this, "S1")
 		, m_S2(*this, "S2")
@@ -34,6 +36,8 @@ namespace netlist
 		}
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
+		NETLIB_HANDLERI(upd_a);
+		NETLIB_HANDLERI(upd_b);
 
 	protected:
 		logic_input_t m_C0;
@@ -46,7 +50,9 @@ namespace netlist
 		logic_input_t m_B3;
 		logic_input_t m_B4;
 
-		state_var<unsigned> m_lastr;
+		state_var_u8 m_a;
+		state_var_u8 m_b;
+		state_var_u8 m_lastr;
 
 		logic_output_t m_S1;
 		logic_output_t m_S2;
@@ -87,12 +93,21 @@ namespace netlist
 		m_lastr = 0;
 	}
 
-	NETLIB_UPDATE(7483)
+	NETLIB_HANDLER(7483, upd_a)
 	{
-		unsigned a = (m_A1() << 0) | (m_A2() << 1) | (m_A3() << 2) | (m_A4() << 3);
-		unsigned b = (m_B1() << 0) | (m_B2() << 1) | (m_B3() << 2) | (m_B4() << 3);
+		m_a = (m_A1() << 0) | (m_A2() << 1) | (m_A3() << 2) | (m_A4() << 3);
+		NETLIB_NAME(7483)::update();
+	}
 
-		unsigned r = a + b + m_C0();
+	NETLIB_HANDLER(7483, upd_b)
+	{
+		m_b = (m_B1() << 0) | (m_B2() << 1) | (m_B3() << 2) | (m_B4() << 3);
+		NETLIB_NAME(7483)::update();
+	}
+
+	inline NETLIB_UPDATE(7483)
+	{
+		uint8_t r = m_a + m_b + m_C0();
 
 		if (r != m_lastr)
 		{

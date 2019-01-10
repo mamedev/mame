@@ -12,6 +12,14 @@ namespace netlist
 {
 	namespace devices
 	{
+
+	/* FIXME: This should be a single device, i.e. one tristate buffer only.
+	 *
+	 * FIXME: Implement tristate output.
+	 *
+	 */
+
+
 	NETLIB_OBJECT(74365)
 	{
 		NETLIB_CONSTRUCTOR(74365)
