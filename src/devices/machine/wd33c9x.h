@@ -55,6 +55,7 @@ private:
 	uint8_t m_addr;
 	uint8_t m_regs[NUM_REGS];
 	uint8_t m_command_length;
+	uint8_t m_last_message;
 
 	void start_command();
 
