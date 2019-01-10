@@ -102,8 +102,8 @@ namespace netlist
 	{
 		m_reset = 1;
 		m_a = m_bcd = 0;
-		m_CLKA.activate_hl();
-		m_CLKB.activate_hl();
+		m_CLKA.set_state(logic_t::STATE_INP_HL);
+		m_CLKB.set_state(logic_t::STATE_INP_HL);
 	}
 
 	NETLIB_UPDATE(7493)
