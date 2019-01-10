@@ -111,7 +111,7 @@ namespace netlist
 
 	NETLIB_RESET(7474)
 	{
-		m_CLK.activate_lh();
+		m_CLK.set_state(logic_t::STATE_INP_LH);
 		m_nextD = 0;
 	}
 

@@ -188,11 +188,11 @@ namespace netlist
 	NETLIB_RESET(7448)
 	{
 		m_state = 0;
-		m_A.inactivate();
-		m_B.inactivate();
-		m_C.inactivate();
-		m_D.inactivate();
-		m_RBIQ.inactivate();
+		m_A.set_state(logic_t::STATE_INP_PASSIVE);
+		m_B.set_state(logic_t::STATE_INP_PASSIVE);
+		m_C.set_state(logic_t::STATE_INP_PASSIVE);
+		m_D.set_state(logic_t::STATE_INP_PASSIVE);
+		m_RBIQ.set_state(logic_t::STATE_INP_PASSIVE);
 	}
 
 	NETLIB_FUNC_VOID(7448, update_outputs, (unsigned v))
