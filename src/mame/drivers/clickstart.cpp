@@ -59,6 +59,7 @@ public:
 	void clickstart(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_update);
+	DECLARE_INPUT_CHANGED_MEMBER(key_update);
 
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -101,7 +102,6 @@ private:
 	uint16_t m_mouse_y;
 	int16_t m_mouse_dx;
 	int16_t m_mouse_dy;
-	uint8_t m_mouse_buffer[16];
 
 	uint8_t m_uart_tx_fifo[32]; // arbitrary size
 	uint8_t m_uart_tx_fifo_start;
@@ -125,7 +125,6 @@ void clickstart_state::machine_start()
 	save_item(NAME(m_mouse_y));
 	save_item(NAME(m_mouse_dx));
 	save_item(NAME(m_mouse_dy));
-	save_item(NAME(m_mouse_buffer));
 
 	save_item(NAME(m_uart_tx_fifo));
 	save_item(NAME(m_uart_tx_fifo_start));
@@ -144,7 +143,6 @@ void clickstart_state::machine_reset()
 	m_mouse_y = 0xffff;
 	m_mouse_dx = 0;
 	m_mouse_dy = 0;
-	memset(m_mouse_buffer, 0, ARRAY_LENGTH(m_mouse_buffer));
 
 	memset(m_uart_tx_fifo, 0, ARRAY_LENGTH(m_uart_tx_fifo));
 	m_uart_tx_fifo_start = 0;
@@ -195,6 +193,31 @@ void clickstart_state::uart_tx_fifo_push(uint8_t value)
 	m_uart_tx_fifo_count++;
 }
 
+INPUT_CHANGED_MEMBER(clickstart_state::key_update)
+{
+	const size_t keycode = reinterpret_cast<size_t>(param);
+	printf("keycode:%02x, oldval:%02x, newval:%02x\n", (uint8_t)keycode, oldval, newval);
+
+	uint8_t buffer[5] = {};
+	buffer[0] = 0x01;
+	buffer[1] = newval ? keycode : 0x3f;
+	buffer[2] = 0x3f;
+	buffer[3] = 0x01;
+	buffer[4] = 0x01;
+
+	printf("Keyboard queueing: ");
+	uint16_t sum = 0;
+	for (int i = 0; i < 5; i++)
+	{
+		uart_tx_fifo_push(buffer[i] ^ 0xff);
+		sum += buffer[i];
+		printf("%02x/%02x ", buffer[i], buffer[i] ^ 0xff);
+	}
+	sum = (sum & 0xff) ^ 0xff;
+	uart_tx_fifo_push((uint8_t)sum);
+	printf("%02x\n", (uint8_t)sum);
+}
+
 INPUT_CHANGED_MEMBER(clickstart_state::mouse_update)
 {
 	uint16_t x = m_io_mouse_x->read();
@@ -235,23 +258,24 @@ void clickstart_state::update_mouse_buffer()
 	if (m_mouse_dx == 0 && m_mouse_dy == 0)
 		return;
 
-	m_mouse_buffer[0] = 0x03;
-	m_mouse_buffer[1] = (m_mouse_x + 1) & 0x3f;
-	m_mouse_buffer[2] = (m_mouse_y + 1) & 0x3f;
-	m_mouse_buffer[3] = (m_mouse_dx + 1) & 0x3f;
-	m_mouse_buffer[4] = (m_mouse_dy + 1) & 0x3f;
+	uint8_t buffer[5] = {};
+	buffer[0] = 0x01;
+	buffer[1] = 0x3f;
+	buffer[2] = 0x3f;
+	buffer[3] = (m_mouse_dx + 1) & 0x3f;
+	buffer[4] = (m_mouse_dy + 1) & 0x3f;
 
-	//printf("Queueing: ");
+	printf("Mouse queueing: ");
 	uint16_t sum = 0;
 	for (int i = 0; i < 5; i++)
 	{
-		uart_tx_fifo_push(m_mouse_buffer[i] ^ 0xff);
-		sum += m_mouse_buffer[i];
-		//printf("%02x ", m_mouse_buffer[i] ^ 0xff);
+		uart_tx_fifo_push(buffer[i] ^ 0xff);
+		sum += buffer[i];
+		printf("%02x/%02x ", buffer[i], buffer[i] ^ 0xff);
 	}
 	sum = (sum & 0xff) ^ 0xff;
 	uart_tx_fifo_push((uint8_t)sum);
-	//printf("%02x\n", (uint8_t)sum);
+	printf("%02x\n", (uint8_t)sum);
 }
 
 READ16_MEMBER(clickstart_state::rom_r)
@@ -322,6 +346,51 @@ static INPUT_PORTS_START( clickstart )
 
 	PORT_START("MOUSEY")
 	PORT_BIT(0x3e, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, mouse_update, 0)
+
+	PORT_START("KEYS0")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x01) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x02) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x03) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x04) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x05) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x06) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x07) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x08) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x09) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x0a) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x0b) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x0c) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x0d) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x0e) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x0f) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x10) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
+
+	PORT_START("KEYS1")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x11) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('q')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x12) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('r')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x13) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('s')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x14) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('t')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x15) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('u')
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x16) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('v')
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x17) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('w')
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x18) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('x')
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x19) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('y')
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x1a) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('z')
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x1b) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x1c) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x1d) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x1e) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x1f) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x20) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+
+	PORT_START("KEYS2")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x21) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x22) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x23) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x24) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0x27) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, clickstart_state, key_update, 0xa9) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("Shift")
+	PORT_BIT(0xffc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 // There is a SEEPROM on the motherboard (type?)
