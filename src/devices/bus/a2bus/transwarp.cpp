@@ -199,7 +199,7 @@ READ8_MEMBER( a2bus_transwarp_device::dma_r )
 		return m_rom[offset & 0xfff];
 	}
 
-	return slot_dma_read(space, offset);
+	return slot_dma_read(offset);
 }
 
 
@@ -221,7 +221,7 @@ WRITE8_MEMBER( a2bus_transwarp_device::dma_w )
 		hit_slot(((offset >> 4) & 0xf) - 8);
 	}
 
-	slot_dma_write(space, offset, data);
+	slot_dma_write(offset, data);
 }
 
 bool a2bus_transwarp_device::take_c800()

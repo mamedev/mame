@@ -277,7 +277,7 @@ void mcms_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				wptr = (m_table[v]<<8) | (m_acc[v]>>8);
 				m_rand = (m_acc[v]>>8) & 0x1f;
 
-				sample = (m_pBusDevice->slot_dma_read_no_space(wptr) ^ 0x80);
+				sample = (m_pBusDevice->slot_dma_read(wptr) ^ 0x80);
 				if (v & 1)
 				{
 					mixL += sample * m_vols[v];
