@@ -1141,8 +1141,18 @@ void wd33c9x_base_device::step(bool timeout)
 				irq_fifo_push(SCSI_STATUS_REQ | m_xfr_phase);
 			}
 		} else {
+			if(cc == COMMAND_CC_SELECT_TRANSFER) {
+				m_regs[COMMAND_PHASE] = COMMAND_PHASE_CP_BYTES_0;
+				std::string cmd;
+				for (uint8_t i = 0; i < m_command_length; ++i) {
+					const uint8_t command_byte = m_regs[CDB_1 + i];
+					cmd += util::string_format(" %02x", command_byte);
+					data_fifo_push(command_byte);
+				}
+				LOGMASKED(LOG_COMMANDS, "Sending command:%s (%d)\n", cmd, m_transfer_count);
+			} else
+				m_regs[COMMAND_PHASE] = COMMAND_PHASE_SELECTED;
 			set_scsi_state(INIT_XFR);
-			m_regs[COMMAND_PHASE] = COMMAND_PHASE_SELECTED;
 		}
 		step(false);
 		break;
@@ -1206,8 +1216,7 @@ void wd33c9x_base_device::step(bool timeout)
 					//state = (m_xfr_phase == S_PHASE_MSG_IN && (!dma_command || tcounter == 1)) ? INIT_XFR_RECV_BYTE_NACK : INIT_XFR_RECV_BYTE_ACK;
 					scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
 					set_scsi_state((RECV_WAIT_REQ_1 << SUB_SHIFT) | INIT_XFR_RECV_BYTE_ACK);
-					if (ctrl & S_REQ)
-						step(false);
+					step(false);
 				}
 				break;
 
@@ -1684,15 +1693,13 @@ bool wd33c9x_base_device::set_command_length(const uint8_t cc)
 	if (eaf && (cc == COMMAND_CC_SELECT_TRANSFER || cc == COMMAND_CC_SELECT_ATN_TRANSFER)) {
 		m_command_length &= OWN_ID_CDB_SIZE;
 		ret = true;
-	}
-	else if (eaf && cc == COMMAND_CC_WAIT_SELECT_RECEIVE_DATA) {
+	} else if (eaf && cc == COMMAND_CC_WAIT_SELECT_RECEIVE_DATA) {
 		m_command_length = 6;
 		m_regs[COMMAND_PHASE] = COMMAND_PHASE_CP_BYTES_1;
 		irq_fifo_push(SCSI_STATUS_NEED_COMMAND_SIZE);
 		update_irq();
 		ret = false;
-	}
-	else {
+	} else {
 		switch (m_regs[CDB_1] >> 5) {
 		default:
 		case 0: m_command_length = 6;  break;
