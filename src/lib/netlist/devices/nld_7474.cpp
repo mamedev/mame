@@ -123,8 +123,8 @@ namespace netlist
 	{
 	}
 
-	NETLIB_DEVICE_IMPL(7474)
-	NETLIB_DEVICE_IMPL(7474_dip)
+	NETLIB_DEVICE_IMPL(7474, "TTL_7474", "+CLK,+D,+CLRQ,+PREQ")
+	NETLIB_DEVICE_IMPL(7474_dip, "TTL_7474_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

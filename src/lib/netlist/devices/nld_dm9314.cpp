@@ -107,8 +107,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL(9314)
-	NETLIB_DEVICE_IMPL(9314_dip)
+	NETLIB_DEVICE_IMPL_DEPRECATED(9314)
+	NETLIB_DEVICE_IMPL_DEPRECATED(9314_dip)
 
 	} //namespace devices
 } // namespace netlist

@@ -126,8 +126,8 @@ namespace netlist
 		m_RCO.push(tRippleCarryOut, NLTIME_FROM_NS(20)); //FIXME
 	}
 
-	NETLIB_DEVICE_IMPL(74161)
-	NETLIB_DEVICE_IMPL(74161_dip)
+	NETLIB_DEVICE_IMPL_DEPRECATED(74161)
+	NETLIB_DEVICE_IMPL_DEPRECATED(74161_dip)
 
 	} //namespace devices
 } // namespace netlist

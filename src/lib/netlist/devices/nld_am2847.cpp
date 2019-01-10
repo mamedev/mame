@@ -130,8 +130,8 @@ namespace netlist
 		m_OUT.push(out, NLTIME_FROM_NS(200));
 	}
 
-	NETLIB_DEVICE_IMPL(AM2847)
-	NETLIB_DEVICE_IMPL(AM2847_dip)
+	NETLIB_DEVICE_IMPL_DEPRECATED(AM2847)
+	NETLIB_DEVICE_IMPL_DEPRECATED(AM2847_dip)
 
 	} //namespace devices
 } // namespace netlist

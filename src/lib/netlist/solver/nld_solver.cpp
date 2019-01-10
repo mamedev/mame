@@ -417,7 +417,7 @@ void NETLIB_NAME(solver)::create_solver_code(std::map<pstring, pstring> &mp)
 	}
 }
 
-	NETLIB_DEVICE_IMPL(solver)
+	NETLIB_DEVICE_IMPL_DEPRECATED(solver)
 
 	} //namespace devices
 } // namespace netlist

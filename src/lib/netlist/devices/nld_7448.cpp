@@ -211,8 +211,8 @@ namespace netlist
 
 	#endif
 
-	NETLIB_DEVICE_IMPL(7448)
-	NETLIB_DEVICE_IMPL(7448_dip)
+	NETLIB_DEVICE_IMPL(7448, "TTL_7448", "+A,+B,+C,+D,+LTQ,+BIQ,+RBIQ")
+	NETLIB_DEVICE_IMPL(7448_dip, "TTL_7448_DIP", "")
 
 
 	} //namespace devices

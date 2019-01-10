@@ -105,8 +105,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL(7483)
-	NETLIB_DEVICE_IMPL(7483_dip)
+	NETLIB_DEVICE_IMPL(7483, "TTL_7483", "+A1,+A2,+A3,+A4,+B1,+B2,+B3,+B4,+C0")
+	NETLIB_DEVICE_IMPL(7483_dip, "TTL_7483_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

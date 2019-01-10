@@ -67,7 +67,11 @@ void list_t::register_device(std::unique_ptr<element_t> &&factory)
 {
 	for (auto & e : *this)
 		if (e->name() == factory->name())
+		{
+			// FIXME: throws pure virtual exception
+			printf("%s\n", e->name().c_str());
 			m_setup.log().fatal(MF_1_FACTORY_ALREADY_CONTAINS_1, factory->name());
+		}
 	push_back(std::move(factory));
 }
 
