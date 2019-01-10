@@ -1219,9 +1219,9 @@ Core Video Options
 **-[no]keepaspect** / **-[no]ka**
 
     When enabled, MAME preserves the correct aspect ratio for the emulated
-    system's screen(s).  This is usually 4:3 or 3:4 on CRT monitors, though some
-    systems may have ratios such as 3:2 (Nintendo Game Boy) or 5:4
-    (some workstations).
+    system's screen(s).  For instance, this can be usually 4:3 or 3:4 on CRT
+    monitors, though some systems may have ratios such as 3:2 (Nintendo Game
+    Boy), 5:4 (some workstations) or various other ratios.
 
     When running in a window with this option on, you can only resize the window
     to the proper aspect ratio, unless you are holding down the CONTROL key.  By
@@ -1261,9 +1261,9 @@ Core Video Options
     system has a higher framerate than your host display, emulated frames will
     be dropped periodically resulting in motion judder.
 
-    You should only need to turn this on in windowed mode. In full screen mode,
-    it is only needed if **-triplebuffer** does not remove the tearing, in which
-    case you should use **-notriplebuffer -waitvsync**.
+    On Windows, you should only need to turn this on in windowed mode. In full
+    screen mode, it is only needed if **-triplebuffer** does not remove the
+    tearing, in which case you should use **-notriplebuffer -waitvsync**.
 
     Note that SDL-based MAME support for this option depends entirely on your
     operating system and video drivers; in general it will not work in windowed
@@ -1295,8 +1295,9 @@ Core Video Options
     graphics system for scaling.  At the minimum setting of 1, the screen is
     rendered at its original resolution before being scaled.  At higher
     settings, the screen is expanded in both axes by a factor of *<amount>*
-    using nearest-neighbor sampling before being scaled.  With **-video d3d**,
-    this produces a less blurry image at the expense of some speed.
+    using nearest-neighbor sampling before applying filters or shaders.  With
+    **-video d3d**, this produces a less blurry image at the expense of a
+    little (on nearly all modern architectures) speed.
 
     The default is ``1``.
 
@@ -2140,7 +2141,8 @@ Debugging Options
 
 **-[no]oslog**
 
-    Output ``error.log`` data to the system debugger, if one is present.
+    Output ``error.log`` data to the system diagnostic output, if one is
+    present.
 
     On Windows, the ``error.log`` data goes nowhere if no debugger is present.
     On other operating systems, the ``error.log`` data will go to standard
@@ -2324,7 +2326,8 @@ Core Misc Options
     cheat database, if present. This also activates additional options on the
     slider menu for overclocking/underclocking.
 
-    *Be advised that savestates may not work correctly with this turned on.*
+    *Be advised that savestates created with cheats on may not work correctly
+    with this turned off and vice-versa.*
 
     The default is OFF (**-nocheat**).
 
