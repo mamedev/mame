@@ -422,8 +422,22 @@ protected:
 
 	void do_sprite_dma(uint32_t len);
 
+	enum blend_enable_t : bool
+	{
+		BlendOff = false,
+		BlendOn = true
+	};
+
+	enum rowscroll_enable_t : bool
+	{
+		RowScrollOff = false,
+		RowScrollOn = true
+	};
+
 	void apply_saturation(const rectangle &cliprect);
 	void apply_fade(const rectangle &cliprect);
+
+	template<blend_enable_t Blend, rowscroll_enable_t RowScroll>
 	void blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile);
 	void blit_page(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t bitmap_addr, uint16_t *regs);
 	void blit_sprite(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t base_addr);
