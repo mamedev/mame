@@ -45,6 +45,7 @@ public:
 	auto intrq_wr_callback() { return intrq_cb.bind(); }
 	auto drq_wr_callback() { return drq_cb.bind(); }
 	auto hdl_wr_callback() { return hdl_cb.bind(); }
+	auto us_wr_callback() { return us_cb.bind(); }
 
 	virtual void map(address_map &map) override = 0;
 
@@ -270,6 +271,7 @@ protected:
 
 	live_info cur_live, checkpoint_live;
 	devcb_write_line intrq_cb, drq_cb, hdl_cb;
+	devcb_write8 us_cb;
 	bool cur_irq, other_irq, data_irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done;
 	floppy_info flopi[4];
 

@@ -166,7 +166,8 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	pc_fdc_interface(mconfig, type, tag, owner, clock),
 	intrq_cb(*this),
 	drq_cb(*this),
-	hdl_cb(*this)
+	hdl_cb(*this),
+	us_cb(*this)
 {
 	ready_polled = true;
 	ready_connected = true;
@@ -199,6 +200,7 @@ void upd765_family_device::device_start()
 	intrq_cb.resolve_safe();
 	drq_cb.resolve_safe();
 	hdl_cb.resolve_safe();
+	us_cb.resolve_safe();
 
 	for(int i=0; i != 4; i++) {
 		char name[2];
@@ -327,6 +329,7 @@ void upd765_family_device::set_ds(int fid)
 	for(floppy_info &fi : flopi)
 		if(fi.dev)
 			fi.dev->ds_w(fid);
+	us_cb(fid);
 
 	// record selected drive
 	selected_drive = fid;
