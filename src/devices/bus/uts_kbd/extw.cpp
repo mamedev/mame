@@ -7,6 +7,9 @@
     This is the default keyboard for the UTS 10 and UTS 20, though the
     latter's manual claims that "SYS MODE" and "WS MODE" have no function.
 
+    User beware: the - and / keys are swapped from their respective
+    positions on most keyboards.
+
     The LED is located on the LOCK key, but also responds to either shift
     key being pressed (which also releases the shift lock).
 
@@ -235,7 +238,7 @@ static INPUT_PORTS_START(uts_extw)
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEYF")
-	PORT_DIPNAME(0x0f, 0x0f, "National Layout")
+	PORT_DIPNAME(0x0f, 0x0f, "National Layout") // stored as a 4-bit value even though only 7 of the first 8 are valid
 	PORT_DIPSETTING(0x0f, "USA/UK English")
 	PORT_DIPSETTING(0x0d, "German (QWERTZ)")
 	PORT_DIPSETTING(0x0c, "European A")
