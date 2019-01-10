@@ -71,7 +71,6 @@ namespace netlist
 		}
 	};
 
-	template<>
 	template<typename R>
 	struct aa<1, R>
 	{
