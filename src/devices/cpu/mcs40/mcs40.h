@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <memory>
+#include <utility>
+
 
 /***********************************************************************
     CONSTANTS
@@ -18,116 +21,6 @@ enum
 	I4040_INT_LINE = 1,
 	I4040_STP_LINE = 2
 };
-
-
-
-/***********************************************************************
-    CONFIGURATION MACROS
-***********************************************************************/
-
-#define MCS40CB_BUSCYCLE(cls, fnc) \
-		mcs40_cpu_device_base::bus_cycle_delegate((&cls::fnc), (#cls "::" #fnc), DEVICE_SELF, (cls *)nullptr)
-
-
-#define MCFG_I4004_ROM_MAP(map) \
-		MCFG_DEVICE_ADDRESS_MAP(i4004_cpu_device::AS_ROM, map)
-
-#define MCFG_I4004_RAM_MEMORY_MAP(map) \
-		MCFG_DEVICE_ADDRESS_MAP(i4004_cpu_device::AS_RAM_MEMORY, map)
-
-#define MCFG_I4004_ROM_PORTS_MAP(map) \
-		MCFG_DEVICE_ADDRESS_MAP(i4004_cpu_device::AS_ROM_PORTS, map)
-
-#define MCFG_I4004_RAM_STATUS_MAP(map) \
-		MCFG_DEVICE_ADDRESS_MAP(i4004_cpu_device::AS_RAM_STATUS, map)
-
-#define MCFG_I4004_RAM_PORTS_MAP(map) \
-		MCFG_DEVICE_ADDRESS_MAP(i4004_cpu_device::AS_RAM_PORTS, map)
-
-#define MCFG_I4004_PROGRAM_MEMORY_MAP(map) \
-		MCFG_DEVICE_ADDRESS_MAP(i4004_cpu_device::AS_PROGRAM_MEMORY, map)
-
-#define MCFG_I4004_BUS_CYCLE_CB(obj) \
-		downcast<i4004_cpu_device &>(*device).set_bus_cycle_cb((MCS40CB_##obj));
-
-#define MCFG_I4004_SYNC_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_sync_cb(DEVCB_##obj);
-
-#define MCFG_I4004_CM_ROM_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_cm_rom_cb(DEVCB_##obj);
-
-#define MCFG_I4004_CM_RAM0_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_cm_ram_cb<0>(DEVCB_##obj);
-
-#define MCFG_I4004_CM_RAM1_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_cm_ram_cb<1>(DEVCB_##obj);
-
-#define MCFG_I4004_CM_RAM2_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_cm_ram_cb<2>(DEVCB_##obj);
-
-#define MCFG_I4004_CM_RAM3_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_cm_ram_cb<3>(DEVCB_##obj);
-
-#define MCFG_I4004_4289_PM_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_4289_pm_cb(DEVCB_##obj);
-
-#define MCFG_I4004_4289_F_L_CB(obj) \
-		devcb = &downcast<i4004_cpu_device &>(*device).set_4289_f_l_cb(DEVCB_##obj);
-
-
-#define MCFG_I4040_ROM_MAP(map) \
-		MCFG_DEVICE_ADDRESS_MAP(i4040_cpu_device::AS_ROM, map)
-
-#define MCFG_I4040_RAM_MEMORY_MAP(map) \
-		MCFG_DEVICE_ADDRESS_MAP(i4040_cpu_device::AS_RAM_MEMORY, map)
-
-#define MCFG_I4040_ROM_PORTS_MAP(map) \
-		MCFG_DEVICE_ADDRESS_MAP(i4040_cpu_device::AS_ROM_PORTS, map)
-
-#define MCFG_I4040_RAM_STATUS_MAP(map) \
-		MCFG_DEVICE_ADDRESS_MAP(i4040_cpu_device::AS_RAM_STATUS, map)
-
-#define MCFG_I4040_RAM_PORTS_MAP(map) \
-		MCFG_DEVICE_ADDRESS_MAP(i4040_cpu_device::AS_RAM_PORTS, map)
-
-#define MCFG_I4040_PROGRAM_MEMORY_MAP(map) \
-		MCFG_DEVICE_ADDRESS_MAP(i4040_cpu_device::AS_PROGRAM_MEMORY, map)
-
-#define MCFG_I4040_BUS_CYCLE_CB(obj) \
-		downcast<i4040_cpu_device &>(*device).set_bus_cycle_cb((MCS40CB_##obj));
-
-#define MCFG_I4040_SYNC_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_sync_cb(DEVCB_##obj);
-
-#define MCFG_I4040_CM_ROM0_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_cm_rom_cb<0>(DEVCB_##obj);
-
-#define MCFG_I4040_CM_ROM1_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_cm_rom_cb<1>(DEVCB_##obj);
-
-#define MCFG_I4040_CM_RAM0_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_cm_ram_cb<0>(DEVCB_##obj);
-
-#define MCFG_I4040_CM_RAM1_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_cm_ram_cb<1>(DEVCB_##obj);
-
-#define MCFG_I4040_CM_RAM2_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_cm_ram_cb<2>(DEVCB_##obj);
-
-#define MCFG_I4040_CM_RAM3_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_cm_ram_cb<3>(DEVCB_##obj);
-
-#define MCFG_I4040_CY_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_cy_cb(DEVCB_##obj);
-
-#define MCFG_I4040_STP_ACK_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_stp_ack_cb(DEVCB_##obj);
-
-#define MCFG_I4040_4289_PM_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_4289_pm_cb(DEVCB_##obj);
-
-#define MCFG_I4040_4289_F_L_CB(obj) \
-		devcb = &downcast<i4040_cpu_device &>(*device).set_4289_f_l_cb(DEVCB_##obj);
 
 
 
@@ -152,9 +45,15 @@ public:
 	typedef device_delegate<void (phase step, u8 sync, u8 data)> bus_cycle_delegate;
 
 	// configuration helpers
-	template <typename Obj> void set_bus_cycle_cb(Obj &&cb) { m_bus_cycle_cb = std::forward<Obj>(cb); }
-	template <typename Obj> devcb_base &set_4289_pm_cb(Obj &&cb) { return m_4289_pm_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base &set_4289_f_l_cb(Obj &&cb) { return m_4289_f_l_cb.set_callback(std::forward<Obj>(cb)); }
+	template <typename... T> void set_rom_map(T &&... args) { set_addrmap(AS_ROM, std::forward<T>(args)...); }
+	template <typename... T> void set_ram_memory_map(T &&... args) { set_addrmap(AS_RAM_MEMORY, std::forward<T>(args)...); }
+	template <typename... T> void set_rom_ports_map(T &&... args) { set_addrmap(AS_ROM_PORTS, std::forward<T>(args)...); }
+	template <typename... T> void set_ram_status_map(T &&... args) { set_addrmap(AS_RAM_STATUS, std::forward<T>(args)...); }
+	template <typename... T> void set_ram_ports_map(T &&... args) { set_addrmap(AS_RAM_PORTS, std::forward<T>(args)...); }
+	template <typename... T> void set_program_memory_map(T &&... args) { set_addrmap(AS_PROGRAM_MEMORY, std::forward<T>(args)...); }
+	template <typename... T> void set_bus_cycle_cb(T &&... args) { m_bus_cycle_cb = bus_cycle_delegate(std::forward<T>(args)...); }
+	auto i4289_pm_cb() { return m_4289_pm_cb.bind(); }
+	auto i4289_f_l_cb() { return m_4289_f_l_cb.bind(); }
 
 	// chip select outputs
 	u8 get_cm_rom() const { return m_cm_rom; }
@@ -238,11 +137,11 @@ protected:
 	void set_stp(int state);
 
 	// configuration helpers
-	template <typename Obj> devcb_base &set_sync_cb(Obj &&cb) { return m_sync_cb.set_callback(std::forward<Obj>(cb)); }
-	template <unsigned N, typename Obj> devcb_base &set_cm_rom_cb(Obj &&cb) { return m_cm_rom_cb[N].set_callback(std::forward<Obj>(cb)); }
-	template <unsigned N, typename Obj> devcb_base &set_cm_ram_cb(Obj &&cb) { return m_cm_ram_cb[N].set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base &set_cy_cb(Obj &&cb) { return m_cy_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base &set_stp_ack_cb(Obj &&cb) { return m_stp_ack_cb.set_callback(std::forward<Obj>(cb)); }
+	auto sync_cb() { return m_sync_cb.bind(); }
+	template <unsigned N> auto cm_rom_cb() { return m_cm_rom_cb[N].bind(); }
+	template <unsigned N> auto cm_ram_cb() { return m_cm_ram_cb[N].bind(); }
+	auto cy_cb() { return m_cy_cb.bind(); }
+	auto stp_ack_cb() { return m_stp_ack_cb.bind(); }
 
 private:
 	enum
@@ -349,9 +248,9 @@ class i4004_cpu_device : public mcs40_cpu_device_base
 {
 public:
 	// configuration helpers
-	template <typename Obj> devcb_base &set_sync_cb(Obj &&cb) { return mcs40_cpu_device_base::set_sync_cb(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base &set_cm_rom_cb(Obj &&cb) { return set_cm_rom_cb<0>(std::forward<Obj>(cb)); }
-	template <unsigned N, typename Obj> devcb_base &set_cm_ram_cb(Obj &&cb) { return mcs40_cpu_device_base::set_cm_ram_cb<N>(std::forward<Obj>(cb)); }
+	using mcs40_cpu_device_base::sync_cb;
+	auto cm_rom_cb() { return mcs40_cpu_device_base::cm_rom_cb<0>(); }
+	template <unsigned N> auto cm_ram_cb() { return mcs40_cpu_device_base::cm_ram_cb<N>(); }
 
 	i4004_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
@@ -370,11 +269,6 @@ protected:
 	virtual cycle do_cycle1(u8 opr, u8 opa, pmem &program_op) override;
 	virtual void do_cycle2(u8 opr, u8 opa, u8 arg) override;
 	virtual u8 do_io(u8 opr, u8 opa) override;
-
-	// configuration helpers
-	using mcs40_cpu_device_base::set_sync_cb;
-	using mcs40_cpu_device_base::set_cm_rom_cb;
-	using mcs40_cpu_device_base::set_cm_ram_cb;
 };
 
 
@@ -382,11 +276,10 @@ class i4040_cpu_device : public i4004_cpu_device
 {
 public:
 	// configuration helpers
-	template <typename Obj> devcb_base &set_sync_cb(Obj &&cb) { return i4004_cpu_device::set_sync_cb(std::forward<Obj>(cb)); }
-	template <unsigned N, typename Obj> devcb_base &set_cm_rom_cb(Obj &&cb) { return set_cm_rom_cb<N>(std::forward<Obj>(cb)); }
-	template <unsigned N, typename Obj> devcb_base &set_cm_ram_cb(Obj &&cb) { return set_cm_ram_cb<N>(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base &set_cy_cb(Obj &&cb) { return i4004_cpu_device::set_cy_cb(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base &set_stp_ack_cb(Obj &&cb) { return i4004_cpu_device::set_stp_ack_cb(std::forward<Obj>(cb)); }
+	template <unsigned N> auto cm_rom_cb() { return mcs40_cpu_device_base::cm_rom_cb<N>(); }
+	template <unsigned N> auto cm_ram_cb() { return mcs40_cpu_device_base::cm_ram_cb<N>(); }
+	auto cy_cb() { return i4004_cpu_device::cy_cb(); }
+	using mcs40_cpu_device_base::stp_ack_cb;
 
 	i4040_cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
@@ -400,13 +293,6 @@ protected:
 
 	// mcs40_cpu_device_base implementation
 	virtual cycle do_cycle1(u8 opr, u8 opa, pmem &program_op) override;
-
-	// configuration helpers
-	using mcs40_cpu_device_base::set_sync_cb;
-	using mcs40_cpu_device_base::set_cm_rom_cb;
-	using mcs40_cpu_device_base::set_cm_ram_cb;
-	using mcs40_cpu_device_base::set_cy_cb;
-	using mcs40_cpu_device_base::set_stp_ack_cb;
 };
 
 

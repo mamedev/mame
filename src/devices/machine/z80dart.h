@@ -152,59 +152,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_Z80DART_OFFSETS(_rxa, _txa, _rxb, _txb) \
-	downcast<z80dart_device &>(*device).configure_channels(_rxa, _txa, _rxb, _txb);
-
-#define MCFG_Z80DART_OUT_TXDA_CB(_devcb) \
-	devcb = &downcast<z80dart_device &>(*device).set_out_txda_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80DART_OUT_DTRA_CB(_devcb) \
-	devcb = &downcast<z80dart_device &>(*device).set_out_dtra_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80DART_OUT_RTSA_CB(_devcb) \
-	devcb = &downcast<z80dart_device &>(*device).set_out_rtsa_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80DART_OUT_WRDYA_CB(_devcb) \
-	devcb = &downcast<z80dart_device &>(*device).set_out_wrdya_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80DART_OUT_SYNCA_CB(_devcb) \
-	devcb = &downcast<z80dart_device &>(*device).set_out_synca_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80DART_OUT_TXDB_CB(_devcb) \
-	devcb = &downcast<z80dart_device &>(*device).set_out_txdb_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80DART_OUT_DTRB_CB(_devcb) \
-	devcb = &downcast<z80dart_device &>(*device).set_out_dtrb_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80DART_OUT_RTSB_CB(_devcb) \
-	devcb = &downcast<z80dart_device &>(*device).set_out_rtsb_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80DART_OUT_WRDYB_CB(_devcb) \
-	devcb = &downcast<z80dart_device &>(*device).set_out_wrdyb_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80DART_OUT_SYNCB_CB(_devcb) \
-	devcb = &downcast<z80dart_device &>(*device).set_out_syncb_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80DART_OUT_INT_CB(_devcb) \
-	devcb = &downcast<z80dart_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80DART_OUT_RXDRQA_CB(_devcb) \
-	devcb = &downcast<z80dart_device &>(*device).set_out_rxdrqa_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80DART_OUT_TXDRQA_CB(_devcb) \
-	devcb = &downcast<z80dart_device &>(*device).set_out_txdrqa_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80DART_OUT_RXDRQB_CB(_devcb) \
-	devcb = &downcast<z80dart_device &>(*device).set_out_rxdrqb_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80DART_OUT_TXDRQB_CB(_devcb) \
-	devcb = &downcast<z80dart_device &>(*device).set_out_txdrqb_callback(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -447,21 +394,21 @@ public:
 	// construction/destruction
 	z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_txda_callback(Object &&cb) { return m_out_txda_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_dtra_callback(Object &&cb) { return m_out_dtra_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_rtsa_callback(Object &&cb) { return m_out_rtsa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_wrdya_callback(Object &&cb) { return m_out_wrdya_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_synca_callback(Object &&cb) { return m_out_synca_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_txdb_callback(Object &&cb) { return m_out_txdb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_dtrb_callback(Object &&cb) { return m_out_dtrb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_rtsb_callback(Object &&cb) { return m_out_rtsb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_wrdyb_callback(Object &&cb) { return m_out_wrdyb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_syncb_callback(Object &&cb) { return m_out_syncb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_rxdrqa_callback(Object &&cb) { return m_out_rxdrqa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_txdrqa_callback(Object &&cb) { return m_out_txdrqa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_rxdrqb_callback(Object &&cb) { return m_out_rxdrqb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_txdrqb_callback(Object &&cb) { return m_out_txdrqb_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_txda_callback() { return m_out_txda_cb.bind(); }
+	auto out_dtra_callback() { return m_out_dtra_cb.bind(); }
+	auto out_rtsa_callback() { return m_out_rtsa_cb.bind(); }
+	auto out_wrdya_callback() { return m_out_wrdya_cb.bind(); }
+	auto out_synca_callback() { return m_out_synca_cb.bind(); }
+	auto out_txdb_callback() { return m_out_txdb_cb.bind(); }
+	auto out_dtrb_callback() { return m_out_dtrb_cb.bind(); }
+	auto out_rtsb_callback() { return m_out_rtsb_cb.bind(); }
+	auto out_wrdyb_callback() { return m_out_wrdyb_cb.bind(); }
+	auto out_syncb_callback() { return m_out_syncb_cb.bind(); }
+	auto out_int_callback() { return m_out_int_cb.bind(); }
+	auto out_rxdrqa_callback() { return m_out_rxdrqa_cb.bind(); }
+	auto out_txdrqa_callback() { return m_out_txdrqa_cb.bind(); }
+	auto out_rxdrqb_callback() { return m_out_rxdrqb_cb.bind(); }
+	auto out_txdrqb_callback() { return m_out_txdrqb_cb.bind(); }
 
 	void configure_channels(int rxa, int txa, int rxb, int txb)
 	{

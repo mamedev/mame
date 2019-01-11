@@ -288,19 +288,19 @@ WRITE_LINE_MEMBER(gridlee_state::coin_counter_w)
 void gridlee_state::cpu1_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("spriteram");
-	map(0x0800, 0x7fff).ram().w(this, FUNC(gridlee_state::gridlee_videoram_w)).share("videoram");
+	map(0x0800, 0x7fff).ram().w(FUNC(gridlee_state::gridlee_videoram_w)).share("videoram");
 	map(0x9000, 0x9000).select(0x0070).lw8("latch_w",
 										   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
 											   m_latch->write_d0(space, offset >> 4, data, mem_mask);
 										   });
-	map(0x9200, 0x9200).w(this, FUNC(gridlee_state::gridlee_palette_select_w));
+	map(0x9200, 0x9200).w(FUNC(gridlee_state::gridlee_palette_select_w));
 	map(0x9380, 0x9380).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x9500, 0x9501).r(this, FUNC(gridlee_state::analog_port_r));
+	map(0x9500, 0x9501).r(FUNC(gridlee_state::analog_port_r));
 	map(0x9502, 0x9502).portr("IN0");
 	map(0x9503, 0x9503).portr("IN1");
 	map(0x9600, 0x9600).portr("DSW");
 	map(0x9700, 0x9700).portr("IN2").nopw();
-	map(0x9820, 0x9820).r(this, FUNC(gridlee_state::random_num_r));
+	map(0x9820, 0x9820).r(FUNC(gridlee_state::random_num_r));
 	map(0x9828, 0x993f).w("gridlee", FUNC(gridlee_sound_device::gridlee_sound_w));
 	map(0x9c00, 0x9cff).ram().share("nvram");
 	map(0xa000, 0xffff).rom();
@@ -396,43 +396,41 @@ static const char *const sample_names[] =
  *
  *************************************/
 
-MACHINE_CONFIG_START(gridlee_state::gridlee)
-
+void gridlee_state::gridlee(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6809, GRIDLEE_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
+	M6809(config, m_maincpu, GRIDLEE_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gridlee_state::cpu1_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // type can only be guessed
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0"))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1"))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gridlee_state, coin_counter_w))
+	LS259(config, m_latch); // type can only be guessed
+	m_latch->q_out_cb<0>().set_output("led0");
+	m_latch->q_out_cb<1>().set_output("led1");
+	m_latch->q_out_cb<2>().set(FUNC(gridlee_state::coin_counter_w));
 	// Q6 unknown - only written to at startup
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, gridlee_state, cocktail_flip_w))
+	m_latch->q_out_cb<7>().set(FUNC(gridlee_state::cocktail_flip_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(GRIDLEE_PIXEL_CLOCK, GRIDLEE_HTOTAL, GRIDLEE_HBEND, GRIDLEE_HBSTART, GRIDLEE_VTOTAL, GRIDLEE_VBEND, GRIDLEE_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(gridlee_state, screen_update_gridlee)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(GRIDLEE_PIXEL_CLOCK, GRIDLEE_HTOTAL, GRIDLEE_HBEND, GRIDLEE_HBSTART, GRIDLEE_VTOTAL, GRIDLEE_VBEND, GRIDLEE_VBSTART);
+	m_screen->set_screen_update(FUNC(gridlee_state::screen_update_gridlee));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_INIT_OWNER(gridlee_state,gridlee)
+	PALETTE(config, m_palette, FUNC(gridlee_state::gridlee_palette), 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("gridlee", GRIDLEE, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	GRIDLEE(config, "gridlee", 0).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(8)
-	MCFG_SAMPLES_NAMES(sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(8);
+	m_samples->set_samples_names(sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.40);
+}
 
 
 

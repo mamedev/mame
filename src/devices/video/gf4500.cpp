@@ -48,7 +48,7 @@ void gf4500_device::device_start()
 {
 	m_data = make_unique_clear<uint32_t[]>(0x140000/4);
 
-	save_pointer(NAME(m_data.get()), 0x140000/4);
+	save_pointer(NAME(m_data), 0x140000/4);
 	save_item(NAME(m_screen_x));
 	save_item(NAME(m_screen_y));
 	save_item(NAME(m_screen_x_max));

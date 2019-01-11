@@ -12,61 +12,24 @@
 #pragma once
 
 
-#define MCFG_HUC6202_NEXT_PIXEL_0_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_next_pixel_0_callback(DEVCB_##_devcb);
-
-#define MCFG_HUC6202_TIME_TIL_NEXT_EVENT_0_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_time_til_next_event_0_callback(DEVCB_##_devcb);
-
-#define MCFG_HUC6202_VSYNC_CHANGED_0_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_vsync_changed_0_callback(DEVCB_##_devcb);
-
-#define MCFG_HUC6202_HSYNC_CHANGED_0_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_hsync_changed_0_callback(DEVCB_##_devcb);
-
-#define MCFG_HUC6202_READ_0_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_read_0_callback(DEVCB_##_devcb);
-
-#define MCFG_HUC6202_WRITE_0_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_write_0_callback(DEVCB_##_devcb);
-
-#define MCFG_HUC6202_NEXT_PIXEL_1_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_next_pixel_1_callback(DEVCB_##_devcb);
-
-#define MCFG_HUC6202_TIME_TIL_NEXT_EVENT_1_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_time_til_next_event_1_callback(DEVCB_##_devcb);
-
-#define MCFG_HUC6202_VSYNC_CHANGED_1_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_vsync_changed_1_callback(DEVCB_##_devcb);
-
-#define MCFG_HUC6202_HSYNC_CHANGED_1_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_hsync_changed_1_callback(DEVCB_##_devcb);
-
-#define MCFG_HUC6202_READ_1_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_read_1_callback(DEVCB_##_devcb);
-
-#define MCFG_HUC6202_WRITE_1_CB(_devcb) \
-	devcb = &downcast<huc6202_device &>(*device).set_write_1_callback(DEVCB_##_devcb);
-
-
 class huc6202_device : public device_t
 {
 public:
 	// construction/destruction
 	huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_next_pixel_0_callback(Object &&cb) { return m_next_pixel_0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_time_til_next_event_0_callback(Object &&cb) { return m_time_til_next_event_0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vsync_changed_0_callback(Object &&cb) { return m_vsync_changed_0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_hsync_changed_0_callback(Object &&cb) { return m_hsync_changed_0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_0_callback(Object &&cb) { return m_read_0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_0_callback(Object &&cb) { return m_write_0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_next_pixel_1_callback(Object &&cb) { return m_next_pixel_1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_time_til_next_event_1_callback(Object &&cb) { return m_time_til_next_event_1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_vsync_changed_1_callback(Object &&cb) { return m_vsync_changed_1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_hsync_changed_1_callback(Object &&cb) { return m_hsync_changed_1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_1_callback(Object &&cb) { return m_read_1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_1_callback(Object &&cb) { return m_write_1_cb.set_callback(std::forward<Object>(cb)); }
+	auto next_pixel_0_callback() { return m_next_pixel_0_cb.bind(); }
+	auto time_til_next_event_0_callback() { return m_time_til_next_event_0_cb.bind(); }
+	auto vsync_changed_0_callback() { return m_vsync_changed_0_cb.bind(); }
+	auto hsync_changed_0_callback() { return m_hsync_changed_0_cb.bind(); }
+	auto read_0_callback() { return m_read_0_cb.bind(); }
+	auto write_0_callback() { return m_write_0_cb.bind(); }
+	auto next_pixel_1_callback() { return m_next_pixel_1_cb.bind(); }
+	auto time_til_next_event_1_callback() { return m_time_til_next_event_1_cb.bind(); }
+	auto vsync_changed_1_callback() { return m_vsync_changed_1_cb.bind(); }
+	auto hsync_changed_1_callback() { return m_hsync_changed_1_cb.bind(); }
+	auto read_1_callback() { return m_read_1_cb.bind(); }
+	auto write_1_callback() { return m_write_1_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

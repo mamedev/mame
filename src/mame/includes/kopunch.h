@@ -5,6 +5,12 @@
   Sega KO Punch
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_KOPUNCH_H
+#define MAME_INCLUDES_KOPUNCH_H
+
+#pragma once
+
+#include "emupal.h"
 
 class kopunch_state : public driver_device
 {
@@ -18,6 +24,12 @@ public:
 		, m_lamp(*this, "lamp0")
 	{ }
 
+	void kopunch(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
+
+private:
 	DECLARE_READ8_MEMBER(sensors1_r);
 	DECLARE_READ8_MEMBER(sensors2_r);
 	DECLARE_WRITE8_MEMBER(lamp_w);
@@ -28,20 +40,16 @@ public:
 	DECLARE_WRITE8_MEMBER(scroll_y_w);
 	DECLARE_WRITE8_MEMBER(gfxbank_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_PALETTE_INIT(kopunch);
+	void kopunch_palette(palette_device &palette) const;
 	uint32_t screen_update_kopunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void kopunch(machine_config &config);
 	void kopunch_io_map(address_map &map);
 	void kopunch_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
@@ -61,3 +69,5 @@ protected:
 	uint8_t m_gfxbank;
 	uint8_t m_scrollx;
 };
+
+#endif // MAME_INCLUDES_KOPUNCH_H

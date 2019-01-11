@@ -187,9 +187,14 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 #include "machine/timekpr.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
+#include "machine/am79c90.h"
+#include "machine/ncr5380n.h"
+#include "machine/nscsi_cd.h"
+#include "machine/nscsi_hd.h"
 
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
+#include "bus/sunmouse/sunmouse.h"
 
 #include "screen.h"
 
@@ -200,6 +205,7 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
 #define KEYBOARD_TAG    "keyboard"
+#define MOUSE_TAG       "mouseport"
 
 // page table entry constants
 #define PM_VALID    (0x80000000)    // page is valid
@@ -220,11 +226,13 @@ fefc34a - start of mem_size, which queries ECC registers for each memory board
 class sun3_state : public driver_device
 {
 public:
-	sun3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sun3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_scc1(*this, SCC1_TAG),
 		m_scc2(*this, SCC2_TAG),
+		m_scsibus(*this, "scsibus"),
+		m_scsi(*this, "scsibus:7:ncr5380"),
 		m_p_ram(*this, "p_ram"),
 		m_bw2_vram(*this, "bw2_vram"),
 		m_type0space(*this, "type0"),
@@ -233,12 +241,25 @@ public:
 		m_type3space(*this, "type3"),
 		m_rom(*this, "user1"),
 		m_idprom(*this, "idprom"),
-		m_ram(*this, RAM_TAG)
-		{ }
+		m_ram(*this, RAM_TAG),
+		m_lance(*this, "lance")
+	{ }
 
+	void sun3(machine_config &config);
+	void sun3e(machine_config &config);
+	void sun3_60(machine_config &config);
+	void sun3200(machine_config &config);
+	void sun3_50(machine_config &config);
+
+	void ncr5380(device_t *device);
+
+private:
 	required_device<m68020_device> m_maincpu;
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
+	required_device<nscsi_bus_device> m_scsibus;
+	required_device<ncr5380n_device> m_scsi;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -247,6 +268,7 @@ public:
 	optional_device<address_map_bank_device> m_type0space, m_type1space, m_type2space, m_type3space;
 	required_memory_region m_rom, m_idprom;
 	required_device<ram_device> m_ram;
+	required_device<am79c90_device> m_lance;
 
 	DECLARE_READ32_MEMBER( tl_mmu_r );
 	DECLARE_WRITE32_MEMBER( tl_mmu_w );
@@ -267,18 +289,13 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sun3_timer);
 
-	void sun3(machine_config &config);
-	void sun3e(machine_config &config);
-	void sun3_60(machine_config &config);
-	void sun3200(machine_config &config);
-	void sun3_50(machine_config &config);
 	void sun3_mem(address_map &map);
 	void vmetype0space_map(address_map &map);
 	void vmetype0space_novram_map(address_map &map);
 	void vmetype1space_map(address_map &map);
 	void vmetype2space_map(address_map &map);
 	void vmetype3space_map(address_map &map);
-private:
+
 	uint32_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
 	uint32_t m_enable, m_diag, m_dvma_enable, m_parregs[8], m_irqctrl, m_ecc[4];
@@ -292,6 +309,27 @@ private:
 
 	uint32_t m_cache_tags[0x4000], m_cache_data[0x4000];
 };
+
+static void sun_cdrom(device_t *device)
+{
+	downcast<nscsi_cdrom_device &>(*device).set_block_size(512);
+}
+
+void sun3_state::ncr5380(device_t *device)
+{
+	devcb_base *devcb;
+	(void)devcb;
+	MCFG_DEVICE_CLOCK(10000000)
+//  MCFG_NCR5380N_DRQ_HANDLER(WRITELINE(*this, sun3_state, drq_w))
+}
+
+static void scsi_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add_internal("ncr5380", NCR5380N);
+	device.set_option_machine_config("cdrom", sun_cdrom);
+}
 
 READ32_MEMBER( sun3_state::ram_r )
 {
@@ -721,13 +759,13 @@ WRITE32_MEMBER(sun3_state::parity_w)
 
 void sun3_state::sun3_mem(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(this, FUNC(sun3_state::tl_mmu_r), FUNC(sun3_state::tl_mmu_w));
+	map(0x00000000, 0xffffffff).rw(FUNC(sun3_state::tl_mmu_r), FUNC(sun3_state::tl_mmu_w));
 }
 
 // type 0 device space
 void sun3_state::vmetype0space_map(address_map &map)
 {
-	map(0x00000000, 0x08ffffff).rw(this, FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
+	map(0x00000000, 0x08ffffff).rw(FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
 	map(0xfe400000, 0xfe41ffff).ram(); // not sure what's going on here (3/110)
 	map(0xff000000, 0xff03ffff).ram().share("bw2_vram");
 }
@@ -735,7 +773,7 @@ void sun3_state::vmetype0space_map(address_map &map)
 // type 0 without VRAM (3/50)
 void sun3_state::vmetype0space_novram_map(address_map &map)
 {
-	map(0x00000000, 0x08ffffff).rw(this, FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
+	map(0x00000000, 0x08ffffff).rw(FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
 }
 
 // type 1 device space
@@ -744,11 +782,13 @@ void sun3_state::vmetype1space_map(address_map &map)
 	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
 	map(0x00020000, 0x0002000f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
 	map(0x00040000, 0x000407ff).ram().share("nvram");   // type 2816 parallel EEPROM
-	map(0x00060000, 0x0006ffff).rw(this, FUNC(sun3_state::rtc7170_r), FUNC(sun3_state::rtc7170_w));
-	map(0x00080000, 0x0008000f).rw(this, FUNC(sun3_state::parity_r), FUNC(sun3_state::parity_w));
-	map(0x000a0000, 0x000a0003).rw(this, FUNC(sun3_state::irqctrl_r), FUNC(sun3_state::irqctrl_w));
+	map(0x00060000, 0x0006ffff).rw(FUNC(sun3_state::rtc7170_r), FUNC(sun3_state::rtc7170_w));
+	map(0x00080000, 0x0008000f).rw(FUNC(sun3_state::parity_r), FUNC(sun3_state::parity_w));
+	map(0x000a0000, 0x000a0003).rw(FUNC(sun3_state::irqctrl_r), FUNC(sun3_state::irqctrl_w));
 	map(0x00100000, 0x0010ffff).rom().region("user1", 0);
-	map(0x001e0000, 0x001e00ff).rw(this, FUNC(sun3_state::ecc_r), FUNC(sun3_state::ecc_w));
+	map(0x00120000, 0x00120003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
+	map(0x00140000, 0x00140007).rw(m_scsi, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask32(0xffffffff);
+	map(0x001e0000, 0x001e00ff).rw(FUNC(sun3_state::ecc_r), FUNC(sun3_state::ecc_w));
 }
 
 // type 2 device space
@@ -979,62 +1019,58 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("6M,8M,12M,16M,20M,24M,28M,32M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("4M").set_extra_options("6M,8M,12M,16M,20M,24M,28M,32M").set_default_value(0x00);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// MMU Type 0 device space
-	MCFG_DEVICE_ADD("type0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype0space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type0").set_map(&sun3_state::vmetype0space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 1 device space
-	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype1space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type1").set_map(&sun3_state::vmetype1space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 2 device space
-	MCFG_DEVICE_ADD("type2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype2space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type2").set_map(&sun3_state::vmetype2space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 3 device space
-	MCFG_DEVICE_ADD("type3", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype3space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type3").set_map(&sun3_state::vmetype3space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3_state, sun3_timer, attotime::from_hz(100))
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
+	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
+	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
+	m_scc1->out_txdb_callback().set(MOUSE_TAG, FUNC(sun_mouse_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, SUNKBD_PORT, default_sun_keyboard_devices, "type3hle")
-	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
 
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	SUNMOUSE_PORT(config, MOUSE_TAG, default_sun_mouse_devices, "hle1200").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
+	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsa_w));
+
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
+
+	AM79C90(config, m_lance, 10'000'000); // clock is a guess
+
+	MCFG_NSCSI_BUS_ADD("scsibus")
+	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:1", scsi_devices, "harddisk", false)
+	MCFG_NSCSI_ADD("scsibus:2", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:3", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:4", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, "cdrom", false)
+	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5380", [this] (device_t *device) { ncr5380(device); })
 MACHINE_CONFIG_END
 
 // Sun 3/60
@@ -1053,6 +1089,7 @@ MACHINE_CONFIG_END
 // Sun 3/E
 MACHINE_CONFIG_START(sun3_state::sun3e)
 	sun3(config);
+
 	MCFG_DEVICE_REPLACE("maincpu", M68020, 20000000)
 	MCFG_DEVICE_PROGRAM_MAP(sun3_mem)
 MACHINE_CONFIG_END
@@ -1069,9 +1106,7 @@ MACHINE_CONFIG_START(sun3_state::sun3200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1600-1, 0, 1100-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32M")
-	MCFG_RAM_EXTRA_OPTIONS("64M,96M,128M")
+	m_ram->set_default_size("32M").set_extra_options("64M,96M,128M");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sun3_state::sun3_50)
@@ -1079,67 +1114,64 @@ MACHINE_CONFIG_START(sun3_state::sun3_50)
 	MCFG_DEVICE_ADD("maincpu", M68020, 15700000)
 	MCFG_DEVICE_PROGRAM_MAP(sun3_mem)
 
+	AM79C90(config, m_lance, 10'000'000); // clock is a guess
+
 	MCFG_SCREEN_ADD("bwtwo", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(sun3_state, bw2_350_update)
 	MCFG_SCREEN_SIZE(1600,1100)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3_state, sun3_timer, attotime::from_hz(100))
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, m_ram).set_default_size("4M").set_default_value(0x00);
 
 	// MMU Type 0 device space
-	MCFG_DEVICE_ADD("type0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype0space_novram_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type0").set_map(&sun3_state::vmetype0space_novram_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 1 device space
-	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype1space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type1").set_map(&sun3_state::vmetype1space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 2 device space
-	MCFG_DEVICE_ADD("type2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype2space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type2").set_map(&sun3_state::vmetype2space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
 	// MMU Type 3 device space
-	MCFG_DEVICE_ADD("type3", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype3space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x80000000)
+	ADDRESS_MAP_BANK(config, "type3").set_map(&sun3_state::vmetype3space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(4'915'200), 0, 0, 0, 0)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(KEYBOARD_TAG, sun_keyboard_port_device, write_txd))
+	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
+	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
+	m_scc1->out_txdb_callback().set(MOUSE_TAG, FUNC(sun_mouse_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, SUNKBD_PORT, default_sun_keyboard_devices, "type3hle")
-	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(SCC1_TAG, z80scc_device, rxa_w))
+	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
 
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(4'915'200), 0, 0, 0, 0)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	SUNMOUSE_PORT(config, MOUSE_TAG, default_sun_mouse_devices, "hle1200").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 
-	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
+	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsa_w));
+
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
+
+	MCFG_NSCSI_BUS_ADD("scsibus")
+	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:1", scsi_devices, "harddisk", false)
+	MCFG_NSCSI_ADD("scsibus:2", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:3", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:4", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, nullptr, false)
+	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, "cdrom", false)
+	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5380", [this] (device_t *device) { ncr5380(device); })
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -1160,15 +1192,15 @@ Sun 3/50 V2.7 Bootprom
 Sun 3/50 V2.8 Bootprom
 */
 	ROM_SYSTEM_BIOS(0, "rev28", "Rev 2.8")
-	ROMX_LOAD( "sun3_50_v2.8", 0x0000, 0x10000, CRC(1ca6b0e8) SHA1(5773ac1c46399501d29d1758aa342862b03ec472), ROM_BIOS(1))
+	ROMX_LOAD( "sun3_50_v2.8", 0x0000, 0x10000, CRC(1ca6b0e8) SHA1(5773ac1c46399501d29d1758aa342862b03ec472), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rev27", "Rev 2.7")
-	ROMX_LOAD( "sun3_50_v2.7", 0x0000, 0x10000, CRC(7c4a9e20) SHA1(6dcd4883a170538050fd0e1f151fae413ec9ea52), ROM_BIOS(2))
+	ROMX_LOAD( "sun3_50_v2.7", 0x0000, 0x10000, CRC(7c4a9e20) SHA1(6dcd4883a170538050fd0e1f151fae413ec9ea52), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "rev26", "Rev 2.6")
-	ROMX_LOAD( "sun3_50_v2.6", 0x0000, 0x10000, CRC(08abbb3b) SHA1(6bfb8d5c97d801cd7bb7d564de0e68a48fb807c4), ROM_BIOS(3))
+	ROMX_LOAD( "sun3_50_v2.6", 0x0000, 0x10000, CRC(08abbb3b) SHA1(6bfb8d5c97d801cd7bb7d564de0e68a48fb807c4), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "rev23", "Rev 2.3")
-	ROMX_LOAD( "sun3_50_v2.3", 0x0000, 0x10000, CRC(163500b3) SHA1(437c8d539e12d442ca6877566dbbe165d577fcab), ROM_BIOS(4))
+	ROMX_LOAD( "sun3_50_v2.3", 0x0000, 0x10000, CRC(163500b3) SHA1(437c8d539e12d442ca6877566dbbe165d577fcab), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "rev16", "Rev 1.6")
-	ROMX_LOAD( "sun3_50_v1.6", 0x0000, 0x10000, CRC(8be20826) SHA1(2a4d73fcb7fe0f0c83eb0f4c91d957b7bf88b7ed), ROM_BIOS(5))
+	ROMX_LOAD( "sun3_50_v1.6", 0x0000, 0x10000, CRC(8be20826) SHA1(2a4d73fcb7fe0f0c83eb0f4c91d957b7bf88b7ed), ROM_BIOS(4))
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun3-50-idprom.bin", 0x000000, 0x000020, CRC(80610dbe) SHA1(0f37e31ed209b8905c5dc7c2663fa01a9b9baaba) )
@@ -1186,11 +1218,11 @@ Sun 3/60 V2.8.3 Bootprom
 Sun 3/60 V3.0.1 Bootprom
 */
 	ROM_SYSTEM_BIOS(0, "rev301", "Rev 3.0.1")
-	ROMX_LOAD( "sun_3.60v3.0.1", 0x0000, 0x10000, CRC(e55dc1d8) SHA1(6e48414ce2139282e69f57612b20f7d5c475e74c), ROM_BIOS(1))
+	ROMX_LOAD( "sun_3.60v3.0.1", 0x0000, 0x10000, CRC(e55dc1d8) SHA1(6e48414ce2139282e69f57612b20f7d5c475e74c), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rev283", "Rev 2.8.3")
-	ROMX_LOAD( "sun_3.60v2.8.3", 0x0000, 0x10000, CRC(de4ec54d) SHA1(e621a9c1a2a7df4975b12fa3a0d7f106383736ef), ROM_BIOS(2))
+	ROMX_LOAD( "sun_3.60v2.8.3", 0x0000, 0x10000, CRC(de4ec54d) SHA1(e621a9c1a2a7df4975b12fa3a0d7f106383736ef), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "rev19", "Rev 1.9")
-	ROMX_LOAD( "sun_3.60v1.9",   0x0000, 0x10000, CRC(32b6d3a9) SHA1(307756ba5698611d51059881057f8086956ce895), ROM_BIOS(3))
+	ROMX_LOAD( "sun_3.60v1.9",   0x0000, 0x10000, CRC(32b6d3a9) SHA1(307756ba5698611d51059881057f8086956ce895), ROM_BIOS(2))
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun3-60-idprom.bin", 0x000000, 0x000020, CRC(117e766a) SHA1(f01547be0156bd4e06bbdee4c342d1b38c7646ae) )
@@ -1208,7 +1240,7 @@ Sun 3/110 V2.8 Bootprom
 Sun 3/110 V3.0 Bootprom
 */
 	ROM_SYSTEM_BIOS(0, "rev30", "Rev 3.0")
-	ROMX_LOAD( "sun3_110_v3.0", 0x0000, 0x10000, CRC(a193b26b) SHA1(0f54212ee3a5709f70e921069cca1ddb8c143b1b), ROM_BIOS(1))
+	ROMX_LOAD( "sun3_110_v3.0", 0x0000, 0x10000, CRC(a193b26b) SHA1(0f54212ee3a5709f70e921069cca1ddb8c143b1b), ROM_BIOS(0))
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun3-110-idprom.bin", 0x000000, 0x000020, CRC(d6cd934a) SHA1(b0913708fe733250ef5c1289c10146dcef6d1a67) )
@@ -1231,15 +1263,15 @@ Sun 3/1[4,5,6,8]0 V2.8.4 Bootprom
 Sun 3/1[4,5,6,8]0 V3.0 Bootprom
 */
 	ROM_SYSTEM_BIOS(0, "rev30", "Rev 3.0")
-	ROMX_LOAD( "sun3_160_v3.0",   0x0000, 0x10000, CRC(fee6e4d6) SHA1(440d532e1848298dba0f043de710bb0b001fb675), ROM_BIOS(1))
+	ROMX_LOAD( "sun3_160_v3.0",   0x0000, 0x10000, CRC(fee6e4d6) SHA1(440d532e1848298dba0f043de710bb0b001fb675), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rev284", "Rev 2.8.4")
-	ROMX_LOAD( "sun3_160_v2.8.4", 0x0000, 0x10000, CRC(3befd013) SHA1(f642bb42200b794e6e32e2fe6c87d5c269c8656d), ROM_BIOS(2))
+	ROMX_LOAD( "sun3_160_v2.8.4", 0x0000, 0x10000, CRC(3befd013) SHA1(f642bb42200b794e6e32e2fe6c87d5c269c8656d), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "rev23", "Rev 2.3")
-	ROMX_LOAD( "sun3_160_v2.3",   0x0000, 0x10000, CRC(09585745) SHA1(1de1725dd9e27f5a910989bbb5b51acfbdc1d70b), ROM_BIOS(3))
+	ROMX_LOAD( "sun3_160_v2.3",   0x0000, 0x10000, CRC(09585745) SHA1(1de1725dd9e27f5a910989bbb5b51acfbdc1d70b), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "rev21rf", "Rev 2.1 RF")
-	ROMX_LOAD( "sun3_160_v2.1_rf",   0x0000, 0x10000, CRC(5c7e9271) SHA1(5e4dbb50859a21f9e1d3e4a06c42494d13a9a8eb), ROM_BIOS(4))
+	ROMX_LOAD( "sun3_160_v2.1_rf",   0x0000, 0x10000, CRC(5c7e9271) SHA1(5e4dbb50859a21f9e1d3e4a06c42494d13a9a8eb), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "rev15", "Rev 1.5")
-	ROMX_LOAD( "sun3_160_v1.5",   0x0000, 0x10000, CRC(06daee37) SHA1(b9873cd48d78ad8e0c85d69966fc20c21cfc99aa), ROM_BIOS(5))
+	ROMX_LOAD( "sun3_160_v1.5",   0x0000, 0x10000, CRC(06daee37) SHA1(b9873cd48d78ad8e0c85d69966fc20c21cfc99aa), ROM_BIOS(4))
 
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
@@ -1259,11 +1291,11 @@ Sun 3/260/280 V2.8.4 Bootprom
 Sun 3/260/280 V3.0 Bootprom
 */
 	ROM_SYSTEM_BIOS(0, "rev30", "Rev 3.0")
-	ROMX_LOAD( "sun3_260_v3.0", 0x0000, 0x10000, CRC(f43ed1d3) SHA1(204880436bd087ede136f853610403d75e60bd75), ROM_BIOS(1))
+	ROMX_LOAD( "sun3_260_v3.0", 0x0000, 0x10000, CRC(f43ed1d3) SHA1(204880436bd087ede136f853610403d75e60bd75), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rev27", "Rev 2.7")
-	ROMX_LOAD( "sun3_260_v2.7", 0x0000, 0x10000, CRC(099fcaab) SHA1(4a5233c778676f48103bdd8bab03b4264686b4aa), ROM_BIOS(2))
+	ROMX_LOAD( "sun3_260_v2.7", 0x0000, 0x10000, CRC(099fcaab) SHA1(4a5233c778676f48103bdd8bab03b4264686b4aa), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "rev26", "Rev 2.6")
-	ROMX_LOAD( "sun3_260_v2.6", 0x0000, 0x10000, CRC(e8b17951) SHA1(e1fdef42670a349d99b0eca9c50c8566b8bb7c56), ROM_BIOS(3))
+	ROMX_LOAD( "sun3_260_v2.6", 0x0000, 0x10000, CRC(e8b17951) SHA1(e1fdef42670a349d99b0eca9c50c8566b8bb7c56), ROM_BIOS(2))
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun3-260-idprom.bin", 0x000000, 0x000020, CRC(d51794f3) SHA1(17930c773b6fe9a32819094ffaf69e5453d1ea4d) )
@@ -1272,7 +1304,7 @@ ROM_END
 ROM_START( sun3_e )
 	ROM_REGION32_BE( 0x10000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "rev28", "Rev 3.2")
-	ROMX_LOAD( "sun3_e.32", 0x0000, 0x10000, CRC(acedde7e) SHA1(1ab6ec28f4365a613a5e326c34cb37585c3f0ecc), ROM_BIOS(1))
+	ROMX_LOAD( "sun3_e.32", 0x0000, 0x10000, CRC(acedde7e) SHA1(1ab6ec28f4365a613a5e326c34cb37585c3f0ecc), ROM_BIOS(0))
 
 	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD( "sun3-e-idprom.bin", 0x000000, 0x000020, CRC(d1a92116) SHA1(4836f3188f2c3dd5ba49ab66e0b55caa6b1b1791) )

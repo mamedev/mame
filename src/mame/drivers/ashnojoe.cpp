@@ -80,6 +80,7 @@ Coin B is not used
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -94,22 +95,22 @@ READ16_MEMBER(ashnojoe_state::fake_4a00a_r)
 void ashnojoe_state::ashnojoe_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
-	map(0x040000, 0x041fff).ram().w(this, FUNC(ashnojoe_state::ashnojoe_tileram3_w)).share("tileram_3");
-	map(0x042000, 0x043fff).ram().w(this, FUNC(ashnojoe_state::ashnojoe_tileram4_w)).share("tileram_4");
-	map(0x044000, 0x044fff).ram().w(this, FUNC(ashnojoe_state::ashnojoe_tileram5_w)).share("tileram_5");
-	map(0x045000, 0x045fff).ram().w(this, FUNC(ashnojoe_state::ashnojoe_tileram2_w)).share("tileram_2");
-	map(0x046000, 0x046fff).ram().w(this, FUNC(ashnojoe_state::ashnojoe_tileram6_w)).share("tileram_6");
-	map(0x047000, 0x047fff).ram().w(this, FUNC(ashnojoe_state::ashnojoe_tileram7_w)).share("tileram_7");
-	map(0x048000, 0x048fff).ram().w(this, FUNC(ashnojoe_state::ashnojoe_tileram_w)).share("tileram");
+	map(0x040000, 0x041fff).ram().w(FUNC(ashnojoe_state::ashnojoe_tileram3_w)).share("tileram_3");
+	map(0x042000, 0x043fff).ram().w(FUNC(ashnojoe_state::ashnojoe_tileram4_w)).share("tileram_4");
+	map(0x044000, 0x044fff).ram().w(FUNC(ashnojoe_state::ashnojoe_tileram5_w)).share("tileram_5");
+	map(0x045000, 0x045fff).ram().w(FUNC(ashnojoe_state::ashnojoe_tileram2_w)).share("tileram_2");
+	map(0x046000, 0x046fff).ram().w(FUNC(ashnojoe_state::ashnojoe_tileram6_w)).share("tileram_6");
+	map(0x047000, 0x047fff).ram().w(FUNC(ashnojoe_state::ashnojoe_tileram7_w)).share("tileram_7");
+	map(0x048000, 0x048fff).ram().w(FUNC(ashnojoe_state::ashnojoe_tileram_w)).share("tileram");
 	map(0x049000, 0x049fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x04a000, 0x04a001).portr("P1");
 	map(0x04a002, 0x04a003).portr("P2");
 	map(0x04a004, 0x04a005).portr("DSW");
 	map(0x04a006, 0x04a007).writeonly().share("tilemap_reg");
 	map(0x04a009, 0x04a009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x04a00a, 0x04a00b).r(this, FUNC(ashnojoe_state::fake_4a00a_r));  // ??
-	map(0x04a010, 0x04a019).w(this, FUNC(ashnojoe_state::joe_tilemaps_xscroll_w));
-	map(0x04a020, 0x04a029).w(this, FUNC(ashnojoe_state::joe_tilemaps_yscroll_w));
+	map(0x04a00a, 0x04a00b).r(FUNC(ashnojoe_state::fake_4a00a_r));  // ??
+	map(0x04a010, 0x04a019).w(FUNC(ashnojoe_state::joe_tilemaps_xscroll_w));
+	map(0x04a020, 0x04a029).w(FUNC(ashnojoe_state::joe_tilemaps_yscroll_w));
 	map(0x04c000, 0x04ffff).ram();
 	map(0x080000, 0x0bffff).rom();
 }
@@ -136,9 +137,9 @@ void ashnojoe_state::sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x02, 0x02).w(this, FUNC(ashnojoe_state::adpcm_w));
+	map(0x02, 0x02).w(FUNC(ashnojoe_state::adpcm_w));
 	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x06, 0x06).r(this, FUNC(ashnojoe_state::sound_latch_status_r));
+	map(0x06, 0x06).r(FUNC(ashnojoe_state::sound_latch_status_r));
 }
 
 
@@ -280,11 +281,11 @@ WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
 {
 	if (m_msm5205_vclk_toggle == 0)
 	{
-		m_msm->data_w(m_adpcm_byte >> 4);
+		m_msm->write_data(m_adpcm_byte >> 4);
 	}
 	else
 	{
-		m_msm->data_w(m_adpcm_byte & 0xf);
+		m_msm->write_data(m_adpcm_byte & 0xf);
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 
@@ -304,47 +305,45 @@ void ashnojoe_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(ashnojoe_state::ashnojoe)
-
+void ashnojoe_state::ashnojoe(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(ashnojoe_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ashnojoe_state,  irq1_line_hold)
+	M68000(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ashnojoe_state::ashnojoe_map);
+	m_maincpu->set_vblank_int("screen", FUNC(ashnojoe_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
-
+	Z80(config, m_audiocpu, 4000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ashnojoe_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &ashnojoe_state::sound_portmap);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, 50*8-1, 3*8, 29*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ashnojoe_state, screen_update_ashnojoe)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 512);
+	screen.set_visarea(14*8, 50*8-1, 3*8, 29*8-1);
+	screen.set_screen_update(FUNC(ashnojoe_state::screen_update_ashnojoe));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ashnojoe)
-	MCFG_PALETTE_ADD("palette", 0x1000/2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_ashnojoe);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x1000/2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ashnojoe_state, ym2203_write_a))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ashnojoe_state, ym2203_write_b))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 4000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_a_write_callback().set(FUNC(ashnojoe_state::ym2203_write_a));
+	ymsnd.port_b_write_callback().set(FUNC(ashnojoe_state::ym2203_write_b));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.1);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ashnojoe_state, ashnojoe_vclk_cb))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(ashnojoe_state::ashnojoe_vclk_cb));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 ROM_START( scessjoe )
 	ROM_REGION( 0xc0000, "maincpu", 0 )     /* 68000 code */

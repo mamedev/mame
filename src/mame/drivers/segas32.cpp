@@ -423,7 +423,7 @@ Always solder the battery plus to plus and minus to minus. If it's wired in plus
 the voltage will double to 6V.
 If you have a System 32 board with an FD1149 add another new battery now!
 
-Rom Types:
+ROM Types:
 Main program ROM at IC8 is 27C240
 Sound Program at IC36 is 27C100
 Sound Data at IC35,34,24 are 838000
@@ -566,9 +566,9 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_z80_shared_ram(*this,"z80_shared_ram")
 	, m_system32_workram(*this,"workram")
-	, m_system32_videoram(*this,"videoram", 0)
-	, m_system32_spriteram(*this,"spriteram", 0)
-	, m_system32_paletteram(*this,"paletteram.%u", 0, uint8_t(0))
+	, m_videoram(*this,"videoram", 0)
+	, m_spriteram(*this,"spriteram", 0)
+	, m_paletteram(*this,"paletteram.%u", 0, uint8_t(0))
 	, m_maincpu(*this, "maincpu")
 	, m_soundcpu(*this, "soundcpu")
 	, m_multipcm(*this, "sega")
@@ -642,7 +642,7 @@ void segas32_upd7725_state::device_start()
 void segas32_cd_state::device_start()
 {
 	common_start(0);
-	m_lamp.resolve();
+	m_lamps.resolve();
 }
 
 void sega_multi32_state::device_start()
@@ -868,18 +868,11 @@ WRITE8_MEMBER(segas32_state::tilebank_external_w)
 	m_system32_tilebank_external = data;
 }
 
-
-WRITE_LINE_MEMBER(segas32_state::display_enable_0_w)
+template<int Which>
+WRITE_LINE_MEMBER(segas32_state::display_enable_w)
 {
-	m_system32_displayenable[0] = state;
+	m_system32_displayenable[Which] = state;
 }
-
-
-WRITE_LINE_MEMBER(segas32_state::display_enable_1_w)
-{
-	m_system32_displayenable[1] = state;
-}
-
 
 
 /*************************************
@@ -899,7 +892,6 @@ READ16_MEMBER(segas32_state::random_number_r)
 }
 
 
-
 /*************************************
  *
  *  Sound communications
@@ -916,7 +908,6 @@ WRITE8_MEMBER(segas32_state::shared_ram_w)
 {
 	m_z80_shared_ram[offset] = data;
 }
-
 
 
 /*************************************
@@ -995,7 +986,6 @@ WRITE_LINE_MEMBER(segas32_state::ym3438_irq_handler)
 }
 
 
-
 /*************************************
  *
  *  Sound banking
@@ -1030,7 +1020,6 @@ WRITE8_MEMBER(segas32_state::scross_bank_w)
 }
 
 
-
 /*************************************
  *
  *  Sound hack (not protection)
@@ -1049,6 +1038,122 @@ WRITE8_MEMBER(segas32_state::sound_dummy_w)
 }
 
 
+/*************************************
+ *
+ *  Common palette handling
+ *
+ *************************************/
+
+inline uint16_t segas32_state::xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(uint16_t value)
+{
+	int r = (value >> 0) & 0x1f;
+	int g = (value >> 5) & 0x1f;
+	int b = (value >> 10) & 0x1f;
+	value = (value & 0x8000) | ((b & 0x01) << 14) | ((g & 0x01) << 13) | ((r & 0x01) << 12);
+	value |= ((b & 0x1e) << 7) | ((g & 0x1e) << 3) | ((r & 0x1e) >> 1);
+	return value;
+}
+
+
+inline uint16_t segas32_state::xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(uint16_t value)
+{
+	int r = ((value >> 12) & 0x01) | ((value << 1) & 0x1e);
+	int g = ((value >> 13) & 0x01) | ((value >> 3) & 0x1e);
+	int b = ((value >> 14) & 0x01) | ((value >> 7) & 0x1e);
+	return (value & 0x8000) | (b << 10) | (g << 5) | (r << 0);
+}
+
+
+inline void segas32_state::update_color(int offset, uint16_t data)
+{
+	/* note that since we use this RAM directly, we don't technically need */
+	/* to call palette_set_color() at all; however, it does give us that */
+	/* nice display when you hit F4, which is useful for debugging */
+
+	/* set the color */
+	m_palette->set_pen_color(offset, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+}
+
+
+/*************************************
+ *
+ *  Palette RAM access
+ *
+ *************************************/
+
+template<int Which>
+READ16_MEMBER(segas32_state::paletteram_r)
+{
+	int convert;
+
+	/* the lower half of palette RAM is formatted xBBBBBGGGGGRRRRR */
+	/* the upper half of palette RAM is formatted xBGRBBBBGGGGRRRR */
+	/* we store everything if the first format, and convert accesses to the other format */
+	/* on the fly */
+	convert = (offset & 0x4000);
+	offset &= 0x3fff;
+
+	if (!convert)
+		return m_paletteram[Which][offset];
+	else
+		return xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(m_paletteram[Which][offset]);
+}
+
+template<int Which>
+WRITE16_MEMBER(segas32_state::paletteram_w)
+{
+	uint16_t value;
+	int convert;
+
+	/* the lower half of palette RAM is formatted xBBBBBGGGGGRRRRR */
+	/* the upper half of palette RAM is formatted xBGRBBBBGGGGRRRR */
+	/* we store everything if the first format, and convert accesses to the other format */
+	/* on the fly */
+	convert = (offset & 0x4000);
+	offset &= 0x3fff;
+
+	/* read, modify, and write the new value, updating the palette */
+	value = m_paletteram[Which][offset];
+	if (convert) value = xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(value);
+	COMBINE_DATA(&value);
+	if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
+	m_paletteram[Which][offset] = value;
+	update_color(0x4000*Which + offset, value);
+
+	/* if blending is enabled, writes go to both halves of palette RAM */
+	if (m_mixer_control[Which][0x4e/2] & 0x0880)
+	{
+		offset ^= 0x2000;
+
+		/* read, modify, and write the new value, updating the palette */
+		value = m_paletteram[Which][offset];
+		if (convert) value = xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(value);
+		COMBINE_DATA(&value);
+		if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
+		m_paletteram[Which][offset] = value;
+		update_color(0x4000*Which + offset, value);
+	}
+}
+
+
+/*************************************
+ *
+ *  Mixer control registers
+ *
+ *************************************/
+
+template<int Which>
+READ16_MEMBER(segas32_state::mixer_r)
+{
+	return m_mixer_control[Which][offset];
+}
+
+template<int Which>
+WRITE16_MEMBER(segas32_state::mixer_w)
+{
+	COMBINE_DATA(&m_mixer_control[Which][offset]);
+}
+
 
 /*************************************
  *
@@ -1061,19 +1166,19 @@ void segas32_state::system32_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x20ffff).mirror(0x0f0000).ram().share("workram");
-	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_videoram_r), FUNC(segas32_state::system32_videoram_w)).share("videoram");
-	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_spriteram_r), FUNC(segas32_state::system32_spriteram_w)).share("spriteram");
-	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(this, FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask16(0x00ff);
-	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_paletteram_r), FUNC(segas32_state::system32_paletteram_w)).share("paletteram.0");
-	map(0x610000, 0x61007f).mirror(0x0eff80).rw(this, FUNC(segas32_state::system32_mixer_r), FUNC(segas32_state::system32_mixer_w));
-	map(0x700000, 0x701fff).mirror(0x0fe000).rw(this, FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w)).share("videoram");
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w)).share("spriteram");
+	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask16(0x00ff);
+	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>)).share("paletteram.0");
+	map(0x610000, 0x61007f).mirror(0x0eff80).rw(FUNC(segas32_state::mixer_r<0>), FUNC(segas32_state::mixer_w<0>));
+	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask16(0x00ff);
 	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
 	map(0x801002, 0x801002).rw("s32comm", FUNC(s32comm_device::fg_r), FUNC(s32comm_device::fg_w));
 	map(0xc00000, 0xc0001f).mirror(0x0fff80).rw("io_chip", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	// 0xc00040-0xc0007f - I/O expansion area
-	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(this, FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
-	map(0xd80000, 0xdfffff).rw(this, FUNC(segas32_state::random_number_r), FUNC(segas32_state::random_number_w));
+	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
+	map(0xd80000, 0xdfffff).rw(FUNC(segas32_state::random_number_r), FUNC(segas32_state::random_number_w));
 	map(0xf00000, 0xffffff).rom().region("maincpu", 0);
 }
 
@@ -1084,14 +1189,14 @@ void segas32_state::multi32_map(address_map &map)
 	map.global_mask(0xffffff);
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x21ffff).mirror(0x0e0000).ram();
-	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::system32_videoram_r), FUNC(segas32_state::system32_videoram_w)).share("videoram");
-	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(this, FUNC(segas32_state::multi32_spriteram_r), FUNC(segas32_state::multi32_spriteram_w)).share("spriteram");
-	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(this, FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask32(0x00ff00ff);
-	map(0x600000, 0x60ffff).mirror(0x060000).rw(this, FUNC(segas32_state::multi32_paletteram_0_r), FUNC(segas32_state::multi32_paletteram_0_w)).share("paletteram.0");
-	map(0x610000, 0x61007f).mirror(0x06ff80).w(this, FUNC(segas32_state::multi32_mixer_0_w));
-	map(0x680000, 0x68ffff).mirror(0x060000).rw(this, FUNC(segas32_state::multi32_paletteram_1_r), FUNC(segas32_state::multi32_paletteram_1_w)).share("paletteram.1");
-	map(0x690000, 0x69007f).mirror(0x06ff80).w(this, FUNC(segas32_state::multi32_mixer_1_w));
-	map(0x700000, 0x701fff).mirror(0x0fe000).rw(this, FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w)).share("videoram");
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w)).share("spriteram");
+	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask32(0x00ff00ff);
+	map(0x600000, 0x60ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>)).share("paletteram.0");
+	map(0x610000, 0x61007f).mirror(0x06ff80).w(FUNC(segas32_state::mixer_w<0>));
+	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<1>), FUNC(segas32_state::paletteram_w<1>)).share("paletteram.1");
+	map(0x690000, 0x69007f).mirror(0x06ff80).w(FUNC(segas32_state::mixer_w<1>));
+	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask32(0x00ff00ff);
 	map(0x801000, 0x801000).rw("s32comm", FUNC(s32comm_device::cn_r), FUNC(s32comm_device::cn_w));
 	map(0x801002, 0x801002).rw("s32comm", FUNC(s32comm_device::fg_r), FUNC(s32comm_device::fg_w));
@@ -1099,8 +1204,8 @@ void segas32_state::multi32_map(address_map &map)
 	// 0xc00040-0xc0007f - I/O expansion area 0
 	map(0xc80000, 0xc8001f).mirror(0x07ff80).rw("io_chip_1", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask32(0x00ff00ff);
 	// 0xc80040-0xc8007f - I/O expansion area 1
-	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(this, FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
-	map(0xd80000, 0xdfffff).rw(this, FUNC(segas32_state::random_number_r), FUNC(segas32_state::random_number_w));
+	map(0xd00000, 0xd0000f).mirror(0x07fff0).rw(FUNC(segas32_state::int_control_r), FUNC(segas32_state::int_control_w));
+	map(0xd80000, 0xdfffff).rw(FUNC(segas32_state::random_number_r), FUNC(segas32_state::random_number_w));
 	map(0xf00000, 0xffffff).rom().region("maincpu", 0);
 }
 
@@ -1127,11 +1232,11 @@ void segas32_state::system32_sound_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x80, 0x83).mirror(0x0c).rw("ym1", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
 	map(0x90, 0x93).mirror(0x0c).rw("ym2", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
-	map(0xa0, 0xaf).w(this, FUNC(segas32_state::sound_bank_lo_w));
-	map(0xb0, 0xbf).w(this, FUNC(segas32_state::sound_bank_hi_w));
-	map(0xc0, 0xcf).w(this, FUNC(segas32_state::sound_int_control_lo_w));
-	map(0xd0, 0xd3).mirror(0x04).w(this, FUNC(segas32_state::sound_int_control_hi_w));
-	map(0xf1, 0xf1).rw(this, FUNC(segas32_state::sound_dummy_r), FUNC(segas32_state::sound_dummy_w));
+	map(0xa0, 0xaf).w(FUNC(segas32_state::sound_bank_lo_w));
+	map(0xb0, 0xbf).w(FUNC(segas32_state::sound_bank_hi_w));
+	map(0xc0, 0xcf).w(FUNC(segas32_state::sound_int_control_lo_w));
+	map(0xd0, 0xd3).mirror(0x04).w(FUNC(segas32_state::sound_int_control_hi_w));
+	map(0xf1, 0xf1).rw(FUNC(segas32_state::sound_dummy_r), FUNC(segas32_state::sound_dummy_w));
 }
 
 void segas32_state::rf5c68_map(address_map &map)
@@ -1154,11 +1259,11 @@ void segas32_state::multi32_sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x80, 0x83).mirror(0x0c).rw("ymsnd", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
-	map(0xa0, 0xaf).w(this, FUNC(segas32_state::sound_bank_lo_w));
-	map(0xb0, 0xbf).w(this, FUNC(segas32_state::multipcm_bank_w));
-	map(0xc0, 0xcf).w(this, FUNC(segas32_state::sound_int_control_lo_w));
-	map(0xd0, 0xd3).mirror(0x04).w(this, FUNC(segas32_state::sound_int_control_hi_w));
-	map(0xf1, 0xf1).rw(this, FUNC(segas32_state::sound_dummy_r), FUNC(segas32_state::sound_dummy_w));
+	map(0xa0, 0xaf).w(FUNC(segas32_state::sound_bank_lo_w));
+	map(0xb0, 0xbf).w(FUNC(segas32_state::multipcm_bank_w));
+	map(0xc0, 0xcf).w(FUNC(segas32_state::sound_int_control_lo_w));
+	map(0xd0, 0xd3).mirror(0x04).w(FUNC(segas32_state::sound_int_control_hi_w));
+	map(0xf1, 0xf1).rw(FUNC(segas32_state::sound_dummy_r), FUNC(segas32_state::sound_dummy_w));
 }
 
 
@@ -1579,6 +1684,7 @@ static INPUT_PORTS_START( f1en )
 
 	PORT_MODIFY("slavepcb:SERVICE12_A")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("slavepcb:SERVICE34_A")
@@ -2200,67 +2306,67 @@ GFXDECODE_END
  *************************************/
 
 
-MACHINE_CONFIG_START(segas32_state::device_add_mconfig)
-
+void segas32_state::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V60, MASTER_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(system32_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas32_state,  start_of_vblank_int)
+	V60(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_state::system32_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas32_state::start_of_vblank_int));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(system32_sound_map)
-	MCFG_DEVICE_IO_MAP(system32_sound_portmap)
+	Z80(config, m_soundcpu, MASTER_CLOCK/4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas32_state::system32_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas32_state::system32_sound_portmap);
 
-	MCFG_DEVICE_ADD("io_chip", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1_A"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2_A"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("PORTC_A"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segas32_state, misc_output_0_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(6)
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE12_A"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("SERVICE34_A"))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(*this, segas32_state, sw2_output_0_w))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(*this, segas32_state, tilebank_external_w))
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(*this, segas32_state, display_enable_0_w))
-	MCFG_315_5296_OUT_CNT2_CB(INPUTLINE("soundcpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	sega_315_5296_device &io_chip(SEGA_315_5296(config, "io_chip", 0)); // unknown clock
+	io_chip.in_pa_callback().set_ioport("P1_A");
+	io_chip.in_pb_callback().set_ioport("P2_A");
+	io_chip.in_pc_callback().set_ioport("PORTC_A");
+	io_chip.out_pd_callback().set(FUNC(segas32_state::misc_output_0_w));
+	io_chip.out_pd_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(7);
+	io_chip.out_pd_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(5);
+	io_chip.out_pd_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(6);
+	io_chip.in_pe_callback().set_ioport("SERVICE12_A");
+	io_chip.in_pf_callback().set_ioport("SERVICE34_A");
+	io_chip.out_pg_callback().set(FUNC(segas32_state::sw2_output_0_w));
+	io_chip.out_ph_callback().set(FUNC(segas32_state::tilebank_external_w));
+	io_chip.out_cnt1_callback().set(FUNC(segas32_state::display_enable_w<0>));
+	io_chip.out_cnt2_callback().set_inputline(m_soundcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
-	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
+	TIMER(config, "v60_irq0").configure_generic(FUNC(segas32_state::signal_v60_irq_callback));
+	TIMER(config, "v60_irq1").configure_generic(FUNC(segas32_state::signal_v60_irq_callback));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas32)
-	MCFG_PALETTE_ADD("palette", 0x4000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas32);
+	PALETTE(config, m_palette).set_entries(0x4000);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(52*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segas32_state, screen_update_system32)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(52*8, 262);
+	m_screen->set_visarea(0*8, 52*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(segas32_state::screen_update_system32));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ym1", YM3438, MASTER_CLOCK/4)
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segas32_state, ym3438_irq_handler))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
+	ym3438_device &ym1(YM3438(config, "ym1", MASTER_CLOCK/4));
+	ym1.irq_handler().set(FUNC(segas32_state::ym3438_irq_handler));
+	ym1.add_route(0, "lspeaker", 0.40);
+	ym1.add_route(1, "rspeaker", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM3438, MASTER_CLOCK/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
+	ym3438_device &ym2(YM3438(config, "ym2", MASTER_CLOCK/4));
+	ym2.add_route(0, "lspeaker", 0.40);
+	ym2.add_route(1, "rspeaker", 0.40);
 
-	MCFG_DEVICE_ADD("rfsnd", RF5C68, RFC_CLOCK/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
-	MCFG_DEVICE_ADDRESS_MAP(0, rf5c68_map)
+	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", RFC_CLOCK/4));
+	rfsnd.add_route(0, "lspeaker", 0.55);
+	rfsnd.add_route(1, "rspeaker", 0.55);
+	rfsnd.set_addrmap(0, &segas32_state::rf5c68_map);
 
-	MCFG_S32COMM_ADD("s32comm")
-MACHINE_CONFIG_END
+	S32COMM(config, m_s32comm, 0);
+}
 
 DEFINE_DEVICE_TYPE(SEGA_S32_REGULAR_DEVICE, segas32_regular_state, "segas32_pcb_regular", "Sega System 32 regular PCB")
 
@@ -2280,18 +2386,18 @@ void segas32_state::system32_analog_map(address_map &map)
 	map(0xc00050, 0xc00057).mirror(0x0fff80).rw("adc", FUNC(msm6253_device::d7_r), FUNC(msm6253_device::address_w)).umask16(0x00ff);
 }
 
-MACHINE_CONFIG_START(segas32_analog_state::device_add_mconfig)
+void segas32_analog_state::device_add_mconfig(machine_config &config)
+{
 	segas32_state::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(system32_analog_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_analog_state::system32_analog_map);
 
-	MCFG_DEVICE_ADD("adc", MSM6253, 0)
-	MCFG_MSM6253_IN0_ANALOG_PORT("ANALOG1")
-	MCFG_MSM6253_IN1_ANALOG_PORT("ANALOG2")
-	MCFG_MSM6253_IN2_ANALOG_PORT("ANALOG3")
-	MCFG_MSM6253_IN3_ANALOG_PORT("ANALOG4")
-MACHINE_CONFIG_END
+	msm6253_device &adc(MSM6253(config, "adc", 0));
+	adc.set_input_tag<0>("ANALOG1");
+	adc.set_input_tag<1>("ANALOG2");
+	adc.set_input_tag<2>("ANALOG3");
+	adc.set_input_tag<3>("ANALOG4");
+}
 
 DEFINE_DEVICE_TYPE(SEGA_S32_ANALOG_DEVICE, segas32_analog_state, "segas32_pcb_analog", "Sega System 32 analog PCB")
 
@@ -2314,31 +2420,31 @@ void segas32_trackball_state::system32_trackball_map(address_map &map)
 	map.unmap_value_high();
 	system32_map(map);
 	//AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_READWRITE8(sonic_custom_io_r, sonic_custom_io_w, 0x00ff)
-	map(0xc00040, 0xc00047).mirror(0x0fff80).rw("upd1", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy)).umask16(0x00ff);
-	map(0xc00048, 0xc0004f).mirror(0x0fff80).rw("upd2", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy)).umask16(0x00ff);
-	map(0xc00050, 0xc00057).mirror(0x0fff80).rw("upd3", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy)).umask16(0x00ff);
+	map(0xc00040, 0xc00047).mirror(0x0fff80).rw("upd1", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
+	map(0xc00048, 0xc0004f).mirror(0x0fff80).rw("upd2", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
+	map(0xc00050, 0xc00057).mirror(0x0fff80).rw("upd3", FUNC(upd4701_device::read_xy), FUNC(upd4701_device::reset_xy_w)).umask16(0x00ff);
 }
 
-MACHINE_CONFIG_START(segas32_trackball_state::device_add_mconfig)
+void segas32_trackball_state::device_add_mconfig(machine_config &config)
+{
 	segas32_state::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(system32_trackball_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_trackball_state::system32_trackball_map);
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX1")
-	MCFG_UPD4701_PORTY("TRACKY1")
+	upd4701_device &upd1(UPD4701A(config, "upd1"));
+	upd1.set_portx_tag("TRACKX1");
+	upd1.set_porty_tag("TRACKY1");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX2")
-	MCFG_UPD4701_PORTY("TRACKY2")
+	upd4701_device &upd2(UPD4701A(config, "upd2"));
+	upd2.set_portx_tag("TRACKX2");
+	upd2.set_porty_tag("TRACKY2");
 
-	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX3")
-	MCFG_UPD4701_PORTY("TRACKY3")
+	upd4701_device &upd3(UPD4701A(config, "upd3"));
+	upd3.set_portx_tag("TRACKX3");
+	upd3.set_porty_tag("TRACKY3");
 
 	// 837-8685 I/O board has an unpopulated space for a fourth UPD4701A
-MACHINE_CONFIG_END
+}
 
 DEFINE_DEVICE_TYPE(SEGA_S32_TRACKBALL_DEVICE, segas32_trackball_state, "segas32_pcb_trackball", "Sega System 32 trackball PCB")
 
@@ -2358,17 +2464,17 @@ void segas32_state::system32_4player_map(address_map &map)
 	map(0xc00060, 0xc00067).mirror(0x0fff80).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 }
 
-MACHINE_CONFIG_START(segas32_4player_state::device_add_mconfig)
+void segas32_4player_state::device_add_mconfig(machine_config &config)
+{
 	segas32_state::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(system32_4player_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_4player_state::system32_4player_map);
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("EXTRA1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("EXTRA2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA3"))
-MACHINE_CONFIG_END
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("EXTRA1");
+	ppi.in_pb_callback().set_ioport("EXTRA2");
+	ppi.in_pc_callback().set_ioport("EXTRA3");
+}
 
 DEFINE_DEVICE_TYPE(SEGA_S32_4PLAYER_DEVICE, segas32_4player_state, "segas32_pcb_4player", "Sega System 32 4-player/fighting PCB")
 
@@ -2393,18 +2499,18 @@ void segas32_state::ga2_main_map(address_map &map)
 	map(0xa00000, 0xa00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask16(0x00ff);
 }
 
-MACHINE_CONFIG_START(segas32_v25_state::device_add_mconfig)
+void segas32_v25_state::device_add_mconfig(machine_config &config)
+{
 	segas32_4player_state::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ga2_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_v25_state::ga2_main_map);
 
-	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+	MB8421(config, "dpram", 0);
 
 	/* add a V25 for protection */
-	MCFG_DEVICE_ADD("mcu", V25, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(v25_map)
-MACHINE_CONFIG_END
+	v25_device &mcu(V25(config, "mcu", 10000000));
+	mcu.set_addrmap(AS_PROGRAM, &segas32_v25_state::v25_map);
+}
 
 DEFINE_DEVICE_TYPE(SEGA_S32_V25_DEVICE, segas32_v25_state, "segas32_pcb_v25", "Sega System 32 V25 PCB")
 
@@ -2417,19 +2523,20 @@ segas32_v25_state::segas32_v25_state(const machine_config &mconfig, const char *
 
 
 
-MACHINE_CONFIG_START(segas32_upd7725_state::device_add_mconfig)
+void segas32_upd7725_state::device_add_mconfig(machine_config &config)
+{
 	segas32_analog_state::device_add_mconfig(config);
 
-	/* add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the master pcb's rom board where an fd1149 could go */
-	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000) // TODO: Find real clock speed for the upd7725; this is a canned oscillator on the 837-8341 pcb
-	MCFG_DEVICE_PROGRAM_MAP(upd7725_prg_map)
-	MCFG_DEVICE_DATA_MAP(upd7725_data_map)
-	MCFG_DEVICE_DISABLE() // TODO: disable for now, needs DMA pins and interrupts implemented in upd7725 core
+	/* add a upd7725; this is on the 837-8341 daughterboard which plugs into the socket on the master pcb's ROM board where an fd1149 could go */
+	upd7725_device &dsp(UPD7725(config, "dsp", 8000000)); // TODO: Find real clock speed for the upd7725; this is a canned oscillator on the 837-8341 pcb
+	dsp.set_addrmap(AS_PROGRAM, &segas32_upd7725_state::upd7725_prg_map);
+	dsp.set_addrmap(AS_DATA, &segas32_upd7725_state::upd7725_data_map);
+	dsp.set_disable(); // TODO: disable for now, needs DMA pins and interrupts implemented in upd7725 core
 	// TODO: find /INT source for upd7725
 	// TODO: figure out how the p0 and p1 lines from the upd7725 affect the mainboard; do they select one of four (or 8) latches to/from the mainboard?
 	// TODO: trace out the 837-8341 pcb
 	// See HLE of this dsp in /src/mame/machine/segas32.cpp : arescue_dsp_r and arescue_dsp_w
-MACHINE_CONFIG_END
+}
 
 DEFINE_DEVICE_TYPE(SEGA_S32_UPD7725_DEVICE, segas32_upd7725_state, "segas32_pcb_upd7725", "Sega System 32 uPD7725 PCB")
 
@@ -2444,13 +2551,13 @@ segas32_upd7725_state::segas32_upd7725_state(const machine_config &mconfig, cons
 WRITE8_MEMBER(segas32_cd_state::lamps1_w)
 {
 	for (int i = 0; i < 8; i++)
-		m_lamp[i] = BIT(data, i);
+		m_lamps[i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(segas32_cd_state::lamps2_w)
 {
 	for (int i = 0; i < 8; i++)
-		m_lamp[8 + i] = BIT(data, i);
+		m_lamps[8 + i] = BIT(data, i);
 }
 
 WRITE_LINE_MEMBER(segas32_cd_state::scsi_irq_w)
@@ -2483,110 +2590,111 @@ void segas32_cd_state::cdrom_config(device_t *device)
 	MCFG_SOUND_ROUTE( 1, "^^rspeaker", 0.30 )
 }
 
-MACHINE_CONFIG_START(segas32_cd_state::device_add_mconfig)
+void segas32_cd_state::device_add_mconfig(machine_config &config)
+{
 	segas32_state::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(system32_cd_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas32_cd_state::system32_cd_map);
 
-	MCFG_DEVICE_ADD("mb89352", MB89352A, 8000000)
-	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_MB89352A_IRQ_CB(WRITELINE(*this, segas32_cd_state, scsi_irq_w))
-	MCFG_MB89352A_DRQ_CB(WRITELINE(*this, segas32_cd_state, scsi_drq_w))
+	mb89352_device &scsictrl(MB89352A(config, "mb89352", 8000000));
+	scsictrl.set_scsi_port("scsi");
+	scsictrl.irq_cb().set(FUNC(segas32_cd_state::scsi_irq_w));
+	scsictrl.drq_cb().set(FUNC(segas32_cd_state::scsi_drq_w));
 
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_0)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_config)
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
+	scsi.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
+	scsi.slot(1).set_option_machine_config("cdrom", cdrom_config);
 
-	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
-	MCFG_CXD1095_OUT_PORTA_CB(WRITE8(*this, segas32_cd_state, lamps1_w))
-	MCFG_CXD1095_OUT_PORTB_CB(WRITE8(*this, segas32_cd_state, lamps2_w))
-	MCFG_CXD1095_IN_PORTD_CB(CONSTANT(0xff)) // Ports C-E used for IEEE-488 printer interface
-MACHINE_CONFIG_END
+	cxd1095_device &cxdio(CXD1095(config, "cxdio", 0));
+	cxdio.out_porta_cb().set(FUNC(segas32_cd_state::lamps1_w));
+	cxdio.out_portb_cb().set(FUNC(segas32_cd_state::lamps2_w));
+	cxdio.in_portd_cb().set_constant(0xff); // Ports C-E used for IEEE-488 printer interface
+}
 
 DEFINE_DEVICE_TYPE(SEGA_S32_CD_DEVICE, segas32_cd_state, "segas32_pcb_cd", "Sega System 32 CD PCB")
 
 segas32_cd_state::segas32_cd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: segas32_state(mconfig, SEGA_S32_CD_DEVICE, tag, owner, clock)
-	, m_lamp(*this, "lamp%u", 0U)
+	, m_lamps(*this, "lamp%u", 0U)
 {
 }
 
 
 
-MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
+void sega_multi32_state::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V70, MULTI32_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(multi32_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas32_state,  start_of_vblank_int)
+	V70(config, m_maincpu, MULTI32_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sega_multi32_state::multi32_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas32_state::start_of_vblank_int));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(multi32_sound_map)
-	MCFG_DEVICE_IO_MAP(multi32_sound_portmap)
+	Z80(config, m_soundcpu, MASTER_CLOCK/4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &sega_multi32_state::multi32_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &sega_multi32_state::multi32_sound_portmap);
 
-	MCFG_DEVICE_ADD("io_chip_0", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1_A"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2_A"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("PORTC_A"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segas32_state, misc_output_0_w))
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE12_A"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("SERVICE34_A"))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(*this, segas32_state, sw2_output_0_w))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(*this, segas32_state, tilebank_external_w))
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(*this, segas32_state, display_enable_0_w))
-	MCFG_315_5296_OUT_CNT2_CB(INPUTLINE("soundcpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	sega_315_5296_device &io_chip_0(SEGA_315_5296(config, "io_chip_0", 0)); // unknown clock
+	io_chip_0.in_pa_callback().set_ioport("P1_A");
+	io_chip_0.in_pb_callback().set_ioport("P2_A");
+	io_chip_0.in_pc_callback().set_ioport("PORTC_A");
+	io_chip_0.out_pd_callback().set(FUNC(segas32_state::misc_output_0_w));
+	io_chip_0.in_pe_callback().set_ioport("SERVICE12_A");
+	io_chip_0.in_pf_callback().set_ioport("SERVICE34_A");
+	io_chip_0.out_pg_callback().set(FUNC(segas32_state::sw2_output_0_w));
+	io_chip_0.out_ph_callback().set(FUNC(segas32_state::tilebank_external_w));
+	io_chip_0.out_cnt1_callback().set(FUNC(segas32_state::display_enable_w<0>));
+	io_chip_0.out_cnt2_callback().set_inputline(m_soundcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_DEVICE_ADD("io_chip_1", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1_B"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2_B"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("PORTC_B"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segas32_state, misc_output_1_w))
-	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE12_B"))
-	MCFG_315_5296_IN_PORTF_CB(IOPORT("SERVICE34_B"))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(*this, segas32_state, sw2_output_1_w))
-	MCFG_315_5296_OUT_PORTH_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(6)
-	MCFG_315_5296_OUT_CNT1_CB(WRITELINE(*this, segas32_state, display_enable_1_w))
+	sega_315_5296_device &io_chip_1(SEGA_315_5296(config, "io_chip_1", 0)); // unknown clock
+	io_chip_1.in_pa_callback().set_ioport("P1_B");
+	io_chip_1.in_pb_callback().set_ioport("P2_B");
+	io_chip_1.in_pc_callback().set_ioport("PORTC_B");
+	io_chip_1.out_pd_callback().set(FUNC(segas32_state::misc_output_1_w));
+	io_chip_1.in_pe_callback().set_ioport("SERVICE12_B");
+	io_chip_1.in_pf_callback().set_ioport("SERVICE34_B");
+	io_chip_1.out_pg_callback().set(FUNC(segas32_state::sw2_output_1_w));
+	io_chip_1.out_ph_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(7);
+	io_chip_1.out_ph_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(5);
+	io_chip_1.out_ph_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(6);
+	io_chip_1.out_cnt1_callback().set(FUNC(segas32_state::display_enable_w<1>));
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_TIMER_DRIVER_ADD("v60_irq0", segas32_state, signal_v60_irq_callback)
-	MCFG_TIMER_DRIVER_ADD("v60_irq1", segas32_state, signal_v60_irq_callback)
+	TIMER(config, "v60_irq0").configure_generic(FUNC(segas32_state::signal_v60_irq_callback));
+	TIMER(config, "v60_irq1").configure_generic(FUNC(segas32_state::signal_v60_irq_callback));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas32)
-	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas32);
+	PALETTE(config, m_palette).set_entries(0x8000);
+	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(52*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segas32_state, screen_update_multi32_left)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(52*8, 262);
+	m_screen->set_visarea(0*8, 52*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(segas32_state::screen_update_multi32_left));
 
-	MCFG_SCREEN_ADD("screen2", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(52*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segas32_state, screen_update_multi32_right)
+	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen2.set_refresh_hz(60);
+	screen2.set_size(52*8, 262);
+	screen2.set_visarea(0*8, 52*8-1, 0*8, 28*8-1);
+	screen2.set_screen_update(FUNC(segas32_state::screen_update_multi32_right));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3438, MASTER_CLOCK/4)
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segas32_state, ym3438_irq_handler))
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.40)
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", MASTER_CLOCK/4));
+	ymsnd.irq_handler().set(FUNC(segas32_state::ym3438_irq_handler));
+	ymsnd.add_route(1, "lspeaker", 0.40);
+	ymsnd.add_route(0, "rspeaker", 0.40);
 
-	MCFG_DEVICE_ADD("sega", MULTIPCM, MASTER_CLOCK/4)
-	MCFG_DEVICE_ADDRESS_MAP(0, multipcm_map)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+	MULTIPCM(config, m_multipcm, MASTER_CLOCK/4);
+	m_multipcm->set_addrmap(0, &sega_multi32_state::multipcm_map);
+	m_multipcm->add_route(1, "lspeaker", 1.0);
+	m_multipcm->add_route(0, "rspeaker", 1.0);
 
-	MCFG_S32COMM_ADD("s32comm")
-MACHINE_CONFIG_END
+	S32COMM(config, m_s32comm, 0);
+}
 
 
 DEFINE_DEVICE_TYPE(SEGA_MULTI32_DEVICE, sega_multi32_state, "segas32_pcb_multi", "Sega Multi 32")
@@ -2608,21 +2716,21 @@ void sega_multi32_analog_state::multi32_analog_map(address_map &map)
 	map.global_mask(0xffffff);
 	multi32_map(map);
 	map(0xc00050, 0xc00057).mirror(0x07ff80).rw("adc", FUNC(msm6253_device::d7_r), FUNC(msm6253_device::address_w)).umask32(0x00ff00ff);
-	map(0xc00060, 0xc00060).mirror(0x07ff80).w(this, FUNC(sega_multi32_analog_state::analog_bank_w));
+	map(0xc00060, 0xc00060).mirror(0x07ff80).w(FUNC(sega_multi32_analog_state::analog_bank_w));
 }
 
-MACHINE_CONFIG_START(sega_multi32_analog_state::device_add_mconfig)
+void sega_multi32_analog_state::device_add_mconfig(machine_config &config)
+{
 	sega_multi32_state::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(multi32_analog_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sega_multi32_analog_state::multi32_analog_map);
 
-	MCFG_DEVICE_ADD("adc", MSM6253, 0)
-	MCFG_MSM6253_IN0_ANALOG_PORT("ANALOG1")
-	MCFG_MSM6253_IN1_ANALOG_PORT("ANALOG2")
-	MCFG_MSM6253_IN2_ANALOG_READ(sega_multi32_analog_state, in2_analog_read)
-	MCFG_MSM6253_IN3_ANALOG_READ(sega_multi32_analog_state, in3_analog_read)
-MACHINE_CONFIG_END
+	msm6253_device &adc(MSM6253(config, "adc", 0));
+	adc.set_input_tag<0>("ANALOG1");
+	adc.set_input_tag<1>("ANALOG2");
+	adc.set_input_cb<2>(FUNC(sega_multi32_analog_state::in2_analog_read));
+	adc.set_input_cb<3>(FUNC(sega_multi32_analog_state::in3_analog_read));
+}
 
 ioport_value sega_multi32_analog_state::in2_analog_read()
 {
@@ -2656,17 +2764,17 @@ void segas32_state::multi32_6player_map(address_map &map)
 	map(0xc00060, 0xc00067).mirror(0x07ff80).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0x00ff00ff);
 }
 
-MACHINE_CONFIG_START(sega_multi32_6player_state::device_add_mconfig)
+void sega_multi32_6player_state::device_add_mconfig(machine_config &config)
+{
 	sega_multi32_state::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(multi32_6player_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sega_multi32_6player_state::multi32_6player_map);
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("EXTRA1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("EXTRA2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA3"))
-MACHINE_CONFIG_END
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("EXTRA1");
+	ppi.in_pb_callback().set_ioport("EXTRA2");
+	ppi.in_pc_callback().set_ioport("EXTRA3");
+}
 
 DEFINE_DEVICE_TYPE(SEGA_MULTI32_6PLAYER_DEVICE, sega_multi32_6player_state, "segas32_pcb_multi_6player", "Sega Multi 32 6-player PCB")
 
@@ -2685,8 +2793,18 @@ public:
 		, m_slavepcb(*this, "slavepcb")
 	{ }
 
-	required_device<segas32_state> m_mainpcb;
-	optional_device<segas32_state> m_slavepcb;
+	void sega_multi32(machine_config &config);
+	void sega_system32(machine_config &config);
+	void sega_multi32_analog(machine_config &config);
+	void sega_multi32_6p(machine_config &config);
+	void sega_system32_dual_direct_upd7725(machine_config &config);
+	void sega_system32_dual_direct(machine_config &config);
+	void sega_system32_track(machine_config &config);
+	void sega_system32_ga2(machine_config &config);
+	void sega_system32_cd(machine_config &config);
+	void sega_system32_arf(machine_config &config);
+	void sega_system32_analog(machine_config &config);
+	void sega_system32_4p(machine_config &config);
 
 	void init_titlef();
 	void init_slipstrm();
@@ -2712,84 +2830,84 @@ public:
 	void init_f1lap();
 	void init_orunners();
 
+private:
+	required_device<segas32_state> m_mainpcb;
+	optional_device<segas32_state> m_slavepcb;
+
 	std::unique_ptr<uint16_t[]> m_dual_pcb_comms;
 	DECLARE_WRITE16_MEMBER(dual_pcb_comms_w);
 	DECLARE_READ16_MEMBER(dual_pcb_comms_r);
 	DECLARE_READ16_MEMBER(dual_pcb_masterslave);
 	DECLARE_READ16_MEMBER(dual_pcb_slave);
-
-
-	void sega_multi32(machine_config &config);
-	void sega_system32(machine_config &config);
-	void sega_multi32_analog(machine_config &config);
-	void sega_multi32_6p(machine_config &config);
-	void sega_system32_dual_direct_upd7725(machine_config &config);
-	void sega_system32_dual_direct(machine_config &config);
-	void sega_system32_track(machine_config &config);
-	void sega_system32_ga2(machine_config &config);
-	void sega_system32_cd(machine_config &config);
-	void sega_system32_arf(machine_config &config);
-	void sega_system32_analog(machine_config &config);
-	void sega_system32_4p(machine_config &config);
 };
 
 
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_REGULAR_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32(machine_config &config)
+{
+	SEGA_S32_REGULAR_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_analog)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_ANALOG_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_analog(machine_config &config)
+{
+	SEGA_S32_ANALOG_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_track)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_TRACKBALL_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_track(machine_config &config)
+{
+	SEGA_S32_TRACKBALL_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_4p)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_4PLAYER_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_4p(machine_config &config)
+{
+	SEGA_S32_4PLAYER_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_cd)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_CD_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_cd(machine_config &config)
+{
+	SEGA_S32_CD_DEVICE(config, "mainpcb", 0);
+}
 
 // for f1en where there is a sub-board containing shared ram sitting underneath the ROM board bridging 2 PCBs (not a network link)
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_dual_direct)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_ANALOG_DEVICE, 0)
-	MCFG_DEVICE_ADD("slavepcb", SEGA_S32_ANALOG_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_dual_direct(machine_config &config)
+{
+	SEGA_S32_ANALOG_DEVICE(config, "mainpcb", 0);
+	SEGA_S32_ANALOG_DEVICE(config, "slavepcb", 0);
+}
 
 // air rescue is like f1en above but also has the 837-8341 DSP daughterboard on the mainpcb side only
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_dual_direct_upd7725)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_UPD7725_DEVICE, 0)
-	MCFG_DEVICE_ADD("slavepcb", SEGA_S32_ANALOG_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_dual_direct_upd7725(machine_config &config)
+{
+	SEGA_S32_UPD7725_DEVICE(config, "mainpcb", 0);
+	SEGA_S32_ANALOG_DEVICE(config, "slavepcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_ga2)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_V25_DEVICE, 0)
-	MCFG_DEVICE_MODIFY("mainpcb:mcu")
-	MCFG_V25_CONFIG(segas32_v25_state::ga2_opcode_table)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_ga2(machine_config &config)
+{
+	SEGA_S32_V25_DEVICE(config, "mainpcb", 0);
+	subdevice<v25_common_device>("mainpcb:mcu")->set_decryption_table(segas32_v25_state::ga2_opcode_table);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_system32_arf)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_S32_V25_DEVICE, 0)
-	MCFG_DEVICE_MODIFY("mainpcb:mcu")
-	MCFG_V25_CONFIG(segas32_v25_state::arf_opcode_table)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_system32_arf(machine_config &config)
+{
+	SEGA_S32_V25_DEVICE(config, "mainpcb", 0);
+	subdevice<v25_common_device>("mainpcb:mcu")->set_decryption_table(segas32_v25_state::arf_opcode_table);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_multi32)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_MULTI32_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_multi32(machine_config &config)
+{
+	SEGA_MULTI32_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_multi32_analog)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_MULTI32_ANALOG_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_multi32_analog(machine_config &config)
+{
+	SEGA_MULTI32_ANALOG_DEVICE(config, "mainpcb", 0);
+}
 
-MACHINE_CONFIG_START(segas32_new_state::sega_multi32_6p)
-	MCFG_DEVICE_ADD("mainpcb", SEGA_MULTI32_6PLAYER_DEVICE, 0)
-MACHINE_CONFIG_END
+void segas32_new_state::sega_multi32_6p(machine_config &config)
+{
+	SEGA_MULTI32_6PLAYER_DEVICE(config, "mainpcb", 0);
+}
 
 /*************************************
  *
@@ -2861,15 +2979,16 @@ MACHINE_CONFIG_END
 /**************************************************************************************************************************
  **************************************************************************************************************************
  **************************************************************************************************************************
-    Air Rescue (US)
+    Air Rescue (Export)
 
     Sega Game ID codes:
        Game BD: 833-8508-01 AIR RESCUE (US)
                 833-8508-02 AIR RESCUE (Export)
                 833-8508-03 AIR RESCUE (Japan)
-    Rom PCB No: 834-8526-01 (US)
+    ROM PCB No: 834-8526-01 (US)
                 834-8526-02 (Export)
                 834-8526-03 (Japan)
+                834-8526-05 (Export)
    Link PCB No: 837-8223-01
      A/D BD No: 837-7536 (one for each mainboard)
      DSP BD No: 837-8341
@@ -2881,7 +3000,7 @@ MACHINE_CONFIG_END
     This provides a direct connection between the PCBs (NOT a network link) so they effectively operate as a single boardset
     sharing RAM (we should emulate it as such)
 
-    Link PCB is a single sparsely populated romless PCB but contains
+    Link PCB is a single sparsely populated ROMless PCB but contains
 
     Left side
     1x MB8431-12LP (IC2)
@@ -2896,10 +3015,86 @@ MACHINE_CONFIG_END
 
     (todo, full layout)
 
-    The left Rom PCB (master?) contains a sub-board on the ROM board with the math DSP, the right Rom PCB does not have this.
+    The left ROM PCB (master?) contains a sub-board on the ROM board with the math DSP, the right ROM PCB does not have this.
 
 */
 ROM_START( arescue )
+	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
+	ROM_LOAD_x4( "epr-14542.ic13",     0x000000, 0x020000, CRC(6d39fc18) SHA1(7fbddfb2605a020331e1e81a7bc4466196df17bd) ) /* 834-8526-05 (Export) */
+	ROM_LOAD_x4( "epr-14541.ic6",      0x080000, 0x020000, CRC(5c3f2ec5) SHA1(d11a24d12917e4c5ac9010ca6db0f1ac9d44475a) )
+	ROM_LOAD16_BYTE( "epr-14509.ic14", 0x100000, 0x080000, CRC(daa5a356) SHA1(ca87242c59de5ab5f9406635bee758a855fe20bc) )
+	ROM_LOAD16_BYTE( "epr-14508.ic7",  0x100001, 0x080000, CRC(6702c14d) SHA1(dc9324f16a3e3238f5ccdade9451d6823a50b563) )
+
+	ROM_REGION( 0x400000, "mainpcb:soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD_x4( "epr-14513.ic35", 0x000000, 0x40000, CRC(f9a884cd) SHA1(73010fff5e0257355e08e78838c74af86ed364ce) )
+	ROM_LOAD_x2( "mpr-14512.ic31", 0x100000, 0x80000, CRC(9da48051) SHA1(2d41148d089a75362ed0fde577eca919213ac666) )
+	ROM_LOAD_x2( "mpr-14511.ic26", 0x200000, 0x80000, CRC(074c53cc) SHA1(9c89843bbe8058123c25b7f8f86de754ddbca2bb) )
+	ROM_LOAD_x2( "mpr-14510.ic22", 0x300000, 0x80000, CRC(5ea6d52d) SHA1(d424082468940bb91ab424ac7812839792ed4e88) )
+
+	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_LOAD32_BYTE( "mpr-14496.ic25", 0x000003, 0x080000, CRC(737da16c) SHA1(52247d9bc2924e90d040bef484a541b1f4a9026f) )
+	ROM_LOAD32_BYTE( "mpr-14497.ic29", 0x000001, 0x080000, CRC(ebd7ed17) SHA1(2307dc28501965432d2ff55a21698efdce014401) )
+	ROM_LOAD32_BYTE( "mpr-14498.ic34", 0x000002, 0x080000, CRC(d4a764bd) SHA1(8434a9225ed1e01e8b1cfe169268e42cd3ce6ee3) )
+	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
+
+	ROM_REGION32_BE( 0x800000, "mainpcb:sprites", 0 ) /* sprites */
+	ROMX_LOAD( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
+
+	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
+	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
+	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+
+	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
+	ROM_LOAD_x4( "epr-14542.ic13",     0x000000, 0x020000, CRC(6d39fc18) SHA1(7fbddfb2605a020331e1e81a7bc4466196df17bd) ) /* 834-8526-05 (Export) */
+	ROM_LOAD_x4( "epr-14541.ic6",      0x080000, 0x020000, CRC(5c3f2ec5) SHA1(d11a24d12917e4c5ac9010ca6db0f1ac9d44475a) )
+	ROM_LOAD16_BYTE( "epr-14509.ic14", 0x100000, 0x080000, CRC(daa5a356) SHA1(ca87242c59de5ab5f9406635bee758a855fe20bc) )
+	ROM_LOAD16_BYTE( "epr-14508.ic7",  0x100001, 0x080000, CRC(6702c14d) SHA1(dc9324f16a3e3238f5ccdade9451d6823a50b563) )
+
+	ROM_REGION( 0x400000, "slavepcb:soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD_x4( "epr-14513.ic35", 0x000000, 0x40000, CRC(f9a884cd) SHA1(73010fff5e0257355e08e78838c74af86ed364ce) )
+	ROM_LOAD_x2( "mpr-14512.ic31", 0x100000, 0x80000, CRC(9da48051) SHA1(2d41148d089a75362ed0fde577eca919213ac666) )
+	ROM_LOAD_x2( "mpr-14511.ic26", 0x200000, 0x80000, CRC(074c53cc) SHA1(9c89843bbe8058123c25b7f8f86de754ddbca2bb) )
+	ROM_LOAD_x2( "mpr-14510.ic22", 0x300000, 0x80000, CRC(5ea6d52d) SHA1(d424082468940bb91ab424ac7812839792ed4e88) )
+
+	ROM_REGION( 0x200000, "slavepcb:gfx1", 0 ) /* tiles */
+	ROM_LOAD32_BYTE( "mpr-14496.ic25", 0x000003, 0x080000, CRC(737da16c) SHA1(52247d9bc2924e90d040bef484a541b1f4a9026f) )
+	ROM_LOAD32_BYTE( "mpr-14497.ic29", 0x000001, 0x080000, CRC(ebd7ed17) SHA1(2307dc28501965432d2ff55a21698efdce014401) )
+	ROM_LOAD32_BYTE( "mpr-14498.ic34", 0x000002, 0x080000, CRC(d4a764bd) SHA1(8434a9225ed1e01e8b1cfe169268e42cd3ce6ee3) )
+	ROM_LOAD32_BYTE( "mpr-14499.ic38", 0x000000, 0x080000, CRC(fadc4b2b) SHA1(01c02a4dfad1ab19bac8b81b61d37fdc035bc5c5) )
+
+	ROM_REGION32_BE( 0x800000, "slavepcb:sprites", 0 ) /* sprites */
+	ROMX_LOAD( "mpr-14500.ic24", 0x000007, 0x100000, CRC(0a064e9b) SHA1(264761f4aacaeeac9426528caf180404cd7f6e18) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14501.ic28", 0x000006, 0x100000, CRC(4662bb41) SHA1(80774e680468e9ba9c5dd5eeaa4791fa3b3722fd) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14502.ic33", 0x000005, 0x100000, CRC(988555a9) SHA1(355e44319fd51358329cc7cd226e4c4725e045cb) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14503.ic37", 0x000004, 0x100000, CRC(90556aca) SHA1(24df62af55048db66d50c7034c5460330d231bf5) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14504.ic23", 0x000003, 0x100000, CRC(46dd038d) SHA1(9530a52e2e7388437c20ebcb19bf84c8b3b5086b) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
+	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
+ROM_END
+
+/**************************************************************************************************************************
+    Air Rescue (US)
+
+    Sega Game ID codes:
+       Game BD: 833-8508-01 AIR RESCUE
+    ROM PCB No: 834-8526-01
+   Link PCB No: 837-8223-01
+     A/D BD No: 837-7536 (one for each mainboard)
+     DSP BD No: 837-8341
+
+    requires 2 linked system32 pcbs
+    requires additional math DSP to be emulated
+*/
+ROM_START( arescueu )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14540.ic13",     0x000000, 0x020000, CRC(c2b4e5d0) SHA1(69f8ddded5095df9012663d0ded61b78f1692a8d) )
 	ROM_LOAD_x4( "epr-14539.ic6",      0x080000, 0x020000, CRC(1a1b5532) SHA1(f3651470222036703b7ecedb6e91e4cdb3d20df7) )
@@ -2960,7 +3155,6 @@ ROM_START( arescue )
 	ROMX_LOAD( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
-
 ROM_END
 
 /**************************************************************************************************************************
@@ -2968,7 +3162,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 833-8508-03 AIR RESCUE
-    Rom PCB No: 834-8526-03
+    ROM PCB No: 834-8526-03
    Link PCB No: 837-8223-01
      A/D BD No: 837-7536 (one for each mainboard)
      DSP BD No: 837-8341
@@ -3037,7 +3231,6 @@ ROM_START( arescuej )
 	ROMX_LOAD( "mpr-14505.ic27", 0x000002, 0x100000, CRC(be142c1f) SHA1(224631e00c2458c39c6a2ef7978c2b1131fb4da2) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14506.ic32", 0x000001, 0x100000, CRC(5dd8fb6b) SHA1(7d21cacb2c9dba5db2547b6d8e89397e0424ee8e) , ROM_SKIP(7) )
 	ROMX_LOAD( "mpr-14507.ic36", 0x000000, 0x100000, CRC(db3f59ec) SHA1(96dcb3827354773fc2911c62260a27e90dcbe96a) , ROM_SKIP(7) )
-
 ROM_END
 
 
@@ -3049,7 +3242,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 834-9877-02
-    Rom PCB No: 837-9878-02
+    ROM PCB No: 837-9878-02
       Main PCB: 837-7428-03 (SYSTEM 32 COM)
      A/D BD NO. 837-7536
 */
@@ -3090,7 +3283,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 834-9877-01
-    Rom PCB No: 837-9878-01
+    ROM PCB No: 837-9878-01
       Main PCB: 837-7428-03 (SYSTEM 32 COM)
      A/D BD NO. 837-7536
 */
@@ -3131,7 +3324,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 834-9877
-    Rom PCB No: 837-9878
+    ROM PCB No: 837-9878
       Main PCB: 837-7428-03 (SYSTEM 32 COM)
      A/D BD NO. 837-7536
 */
@@ -3174,7 +3367,7 @@ ROM_END
 
     Sega Game ID codes:
        Game BD: 833-8646-05 ARABIAN FIGHT
-    Rom PCB No: 833-8647-02
+    ROM PCB No: 833-8647-02
    V25 sub PCB: 834-8529-01
      A/D BD NO. 837-7968
 */
@@ -3326,13 +3519,13 @@ ROM_START( brivalj )
 	ROM_LOAD( "mpr-15626.ic34",    0x200000, 0x100000, CRC(83306d1e) SHA1(feb08902b51c0013d9417832cdf198e36cdfc28c) )
 	ROM_LOAD( "mpr-15625.ic24",    0x300000, 0x100000, CRC(3ce82932) SHA1(f2107bc2591f46a51c9f0d706933b1ae69db91f9) )
 
-	/* the 10 roms below may be bad dumps ... mp14598 / 99 have corrupt tiles when compared to the roms
+	/* the 10 ROMs below may be bad dumps ... mp14598 / 99 have corrupt tiles when compared to the ROMs
 	   in the parent set, but Sega did change the part numbers so they might be correct, the others
 	   are suspicious, the changes are very similar but the part numbers haven't changed.  We really
 	   need a 3rd board to verify */
 	ROM_REGION( 0x400000, "mainpcb:gfx1", 0 ) /* tiles */
-	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(1de17e83) SHA1(04ee14b863f93b42a5bd1b6da71cff54ef11d4b7) ) /* Rom # matches tile rom # from Arabian Fight ??? */
-	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(cafb0de9) SHA1(94c6bfc7a4081dee373e9466a7b6f80889696087) ) /* Rom # matchrs tile rom # from Arabian Fight ??? */
+	ROM_LOAD16_BYTE( "mpr-14599f.ic14", 0x000000, 0x200000, CRC(1de17e83) SHA1(04ee14b863f93b42a5bd1b6da71cff54ef11d4b7) ) /* ROM # matches tile ROM # from Arabian Fight ??? */
+	ROM_LOAD16_BYTE( "mpr-14598f.ic5",  0x000001, 0x200000, CRC(cafb0de9) SHA1(94c6bfc7a4081dee373e9466a7b6f80889696087) ) /* ROM # matches tile ROM # from Arabian Fight ??? */
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", 0 ) /* sprites */
 	ROMX_LOAD( "brivalj_mp15637.32", 0x000000, 0x200000, CRC(f39844c0) SHA1(c48dc8cccdd9d3756cf99a983c6a89ed43fcda22) , ROM_SKIP(6)|ROM_GROUPWORD )
@@ -3653,6 +3846,9 @@ ROM_END
  **************************************************************************************************************************
     F1 Super Lap (Export)
     protected via FD1149 317-0210
+     GAME BD NO. 833-9407-02 F1 SUPER LAP
+         ROM BD. 834-9408-02
+      A/D BD NO. 837-7536
 */
 ROM_START( f1lap )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -3767,7 +3963,7 @@ ROM_END
     protected via a custom V25 with encrypted code
     Sega Game ID codes:
      Game: 833-8932-02 GOLDEN AXE II AC USA
-Rom board: 833-8933-01
+ROM board: 833-8933-01
 Sub board: 834-8529-02
 
 */
@@ -3910,7 +4106,7 @@ ROM_END
     Holosseum (US)
     not protected
      Game: 833-8887-01 HOLOSSEUM
-Rom board: 834-8888-01
+ROM board: 834-8888-01
 
 */
 ROM_START( holo )
@@ -4092,7 +4288,7 @@ ROM_END
     Soreike Kokology Vol. 2
     Sega System32 + CD - Sega 1993
 
-    Rom Board is 837-8393 16Mb ROM board (Same as godenaxe2 or Arabian Fight)
+    ROM Board is 837-8393 16Mb ROM board (Same as godenaxe2 or Arabian Fight)
 
     SCSI CD board is 839-0572-01. It use a Fujitsu MB89352AP for SCSI + a Sony CXD1095Q for I/O + 8Mhz quartz
 */
@@ -4271,7 +4467,7 @@ Export: EPR-13693.ic21 (dumped)
         EPR-13694.ic37 (not dumped)
         EPR-13695.ic38 (not dumped)
 
-    Japanese version is undumped. There is likely a Japanese specific sound rom at IC20 (EPR-13524.ic20 ??)
+    Japanese version is undumped. There is likely a Japanese specific sound ROM at IC20 (EPR-13524.ic20 ??)
 */
 ROM_START( radm )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -4283,7 +4479,7 @@ ROM_START( radm )
 	ROM_LOAD_x8( "epr-13527.ic9",  0x000000, 0x020000, CRC(a2e3fbbe) SHA1(2787bbef696ab3f2b7855ac991867837d3de54cd) )
 	ROM_LOAD_x2( "epr-13523.ic14", 0x100000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) )
 	ROM_LOAD_x2( "epr-13699.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) )
-	ROM_LOAD_x2( "epr-13523.ic22", 0x300000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) /* Deluxe or Upright manuals don't show this rom */
+	ROM_LOAD_x2( "epr-13523.ic22", 0x300000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) /* Deluxe or Upright manuals don't show this ROM */
 
 	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-13519.ic3",  0x000000, 0x080000, CRC(bedc9534) SHA1(7b3f7a47b6c0ca6707dc3c1167f3564d43adb32f) )
@@ -4322,7 +4518,7 @@ ROM_START( radmu )
 	ROM_LOAD_x8( "epr-13527.ic9",  0x000000, 0x020000, CRC(a2e3fbbe) SHA1(2787bbef696ab3f2b7855ac991867837d3de54cd) )
 	ROM_LOAD_x2( "epr-13523.ic14", 0x100000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) )
 	ROM_LOAD_x2( "epr-13699.ic20", 0x200000, 0x080000, CRC(33fd2913) SHA1(60b664559b4989446b1c7d875432e53a36fe27df) )
-	ROM_LOAD_x2( "epr-13523.ic22", 0x300000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) /* Deluxe or Upright manuals don't show this rom */
+	ROM_LOAD_x2( "epr-13523.ic22", 0x300000, 0x080000, CRC(d5563697) SHA1(eb3fd3dbfea383ac1bb5d2e1552723994cb4693d) ) /* Deluxe or Upright manuals don't show this ROM */
 
 	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
 	ROM_LOAD32_BYTE( "mpr-13519.ic3",  0x000000, 0x080000, CRC(bedc9534) SHA1(7b3f7a47b6c0ca6707dc3c1167f3564d43adb32f) )
@@ -4356,7 +4552,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-8110-02 RAD RALLY
-Rom board: 833-8111-02
+ROM board: 833-8111-02
 A/D BD NO. 837-7536
 
 */
@@ -4401,7 +4597,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-8110-01 RAD RALLY
-Rom board: 833-8111-01
+ROM board: 833-8111-01
 A/D BD NO. 837-7536
 
 */
@@ -4446,7 +4642,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-8110-03 RAD RALLY
-Rom board: 833-8111-03
+ROM board: 833-8111-03
 A/D BD NO. 837-7536
 
 */
@@ -4580,7 +4776,7 @@ ROM_START( sonic )
 	ROM_LOAD_x4( "epr-15785.ic36", 0x000000, 0x040000, CRC(0fe7422e) SHA1(b7eaf4736ba155965317bb4ef3b33fc122635151) )
 	ROM_LOAD( "mpr-15784.ic35",    0x100000, 0x100000, CRC(42f06714) SHA1(30e45bb2d9b492f0c1acc4fbe1e5869f0559300b) )
 	ROM_LOAD( "mpr-15783.ic34",    0x200000, 0x100000, CRC(e4220eea) SHA1(a546c8bfc24e0695cf79c49e1a867d2595a1ed7f) )
-	ROM_LOAD( "mpr-15782.ic33",    0x300000, 0x100000, CRC(cf56b5a0) SHA1(5786228aab120c3361524ba93b418b24fd5b8ffb) ) // (this is the only rom unchanged from the prototype)
+	ROM_LOAD( "mpr-15782.ic33",    0x300000, 0x100000, CRC(cf56b5a0) SHA1(5786228aab120c3361524ba93b418b24fd5b8ffb) ) // (this is the only ROM unchanged from the prototype)
 
 	ROM_REGION( 0x200000, "mainpcb:gfx1", 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "mpr-15789.ic14", 0x000000, 0x100000, CRC(4378f12b) SHA1(826e0550a3c5f2b6e59c6531ac03658a4f826651) )
@@ -4678,9 +4874,9 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-8331-04 SPIDER-MAN
-Rom board: 834-8332-01
+ROM board: 834-8332-01
 
- Rom board type: 837-7429-01
+ ROM board type: 837-7429-01
 Input sub board: 837-7968
 
 */
@@ -4719,7 +4915,7 @@ ROM_END
     not protected
 
      Game: 833-8331 SPIDER-MAN
-Rom board: 834-8332
+ROM board: 834-8332
 
 */
 ROM_START( spidmanj )
@@ -4865,7 +5061,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-10851-02
-Rom board: 834-10852-02
+ROM board: 834-10852-02
 */
 ROM_START( svf )
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code + data */
@@ -5028,7 +5224,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 834-9324-02 TITLE FIGHT
-Rom board: 834-9413-02
+ROM board: 834-9413-02
   Main BD: 837-8676 (SYSTEM MULTI 32)
 
 */
@@ -5064,7 +5260,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 834-9324-01 TITLE FIGHT
-Rom board: 834-9413-01
+ROM board: 834-9413-01
   Main BD: 837-8676 (SYSTEM MULTI 32)
 
 */
@@ -5100,7 +5296,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 834-9324-03 TITLE FIGHT
-Rom board: 834-9413-03
+ROM board: 834-9413-03
   Main BD: 837-8676 (SYSTEM MULTI 32)
 
 */
@@ -5647,7 +5843,8 @@ void segas32_state::init_titlef(void)
  *
  *************************************/
 
-GAME( 1992, arescue,   0,        sega_system32_dual_direct_upd7725, arescue, segas32_new_state, init_arescue, ROT0, "Sega", "Air Rescue (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, arescue,   0,        sega_system32_dual_direct_upd7725, arescue, segas32_new_state, init_arescue, ROT0, "Sega", "Air Rescue (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, arescueu,  arescue,  sega_system32_dual_direct_upd7725, arescue, segas32_new_state, init_arescue, ROT0, "Sega", "Air Rescue (US)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, arescuej,  arescue,  sega_system32_dual_direct_upd7725, arescue, segas32_new_state, init_arescue, ROT0, "Sega", "Air Rescue (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1993, alien3,    0,        sega_system32_analog,      alien3,   segas32_new_state, init_alien3,   ROT0, "Sega",   "Alien3: The Gun (World)", MACHINE_IMPERFECT_GRAPHICS )

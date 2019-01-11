@@ -19,6 +19,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/m6800/m6801.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 class banctec_state : public driver_device
@@ -63,7 +64,7 @@ void banctec_state::banctec_mcu_mem(address_map &map)
 	map(0x0000, 0x00ff).ram(); /* Probably wrong. Must be verified on pcb! */
 	map(0x2000, 0x2000).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x2001, 0x2001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x2003, 0x2003).w(this, FUNC(banctec_state::videoram_w));
+	map(0x2003, 0x2003).w(FUNC(banctec_state::videoram_w));
 	map(0x8000, 0x80ff).ram().share("videoram"); /* Probably wrong. Must be verified on pcb! */
 	map(0xe000, 0xffff).rom().region("mcu", 0x0000);
 }
@@ -153,15 +154,15 @@ MACHINE_CONFIG_START(banctec_state::banctec)
 	MCFG_SCREEN_SIZE((52+1)*8, (31+1)*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_banctec)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(2'000'000)) /* (?) */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(banctec_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(banctec_state, crtc_addr)
-
+	r6545_1_device &crtc(R6545_1(config, "crtc", XTAL(2'000'000))); /* (?) */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(banctec_state::crtc_update_row), this);
+	crtc.set_on_update_addr_change_callback(FUNC(banctec_state::crtc_addr), this);
 MACHINE_CONFIG_END
 
 ROM_START(banctec)

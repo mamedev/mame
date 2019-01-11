@@ -32,9 +32,24 @@ public:
 		m_gamma(*this, "gamma"),
 		m_pokey(*this, "pokey%u", 1U),
 		m_tms(*this, "tms"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void alphaone(machine_config &config);
+	void mhavoc(machine_config &config);
+	void mhavocrv(machine_config &config);
+
+	void init_mhavocrv();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(tms5220_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(mhavoc_bit67_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gamma_rcvd_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gamma_xmtd_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(alpha_rcvd_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(alpha_xmtd_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+
+private:
 	DECLARE_READ8_MEMBER(dual_pokey_r);
 	DECLARE_WRITE8_MEMBER(dual_pokey_w);
 	DECLARE_WRITE8_MEMBER(mhavoc_alpha_irq_ack_w);
@@ -52,24 +67,13 @@ public:
 	DECLARE_WRITE8_MEMBER(mhavocrv_speech_strobe_w);
 	DECLARE_READ8_MEMBER(quad_pokeyn_r);
 	DECLARE_WRITE8_MEMBER(quad_pokeyn_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(tms5220_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(mhavoc_bit67_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gamma_rcvd_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gamma_xmtd_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(alpha_rcvd_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(alpha_xmtd_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
-	void init_mhavocrv();
+
 	TIMER_CALLBACK_MEMBER(delayed_gamma_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mhavoc_cpu_irq_clock);
-	void alphaone(machine_config &config);
-	void mhavoc(machine_config &config);
-	void mhavocrv(machine_config &config);
 	void alpha_map(address_map &map);
 	void alphaone_map(address_map &map);
 	void gamma_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -79,7 +83,7 @@ protected:
 	optional_device<cpu_device> m_gamma;
 	optional_device_array<pokey_device, 4> m_pokey;
 	optional_device<tms5220_device> m_tms;
-	output_finder<2> m_lamp;
+	output_finder<2> m_lamps;
 	uint8_t m_alpha_data;
 	uint8_t m_alpha_rcvd;
 	uint8_t m_alpha_xmtd;

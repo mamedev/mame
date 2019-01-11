@@ -26,6 +26,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -40,7 +41,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(chsuper_vram_w);
@@ -59,7 +60,7 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	//virtual void machine_reset();
 
 	virtual void video_start() override;
@@ -73,7 +74,7 @@ protected:
 	required_device<z180_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	output_finder<7> m_lamp;
+	output_finder<7> m_lamps;
 };
 
 
@@ -157,11 +158,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
 WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);  // Coin counter
-	m_lamp[0] = BIT(data, 1);  // Hold 1 / Black (Nero) lamp.
+	m_lamps[0] = BIT(data, 1);  // Hold 1 / Black (Nero) lamp.
 	machine().bookkeeping().coin_counter_w(1, data & 0x04);  // Payout / Ticket Out pulse
-	m_lamp[1] = BIT(data, 3);  // Hold 2 / Low (Bassa) lamp.
+	m_lamps[1] = BIT(data, 3);  // Hold 2 / Low (Bassa) lamp.
 	// D4: unused...
-	m_lamp[5] = BIT(data, 5);  // BET lamp
+	m_lamps[5] = BIT(data, 5);  // BET lamp
 	// D6: ticket motor...
 	// D7: unused...
 
@@ -172,11 +173,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 
 	if ((m_blacklamp == 1) & (m_redlamp == 1))  // if both are ON...
 	{
-		m_lamp[2] = 1;            // HOLD 3 ON
+		m_lamps[2] = 1;            // HOLD 3 ON
 	}
 	else
 	{
-		m_lamp[2] = 0;            // otherwise HOLD 3 OFF
+		m_lamps[2] = 0;            // otherwise HOLD 3 OFF
 	}
 }
 
@@ -184,11 +185,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 {
 	// D0: unknown...
 	// D1: unused...
-	m_lamp[3] = BIT(data, 2);  // Hold 4 / High (Alta) lamp.
+	m_lamps[3] = BIT(data, 2);  // Hold 4 / High (Alta) lamp.
 	// D3: unused...
 	// D4: unused...
-	m_lamp[4] = BIT(data, 5);  // Hold 5 / Red (Rosso) / Gamble (Raddoppio) lamp.
-	m_lamp[6] = BIT(data, 6);  // Start / Gamble (Raddoppio) lamp.
+	m_lamps[4] = BIT(data, 5);  // Hold 5 / Red (Rosso) / Gamble (Raddoppio) lamp.
+	m_lamps[6] = BIT(data, 6);  // Start / Gamble (Raddoppio) lamp.
 	// D7: unused...
 
 /*  Workaround to get the HOLD 3 lamp line active,
@@ -198,11 +199,11 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 
 	if ((m_blacklamp == 1) & (m_redlamp == 1))  // if both are ON...
 	{
-		m_lamp[2] = 1;    // Hold 3 ON
+		m_lamps[2] = 1;    // Hold 3 ON
 	}
 	else
 	{
-		m_lamp[2] = 0;    // Hold 3 OFF
+		m_lamps[2] = 0;    // Hold 3 OFF
 	}
 }
 
@@ -214,7 +215,7 @@ WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
 void chsuper_state::chsuper_prg_map(address_map &map)
 {
 	map(0x00000, 0x0efff).rom();
-	map(0x00000, 0x01fff).w(this, FUNC(chsuper_state::chsuper_vram_w));
+	map(0x00000, 0x01fff).w(FUNC(chsuper_state::chsuper_vram_w));
 	map(0x0f000, 0x0ffff).ram().region("maincpu", 0xf000);
 	map(0xfb000, 0xfbfff).ram().share("nvram");
 }
@@ -228,13 +229,13 @@ void chsuper_state::chsuper_portmap(address_map &map)
 	map(0x00e9, 0x00e9).portr("IN1");
 	map(0x00ea, 0x00ea).portr("DSW");
 	map(0x00ed, 0x00ed).nopw(); // mirror of EFh, but with bit0 active...
-	map(0x00ee, 0x00ee).w(this, FUNC(chsuper_state::chsuper_outporta_w));
-	map(0x00ef, 0x00ef).w(this, FUNC(chsuper_state::chsuper_outportb_w));
+	map(0x00ee, 0x00ee).w(FUNC(chsuper_state::chsuper_outporta_w));
+	map(0x00ef, 0x00ef).w(FUNC(chsuper_state::chsuper_outportb_w));
 	map(0x00fc, 0x00fc).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x00fd, 0x00fd).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x00fe, 0x00fe).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x8300, 0x8300).portr("IN2");  // valid input port present in test mode.
-	map(0xff20, 0xff3f).w("dac", FUNC(dac_byte_interface::write)); // unk writes
+	map(0xff20, 0xff3f).w("dac", FUNC(dac_byte_interface::data_w)); // unk writes
 }
 
 /* About Sound...
@@ -380,12 +381,13 @@ MACHINE_CONFIG_START(chsuper_state::chsuper)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chsuper)
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &chsuper_state::ramdac_map);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

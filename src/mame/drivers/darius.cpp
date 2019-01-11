@@ -196,7 +196,7 @@ void darius_state::darius_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
 	map(0x080000, 0x08ffff).ram();                                             /* main RAM */
-	map(0x0a0000, 0x0a0001).w(this, FUNC(darius_state::cpua_ctrl_w));
+	map(0x0a0000, 0x0a0001).w(FUNC(darius_state::cpua_ctrl_w));
 	map(0x0b0000, 0x0b0001).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 	map(0xc00000, 0xc00001).nopr();
 	map(0xc00001, 0xc00001).w("ciu", FUNC(pc060ha_device::master_port_w));
@@ -204,10 +204,10 @@ void darius_state::darius_map(address_map &map)
 	map(0xc00008, 0xc00009).portr("P1");
 	map(0xc0000a, 0xc0000b).portr("P2");
 	map(0xc0000c, 0xc0000d).portr("SYSTEM");
-	map(0xc0000e, 0xc0000f).r(this, FUNC(darius_state::coin_r));
+	map(0xc0000e, 0xc0000f).r(FUNC(darius_state::coin_r));
 	map(0xc00010, 0xc00011).portr("DSW");
 	map(0xc00050, 0xc00051).noprw(); // unknown, written by both cpus - always 0?
-	map(0xc00060, 0xc00061).w(this, FUNC(darius_state::coin_w));
+	map(0xc00060, 0xc00061).w(FUNC(darius_state::coin_w));
 	map(0xd00000, 0xd0ffff).rw(m_pc080sn, FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));  /* tilemaps */
 	map(0xd20000, 0xd20003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
 	map(0xd40000, 0xd40003).w(m_pc080sn, FUNC(pc080sn_device::xscroll_word_w));
@@ -215,7 +215,7 @@ void darius_state::darius_map(address_map &map)
 	map(0xd80000, 0xd80fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");/* palette */
 	map(0xe00100, 0xe00fff).ram().share("spriteram");
 	map(0xe01000, 0xe02fff).ram().share("share2");
-	map(0xe08000, 0xe0ffff).ram().w(this, FUNC(darius_state::darius_fg_layer_w)).share("fg_ram");
+	map(0xe08000, 0xe0ffff).ram().w(FUNC(darius_state::darius_fg_layer_w)).share("fg_ram");
 	map(0xe10000, 0xe10fff).ram();                                             /* ??? */
 }
 
@@ -227,7 +227,7 @@ void darius_state::darius_cpub_map(address_map &map)
 	map(0xd80000, 0xd80fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xe00100, 0xe00fff).ram().share("spriteram");
 	map(0xe01000, 0xe02fff).ram().share("share2");
-	map(0xe08000, 0xe0ffff).ram().w(this, FUNC(darius_state::darius_fg_layer_w)).share("fg_ram");
+	map(0xe08000, 0xe0ffff).ram().w(FUNC(darius_state::darius_fg_layer_w)).share("fg_ram");
 }
 
 
@@ -430,14 +430,14 @@ void darius_state::darius_sound_map(address_map &map)
 	map(0xa000, 0xa001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xb000, 0xb000).nopr().w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xb001, 0xb001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
-	map(0xc000, 0xc000).w(this, FUNC(darius_state::darius_fm0_pan));
-	map(0xc400, 0xc400).w(this, FUNC(darius_state::darius_fm1_pan));
-	map(0xc800, 0xc800).w(this, FUNC(darius_state::darius_psg0_pan));
-	map(0xcc00, 0xcc00).w(this, FUNC(darius_state::darius_psg1_pan));
-	map(0xd000, 0xd000).w(this, FUNC(darius_state::darius_da_pan));
-	map(0xd400, 0xd400).w(this, FUNC(darius_state::adpcm_command_w));  /* ADPCM command for second Z80 to read from port 0x00 */
+	map(0xc000, 0xc000).w(FUNC(darius_state::darius_fm0_pan));
+	map(0xc400, 0xc400).w(FUNC(darius_state::darius_fm1_pan));
+	map(0xc800, 0xc800).w(FUNC(darius_state::darius_psg0_pan));
+	map(0xcc00, 0xcc00).w(FUNC(darius_state::darius_psg1_pan));
+	map(0xd000, 0xd000).w(FUNC(darius_state::darius_da_pan));
+	map(0xd400, 0xd400).w(FUNC(darius_state::adpcm_command_w));  /* ADPCM command for second Z80 to read from port 0x00 */
 //  AM_RANGE(0xd800, 0xd800) AM_WRITE(display_value)    /* ??? */
-	map(0xdc00, 0xdc00).w(this, FUNC(darius_state::sound_bankswitch_w));
+	map(0xdc00, 0xdc00).w(FUNC(darius_state::sound_bankswitch_w));
 }
 
 void darius_state::darius_sound2_map(address_map &map)
@@ -483,17 +483,17 @@ WRITE8_MEMBER(darius_state::adpcm_nmi_enable)
 
 WRITE8_MEMBER(darius_state::adpcm_data_w)
 {
-	m_msm->data_w(data);
+	m_msm->write_data(data);
 	m_msm->reset_w(!(data & 0x20));    /* my best guess, but it could be output enable as well */
 }
 
 void darius_state::darius_sound2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(darius_state::adpcm_command_read), FUNC(darius_state::adpcm_nmi_disable));
-	map(0x01, 0x01).w(this, FUNC(darius_state::adpcm_nmi_enable));
-	map(0x02, 0x02).r(this, FUNC(darius_state::readport2)).w(this, FUNC(darius_state::adpcm_data_w));  /* readport2 ??? */
-	map(0x03, 0x03).r(this, FUNC(darius_state::readport3)); /* ??? */
+	map(0x00, 0x00).rw(FUNC(darius_state::adpcm_command_read), FUNC(darius_state::adpcm_nmi_disable));
+	map(0x01, 0x01).w(FUNC(darius_state::adpcm_nmi_enable));
+	map(0x02, 0x02).r(FUNC(darius_state::readport2)).w(FUNC(darius_state::adpcm_data_w));  /* readport2 ??? */
+	map(0x03, 0x03).r(FUNC(darius_state::readport3)); /* ??? */
 }
 
 
@@ -703,126 +703,124 @@ void darius_state::machine_reset()
 	}
 }
 
-
-MACHINE_CONFIG_START(darius_state::darius)
-
+void darius_state::darius(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)  /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(darius_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", darius_state,  irq4_line_hold)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2);  /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &darius_state::darius_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(darius_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(darius_sound_map)
+	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &darius_state::darius_sound_map);
 
-	MCFG_DEVICE_ADD("cpub", M68000, XTAL(16'000'000)/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(darius_cpub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", darius_state,  irq4_line_hold)
+	M68000(config, m_cpub, XTAL(16'000'000)/2); /* 8 MHz */
+	m_cpub->set_addrmap(AS_PROGRAM, &darius_state::darius_cpub_map);
+	m_cpub->set_vblank_int("lscreen", FUNC(darius_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("adpcm", Z80, XTAL(8'000'000)/2) /* 4 MHz */  /* ADPCM player using MSM5205 */
-	MCFG_DEVICE_PROGRAM_MAP(darius_sound2_map)
-	MCFG_DEVICE_IO_MAP(darius_sound2_io_map)
+	Z80(config, m_adpcm, XTAL(8'000'000)/2); /* 4 MHz */  /* ADPCM player using MSM5205 */
+	m_adpcm->set_addrmap(AS_PROGRAM, &darius_state::darius_sound2_map);
+	m_adpcm->set_addrmap(AS_IO, &darius_state::darius_sound2_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame ? */
+	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame ? */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darius)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_DEFAULT_LAYOUT(layout_darius)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_darius);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+	config.set_default_layout(layout_darius);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 29*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(darius_state, screen_update_darius_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(36*8, 32*8);
+	lscreen.set_visarea(0*8, 36*8-1, 1*8, 29*8-1);
+	lscreen.set_screen_update(FUNC(darius_state::screen_update_darius_left));
+	lscreen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("mscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 29*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(darius_state, screen_update_darius_middle)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
+	mscreen.set_refresh_hz(60);
+	mscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	mscreen.set_size(36*8, 32*8);
+	mscreen.set_visarea(0*8, 36*8-1, 1*8, 29*8-1);
+	mscreen.set_screen_update(FUNC(darius_state::screen_update_darius_middle));
+	mscreen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 29*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(darius_state, screen_update_darius_right)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(36*8, 32*8);
+	rscreen.set_visarea(0*8, 36*8-1, 1*8, 29*8-1);
+	rscreen.set_screen_update(FUNC(darius_state::screen_update_darius_right));
+	rscreen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
-	MCFG_PC080SN_GFX_REGION(1)
-	MCFG_PC080SN_OFFSETS(-16, 8)
-	MCFG_PC080SN_YINVERT(0)
-	MCFG_PC080SN_DBLWIDTH(1)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn, 0);
+	m_pc080sn->set_gfx_region(1);
+	m_pc080sn->set_offsets(-16, 8);
+	m_pc080sn->set_yinvert(0);
+	m_pc080sn->set_dblwidth(1);
+	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(8'000'000)/2) /* 4 MHz */
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) /* assumes Z80 sandwiched between 68Ks */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, darius_state, darius_write_portA0))  /* portA write */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, darius_state, darius_write_portB0))  /* portB write */
-	MCFG_SOUND_ROUTE(0, "filter0.0l", 0.08)
-	MCFG_SOUND_ROUTE(0, "filter0.0r", 0.08)
-	MCFG_SOUND_ROUTE(1, "filter0.1l", 0.08)
-	MCFG_SOUND_ROUTE(1, "filter0.1r", 0.08)
-	MCFG_SOUND_ROUTE(2, "filter0.2l", 0.08)
-	MCFG_SOUND_ROUTE(2, "filter0.2r", 0.08)
-	MCFG_SOUND_ROUTE(3, "filter0.3l", 0.60)
-	MCFG_SOUND_ROUTE(3, "filter0.3r", 0.60)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(8'000'000)/2)); /* 4 MHz */
+	ym1.irq_handler().set_inputline(m_audiocpu, 0); /* assumes Z80 sandwiched between 68Ks */
+	ym1.port_a_write_callback().set(FUNC(darius_state::darius_write_portA0));
+	ym1.port_b_write_callback().set(FUNC(darius_state::darius_write_portB0));
+	ym1.add_route(0, "filter0.0l", 0.08);
+	ym1.add_route(0, "filter0.0r", 0.08);
+	ym1.add_route(1, "filter0.1l", 0.08);
+	ym1.add_route(1, "filter0.1r", 0.08);
+	ym1.add_route(2, "filter0.2l", 0.08);
+	ym1.add_route(2, "filter0.2r", 0.08);
+	ym1.add_route(3, "filter0.3l", 0.60);
+	ym1.add_route(3, "filter0.3r", 0.60);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(8'000'000)/2) /* 4 MHz */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, darius_state, darius_write_portA1))  /* portA write */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, darius_state, darius_write_portB1))  /* portB write */
-	MCFG_SOUND_ROUTE(0, "filter1.0l", 0.08)
-	MCFG_SOUND_ROUTE(0, "filter1.0r", 0.08)
-	MCFG_SOUND_ROUTE(1, "filter1.1l", 0.08)
-	MCFG_SOUND_ROUTE(1, "filter1.1r", 0.08)
-	MCFG_SOUND_ROUTE(2, "filter1.2l", 0.08)
-	MCFG_SOUND_ROUTE(2, "filter1.2r", 0.08)
-	MCFG_SOUND_ROUTE(3, "filter1.3l", 0.60)
-	MCFG_SOUND_ROUTE(3, "filter1.3r", 0.60)
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL(8'000'000)/2)); /* 4 MHz */
+	ym2.port_a_write_callback().set(FUNC(darius_state::darius_write_portA1));
+	ym2.port_b_write_callback().set(FUNC(darius_state::darius_write_portB1));
+	ym2.add_route(0, "filter1.0l", 0.08);
+	ym2.add_route(0, "filter1.0r", 0.08);
+	ym2.add_route(1, "filter1.1l", 0.08);
+	ym2.add_route(1, "filter1.1r", 0.08);
+	ym2.add_route(2, "filter1.2l", 0.08);
+	ym2.add_route(2, "filter1.2r", 0.08);
+	ym2.add_route(3, "filter1.3l", 0.60);
+	ym2.add_route(3, "filter1.3r", 0.60);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, darius_state, darius_adpcm_int))   /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz   */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.l", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.r", 1.0)
+	MSM5205(config, m_msm, XTAL(384'000));
+	m_msm->vck_legacy_callback().set(FUNC(darius_state::darius_adpcm_int));   /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8KHz   */
+	m_msm->add_route(ALL_OUTPUTS, "msm5205.l", 1.0);
+	m_msm->add_route(ALL_OUTPUTS, "msm5205.r", 1.0);
 
-	FILTER_VOLUME(config, "filter0.0l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter0.0r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "filter0.1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter0.1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "filter0.2l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter0.2r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "filter0.3l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter0.3r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_0l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_0r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_1l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_1r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_2l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_2r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_3l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_3r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	FILTER_VOLUME(config, "filter1.0l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter1.0r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "filter1.1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter1.1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "filter1.2l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter1.2r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "filter1.3l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter1.3r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_0l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_0r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_1l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_1r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_2l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_2r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_3l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_3r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	FILTER_VOLUME(config, "msm5205.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "msm5205.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_msm5205_l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_msm5205_r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
+}
 
 
 /***************************************************************************

@@ -28,17 +28,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ATARI_SOUND_COMM_ADD(_tag, _soundcpu, _intcb) \
-	MCFG_DEVICE_ADD(_tag, ATARI_SOUND_COMM, 0) \
-	downcast<atari_sound_comm_device &>(*device).set_sound_cpu(_soundcpu); \
-	devcb = &downcast<atari_sound_comm_device &>(*device).set_main_int_cb(DEVCB_##_intcb);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -58,11 +47,17 @@ class atari_sound_comm_device : public device_t
 {
 public:
 	// construction/destruction
+	template <typename T>
+	atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cputag)
+		: atari_sound_comm_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		m_sound_cpu.set_tag(std::forward<T>(cputag));
+	}
+
 	atari_sound_comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	void set_sound_cpu(const char *cputag) { m_sound_cpu_tag = cputag; }
-	template <class Object> devcb_base &set_main_int_cb(Object &&cb) { return m_main_int_cb.set_callback(std::forward<Object>(cb)); }
+	auto int_callback() { return m_main_int_cb.bind(); }
 
 	// getters
 	DECLARE_READ_LINE_MEMBER(main_to_sound_ready) { return m_main_to_sound_ready ? ASSERT_LINE : CLEAR_LINE; }
@@ -80,6 +75,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
 	DECLARE_READ8_MEMBER(sound_irq_ack_r);
 	INTERRUPT_GEN_MEMBER(sound_irq_gen);
+	void sound_irq();
 
 	// additional helpers
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_gen);
@@ -106,11 +102,10 @@ private:
 	};
 
 	// configuration state
-	const char *        m_sound_cpu_tag;
 	devcb_write_line   m_main_int_cb;
 
 	// internal state
-	m6502_device *      m_sound_cpu;
+	required_device<m6502_device> m_sound_cpu;
 	bool                m_main_to_sound_ready;
 	bool                m_sound_to_main_ready;
 	uint8_t               m_main_to_sound_data;
@@ -152,7 +147,6 @@ protected:
 	// interrupt handling
 	void scanline_int_set(screen_device &screen, int scanline);
 	DECLARE_WRITE_LINE_MEMBER(scanline_int_write_line);
-	INTERRUPT_GEN_MEMBER(scanline_int_gen);
 	DECLARE_WRITE16_MEMBER(scanline_int_ack_w);
 
 	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
@@ -208,8 +202,6 @@ protected:
 
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<screen_device> m_screen;
-	optional_device<palette_device> m_palette;
-	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
 	optional_device<atari_slapstic_device> m_slapstic_device;
 
 private:

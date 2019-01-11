@@ -5,25 +5,22 @@
  * includes/pmd85.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_PMD85_H
 #define MAME_INCLUDES_PMD85_H
+
+#pragma once
 
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "emupal.h"
 
 
 class pmd85_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_CASSETTE
-	};
-
 	pmd85_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -54,8 +51,31 @@ public:
 		m_bank16(*this, "bank16"),
 		m_io_dsw0(*this, "DSW0"),
 		m_palette(*this, "palette"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
+
+	void pmd85(machine_config &config, bool with_uart = true);
+	void pmd851(machine_config &config);
+	void pmd853(machine_config &config);
+	void pmd852a(machine_config &config);
+	void alfa(machine_config &config);
+	void c2717(machine_config &config);
+	void mato(machine_config &config);
+
+	void init_mato();
+	void init_pmd852a();
+	void init_pmd851();
+	void init_pmd853();
+	void init_alfa();
+	void init_c2717();
+
+	DECLARE_INPUT_CHANGED_MEMBER(pmd85_reset);
+
+private:
+	enum
+	{
+		TIMER_CASSETTE
+	};
 
 	uint8_t m_rom_module_present;
 	uint8_t m_ppi_port_outputs[4][3];
@@ -71,12 +91,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pmd85_io_w);
 	DECLARE_READ8_MEMBER(mato_io_r);
 	DECLARE_WRITE8_MEMBER(mato_io_w);
-	void init_mato();
-	void init_pmd852a();
-	void init_pmd851();
-	void init_pmd853();
-	void init_alfa();
-	void init_c2717();
+
 	virtual void machine_reset() override;
 	uint32_t screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pmd85_cassette_timer_callback);
@@ -108,15 +123,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pmd85_ppi_3_porta_w);
 	DECLARE_WRITE8_MEMBER(pmd85_ppi_3_portb_w);
 	DECLARE_WRITE8_MEMBER(pmd85_ppi_3_portc_w);
-	DECLARE_INPUT_CHANGED_MEMBER(pmd85_reset);
 
-	void pmd85(machine_config &config);
-	void pmd851(machine_config &config);
-	void pmd853(machine_config &config);
-	void pmd852a(machine_config &config);
-	void alfa(machine_config &config);
-	void c2717(machine_config &config);
-	void mato(machine_config &config);
 	void alfa_mem(address_map &map);
 	void c2717_mem(address_map &map);
 	void mato_io_map(address_map &map);
@@ -125,8 +132,8 @@ public:
 	void pmd853_mem(address_map &map);
 	void pmd85_io_map(address_map &map);
 	void pmd85_mem(address_map &map);
-protected:
-	virtual void machine_start() override { m_led.resolve(); }
+
+	virtual void machine_start() override { m_leds.resolve(); }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -157,7 +164,7 @@ protected:
 	optional_ioport m_io_dsw0;
 	ioport_port *m_io_port[16];
 	required_device<palette_device> m_palette;
-	output_finder<3> m_led;
+	output_finder<3> m_leds;
 
 	void pmd851_update_memory();
 	void pmd852a_update_memory();

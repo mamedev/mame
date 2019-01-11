@@ -25,9 +25,9 @@ DEFINE_DEVICE_TYPE(SV806, sv806_device, "sv806", "SV-806 80 Column Cartridge")
 ROM_START( sv806 )
 	ROM_REGION(0x1000, "gfx", 0)
 	ROM_SYSTEM_BIOS(0, "en", "English Character Set")
-	ROMX_LOAD("sv806.ic27",   0x0000, 0x1000, CRC(850bc232) SHA1(ed45cb0e9bd18a9d7bd74f87e620f016a7ae840f), ROM_BIOS(1))
+	ROMX_LOAD("sv806.ic27",   0x0000, 0x1000, CRC(850bc232) SHA1(ed45cb0e9bd18a9d7bd74f87e620f016a7ae840f), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "se", "Swedish Character Set")
-	ROMX_LOAD("sv806se.ic27", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(2))
+	ROMX_LOAD("sv806se.ic27", 0x0000, 0x1000, CRC(daea8956) SHA1(3f16d5513ad35692488ae7d864f660e76c6e8ed3), ROM_BIOS(1))
 ROM_END
 
 const tiny_rom_entry *sv806_device::device_rom_region() const
@@ -39,18 +39,21 @@ const tiny_rom_entry *sv806_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sv806_device::device_add_mconfig)
-	MCFG_SCREEN_ADD_MONOCHROME("80col", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS((XTAL(12'000'000) / 6) * 8, 864, 0, 640, 317, 0, 192)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
+void sv806_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "80col", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_raw((XTAL(12'000'000) / 6) * 8, 864, 0, 640, 317, 0, 192);
+	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_MC6845_ADD("crtc", HD6845, "80col", XTAL(12'000'000) / 6)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(sv806_device, crtc_update_row)
-MACHINE_CONFIG_END
+	HD6845(config, m_crtc, XTAL(12'000'000) / 6);
+	m_crtc->set_screen("80col");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(sv806_device::crtc_update_row), this);
+}
 
 
 //**************************************************************************
@@ -81,7 +84,7 @@ void sv806_device::device_start()
 {
 	// register for savestates
 	save_item(NAME(m_ram_enabled));
-	save_pointer(NAME(m_ram.get()), 0x800);
+	save_pointer(NAME(m_ram), 0x800);
 }
 
 

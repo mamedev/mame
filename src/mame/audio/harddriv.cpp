@@ -395,13 +395,13 @@ void harddriv_sound_board_device::driversnd_68k_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x01ffff).rom();
-	map(0xff0000, 0xff0fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_data_r), FUNC(harddriv_sound_board_device::hdsnd68k_data_w));
-	map(0xff1000, 0xff1fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_switches_r), FUNC(harddriv_sound_board_device::hdsnd68k_latches_w));
-	map(0xff2000, 0xff2fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_320port_r), FUNC(harddriv_sound_board_device::hdsnd68k_speech_w));
-	map(0xff3000, 0xff3fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_status_r), FUNC(harddriv_sound_board_device::hdsnd68k_irqclr_w));
-	map(0xff4000, 0xff5fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_320ram_r), FUNC(harddriv_sound_board_device::hdsnd68k_320ram_w));
-	map(0xff6000, 0xff7fff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_320ports_r), FUNC(harddriv_sound_board_device::hdsnd68k_320ports_w));
-	map(0xff8000, 0xffbfff).rw(this, FUNC(harddriv_sound_board_device::hdsnd68k_320com_r), FUNC(harddriv_sound_board_device::hdsnd68k_320com_w));
+	map(0xff0000, 0xff0fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_data_r), FUNC(harddriv_sound_board_device::hdsnd68k_data_w));
+	map(0xff1000, 0xff1fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_switches_r), FUNC(harddriv_sound_board_device::hdsnd68k_latches_w));
+	map(0xff2000, 0xff2fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_320port_r), FUNC(harddriv_sound_board_device::hdsnd68k_speech_w));
+	map(0xff3000, 0xff3fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_status_r), FUNC(harddriv_sound_board_device::hdsnd68k_irqclr_w));
+	map(0xff4000, 0xff5fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_320ram_r), FUNC(harddriv_sound_board_device::hdsnd68k_320ram_w));
+	map(0xff6000, 0xff7fff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_320ports_r), FUNC(harddriv_sound_board_device::hdsnd68k_320ports_w));
+	map(0xff8000, 0xffbfff).rw(FUNC(harddriv_sound_board_device::hdsnd68k_320com_r), FUNC(harddriv_sound_board_device::hdsnd68k_320com_w));
 	map(0xffc000, 0xffffff).ram();
 }
 
@@ -417,14 +417,14 @@ void harddriv_sound_board_device::driversnd_dsp_program_map(address_map &map)
 
 void harddriv_sound_board_device::driversnd_dsp_io_map(address_map &map)
 {
-	map(0, 0).r(this, FUNC(harddriv_sound_board_device::hdsnddsp_rom_r)).w(this, FUNC(harddriv_sound_board_device::hdsnddsp_dac_w));
-	map(1, 1).r(this, FUNC(harddriv_sound_board_device::hdsnddsp_comram_r));
-	map(2, 2).r(this, FUNC(harddriv_sound_board_device::hdsnddsp_compare_r));
+	map(0, 0).r(FUNC(harddriv_sound_board_device::hdsnddsp_rom_r)).w(FUNC(harddriv_sound_board_device::hdsnddsp_dac_w));
+	map(1, 1).r(FUNC(harddriv_sound_board_device::hdsnddsp_comram_r));
+	map(2, 2).r(FUNC(harddriv_sound_board_device::hdsnddsp_compare_r));
 	map(1, 2).nopw();
-	map(3, 3).w(this, FUNC(harddriv_sound_board_device::hdsnddsp_comport_w));
-	map(4, 4).w(this, FUNC(harddriv_sound_board_device::hdsnddsp_mute_w));
-	map(5, 5).w(this, FUNC(harddriv_sound_board_device::hdsnddsp_gen68kirq_w));
-	map(6, 7).w(this, FUNC(harddriv_sound_board_device::hdsnddsp_soundaddr_w));
+	map(3, 3).w(FUNC(harddriv_sound_board_device::hdsnddsp_comport_w));
+	map(4, 4).w(FUNC(harddriv_sound_board_device::hdsnddsp_mute_w));
+	map(5, 5).w(FUNC(harddriv_sound_board_device::hdsnddsp_gen68kirq_w));
+	map(6, 7).w(FUNC(harddriv_sound_board_device::hdsnddsp_soundaddr_w));
 }
 
 
@@ -435,22 +435,22 @@ void harddriv_sound_board_device::driversnd_dsp_io_map(address_map &map)
 MACHINE_CONFIG_START(harddriv_sound_board_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("soundcpu", M68000, XTAL(16'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(driversnd_68k_map)
+	M68000(config, m_soundcpu, 16_MHz_XTAL/2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &harddriv_sound_board_device::driversnd_68k_map);
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // 80R
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, speech_write_w)) // SPWR - 5220 write strobe
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, speech_reset_w)) // SPRES - 5220 hard reset
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, speech_rate_w)) // SPRATE
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, cram_enable_w)) // CRAMEN
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sounddsp", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT // RES320
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, harddriv_sound_board_device, led_w))
+	LS259(config, m_latch, 0); // 80R
+	m_latch->q_out_cb<0>().set(FUNC(harddriv_sound_board_device::speech_write_w)); // SPWR - 5220 write strobe
+	m_latch->q_out_cb<1>().set(FUNC(harddriv_sound_board_device::speech_reset_w)); // SPRES - 5220 hard reset
+	m_latch->q_out_cb<2>().set(FUNC(harddriv_sound_board_device::speech_rate_w)); // SPRATE
+	m_latch->q_out_cb<3>().set(FUNC(harddriv_sound_board_device::cram_enable_w)); // CRAMEN
+	m_latch->q_out_cb<4>().set_inputline(m_sounddsp, INPUT_LINE_HALT).invert(); // RES320
+	m_latch->q_out_cb<7>().set(FUNC(harddriv_sound_board_device::led_w));
 
-	MCFG_DEVICE_ADD("sounddsp", TMS32010, XTAL(20'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(driversnd_dsp_program_map)
+	TMS32010(config, m_sounddsp, XTAL(20'000'000));
+	m_sounddsp->set_addrmap(AS_PROGRAM, &harddriv_sound_board_device::driversnd_dsp_program_map);
 	/* Data Map is internal to the CPU */
-	MCFG_DEVICE_IO_MAP(driversnd_dsp_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, harddriv_sound_board_device, hdsnddsp_get_bio))
+	m_sounddsp->set_addrmap(AS_IO, &harddriv_sound_board_device::driversnd_dsp_io_map);
+	m_sounddsp->bio().set(FUNC(harddriv_sound_board_device::hdsnddsp_get_bio));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

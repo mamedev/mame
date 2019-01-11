@@ -14,6 +14,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -21,9 +22,14 @@ class a51xx_state : public driver_device
 {
 public:
 	a51xx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
+	void a5130(machine_config &config);
+	void a5120(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(a5130);
@@ -31,8 +37,6 @@ public:
 	uint32_t screen_update_a5120(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_a5130(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void a5130(machine_config &config);
-	void a5120(machine_config &config);
 	void a5120_io(address_map &map);
 	void a5120_mem(address_map &map);
 	void a5130_io(address_map &map);
@@ -140,8 +144,7 @@ MACHINE_CONFIG_START(a51xx_state::a5120)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_a51xx)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a51xx_state::a5130)
@@ -164,9 +167,9 @@ MACHINE_CONFIG_END
 ROM_START( a5120 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v1", "v1" )
-	ROMX_LOAD( "a5120_v1.rom", 0x0000, 0x0400, CRC(b2b3fee0) SHA1(6198513b263d8a7a867f1dda368b415bb37fcdae), ROM_BIOS(1))
+	ROMX_LOAD( "a5120_v1.rom", 0x0000, 0x0400, CRC(b2b3fee0) SHA1(6198513b263d8a7a867f1dda368b415bb37fcdae), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v2", "v2" )
-	ROMX_LOAD( "a5120_v2.rom", 0x0000, 0x0400, CRC(052386c2) SHA1(e545d30a0882cb7ee7acdbea842b57440552e4a6), ROM_BIOS(2))
+	ROMX_LOAD( "a5120_v2.rom", 0x0000, 0x0400, CRC(052386c2) SHA1(e545d30a0882cb7ee7acdbea842b57440552e4a6), ROM_BIOS(1))
 
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD( "bab47_1_lat.bin", 0x0000, 0x0400, CRC(93220886) SHA1(a5a1ab4e2e06eabc58c84991caa6a1cf55f1462d))

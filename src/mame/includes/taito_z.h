@@ -6,6 +6,10 @@
     Taito Z system
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_TAITO_Z_H
+#define MAME_INCLUDES_TAITO_Z_H
+
+#pragma once
 
 #include "audio/taitosnd.h"
 #include "machine/eepromser.h"
@@ -38,11 +42,12 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_filter(*this, {"2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l"}),
 		m_steer(*this, "STEER"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(taitoz_pedal_r);
 
+	void bshark_base(machine_config &config);
 	void sci(machine_config &config);
 	void spacegun(machine_config &config);
 	void chasehq(machine_config &config);
@@ -96,7 +101,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device_array<filter_volume_device, 4> m_filter;
 	optional_ioport m_steer;
-	output_finder<2> m_lamp;
+	output_finder<2> m_lamps;
 
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(bshark_cpua_ctrl_w);
@@ -165,3 +170,5 @@ private:
 	void spacegun_map(address_map &map);
 	void z80_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TAITO_Z_H

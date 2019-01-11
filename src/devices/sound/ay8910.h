@@ -52,27 +52,7 @@
 #define YM2149_PIN26_LOW            (0x10)
 
 
-#define MCFG_AY8910_OUTPUT_TYPE(_flag) \
-	downcast<ay8910_device &>(*device).set_flags(_flag);
-
-#define MCFG_AY8910_RES_LOADS(_res0, _res1, _res2) \
-	downcast<ay8910_device &>(*device).set_resistors_load(_res0, _res1, _res2);
-
-#define MCFG_AY8910_PORT_A_READ_CB(_devcb) \
-	devcb = &downcast<ay8910_device &>(*device).set_port_a_read_callback(DEVCB_##_devcb);
-
-#define MCFG_AY8910_PORT_B_READ_CB(_devcb) \
-	devcb = &downcast<ay8910_device &>(*device).set_port_b_read_callback(DEVCB_##_devcb);
-
-#define MCFG_AY8910_PORT_A_WRITE_CB(_devcb) \
-	devcb = &downcast<ay8910_device &>(*device).set_port_a_write_callback(DEVCB_##_devcb);
-
-#define MCFG_AY8910_PORT_B_WRITE_CB(_devcb) \
-	devcb = &downcast<ay8910_device &>(*device).set_port_b_write_callback(DEVCB_##_devcb);
-
-
-class ay8910_device : public device_t,
-									public device_sound_interface
+class ay8910_device : public device_t, public device_sound_interface
 {
 public:
 	enum psg_type_t
@@ -88,27 +68,26 @@ public:
 	void set_flags(int flags) { m_flags = flags; }
 	void set_psg_type(psg_type_t psg_type) { set_type(psg_type); }
 	void set_resistors_load(int res_load0, int res_load1, int res_load2) { m_res_load[0] = res_load0; m_res_load[1] = res_load1; m_res_load[2] = res_load2; }
-	template <class Object> devcb_base &set_port_a_read_callback(Object &&cb) { return m_port_a_read_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_port_b_read_callback(Object &&cb) { return m_port_b_read_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_port_a_write_callback(Object &&cb) { return m_port_a_write_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_port_b_write_callback(Object &&cb) { return m_port_b_write_cb.set_callback(std::forward<Object>(cb)); }
+	auto port_a_read_callback() { return m_port_a_read_cb.bind(); }
+	auto port_b_read_callback() { return m_port_b_read_cb.bind(); }
+	auto port_a_write_callback() { return m_port_a_write_cb.bind(); }
+	auto port_b_write_callback() { return m_port_b_write_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( address_w );
 	DECLARE_WRITE8_MEMBER( data_w );
-	u8 data_r();
-	void address_w(u8 data);
-	void data_w(u8 data);
+	u8 read_data() { return ay8910_read_ym(); }
+	void write_address(u8 data) { ay8910_write_ym(0, data); }
+	void write_data(u8 data) { ay8910_write_ym(1, data); }
 
 	/* /RES */
-	void reset_w();
-	DECLARE_WRITE8_MEMBER( reset_w );
+	DECLARE_WRITE8_MEMBER( reset_w ) { ay8910_reset_ym(); }
 
-	/* use this when BC1 == A0; here, BC1=0 selects 'data' and BC1=1 selects 'latch address' */
-	DECLARE_WRITE8_MEMBER( data_address_w );
+	// use this when BC1 == A0; here, BC1=0 selects 'data' and BC1=1 selects 'latch address'
+	DECLARE_WRITE8_MEMBER( data_address_w ) { ay8910_write_ym(~offset & 1, data); } // note that directly connecting BC1 to A0 puts data on 0 and address on 1
 
-	/* use this when BC1 == !A0; here, BC1=0 selects 'latch address' and BC1=1 selects 'data' */
-	DECLARE_WRITE8_MEMBER( address_data_w );
+	// use this when BC1 == !A0; here, BC1=0 selects 'latch address' and BC1=1 selects 'data'
+	DECLARE_WRITE8_MEMBER( address_data_w ) { ay8910_write_ym(offset & 1, data); }
 
 	// bc1=a0, bc2=a1
 	DECLARE_WRITE8_MEMBER(write_bc1_bc2);

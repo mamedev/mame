@@ -9,284 +9,26 @@
 */
 
 #include "emu.h"
-#include "cpu/apexc/apexc.h"
-#include "screen.h"
+#include "includes/apexc.h"
 
-
-class apexc_state : public driver_device
-{
-public:
-	apexc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_screen(*this, "screen")  { }
-
-	uint32_t m_panel_data_reg;    /* value of a data register on the control panel which can
-	                            be edited - the existence of this register is a personnal
-	                            guess */
-
-	std::unique_ptr<bitmap_ind16> m_bitmap;
-
-	uint32_t m_old_edit_keys;
-	int m_old_control_keys;
-
-	int m_letters;
-	int m_pos;
-	void init_apexc();
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(apexc);
-	uint32_t screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(apexc_interrupt);
-	DECLARE_READ8_MEMBER(tape_read);
-	DECLARE_WRITE8_MEMBER(tape_write);
-	void apexc_draw_led(bitmap_ind16 &bitmap, int x, int y, int state);
-	void apexc_draw_char(bitmap_ind16 &bitmap, char character, int x, int y, int color);
-	void apexc_draw_string(bitmap_ind16 &bitmap, const char *buf, int x, int y, int color);
-	void apexc_teletyper_init();
-	void apexc_teletyper_linefeed();
-	void apexc_teletyper_putchar(int character);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
-	void apexc(machine_config &config);
-	void apexc_mem_map(address_map &map);
-};
+/*static*/ const device_timer_id apexc_state::TIMER_POLL_INPUTS = 1;
 
 void apexc_state::machine_start()
 {
-	apexc_teletyper_init();
-}
+	teletyper_init();
 
-
-/*
-    APEXC RAM loading/saving from cylinder image
-
-    Note that, in an actual APEXC, the RAM contents are not read from the cylinder :
-    the cylinder IS the RAM.
-
-    This feature is important : of course, the tape reader allows to enter programs, but you
-    still need an object code loader in memory.  (Of course, the control panel enables
-    the user to enter such a loader manually, but it would take hours...)
-*/
-
-class apexc_cylinder_image_device : public device_t, public device_image_interface
-{
-public:
-	// construction/destruction
-	apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// image-level overrides
-	virtual iodevice_t image_type() const override { return IO_CYLINDER; }
-
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *file_extensions() const override { return "apc"; }
-
-	virtual image_init_result call_load() override;
-	virtual void call_unload() override;
-protected:
-	// device-level overrides
-	virtual void device_start() override { }
-private:
-	int m_writable;
-};
-
-DEFINE_DEVICE_TYPE(APEXC_CYLINDER, apexc_cylinder_image_device, "apexc_cylinder_image", "APEXC Cylinder")
-
-apexc_cylinder_image_device::apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, APEXC_CYLINDER, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
-{
+	m_input_timer = timer_alloc(TIMER_POLL_INPUTS);
+	m_input_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
 
 /*
-    Open cylinder image and read RAM
+    Punch a tape character
 */
-image_init_result apexc_cylinder_image_device::call_load()
-{
-	/* load RAM contents */
-	m_writable = !is_readonly();
-
-	fread( machine().root_device().memshare("maincpu")->ptr(), 0x1000);
-#ifdef LSB_FIRST
-	{   /* fix endianness */
-		uint32_t *RAM = (uint32_t *)(machine().root_device().memshare("maincpu")->ptr());
-
-		for (int i=0; i < 0x0400; i++)
-			RAM[i] = big_endianize_int32(RAM[i]);
-	}
-#endif
-
-	return image_init_result::PASS;
-}
-
-/*
-    Save RAM to cylinder image and close it
-*/
-void apexc_cylinder_image_device::call_unload()
-{
-	if (m_writable)
-	{   /* save RAM contents */
-		/* rewind file */
-		fseek(0, SEEK_SET);
-#ifdef LSB_FIRST
-		{   /* fix endianness */
-			uint32_t *RAM = (uint32_t *)(machine().root_device().memshare("maincpu")->ptr());
-
-			for (int i=0; i < /*0x2000*/0x0400; i++)
-				RAM[i] = big_endianize_int32(RAM[i]);
-		}
-#endif
-		/* write */
-		fwrite(machine().root_device().memshare("maincpu")->ptr(), /*0x8000*/0x1000);
-	}
-}
-
-
-#define MCFG_APEXC_CYLINDER_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, APEXC_CYLINDER, 0)
-
-
-/*
-    APEXC tape support
-
-    APEXC does all I/O on paper tape.  There are 5 punch rows on tape.
-
-    Both a reader (read-only), and a puncher (write-only) are provided.
-
-    Tape output can be fed into a teletyper, in order to have text output :
-
-    code                    Symbol
-    (binary)        Letters         Figures
-    00000                           0
-    00001           T               1
-    00010           B               2
-    00011           O               3
-    00100           E               4
-    00101           H               5
-    00110           N               6
-    00111           M               7
-    01000           A               8
-    01001           L               9
-    01010           R               +
-    01011           G               -
-    01100           I               z
-    01101           P               .
-    01110           C               d
-    01111           V               =
-    10000                   Space
-    10001           Z               y
-    10010           D               theta (greek letter)
-    10011                   Line Space (i.e. LF)
-    10100           S               ,
-    10101           Y               Sigma (greek letter)
-    10110           F               x
-    10111           X               /
-    11000                   Carriage Return
-    11001           W               phi (greek letter)
-    11010           J               - (dash ?)
-    11011                   Figures
-    11100           U               pi (greek letter)
-    11101           Q               )
-    11110           K               (
-    11111                   Letters
-*/
-
-class apexc_tape_puncher_image_device : public device_t, public device_image_interface
-{
-public:
-	// construction/destruction
-	apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// image-level overrides
-	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
-
-	virtual bool is_readable()  const override { return 0; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return "tap"; }
-protected:
-	// device-level overrides
-	virtual void device_start() override { }
-};
-
-DEFINE_DEVICE_TYPE(APEXC_TAPE_PUNCHER, apexc_tape_puncher_image_device, "apexc_tape_puncher_image", "APEXC Tape Puncher")
-
-apexc_tape_puncher_image_device::apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, APEXC_TAPE_PUNCHER, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
-{
-}
-
-#define MCFG_APEXC_TAPE_PUNCHER_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, APEXC_TAPE_PUNCHER, 0)
-
-class apexc_tape_reader_image_device :  public device_t, public device_image_interface
-{
-public:
-	// construction/destruction
-	apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// image-level overrides
-	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
-
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return "tap"; }
-protected:
-	// device-level overrides
-	virtual void device_start() override { }
-};
-
-DEFINE_DEVICE_TYPE(APEXC_TAPE_READER, apexc_tape_reader_image_device, "apexc_tape_reader_image", "APEXC Tape Reader")
-
-apexc_tape_reader_image_device::apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, APEXC_TAPE_READER, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
-{
-}
-
-#define MCFG_APEXC_TAPE_READER_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, APEXC_TAPE_READER, 0)
-
-/*
-    Open a tape image
-*/
-
-READ8_MEMBER(apexc_state::tape_read)
-{
-	device_t *device = machine().device("tape_reader");
-	uint8_t reply;
-	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
-
-	if (image->exists() && (image->fread(& reply, 1) == 1))
-		return reply & 0x1f;
-	else
-		return 0;   /* unit not ready - I don't know what we should do */
-}
 
 WRITE8_MEMBER(apexc_state::tape_write)
 {
-	device_t *device = machine().device("tape_puncher");
-	uint8_t data5 = (data & 0x1f);
-	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
-
-	if (image->exists())
-		image->fwrite(& data5, 1);
-
-	apexc_teletyper_putchar(data & 0x1f);    /* display on screen */
+	m_tape_puncher->write(m_maincpu->space(AS_PROGRAM), 0, data);
+	teletyper_putchar(data & 0x1f); /* display on 'screen' */
 }
 
 /*
@@ -395,21 +137,18 @@ static INPUT_PORTS_START(apexc)
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Toggle bit #32")             PORT_CODE(KEYCODE_C)
 INPUT_PORTS_END
 
-
-/*
-    Not a real interrupt - just handle keyboard input
-*/
-INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
+void apexc_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	uint32_t edit_keys;
-	int control_keys;
+	if (id == TIMER_POLL_INPUTS)
+	{
+		check_inputs();
+	}
+}
 
-	int control_transitions;
-
-
+void apexc_state::check_inputs()
+{
 	/* read new state of edit keys */
-	edit_keys = ioport("data")->read();
+	uint32_t edit_keys = m_data_port->read();
 
 	/* toggle data reg according to transitions */
 	m_panel_data_reg ^= edit_keys & (~m_old_edit_keys);
@@ -417,12 +156,11 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 	/* remember new state of edit keys */
 	m_old_edit_keys = edit_keys;
 
-
 	/* read new state of control keys */
-	control_keys = ioport("panel")->read();
+	int control_keys = m_panel_port->read();
 
 	/* compute transitions */
-	control_transitions = control_keys & (~m_old_control_keys);
+	int control_transitions = control_keys & (~m_old_control_keys);
 
 	/* process commands */
 
@@ -436,6 +174,7 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 		/* note that we must take into account the possibility of simulteanous keypresses
 		(which would be a goofy thing to do when reading, but a normal one when writing,
 		if the user wants to clear several registers at once) */
+		printf("crarmlhb\n");
 		int reg_id = -1;
 
 		/* determinate value of reg_id */
@@ -479,243 +218,14 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 
 	if (control_transitions & panel_mem)
 	{   /* read/write memory */
-
-		if (control_keys & panel_write) {
-			/* write memory */
-			space.write_dword(m_maincpu->pc(), m_panel_data_reg);
-		}
-		else {
-			/* read memory */
-			m_panel_data_reg = space.read_dword(m_maincpu->pc());
-		}
+		if (control_keys & panel_write) /* write memory */
+			m_maincpu->space(AS_PROGRAM).write_dword(m_maincpu->pc(), m_panel_data_reg);
+		else                            /* read memory */
+			m_panel_data_reg = m_maincpu->space(AS_PROGRAM).read_dword(m_maincpu->pc());
 	}
 
 	/* remember new state of control keys */
 	m_old_control_keys = control_keys;
-}
-
-/*
-    apexc video emulation.
-
-    Since the APEXC has no video display, we display the control panel.
-
-    Additionally, We display one page of teletyper output.
-*/
-
-static const rgb_t apexc_palette[] =
-{
-	rgb_t::white(),
-	rgb_t::black(),
-	rgb_t(255, 0, 0),
-	rgb_t(50, 0, 0)
-};
-
-#if 0
-static const unsigned short apexc_colortable[] =
-{
-	0, 1
-};
-#endif
-
-#define APEXC_PALETTE_SIZE ARRAY_LENGTH(apexc_palette)
-#define APEXC_COLORTABLE_SIZE sizeof(apexc_colortable)/2
-
-enum
-{
-	/* size and position of panel window */
-	panel_window_width = 256,
-	panel_window_height = 64,
-	panel_window_offset_x = 0,
-	panel_window_offset_y = 0,
-	/* size and position of teletyper window */
-	teletyper_window_width = 256,
-	teletyper_window_height = 128,
-	teletyper_window_offset_x = 0,
-	teletyper_window_offset_y = panel_window_height
-};
-
-static const rectangle panel_window(
-	panel_window_offset_x,  panel_window_offset_x+panel_window_width-1, /* min_x, max_x */
-	panel_window_offset_y,  panel_window_offset_y+panel_window_height-1/* min_y, max_y */
-);
-static const rectangle teletyper_window(
-	teletyper_window_offset_x,  teletyper_window_offset_x+teletyper_window_width-1, /* min_x, max_x */
-	teletyper_window_offset_y,  teletyper_window_offset_y+teletyper_window_height-1/* min_y, max_y */
-);
-enum
-{
-	teletyper_scroll_step = 8
-};
-static const rectangle teletyper_scroll_clear_window(
-	teletyper_window_offset_x,  teletyper_window_offset_x+teletyper_window_width-1, /* min_x, max_x */
-	teletyper_window_offset_y+teletyper_window_height-teletyper_scroll_step,    teletyper_window_offset_y+teletyper_window_height-1 /* min_y, max_y */
-);
-//static const int var_teletyper_scroll_step = - teletyper_scroll_step;
-
-PALETTE_INIT_MEMBER(apexc_state, apexc)
-{
-	palette.set_pen_colors(0, apexc_palette, APEXC_PALETTE_SIZE);
-}
-
-void apexc_state::video_start()
-{
-	int width = m_screen->width();
-	int height = m_screen->height();
-
-	m_bitmap = std::make_unique<bitmap_ind16>(width, height);
-	m_bitmap->fill(0, /*machine().visible_area*/teletyper_window);
-}
-
-/* draw a small 8*8 LED (well, there were no LEDs at the time, so let's call this a lamp ;-) ) */
-void apexc_state::apexc_draw_led(bitmap_ind16 &bitmap, int x, int y, int state)
-{
-	int xx, yy;
-
-	for (yy=1; yy<7; yy++)
-		for (xx=1; xx<7; xx++)
-			bitmap.pix16(y+yy, x+xx) = state ? 2 : 3;
-}
-
-/* write a single char on screen */
-void apexc_state::apexc_draw_char(bitmap_ind16 &bitmap, char character, int x, int y, int color)
-{
-	m_gfxdecode->gfx(0)->transpen(bitmap,bitmap.cliprect(), character-32, color, 0, 0,
-				x+1, y, 0);
-}
-
-/* write a string on screen */
-void apexc_state::apexc_draw_string(bitmap_ind16 &bitmap, const char *buf, int x, int y, int color)
-{
-	while (* buf)
-	{
-		apexc_draw_char(bitmap, *buf, x, y, color);
-
-		x += 8;
-		buf++;
-	}
-}
-
-
-uint32_t apexc_state::screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int i;
-	char the_char;
-
-	bitmap.fill(0, /*machine().visible_area*/panel_window);
-	apexc_draw_string(bitmap, "power", 8, 0, 0);
-	apexc_draw_string(bitmap, "running", 8, 8, 0);
-	apexc_draw_string(bitmap, "data :", 0, 24, 0);
-
-	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, teletyper_window);
-
-
-	apexc_draw_led(bitmap, 0, 0, 1);
-
-	apexc_draw_led(bitmap, 0, 8, m_maincpu->state_int(APEXC_STATE));
-
-	for (i=0; i<32; i++)
-	{
-		apexc_draw_led(bitmap, i*8, 32, (m_panel_data_reg << i) & 0x80000000UL);
-		the_char = '0' + ((i + 1) % 10);
-		apexc_draw_char(bitmap, the_char, i*8, 40, 0);
-		if (((i + 1) % 10) == 0)
-		{
-			the_char = '0' + ((i + 1) / 10);
-			apexc_draw_char(bitmap, the_char, i*8, 48, 0);
-		}
-	}
-	return 0;
-}
-
-void apexc_state::apexc_teletyper_init()
-{
-	m_letters = false;
-	m_pos = 0;
-}
-
-void apexc_state::apexc_teletyper_linefeed()
-{
-	uint8_t buf[teletyper_window_width];
-	int y;
-
-	for (y=teletyper_window_offset_y; y<teletyper_window_offset_y+teletyper_window_height-teletyper_scroll_step; y++)
-	{
-		extract_scanline8(*m_bitmap, teletyper_window_offset_x, y+teletyper_scroll_step, teletyper_window_width, buf);
-		draw_scanline8(*m_bitmap, teletyper_window_offset_x, y, teletyper_window_width, buf, m_palette->pens());
-	}
-
-	m_bitmap->fill(0, teletyper_scroll_clear_window);
-}
-
-void apexc_state::apexc_teletyper_putchar(int character)
-{
-	static const char ascii_table[2][32] =
-	{
-		{
-			'0',                '1',                '2',                '3',
-			'4',                '5',                '6',                '7',
-			'8',                '9',                '+',                '-',
-			'z',                '.',                'd',                '=',
-			' ',                'y',                /*'@'*/'\200'/*theta*/,'\n'/*Line Space*/,
-			',',                /*'&'*/'\201'/*Sigma*/,'x',             '/',
-			'\r'/*Carriage Return*/,/*'!'*/'\202'/*Phi*/,'_'/*???*/,    '\0'/*Figures*/,
-			/*'#'*/'\203'/*pi*/,')',                '(',                '\0'/*Letters*/
-		},
-		{
-			' '/*???*/,         'T',                'B',                'O',
-			'E',                'H',                'N',                'M',
-			'A',                'L',                'R',                'G',
-			'I',                'P',                'C',                'V',
-			' ',                'Z',                'D',                '\n'/*Line Space*/,
-			'S',                'Y',                'F',                'X',
-			'\r'/*Carriage Return*/,'W',            'J',                '\0'/*Figures*/,
-			'U',                'Q',                'K',                '\0'/*Letters*/
-		}
-	};
-
-	char buffer[2] = "x";
-
-	character &= 0x1f;
-
-	switch (character)
-	{
-	case 19:
-		/* Line Space */
-		apexc_teletyper_linefeed();
-		break;
-
-	case 24:
-		/* Carriage Return */
-		m_pos = 0;
-		break;
-
-	case 27:
-		/* Figures */
-		m_letters = false;
-		break;
-
-	case 31:
-		/* Letters */
-		m_letters = true;
-		break;
-
-	default:
-		/* Any printable character... */
-
-		if (m_pos >= 32)
-		{   /* if past right border, wrap around */
-			apexc_teletyper_linefeed();  /* next line */
-			m_pos = 0;                   /* return to start of line */
-		}
-
-		/* print character */
-		buffer[0] = ascii_table[m_letters][character];   /* lookup ASCII equivalent in table */
-		buffer[1] = '\0';                               /* terminate string */
-		apexc_draw_string(*m_bitmap, buffer, 8*m_pos, 176, 0);   /* print char */
-		m_pos++;                                         /* step carriage forward */
-
-		break;
-	}
 }
 
 enum
@@ -736,6 +246,7 @@ void apexc_state::init_apexc()
 		0x20,0x70,0xc0,0x70,0x18,0xf0,0x20,0x00,0x40,0xa4,0x48,0x10,0x20,0x48,0x94,0x08,
 		0x60,0x90,0xa0,0x40,0xa8,0x90,0x68,0x00,0x10,0x20,0x40,0x00,0x00,0x00,0x00,0x00,
 		0x20,0x40,0x40,0x40,0x40,0x40,0x20,0x00,0x10,0x08,0x08,0x08,0x08,0x08,0x10,0x00,
+
 		0x20,0xa8,0x70,0xf8,0x70,0xa8,0x20,0x00,0x00,0x20,0x20,0xf8,0x20,0x20,0x00,0x00,
 		0x00,0x00,0x00,0x00,0x00,0x30,0x30,0x60,0x00,0x00,0x00,0xf8,0x00,0x00,0x00,0x00,
 		0x00,0x00,0x00,0x00,0x00,0x30,0x30,0x00,0x00,0x08,0x10,0x20,0x40,0x80,0x00,0x00,
@@ -821,9 +332,7 @@ void apexc_state::init_apexc()
 		0x00
 	};
 
-	uint8_t *dst = memregion("chargen")->base();
-
-	memcpy(dst, fontdata6x8, apexcfontdata_size);
+	memcpy(m_chargen_region->base(), fontdata6x8, apexcfontdata_size);
 }
 
 static const gfx_layout fontlayout =
@@ -842,43 +351,38 @@ static GFXDECODE_START( gfx_apexc )
 GFXDECODE_END
 
 
-void apexc_state::apexc_mem_map(address_map &map)
+void apexc_state::mem(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("maincpu");
 	map(0x1000, 0x7fff).noprw();
 }
 
-
-MACHINE_CONFIG_START(apexc_state::apexc)
-
+void apexc_state::apexc(machine_config &config)
+{
 	/* basic machine hardware */
 	/* APEXC CPU @ 2.0 kHz (memory word clock frequency) */
-	MCFG_DEVICE_ADD("maincpu", APEXC, 2000)
-	MCFG_DEVICE_PROGRAM_MAP(apexc_mem_map)
-	MCFG_APEXC_TAPE_READ_CB(READ8(*this, apexc_state, tape_read))
-	MCFG_APEXC_TAPE_PUNCH_CB(WRITE8(*this, apexc_state, tape_write))
-	/* dummy interrupt: handles the control panel */
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", apexc_state,  apexc_interrupt)
-
+	APEXC(config, m_maincpu, 2000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apexc_state::mem);
+	m_maincpu->tape_read().set(m_tape_reader, FUNC(apexc_tape_reader_image_device::read));
+	m_maincpu->tape_punch().set(FUNC(apexc_state::tape_write));
 
 	/* video hardware does not exist, but we display a control panel and the typewriter output */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 192)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-	MCFG_SCREEN_UPDATE_DRIVER(apexc_state, screen_update_apexc)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(256, 192);
+	m_screen->set_visarea(0, 256-1, 0, 192-1);
+	m_screen->set_palette(m_palette);
+	m_screen->set_screen_update(FUNC(apexc_state::screen_update_apexc));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apexc)
-	MCFG_PALETTE_ADD("palette", APEXC_PALETTE_SIZE)
-	MCFG_PALETTE_INIT_OWNER(apexc_state, apexc)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apexc);
 
+	PALETTE(config, m_palette, FUNC(apexc_state::apexc_palette), ARRAY_LENGTH(palette_table));
 
-	MCFG_APEXC_CYLINDER_ADD("cylinder")
-	MCFG_APEXC_TAPE_PUNCHER_ADD("tape_puncher")
-	MCFG_APEXC_TAPE_READER_ADD("tape_reader")
-MACHINE_CONFIG_END
+	APEXC_CYLINDER(config, m_cylinder);
+	APEXC_TAPE_PUNCHER(config, m_tape_puncher);
+	APEXC_TAPE_READER(config, m_tape_reader);
+}
 
 ROM_START(apexc)
 	/*CPU memory space*/

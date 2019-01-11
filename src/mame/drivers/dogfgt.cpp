@@ -13,19 +13,7 @@ driver by Nicola Salmoria
 #include "includes/dogfgt.h"
 
 #include "cpu/m6502/m6502.h"
-#include "sound/ay8910.h"
 #include "speaker.h"
-
-
-READ8_MEMBER(dogfgt_state::sharedram_r)
-{
-	return m_sharedram[offset];
-}
-
-WRITE8_MEMBER(dogfgt_state::sharedram_w)
-{
-	m_sharedram[offset] = data;
-}
 
 
 WRITE8_MEMBER(dogfgt_state::subirqtrigger_w)
@@ -40,20 +28,20 @@ WRITE8_MEMBER(dogfgt_state::sub_irqack_w)
 	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(dogfgt_state::dogfgt_soundlatch_w)
+WRITE8_MEMBER(dogfgt_state::soundlatch_w)
 {
 	m_soundlatch = data;
 }
 
-WRITE8_MEMBER(dogfgt_state::dogfgt_soundcontrol_w)
+WRITE8_MEMBER(dogfgt_state::soundcontrol_w)
 {
 	/* bit 5 goes to 8910 #0 BDIR pin  */
 	if ((m_last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		machine().device<ay8910_device>("ay1")->data_address_w(space, m_last_snd_ctrl >> 4, m_soundlatch);
+		m_ay[0]->data_address_w(space, m_last_snd_ctrl >> 4, m_soundlatch);
 
 	/* bit 7 goes to 8910 #1 BDIR pin  */
 	if ((m_last_snd_ctrl & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		machine().device<ay8910_device>("ay2")->data_address_w(space, m_last_snd_ctrl >> 6, m_soundlatch);
+		m_ay[1]->data_address_w(space, m_last_snd_ctrl >> 6, m_soundlatch);
 
 	m_last_snd_ctrl = data;
 }
@@ -62,29 +50,29 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_soundcontrol_w)
 
 void dogfgt_state::main_map(address_map &map)
 {
-	map(0x0000, 0x07ff).rw(this, FUNC(dogfgt_state::sharedram_r), FUNC(dogfgt_state::sharedram_w)).share("sharedram");
+	map(0x0000, 0x07ff).ram().share("sharedram");
 	map(0x0f80, 0x0fdf).writeonly().share("spriteram");
-	map(0x1000, 0x17ff).w(this, FUNC(dogfgt_state::dogfgt_bgvideoram_w)).share("bgvideoram");
+	map(0x1000, 0x17ff).w(FUNC(dogfgt_state::bgvideoram_w)).share("bgvideoram");
 	map(0x1800, 0x1800).portr("P1");
-	map(0x1800, 0x1800).w(this, FUNC(dogfgt_state::dogfgt_1800_w));    /* text color, flip screen & coin counters */
+	map(0x1800, 0x1800).w(FUNC(dogfgt_state::_1800_w));    /* text color, flip screen & coin counters */
 	map(0x1810, 0x1810).portr("P2");
-	map(0x1810, 0x1810).w(this, FUNC(dogfgt_state::subirqtrigger_w));
+	map(0x1810, 0x1810).w(FUNC(dogfgt_state::subirqtrigger_w));
 	map(0x1820, 0x1820).portr("DSW1");
-	map(0x1820, 0x1823).w(this, FUNC(dogfgt_state::dogfgt_scroll_w));
-	map(0x1824, 0x1824).w(this, FUNC(dogfgt_state::dogfgt_plane_select_w));
+	map(0x1820, 0x1823).w(FUNC(dogfgt_state::scroll_w));
+	map(0x1824, 0x1824).w(FUNC(dogfgt_state::plane_select_w));
 	map(0x1830, 0x1830).portr("DSW2");
-	map(0x1830, 0x1830).w(this, FUNC(dogfgt_state::dogfgt_soundlatch_w));
-	map(0x1840, 0x1840).w(this, FUNC(dogfgt_state::dogfgt_soundcontrol_w));
+	map(0x1830, 0x1830).w(FUNC(dogfgt_state::soundlatch_w));
+	map(0x1840, 0x1840).w(FUNC(dogfgt_state::soundcontrol_w));
 	map(0x1870, 0x187f).w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x2000, 0x3fff).rw(this, FUNC(dogfgt_state::dogfgt_bitmapram_r), FUNC(dogfgt_state::dogfgt_bitmapram_w));
+	map(0x2000, 0x3fff).rw(FUNC(dogfgt_state::bitmapram_r), FUNC(dogfgt_state::bitmapram_w));
 	map(0x8000, 0xffff).rom();
 }
 
 void dogfgt_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x2000, 0x27ff).rw(this, FUNC(dogfgt_state::sharedram_r), FUNC(dogfgt_state::sharedram_w));
-	map(0x4000, 0x4000).w(this, FUNC(dogfgt_state::sub_irqack_w));
+	map(0x2000, 0x27ff).ram().share("sharedram");
+	map(0x4000, 0x4000).w(FUNC(dogfgt_state::sub_irqack_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -242,37 +230,32 @@ void dogfgt_state::machine_reset()
 MACHINE_CONFIG_START(dogfgt_state::dogfgt)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
+	MCFG_DEVICE_ADD(m_maincpu, M6502, 1500000) /* 1.5 MHz ???? */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(dogfgt_state, irq0_line_hold, 16*60)   /* ? controls music tempo */
 
-	MCFG_DEVICE_ADD("sub", M6502, 1500000) /* 1.5 MHz ???? */
+	MCFG_DEVICE_ADD(m_subcpu, M6502, 1500000) /* 1.5 MHz ???? */
 	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dogfgt_state, screen_update_dogfgt)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DRIVER(dogfgt_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dogfgt)
-	MCFG_PALETTE_ADD("palette", 16+64)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
-	MCFG_PALETTE_INIT_OWNER(dogfgt_state, dogfgt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dogfgt);
+	PALETTE(config, m_palette, FUNC(dogfgt_state::dogfgt_palette)).set_format(palette_device::BGR_233, 16 + 64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-
-	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, m_ay[0], 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8910(config, m_ay[1], 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
 MACHINE_CONFIG_END
 
 

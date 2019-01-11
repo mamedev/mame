@@ -7,9 +7,13 @@
     Frank Palazzolo (palazzol@home.com)
 
 ****************************************************************************/
+#ifndef MAME_INCLUDES_STACTICS_H
+#define MAME_INCLUDES_STACTICS_H
 
+#pragma once
 
 #include "machine/74259.h"
+#include "emupal.h"
 
 class stactics_state : public driver_device
 {
@@ -37,15 +41,15 @@ public:
 		m_fake(*this, "FAKE")
 	{ }
 
+	void stactics(machine_config &config);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(get_frame_count_d3);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_shot_standby);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_not_shot_arrive);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_motor_not_ready);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_rng);
 
-	void stactics(machine_config &config);
-
-protected:
+private:
 	DECLARE_READ8_MEMBER(vert_pos_r);
 	DECLARE_READ8_MEMBER(horiz_pos_r);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_1_w);
@@ -69,7 +73,7 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(stactics);
+	void stactics_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_beam();
@@ -82,7 +86,6 @@ protected:
 	void stactics_video(machine_config &config);
 	void main_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_outlatch;
 
@@ -123,3 +126,5 @@ private:
 	uint16_t m_beam_states_per_frame;
 	uint8_t  m_palette_bank;
 };
+
+#endif // MAME_INCLUDES_STACTICS_H

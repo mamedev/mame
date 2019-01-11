@@ -146,22 +146,22 @@ void segas1x_bootleg_state::shinobib_map(address_map &map)
 	map(0x411000, 0x411fff).ram().share("bg0_tileram");
 	map(0x412000, 0x412fff).ram().share("bg1_tileram");
 	map(0x440000, 0x440fff).ram().share("sprites");
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
-//  map(0xc40000, 0xc40001).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+//  map(0xc40000, 0xc40001).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
 
 	map(0xc41000, 0xc41001).portr("SERVICE");
 	map(0xc41002, 0xc41003).portr("P1");
 	map(0xc41006, 0xc41007).portr("P2");
 	map(0xc42000, 0xc42001).portr("DSW1");
 	map(0xc42002, 0xc42003).portr("DSW2");
-	map(0xc42006, 0xc42007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0xc42006, 0xc42007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
 	map(0xc43000, 0xc43001).nopw();
 	map(0xc44000, 0xc44001).noprw();
-	map(0xc46000, 0xc46001).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrolly_w));
-	map(0xc46002, 0xc46003).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrollx_w));
-	map(0xc46004, 0xc46005).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrolly_w));
-	map(0xc46006, 0xc46007).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrollx_w));
-	map(0xc46008, 0xc46009).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_tilemapselect_w));
+	map(0xc46000, 0xc46001).w(FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrolly_w));
+	map(0xc46002, 0xc46003).w(FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrollx_w));
+	map(0xc46004, 0xc46005).w(FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrolly_w));
+	map(0xc46006, 0xc46007).w(FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrollx_w));
+	map(0xc46008, 0xc46009).w(FUNC(segas1x_bootleg_state::s16a_bootleg_tilemapselect_w));
 	map(0xc60000, 0xc60001).nopr();
 	map(0xffc000, 0xffffff).ram(); // work ram
 }
@@ -174,8 +174,8 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_coinctrl_w)
 	{
 		m_coinctrl = data & 0xff;
 		m_refreshenable = m_coinctrl & 0x20;
-		m_led[1] = BIT(m_coinctrl, 3);
-		m_led[0] = BIT(m_coinctrl, 2);
+		m_leds[1] = BIT(m_coinctrl, 3);
+		m_leds[0] = BIT(m_coinctrl, 2);
 		machine().bookkeeping().coin_counter_w(1, m_coinctrl & 0x02);
 		machine().bookkeeping().coin_counter_w(0, m_coinctrl & 0x01);
 		/* bit 6 is also used (1 most of the time; 0 in dduxbl, sdi, wb3;
@@ -194,19 +194,19 @@ void segas1x_bootleg_state::passshtb_map(address_map &map)
 	map(0x410000, 0x410fff).ram().share("textram");
 
 	map(0x440000, 0x440fff).ram().share("sprites");
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
-	map(0xc40000, 0xc40001).w(this, FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
+	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0xc40000, 0xc40001).w(FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
 	map(0xc41002, 0xc41003).portr("P1");
 	map(0xc41004, 0xc41005).portr("P2");
 	map(0xc41000, 0xc41001).portr("SERVICE");
 	map(0xc42002, 0xc42003).portr("DSW1");
 	map(0xc42000, 0xc42001).portr("DSW2");
-	map(0xc42006, 0xc42007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
-	map(0xc46000, 0xc46001).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrolly_w));
-	map(0xc46002, 0xc46003).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrollx_w));
-	map(0xc46004, 0xc46005).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrolly_w));
-	map(0xc46006, 0xc46007).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrollx_w));
-	map(0xc46008, 0xc46009).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_tilemapselect_w));
+	map(0xc42006, 0xc42007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0xc46000, 0xc46001).w(FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrolly_w));
+	map(0xc46002, 0xc46003).w(FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrollx_w));
+	map(0xc46004, 0xc46005).w(FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrolly_w));
+	map(0xc46006, 0xc46007).w(FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrollx_w));
+	map(0xc46008, 0xc46009).w(FUNC(segas1x_bootleg_state::s16a_bootleg_tilemapselect_w));
 
 	map(0xffc000, 0xffffff).ram(); // work ram
 }
@@ -273,24 +273,24 @@ void segas1x_bootleg_state::passht4b_map(address_map &map)
 	map(0x40a000, 0x40afff).ram().share("bg1_tileram");
 	map(0x410000, 0x410fff).ram().share("textram");
 	map(0x440000, 0x440fff).ram().share("sprites");
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
-	map(0xc41000, 0xc41001).r(this, FUNC(segas1x_bootleg_state::passht4b_service_r));
-	map(0xc41002, 0xc41003).r(this, FUNC(segas1x_bootleg_state::passht4b_io1_r));
-	map(0xc41004, 0xc41005).r(this, FUNC(segas1x_bootleg_state::passht4b_io2_r));
-	map(0xc41006, 0xc41007).r(this, FUNC(segas1x_bootleg_state::passht4b_io3_r));
+	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0xc41000, 0xc41001).r(FUNC(segas1x_bootleg_state::passht4b_service_r));
+	map(0xc41002, 0xc41003).r(FUNC(segas1x_bootleg_state::passht4b_io1_r));
+	map(0xc41004, 0xc41005).r(FUNC(segas1x_bootleg_state::passht4b_io2_r));
+	map(0xc41006, 0xc41007).r(FUNC(segas1x_bootleg_state::passht4b_io3_r));
 	map(0xc42000, 0xc42001).portr("DSW2");
 	map(0xc42002, 0xc42003).portr("DSW1");
-	map(0xc42006, 0xc42007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0xc42006, 0xc42007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
 	map(0xc43000, 0xc43001).portr("P1");     // test mode only
 	map(0xc43002, 0xc43003).portr("P2");
 	map(0xc43004, 0xc43005).portr("P3");
 	map(0xc43006, 0xc43007).portr("P4");
-	map(0xc4600a, 0xc4600b).w(this, FUNC(segas1x_bootleg_state::sys16_coinctrl_w)); /* coin counter doesn't work */
-	map(0xc46000, 0xc46001).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrolly_w));
-	map(0xc46002, 0xc46003).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrollx_w));
-	map(0xc46004, 0xc46005).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrolly_w));
-	map(0xc46006, 0xc46007).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrollx_w));
-	map(0xc46008, 0xc46009).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_tilemapselect_w));
+	map(0xc4600a, 0xc4600b).w(FUNC(segas1x_bootleg_state::sys16_coinctrl_w)); /* coin counter doesn't work */
+	map(0xc46000, 0xc46001).w(FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrolly_w));
+	map(0xc46002, 0xc46003).w(FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrollx_w));
+	map(0xc46004, 0xc46005).w(FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrolly_w));
+	map(0xc46006, 0xc46007).w(FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrollx_w));
+	map(0xc46008, 0xc46009).w(FUNC(segas1x_bootleg_state::s16a_bootleg_tilemapselect_w));
 
 	map(0xffc000, 0xffffff).ram(); // work ram
 }
@@ -308,26 +308,26 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_tilebank_w)
 void segas1x_bootleg_state::wb3bbl_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x3f0000, 0x3fffff).w(this, FUNC(segas1x_bootleg_state::sys16_tilebank_w));
+	map(0x3f0000, 0x3fffff).w(FUNC(segas1x_bootleg_state::sys16_tilebank_w));
 	map(0x400000, 0x407fff).ram(); // tilemap ram on the original, used as a buffer on the bootlegs
 	map(0x409000, 0x409fff).ram().share("bg0_tileram");
 	map(0x40a000, 0x40afff).ram().share("bg1_tileram");
 	map(0x410000, 0x410fff).ram().share("textram");
 	map(0x440000, 0x440fff).ram().share("sprites");
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
-	map(0xc40000, 0xc40001).w(this, FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
+	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0xc40000, 0xc40001).w(FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
 	map(0xc41000, 0xc41001).portr("SERVICE");
 	map(0xc41002, 0xc41003).portr("P1");
 	map(0xc41004, 0xc41005).portr("P2");
 	map(0xc42000, 0xc42001).portr("DSW2");
 	map(0xc42002, 0xc42003).portr("DSW1");
-	map(0xc42006, 0xc42007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0xc42006, 0xc42007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
 	map(0xc44000, 0xc44001).nopw();
-	map(0xc46000, 0xc46001).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrolly_w));
-	map(0xc46002, 0xc46003).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrollx_w));
-	map(0xc46004, 0xc46005).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrolly_w));
-	map(0xc46006, 0xc46007).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrollx_w));
-	map(0xc46008, 0xc46009).w(this, FUNC(segas1x_bootleg_state::s16a_bootleg_tilemapselect_w));
+	map(0xc46000, 0xc46001).w(FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrolly_w));
+	map(0xc46002, 0xc46003).w(FUNC(segas1x_bootleg_state::s16a_bootleg_bgscrollx_w));
+	map(0xc46004, 0xc46005).w(FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrolly_w));
+	map(0xc46006, 0xc46007).w(FUNC(segas1x_bootleg_state::s16a_bootleg_fgscrollx_w));
+	map(0xc46008, 0xc46009).w(FUNC(segas1x_bootleg_state::s16a_bootleg_tilemapselect_w));
 	map(0xff0000, 0xffffff).ram(); // work ram
 }
 
@@ -368,7 +368,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_data_w)
 
 WRITE_LINE_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_callback)
 {
-	m_msm->data_w((m_sample_buffer >> 4) & 0x0f);
+	m_msm->write_data((m_sample_buffer >> 4) & 0x0f);
 
 	m_sample_buffer <<=  4;
 	m_sample_select ^=  1;
@@ -417,10 +417,10 @@ WRITE8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_w)
 void segas1x_bootleg_state::tturfbl_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).r(this, FUNC(segas1x_bootleg_state::tturfbl_soundbank_r));
-	map(0xe000, 0xe000).w(this, FUNC(segas1x_bootleg_state::tturfbl_soundbank_w));
+	map(0x8000, 0xbfff).r(FUNC(segas1x_bootleg_state::tturfbl_soundbank_r));
+	map(0xe000, 0xe000).w(FUNC(segas1x_bootleg_state::tturfbl_soundbank_w));
 	map(0xe800, 0xe800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xf000, 0xf000).w(this, FUNC(segas1x_bootleg_state::tturfbl_msm5205_data_w));
+	map(0xf000, 0xf000).w(FUNC(segas1x_bootleg_state::tturfbl_msm5205_data_w));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -440,9 +440,9 @@ void segas1x_bootleg_state::shinobi_datsu_sound_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("soundbank");
 	map(0xe000, 0xe001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xe400, 0xe401).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xe800, 0xe800).r(this, FUNC(segas1x_bootleg_state::sound_command_irq_r));
+	map(0xe800, 0xe800).r(FUNC(segas1x_bootleg_state::sound_command_irq_r));
 	map(0xec00, 0xec00).w(m_adpcm_select, FUNC(ls157_device::ba_w));
-	map(0xf000, 0xf000).w(this, FUNC(segas1x_bootleg_state::soundbank_msm_w));
+	map(0xf000, 0xf000).w(FUNC(segas1x_bootleg_state::soundbank_msm_w));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -487,7 +487,8 @@ WRITE8_MEMBER(segas1x_bootleg_state::upd7759_bank_w)//*
 {
 	int offs, size = m_soundcpu_region->bytes() - 0x10000;
 
-	m_upd7759->reset_w(data & 0x40);
+	m_upd7759->start_w(BIT(data, 7));
+	m_upd7759->reset_w(BIT(data, 6));
 	offs = 0x10000 + (data * 0x4000) % size;
 	membank("bank1")->set_base(m_soundcpu_region->base() + offs);
 }
@@ -497,7 +498,7 @@ void segas1x_bootleg_state::sound_7759_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x40, 0x40).w(this, FUNC(segas1x_bootleg_state::upd7759_bank_w));
+	map(0x40, 0x40).w(FUNC(segas1x_bootleg_state::upd7759_bank_w));
 	map(0x80, 0x80).w(m_upd7759, FUNC(upd7759_device::port_w));
 	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -590,23 +591,23 @@ WRITE16_MEMBER(segas1x_bootleg_state::s16bl_bgscrolly_w)
 void segas1x_bootleg_state::goldnaxeb1_map(address_map &map)
 {
 	map(0x000000, 0x0bffff).rom();
-	map(0x100000, 0x10ffff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x110000, 0x110fff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
-	map(0x118000, 0x118001).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
-	map(0x118008, 0x118009).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrollx_bank_w)); // and tile bank
-	map(0x118010, 0x118011).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
-	map(0x118018, 0x118019).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
-	map(0x118020, 0x118021).w(this, FUNC(segas1x_bootleg_state::s16bl_fgpage_w));
-	map(0x118028, 0x118029).w(this, FUNC(segas1x_bootleg_state::s16bl_bgpage_w));
-	map(0x140000, 0x143fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0x100000, 0x10ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x110000, 0x110fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x118000, 0x118001).w(FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
+	map(0x118008, 0x118009).w(FUNC(segas1x_bootleg_state::s16bl_fgscrollx_bank_w)); // and tile bank
+	map(0x118010, 0x118011).w(FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
+	map(0x118018, 0x118019).w(FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
+	map(0x118020, 0x118021).w(FUNC(segas1x_bootleg_state::s16bl_fgpage_w));
+	map(0x118028, 0x118029).w(FUNC(segas1x_bootleg_state::s16bl_bgpage_w));
+	map(0x140000, 0x143fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
 	map(0x200000, 0x200fff).ram().share("sprites");
-	map(0xc40000, 0xc40001).w(this, FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
+	map(0xc40000, 0xc40001).w(FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
 	map(0xc41002, 0xc41003).portr("P1");
 	map(0xc41006, 0xc41007).portr("P2");
 	map(0xc41000, 0xc41001).portr("SERVICE");
 	map(0xc42002, 0xc42003).portr("DSW1");
 	map(0xc42000, 0xc42001).portr("DSW2");
-	map(0xc42006, 0xc42007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0xc42006, 0xc42007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
 	map(0xc43000, 0xc43001).nopw();
 	map(0xc43034, 0xc43035).nopw();
 	map(0xc80000, 0xc80001).nopw();
@@ -618,21 +619,21 @@ void segas1x_bootleg_state::bayrouteb1_map(address_map &map)
 	map(0x000000, 0x0bffff).rom();
 	map(0x500000, 0x503fff).ram(); // work ram
 	map(0x600000, 0x600fff).ram().share("sprites");
-	map(0x700000, 0x70ffff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x710000, 0x710fff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
-	map(0x718000, 0x718001).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
-	map(0x718008, 0x718009).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrollx_bank_w)); // and tile bank
-	map(0x718010, 0x718011).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
-	map(0x718018, 0x718019).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
-	map(0x718020, 0x718021).w(this, FUNC(segas1x_bootleg_state::s16bl_fgpage_w));
-	map(0x718028, 0x718029).w(this, FUNC(segas1x_bootleg_state::s16bl_bgpage_w));
-	map(0x800000, 0x800fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
-	map(0x901000, 0x901001).portr("SERVICE").w(this, FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
+	map(0x700000, 0x70ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x710000, 0x710fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x718000, 0x718001).w(FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
+	map(0x718008, 0x718009).w(FUNC(segas1x_bootleg_state::s16bl_fgscrollx_bank_w)); // and tile bank
+	map(0x718010, 0x718011).w(FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
+	map(0x718018, 0x718019).w(FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
+	map(0x718020, 0x718021).w(FUNC(segas1x_bootleg_state::s16bl_fgpage_w));
+	map(0x718028, 0x718029).w(FUNC(segas1x_bootleg_state::s16bl_bgpage_w));
+	map(0x800000, 0x800fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0x901000, 0x901001).portr("SERVICE").w(FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
 	map(0x901002, 0x901003).portr("P1");
 	map(0x901006, 0x901007).portr("P2");
 	map(0x902000, 0x902001).portr("DSW2");
 	map(0x902002, 0x902003).portr("DSW1");
-	map(0x902006, 0x902007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0x902006, 0x902007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
 }
 
 void segas1x_bootleg_state::decrypted_opcodes_map(address_map &map)
@@ -672,22 +673,22 @@ void segas1x_bootleg_state::bayrouteb2_map(address_map &map)
 	map(0x000000, 0x0bffff).rom();
 	map(0x500000, 0x503fff).ram(); // work ram
 	map(0x600000, 0x600fff).ram().share("sprites");
-	map(0x700000, 0x70ffff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x710000, 0x710fff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
-	map(0x718000, 0x718001).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
-	map(0x718008, 0x718009).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrollx_bank_w)); // and tile bank
-	map(0x718010, 0x718011).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
-	map(0x718018, 0x718019).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
-	map(0x718020, 0x718021).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<0>));
-	map(0x718022, 0x718023).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<1>));
-	map(0x718024, 0x718025).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<2>));
-	map(0x718026, 0x718027).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<3>));
+	map(0x700000, 0x70ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x710000, 0x710fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x718000, 0x718001).w(FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
+	map(0x718008, 0x718009).w(FUNC(segas1x_bootleg_state::s16bl_fgscrollx_bank_w)); // and tile bank
+	map(0x718010, 0x718011).w(FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
+	map(0x718018, 0x718019).w(FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
+	map(0x718020, 0x718021).w(FUNC(segas1x_bootleg_state::datsu_page_w<0>));
+	map(0x718022, 0x718023).w(FUNC(segas1x_bootleg_state::datsu_page_w<1>));
+	map(0x718024, 0x718025).w(FUNC(segas1x_bootleg_state::datsu_page_w<2>));
+	map(0x718026, 0x718027).w(FUNC(segas1x_bootleg_state::datsu_page_w<3>));
 
-	map(0x800000, 0x800fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0x800000, 0x800fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
 	map(0x900000, 0x900001).portr("DSW1");
 	map(0x900002, 0x900003).portr("DSW2");
-	map(0x900006, 0x900007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
-	map(0x901000, 0x901001).portr("SERVICE").w(this, FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
+	map(0x900006, 0x900007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0x901000, 0x901001).portr("SERVICE").w(FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
 	map(0x901002, 0x901003).portr("P1");
 	map(0x901006, 0x901007).portr("P2");
 }
@@ -695,27 +696,27 @@ void segas1x_bootleg_state::bayrouteb2_map(address_map &map)
 void segas1x_bootleg_state::dduxbl_map(address_map &map)
 {
 	map(0x000000, 0x0bffff).rom();
-	map(0x3f0000, 0x3fffff).w(this, FUNC(segas1x_bootleg_state::sys16_tilebank_w));
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x410000, 0x410fff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x3f0000, 0x3fffff).w(FUNC(segas1x_bootleg_state::sys16_tilebank_w));
+	map(0x400000, 0x40ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
 	map(0x440000, 0x440fff).ram().share("sprites");
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
-	map(0xc40000, 0xc40001).w(this, FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
-	map(0xc40006, 0xc40007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0xc40000, 0xc40001).w(FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
+	map(0xc40006, 0xc40007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
 	map(0xc41002, 0xc41003).portr("P1");
 	map(0xc41004, 0xc41005).portr("P2");
 	map(0xc41000, 0xc41001).portr("SERVICE");
 	map(0xc42002, 0xc42003).portr("DSW1");
 	map(0xc42000, 0xc42001).portr("DSW2");
 
-	map(0xC46000, 0xC46001).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
-	map(0xC46008, 0xC46009).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrollx_w));
-	map(0xC46010, 0xC46011).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
-	map(0xC46018, 0xC46019).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
-	map(0xC46020, 0xC46021).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<0>));
-	map(0xC46022, 0xC46023).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<1>));
-	map(0xC46024, 0xC46025).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<2>));
-	map(0xC46026, 0xC46027).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<3>));
+	map(0xC46000, 0xC46001).w(FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
+	map(0xC46008, 0xC46009).w(FUNC(segas1x_bootleg_state::s16bl_fgscrollx_w));
+	map(0xC46010, 0xC46011).w(FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
+	map(0xC46018, 0xC46019).w(FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
+	map(0xC46020, 0xC46021).w(FUNC(segas1x_bootleg_state::datsu_page_w<0>));
+	map(0xC46022, 0xC46023).w(FUNC(segas1x_bootleg_state::datsu_page_w<1>));
+	map(0xC46024, 0xC46025).w(FUNC(segas1x_bootleg_state::datsu_page_w<2>));
+	map(0xC46026, 0xC46027).w(FUNC(segas1x_bootleg_state::datsu_page_w<3>));
 
 	map(0xffc000, 0xffffff).ram(); // work ram
 }
@@ -789,9 +790,9 @@ WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_bgpage_w)
 void segas1x_bootleg_state::goldnaxeb2_map(address_map &map)
 {
 	map(0x000000, 0x0bffff).rom();
-	map(0x100000, 0x10ffff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x110000, 0x110fff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
-	map(0x140000, 0x143fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0x100000, 0x10ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x110000, 0x110fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x140000, 0x143fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
 	map(0x200000, 0x200fff).ram().share("sprites");
 	map(0xc40000, 0xc40001).portr("DSW2").nopw();
 	map(0xc40002, 0xc40003).portr("DSW1");
@@ -799,15 +800,15 @@ void segas1x_bootleg_state::goldnaxeb2_map(address_map &map)
 	map(0xc41002, 0xc41003).portr("P1");
 	map(0xc41004, 0xc41005).portr("P2");
 	map(0xc43000, 0xc43001).nopw();
-	map(0xc44000, 0xc44001).w(this, FUNC(segas1x_bootleg_state::goldnaxeb2_fgscrolly_w));
-	map(0xc44008, 0xc44009).w(this, FUNC(segas1x_bootleg_state::goldnaxeb2_fgscrollx_w)); // and tile bank
-	map(0xc44010, 0xc44011).w(this, FUNC(segas1x_bootleg_state::goldnaxeb2_bgscrolly_w));
-	map(0xc44018, 0xc44019).w(this, FUNC(segas1x_bootleg_state::goldnaxeb2_bgscrollx_w));
-	map(0xc44020, 0xc44027).w(this, FUNC(segas1x_bootleg_state::goldnaxeb2_bgpage_w)).share("gab2_bgpage");
-	map(0xc44060, 0xc44067).w(this, FUNC(segas1x_bootleg_state::goldnaxeb2_fgpage_w)).share("gab2_fgpage");
+	map(0xc44000, 0xc44001).w(FUNC(segas1x_bootleg_state::goldnaxeb2_fgscrolly_w));
+	map(0xc44008, 0xc44009).w(FUNC(segas1x_bootleg_state::goldnaxeb2_fgscrollx_w)); // and tile bank
+	map(0xc44010, 0xc44011).w(FUNC(segas1x_bootleg_state::goldnaxeb2_bgscrolly_w));
+	map(0xc44018, 0xc44019).w(FUNC(segas1x_bootleg_state::goldnaxeb2_bgscrollx_w));
+	map(0xc44020, 0xc44027).w(FUNC(segas1x_bootleg_state::goldnaxeb2_bgpage_w)).share("gab2_bgpage");
+	map(0xc44060, 0xc44067).w(FUNC(segas1x_bootleg_state::goldnaxeb2_fgpage_w)).share("gab2_fgpage");
 	map(0xc46000, 0xc46001).nopw();
 	map(0xc43034, 0xc43035).nopw();
-	map(0xfe0006, 0xfe0007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0xfe0006, 0xfe0007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
 	map(0xffc000, 0xffffff).ram(); // work ram
 }
 
@@ -827,26 +828,26 @@ void segas1x_bootleg_state::eswatbl_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
-	map(0x3e2000, 0x3e2001).w(this, FUNC(segas1x_bootleg_state::eswat_tilebank0_w)); // external tile bank ( > 0x4000 tiles )
+	map(0x3e2000, 0x3e2001).w(FUNC(segas1x_bootleg_state::eswat_tilebank0_w)); // external tile bank ( > 0x4000 tiles )
 
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x410000, 0x410fff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
-	map(0x418000, 0x418001).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
-	map(0x418008, 0x418009).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w)); // and tile bank
-	map(0x418010, 0x418011).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
-	map(0x418018, 0x418019).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrollx_bank_w));
-	map(0x418020, 0x418021).w(this, FUNC(segas1x_bootleg_state::s16bl_bgpage_w));
-	map(0x418028, 0x418029).w(this, FUNC(segas1x_bootleg_state::s16bl_fgpage_w));
+	map(0x400000, 0x40ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x418000, 0x418001).w(FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
+	map(0x418008, 0x418009).w(FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w)); // and tile bank
+	map(0x418010, 0x418011).w(FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
+	map(0x418018, 0x418019).w(FUNC(segas1x_bootleg_state::s16bl_fgscrollx_bank_w));
+	map(0x418020, 0x418021).w(FUNC(segas1x_bootleg_state::s16bl_bgpage_w));
+	map(0x418028, 0x418029).w(FUNC(segas1x_bootleg_state::s16bl_fgpage_w));
 
 	map(0x440000, 0x440fff).ram().share("sprites");
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
-	map(0xc40000, 0xc40001).w(this, FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
+	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0xc40000, 0xc40001).w(FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
 	map(0xc41002, 0xc41003).portr("P1");
 	map(0xc41006, 0xc41007).portr("P2");
 	map(0xc41000, 0xc41001).portr("SERVICE");
 	map(0xc42002, 0xc42003).portr("DSW1");
 	map(0xc42000, 0xc42001).portr("DSW2");
-	map(0xc42006, 0xc42007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0xc42006, 0xc42007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
 	map(0xc80000, 0xc80001).nopw();
 	map(0xffc000, 0xffffff).ram(); // work ram
 }
@@ -856,26 +857,26 @@ void segas1x_bootleg_state::eswatbl2_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x123420, 0x12343f).nopw(); // written on boot only
 	map(0x200000, 0x200fff).ram().share("sprites");
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x410000, 0x410fff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x400000, 0x40ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
 	map(0x440000, 0x4407ff).nopw(); // 0xffff, possibly old sprites ram location
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
-	map(0xc40000, 0xc40001).portr("DSW2").w(this, FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
+	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0xc40000, 0xc40001).portr("DSW2").w(FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
 	map(0xc40002, 0xc40003).portr("DSW1");
-	map(0xc40006, 0xc40007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0xc40006, 0xc40007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
 	map(0xc41000, 0xc41001).portr("SERVICE");
 	map(0xc41002, 0xc41003).portr("P1");
 	map(0xc41004, 0xc41005).portr("P2");
 	map(0xc42000, 0xc42001).portr("DSW2"); // test mode still reads them from here
 	map(0xc42002, 0xc42003).portr("DSW1"); // test mode still reads them from here
 	map(0xc43034, 0xc43035).nopw();
-	map(0xc44000, 0xc44001).w(this, FUNC(segas1x_bootleg_state::goldnaxeb2_fgscrolly_w));
-	map(0xc44008, 0xc44009).w(this, FUNC(segas1x_bootleg_state::goldnaxeb2_fgscrollx_w)); // and tile bank
-	map(0xc44010, 0xc44011).w(this, FUNC(segas1x_bootleg_state::goldnaxeb2_bgscrolly_w));
-	map(0xc44018, 0xc44019).w(this, FUNC(segas1x_bootleg_state::goldnaxeb2_bgscrollx_w));
-	map(0xc44020, 0xc44027).w(this, FUNC(segas1x_bootleg_state::goldnaxeb2_bgpage_w)).share("gab2_bgpage");
+	map(0xc44000, 0xc44001).w(FUNC(segas1x_bootleg_state::goldnaxeb2_fgscrolly_w));
+	map(0xc44008, 0xc44009).w(FUNC(segas1x_bootleg_state::goldnaxeb2_fgscrollx_w)); // and tile bank
+	map(0xc44010, 0xc44011).w(FUNC(segas1x_bootleg_state::goldnaxeb2_bgscrolly_w));
+	map(0xc44018, 0xc44019).w(FUNC(segas1x_bootleg_state::goldnaxeb2_bgscrollx_w));
+	map(0xc44020, 0xc44027).w(FUNC(segas1x_bootleg_state::goldnaxeb2_bgpage_w)).share("gab2_bgpage");
 	map(0xc44028, 0xc44029).nopw();
-	map(0xc44060, 0xc44067).w(this, FUNC(segas1x_bootleg_state::goldnaxeb2_fgpage_w)).share("gab2_fgpage");
+	map(0xc44060, 0xc44067).w(FUNC(segas1x_bootleg_state::goldnaxeb2_fgpage_w)).share("gab2_fgpage");
 	map(0xc46000, 0xc46001).noprw();
 	map(0xffc000, 0xffffff).ram(); // work ram
 }
@@ -885,25 +886,25 @@ void segas1x_bootleg_state::eswatbl2_map(address_map &map)
 void segas1x_bootleg_state::tetrisbl_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x410000, 0x410fff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x400000, 0x40ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
 
-	map(0x418000, 0x418001).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
-	map(0x418008, 0x418009).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrollx_w));
-	map(0x418010, 0x418011).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
-	map(0x418018, 0x418019).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
-	map(0x418020, 0x418021).w(this, FUNC(segas1x_bootleg_state::s16bl_fgpage_w));
-	map(0x418028, 0x418029).w(this, FUNC(segas1x_bootleg_state::s16bl_bgpage_w));
+	map(0x418000, 0x418001).w(FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
+	map(0x418008, 0x418009).w(FUNC(segas1x_bootleg_state::s16bl_fgscrollx_w));
+	map(0x418010, 0x418011).w(FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
+	map(0x418018, 0x418019).w(FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
+	map(0x418020, 0x418021).w(FUNC(segas1x_bootleg_state::s16bl_fgpage_w));
+	map(0x418028, 0x418029).w(FUNC(segas1x_bootleg_state::s16bl_bgpage_w));
 
 	map(0x440000, 0x440fff).ram().share("sprites");
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
-	map(0xc40000, 0xc40001).w(this, FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
+	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0xc40000, 0xc40001).w(FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
 	map(0xc41000, 0xc41001).portr("SERVICE");
 	map(0xc41002, 0xc41003).portr("P1");
 	map(0xc41006, 0xc41007).portr("P2");
 	map(0xc42000, 0xc42001).portr("DSW2");
 	map(0xc42002, 0xc42003).portr("DSW1");
-	map(0xc42006, 0xc42007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0xc42006, 0xc42007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
 	map(0xc43034, 0xc43035).nopw();
 	map(0xc80000, 0xc80001).noprw();
 	map(0xffc000, 0xffffff).ram(); // work ram
@@ -922,27 +923,27 @@ void segas1x_bootleg_state::beautyb_map(address_map &map)
 	map(0x000000, 0x00ffff).rom().nopw();
 	map(0x010000, 0x03ffff).nopw();
 
-	map(0x0280D6, 0x0280D7).r(this, FUNC(segas1x_bootleg_state::beautyb_unkx_r));
-	map(0x0280D8, 0x0280D9).r(this, FUNC(segas1x_bootleg_state::beautyb_unkx_r));
+	map(0x0280D6, 0x0280D7).r(FUNC(segas1x_bootleg_state::beautyb_unkx_r));
+	map(0x0280D8, 0x0280D9).r(FUNC(segas1x_bootleg_state::beautyb_unkx_r));
 
-	map(0x3f0000, 0x3fffff).w(this, FUNC(segas1x_bootleg_state::sys16_tilebank_w));
+	map(0x3f0000, 0x3fffff).w(FUNC(segas1x_bootleg_state::sys16_tilebank_w));
 
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x410000, 0x413fff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x400000, 0x40ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x410000, 0x413fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
 
-	map(0x418000, 0x418001).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
-	map(0x418008, 0x418009).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
-	map(0x418010, 0x418011).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
-	map(0x418018, 0x418019).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrollx_w));
-	map(0x418020, 0x418021).w(this, FUNC(segas1x_bootleg_state::s16bl_bgpage_w));
-	map(0x418028, 0x418029).w(this, FUNC(segas1x_bootleg_state::s16bl_fgpage_w));
+	map(0x418000, 0x418001).w(FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
+	map(0x418008, 0x418009).w(FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
+	map(0x418010, 0x418011).w(FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
+	map(0x418018, 0x418019).w(FUNC(segas1x_bootleg_state::s16bl_fgscrollx_w));
+	map(0x418020, 0x418021).w(FUNC(segas1x_bootleg_state::s16bl_bgpage_w));
+	map(0x418028, 0x418029).w(FUNC(segas1x_bootleg_state::s16bl_fgpage_w));
 
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
 
 	map(0xc41000, 0xc41001).portr("SERVICE");
 	map(0xc41002, 0xc41003).portr("P1");
 	map(0xc41004, 0xc41005).portr("P2");
-	map(0xc42006, 0xc42007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0xc42006, 0xc42007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
 
 	map(0xc40000, 0xc40001).nopw();
 	map(0xc80000, 0xc80001).noprw(); // vblank irq ack
@@ -957,13 +958,13 @@ void segas1x_bootleg_state::tturfbl_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x200000, 0x203fff).ram(); // work ram
 	map(0x300000, 0x300fff).ram().share("sprites");
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x410000, 0x410fff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
-	map(0x500000, 0x500fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
-	map(0x600000, 0x600001).w(this, FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
+	map(0x400000, 0x40ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x500000, 0x500fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0x600000, 0x600001).w(FUNC(segas1x_bootleg_state::sys16_coinctrl_w));
 	map(0x600000, 0x600001).portr("DSW2");
 	map(0x600002, 0x600003).portr("DSW1");
-	map(0x600006, 0x600007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0x600006, 0x600007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
 	map(0x601000, 0x601001).portr("SERVICE");
 	map(0x601002, 0x601003).portr("P1");
 	map(0x601004, 0x601005).portr("P2");
@@ -971,14 +972,14 @@ void segas1x_bootleg_state::tturfbl_map(address_map &map)
 	map(0x602002, 0x602003).portr("DSW1");
 	map(0xc44000, 0xc44001).nopw();
 
-	map(0xC46000, 0xC46001).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
-	map(0xC46008, 0xC46009).w(this, FUNC(segas1x_bootleg_state::s16bl_fgscrollx_w));
-	map(0xC46010, 0xC46011).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
-	map(0xC46018, 0xC46019).w(this, FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
-	map(0xC46020, 0xC46021).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<0>));
-	map(0xc46022, 0xc46023).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<1>));
-	map(0xC46024, 0xC46025).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<2>));
-	map(0xC46026, 0xC46027).w(this, FUNC(segas1x_bootleg_state::datsu_page_w<3>));
+	map(0xC46000, 0xC46001).w(FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
+	map(0xC46008, 0xC46009).w(FUNC(segas1x_bootleg_state::s16bl_fgscrollx_w));
+	map(0xC46010, 0xC46011).w(FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
+	map(0xC46018, 0xC46019).w(FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
+	map(0xC46020, 0xC46021).w(FUNC(segas1x_bootleg_state::datsu_page_w<0>));
+	map(0xc46022, 0xc46023).w(FUNC(segas1x_bootleg_state::datsu_page_w<1>));
+	map(0xC46024, 0xC46025).w(FUNC(segas1x_bootleg_state::datsu_page_w<2>));
+	map(0xC46026, 0xC46027).w(FUNC(segas1x_bootleg_state::datsu_page_w<3>));
 }
 
 /***************************************************************************/
@@ -1011,7 +1012,7 @@ READ8_MEMBER(segas1x_bootleg_state::system18_bank_r)
 void segas1x_bootleg_state::sound_18_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
-	map(0xa000, 0xbfff).r(this, FUNC(segas1x_bootleg_state::system18_bank_r));
+	map(0xa000, 0xbfff).r(FUNC(segas1x_bootleg_state::system18_bank_r));
 	/**** D/A register ****/
 	map(0xc000, 0xc008).w("5c68", FUNC(rf5c68_device::rf5c68_w));
 	map(0xd000, 0xdfff).rw("5c68", FUNC(rf5c68_device::rf5c68_mem_r), FUNC(rf5c68_device::rf5c68_mem_w));
@@ -1038,7 +1039,7 @@ void segas1x_bootleg_state::sound_18_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x80, 0x83).rw("3438.0", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
 	map(0x90, 0x93).rw("3438.1", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
-	map(0xa0, 0xa0).w(this, FUNC(segas1x_bootleg_state::sys18_soundbank_w));
+	map(0xa0, 0xa0).w(FUNC(segas1x_bootleg_state::sys18_soundbank_w));
 	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
@@ -1095,14 +1096,14 @@ void segas1x_bootleg_state::pcm_map(address_map &map)
 void segas1x_bootleg_state::shdancbl_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x410000, 0x410fff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x400000, 0x40ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
 	map(0x440000, 0x440fff).ram().share("sprites");
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
 	map(0xc00000, 0xc0ffff).noprw();
 	map(0xc40000, 0xc40001).portr("COINAGE");
 	map(0xc40002, 0xc40003).portr("DSW1");
-	map(0xc40006, 0xc40007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0xc40006, 0xc40007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
 	map(0xc41000, 0xc41001).portr("SERVICE");
 	map(0xc41002, 0xc41003).portr("P1");
 	map(0xc41004, 0xc41005).portr("P2");
@@ -1116,20 +1117,20 @@ void segas1x_bootleg_state::shdancbl_map(address_map &map)
 void segas1x_bootleg_state::shdancbla_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x410000, 0x410fff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x400000, 0x40ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
 	map(0x440000, 0x440fff).ram().share("sprites");
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
 
 	// moved from C4xxxx to E4xxxx
 	map(0xe40000, 0xe40001).portr("COINAGE");
 	map(0xe40002, 0xe40003).portr("DSW1");
-	map(0xe40006, 0xe40007).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0xe40006, 0xe40007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
 	map(0xe41000, 0xe41001).portr("SERVICE");
 	map(0xe41002, 0xe41003).portr("P1");
 	map(0xe41004, 0xe41005).portr("P2");
 
-//  map(0xff8038, 0xff8039).r(this, FUNC(segas1x_bootleg_state::shdancbla_ff8038_r));
+//  map(0xff8038, 0xff8039).r(FUNC(segas1x_bootleg_state::shdancbla_ff8038_r));
 	map(0xffc000, 0xffffff).ram();
 }
 /***************************************************************************
@@ -1175,7 +1176,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_data_w)
 
 WRITE_LINE_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_callback)
 {
-	m_msm->data_w(m_sample_buffer & 0x0f);
+	m_msm->write_data(m_sample_buffer & 0x0f);
 
 	m_sample_buffer >>=  4;
 	m_sample_select ^=  1;
@@ -1218,13 +1219,13 @@ WRITE8_MEMBER(segas1x_bootleg_state::shdancbl_bankctrl_w)
 void segas1x_bootleg_state::shdancbl_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).r(this, FUNC(segas1x_bootleg_state::shdancbl_soundbank_r));
+	map(0x8000, 0xbfff).r(FUNC(segas1x_bootleg_state::shdancbl_soundbank_r));
 	map(0xc000, 0xc00f).nopw();
 	map(0xc400, 0xc400).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xc800, 0xc800).w(this, FUNC(segas1x_bootleg_state::shdancbl_msm5205_data_w));
+	map(0xc800, 0xc800).w(FUNC(segas1x_bootleg_state::shdancbl_msm5205_data_w));
 	map(0xcc00, 0xcc03).rw("3438.0", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
 	map(0xd000, 0xd003).rw("3438.1", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
-	map(0xd400, 0xd400).w(this, FUNC(segas1x_bootleg_state::shdancbl_bankctrl_w));
+	map(0xd400, 0xd400).w(FUNC(segas1x_bootleg_state::shdancbl_bankctrl_w));
 	map(0xdf00, 0xdfff).noprw();
 	map(0xe000, 0xffff).ram();
 }
@@ -1241,7 +1242,7 @@ void segas1x_bootleg_state::shdancbl_sound_io_map(address_map &map)
 void segas1x_bootleg_state::shdancbla_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).r(this, FUNC(segas1x_bootleg_state::shdancbl_soundbank_r));
+	map(0x8000, 0xbfff).r(FUNC(segas1x_bootleg_state::shdancbl_soundbank_r));
 
 	map(0xc000, 0xc003).rw("3438.0", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
 	map(0xc000, 0xc000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
@@ -1265,10 +1266,10 @@ void segas1x_bootleg_state::shdancbla_sound_map(address_map &map)
 void segas1x_bootleg_state::mwalkbl_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x410000, 0x410fff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x400000, 0x40ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
 	map(0x440000, 0x440fff).ram().share("sprites");
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
 
 	/* bootleg video regs */
 /*  map(0xc00000, 0xc00001).nop();
@@ -1290,8 +1291,8 @@ void segas1x_bootleg_state::mwalkbl_map(address_map &map)
 	map(0xc41004, 0xc41005).portr("P2");
 	map(0xc41006, 0xc41007).portr("P3");
 	map(0xc41008, 0xc41009).nopr(); // figure this out, extra input for 3p?
-	map(0xc46600, 0xc46601).w(this, FUNC(segas1x_bootleg_state::sys18_refreshenable_w));
-	map(0xc46800, 0xc46801).w(this, FUNC(segas1x_bootleg_state::sys18_tilebank_w));
+	map(0xc46600, 0xc46601).w(FUNC(segas1x_bootleg_state::sys18_refreshenable_w));
+	map(0xc46800, 0xc46801).w(FUNC(segas1x_bootleg_state::sys18_tilebank_w));
 
 	map(0xfe0020, 0xfe003f).nopw(); // config regs
 	map(0xffc000, 0xffffff).ram();
@@ -1314,14 +1315,14 @@ WRITE8_MEMBER(segas1x_bootleg_state::sys18bl_okibank_w) // TODO: verify correctn
 void segas1x_bootleg_state::astormbl_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x10ffff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x110000, 0x110fff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
-	map(0x140000, 0x140fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
+	map(0x100000, 0x10ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x110000, 0x110fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x140000, 0x140fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
 	map(0x200000, 0x200fff).ram().share("sprites");
 	map(0xa00000, 0xa00001).portr("COINAGE");
 	map(0xa00002, 0xa00003).portr("DSW1");
-	map(0xa00006, 0xa00007).w(this, FUNC(segas1x_bootleg_state::sound_command_nmi_w));
-	map(0xa0000e, 0xa0000f).w(this, FUNC(segas1x_bootleg_state::sys18_tilebank_w));
+	map(0xa00006, 0xa00007).w(FUNC(segas1x_bootleg_state::sound_command_nmi_w));
+	map(0xa0000e, 0xa0000f).w(FUNC(segas1x_bootleg_state::sys18_tilebank_w));
 	map(0xa01000, 0xa01001).portr("SERVICE");
 	map(0xa01002, 0xa01003).portr("P1");
 	map(0xa01004, 0xa01005).portr("P2");
@@ -1341,7 +1342,7 @@ void segas1x_bootleg_state::astormbl_map(address_map &map)
 	map(0xc46400, 0xc464ff).noprw(); // scroll?
 	map(0xc46500, 0xc465ff).noprw(); // scroll?
 
-	map(0xc46600, 0xc46601).w(this, FUNC(segas1x_bootleg_state::sys18_refreshenable_w));
+	map(0xc46600, 0xc46601).w(FUNC(segas1x_bootleg_state::sys18_refreshenable_w));
 	map(0xfe0020, 0xfe003f).nopw();
 	map(0xffc000, 0xffffff).ram();
 }
@@ -1349,7 +1350,7 @@ void segas1x_bootleg_state::astormbl_map(address_map &map)
 void segas1x_bootleg_state::sys18bl_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x9000, 0x9000).w(this, FUNC(segas1x_bootleg_state::sys18bl_okibank_w));
+	map(0x9000, 0x9000).w(FUNC(segas1x_bootleg_state::sys18bl_okibank_w));
 	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x87ff).ram();
@@ -1383,11 +1384,11 @@ void segas1x_bootleg_state::ddcrewbl_map(address_map &map)
 	map(0x000000, 0x07ffff).rom(); // ok
 	map(0x200000, 0x27ffff).rom(); // ok
 
-	map(0x400000, 0x40ffff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x410000, 0x410fff).ram().w(this, FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0x400000, 0x40ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
 	map(0x440000, 0x440fff).ram().share("sprites"); // ok
 
-	map(0x840000, 0x840fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram"); // ok
+	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram"); // ok
 
 	map(0xc00000, 0xc00001).nopw(); // vdp leftovers maybe?
 	map(0xc00004, 0xc00005).nopw();
@@ -1402,9 +1403,9 @@ void segas1x_bootleg_state::ddcrewbl_map(address_map &map)
 
 	map(0xc44001, 0xc44001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0xc46600, 0xc46601).w(this, FUNC(segas1x_bootleg_state::sys18_refreshenable_w));
+	map(0xc46600, 0xc46601).w(FUNC(segas1x_bootleg_state::sys18_refreshenable_w));
 
-	map(0xc46038, 0xc4603f).w(this, FUNC(segas1x_bootleg_state::ddcrewbl_spritebank_w)); // ok
+	map(0xc46038, 0xc4603f).w(FUNC(segas1x_bootleg_state::ddcrewbl_spritebank_w)); // ok
 
 	map(0xc46000, 0xc46001).nopw();
 	map(0xc46010, 0xc46011).nopw();
@@ -2059,99 +2060,96 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151)
-
-	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
+void segas1x_bootleg_state::z80_ym2151(machine_config &config)
+{
+	Z80(config, m_soundcpu, 4000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::sound_io_map);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.32)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
-MACHINE_CONFIG_END
+	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
+}
 
 WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
 {
-	/* upd7759 callback */
-	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	if (state)
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::z80_ym2151_upd7759)
-
-	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_7759_map)
-	MCFG_DEVICE_IO_MAP(sound_7759_io_map)
+void segas1x_bootleg_state::z80_ym2151_upd7759(machine_config &config)
+{
+	Z80(config, m_soundcpu, 4000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::sound_7759_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::sound_7759_io_map);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.32)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
+	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
 
-	MCFG_DEVICE_ADD("7759", UPD7759)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, segas1x_bootleg_state,sound_cause_nmi))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->md_w(0);
+	m_upd7759->drq().set(FUNC(segas1x_bootleg_state::sound_cause_nmi));
+	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.48);
+	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.48);
+}
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::datsu_ym2151_msm5205)
+void segas1x_bootleg_state::datsu_ym2151_msm5205(machine_config &config)
+{
 	/* TODO:
 	- other games might use this sound configuration
 	- speaker is likely to be mono for the bootlegs, not stereo.
 	- check msm5205 frequency.
 	*/
-	MCFG_DEVICE_ADD("soundcpu",Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(tturfbl_sound_map)
-	MCFG_DEVICE_IO_MAP(tturfbl_sound_io_map)
+	Z80(config, m_soundcpu, 4000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::tturfbl_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::tturfbl_sound_io_map);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.32)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
+	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
 
-	MCFG_DEVICE_ADD("5205", MSM5205, 220000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, segas1x_bootleg_state, tturfbl_msm5205_callback))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 220000);
+	m_msm->vck_legacy_callback().set(FUNC(segas1x_bootleg_state::tturfbl_msm5205_callback));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
+	m_msm->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
+	m_msm->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+}
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::datsu_2x_ym2203_msm5205)
-	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(shinobi_datsu_sound_map)
+void segas1x_bootleg_state::datsu_2x_ym2203_msm5205(machine_config &config)
+{
+	Z80(config, m_soundcpu, 4000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::shinobi_datsu_sound_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	// 2x YM2203C, one at U57, one at U56
-	MCFG_DEVICE_ADD("ym1", YM2203, 4000000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
-	MCFG_SOUND_ROUTE(2, "mono", 0.50)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ym1(YM2203(config, "ym1", 4000000));
+	ym1.add_route(0, "mono", 0.50);
+	ym1.add_route(1, "mono", 0.50);
+	ym1.add_route(2, "mono", 0.50);
+	ym1.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 4000000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
-	MCFG_SOUND_ROUTE(2, "mono", 0.50)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ym2(YM2203(config, "ym2", 4000000));
+	ym2.add_route(0, "mono", 0.50);
+	ym2.add_route(1, "mono", 0.50);
+	ym2.add_route(2, "mono", 0.50);
+	ym2.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("5205", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0);
+	m_adpcm_select->out_callback().set("5205", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("5205", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, segas1x_bootleg_state, datsu_msm5205_callback))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(segas1x_bootleg_state::datsu_msm5205_callback));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 /*************************************
@@ -2161,411 +2159,394 @@ MACHINE_CONFIG_END
  *************************************/
 
 /* System 16A/B Bootlegs */
-MACHINE_CONFIG_START(segas1x_bootleg_state::system16_base)
-
+void segas1x_bootleg_state::system16_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  irq4_line_hold)
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_vblank_int("screen", FUNC(segas1x_bootleg_state::irq4_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 36*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system16)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(40*8, 36*8);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_system16));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
-	MCFG_PALETTE_ADD("palette", 2048*SHADOW_COLORS_MULTIPLIER)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sys16);
+	PALETTE(config, m_palette).set_entries(2048*SHADOW_COLORS_MULTIPLIER);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-MACHINE_CONFIG_END
+	GENERIC_LATCH_8(config, m_soundlatch);
+}
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::shinobi_datsu)
+void segas1x_bootleg_state::shinobi_datsu(machine_config &config)
+{
 	system16_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(shinobib_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::shinobib_map);
 
-	MCFG_BOOTLEG_SYS16A_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16A_SPRITES_XORIGIN(189-117)
+	BOOTLEG_SYS16A_SPRITES(config, m_sprites, 0, 189-117, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, s16a_bootleg_shinobi )
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg)
+	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_s16a_bootleg));
 
 	datsu_2x_ym2203_msm5205(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(segas1x_bootleg_state::passshtb)
+void segas1x_bootleg_state::passshtb(machine_config &config)
+{
 	system16_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(passshtb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::passshtb_map);
 
-	MCFG_BOOTLEG_SYS16A_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16A_SPRITES_XORIGIN(189-117)
-	MCFG_BOOTLEG_SYS16A_SPRITES_REMAP(1,0,3,2,5,4,7,6)
+	BOOTLEG_SYS16A_SPRITES(config, m_sprites, 0, 189-117, 1, 0, 3, 2, 5, 4, 7, 6);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, s16a_bootleg_passsht )
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg)
+	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_s16a_bootleg));
 
 	z80_ym2151_upd7759(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(segas1x_bootleg_state::passsht4b)
+void segas1x_bootleg_state::passsht4b(machine_config &config)
+{
 	system16_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(passht4b_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::passht4b_map);
 
 	// wrong
-	MCFG_BOOTLEG_SYS16A_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16A_SPRITES_XORIGIN(189-117)
-	MCFG_BOOTLEG_SYS16A_SPRITES_REMAP(1,0,3,2,5,4,7,6)
+	BOOTLEG_SYS16A_SPRITES(config, m_sprites, 0, 189-117, 1, 0, 3, 2, 5, 4, 7, 6);
 
-	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, s16a_bootleg_passsht )
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg_passht4b)
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, s16a_bootleg_passsht)
+	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b));
 
 	datsu_2x_ym2203_msm5205(config);
-	MCFG_DEVICE_MODIFY("5205")
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-MACHINE_CONFIG_END
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
+}
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::wb3bb)
+void segas1x_bootleg_state::wb3bb(machine_config &config)
+{
 	system16_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(wb3bbl_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::wb3bbl_map);
 
-	MCFG_BOOTLEG_SYS16A_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16A_SPRITES_XORIGIN(189-117)
-	MCFG_BOOTLEG_SYS16A_SPRITES_REMAP(4,0,5,1,6,2,7,3)
-	MCFG_BOOTLEG_SYS16A_SPRITES_YORIGIN(0)
+	BOOTLEG_SYS16A_SPRITES(config, m_sprites, 0, 189-117, 4, 0, 5, 1, 6, 2, 7, 3);
+	m_sprites->set_local_originy(0);
 
-	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, s16a_bootleg_wb3bl )
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg)
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state, s16a_bootleg_wb3bl)
+	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_s16a_bootleg));
 
 	z80_ym2151(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb_base)
-
+void segas1x_bootleg_state::goldnaxeb_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(goldnaxeb1_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  irq4_line_hold)
-
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::goldnaxeb1_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segas1x_bootleg_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas1x_bootleg_state::irq4_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system16)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(40*8, 28*8);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_system16));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sys16);
+	PALETTE(config, m_palette, palette_device::BLACK, 2048*SHADOW_COLORS_MULTIPLIER);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 2048*SHADOW_COLORS_MULTIPLIER)
-
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-121)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-121);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system16)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-MACHINE_CONFIG_END
+	GENERIC_LATCH_8(config, m_soundlatch);
+}
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb1)
+void segas1x_bootleg_state::goldnaxeb1(machine_config &config)
+{
 	goldnaxeb_base(config);
+
+	m_palette->set_entries(0x2000*SHADOW_COLORS_MULTIPLIER);
 
 	z80_ym2151_upd7759(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::goldnaxeb2)
+void segas1x_bootleg_state::goldnaxeb2(machine_config &config)
+{
 	goldnaxeb_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(goldnaxeb2_map)
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::goldnaxeb2_map);
+	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
+
+	m_palette->set_entries(0x2000*SHADOW_COLORS_MULTIPLIER);
 
 	datsu_2x_ym2203_msm5205(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(segas1x_bootleg_state::bayrouteb1)
-	goldnaxeb1(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bayrouteb1_map)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(segas1x_bootleg_state::bayrouteb2)
+void segas1x_bootleg_state::bayrouteb1(machine_config &config)
+{
 	goldnaxeb_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bayrouteb2_map)
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::bayrouteb1_map);
+	z80_ym2151_upd7759(config);
+}
+
+void segas1x_bootleg_state::bayrouteb2(machine_config &config)
+{
+	goldnaxeb_base(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::bayrouteb2_map);
+	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
 
 	datsu_ym2151_msm5205(config);
 
-	MCFG_DEVICE_MODIFY("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
+	m_sprites->set_local_originx(189-107);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(segas1x_bootleg_state::tturfbl)
+void segas1x_bootleg_state::tturfbl(machine_config &config)
+{
 	system16_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tturfbl_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::tturfbl_map);
 
 	datsu_ym2151_msm5205(config);
 
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
-MACHINE_CONFIG_END
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-107);
+}
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::dduxbl)
+void segas1x_bootleg_state::dduxbl(machine_config &config)
+{
 	system16_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dduxbl_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::dduxbl_map);
 
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-112);
 
 	z80_ym2151(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::eswatbl)
+void segas1x_bootleg_state::eswatbl(machine_config &config)
+{
 	system16_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(eswatbl_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::eswatbl_map);
 
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-124)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-124);
 
 	z80_ym2151_upd7759(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::eswatbl2)
+void segas1x_bootleg_state::eswatbl2(machine_config &config)
+{
 	system16_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(eswatbl2_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::eswatbl2_map);
 
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-121)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-121);
 
 	datsu_2x_ym2203_msm5205(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::tetrisbl)
+void segas1x_bootleg_state::tetrisbl(machine_config &config)
+{
 	system16_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tetrisbl_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::tetrisbl_map);
 
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-112);
 
 	z80_ym2151(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::altbeastbl)
+void segas1x_bootleg_state::altbeastbl(machine_config &config)
+{
 	system16_base(config);
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tetrisbl_map)
 
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::tetrisbl_map);
+
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-112);
 
 	datsu_2x_ym2203_msm5205(config);
-	MCFG_DEVICE_MODIFY("5205")
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-MACHINE_CONFIG_END
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
+}
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::beautyb)
+void segas1x_bootleg_state::beautyb(machine_config &config)
+{
 	system16_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(beautyb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::beautyb_map);
 
 	// no sprites
 
 	z80_ym2151(config);
-MACHINE_CONFIG_END
-
+}
 
 /* System 18 Bootlegs */
-MACHINE_CONFIG_START(segas1x_bootleg_state::system18)
-
+void segas1x_bootleg_state::system18(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  irq4_line_hold)
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_vblank_int("screen", FUNC(segas1x_bootleg_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_18_map)
-	MCFG_DEVICE_IO_MAP(sound_18_io_map)
+	Z80(config, m_soundcpu, 8000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::sound_18_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::sound_18_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(40*8, 28*8);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_system18old));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
-	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER) // 64 extra colours for vdp (but we use 2048 so shadow mask works)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sys16);
+	PALETTE(config, m_palette).set_entries((2048+2048)*SHADOW_COLORS_MULTIPLIER); // 64 extra colours for vdp (but we use 2048 so shadow mask works)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-107);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("3438.0", YM3438, 8000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
+	ym3438_device &ym3438_0(YM3438(config, "3438.0", 8000000));
+	ym3438_0.add_route(0, "lspeaker", 0.40);
+	ym3438_0.add_route(1, "rspeaker", 0.40);
 
-	MCFG_DEVICE_ADD("3438.1", YM3438, 8000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
+	ym3438_device &ym3438_1(YM3438(config, "3438.1", 8000000));
+	ym3438_1.add_route(0, "lspeaker", 0.40);
+	ym3438_1.add_route(1, "rspeaker", 0.40);
 
-	MCFG_DEVICE_ADD("5c68", RF5C68, 8000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, pcm_map)
-MACHINE_CONFIG_END
+	rf5c68_device &rf5c68(RF5C68(config, "5c68", 8000000));
+	rf5c68.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	rf5c68.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	rf5c68.set_addrmap(0, &segas1x_bootleg_state::pcm_map);
+}
 
-
-MACHINE_CONFIG_START(segas1x_bootleg_state::astormbl)
+void segas1x_bootleg_state::astormbl(machine_config &config)
+{
 	system18(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(astormbl_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::astormbl_map);
+}
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::astormb2)
-
+void segas1x_bootleg_state::astormb2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* 12MHz */
-	MCFG_DEVICE_PROGRAM_MAP(astormbl_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  irq4_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);	/* 12MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::astormbl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas1x_bootleg_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(8'000'000)/2) /* 4MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sys18bl_sound_map)
+	Z80(config, m_soundcpu, XTAL(8'000'000)/2); /* 4MHz */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::sys18bl_sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.271) /* V-Sync is 58.271Hz & H-Sync is ~ 14.48KHz measured */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(58.271); /* V-Sync is 58.271Hz & H-Sync is ~ 14.48KHz measured */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(40*8, 28*8);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_system18old));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
-	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER) // 64 extra colours for vdp (but we use 2048 so shadow mask works)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sys16);
+	PALETTE(config, m_palette).set_entries((2048+2048)*SHADOW_COLORS_MULTIPLIER); // 64 extra colours for vdp (but we use 2048 so shadow mask works)
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-107)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-107);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
 	// 1 OKI M6295 instead of original sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000)/8, okim6295_device::PIN7_HIGH) // 1MHz clock and pin verified
-	MCFG_DEVICE_ADDRESS_MAP(0, sys18bl_oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(8'000'000)/8, okim6295_device::PIN7_HIGH)); // 1MHz clock and pin verified
+	oki.set_addrmap(0, &segas1x_bootleg_state::sys18bl_oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::mwalkbl)
+void segas1x_bootleg_state::mwalkbl(machine_config &config)
+{
 	astormb2(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mwalkbl_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::mwalkbl_map);
+}
 
-
-MACHINE_CONFIG_START(segas1x_bootleg_state::shdancbl)
+void segas1x_bootleg_state::shdancbl(machine_config &config)
+{
 	system18(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(shdancbl_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::shdancbl_map);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(shdancbl_sound_map)
-	MCFG_DEVICE_IO_MAP(shdancbl_sound_io_map)
-	MCFG_DEVICE_REMOVE("5c68")
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::shdancbl_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::shdancbl_sound_io_map);
 
-	MCFG_DEVICE_ADD("5205", MSM5205, 200000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, segas1x_bootleg_state, shdancbl_msm5205_callback))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_CONFIG_END
+	config.device_remove("5c68");
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::shdancbla)
+	MSM5205(config, m_msm, 200000);
+	m_msm->vck_legacy_callback().set(FUNC(segas1x_bootleg_state::shdancbl_msm5205_callback));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
+	m_msm->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
+	m_msm->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+}
+
+void segas1x_bootleg_state::shdancbla(machine_config &config)
+{
 	system18(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(shdancbla_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::shdancbla_map);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(shdancbla_sound_map)
-	MCFG_DEVICE_IO_MAP(shdancbl_sound_io_map)
-	MCFG_DEVICE_REMOVE("5c68")
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::shdancbla_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::shdancbl_sound_io_map);
 
-	MCFG_DEVICE_ADD("5205", MSM5205, 200000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, segas1x_bootleg_state, shdancbl_msm5205_callback))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_CONFIG_END
+	config.device_remove("5c68");
+
+	MSM5205(config, m_msm, 200000);
+	m_msm->vck_legacy_callback().set(FUNC(segas1x_bootleg_state::shdancbl_msm5205_callback));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
+	m_msm->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
+	m_msm->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+}
 
 
 MACHINE_RESET_MEMBER(segas1x_bootleg_state,ddcrewbl)
@@ -2580,37 +2561,37 @@ MACHINE_RESET_MEMBER(segas1x_bootleg_state,ddcrewbl)
 }
 
 
-MACHINE_CONFIG_START(segas1x_bootleg_state::ddcrewbl)
-
+void segas1x_bootleg_state::ddcrewbl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  irq4_line_hold)
-	MCFG_DEVICE_PROGRAM_MAP(ddcrewbl_map)
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::ddcrewbl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas1x_bootleg_state::irq4_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_system18old)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(40*8, 28*8);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_system18old));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sys16)
-	MCFG_PALETTE_ADD("palette", (2048+2048)*SHADOW_COLORS_MULTIPLIER)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sys16);
+	PALETTE(config, m_palette).set_entries((2048+2048)*SHADOW_COLORS_MULTIPLIER);
 
 	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,system18old)
 
-	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
-	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-124)
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(189-124);
 
 	MCFG_MACHINE_RESET_OVERRIDE(segas1x_bootleg_state,ddcrewbl)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, 10000000/10, okim6295_device::PIN7_HIGH) // clock and pin not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 10000000/10, okim6295_device::PIN7_HIGH)); // clock and pin not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*************************************
@@ -3130,6 +3111,16 @@ ROM_START( dduxbl )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "dduxb01.bin", 0x0000, 0x8000, CRC(0dbef0d7) SHA1(8b9afb2fcb946cec467b1e691c267194b503f841) )
+
+	/* stuff below isn't used but loaded because it was on the board .. */
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "dduxb_5_82s129.b1",  0x0000, 0x0100, CRC(a7c22d96) SHA1(160deae8053b09c09328325246598b3518c7e20b) )
+	ROM_LOAD( "dduxb_4_18s030.a17", 0x0100, 0x0020, CRC(58bcf8bd) SHA1(e4d3d179b08c0f3424a6bec0f15058fb1b56f8d8) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "dduxb_pal16l8.1",     0x0000, 0x0104, CRC(3b406587) SHA1(76f875879fb041c39fb5e6527c0d3ab98b66e36e) )
+	ROM_LOAD( "dduxb_p_gal16v8.a18", 0x0200, 0x0117, CRC(ce1ab1e1) SHA1(dcfc0015d8595ee6cb6bb02c95655161a7f3b017) )
+	ROM_LOAD( "dduxb_pal20l8.2",     0x0400, 0x0144, CRC(09098fbe) SHA1(ea251bbcc140b2c69a155bf2fc046c57b206335b) )
 ROM_END
 
 
@@ -3184,6 +3175,44 @@ ROM_START( altbeastbl )
 	ROM_LOAD( "2.bin", 0x10000, 0x10000, CRC(7c653d8b) SHA1(f74355e12322ac3e3da1b5fc14d81908f61d01e6) )
 ROM_END
 
+ROM_START( altbeastbl2 ) // mostly same as mutantwarr. Only program ROMs differ, while sprites ROM are double sized but same content
+	ROM_REGION( 0xc0000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "al-3-4-27c010-a.ic2", 0x020000, 0x10000, CRC(2c41cb49) SHA1(1d666c94f679da93aea07bb8461da3331a1e75c6) )
+	ROM_CONTINUE( 0x000000, 0x10000)
+	ROM_LOAD16_BYTE( "al-5-6-27c010-a.ic5", 0x020001, 0x10000, CRC(fda831c9) SHA1(d8afc89044f9a5661664889bc1052958446f8fd3) )
+	ROM_CONTINUE( 0x000001, 0x10000)
+
+	ROM_REGION( 0x60000, "gfx1", ROMREGION_INVERT ) // tiles
+	ROM_LOAD( "al-15-27512-b.ic54",  0x00000, 0x10000,  CRC(a4967d10) SHA1(537b9ea604a38a919c111ece5dd3e55a5070d346) )
+	ROM_LOAD( "al-16-27512-b.ic63",  0x10000, 0x10000,  CRC(e091ae2c) SHA1(5a129f2445d13c321cb3ad0eff7ab8ea3f6ddf43) )
+	ROM_LOAD( "al-17-27512-b.ic72",  0x20000, 0x10000,  CRC(1a26cf3f) SHA1(3a488ee485db7b3f27d5ed6c6e7d263d4840bd6a) )
+	ROM_LOAD( "al-18-27512-b.ic144", 0x30000, 0x10000, BAD_DUMP CRC(277ef086) SHA1(d7a5e944f5287aa15d14ff940d1aca8d1e649d26) ) // dumped empty, using the mutantwarr one as all the others match
+	ROM_LOAD( "al-19-27512-b.ic145", 0x40000, 0x10000, CRC(661225af) SHA1(115303efeb5676ab059600a48edf36b8a56f6c15) )
+	ROM_LOAD( "al-20-27512-b.ic146", 0x50000, 0x10000, CRC(d7019da7) SHA1(682347a276e03a733608066ad911af1674a00ed9) )
+
+	ROM_REGION16_BE( 0x100000, "sprites", ROMREGION_ERASEFF ) // sprites
+	ROM_LOAD16_BYTE( "al-11-27c010-b.ic11", 0x000001, 0x020000, CRC(a01425cd) SHA1(72be5ec29e476601f9bf6aaedef9b73cedeb42f0) )
+	ROM_LOAD16_BYTE( "al-7-27c010-b.ic12",  0x000000, 0x020000, CRC(d9e03363) SHA1(995a7c6a8f0c61468b57a3bb407461a2a3ae8adc) )
+	ROM_LOAD16_BYTE( "al-12-27c010-b.ic24", 0x040001, 0x020000, CRC(17a9fc53) SHA1(85a9a605742ae5aab86db37189b9ee4d54c70e56) )
+	ROM_LOAD16_BYTE( "al-8-27c010-b.ic25",  0x040000, 0x020000, CRC(e3f77c5e) SHA1(6b3cb7918ab0c7c97a51cc5ea19ced3374ff3914) )
+	ROM_LOAD16_BYTE( "al-13-27c010-b.ic32", 0x080001, 0x020000, CRC(14dcc245) SHA1(1ca1b6e0f2b7bedad2a8ab70f52da8c54d40d3cf) )
+	ROM_LOAD16_BYTE( "al-9-27c010-b.ic33",  0x080000, 0x020000, CRC(f9a60f06) SHA1(0cffcfdb02733feaa869198b7e668c58b47c321a) )
+	ROM_LOAD16_BYTE( "al-14-27512-b.ic46",  0x0c0001, 0x010000, CRC(339987f7) SHA1(b5650f8bdbd44510e84686b20daf70bc4a564f28) )
+	ROM_LOAD16_BYTE( "al-10-27512-b.ic47",  0x0c0000, 0x010000, CRC(4fe406aa) SHA1(7f068b81f35be4cc4785824ed524d28f201ff0a5) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "al-1-27512-a.ic53", 0x00000, 0x10000, CRC(67e09da3) SHA1(1c57048b428027fb8fae531363930ac5fed961fe) )
+	ROM_LOAD( "al-2-27512-a.ic54", 0x10000, 0x10000, CRC(7c653d8b) SHA1(f74355e12322ac3e3da1b5fc14d81908f61d01e6) )
+
+	ROM_REGION( 0x120, "proms", 0) // currently not used by the emulation
+	ROM_LOAD( "2-82s129-b.ic142",    0x000, 0x100, CRC(a7c22d96) SHA1(160deae8053b09c09328325246598b3518c7e20b) ) // same as dduxbl, fpointbj and other bootlegs
+	ROM_LOAD( "3-tbp18s030n-b.ic22", 0x100, 0x020, CRC(58bcf8bd) SHA1(e4d3d179b08c0f3424a6bec0f15058fb1b56f8d8) ) // same as dduxbl, fpointbj and other bootlegs
+
+	ROM_REGION( 0x600, "plds", 0) // currently not used by the emulation
+	ROM_LOAD( "pal16l8anc.ic51", 0x000, 0x104, CRC(99a637cb) SHA1(ce26f18290b9fe563fd05a743473efbd2db59c39) )
+	ROM_LOAD( "pal20l8a2.ic13",  0x200, 0x144, CRC(8563102a) SHA1(e5349a91a3c3e48ad9503259858531caba610d01) )
+	ROM_LOAD( "gal16v8.ic10",    0x400, 0x117, CRC(ce1ab1e1) SHA1(dcfc0015d8595ee6cb6bb02c95655161a7f3b017) ) // same as dduxbl and fpointbj
+ROM_END
 
 ROM_START( mutantwarr )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) // 68000 code
@@ -3380,11 +3409,11 @@ ROM_START( iqpipe )
 	ROM_LOAD( "82s123.2",  0x0000, 0x0020, NO_DUMP ) //same as beauty block?
 
 	ROM_REGION( 0x0144, "pals", 0 )
-	ROM_LOAD( "iqpipe.a",  0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	ROM_LOAD( "iqpipe.b",  0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	ROM_LOAD( "iqpipe.c",  0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "iqpipe.a",  0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "iqpipe.b",  0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "iqpipe.c",  0x0000, 0x0104, NO_DUMP )
 	ROM_LOAD( "iqpipe.d",  0x0000, 0x0144, CRC(36e30d71) SHA1(e38f0257f9beedccc9421eec78701a86465d16ad) )
-	ROM_LOAD( "iqpipe.u4", 0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "iqpipe.u4", 0x0000, 0x0104, NO_DUMP )
 ROM_END
 
 
@@ -4039,6 +4068,7 @@ GAME( 1989, goldnaxeb2,  goldnaxe,  goldnaxeb2,    goldnaxe, segas1x_bootleg_sta
 GAME( 1989, tturfbl,     tturf,     tturfbl,       tturf,    segas1x_bootleg_state,  init_tturfbl,    ROT0,   "bootleg (Datsu)", "Tough Turf (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, dduxbl,      ddux,      dduxbl,        ddux,     segas1x_bootleg_state,  init_dduxbl,     ROT0,   "bootleg (Datsu)", "Dynamite Dux (Datsu bootleg)", MACHINE_NOT_WORKING )
 GAME( 1988, altbeastbl,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg (Datsu)", "Altered Beast (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, altbeastbl2, altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg",         "Altered Beast (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // broken sprites
 GAME( 1988, mutantwarr,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg (Datsu)", "Mutant Warrior (Altered Beast - Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, eswatbl,     eswat,     eswatbl,       eswat,    segas1x_bootleg_state,  init_eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, eswatbl2,    eswat,     eswatbl2,      eswat,    segas1x_bootleg_state,  init_eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

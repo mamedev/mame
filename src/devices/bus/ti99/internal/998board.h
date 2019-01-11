@@ -337,7 +337,7 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_SETOFFSET_MEMBER( set_address );
+	DECLARE_READ8_MEMBER( set_address );
 
 	// Debugger support
 	int get_physical_address_debug(offs_t offset);
@@ -470,6 +470,8 @@ private:
 	void set_status(int bit, bool set) { m_status = (set)? (m_status | bit) : (m_status & ~bit); }
 	void update_hexbus();
 
+	required_device<bus::hexbus::hexbus_device> m_hexbusout;
+
 	// Registers
 	uint8_t m_data;
 	uint8_t m_status;
@@ -541,7 +543,7 @@ public:
 	// Memory space
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_SETOFFSET_MEMBER( setoffset );
+	DECLARE_READ8_MEMBER( setoffset );
 
 	// Memory space for debugger access
 	DECLARE_READ8_MEMBER( debugger_read );
@@ -563,9 +565,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( holda_line );
 
-	template<class Object> devcb_base &set_ready_wr_callback(Object &&cb) { return m_ready.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_reset_wr_callback(Object &&cb) { return m_console_reset.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_hold_wr_callback(Object &&cb) { return m_hold_line.set_callback(std::forward<Object>(cb)); }
+	auto ready_cb() { return m_ready.bind(); }
+	auto reset_cb() { return m_console_reset.bind(); }
+	auto hold_cb() { return m_hold_line.bind(); }
 
 	void set_paddress(int address);
 
@@ -638,6 +640,9 @@ private:
 	required_device<amigo_device>    m_amigo;
 	required_device<oso_device>       m_oso;
 
+	// Link to main cpu
+	required_device<cpu_device>             m_maincpu;
+
 	// More devices
 	required_device<tms9928a_device>        m_video;
 	required_device<sn76496_base_device>    m_sound;
@@ -653,16 +658,34 @@ private:
 	line_state m_crus_debug;
 
 	// System GROM library
-	tmc0430_device* m_sgrom[3];
+	required_device<tmc0430_device> m_sgrom0;
+	required_device<tmc0430_device> m_sgrom1;
+	required_device<tmc0430_device> m_sgrom2;
 
 	// Text-to-speech GROM library
-	tmc0430_device* m_tsgrom[8];
+	required_device<tmc0430_device> m_tsgrom0;
+	required_device<tmc0430_device> m_tsgrom1;
+	required_device<tmc0430_device> m_tsgrom2;
+	required_device<tmc0430_device> m_tsgrom3;
+	required_device<tmc0430_device> m_tsgrom4;
+	required_device<tmc0430_device> m_tsgrom5;
+	required_device<tmc0430_device> m_tsgrom6;
+	required_device<tmc0430_device> m_tsgrom7;
 
 	// Pascal 8 GROM library
-	tmc0430_device* m_p8grom[8];
+	required_device<tmc0430_device> m_p8grom0;
+	required_device<tmc0430_device> m_p8grom1;
+	required_device<tmc0430_device> m_p8grom2;
+	required_device<tmc0430_device> m_p8grom3;
+	required_device<tmc0430_device> m_p8grom4;
+	required_device<tmc0430_device> m_p8grom5;
+	required_device<tmc0430_device> m_p8grom6;
+	required_device<tmc0430_device> m_p8grom7;
 
 	// Pascal 3 GROM library
-	tmc0430_device* m_p3grom[3];
+	required_device<tmc0430_device> m_p3grom0;
+	required_device<tmc0430_device> m_p3grom1;
+	required_device<tmc0430_device> m_p3grom2;
 
 	// Idle flags for GROMs
 	bool m_sgrom_idle;
@@ -677,18 +700,6 @@ private:
 };
 
 } } } // end namespace bus::ti99::internal
-
-#define MCFG_MAINBOARD8_READY_CALLBACK(_write) \
-	devcb = &downcast<bus::ti99::internal::mainboard8_device &>(*device).set_ready_wr_callback(DEVCB_##_write);
-
-#define MCFG_MAINBOARD8_RESET_CALLBACK(_write) \
-	devcb = &downcast<bus::ti99::internal::mainboard8_device &>(*device).set_reset_wr_callback(DEVCB_##_write);
-
-#define MCFG_MAINBOARD8_HOLD_CALLBACK(_write) \
-	devcb = &downcast<bus::ti99::internal::mainboard8_device &>(*device).set_hold_wr_callback(DEVCB_##_write);
-
-#define MCFG_OSO_INT_CALLBACK(_int) \
-	devcb = &downcast<bus::ti99::internal::oso_device &>(*device).set_int_callback(DEVCB##_int);
 
 DECLARE_DEVICE_TYPE_NS(TI99_MAINBOARD8, bus::ti99::internal, mainboard8_device)
 DECLARE_DEVICE_TYPE_NS(TI99_VAQUERRO, bus::ti99::internal, vaquerro_device)

@@ -24,6 +24,7 @@ likewise a 2 screen game
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "speaker.h"
 
@@ -84,7 +85,7 @@ void xmen_state::main_map(address_map &map)
 	map(0x100000, 0x100fff).rw(m_k053246, FUNC(k053247_device::k053247_word_r), FUNC(k053247_device::k053247_word_w));
 	map(0x101000, 0x101fff).ram();
 	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x108000, 0x108001).w(this, FUNC(xmen_state::eeprom_w));
+	map(0x108000, 0x108001).w(FUNC(xmen_state::eeprom_w));
 	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_word_w));
 	map(0x108040, 0x10805f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::lsb_w));
@@ -94,7 +95,7 @@ void xmen_state::main_map(address_map &map)
 	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_word_r));
 	map(0x110000, 0x113fff).ram();     /* main RAM */
 	map(0x18c000, 0x197fff).rw(m_k052109, FUNC(k052109_device::lsb_r), FUNC(k052109_device::lsb_w));
-	map(0x18fa00, 0x18fa01).w(this, FUNC(xmen_state::xmen_18fa00_w));
+	map(0x18fa00, 0x18fa01).w(FUNC(xmen_state::xmen_18fa00_w));
 }
 
 void xmen_state::sound_map(address_map &map)
@@ -105,7 +106,7 @@ void xmen_state::sound_map(address_map &map)
 	map(0xe000, 0xe22f).rw(m_k054539, FUNC(k054539_device::read), FUNC(k054539_device::write));
 	map(0xe800, 0xe801).mirror(0x0400).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
-	map(0xf800, 0xf800).w(this, FUNC(xmen_state::sound_bankswitch_w));
+	map(0xf800, 0xf800).w(FUNC(xmen_state::sound_bankswitch_w));
 }
 
 
@@ -118,7 +119,7 @@ void xmen_state::_6p_main_map(address_map &map)
 	map(0x102000, 0x102fff).ram().share("spriteramright");  /* sprites (screen 2) */
 	map(0x103000, 0x103fff).ram();     /* 6p - a buffer? */
 	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x108000, 0x108001).w(this, FUNC(xmen_state::eeprom_w));
+	map(0x108000, 0x108001).w(FUNC(xmen_state::eeprom_w));
 	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_word_w)); /* sprites */
 	map(0x108040, 0x10805f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::lsb_w));
@@ -130,7 +131,7 @@ void xmen_state::_6p_main_map(address_map &map)
 	map(0x110000, 0x113fff).ram();     /* main RAM */
 /*  map(0x18c000, 0x197fff).w("k052109", FUNC(k052109_device:lsb_w)).share("tilemapleft"); */
 	map(0x18c000, 0x197fff).ram().share("tilemapleft"); /* left tilemap (p1,p2,p3 counters) */
-	map(0x18fa00, 0x18fa01).w(this, FUNC(xmen_state::xmen_18fa00_w));
+	map(0x18fa00, 0x18fa01).w(FUNC(xmen_state::xmen_18fa00_w));
 /*
     map(0x1ac000, 0x1af7ff).readonly();
     map(0x1ac000, 0x1af7ff).writeonly();
@@ -307,9 +308,9 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -320,34 +321,30 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(xmen_state, tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette("palette");
+	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(xmen_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 53, -2)
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, 53, -2);
+	m_k053246->set_palette("palette");
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
+	YM2151(config, "ymsnd", XTAL(16'000'000)/4).add_route(0, "lspeaker", 0.20).add_route(1, "rspeaker", 0.20);  /* verified on pcb */
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xmen_state::xmen6p)
@@ -360,15 +357,13 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -389,31 +384,29 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 
 	MCFG_VIDEO_START_OVERRIDE(xmen_state,xmen6p)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(xmen_state, tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette("palette");
+	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k053246", K053246, 0)
-	MCFG_K053246_CB(xmen_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, 53, -2)
-	MCFG_K053246_SET_SCREEN("screen")
-	MCFG_K053246_PALETTE("palette")
+	K053246(config, m_k053246, 0);
+	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback), this);
+	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, 53, -2);
+	m_k053246->set_screen(m_screen);
+	m_k053246->set_palette("palette");
 
-	MCFG_K053251_ADD("k053251")
+	K053251(config, m_k053251, 0);
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
+	YM2151(config, "ymsnd", XTAL(16'000'000)/4).add_route(0, "lspeaker", 0.20).add_route(1, "rspeaker", 0.20);
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
 

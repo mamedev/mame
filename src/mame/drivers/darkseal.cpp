@@ -43,14 +43,14 @@ void darkseal_state::darkseal_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram();
 	map(0x120000, 0x1207ff).ram().share("spriteram");
-	map(0x140000, 0x140fff).ram().w(this, FUNC(darkseal_state::palette_w)).share("palette");
-	map(0x141000, 0x141fff).ram().w(this, FUNC(darkseal_state::palette_ext_w)).share("palette_ext");
+	map(0x140000, 0x140fff).ram().w(FUNC(darkseal_state::palette_w)).share("palette");
+	map(0x141000, 0x141fff).ram().w(FUNC(darkseal_state::palette_ext_w)).share("palette_ext");
 	map(0x180000, 0x180001).portr("DSW");
 	map(0x180002, 0x180003).portr("P1_P2");
 	map(0x180004, 0x180005).portr("SYSTEM");
 	map(0x180006, 0x180007).nopr().w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x180008, 0x180009).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16);
-	map(0x18000a, 0x18000b).nopr().w(this, FUNC(darkseal_state::irq_ack_w));
+	map(0x18000a, 0x18000b).nopr().w(FUNC(darkseal_state::irq_ack_w));
 
 	map(0x200000, 0x201fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x202000, 0x203fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
@@ -76,8 +76,6 @@ void darkseal_state::sound_map(address_map &map)
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
-	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 /******************************************************************************/
@@ -210,8 +208,9 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	MCFG_DEVICE_PROGRAM_MAP(darkseal_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", darkseal_state,  irq6_line_assert)/* VBL */
 
-	MCFG_DEVICE_ADD(m_audiocpu, H6280, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	H6280(config, m_audiocpu, XTAL(32'220'000)/4); /* Custom chip 45, Audio section crystal is 32.220 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &darkseal_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -227,52 +226,51 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 
 	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x64)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x64)     // both these tilemaps need to be twice the y size of usual!
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x00)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[0], 0);
+	m_deco_tilegen[0]->set_split(0);
+	m_deco_tilegen[0]->set_pf1_size(DECO_64x64);
+	m_deco_tilegen[0]->set_pf2_size(DECO_64x64);     // both these tilemaps need to be twice the y size of usual!
+	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[0]->set_pf2_col_bank(0x00);
+	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
+	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x00)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(2)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[1], 0);
+	m_deco_tilegen[1]->set_split(0);
+	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[1]->set_pf2_col_bank(0x00);
+	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
+	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD(m_sprgen, DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(3)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(3);
+	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD(m_soundlatch)
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
-	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000)/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
-	MCFG_SOUND_ROUTE(0, "mono", 0.55)
-	MCFG_SOUND_ROUTE(1, "mono", 0.55)
+	ym2151_device &ym2(YM2151(config, "ym2", XTAL(32'220'000)/9));
+	ym2.irq_handler().set_inputline(m_audiocpu, 1); // IRQ2
+	ym2.add_route(0, "mono", 0.55);
+	ym2.add_route(1, "mono", 0.55);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

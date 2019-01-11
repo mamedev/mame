@@ -11,18 +11,8 @@
 
 #pragma once
 
+#include "cpu/mcs48/mcs48.h"
 #include "sound/spkrdev.h"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_COMPIS_KEYBOARD_OUT_TX_HANDLER(_devcb) \
-	devcb = &downcast<compis_keyboard_device &>(*device).set_out_tx_handler(DEVCB_##_devcb);
-
-
 
 
 //**************************************************************************
@@ -37,7 +27,7 @@ public:
 	// construction/destruction
 	compis_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_tx_handler(Object &&cb) { return m_out_tx_handler.set_callback(std::forward<Object>(cb)); }
+	auto out_tx_handler() { return m_out_tx_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( si_w );
 
@@ -51,7 +41,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i8748_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<9> m_y;
 	required_ioport m_special;

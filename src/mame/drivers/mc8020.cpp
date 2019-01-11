@@ -18,9 +18,9 @@ ToDo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
-#include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mc8020_state : public driver_device
@@ -31,20 +31,22 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_keyboard(*this, "X%u", 0)
-		{ }
+	{ }
 
+	void mc8020(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port_b_r);
 	DECLARE_WRITE8_MEMBER(port_a_w);
 	DECLARE_WRITE8_MEMBER(port_b_w);
 	uint32_t screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mc8020(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	u8 m_row;
 	required_shared_ptr<u8> m_p_videoram;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_ioport_array<7> m_keyboard;
 };
 
@@ -296,10 +298,10 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(mc8020_state::mc8020)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(2'457'600))
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, XTAL(2'457'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mc8020_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &mc8020_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -310,21 +312,19 @@ MACHINE_CONFIG_START(mc8020_state::mc8020)
 	MCFG_SCREEN_UPDATE_DRIVER(mc8020_state, screen_update_mc8020)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* devices */
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(2'457'600))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mc8020_state, port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mc8020_state, port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, mc8020_state, port_b_w))
+	z80pio_device& pio(Z80PIO(config, "pio", XTAL(2'457'600)));
+	pio.out_pa_callback().set(FUNC(mc8020_state::port_a_w));
+	pio.in_pb_callback().set(FUNC(mc8020_state::port_b_r));
+	pio.out_pb_callback().set(FUNC(mc8020_state::port_b_w));
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(2'457'600) / 64) // guess
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg2))
-
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(2'457'600))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg0))
+	z80ctc_device &ctc(Z80CTC(config, "ctc", XTAL(2'457'600)));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.set_clk<2>(XTAL(2'457'600) / 64); // guess
+	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg1));
+	ctc.zc_callback<2>().append("ctc", FUNC(z80ctc_device::trg0));
 MACHINE_CONFIG_END
 
 
@@ -332,22 +332,22 @@ MACHINE_CONFIG_END
 ROM_START( mc8020 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "ver1", "Version 1")
-	ROMX_LOAD( "s01.rom",     0x0000, 0x0400, CRC(0f1c1a62) SHA1(270c0a9e8e165658f3b09d40a3e8bb3dc1b88184), ROM_BIOS(1))
-	ROMX_LOAD( "s02.rom",     0x0400, 0x0400, CRC(93b5811c) SHA1(8559d24072c9b5908a2627ff986d818308f51d59), ROM_BIOS(1))
-	ROMX_LOAD( "s03.rom",     0x0800, 0x0400, CRC(3d32c334) SHA1(56d3012595540d03054ad3c6795ed5d929581a04), ROM_BIOS(1))
-	ROMX_LOAD( "mo01_v2.rom", 0x2000, 0x0400, CRC(7e47201c) SHA1(db49afdc5c1fe4065a979c56cbdbd3c58f5d942f), ROM_BIOS(1))
+	ROMX_LOAD( "s01.rom",     0x0000, 0x0400, CRC(0f1c1a62) SHA1(270c0a9e8e165658f3b09d40a3e8bb3dc1b88184), ROM_BIOS(0))
+	ROMX_LOAD( "s02.rom",     0x0400, 0x0400, CRC(93b5811c) SHA1(8559d24072c9b5908a2627ff986d818308f51d59), ROM_BIOS(0))
+	ROMX_LOAD( "s03.rom",     0x0800, 0x0400, CRC(3d32c334) SHA1(56d3012595540d03054ad3c6795ed5d929581a04), ROM_BIOS(0))
+	ROMX_LOAD( "mo01_v2.rom", 0x2000, 0x0400, CRC(7e47201c) SHA1(db49afdc5c1fe4065a979c56cbdbd3c58f5d942f), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "ver2", "Version 2")
-	ROMX_LOAD( "s01.rom",    0x0000, 0x0400, CRC(0f1c1a62) SHA1(270c0a9e8e165658f3b09d40a3e8bb3dc1b88184), ROM_BIOS(2))
-	ROMX_LOAD( "s02_v2.rom", 0x0400, 0x0400, CRC(dd26c90a) SHA1(1108c11362fa63d21110a3b17868c1854a318c09), ROM_BIOS(2))
-	ROMX_LOAD( "s03_v2.rom", 0x0800, 0x0400, CRC(5b64ee7b) SHA1(3b4cbfcb8e2dedcfd4a3680c81fe6ceb2211b275), ROM_BIOS(2))
-	ROMX_LOAD( "mo01.rom",   0x2000, 0x0400, CRC(c65a470f) SHA1(71325fed1a342149b5efc2234ecfc8adfff0a42d), ROM_BIOS(2))
+	ROMX_LOAD( "s01.rom",    0x0000, 0x0400, CRC(0f1c1a62) SHA1(270c0a9e8e165658f3b09d40a3e8bb3dc1b88184), ROM_BIOS(1))
+	ROMX_LOAD( "s02_v2.rom", 0x0400, 0x0400, CRC(dd26c90a) SHA1(1108c11362fa63d21110a3b17868c1854a318c09), ROM_BIOS(1))
+	ROMX_LOAD( "s03_v2.rom", 0x0800, 0x0400, CRC(5b64ee7b) SHA1(3b4cbfcb8e2dedcfd4a3680c81fe6ceb2211b275), ROM_BIOS(1))
+	ROMX_LOAD( "mo01.rom",   0x2000, 0x0400, CRC(c65a470f) SHA1(71325fed1a342149b5efc2234ecfc8adfff0a42d), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(2, "ver3", "Version 3")
-	ROMX_LOAD( "s01.rom",    0x0000, 0x0400, CRC(0f1c1a62) SHA1(270c0a9e8e165658f3b09d40a3e8bb3dc1b88184), ROM_BIOS(3))
-	ROMX_LOAD( "s02_v3.rom", 0x0400, 0x0400, CRC(40c7a694) SHA1(bcdf382e8dad9bb6e06d23ec018e9df55c8d8d0c), ROM_BIOS(3))
-	ROMX_LOAD( "s03.rom",    0x0800, 0x0400, CRC(3d32c334) SHA1(56d3012595540d03054ad3c6795ed5d929581a04), ROM_BIOS(3))
-	ROMX_LOAD( "mo01_v2.rom",0x2000, 0x0400, CRC(7e47201c) SHA1(db49afdc5c1fe4065a979c56cbdbd3c58f5d942f), ROM_BIOS(3))
+	ROMX_LOAD( "s01.rom",    0x0000, 0x0400, CRC(0f1c1a62) SHA1(270c0a9e8e165658f3b09d40a3e8bb3dc1b88184), ROM_BIOS(2))
+	ROMX_LOAD( "s02_v3.rom", 0x0400, 0x0400, CRC(40c7a694) SHA1(bcdf382e8dad9bb6e06d23ec018e9df55c8d8d0c), ROM_BIOS(2))
+	ROMX_LOAD( "s03.rom",    0x0800, 0x0400, CRC(3d32c334) SHA1(56d3012595540d03054ad3c6795ed5d929581a04), ROM_BIOS(2))
+	ROMX_LOAD( "mo01_v2.rom",0x2000, 0x0400, CRC(7e47201c) SHA1(db49afdc5c1fe4065a979c56cbdbd3c58f5d942f), ROM_BIOS(2))
 
 	// m02 doesn't exist on board
 	ROM_LOAD( "mo03.rom", 0x2800, 0x0400, CRC(29685056) SHA1(39e77658fb7af5a28112341f0893e007d73c1b7a))

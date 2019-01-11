@@ -46,19 +46,19 @@ void redclash_state::zerohour_map(address_map &map)
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x37ff).ram();
 	map(0x3800, 0x3bff).ram().share("spriteram");
-	map(0x4000, 0x43ff).ram().w(this, FUNC(redclash_state::redclash_videoram_w)).share("videoram");
+	map(0x4000, 0x43ff).ram().w(FUNC(redclash_state::redclash_videoram_w)).share("videoram");
 	map(0x4800, 0x4800).portr("IN0");    /* IN0 */
 	map(0x4801, 0x4801).portr("IN1");    /* IN1 */
 	map(0x4802, 0x4802).portr("DSW1");   /* DSW0 */
 	map(0x4803, 0x4803).portr("DSW2");   /* DSW1 */
 	map(0x5000, 0x5007).nopw();    /* to sound board */
-	map(0x5800, 0x5800).w(this, FUNC(redclash_state::redclash_star_w<0>));
+	map(0x5800, 0x5800).w(FUNC(redclash_state::redclash_star_w<0>));
 	map(0x5801, 0x5804).nopw();    /* to sound board */
-	map(0x5805, 0x5805).w(this, FUNC(redclash_state::redclash_star_w<1>));
-	map(0x5806, 0x5806).w(this, FUNC(redclash_state::redclash_star_w<2>));
-	map(0x5807, 0x5807).w(this, FUNC(redclash_state::redclash_flipscreen_w));
-	map(0x7000, 0x7000).w(this, FUNC(redclash_state::redclash_star_reset_w));
-	map(0x7800, 0x7800).w(this, FUNC(redclash_state::irqack_w));
+	map(0x5805, 0x5805).w(FUNC(redclash_state::redclash_star_w<1>));
+	map(0x5806, 0x5806).w(FUNC(redclash_state::redclash_star_w<2>));
+	map(0x5807, 0x5807).w(FUNC(redclash_state::redclash_flipscreen_w));
+	map(0x7000, 0x7000).w(FUNC(redclash_state::redclash_star_reset_w));
+	map(0x7800, 0x7800).w(FUNC(redclash_state::irqack_w));
 }
 
 void redclash_state::redclash_map(address_map &map)
@@ -66,21 +66,21 @@ void redclash_state::redclash_map(address_map &map)
 	map(0x0000, 0x2fff).rom();
 //  AM_RANGE(0x3000, 0x3000) AM_WRITENOP
 //  AM_RANGE(0x3800, 0x3800) AM_WRITENOP
-	map(0x4000, 0x43ff).ram().w(this, FUNC(redclash_state::redclash_videoram_w)).share("videoram");
+	map(0x4000, 0x43ff).ram().w(FUNC(redclash_state::redclash_videoram_w)).share("videoram");
 	map(0x4800, 0x4800).portr("IN0");    /* IN0 */
 	map(0x4801, 0x4801).portr("IN1");    /* IN1 */
 	map(0x4802, 0x4802).portr("DSW1");   /* DSW0 */
 	map(0x4803, 0x4803).portr("DSW2");   /* DSW1 */
 	map(0x5000, 0x5007).nopw();    /* to sound board */
-	map(0x5800, 0x5800).w(this, FUNC(redclash_state::redclash_star_w<0>));
-	map(0x5801, 0x5801).w(this, FUNC(redclash_state::redclash_gfxbank_w));
-	map(0x5805, 0x5805).w(this, FUNC(redclash_state::redclash_star_w<1>));
-	map(0x5806, 0x5806).w(this, FUNC(redclash_state::redclash_star_w<2>));
-	map(0x5807, 0x5807).w(this, FUNC(redclash_state::redclash_flipscreen_w));
+	map(0x5800, 0x5800).w(FUNC(redclash_state::redclash_star_w<0>));
+	map(0x5801, 0x5801).w(FUNC(redclash_state::redclash_gfxbank_w));
+	map(0x5805, 0x5805).w(FUNC(redclash_state::redclash_star_w<1>));
+	map(0x5806, 0x5806).w(FUNC(redclash_state::redclash_star_w<2>));
+	map(0x5807, 0x5807).w(FUNC(redclash_state::redclash_flipscreen_w));
 	map(0x6000, 0x67ff).ram();
 	map(0x6800, 0x6bff).ram().share("spriteram");
-	map(0x7000, 0x7000).w(this, FUNC(redclash_state::redclash_star_reset_w));
-	map(0x7800, 0x7800).w(this, FUNC(redclash_state::irqack_w));
+	map(0x7000, 0x7000).w(FUNC(redclash_state::redclash_star_reset_w));
+	map(0x7800, 0x7800).w(FUNC(redclash_state::irqack_w));
 }
 
 /*
@@ -359,14 +359,12 @@ MACHINE_CONFIG_START(redclash_state::zerohour)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(redclash_state, screen_update_redclash)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, redclash_state, screen_vblank_redclash))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_redclash)
-	MCFG_PALETTE_ADD("palette", 4*8+4*16+32)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32+32)
-	MCFG_PALETTE_INIT_OWNER(redclash_state,redclash)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_redclash);
+	PALETTE(config, m_palette, FUNC(redclash_state::redclash_palette), 4*8 + 4*16 + 32, 32 + 32);
 
-	MCFG_DEVICE_ADD("stars", ZEROHOUR_STARS, 0)
+	ZEROHOUR_STARS(config, m_stars, 0);
 
 	/* sound hardware */
 MACHINE_CONFIG_END
@@ -386,14 +384,12 @@ MACHINE_CONFIG_START(redclash_state::redclash)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(redclash_state, screen_update_redclash)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, redclash_state, screen_vblank_redclash))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_redclash)
-	MCFG_PALETTE_ADD("palette", 4*8+4*16+32)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32+32)
-	MCFG_PALETTE_INIT_OWNER(redclash_state,redclash)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_redclash);
+	PALETTE(config, m_palette, FUNC(redclash_state::redclash_palette), 4*8 + 4*16 + 32, 32 + 32);
 
-	MCFG_DEVICE_ADD("stars", ZEROHOUR_STARS, 0)
+	ZEROHOUR_STARS(config, m_stars, 0);
 
 	/* sound hardware */
 MACHINE_CONFIG_END

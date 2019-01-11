@@ -91,13 +91,13 @@ void cninja_state::cninja_map(address_map &map)
 {
 	map(0x000000, 0x0bffff).rom();
 
-	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf_control_w<0>));
+	map(0x140000, 0x14000f).w(FUNC(cninja_state::cninja_pf_control_w<0>));
 	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x14c000, 0x14c7ff).writeonly().share("pf1_rowscroll");
 	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
 
-	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf_control_w<1>));
+	map(0x150000, 0x15000f).w(FUNC(cninja_state::cninja_pf_control_w<1>));
 	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
@@ -109,7 +109,7 @@ void cninja_state::cninja_map(address_map &map)
 
 	map(0x1a4000, 0x1a47ff).ram().share("spriteram1");           /* Sprites */
 	map(0x1b4000, 0x1b4001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); /* DMA flag */
-	map(0x1bc000, 0x1bffff).rw(this, FUNC(cninja_state::cninja_protection_region_0_104_r), FUNC(cninja_state::cninja_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
+	map(0x1bc000, 0x1bffff).rw(FUNC(cninja_state::cninja_protection_region_0_104_r), FUNC(cninja_state::cninja_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
 
 	map(0x308000, 0x308fff).nopw(); /* Bootleg only */
 }
@@ -120,13 +120,13 @@ void cninja_state::cninjabl_map(address_map &map)
 
 	map(0x138000, 0x1387ff).ram().share("spriteram1"); /* bootleg sprite-ram (sprites rewritten here in new format) */
 
-	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf_control_w<0>));
+	map(0x140000, 0x14000f).w(FUNC(cninja_state::cninja_pf_control_w<0>));
 	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x14c000, 0x14c7ff).writeonly().share("pf1_rowscroll");
 	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
 
-	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf_control_w<1>));    // not used / incorrect on this
+	map(0x150000, 0x15000f).w(FUNC(cninja_state::cninja_pf_control_w<1>));    // not used / incorrect on this
 	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
@@ -193,13 +193,13 @@ void cninja_state::edrandy_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 
-	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf_control_w<0>));
+	map(0x140000, 0x14000f).w(FUNC(cninja_state::cninja_pf_control_w<0>));
 	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x14c000, 0x14c7ff).ram().share("pf1_rowscroll");
 	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
 
-	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf_control_w<1>));
+	map(0x150000, 0x15000f).w(FUNC(cninja_state::cninja_pf_control_w<1>));
 	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
@@ -207,10 +207,10 @@ void cninja_state::edrandy_map(address_map &map)
 
 	map(0x188000, 0x189fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x194000, 0x197fff).ram(); /* Main ram */
-	map(0x198000, 0x19bfff).rw(this, FUNC(cninja_state::edrandy_protection_region_6_146_r), FUNC(cninja_state::edrandy_protection_region_6_146_w)).share("prot16ram"); /* Protection device */
-//  map(0x198000, 0x1987ff).rw(this, FUNC(cninja_state::edrandy_protection_region_6_146_r), FUNC(cninja_state::edrandy_protection_region_6_146_w)).share("prot16ram"); /* Protection device */
+	map(0x198000, 0x19bfff).rw(FUNC(cninja_state::edrandy_protection_region_6_146_r), FUNC(cninja_state::edrandy_protection_region_6_146_w)).share("prot16ram"); /* Protection device */
+//  map(0x198000, 0x1987ff).rw(FUNC(cninja_state::edrandy_protection_region_6_146_r), FUNC(cninja_state::edrandy_protection_region_6_146_w)).share("prot16ram"); /* Protection device */
 
-	map(0x1a0000, 0x1a3fff).rw(this, FUNC(cninja_state::edrandy_protection_region_8_146_r), FUNC(cninja_state::edrandy_protection_region_8_146_w));
+	map(0x1a0000, 0x1a3fff).rw(FUNC(cninja_state::edrandy_protection_region_8_146_r), FUNC(cninja_state::edrandy_protection_region_8_146_w));
 
 	map(0x1a4000, 0x1a4007).m("irq", FUNC(deco_irq_device::map)).umask16(0x00ff);
 	map(0x1ac000, 0x1ac001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); /* DMA flag */
@@ -227,29 +227,29 @@ void cninja_state::robocop2_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 
-	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf_control_w<0>));
+	map(0x140000, 0x14000f).w(FUNC(cninja_state::cninja_pf_control_w<0>));
 	map(0x144000, 0x144fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x146000, 0x146fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x14c000, 0x14c7ff).ram().share("pf1_rowscroll");
 	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
 
-	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf_control_w<1>));
+	map(0x150000, 0x15000f).w(FUNC(cninja_state::cninja_pf_control_w<1>));
 	map(0x154000, 0x154fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x156000, 0x156fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
 	map(0x15e000, 0x15e7ff).ram().share("pf4_rowscroll");
 
 	map(0x180000, 0x1807ff).ram().share("spriteram1");
-//  map(0x18c000, 0x18c0ff).w(this, FUNC(cninja_state::cninja_loopback_w)) /* Protection writes */
+//  map(0x18c000, 0x18c0ff).w(FUNC(cninja_state::cninja_loopback_w)) /* Protection writes */
 //  map(0x18c000, 0x18c7ff).r(m_ioprot, FUNC(deco146_device,robocop2_prot_r)) /* Protection device */
 //  map(0x18c064, 0x18c065).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x18c000, 0x18ffff).rw(this, FUNC(cninja_state::mutantf_protection_region_0_146_r), FUNC(cninja_state::mutantf_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
+	map(0x18c000, 0x18ffff).rw(FUNC(cninja_state::mutantf_protection_region_0_146_r), FUNC(cninja_state::mutantf_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
 
 	map(0x198000, 0x198001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); /* DMA flag */
 	map(0x1a8000, 0x1a9fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x1b0000, 0x1b0007).m("irq", FUNC(deco_irq_device::map)).umask16(0x00ff);
 	map(0x1b8000, 0x1bbfff).ram(); /* Main ram */
-	map(0x1f0000, 0x1f0001).w(this, FUNC(cninja_state::robocop2_priority_w));
+	map(0x1f0000, 0x1f0001).w(FUNC(cninja_state::robocop2_priority_w));
 	map(0x1f8000, 0x1f8001).portr("DSW3"); /* Dipswitch #3 */
 }
 
@@ -283,19 +283,19 @@ void cninja_state::mutantf_map(address_map &map)
 	map(0x120000, 0x1207ff).ram().share("spriteram1");
 	map(0x140000, 0x1407ff).ram().share("spriteram2");
 	map(0x160000, 0x161fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x180000, 0x180001).w(this, FUNC(cninja_state::robocop2_priority_w));
+	map(0x180000, 0x180001).w(FUNC(cninja_state::robocop2_priority_w));
 	map(0x180002, 0x180003).nopw(); /* VBL irq ack */
-	map(0x1a0000, 0x1a3fff).rw(this, FUNC(cninja_state::mutantf_protection_region_0_146_r), FUNC(cninja_state::mutantf_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
-	map(0x1c0000, 0x1c0001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)).r(this, FUNC(cninja_state::mutantf_71_r));
+	map(0x1a0000, 0x1a3fff).rw(FUNC(cninja_state::mutantf_protection_region_0_146_r), FUNC(cninja_state::mutantf_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
+	map(0x1c0000, 0x1c0001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)).r(FUNC(cninja_state::mutantf_71_r));
 	map(0x1e0000, 0x1e0001).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write));
 
-	map(0x300000, 0x30000f).w(this, FUNC(cninja_state::cninja_pf_control_w<0>));
+	map(0x300000, 0x30000f).w(FUNC(cninja_state::cninja_pf_control_w<0>));
 	map(0x304000, 0x305fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x306000, 0x307fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x308000, 0x3087ff).ram().share("pf1_rowscroll");
 	map(0x30a000, 0x30a7ff).ram().share("pf2_rowscroll");
 
-	map(0x310000, 0x31000f).w(this, FUNC(cninja_state::cninja_pf_control_w<1>));
+	map(0x310000, 0x31000f).w(FUNC(cninja_state::cninja_pf_control_w<1>));
 	map(0x314000, 0x315fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x316000, 0x317fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x318000, 0x3187ff).ram().share("pf3_rowscroll");
@@ -315,8 +315,6 @@ void cninja_state::sound_map(address_map &map)
 	map(0x130000, 0x130001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).rw("audiocpu", FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
-	map(0x1ff400, 0x1ff403).rw("audiocpu", FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 void cninja_state::sound_map_mutantf(address_map &map)
@@ -328,8 +326,6 @@ void cninja_state::sound_map_mutantf(address_map &map)
 	map(0x130000, 0x130001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140001).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).rw("audiocpu", FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
-	map(0x1ff400, 0x1ff403).rw("audiocpu", FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 void cninja_state::stoneage_s_map(address_map &map)
@@ -354,7 +350,7 @@ void cninja_state::cninjabl2_s_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(cninja_state::cninjabl2_oki_bank_w));
+	map(0x9000, 0x9000).w(FUNC(cninja_state::cninjabl2_oki_bank_w));
 	map(0x9800, 0x9800).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 }
@@ -801,67 +797,68 @@ MACHINE_CONFIG_START(cninja_state::cninja)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(cninja_map)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
+	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
+	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(INPUTLINE("maincpu", 4))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(INPUTLINE("maincpu", 5))
+	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
+	irq.set_screen_tag(m_screen);
+	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
+	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
+	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninja)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninja)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(1)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x10)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[0], 0);
+	m_deco_tilegen[0]->set_split(1);
+	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
+	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
+	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x30)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(cninja_state, cninja_bank_callback)
-	MCFG_DECO16IC_BANK2_CB(cninja_state, cninja_bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(2)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[1], 0);
+	m_deco_tilegen[1]->set_split(0);
+	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
+	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
+	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(3)
-	MCFG_DECO_SPRITE_PRIORITY_CB(cninja_state, pri_callback)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen[0], 0);
+	m_sprgen[0]->set_gfx_region(3);
+	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback), this);
+	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DECO104_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
-	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
+	DECO104PROT(config, m_ioprot, 0);
+	m_ioprot->port_a_cb().set_ioport("INPUTS");
+	m_ioprot->port_b_cb().set_ioport("SYSTEM");
+	m_ioprot->port_c_cb().set_ioport("DSW");
+	m_ioprot->soundlatch_irq_cb().set_inputline(m_audiocpu, 0);
+	m_ioprot->set_use_magic_read_address_xor(true);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -869,11 +866,11 @@ MACHINE_CONFIG_START(cninja_state::cninja)
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000) / 9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, cninja_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.45)
-	MCFG_SOUND_ROUTE(1, "mono", 0.45)
+	ym2151_device &ym2(YM2151(config, "ym2", XTAL(32'220'000) / 9));
+	ym2.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
+	ym2.port_write_handler().set(FUNC(cninja_state::sound_bankswitch_w));
+	ym2.add_route(0, "mono", 0.45);
+	ym2.add_route(1, "mono", 0.45);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000) / 32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -892,74 +889,74 @@ MACHINE_CONFIG_START(cninja_state::stoneage)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
 	MCFG_DEVICE_PROGRAM_MAP(stoneage_s_map)
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(INPUTLINE("maincpu", 4))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(INPUTLINE("maincpu", 5))
+	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
+	irq.set_screen_tag(m_screen);
+	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
+	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
+	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninja)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninja)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,stoneage)
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(1)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x10)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[0], 0);
+	m_deco_tilegen[0]->set_split(1);
+	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
+	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
+	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x30)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(cninja_state, cninja_bank_callback)
-	MCFG_DECO16IC_BANK2_CB(cninja_state, cninja_bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(2)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[1], 0);
+	m_deco_tilegen[1]->set_split(0);
+	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
+	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
+	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(3)
-	MCFG_DECO_SPRITE_PRIORITY_CB(cninja_state, pri_callback)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen[0], 0);
+	m_sprgen[0]->set_gfx_region(3);
+	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback), this);
+	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DECO104_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
+	DECO104PROT(config, m_ioprot, 0);
+	m_ioprot->port_a_cb().set_ioport("INPUTS");
+	m_ioprot->port_b_cb().set_ioport("SYSTEM");
+	m_ioprot->port_c_cb().set_ioport("DSW");
+	m_ioprot->soundlatch_irq_cb().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_ioprot->set_use_magic_read_address_xor(true);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000) / 9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.45)
-	MCFG_SOUND_ROUTE(1, "mono", 0.45)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'220'000) / 9));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	ymsnd.add_route(0, "mono", 0.45);
+	ymsnd.add_route(1, "mono", 0.45);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000) / 32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -973,8 +970,7 @@ MACHINE_CONFIG_START(cninja_state::cninjabl2)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninjabl2)
 
-	MCFG_DEVICE_MODIFY("ioprot")
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	m_ioprot->soundlatch_irq_cb().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_REMOVE("ymsnd")
 
@@ -992,63 +988,63 @@ MACHINE_CONFIG_START(cninja_state::cninjabl)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
 	MCFG_DEVICE_PROGRAM_MAP(cninjabl_sound_map)
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(INPUTLINE("maincpu", 4))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(INPUTLINE("maincpu", 5))
+	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
+	irq.set_screen_tag(m_screen);
+	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
+	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
+	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_cninjabl)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninjabl)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(1)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x10)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[0], 0);
+	m_deco_tilegen[0]->set_split(1);
+	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
+	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
+	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x30)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(cninja_state, cninja_bank_callback)
-	MCFG_DECO16IC_BANK2_CB(cninja_state, cninja_bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(2)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[1], 0);
+	m_deco_tilegen[1]->set_split(0);
+	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
+	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
+	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000) / 9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.45)
-	MCFG_SOUND_ROUTE(1, "mono", 0.45)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'220'000) / 9));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	ymsnd.add_route(0, "mono", 0.45);
+	ymsnd.add_route(1, "mono", 0.45);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000) / 32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -1061,66 +1057,67 @@ MACHINE_CONFIG_START(cninja_state::edrandy)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(edrandy_map)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
+	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
+	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(INPUTLINE("maincpu", 4))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(INPUTLINE("maincpu", 5))
+	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
+	irq.set_screen_tag(m_screen);
+	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
+	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
+	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_edrandy)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cninja)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x10)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[0], 0);
+	m_deco_tilegen[0]->set_split(0);
+	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
+	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
+	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x30)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(cninja_state, cninja_bank_callback)
-	MCFG_DECO16IC_BANK2_CB(cninja_state, cninja_bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(2)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[1], 0);
+	m_deco_tilegen[1]->set_split(0);
+	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
+	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
+	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(3)
-	MCFG_DECO_SPRITE_PRIORITY_CB(cninja_state, pri_callback)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen[0], 0);
+	m_sprgen[0]->set_gfx_region(3);
+	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback), this);
+	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DECO146_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
+	DECO146PROT(config, m_ioprot, 0);
+	m_ioprot->port_a_cb().set_ioport("INPUTS");
+	m_ioprot->port_b_cb().set_ioport("SYSTEM");
+	m_ioprot->port_c_cb().set_ioport("DSW");
+	m_ioprot->soundlatch_irq_cb().set_inputline(m_audiocpu, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1128,11 +1125,11 @@ MACHINE_CONFIG_START(cninja_state::edrandy)
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000) / 9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, cninja_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.45)
-	MCFG_SOUND_ROUTE(1, "mono", 0.45)
+	ym2151_device &ym2(YM2151(config, "ym2", XTAL(32'220'000) / 9));
+	ym2.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
+	ym2.port_write_handler().set(FUNC(cninja_state::sound_bankswitch_w));
+	ym2.add_route(0, "mono", 0.45);
+	ym2.add_route(1, "mono", 0.45);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000) / 32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -1148,72 +1145,73 @@ MACHINE_CONFIG_START(cninja_state::robocop2)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(robocop2_map)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
+	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map);
+	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
-	MCFG_DECO_IRQ_ADD("irq", "screen")
-	MCFG_DECO_IRQ_RASTER1_IRQ_CB(INPUTLINE("maincpu", 3))
-	MCFG_DECO_IRQ_RASTER2_IRQ_CB(INPUTLINE("maincpu", 4))
-	MCFG_DECO_IRQ_VBLANK_IRQ_CB(INPUTLINE("maincpu", 5))
+	deco_irq_device &irq(DECO_IRQ(config, "irq", 0));
+	irq.set_screen_tag(m_screen);
+	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
+	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
+	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_robocop2)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_MACHINE_START_OVERRIDE(cninja_state,robocop2)
 	MCFG_MACHINE_RESET_OVERRIDE(cninja_state,robocop2)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_robocop2)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x10)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK2_CB(cninja_state, robocop2_bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[0], 0);
+	m_deco_tilegen[0]->set_split(0);
+	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
+	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(cninja_state::robocop2_bank_callback), this);
+	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
+	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x30)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(cninja_state, robocop2_bank_callback)
-	MCFG_DECO16IC_BANK2_CB(cninja_state, robocop2_bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(2)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[1], 0);
+	m_deco_tilegen[1]->set_split(0);
+	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
+	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::robocop2_bank_callback), this);
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::robocop2_bank_callback), this);
+	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
+	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(3)
-	MCFG_DECO_SPRITE_PRIORITY_CB(cninja_state, pri_callback)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen[0], 0);
+	m_sprgen[0]->set_gfx_region(3);
+	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback), this);
+	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DECO146_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
-	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
-
+	DECO146PROT(config, m_ioprot, 0);
+	m_ioprot->port_a_cb().set_ioport("INPUTS");
+	m_ioprot->port_b_cb().set_ioport("SYSTEM");
+	m_ioprot->port_c_cb().set_ioport("DSW");
+	m_ioprot->soundlatch_irq_cb().set_inputline(m_audiocpu, 0);
+	m_ioprot->set_use_magic_read_address_xor(true);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1223,11 +1221,11 @@ MACHINE_CONFIG_START(cninja_state::robocop2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
-	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000) / 9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, cninja_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	ym2151_device &ym2(YM2151(config, "ym2", XTAL(32'220'000) / 9));
+	ym2.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
+	ym2.port_write_handler().set(FUNC(cninja_state::sound_bankswitch_w));
+	ym2.add_route(0, "lspeaker", 0.45);
+	ym2.add_route(1, "rspeaker", 0.45);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000) / 32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
@@ -1246,8 +1244,10 @@ MACHINE_CONFIG_START(cninja_state::mutantf)
 	MCFG_DEVICE_PROGRAM_MAP(mutantf_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cninja_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map_mutantf)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
+	audiocpu.set_addrmap(AS_PROGRAM, &cninja_state::sound_map_mutantf);
+	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1259,67 +1259,66 @@ MACHINE_CONFIG_START(cninja_state::mutantf)
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,mutantf)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mutantf)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
 	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x30)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(cninja_state, mutantf_1_bank_callback)
-	MCFG_DECO16IC_BANK2_CB(cninja_state, mutantf_2_bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[0], 0);
+	m_deco_tilegen[0]->set_split(0);
+	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[0]->set_pf2_col_bank(0x30);
+	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(cninja_state::mutantf_1_bank_callback), this);
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(cninja_state::mutantf_2_bank_callback), this);
+	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
+	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x20)
-	MCFG_DECO16IC_PF2_COL_BANK(0x40)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(cninja_state, mutantf_1_bank_callback)
-	MCFG_DECO16IC_BANK2_CB(cninja_state, mutantf_1_bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(2)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[1], 0);
+	m_deco_tilegen[1]->set_split(0);
+	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf1_col_bank(0x20);
+	m_deco_tilegen[1]->set_pf2_col_bank(0x40);
+	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::mutantf_1_bank_callback), this);
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::mutantf_1_bank_callback), this);
+	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
+	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(3)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen[0], 0);
+	m_sprgen[0]->set_gfx_region(3);
+	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(4)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen[1], 0);
+	m_sprgen[1]->set_gfx_region(4);
+	m_sprgen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DECO146_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
+	DECO146PROT(config, m_ioprot, 0);
+	m_ioprot->port_a_cb().set_ioport("INPUTS");
+	m_ioprot->port_b_cb().set_ioport("SYSTEM");
+	m_ioprot->port_c_cb().set_ioport("DSW");
+	m_ioprot->soundlatch_irq_cb().set_inputline(m_audiocpu, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000) / 9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, cninja_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'220'000) / 9));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
+	ymsnd.port_write_handler().set(FUNC(cninja_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 0.45);
+	ymsnd.add_route(1, "rspeaker", 0.45);
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000) / 32, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)

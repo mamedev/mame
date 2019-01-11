@@ -1,9 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi, Uki
+#ifndef MAME_INCLUDES_FROMANC2_H
+#define MAME_INCLUDES_FROMANC2_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/eepromser.h"
 #include "machine/ins8250.h"
+#include "emupal.h"
 
 class fromanc2_state : public driver_device
 {
@@ -19,8 +24,21 @@ public:
 		m_rpalette(*this, "rpalette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_uart(*this, "uart") { }
+		m_uart(*this, "uart")
+	{ }
 
+	void fromanc2(machine_config &config);
+	void fromancr(machine_config &config);
+	void fromanc4(machine_config &config);
+
+	void init_fromanc4();
+	void init_fromanc2();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_int_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(sndcpu_nmi_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_nmi_r);
+
+private:
 	/* memory pointers */
 	std::unique_ptr<uint16_t[]>   m_videoram[2][4];
 	std::unique_ptr<uint8_t[]>    m_bankedram;
@@ -86,11 +104,7 @@ public:
 	DECLARE_WRITE16_MEMBER(fromanc4_gfxreg_0_w);
 	DECLARE_WRITE16_MEMBER(fromanc4_gfxreg_1_w);
 	DECLARE_WRITE16_MEMBER(fromanc4_gfxreg_2_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_int_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(sndcpu_nmi_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_nmi_r);
-	void init_fromanc4();
-	void init_fromanc2();
+
 	template<int VRAM, int Layer> TILE_GET_INFO_MEMBER(fromanc2_get_tile_info);
 	template<int VRAM, int Layer> TILE_GET_INFO_MEMBER(fromancr_get_tile_info);
 	virtual void machine_reset() override;
@@ -105,9 +119,6 @@ public:
 	inline void fromancr_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int layer );
 	void fromancr_gfxbank_w( int data );
 	inline void fromanc4_vram_w( offs_t offset, uint16_t data, uint16_t mem_mask, int layer );
-	void fromanc2(machine_config &config);
-	void fromancr(machine_config &config);
-	void fromanc4(machine_config &config);
 	void fromanc2_main_map(address_map &map);
 	void fromanc2_sound_io_map(address_map &map);
 	void fromanc2_sound_map(address_map &map);
@@ -116,3 +127,5 @@ public:
 	void fromanc4_main_map(address_map &map);
 	void fromancr_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_FROMANC2_H

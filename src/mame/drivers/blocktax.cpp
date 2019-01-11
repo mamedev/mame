@@ -32,6 +32,7 @@ there is no code to emulate tho as it is all inside the MCU.
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -40,8 +41,8 @@ class blocktax_state : public driver_device
 {
 public:
 	blocktax_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void blocktax(machine_config &config);
@@ -83,8 +84,7 @@ MACHINE_CONFIG_START(blocktax_state::blocktax)
 	MCFG_SCREEN_UPDATE_DRIVER(blocktax_state, screen_update_blocktax)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
 
 	SPEAKER(config, "speaker").front_center();
 

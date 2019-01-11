@@ -1,13 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#ifndef MAME_INCLUDES_DCON_H
+#define MAME_INCLUDES_DCON_H
+
+#pragma once
 
 #include "audio/seibu.h"
+#include "emupal.h"
 
-class dcon_state : public driver_device, protected seibu_sound_common
+class dcon_state : public driver_device, public seibu_sound_common
 {
 public:
-	dcon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dcon_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_seibu_sound(*this, "seibu_sound"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -16,8 +21,13 @@ public:
 		m_fore_data(*this, "fore_data"),
 		m_mid_data(*this, "mid_data"),
 		m_textram(*this, "textram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
+	void dcon(machine_config &config);
+	void sdgndmps(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<seibu_sound_device> m_seibu_sound;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -39,7 +49,7 @@ public:
 	uint16_t m_scroll_ram[6];
 	uint16_t m_layer_en;
 
-	DECLARE_READ8_MEMBER(sdgndmps_sound_comms_r);
+	u8 sdgndmps_sound_comms_r(offs_t offset);
 
 	DECLARE_WRITE16_MEMBER(layer_en_w);
 	DECLARE_WRITE16_MEMBER(layer_scroll_w);
@@ -59,8 +69,8 @@ public:
 	uint32_t screen_update_dcon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void dcon(machine_config &config);
-	void sdgndmps(machine_config &config);
 	void dcon_map(address_map &map);
 	void sdgndmps_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DCON_H

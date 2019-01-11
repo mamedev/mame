@@ -96,14 +96,15 @@ Notes:
 #include "machine/tmp68301.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class joystand_state : public driver_device
 {
 public:
-	joystand_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	joystand_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tmp68301(*this, "tmp68301"),
 		m_palette(*this, "palette"),
@@ -132,6 +133,14 @@ public:
 		m_outputs(*this, "outputs")
 	{ }
 
+	void joystand(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
@@ -197,13 +206,9 @@ public:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void video_start() override;
 
 	// machine
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(joystand_interrupt);
-	void joystand(machine_config &config);
 	void joystand_map(address_map &map);
 };
 
@@ -429,7 +434,7 @@ READ16_MEMBER(joystand_state::cart_r)
 {
 	int which = offset / 0x80000;
 	int addr  = offset & 0x7ffff;
-	return (m_cart_flash[which * 2 + 0]->read(addr) << 8) | m_cart_flash[which * 2 + 1]->read(addr);
+	return (m_cart_flash[which * 2 + 0]->read(space, addr) << 8) | m_cart_flash[which * 2 + 1]->read(space, addr);
 }
 
 WRITE16_MEMBER(joystand_state::cart_w)
@@ -438,9 +443,9 @@ WRITE16_MEMBER(joystand_state::cart_w)
 	int addr  = offset & 0x7ffff;
 
 	if (ACCESSING_BITS_0_7)
-		m_cart_flash[which * 2 + 1]->write(addr, data & 0xff);
+		m_cart_flash[which * 2 + 1]->write(space, addr, data & 0xff);
 	if (ACCESSING_BITS_8_15)
-		m_cart_flash[which * 2 + 0]->write(addr, data >> 8);
+		m_cart_flash[which * 2 + 0]->write(space, addr, data >> 8);
 
 	bg15_tiles_dirty = true;
 }
@@ -452,26 +457,26 @@ void joystand_state::joystand_map(address_map &map)
 	map(0x200000, 0x200003).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x200009, 0x200009).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x200010, 0x200011).portr("IN0"); // r/w
-	map(0x200012, 0x200013).ram().w(this, FUNC(joystand_state::outputs_w)).share("outputs"); // r/w
-	map(0x200014, 0x200015).rw(this, FUNC(joystand_state::fpga_r), FUNC(joystand_state::oki_bank_w)); // r/w
+	map(0x200012, 0x200013).ram().w(FUNC(joystand_state::outputs_w)).share("outputs"); // r/w
+	map(0x200014, 0x200015).rw(FUNC(joystand_state::fpga_r), FUNC(joystand_state::oki_bank_w)); // r/w
 //  AM_RANGE(0x200016, 0x200017) // write $9190 at boot
 
-	map(0x400000, 0x47ffff).ram().w(this, FUNC(joystand_state::bg15_0_w)).share("bg15_0_ram"); // r5g5b5 200x200 pixel-based
+	map(0x400000, 0x47ffff).ram().w(FUNC(joystand_state::bg15_0_w)).share("bg15_0_ram"); // r5g5b5 200x200 pixel-based
 	map(0x480000, 0x4fffff).ram(); // more rgb layers? (writes at offset 0)
 	map(0x500000, 0x57ffff).ram(); // ""
 	map(0x580000, 0x5fffff).ram(); // ""
 
-	map(0x600000, 0x603fff).ram().w(this, FUNC(joystand_state::bg2_w)).share("bg2_ram");
-	map(0x604000, 0x605fff).ram().w(this, FUNC(joystand_state::bg1_w)).share("bg1_ram");
-	map(0x606000, 0x607fff).ram().w(this, FUNC(joystand_state::bg15_1_w)).share("bg15_1_ram"); // r5g5b5 200x200 tile-based
+	map(0x600000, 0x603fff).ram().w(FUNC(joystand_state::bg2_w)).share("bg2_ram");
+	map(0x604000, 0x605fff).ram().w(FUNC(joystand_state::bg1_w)).share("bg1_ram");
+	map(0x606000, 0x607fff).ram().w(FUNC(joystand_state::bg15_1_w)).share("bg15_1_ram"); // r5g5b5 200x200 tile-based
 	map(0x608000, 0x609fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x60c000, 0x60c003).ram().share("scroll"); // write
 	map(0x60c00c, 0x60c00d).ram().share("enable"); // write
 
-	map(0x800000, 0xdfffff).rw(this, FUNC(joystand_state::cart_r), FUNC(joystand_state::cart_w)); // r/w (cart flash)
+	map(0x800000, 0xdfffff).rw(FUNC(joystand_state::cart_r), FUNC(joystand_state::cart_w)); // r/w (cart flash)
 //  AM_RANGE(0xe00080, 0xe00081) // write (bit 0 = cart? bit 1 = ? bit 3 = ?)
-	map(0xe00000, 0xe00001).r(this, FUNC(joystand_state::e00000_r)); // copy slot
-	map(0xe00020, 0xe00021).r(this, FUNC(joystand_state::e00020_r)); // master slot
+	map(0xe00000, 0xe00001).r(FUNC(joystand_state::e00000_r)); // copy slot
+	map(0xe00020, 0xe00021).r(FUNC(joystand_state::e00020_r)); // master slot
 
 	map(0xe80040, 0xe8005f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
 
@@ -585,15 +590,15 @@ INTERRUPT_GEN_MEMBER(joystand_state::joystand_interrupt)
 MACHINE_CONFIG_START(joystand_state::joystand)
 
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // !! TMP68301 !!
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(16'000'000)) // !! TMP68301 !!
 	MCFG_DEVICE_PROGRAM_MAP(joystand_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", joystand_state, joystand_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_IN_PARALLEL_CB(READ16(*this, joystand_state, eeprom_r))
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, joystand_state, eeprom_w))
+	TMP68301(config, m_tmp68301, 0);
+	m_tmp68301->set_cputag(m_maincpu);
+	m_tmp68301->in_parallel_callback().set(FUNC(joystand_state::eeprom_r));
+	m_tmp68301->out_parallel_callback().set(FUNC(joystand_state::eeprom_w));
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -602,11 +607,10 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 	MCFG_SCREEN_SIZE(0x200, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x40+0x178-1, 0x10, 0x100-1)
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_joystand)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_joystand);
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("bg15_palette")
+	PALETTE(config, m_bg15_palette, palette_device::RGB_555);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -618,21 +622,21 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// cart
-	MCFG_TMS_29F040_ADD("cart.u1")
-	MCFG_TMS_29F040_ADD("cart.u2")
-	MCFG_TMS_29F040_ADD("cart.u3")
-	MCFG_TMS_29F040_ADD("cart.u4")
-	MCFG_TMS_29F040_ADD("cart.u5")
-	MCFG_TMS_29F040_ADD("cart.u6")
-	MCFG_TMS_29F040_ADD("cart.u7")
-	MCFG_TMS_29F040_ADD("cart.u8")
-	MCFG_TMS_29F040_ADD("cart.u9")
-	MCFG_TMS_29F040_ADD("cart.u10")
-	MCFG_TMS_29F040_ADD("cart.u11")
-	MCFG_TMS_29F040_ADD("cart.u12")
+	TMS_29F040(config, "cart.u1");
+	TMS_29F040(config, "cart.u2");
+	TMS_29F040(config, "cart.u3");
+	TMS_29F040(config, "cart.u4");
+	TMS_29F040(config, "cart.u5");
+	TMS_29F040(config, "cart.u6");
+	TMS_29F040(config, "cart.u7");
+	TMS_29F040(config, "cart.u8");
+	TMS_29F040(config, "cart.u9");
+	TMS_29F040(config, "cart.u10");
+	TMS_29F040(config, "cart.u11");
+	TMS_29F040(config, "cart.u12");
 
 	// devices
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
 

@@ -6,6 +6,7 @@
 
     TODO:
     - Use NSCSI instead of legacy one!
+    - ADPCM Transfer is correct?
 
 ***************************************************************************/
 
@@ -46,6 +47,8 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, HUC6272, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_huc6271(*this, finder_base::DUMMY_TAG),
+		m_cdda_l(*this, "cdda_l"),
+		m_cdda_r(*this, "cdda_r"),
 		m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, address_map_constructor(), address_map_constructor(FUNC(huc6272_device::microprg_map), this)),
 		m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, address_map_constructor(), address_map_constructor(FUNC(huc6272_device::kram_map), this)),
 		m_microprg_ram(*this, "microprg_ram"),
@@ -77,6 +80,51 @@ void huc6272_device::device_validity_check(validity_checker &valid) const
 void huc6272_device::device_start()
 {
 	m_irq_changed_cb.resolve_safe();
+
+	save_item(NAME(m_register));
+	save_item(NAME(m_kram_addr_r));
+	save_item(NAME(m_kram_inc_r));
+	save_item(NAME(m_kram_page_r));
+	save_item(NAME(m_kram_addr_w));
+	save_item(NAME(m_kram_inc_w));
+	save_item(NAME(m_kram_page_w));
+	save_item(NAME(m_page_setting));
+
+	for (int bg = 0; bg < 4; bg++)
+	{
+		save_item(NAME(m_bg[bg].bat_address), bg);
+		save_item(NAME(m_bg[bg].cg_address), bg);
+		save_item(NAME(m_bg[bg].mode), bg);
+		save_item(NAME(m_bg[bg].height), bg);
+		save_item(NAME(m_bg[bg].width), bg);
+		save_item(NAME(m_bg[bg].xscroll), bg);
+		save_item(NAME(m_bg[bg].yscroll), bg);
+		save_item(NAME(m_bg[bg].priority), bg);
+	}
+
+	save_item(NAME(m_bg0sub.bat_address));
+	save_item(NAME(m_bg0sub.cg_address));
+	save_item(NAME(m_bg0sub.height));
+	save_item(NAME(m_bg0sub.width));
+
+	save_item(NAME(m_micro_prg.index));
+	save_item(NAME(m_micro_prg.ctrl));
+
+	save_item(NAME(m_adpcm.rate));
+	save_item(NAME(m_adpcm.status));
+	save_item(NAME(m_adpcm.interrupt));
+	for (int adpcm = 0; adpcm < 2; adpcm++)
+	{
+		save_item(NAME(m_adpcm.playing[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.control[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.start[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.end[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.imm[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.input[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.nibble[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.pos[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.addr[adpcm]), adpcm);
+	}
 }
 
 
@@ -156,6 +204,7 @@ READ32_MEMBER( huc6272_device::read )
 		---- ---- ---- ---- ---- ---- -xxx xxxx register read-back
 		*/
 		res = m_register & 0x7f;
+		res |= (m_adpcm.interrupt << 10);
 		res |= (m_scsi_ctrl_in->read() & 0xff) << 16;
 	}
 	else
@@ -190,6 +239,14 @@ READ32_MEMBER( huc6272_device::read )
 
 			case 0x0f:
 				res = m_page_setting;
+				break;
+
+			case 0x53: // ADPCM status
+				res = m_adpcm.status;
+
+				m_adpcm.status = 0;
+				m_adpcm.interrupt = 0;
+				interrupt_update();
 				break;
 			//default: printf("%04x\n",m_register);
 		}
@@ -370,30 +427,176 @@ WRITE32_MEMBER( huc6272_device::write )
 				break;
 			}
 
+			case 0x50: // ADPCM control
+			{
+				for (int i = 0; i < 2; i++)
+				{
+					m_adpcm.playing[i] = BIT(data, i);
+					if (!m_adpcm.playing[i])
+					{
+						m_adpcm.input[i] = -1;
+						m_adpcm.pos[i] = 0;
+					}
+					else
+					{
+						m_adpcm.addr[i] = m_adpcm.start[i];
+					}
+				}
+
+				m_adpcm.rate = (data & 0xc) >> 2;
+				break;
+			}
+
+			// ADPCM channel control
+			case 0x51:
+			case 0x52:
+			{
+				uint8_t reg_offs = 1-(m_register & 1);
+				m_adpcm.control[reg_offs] = data & 0x7;
+				if (BIT(m_adpcm.control[reg_offs], 1) == 0)
+					m_adpcm.status &= ~(1 << (2*reg_offs));
+
+				if (BIT(m_adpcm.control[reg_offs], 2) == 0)
+					m_adpcm.status &= ~(1 << (2*reg_offs+1));
+
+				break;
+			}
+
+			// ADPCM start address
+			case 0x58:
+			case 0x5c:
+				m_adpcm.start[(m_register >> 2) & 1] = (data << 8) & 0x3ffff;
+				break;
+
+			// ADPCM end address
+			case 0x59:
+			case 0x5d:
+				m_adpcm.end[(m_register >> 2) & 1] = data & 0x3ffff;
+				break;
+
+			// ADPCM intermediate address
+			case 0x5a:
+			case 0x5e:
+				m_adpcm.imm[(m_register >> 2) & 1] = (data << 6) & 0x3ffff;
+				break;
+
 			//default: printf("%04x %04x %08x\n",m_register,data,mem_mask);
 		}
 	}
+}
+
+uint8_t huc6272_device::adpcm_update(int chan)
+{
+	if (!m_adpcm.playing[chan])
+		return 0;
+
+	int rate = (1 << m_adpcm.rate);
+	m_adpcm.pos[chan]++;
+	if (m_adpcm.pos[chan] > rate)
+	{
+		if (m_adpcm.input[chan] == -1)
+		{
+			m_adpcm.input[chan] = read_dword(((m_page_setting & 0x1000) << 6) | m_adpcm.addr[chan]);
+			m_adpcm.addr[chan] = (m_adpcm.addr[chan] & 0x20000) | ((m_adpcm.addr[chan] + 1) & 0x1ffff);
+			if (m_adpcm.addr[chan] == m_adpcm.imm[chan])
+			{
+				m_adpcm.status |= (1 << (chan*2+1));
+				if (BIT(m_adpcm.control[chan], 2))
+				{
+					m_adpcm.interrupt = 1;
+					interrupt_update();
+				}
+			}
+			if (m_adpcm.addr[chan] > m_adpcm.end[chan])
+			{
+				m_adpcm.status |= (1 << (chan*2));
+				if (BIT(m_adpcm.control[chan], 1))
+				{
+					m_adpcm.interrupt = 1;
+					interrupt_update();
+				}
+
+				if (BIT(m_adpcm.control[chan],0)) // Ring Buffer
+				{
+					m_adpcm.addr[chan] = m_adpcm.start[chan];
+				}
+				else
+				{
+					m_adpcm.playing[chan] = 0;
+					return 0;
+				}
+			}
+			m_adpcm.nibble[chan] = 0;
+		}
+		else
+		{
+			m_adpcm.nibble[chan] += 4;
+			if (m_adpcm.nibble[chan] >= 28)
+				m_adpcm.input[chan] = -1;
+		}
+	}
+
+	return (m_adpcm.input[chan] >> m_adpcm.nibble[chan]) & 0xf;
+}
+
+READ8_MEMBER(huc6272_device::adpcm_update_0)
+{
+	return adpcm_update(0);
+}
+
+READ8_MEMBER(huc6272_device::adpcm_update_1)
+{
+	return adpcm_update(1);
+}
+
+WRITE8_MEMBER(huc6272_device::cdda_update)
+{
+	if (offset)
+		m_cdda_r->set_output_gain(ALL_OUTPUTS, float(data) / 63.0);
+	else
+		m_cdda_l->set_output_gain(ALL_OUTPUTS, float(data) / 63.0);
+}
+
+void huc6272_device::interrupt_update()
+{
+	if (m_adpcm.interrupt)
+		m_irq_changed_cb(ASSERT_LINE);
+	else
+		m_irq_changed_cb(CLEAR_LINE);
+}
+
+void huc6272_device::cdrom_config(device_t *device)
+{
+	device = device->subdevice("cdda");
+	MCFG_SOUND_ROUTE(0, "^^cdda_l", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^cdda_r", 1.0)
 }
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(huc6272_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	MCFG_SCSI_RST_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit7))
-	MCFG_SCSI_BSY_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit6))
-	MCFG_SCSI_REQ_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit5))
-	MCFG_SCSI_MSG_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit4))
-	MCFG_SCSI_CD_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit3))
-	MCFG_SCSI_IO_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit2))
-	MCFG_SCSI_SEL_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit1))
+void huc6272_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, m_cdda_l).front_left();
+	SPEAKER(config, m_cdda_r).front_right();
 
-	MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
+	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
+	scsibus.set_data_input_buffer("scsi_data_in");
+	scsibus.rst_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit7));
+	scsibus.bsy_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit6));
+	scsibus.req_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit5));
+	scsibus.msg_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit4));
+	scsibus.cd_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit3));
+	scsibus.io_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit2));
+	scsibus.sel_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit1));
 
-	MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", "scsi")
-	MCFG_DEVICE_ADD("scsi_ctrl_in", INPUT_BUFFER, 0)
-	MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
+	output_latch_device &scsiout(OUTPUT_LATCH(config, "scsi_data_out"));
+	scsibus.set_output_latch(scsiout);
 
-	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "cdrom", SCSICD, SCSI_ID_1)
-MACHINE_CONFIG_END
+	INPUT_BUFFER(config, "scsi_ctrl_in");
+	INPUT_BUFFER(config, "scsi_data_in");
+
+	scsibus.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
+	scsibus.slot(1).set_option_machine_config("cdrom", cdrom_config);
+}

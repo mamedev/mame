@@ -52,6 +52,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -65,15 +66,15 @@ void quizpani_state::quizpani_map(address_map &map)
 	map(0x10000a, 0x10000b).portr("DSW2");
 	map(0x100014, 0x100015).nopw(); /* screen flipping? */
 	map(0x100016, 0x100017).nopw(); /* IRQ enable? */
-	map(0x100018, 0x100019).w(this, FUNC(quizpani_state::tilesbank_w));
+	map(0x100018, 0x100019).w(FUNC(quizpani_state::tilesbank_w));
 	map(0x104001, 0x104001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x104020, 0x104027).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);
 	map(0x108000, 0x1083ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x108400, 0x1085ff).nopw();
 	map(0x10c000, 0x10c007).ram().share("scrollreg");
 	map(0x10c008, 0x10c403).nopw();
-	map(0x110000, 0x113fff).ram().w(this, FUNC(quizpani_state::bg_videoram_w)).share("bg_videoram");
-	map(0x11c000, 0x11ffff).ram().w(this, FUNC(quizpani_state::txt_videoram_w)).share("txt_videoram");
+	map(0x110000, 0x113fff).ram().w(FUNC(quizpani_state::bg_videoram_w)).share("bg_videoram");
+	map(0x11c000, 0x11ffff).ram().w(FUNC(quizpani_state::txt_videoram_w)).share("txt_videoram");
 	map(0x180000, 0x18ffff).ram();
 	map(0x200000, 0x33ffff).rom();
 }
@@ -200,9 +201,8 @@ MACHINE_CONFIG_START(quizpani_state::quizpani)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quizpani_state,  irq4_line_hold)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(quizpani_state, irq1_line_hold, 164) // music tempo
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quizpani)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_quizpani);
+	PALETTE(config, "palette").set_format(palette_device::RRRRGGGGBBBBRGBx, 0x200);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -218,8 +218,8 @@ MACHINE_CONFIG_START(quizpani_state::quizpani)
 	MCFG_DEVICE_ADD("oki", OKIM6295, 16000000/4, okim6295_device::PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki")
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki");
 MACHINE_CONFIG_END
 
 ROM_START( quizpani )

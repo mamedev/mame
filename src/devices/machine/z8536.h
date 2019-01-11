@@ -59,34 +59,6 @@
 #include "machine/z80daisy.h"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_Z8536_IRQ_CALLBACK(_write) \
-	devcb = &downcast<z8536_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
-
-#define MCFG_Z8536_PA_IN_CALLBACK(_read) \
-	devcb = &downcast<z8536_device &>(*device).set_pa_rd_callback(DEVCB_##_read);
-
-#define MCFG_Z8536_PA_OUT_CALLBACK(_write) \
-	devcb = &downcast<z8536_device &>(*device).set_pa_wr_callback(DEVCB_##_write);
-
-#define MCFG_Z8536_PB_IN_CALLBACK(_read) \
-	devcb = &downcast<z8536_device &>(*device).set_pb_rd_callback(DEVCB_##_read);
-
-#define MCFG_Z8536_PB_OUT_CALLBACK(_write) \
-	devcb = &downcast<z8536_device &>(*device).set_pb_wr_callback(DEVCB_##_write);
-
-#define MCFG_Z8536_PC_IN_CALLBACK(_read) \
-	devcb = &downcast<z8536_device &>(*device).set_pc_rd_callback(DEVCB_##_read);
-
-#define MCFG_Z8536_PC_OUT_CALLBACK(_write) \
-	devcb = &downcast<z8536_device &>(*device).set_pc_wr_callback(DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -97,13 +69,13 @@ class cio_base_device : public device_t
 {
 public:
 
-	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pa_rd_callback(Object &&cb) { return m_read_pa.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pa_wr_callback(Object &&cb) { return m_write_pa.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pb_rd_callback(Object &&cb) { return m_read_pb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pb_wr_callback(Object &&cb) { return m_write_pb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pc_rd_callback(Object &&cb) { return m_read_pc.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pc_wr_callback(Object &&cb) { return m_write_pc.set_callback(std::forward<Object>(cb)); }
+	auto irq_wr_cb() { return m_write_irq.bind(); }
+	auto pa_rd_cb() { return m_read_pa.bind(); }
+	auto pa_wr_cb() { return m_write_pa.bind(); }
+	auto pb_rd_cb() { return m_read_pb.bind(); }
+	auto pb_wr_cb() { return m_write_pb.bind(); }
+	auto pc_rd_cb() { return m_read_pc.bind(); }
+	auto pc_wr_cb() { return m_write_pc.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { external_port_w(PORT_A, 0, state); }
 	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { external_port_w(PORT_A, 1, state); }

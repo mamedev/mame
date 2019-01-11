@@ -24,7 +24,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -39,6 +39,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_lcdc(*this, "hd44780")
+		, m_screen(*this, "screen")
 		, m_beep(*this, "beeper")
 		, m_cart(*this, "cartslot")
 		, m_bank0(*this, "bank0")
@@ -61,7 +62,7 @@ protected:
 	DECLARE_WRITE8_MEMBER( rombank2_w );
 	DECLARE_READ8_MEMBER( beep_r );
 	DECLARE_WRITE8_MEMBER( beep_w );
-	DECLARE_PALETTE_INIT(pc2000);
+	void pc2000_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pc2000_cart);
 
 	void pc2000_io(address_map &map);
@@ -69,6 +70,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<hd44780_device> m_lcdc;
+	required_device<screen_device> m_screen;
 	required_device<beep_device> m_beep;
 	required_device<generic_slot_device> m_cart;
 	optional_memory_bank m_bank0;
@@ -215,12 +217,12 @@ void pc2000_state::pc2000_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(pc2000_state::rombank0_w));
-	map(0x01, 0x01).w(this, FUNC(pc2000_state::rombank1_w));
-	map(0x03, 0x03).w(this, FUNC(pc2000_state::rombank2_w));
+	map(0x00, 0x00).w(FUNC(pc2000_state::rombank0_w));
+	map(0x01, 0x01).w(FUNC(pc2000_state::rombank1_w));
+	map(0x03, 0x03).w(FUNC(pc2000_state::rombank2_w));
 	map(0x0a, 0x0b).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
-	map(0x10, 0x11).rw(this, FUNC(pc2000_state::key_matrix_r), FUNC(pc2000_state::key_matrix_w));
-	map(0x12, 0x12).rw(this, FUNC(pc2000_state::beep_r), FUNC(pc2000_state::beep_w));
+	map(0x10, 0x11).rw(FUNC(pc2000_state::key_matrix_r), FUNC(pc2000_state::key_matrix_w));
+	map(0x12, 0x12).rw(FUNC(pc2000_state::beep_r), FUNC(pc2000_state::beep_w));
 }
 
 
@@ -336,11 +338,11 @@ void gl3000s_state::gl3000s_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x01, 0x01).w(this, FUNC(gl3000s_state::rombank1_w));
-	map(0x03, 0x03).w(this, FUNC(gl3000s_state::rombank2_w));
+	map(0x01, 0x01).w(FUNC(gl3000s_state::rombank1_w));
+	map(0x03, 0x03).w(FUNC(gl3000s_state::rombank2_w));
 	map(0x08, 0x09).rw(m_lcdc_r, FUNC(sed1520_device::read), FUNC(sed1520_device::write));
 	map(0x0a, 0x0b).rw(m_lcdc_l, FUNC(sed1520_device::read), FUNC(sed1520_device::write));
-	map(0x10, 0x11).rw(this, FUNC(gl3000s_state::key_matrix_r), FUNC(gl3000s_state::key_matrix_w));
+	map(0x10, 0x11).rw(FUNC(gl3000s_state::key_matrix_r), FUNC(gl3000s_state::key_matrix_w));
 }
 
 READ8_MEMBER( pc1000_state::kb_r )
@@ -362,7 +364,7 @@ READ8_MEMBER( pc1000_state::kb_r )
 READ8_MEMBER( pc1000_state::lcdc_data_r )
 {
 	//logerror("lcdc data r\n");
-	return m_lcdc->data_read(space, 0) >> 4;
+	return m_lcdc->data_read() >> 4;
 }
 
 WRITE8_MEMBER( pc1000_state::lcdc_data_w )
@@ -370,19 +372,19 @@ WRITE8_MEMBER( pc1000_state::lcdc_data_w )
 	//popmessage("%s", (char*)m_maincpu->space(AS_PROGRAM).get_read_ptr(0x4290));
 
 	//logerror("lcdc data w %x\n", data);
-	m_lcdc->data_write(space, 0, data << 4);
+	m_lcdc->data_write(data << 4);
 }
 
 READ8_MEMBER( pc1000_state::lcdc_control_r )
 {
 	//logerror("lcdc control r\n");
-	return m_lcdc->control_read(space, 0) >> 4;
+	return m_lcdc->control_read() >> 4;
 }
 
 WRITE8_MEMBER( pc1000_state::lcdc_control_w )
 {
 	//logerror("lcdc control w %x\n", data);
-	m_lcdc->control_write(space, 0, data<<4);
+	m_lcdc->control_write(data<<4);
 }
 
 HD44780_PIXEL_UPDATE(pc1000_state::pc1000_pixel_update)
@@ -409,9 +411,9 @@ void pc1000_state::pc1000_mem(address_map &map)
 
 void pc1000_state::pc1000_io(address_map &map)
 {
-	map(0x0000, 0x01ff).r(this, FUNC(pc1000_state::kb_r));
-	map(0x4000, 0x4000).mirror(0xfe).rw(this, FUNC(pc1000_state::lcdc_control_r), FUNC(pc1000_state::lcdc_control_w));
-	map(0x4100, 0x4100).mirror(0xfe).rw(this, FUNC(pc1000_state::lcdc_data_r), FUNC(pc1000_state::lcdc_data_w));
+	map(0x0000, 0x01ff).r(FUNC(pc1000_state::kb_r));
+	map(0x4000, 0x4000).mirror(0xfe).rw(FUNC(pc1000_state::lcdc_control_r), FUNC(pc1000_state::lcdc_control_w));
+	map(0x4100, 0x4100).mirror(0xfe).rw(FUNC(pc1000_state::lcdc_data_r), FUNC(pc1000_state::lcdc_data_w));
 }
 
 /* Input ports */
@@ -844,7 +846,7 @@ void pc1000_state::machine_reset()
 	m_bank1->set_entry(0);
 }
 
-PALETTE_INIT_MEMBER(pc2000_state, pc2000)
+void pc2000_state::pc2000_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -878,46 +880,46 @@ DEVICE_IMAGE_LOAD_MEMBER( pc2000_state, pc2000_cart )
 	return image_init_result::PASS;
 }
 
-MACHINE_CONFIG_START(pc2000_state::pc2000)
+void pc2000_state::pc2000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) /* probably not accurate */
-	MCFG_DEVICE_PROGRAM_MAP(pc2000_mem)
-	MCFG_DEVICE_IO_MAP(pc2000_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(pc2000_state, irq0_line_hold, 50)
+	Z80(config, m_maincpu, XTAL(4'000'000)); /* probably not accurate */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc2000_state::pc2000_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc2000_state::pc2000_io);
+	m_maincpu->set_periodic_int(FUNC(pc2000_state::irq0_line_hold), attotime::from_hz(50));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_SIZE(120, 18) //2x20 chars
-	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 18-1)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	m_screen->set_size(120, 18); //2x20 chars
+	m_screen->set_visarea(0, 120-1, 0, 18-1);
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pc2000_state, pc2000)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc2000)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	PALETTE(config, "palette", FUNC(pc2000_state::pc2000_palette), 2);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_pc2000);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 20)
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "genius_cart")
-	MCFG_GENERIC_LOAD(pc2000_state, pc2000_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "genius_cart"));
+	cartslot.set_device_load(device_image_load_delegate(&pc2000_state::device_image_load_pc2000_cart, this));
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc1000_cart", "pc1000")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "pc1000_cart").set_compatible("pc1000");
+}
 
-MACHINE_CONFIG_START(pc2000_state::gl2000)
+void pc2000_state::gl2000(machine_config &config)
+{
 	pc2000(config);
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "gl2000")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
-MACHINE_CONFIG_END
+
+	SOFTWARE_LIST(config, "cart_list").set_original("gl2000");
+	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
+}
 
 HD44780_PIXEL_UPDATE(gl4004_state::gl4000_pixel_update)
 {
@@ -936,70 +938,70 @@ HD44780_PIXEL_UPDATE(gl4004_state::gl4000_pixel_update)
 	}
 }
 
-MACHINE_CONFIG_START(gl3000s_state::gl3000s)
+void gl3000s_state::gl3000s(machine_config &config)
+{
 	pc2000(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(gl3000s_io)
 
-	MCFG_DEVICE_REMOVE("hd44780")
-	MCFG_SED1520_ADD("sed1520_l", UPDATE(gl3000s_state, screen_update_left))    // left panel is 59 pixels (0-58)
-	MCFG_SED1520_ADD("sed1520_r", UPDATE(gl3000s_state, screen_update_right))   // right panel is 61 pixels (59-119)
+	m_maincpu->set_addrmap(AS_IO, &gl3000s_state::gl3000s_io);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(120, 24)
-	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 24-1)
-	MCFG_SCREEN_UPDATE_DRIVER( gl3000s_state, screen_update )
+	config.device_remove("hd44780");
+	SED1520(config, "sed1520_l").set_screen_update_cb(FUNC(gl3000s_state::screen_update_left));  // left panel is 59 pixels (0-58)
+	SED1520(config, "sed1520_r").set_screen_update_cb(FUNC(gl3000s_state::screen_update_right)); // right panel is 61 pixels (59-119)
 
-	MCFG_DEFAULT_LAYOUT(layout_gl3000s)
+	m_screen->set_size(120, 24);
+	m_screen->set_visarea(0, 120-1, 0, 24-1);
+	m_screen->set_screen_update(FUNC(gl3000s_state::screen_update));
 
-	MCFG_DEVICE_REMOVE("gfxdecode")
+	config.set_default_layout(layout_gl3000s);
+	config.device_remove("gfxdecode");
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
+	SOFTWARE_LIST(config, "gl2000_cart").set_compatible("gl2000");
+	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gl4004_state::gl4000)
+void gl4004_state::gl4000(machine_config &config)
+{
 	pc2000(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(120, 36) // 4x20 chars
-	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 36-1)
 
-	MCFG_DEVICE_MODIFY("hd44780")
-	MCFG_HD44780_LCD_SIZE(4, 20)
-	MCFG_HD44780_PIXEL_UPDATE_CB(gl4004_state,gl4000_pixel_update)
+	m_screen->set_size(120, 36); // 4x20 chars
+	m_screen->set_visarea(0, 120-1, 0, 36-1);
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
-MACHINE_CONFIG_END
+	m_lcdc->set_lcd_size(4, 20);
+	m_lcdc->set_pixel_update_cb(FUNC(gl4004_state::gl4000_pixel_update));
 
-MACHINE_CONFIG_START(pc1000_state::misterx)
+	SOFTWARE_LIST(config, "gl2000_cart").set_compatible("gl2000");
+	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
+}
+
+void pc1000_state::misterx(machine_config &config)
+{
 	pc2000(config);
+
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pc1000_mem)
-	MCFG_DEVICE_IO_MAP(pc1000_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(pc1000_state, irq0_line_hold,  10)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc1000_state::pc1000_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc1000_state::pc1000_io);
+	m_maincpu->set_periodic_int(FUNC(pc1000_state::irq0_line_hold), attotime::from_hz(10));
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(120, 9) //1x20 chars
-	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 9-1)
+	m_screen->set_size(120, 9); //1x20 chars
+	m_screen->set_visarea(0, 120-1, 0, 9-1);
 
-	MCFG_DEVICE_MODIFY("hd44780")
-	MCFG_HD44780_LCD_SIZE(1, 20)
-	MCFG_HD44780_PIXEL_UPDATE_CB(pc1000_state,pc1000_pixel_update)
+	m_lcdc->set_lcd_size(1, 20);
+	m_lcdc->set_pixel_update_cb(FUNC(pc1000_state::pc1000_pixel_update));
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "misterx")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("misterx");
+}
 
-MACHINE_CONFIG_START(pc1000_state::pc1000)
+void pc1000_state::pc1000(machine_config &config)
+{
 	misterx(config);
-	MCFG_SOFTWARE_LIST_REMOVE("cart_list")
-	MCFG_SOFTWARE_LIST_REMOVE("pc1000_cart")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "pc1000")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
-MACHINE_CONFIG_END
+
+	config.device_remove("cart_list");
+	config.device_remove("pc1000_cart");
+	SOFTWARE_LIST(config, "cart_list").set_original("pc1000");
+	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
+}
 
 /* ROM definition */
 ROM_START( pc2000 )

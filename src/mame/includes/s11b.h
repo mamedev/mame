@@ -19,6 +19,11 @@ public:
 		, m_bg_hc55516(*this, "hc55516_bg")
 	{ }
 
+	void s11b(machine_config &config);
+
+	void init_s11b();
+	void init_s11b_invert();
+
 	DECLARE_WRITE8_MEMBER(dig1_w);
 	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
 	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
@@ -27,23 +32,20 @@ public:
 	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
 	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
 
-	DECLARE_MACHINE_RESET(s11b);
-	void init_s11b();
-	void init_s11b_invert();
-
-	void s11b(machine_config &config);
-	void s11b_audio_map(address_map &map);
-	void s11b_bg_map(address_map &map);
-	void s11b_main_map(address_map &map);
 protected:
-	optional_device<hc55516_device> m_bg_hc55516;
-
 	void set_invert(bool inv) { m_invert = inv; }
 
 private:
+	DECLARE_MACHINE_RESET(s11b);
+
+	void s11b_audio_map(address_map &map);
+	void s11b_bg_map(address_map &map);
+	void s11b_main_map(address_map &map);
+
+	optional_device<hc55516_device> m_bg_hc55516;
+
+
 	bool m_invert;  // later System 11B games start expecting inverted data to the display LED segments.
-
-
 };
 
 #endif // MAME_INCLUDES_S11B_H

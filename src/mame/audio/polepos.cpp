@@ -270,7 +270,7 @@ void polepos_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 	}
 
 	/* determine the effective clock rate */
-	clock = (machine().device("maincpu")->unscaled_clock() / 16) * ((m_sample_msb + 1) * 64 + m_sample_lsb + 1) / (64*64);
+	clock = (unscaled_clock() / 16) * ((m_sample_msb + 1) * 64 + m_sample_lsb + 1) / (64*64);
 	step = (clock << 12) / OUTPUT_RATE;
 
 	/* determine the volume */

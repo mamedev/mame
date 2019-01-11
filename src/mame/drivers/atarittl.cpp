@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli, Scott Stone, Couriersud
+// copyright-holders:Fabio Priuli, Scott Stone, Couriersud, Felipe Sanches
 /***************************************************************************
 
  Atari / Kee Games Driver - Discrete Games made in the 1970's
@@ -76,6 +76,7 @@
 
 #include "machine/netlist.h"
 #include "machine/nl_stuntcyc.h"
+#include "machine/nl_gtrak10.h"
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 #include "screen.h"
@@ -102,6 +103,10 @@
 #define SC_HBEND        (32)
 #define SC_VBSTART      (SC_VTOTAL)
 #define SC_VBEND        (8)
+
+#define GTRAK10_VIDCLOCK 14318181
+#define GTRAK10_HTOTAL 451
+#define GTRAK10_VTOTAL 521
 
 class atarikee_state : public driver_device
 {
@@ -190,6 +195,17 @@ private:
 	int m_last_hpos;
 	int m_last_vpos;
 	double m_last_fraction;
+};
+
+class gtrak10_state : public driver_device
+{
+public:
+	gtrak10_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+	{
+	}
+
+	void gtrak10(machine_config &config);
 };
 
 static NETLIST_START(atarikee)
@@ -352,6 +368,49 @@ MACHINE_CONFIG_START(stuntcyc_state::stuntcyc)
 	//MCFG_FIXFREQ_SYNC_THRESHOLD(0.30)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(gtrak10_state::gtrak10)
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
+	MCFG_NETLIST_SETUP(gtrak10)
+
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_composite_monochrome, "fixfreq")
+
+	/* video hardware */
+
+	/* Service Manual describes it as
+	   "true interlaced raster scan"
+	   "composed of 260.5 horizontal lines stacked on top of one another"
+
+	   == PARAMETERS ==
+
+	   Pixel Clock = 14.318MHz
+
+	   Horiz Total       = 451
+	   Horiz Front Porch =  0
+	   Horiz Sync        =  1
+	   Horiz Back Porch  = 31
+
+	   Vert Total       = 521
+	   Vert Front Porch =   0
+	   Vert Sync        =   8
+	   Vert Back Porch  =   0
+	*/
+
+	MCFG_FIXFREQ_ADD("fixfreq", "screen")
+	MCFG_FIXFREQ_MONITOR_CLOCK(GTRAK10_VIDCLOCK)
+	//                    Length of active video,   end of front-porch,   end of sync signal,  end of line/frame
+	MCFG_FIXFREQ_HORZ_PARAMS(GTRAK10_HTOTAL*1 - 32,  GTRAK10_HTOTAL*1 - 32,  GTRAK10_HTOTAL*1 - 31,     GTRAK10_HTOTAL*1)
+	//MCFG_FIXFREQ_HORZ_PARAMS(GTRAK10_HTOTAL - 32,  GTRAK10_HTOTAL - 32,  GTRAK10_HTOTAL - 31,     GTRAK10_HTOTAL)
+	MCFG_FIXFREQ_VERT_PARAMS( GTRAK10_VTOTAL - 8,   GTRAK10_VTOTAL - 8,       GTRAK10_VTOTAL,     GTRAK10_VTOTAL)
+	MCFG_FIXFREQ_FIELDCOUNT(2)
+	MCFG_FIXFREQ_SYNC_THRESHOLD(1.0)
+	//MCFG_FIXFREQ_GAIN(1.50)
+
+MACHINE_CONFIG_END
+
+static INPUT_PORTS_START( gtrak10 )
+	// TODO
+INPUT_PORTS_END
 
 /***************************************************************************
 
@@ -390,7 +449,7 @@ ROM_END
 ROM_START( gtrak10 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x0800, "racetrack", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "maincpu:gamedata", ROMREGION_ERASE00 )
 	ROM_LOAD( "074186.j5",    0x0000, 0x0800, CRC(3bad3280) SHA1(b83fe1a1dc6bf20717dadf576f1d817496340f8c) ) // not actually a SN74186 but an Electronic Arrays, Inc. EA4800 16K (2048 x 8) ROM. TI TMS4800 clone (EA4800). Intentionally mislabeled by Atari.
 ROM_END
 
@@ -398,7 +457,7 @@ ROM_END
 ROM_START( gtrak10a )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x0800, "racetrack", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800, "maincpu:gamedata", ROMREGION_ERASE00 )
 	ROM_LOAD( "074181.j5",    0x0000, 0x0800, CRC(f564c58a) SHA1(8097419e22bd8b5fd2a9fe4ea89302046c42e583) ) // not actually a SN74181 but an Electronic Arrays, Inc. EA4800 16K (2048 x 8) ROM. TI TMS4800 clone (EA4800). Intentionally mislabeled by Atari.
 ROM_END
 
@@ -406,7 +465,7 @@ ROM_END
 ROM_START( gtrak20 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x2000, "racetrack", ROMREGION_ERASE00 )
+	ROM_REGION( 0x2000, "maincpu:gamedata", ROMREGION_ERASE00 )
 	ROM_LOAD( "074187.b3",    0x0000, 0x0800, CRC(d38709ca) SHA1(1ea5d174dbd0faa0c8aba6b8c845c62b18d9e60b) )
 	ROM_LOAD( "074187a.d3",   0x0800, 0x0800, CRC(3d30654f) SHA1(119bac8ba8c300c026decf3f59a7da4e5d746648) )
 	ROM_LOAD( "074187b.f3",   0x1000, 0x0800, CRC(a811cc11) SHA1(a0eb3f732268e796068d1a6c96cdddd1fd7fba21) )
@@ -646,23 +705,23 @@ ROM_END
 
 */
 
-GAME(1975,  antiairc,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Anti-Aircraft [TTL]",    MACHINE_IS_SKELETON)
-GAME(1975,  crashnsc,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Crash 'n Score/Stock Car [TTL]",   MACHINE_IS_SKELETON)
-GAME(1974,  gtrak10,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K [TTL]",     MACHINE_IS_SKELETON)
-GAME(1974,  gtrak10a,  gtrak10,  atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K (older) [TTL]",     MACHINE_IS_SKELETON)
-GAME(1974,  gtrak20,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 20/Trak 20/Twin Racer [TTL]",    MACHINE_IS_SKELETON)
-GAME(1976,  indy4,     0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Indy 4 [TTL]",           MACHINE_IS_SKELETON)
-GAME(1975,  indy800,   0,        atarikee, 0, atarikee_state, empty_init, ROT90, "Atari/Kee",    "Indy 800 [TTL]",         MACHINE_IS_SKELETON)
-GAME(1975,  jetfight,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 1) [TTL]",      MACHINE_IS_SKELETON)
-GAME(1975,  jetfighta, jetfight, atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 2) [TTL]",      MACHINE_IS_SKELETON)
-GAME(1976,  lemans,    0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Le Mans [TTL]",          MACHINE_IS_SKELETON)
-GAME(1976,  outlaw,    0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Outlaw [TTL]",           MACHINE_IS_SKELETON)
-GAME(1974,  qwakttl,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Qwak!/Quack [TTL]",      MACHINE_IS_SKELETON)
-GAME(1975,  sharkjaw,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari/Horror Games",    "Shark JAWS [TTL]",     MACHINE_IS_SKELETON)
-GAME(1975,  steeplec,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Steeplechase [TTL]",     MACHINE_IS_SKELETON)
-GAME(1976,  stuntcyc,  0,        stuntcyc, 0, stuntcyc_state, empty_init, ROT0,  "Atari",        "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
-GAME(1974,  tank,      0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Tank/Tank Cocktail [TTL]",     MACHINE_IS_SKELETON)
-GAME(1975,  tankii,    0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Tank II [TTL]",          MACHINE_IS_SKELETON)
+GAME(1975,  antiairc,  0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Anti-Aircraft [TTL]",    MACHINE_IS_SKELETON)
+GAME(1975,  crashnsc,  0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Crash 'n Score/Stock Car [TTL]",   MACHINE_IS_SKELETON)
+GAME(1974,  gtrak10,   0,        gtrak10,  gtrak10,  gtrak10_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K [TTL]",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1974,  gtrak10a,  gtrak10,  atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K (older) [TTL]",     MACHINE_IS_SKELETON)
+GAME(1974,  gtrak20,   0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 20/Trak 20/Twin Racer [TTL]",    MACHINE_IS_SKELETON)
+GAME(1976,  indy4,     0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Indy 4 [TTL]",           MACHINE_IS_SKELETON)
+GAME(1975,  indy800,   0,        atarikee,       0, atarikee_state, empty_init, ROT90, "Atari/Kee",    "Indy 800 [TTL]",         MACHINE_IS_SKELETON)
+GAME(1975,  jetfight,  0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 1) [TTL]",      MACHINE_IS_SKELETON)
+GAME(1975,  jetfighta, jetfight, atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 2) [TTL]",      MACHINE_IS_SKELETON)
+GAME(1976,  lemans,    0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Le Mans [TTL]",          MACHINE_IS_SKELETON)
+GAME(1976,  outlaw,    0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Outlaw [TTL]",           MACHINE_IS_SKELETON)
+GAME(1974,  qwakttl,   0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Qwak!/Quack [TTL]",      MACHINE_IS_SKELETON)
+GAME(1975,  sharkjaw,  0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Horror Games",    "Shark JAWS [TTL]",     MACHINE_IS_SKELETON)
+GAME(1975,  steeplec,  0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari",        "Steeplechase [TTL]",     MACHINE_IS_SKELETON)
+GAME(1976,  stuntcyc,  0,        stuntcyc,       0, stuntcyc_state, empty_init, ROT0,  "Atari",        "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
+GAME(1974,  tank,      0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Tank/Tank Cocktail [TTL]",     MACHINE_IS_SKELETON)
+GAME(1975,  tankii,    0,        atarikee,       0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Tank II [TTL]",          MACHINE_IS_SKELETON)
 
 // MISSING ROM DUMPS
 //GAME(1975,  astrotrf,  steeplec, atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Astroturf [TTL]",        MACHINE_IS_SKELETON)

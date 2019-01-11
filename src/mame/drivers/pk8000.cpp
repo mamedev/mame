@@ -47,6 +47,9 @@ public:
 		, m_keyboard(*this, "LINE%u", 0)
 	{ }
 
+	void pk8000(machine_config &config);
+
+private:
 	uint8_t m_keyboard_line;
 
 	DECLARE_READ8_MEMBER(joy_1_r);
@@ -64,10 +67,9 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	void pk8000(machine_config &config);
 	void pk8000_io(address_map &map);
 	void pk8000_mem(address_map &map);
-protected:
+
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<speaker_sound_device> m_speaker;
@@ -198,14 +200,14 @@ void pk8000_state::pk8000_io(address_map &map)
 	map.unmap_value_high();
 	map(0x80, 0x83).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x84, 0x87).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x88, 0x88).rw(this, FUNC(pk8000_state::video_color_r), FUNC(pk8000_state::video_color_w));
-	map(0x8c, 0x8c).r(this, FUNC(pk8000_state::joy_1_r));
-	map(0x8d, 0x8d).r(this, FUNC(pk8000_state::joy_2_r));
-	map(0x90, 0x90).rw(this, FUNC(pk8000_state::text_start_r), FUNC(pk8000_state::text_start_w));
-	map(0x91, 0x91).rw(this, FUNC(pk8000_state::chargen_start_r), FUNC(pk8000_state::chargen_start_w));
-	map(0x92, 0x92).rw(this, FUNC(pk8000_state::video_start_r), FUNC(pk8000_state::video_start_w));
-	map(0x93, 0x93).rw(this, FUNC(pk8000_state::color_start_r), FUNC(pk8000_state::color_start_w));
-	map(0xa0, 0xbf).rw(this, FUNC(pk8000_state::color_r), FUNC(pk8000_state::color_w));
+	map(0x88, 0x88).rw(FUNC(pk8000_state::video_color_r), FUNC(pk8000_state::video_color_w));
+	map(0x8c, 0x8c).r(FUNC(pk8000_state::joy_1_r));
+	map(0x8d, 0x8d).r(FUNC(pk8000_state::joy_2_r));
+	map(0x90, 0x90).rw(FUNC(pk8000_state::text_start_r), FUNC(pk8000_state::text_start_w));
+	map(0x91, 0x91).rw(FUNC(pk8000_state::chargen_start_r), FUNC(pk8000_state::chargen_start_w));
+	map(0x92, 0x92).rw(FUNC(pk8000_state::video_start_r), FUNC(pk8000_state::video_start_w));
+	map(0x93, 0x93).rw(FUNC(pk8000_state::color_start_r), FUNC(pk8000_state::color_start_w));
+	map(0xa0, 0xbf).rw(FUNC(pk8000_state::color_r), FUNC(pk8000_state::color_w));
 }
 
 /*   Input ports */
@@ -375,18 +377,17 @@ MACHINE_CONFIG_START(pk8000_state::pk8000)
 	MCFG_SCREEN_UPDATE_DRIVER(pk8000_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(pk8000_base_state, pk8000)
+	PALETTE(config, "palette", FUNC(pk8000_state::pk8000_palette), 16);
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pk8000_state, _80_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pk8000_state, _80_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8000_state, _80_portc_w))
+	i8255_device &ppi1(I8255(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(pk8000_state::_80_porta_w));
+	ppi1.in_pb_callback().set(FUNC(pk8000_state::_80_portb_r));
+	ppi1.out_pc_callback().set(FUNC(pk8000_state::_80_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pk8000_base_state, _84_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pk8000_base_state, _84_porta_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8000_base_state, _84_portc_w))
+	i8255_device &ppi2(I8255(config, "ppi8255_2"));
+	ppi2.in_pa_callback().set(FUNC(pk8000_base_state::_84_porta_r));
+	ppi2.out_pa_callback().set(FUNC(pk8000_base_state::_84_porta_w));
+	ppi2.out_pc_callback().set(FUNC(pk8000_base_state::_84_portc_w));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
@@ -398,8 +399,7 @@ MACHINE_CONFIG_START(pk8000_state::pk8000)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 /* ROM definition */

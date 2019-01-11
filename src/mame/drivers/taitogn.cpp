@@ -344,6 +344,7 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 #include "machine/znmcu.h"
 #include "sound/spu.h"
 #include "video/psx.h"
+#include "screen.h"
 #include "speaker.h"
 
 #include <algorithm>
@@ -358,6 +359,7 @@ public:
 		m_znmcu(*this, "znmcu"),
 		m_maincpu(*this, "maincpu"),
 		m_mn10200(*this, "taito_zoom:mn10200"),
+		m_pccard(*this, "pccard"),
 		m_flashbank(*this, "flashbank"),
 		m_mb3773(*this, "mb3773"),
 		m_zoom(*this, "taito_zoom"),
@@ -370,11 +372,18 @@ public:
 		std::fill(std::begin(m_cat702_dataout), std::end(m_cat702_dataout), 1);
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(sio0_sck){ m_cat702[0]->write_clock(state);  m_cat702[1]->write_clock(state); m_znmcu->write_clock(state); }
-	DECLARE_WRITE_LINE_MEMBER(sio0_txd){ m_cat702[0]->write_datain(state);  m_cat702[1]->write_datain(state); }
-	DECLARE_WRITE_LINE_MEMBER(cat702_1_dataout){ m_cat702_dataout[0] = state; update_sio0_rxd(); }
-	DECLARE_WRITE_LINE_MEMBER(cat702_2_dataout){ m_cat702_dataout[1] = state; update_sio0_rxd(); }
-	DECLARE_WRITE_LINE_MEMBER(znmcu_dataout){ m_znmcu_dataout = state; update_sio0_rxd(); }
+	void init_coh3002t_nz();
+
+	void coh3002t_t2_mp(machine_config &config);
+	void coh3002t(machine_config &config);
+	void coh3002t_t1_mp(machine_config &config);
+	void coh3002t_cf(machine_config &config);
+	void coh3002t_t2(machine_config &config);
+	void coh3002t_t1(machine_config &config);
+
+private:
+	template<int Chip> DECLARE_WRITE_LINE_MEMBER(cat702_dataout) { m_cat702_dataout[Chip] = state; update_sio0_rxd(); }
+	DECLARE_WRITE_LINE_MEMBER(znmcu_dataout) { m_znmcu_dataout = state; update_sio0_rxd(); }
 	void update_sio0_rxd() { m_sio0->write_rxd(m_cat702_dataout[0] && m_cat702_dataout[1] && m_znmcu_dataout); }
 	DECLARE_READ8_MEMBER(control_r);
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -391,27 +400,20 @@ public:
 	DECLARE_READ8_MEMBER(coin_r);
 	DECLARE_READ8_MEMBER(gnet_mahjong_panel_r);
 	DECLARE_READ32_MEMBER(zsg2_ext_r);
-	void init_coh3002t_nz();
 
-	void coh3002t_t2_mp(machine_config &config);
-	void coh3002t(machine_config &config);
-	void coh3002t_t1_mp(machine_config &config);
-	void coh3002t_cf(machine_config &config);
-	void coh3002t_t2(machine_config &config);
-	void coh3002t_t1(machine_config &config);
 	void flashbank_map(address_map &map);
 	void taitogn_map(address_map &map);
 	void taitogn_mp_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	required_device<psxsio0_device> m_sio0;
 	required_device_array<cat702_device, 2> m_cat702;
 	required_device<znmcu_device> m_znmcu;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mn10200;
+	required_device<pccard_slot_device> m_pccard;
 	required_device<address_map_bank_device> m_flashbank;
 	required_device<mb3773_device> m_mb3773;
 	required_device<taito_zoom_device> m_zoom;
@@ -458,10 +460,10 @@ WRITE8_MEMBER(taitogn_state::control_w)
 			m_zoom->reset();
 
 			// assume that this also readys the sound flash chips
-			m_pgmflash->write(0, 0xff);
-			m_sndflash[0]->write(0, 0xff);
-			m_sndflash[1]->write(0, 0xff);
-			m_sndflash[2]->write(0, 0xff);
+			m_pgmflash->write(space, 0, 0xff);
+			m_sndflash[0]->write(space, 0, 0xff);
+			m_sndflash[1]->write(space, 0, 0xff);
+			m_sndflash[2]->write(space, 0, 0xff);
 		}
 	}
 
@@ -592,8 +594,8 @@ READ32_MEMBER(taitogn_state::zsg2_ext_r)
 	switch (offset & 0x300000)
 	{
 		case 0x000000:
-		case 0x100000: 
-		case 0x200000: return m_sndflash[offset >> 20]->read(offset & 0xfffff) | m_sndflash[offset >> 20]->read((offset & 0xfffff) | 1) << 16;
+		case 0x100000:
+		case 0x200000: return m_sndflash[offset >> 20]->read(space, offset & 0xfffff) | m_sndflash[offset >> 20]->read(space, (offset & 0xfffff) | 1) << 16;
 
 		default:
 			break;
@@ -636,17 +638,17 @@ void taitogn_state::taitogn_map(address_map &map)
 	map(0x1fa00300, 0x1fa00303).portr("SYSTEM");
 	map(0x1fa10000, 0x1fa10003).portr("P3");
 	map(0x1fa10100, 0x1fa10103).portr("P4");
-	map(0x1fa10200, 0x1fa10200).r(this, FUNC(taitogn_state::boardconfig_r));
-	map(0x1fa10300, 0x1fa10300).rw(this, FUNC(taitogn_state::znsecsel_r), FUNC(taitogn_state::znsecsel_w));
-	map(0x1fa20000, 0x1fa20000).rw(this, FUNC(taitogn_state::coin_r), FUNC(taitogn_state::coin_w));
-	map(0x1fa30000, 0x1fa30000).rw(this, FUNC(taitogn_state::control3_r), FUNC(taitogn_state::control3_w));
+	map(0x1fa10200, 0x1fa10200).r(FUNC(taitogn_state::boardconfig_r));
+	map(0x1fa10300, 0x1fa10300).rw(FUNC(taitogn_state::znsecsel_r), FUNC(taitogn_state::znsecsel_w));
+	map(0x1fa20000, 0x1fa20000).rw(FUNC(taitogn_state::coin_r), FUNC(taitogn_state::coin_w));
+	map(0x1fa30000, 0x1fa30000).rw(FUNC(taitogn_state::control3_r), FUNC(taitogn_state::control3_w));
 	map(0x1fa51c00, 0x1fa51dff).nopr(); // systematic read at spu_address + 250000, result dropped, maybe other accesses
-	map(0x1fa60000, 0x1fa60003).r(this, FUNC(taitogn_state::hack1_r));
+	map(0x1fa60000, 0x1fa60003).r(FUNC(taitogn_state::hack1_r));
 	map(0x1faf0000, 0x1faf07ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)); /* eeprom */
 	map(0x1fb00000, 0x1fb0ffff).rw("rf5c296", FUNC(rf5c296_device::io_r), FUNC(rf5c296_device::io_w));
-	map(0x1fb40000, 0x1fb40000).rw(this, FUNC(taitogn_state::control_r), FUNC(taitogn_state::control_w));
-	map(0x1fb60000, 0x1fb60001).w(this, FUNC(taitogn_state::control2_w));
-	map(0x1fb70000, 0x1fb70001).rw(this, FUNC(taitogn_state::gn_1fb70000_r), FUNC(taitogn_state::gn_1fb70000_w));
+	map(0x1fb40000, 0x1fb40000).rw(FUNC(taitogn_state::control_r), FUNC(taitogn_state::control_w));
+	map(0x1fb60000, 0x1fb60001).w(FUNC(taitogn_state::control2_w));
+	map(0x1fb70000, 0x1fb70001).rw(FUNC(taitogn_state::gn_1fb70000_r), FUNC(taitogn_state::gn_1fb70000_w));
 	map(0x1fb80000, 0x1fb80001).w(m_zoom, FUNC(taito_zoom_device::reg_data_w));
 	map(0x1fb80002, 0x1fb80003).w(m_zoom, FUNC(taito_zoom_device::reg_address_w));
 	map(0x1fba0000, 0x1fba0001).w(m_zoom, FUNC(taito_zoom_device::sound_irq_w));
@@ -675,7 +677,7 @@ void taitogn_state::flashbank_map(address_map &map)
 void taitogn_state::taitogn_mp_map(address_map &map)
 {
 	taitogn_map(map);
-	map(0x1fa10100, 0x1fa10100).r(this, FUNC(taitogn_state::gnet_mahjong_panel_r));
+	map(0x1fa10100, 0x1fa10100).r(FUNC(taitogn_state::gnet_mahjong_panel_r));
 }
 
 void slot_ataflash(device_slot_interface &device)
@@ -686,107 +688,106 @@ void slot_ataflash(device_slot_interface &device)
 	device.option_add("ataflash", ATA_FLASH_PCCARD);
 }
 
-MACHINE_CONFIG_START(taitogn_state::coh3002t)
-
+void taitogn_state::coh3002t(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", CXD8661R, XTAL(100'000'000) )
-	MCFG_DEVICE_PROGRAM_MAP(taitogn_map)
+	CXD8661R(config, m_maincpu, XTAL(100'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitogn_state::taitogn_map);
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
 
-	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(*this, taitogn_state, sio0_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE(*this, taitogn_state, sio0_txd))
+	auto &sio0(*m_maincpu->subdevice<psxsio0_device>("sio0"));
+	sio0.sck_handler().set(m_cat702[0], FUNC(cat702_device::write_clock));
+	sio0.sck_handler().append(m_cat702[1], FUNC(cat702_device::write_clock));
+	sio0.sck_handler().append(m_znmcu, FUNC(znmcu_device::write_clock));
+	sio0.txd_handler().set(m_cat702[0], FUNC(cat702_device::write_datain));
+	sio0.txd_handler().append(m_cat702[1], FUNC(cat702_device::write_datain));
 
-	MCFG_DEVICE_ADD("cat702_1", CAT702, 0)
-	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(*this, taitogn_state, cat702_1_dataout))
+	CAT702(config, m_cat702[0], 0);
+	m_cat702[0]->dataout_handler().set(FUNC(taitogn_state::cat702_dataout<0>));
 
-	MCFG_DEVICE_ADD("cat702_2", CAT702, 0)
-	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(*this, taitogn_state, cat702_2_dataout))
+	CAT702(config, m_cat702[1], 0);
+	m_cat702[1]->dataout_handler().set(FUNC(taitogn_state::cat702_dataout<1>));
 
-	MCFG_DEVICE_ADD("znmcu", ZNMCU, 0)
-	MCFG_ZNMCU_DATAOUT_HANDLER(WRITELINE(*this, taitogn_state, znmcu_dataout))
-	MCFG_ZNMCU_DSR_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
-	MCFG_ZNMCU_DSW_HANDLER(IOPORT("DSW"))
-	MCFG_ZNMCU_ANALOG1_HANDLER(IOPORT("ANALOG1"))
-	MCFG_ZNMCU_ANALOG2_HANDLER(IOPORT("ANALOG2"))
+	ZNMCU(config, m_znmcu, 0);
+	m_znmcu->dataout_handler().set(FUNC(taitogn_state::znmcu_dataout));
+	m_znmcu->dsr_handler().set("maincpu:sio0", FUNC(psxsio0_device::write_dsr));
+	m_znmcu->dsw_handler().set_ioport("DSW");
+	m_znmcu->analog1_handler().set_ioport("ANALOG1");
+	m_znmcu->analog2_handler().set_ioport("ANALOG2");
 
-	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
-	MCFG_DEVICE_ADD("rf5c296", RF5C296, 0)
-	MCFG_RF5C296_SLOT("pccard")
+	AT28C16(config, "at28c16", 0);
+	RF5C296(config, "rf5c296", 0).set_pccard("pccard");
 
-	MCFG_DEVICE_ADD("pccard", PCCARD_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(slot_ataflash, nullptr, false)
+	PCCARD_SLOT(config, m_pccard, slot_ataflash, nullptr);
 
-	MCFG_MB3773_ADD("mb3773")
+	MB3773(config, "mb3773");
 
-	MCFG_INTEL_TE28F160_ADD("biosflash")
-	MCFG_INTEL_E28F400B_ADD("pgmflash")
-	MCFG_INTEL_TE28F160_ADD("sndflash0")
-	MCFG_INTEL_TE28F160_ADD("sndflash1")
-	MCFG_INTEL_TE28F160_ADD("sndflash2")
+	INTEL_TE28F160(config, "biosflash");
+	INTEL_E28F400B(config, "pgmflash");
+	INTEL_TE28F160(config, "sndflash0");
+	INTEL_TE28F160(config, "sndflash1");
+	INTEL_TE28F160(config, "sndflash2");
 
-	MCFG_DEVICE_ADD("flashbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(flashbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000000)
+	ADDRESS_MAP_BANK(config, "flashbank").set_map(&taitogn_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 16, 32, 0x8000000);
 
 	// 5MHz NEC uPD78081 MCU:
 	// we don't have a 78K0 emulation core yet..
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
+	CXD8654Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SPU_ADD("spu", XTAL(67'737'600)/2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
+	spu.add_route(0, "lspeaker", 0.3);
+	spu.add_route(1, "rspeaker", 0.3);
 
-	MCFG_TAITO_ZOOM_ADD("taito_zoom")
-	MCFG_TAITO_ZOOM_USE_FLASH
+	TAITO_ZOOM(config, m_zoom);
+	m_zoom->set_use_flash();
+	m_zoom->add_route(0, "lspeaker", 1.0);
+	m_zoom->add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_MODIFY("taito_zoom:zsg2")
-	MCFG_ZSG2_EXT_READ_HANDLER(READ32(*this, taitogn_state, zsg2_ext_r))
-MACHINE_CONFIG_END
+	m_zoom->subdevice<zsg2_device>("zsg2")->ext_read().set(FUNC(taitogn_state::zsg2_ext_r));
+}
 
-MACHINE_CONFIG_START(taitogn_state::coh3002t_t1)
+void taitogn_state::coh3002t_t1(machine_config &config)
+{
 	coh3002t(config);
-	MCFG_DEVICE_MODIFY("pccard")
-	MCFG_SLOT_DEFAULT_OPTION("taitopccard1")
-MACHINE_CONFIG_END
+	m_pccard->set_default_option("taitopccard1");
+}
 
-MACHINE_CONFIG_START(taitogn_state::coh3002t_t2)
+void taitogn_state::coh3002t_t2(machine_config &config)
+{
 	coh3002t(config);
-	MCFG_DEVICE_MODIFY("pccard")
-	MCFG_SLOT_DEFAULT_OPTION("taitopccard2")
-MACHINE_CONFIG_END
+	m_pccard->set_default_option("taitopccard2");
+}
 
-MACHINE_CONFIG_START(taitogn_state::coh3002t_t1_mp)
+void taitogn_state::coh3002t_t1_mp(machine_config &config)
+{
 	coh3002t_t1(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(taitogn_mp_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitogn_state::taitogn_mp_map);
+}
 
-MACHINE_CONFIG_START(taitogn_state::coh3002t_t2_mp)
+void taitogn_state::coh3002t_t2_mp(machine_config &config)
+{
 	coh3002t_t2(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_PROGRAM_MAP(taitogn_mp_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitogn_state::taitogn_mp_map);
+}
 
-MACHINE_CONFIG_START(taitogn_state::coh3002t_cf)
+void taitogn_state::coh3002t_cf(machine_config &config)
+{
 	coh3002t(config);
-	MCFG_DEVICE_MODIFY("pccard")
-	MCFG_SLOT_DEFAULT_OPTION("taitocf")
-MACHINE_CONFIG_END
+	m_pccard->set_default_option("taitocf");
+}
 
 
 static INPUT_PORTS_START( coh3002t )
@@ -936,7 +937,7 @@ INPUT_PORTS_END
 //
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 #define TAITOGNET_BIOS \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
@@ -1205,7 +1206,7 @@ GAME( 2001, otenki,    coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, em
 GAME( 1999, mahjngoh,  coh3002t, coh3002t_t1_mp, coh3002t_mp,  taitogn_state, empty_init, ROT0,   "Warashi / Mahjong Kobo / Taito", "Mahjong Oh (V2.06J 1999/11/23 08:52:22)", MACHINE_IMPERFECT_SOUND )
 GAME( 2000, shanghss,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT0,   "Warashi", "Shanghai Shoryu Sairin (V2.03J 2000/05/26 12:45:28)", MACHINE_IMPERFECT_SOUND )
 GAME( 2000, soutenry,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT0,   "Warashi", "Soutenryu (V2.07J 2000/12/14 11:13:02)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, usagi,     coh3002t, coh3002t_t2_mp, coh3002t_mp,  taitogn_state, empty_init, ROT0,   "Warashi / Mahjong Kobo / Taito", "Usagi (V2.02J 2001/10/02 12:41:19)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // missing transparencies, see MT #06258
+GAME( 2001, usagi,     coh3002t, coh3002t_t2_mp, coh3002t_mp,  taitogn_state, empty_init, ROT0,   "Warashi / Mahjong Kobo / Taito", "Usagi (V2.02J 2001/10/02 12:41:19)", MACHINE_IMPERFECT_SOUND ) // missing transparencies, see MT #06258
 GAME( 2002, shangtou,  coh3002t, coh3002t_t1,    coh3002t,     taitogn_state, empty_init, ROT0,   "Warashi / Sunsoft / Taito", "Shanghai Sangokuhai Tougi (Ver 2.01J 2002/01/18 18:26:58)", MACHINE_IMPERFECT_SOUND )
 
 /* Triangle Service */

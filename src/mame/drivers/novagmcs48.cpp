@@ -45,15 +45,18 @@ public:
 		: novagbase_state(mconfig, type, tag)
 	{ }
 
+	void presto(machine_config &config);
+	void octo(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(octo_cpu_freq);
+
+private:
 	// Presto/Octo
 	DECLARE_WRITE8_MEMBER(presto_mux_w);
 	DECLARE_WRITE8_MEMBER(presto_control_w);
 	DECLARE_READ8_MEMBER(presto_input_r);
 	DECLARE_MACHINE_RESET(octo);
-	DECLARE_INPUT_CHANGED_MEMBER(octo_cpu_freq);
 	void octo_set_cpu_freq();
-	void presto(machine_config &config);
-	void octo(machine_config &config);
 };
 
 
@@ -147,13 +150,13 @@ INPUT_CHANGED_MEMBER(novagmcs48_state::octo_cpu_freq)
 MACHINE_CONFIG_START(novagmcs48_state::presto)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8049, 6000000) // LC circuit, measured 6MHz
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, novagmcs48_state, presto_input_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, novagmcs48_state, presto_control_w))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, novagmcs48_state, presto_mux_w))
+	i8049_device &maincpu(I8049(config, m_maincpu, 6000000)); // LC circuit, measured 6MHz
+	maincpu.p1_in_cb().set(FUNC(novagmcs48_state::presto_input_r));
+	maincpu.p2_out_cb().set(FUNC(novagmcs48_state::presto_control_w));
+	maincpu.bus_out_cb().set(FUNC(novagmcs48_state::presto_mux_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagbase_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_novag_presto)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagmcs48_state, display_decay_tick, attotime::from_msec(1))
+	config.set_default_layout(layout_novag_presto);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

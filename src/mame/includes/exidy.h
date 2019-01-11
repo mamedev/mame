@@ -8,6 +8,7 @@
 
 #include "sound/dac.h"
 #include "sound/samples.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define EXIDY_MASTER_CLOCK              (XTAL(11'289'000))
@@ -51,7 +52,33 @@ public:
 		m_color_latch(*this, "color_latch"),
 		m_characterram(*this, "characterram") { }
 
+	void base(machine_config &config);
+	void mtrap(machine_config &config);
+	void venture(machine_config &config);
+	void fax(machine_config &config);
+	void teetert(machine_config &config);
+	void sidetrac(machine_config &config);
+	void spectar(machine_config &config);
+	void spectar_audio(machine_config &config);
+	void rallys(machine_config &config);
+	void pepper2(machine_config &config);
+	void targ(machine_config &config);
+	void targ_audio(machine_config &config);
 
+	void init_fax();
+	void init_sidetrac();
+	void init_pepper2();
+	void init_targ();
+	void init_rallys();
+	void init_mtrap();
+	void init_teetert();
+	void init_venture();
+	void init_spectar();
+	void init_phantoma();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(teetert_input_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<dac_bit_interface> m_dac;
 	optional_device<samples_device> m_samples;
@@ -81,19 +108,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(fax_bank_select_w);
 	DECLARE_READ8_MEMBER(exidy_interrupt_r);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(teetert_input_r);
-
-	void init_fax();
-	void init_sidetrac();
-	void init_pepper2();
-	void init_targ();
-	void init_rallys();
-	void init_mtrap();
-	void init_teetert();
-	void init_venture();
-	void init_spectar();
-	void init_phantoma();
+	DECLARE_WRITE8_MEMBER(mtrap_ocl_w);
 
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(teetert);
@@ -126,31 +141,16 @@ public:
 	SAMPLES_START_CB_MEMBER(spectar_audio_start);
 	SAMPLES_START_CB_MEMBER(targ_audio_start);
 
-	void base(machine_config &config);
-	void mtrap(machine_config &config);
-	void mtrap_cvsd_audio(machine_config &config);
-	void venture(machine_config &config);
-	void venture_audio(machine_config &config);
-	void fax(machine_config &config);
-	void teetert(machine_config &config);
-	void sidetrac(machine_config &config);
-	void spectar(machine_config &config);
-	void spectar_audio(machine_config &config);
-	void rallys(machine_config &config);
-	void pepper2(machine_config &config);
-	void targ(machine_config &config);
-	void targ_audio(machine_config &config);
 	void exidy_map(address_map &map);
 	void fax_map(address_map &map);
+	void mtrap_map(address_map &map);
 	void pepper2_map(address_map &map);
 	void rallys_map(address_map &map);
 	void sidetrac_map(address_map &map);
 	void spectar_map(address_map &map);
 	void targ_map(address_map &map);
 	void venture_map(address_map &map);
-	void venture_audio_map(address_map &map);
-	void cvsd_iomap(address_map &map);
-	void cvsd_map(address_map &map);
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -354,10 +354,10 @@ void playch10_state::bios_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram(); // 8V
-	map(0x8800, 0x8fff).rw(this, FUNC(playch10_state::ram_8w_r), FUNC(playch10_state::ram_8w_w)).share("ram_8w");    // 8W
-	map(0x9000, 0x97ff).ram().w(this, FUNC(playch10_state::playch10_videoram_w)).share("videoram");
+	map(0x8800, 0x8fff).rw(FUNC(playch10_state::ram_8w_r), FUNC(playch10_state::ram_8w_w)).share("ram_8w");    // 8W
+	map(0x9000, 0x97ff).ram().w(FUNC(playch10_state::playch10_videoram_w)).share("videoram");
 	map(0xc000, 0xdfff).rom();
-	map(0xe000, 0xffff).rw(this, FUNC(playch10_state::pc10_prot_r), FUNC(playch10_state::pc10_prot_w));
+	map(0xe000, 0xffff).rw(FUNC(playch10_state::pc10_prot_r), FUNC(playch10_state::pc10_prot_w));
 }
 
 void playch10_state::bios_io_map(address_map &map)
@@ -366,19 +366,19 @@ void playch10_state::bios_io_map(address_map &map)
 	map(0x00, 0x00).portr("BIOS");
 	map(0x01, 0x01).portr("SW1");
 	map(0x02, 0x02).portr("SW2");
-	map(0x03, 0x03).r(this, FUNC(playch10_state::pc10_detectclr_r));
+	map(0x03, 0x03).r(FUNC(playch10_state::pc10_detectclr_r));
 	map(0x00, 0x07).w("outlatch1", FUNC(ls259_device::write_d0));
 	map(0x08, 0x0f).w("outlatch2", FUNC(ls259_device::write_d0));
-	map(0x10, 0x13).w(this, FUNC(playch10_state::time_w));
+	map(0x10, 0x13).w(FUNC(playch10_state::time_w));
 }
 
 void playch10_state::cart_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().mirror(0x1800).share("work_ram");
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(this, FUNC(playch10_state::sprite_dma_w));
-	map(0x4016, 0x4016).rw(this, FUNC(playch10_state::pc10_in0_r), FUNC(playch10_state::pc10_in0_w));
-	map(0x4017, 0x4017).r(this, FUNC(playch10_state::pc10_in1_r));  /* IN1 - input port 2 / PSG second control register */
+	map(0x4014, 0x4014).w(FUNC(playch10_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(FUNC(playch10_state::pc10_in0_r), FUNC(playch10_state::pc10_in0_w));
+	map(0x4017, 0x4017).r(FUNC(playch10_state::pc10_in1_r));  /* IN1 - input port 2 / PSG second control register */
 	map(0x8000, 0xffff).rom();
 }
 
@@ -644,70 +644,72 @@ WRITE_LINE_MEMBER(playch10_state::vblank_irq)
 	}
 }
 
-MACHINE_CONFIG_START(playch10_state::playch10)
+void playch10_state::playch10(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, 8000000/2) // 4 MHz
-	MCFG_DEVICE_PROGRAM_MAP(bios_map)
-	MCFG_DEVICE_IO_MAP(bios_io_map)
+	Z80(config, m_maincpu, 8000000/2); // 4 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &playch10_state::bios_map);
+	m_maincpu->set_addrmap(AS_IO, &playch10_state::bios_io_map);
 
-	MCFG_DEVICE_ADD("cart", N2A03, NTSC_APU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(cart_map)
+	N2A03(config, m_cartcpu, NTSC_APU_CLOCK);
+	m_cartcpu->set_addrmap(AS_PROGRAM, &playch10_state::cart_map);
 
-	MCFG_DEVICE_ADD("outlatch1", LS259, 0) // 7D
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, playch10_state, sdcs_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, playch10_state, cntrl_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, playch10_state, disp_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, playch10_state, sound_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("cart", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // GAMERES
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("cart", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT // GAMESTOP
+	ls259_device &outlatch1(LS259(config, "outlatch1")); // 7D
+	outlatch1.q_out_cb<0>().set(FUNC(playch10_state::sdcs_w));
+	outlatch1.q_out_cb<1>().set(FUNC(playch10_state::cntrl_mask_w));
+	outlatch1.q_out_cb<2>().set(FUNC(playch10_state::disp_mask_w));
+	outlatch1.q_out_cb<3>().set(FUNC(playch10_state::sound_mask_w));
+	outlatch1.q_out_cb<4>().set_inputline(m_cartcpu, INPUT_LINE_RESET).invert(); // GAMERES
+	outlatch1.q_out_cb<5>().set_inputline(m_cartcpu, INPUT_LINE_HALT).invert(); // GAMESTOP
 
-	MCFG_DEVICE_ADD("outlatch2", LS259, 0) // 7E
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, playch10_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, playch10_state, dog_di_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, playch10_state, ppu_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, playch10_state, up8w_w))
-	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, playch10_state, cart_sel_w)) MCFG_DEVCB_MASK(0x78) MCFG_DEVCB_RSHIFT(-3)
+	ls259_device &outlatch2(LS259(config, "outlatch2")); // 7E
+	outlatch2.q_out_cb<0>().set(FUNC(playch10_state::nmi_enable_w));
+	outlatch2.q_out_cb<1>().set(FUNC(playch10_state::dog_di_w));
+	outlatch2.q_out_cb<2>().set(FUNC(playch10_state::ppu_reset_w));
+	outlatch2.q_out_cb<7>().set(FUNC(playch10_state::up8w_w));
+	outlatch2.parallel_out_cb().set(FUNC(playch10_state::cart_sel_w)).rshift(3).mask(0x0f);
 
 	// video hardware
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_playch10)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(playch10_state, playch10)
-	MCFG_DEFAULT_LAYOUT(layout_playch10)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_playch10);
+	PALETTE(config, "palette", FUNC(playch10_state::playch10_palette), 256);
+	config.set_default_layout(layout_playch10);
 
-	MCFG_SCREEN_ADD("top", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_top)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, playch10_state, vblank_irq))
+	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
+	top.set_refresh_hz(60);
+	top.set_size(32*8, 262);
+	top.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	top.set_screen_update(FUNC(playch10_state::screen_update_playch10_top));
+	top.screen_vblank().set(FUNC(playch10_state::vblank_irq));
 
-	MCFG_SCREEN_ADD("bottom", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_bottom)
+	screen_device &bottom(SCREEN(config, "bottom", SCREEN_TYPE_RASTER));
+	bottom.set_refresh_hz(60);
+	bottom.set_size(32*8, 262);
+	bottom.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	bottom.set_screen_update(FUNC(playch10_state::screen_update_playch10_bottom));
 
-	MCFG_PPU2C03B_ADD("ppu")
-	MCFG_PPU2C0X_SET_SCREEN("bottom")
-	MCFG_PPU2C0X_CPU("cart")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("cart", INPUT_LINE_NMI))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, playch10_state, int_detect_w))
+	PPU_2C03B(config, m_ppu, 0);
+	m_ppu->set_screen("bottom");
+	m_ppu->set_cpu_tag("cart");
+	m_ppu->int_callback().set_inputline(m_cartcpu, INPUT_LINE_NMI);
+	m_ppu->int_callback().append(FUNC(playch10_state::int_detect_w));
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_RP5H01_ADD("rp5h01")
-MACHINE_CONFIG_END
+	RP5H01(config, m_rp5h01, 0);
+}
 
-MACHINE_CONFIG_START(playch10_state::playchnv)
+void playch10_state::playchnv(machine_config &config)
+{
 	playch10(config);
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
-MACHINE_CONFIG_START(playch10_state::playch10_hboard)
+void playch10_state::playch10_hboard(machine_config &config)
+{
 	playch10(config);
 	MCFG_VIDEO_START_OVERRIDE(playch10_state,playch10_hboard)
 	MCFG_MACHINE_START_OVERRIDE(playch10_state,playch10_hboard)
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 
@@ -716,7 +718,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define BIOS_CPU                                            \
 	ROM_REGION( 0x10000, "maincpu", 0 )                     \
@@ -724,7 +726,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD_BIOS( 0, "pch1-c__8t_e-2.8t", 0x00000, 0x4000, CRC(d52fa07a) SHA1(55cabf52ae10c050c2229081a80b9fe5454ab8c5) ) \
 	ROM_SYSTEM_BIOS( 1, "single", "Single Monitor Version" ) \
 	ROM_LOAD_BIOS( 1, "pck1-c.8t", 0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0) ) \
-	ROM_SYSTEM_BIOS( 2, "alt", "Alt Bios" ) /* this bios doens't work properly, selecting service mode causes it to hang, is it good? maybe different hw? */ \
+	ROM_SYSTEM_BIOS( 2, "alt", "Alt Bios" ) /* this bios doesn't work properly, selecting service mode causes it to hang, is it good? maybe different hw? */ \
 	ROM_LOAD_BIOS( 2, "pch1-c_8te.8t", 0x00000, 0x4000, CRC(123ffa37) SHA1(3bef754a5a85a8498bb6222ddf5cb9021f264db5) ) \
 	ROM_SYSTEM_BIOS( 3, "singleb", "Single Monitor Version (Newer?)" ) /* Newer single screen? Four bytes different, reported bugfix in freeplay */ \
 	ROM_LOAD_BIOS( 3, "pck1-c_fix.8t", 0x00000, 0x4000, CRC(0be8ceb4) SHA1(45b127a537370226e6b30be2b5a92ad05673ca7f) )
@@ -1748,7 +1750,6 @@ GAME( 1987, pc_miket, playch10, playchnv, playch10, playch10_state, init_pceboar
 
 /* F-Board Games */
 GAME( 1987, pc_rcpam, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Rare",                                     "R.C. Pro-Am (PlayChoice-10)", 0 )
-GAME( 1987, pc_rrngr, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Chip'n Dale: Rescue Rangers (PlayChoice-10)", 0 )
 GAME( 1988, pc_ddrgn, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Technos Japan",                            "Double Dragon (PlayChoice-10)", 0 )
 GAME( 1989, pc_ngaid, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden (PlayChoice-10)", 0 )
 GAME( 1989, pc_tmnt,  playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Konami (Nintendo of America license)",     "Teenage Mutant Ninja Turtles (PlayChoice-10)", 0 )
@@ -1756,6 +1757,7 @@ GAME( 1989, pc_ftqst, playch10, playch10, playch10, playch10_state, init_pcfboar
 GAME( 1989, pc_bstar, playch10, playch10, playch10, playch10_state, init_pcfboard_2, ROT0, "SNK (Nintendo of America license)",      "Baseball Stars: Be a Champ! (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1989, pc_tbowl, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Tecmo Bowl (PlayChoice-10)", 0 )
 GAME( 1990, pc_virus, pc_drmro, playch10, playch10, playch10_state, init_virus,    ROT0, "Nintendo",                                 "Virus (Dr. Mario prototype, PlayChoice-10)", 0 )
+GAME( 1990, pc_rrngr, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Chip'n Dale: Rescue Rangers (PlayChoice-10)", 0 )
 GAME( 1990, pc_drmro, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Nintendo",                                 "Dr. Mario (PlayChoice-10)", 0 )
 GAME( 1990, pc_bload, playch10, playch10, playch10, playch10_state, init_virus,    ROT0, "Jaleco (Nintendo of America license)",     "Bases Loaded (Prototype, PlayChoice-10)", 0 )
 GAME( 1990, pc_ynoid, playch10, playch10, playch10, playch10_state, init_pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Yo! Noid (PlayChoice-10)", 0 )

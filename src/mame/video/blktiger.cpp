@@ -86,7 +86,7 @@ void blktiger_state::video_start()
 	m_bg_tilemap4x8->set_transmask(2, 0xff00, 0x80ff);
 	m_bg_tilemap4x8->set_transmask(3, 0xf000, 0x8fff);
 
-	save_pointer(NAME(m_scroll_ram.get()), BGRAM_BANK_SIZE * BGRAM_BANKS);
+	save_pointer(NAME(m_scroll_ram), BGRAM_BANK_SIZE * BGRAM_BANKS);
 }
 
 

@@ -7,6 +7,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "imagedev/floppy.h"
 #include "machine/74259.h"
 #include "machine/wd_fdc.h"
 #include "machine/mc68681.h"
@@ -24,13 +25,16 @@ public:
 	{
 	}
 
+	void slicer(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(sio_out_w);
+	DECLARE_WRITE_LINE_MEMBER(drive_size_w);
 	template<unsigned int drive> DECLARE_WRITE_LINE_MEMBER(drive_sel_w);
 
-	void slicer(machine_config &config);
 	void slicer_io(address_map &map);
 	void slicer_map(address_map &map);
-protected:
+
 	required_device<fd1797_device> m_fdc;
 	required_device<scsi_port_device> m_sasi;
 };
@@ -64,6 +68,11 @@ WRITE_LINE_MEMBER(slicer_state::drive_sel_w)
 	m_fdc->set_floppy(floppy);
 }
 
+WRITE_LINE_MEMBER(slicer_state::drive_size_w)
+{
+	m_fdc->set_unscaled_clock (state ? 1'000'000 : 2'000'000);
+}
+
 void slicer_state::slicer_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).ram(); // fixed 256k for now
@@ -75,12 +84,12 @@ void slicer_state::slicer_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x007f).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write)).umask16(0x00ff); //PCS0
 	map(0x0080, 0x00ff).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff); //PCS1
-	map(0x0100, 0x0107).mirror(0x0078).w("drivelatch", FUNC(ls259_device::write_d0)).umask16(0x00ff); //PCS2
+	map(0x0100, 0x010f).mirror(0x0070).w("drivelatch", FUNC(ls259_device::write_d0)).umask16(0x00ff); //PCS2
 	// TODO: 0x180 sets ack
-	map(0x0180, 0x0180).r("sasi_data_in", FUNC(input_buffer_device::read)).w("sasi_data_out", FUNC(output_latch_device::write)).umask16(0x00ff); //PCS3
-	map(0x0181, 0x0181).r("sasi_ctrl_in", FUNC(input_buffer_device::read));
-	map(0x0184, 0x0184).r("sasi_data_in", FUNC(input_buffer_device::read)).w("sasi_data_out", FUNC(output_latch_device::write)).umask16(0x00ff);
-	map(0x0185, 0x0185).r("sasi_ctrl_in", FUNC(input_buffer_device::read));
+	map(0x0180, 0x0180).r("sasi_data_in", FUNC(input_buffer_device::bus_r)).w("sasi_data_out", FUNC(output_latch_device::bus_w)).umask16(0x00ff); //PCS3
+	map(0x0181, 0x0181).r("sasi_ctrl_in", FUNC(input_buffer_device::bus_r));
+	map(0x0184, 0x0184).r("sasi_data_in", FUNC(input_buffer_device::bus_r)).w("sasi_data_out", FUNC(output_latch_device::bus_w)).umask16(0x00ff);
+	map(0x0185, 0x0185).r("sasi_ctrl_in", FUNC(input_buffer_device::bus_r));
 }
 
 static void slicer_floppies(device_slot_interface &device)
@@ -90,37 +99,38 @@ static void slicer_floppies(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(slicer_state::slicer)
-	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(16'000'000) / 2)
+	MCFG_DEVICE_ADD("maincpu", I80186, 16_MHz_XTAL / 2)
 	MCFG_DEVICE_PROGRAM_MAP(slicer_map)
 	MCFG_DEVICE_IO_MAP(slicer_io)
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
+	MCFG_DEVICE_ADD("duart", SCN2681, 3.6864_MHz_XTAL)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int0_w))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("rs232_1", rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232_2", rs232_port_device, write_txd))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, slicer_state, sio_out_w))
 
-	MCFG_DEVICE_ADD("rs232_1", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_a_w))
-	MCFG_DEVICE_ADD("rs232_2", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
+	rs232_port_device &rs232_1(RS232_PORT(config, "rs232_1", default_rs232_devices, "terminal"));
+	rs232_1.rxd_handler().set("duart", FUNC(scn2681_device::rx_a_w));
+	rs232_port_device &rs232_2(RS232_PORT(config, "rs232_2", default_rs232_devices, nullptr));
+	rs232_2.rxd_handler().set("duart", FUNC(scn2681_device::rx_b_w));
 
-	MCFG_FD1797_ADD("fdc", XTAL(16'000'000)/2/8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int1_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq0_w))
+	FD1797(config, m_fdc, 16_MHz_XTAL / 2 / 8);
+	m_fdc->intrq_wr_callback().set("maincpu", FUNC(i80186_cpu_device::int1_w));
+	m_fdc->drq_wr_callback().set("maincpu", FUNC(i80186_cpu_device::drq0_w));
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", slicer_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", slicer_floppies, nullptr, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", slicer_floppies, nullptr, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", slicer_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("drivelatch", LS259, 0) // U29
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("sasi", scsi_port_device, write_sel))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("sasi", scsi_port_device, write_rst))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, slicer_state, drive_sel_w<3>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, slicer_state, drive_sel_w<2>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, slicer_state, drive_sel_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, slicer_state, drive_sel_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("fdc", fd1797_device, dden_w))
+	ls259_device &drivelatch(LS259(config, "drivelatch")); // U29
+	drivelatch.q_out_cb<0>().set("sasi", FUNC(scsi_port_device::write_sel));
+	drivelatch.q_out_cb<1>().set("sasi", FUNC(scsi_port_device::write_rst));
+	drivelatch.q_out_cb<2>().set(FUNC(slicer_state::drive_sel_w<3>));
+	drivelatch.q_out_cb<3>().set(FUNC(slicer_state::drive_sel_w<2>));
+	drivelatch.q_out_cb<4>().set(FUNC(slicer_state::drive_sel_w<1>));
+	drivelatch.q_out_cb<5>().set(FUNC(slicer_state::drive_sel_w<0>));
+	drivelatch.q_out_cb<6>().set(FUNC(slicer_state::drive_size_w));
+	drivelatch.q_out_cb<7>().set("fdc", FUNC(fd1797_device::dden_w));
 
 	MCFG_DEVICE_ADD("sasi", SCSI_PORT, 0)
 	MCFG_SCSI_DATA_INPUT_BUFFER("sasi_data_in")

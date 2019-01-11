@@ -1,16 +1,18 @@
 // license:BSD-3-Clause
-// copyright-holders:Mariusz Wojcieszek, R. Belmont
+// copyright-holders:Mariusz Wojcieszek, R. Belmont, Joseph Zatarski
 /*
     2681 DUART
     68681 DUART
     28C94 QUART
     68340 serial module
+    XR68C681 DUART (backwards compatible with 68681 with some improvements)
 
     Written by Mariusz Wojcieszek
     Updated by Jonathan Gevaryahu AKA Lord Nightmare
     Improved interrupt handling by R. Belmont
     Rewrite and modernization in progress by R. Belmont
     Addition of the duart compatible 68340 serial module support by Edstrom
+    Support for the Exar XR68C681 by Joseph Zatarski (July of 2018)
 
     The main incompatibility between the 2681 and 68681 (Signetics and Motorola each
     manufactured both versions of the chip) is that the 68681 has a R/W input and
@@ -21,10 +23,32 @@
     The command register addresses should never be read from. Doing so may place
     the baud rate generator into a test mode which drives the parallel outputs with
     internal counters and causes serial ports to operate at uncontrollable rates.
+
+    Exar XR68C681
+
+    The XR68C681 is an improvement upon the MC68681 which supports more baud
+    rates, adds an additional MISR (masked ISR) register, and adds a low-power
+    standby mode. There may be other differences, but these are the most
+    notable.
+
+    The extra baud rates are implemented by an 'X' bit for each channel. The X
+    bit chooses between two baud rate tables, in addition to the ACR[7] bit.
+    The X bit is changed by additional commands that are written to CRA and
+    CRB.
+
+    The MISR is a read only register that takes the place of the 'BRG Test'
+    register on the MC68681.
+
+    The low power standby mode is entered and left by a command written to CRA
+    or CRB registers. Writing the commands to either register affects the whole
+    DUART, not just one channel. Resetting the DUART also leaves low power
+    mode.
 */
 
 #include "emu.h"
 #include "mc68681.h"
+
+#include <algorithm>
 
 //#define VERBOSE 1
 //#define LOG_OUTPUT_FUNC printf
@@ -41,8 +65,10 @@ static const char *const duart68681_reg_write_names[0x10] =
 	"MRA", "CSRA", "CRA", "THRA", "ACR", "IMR", "CRUR", "CTLR", "MRB", "CSRB", "CRB", "THRB", "IVR", "OPCR", "Set OP Bits", "Reset OP Bits"
 };
 
-static const int baud_rate_ACR_0[] = { 50, 110, 134, 200, 300, 600, 1200, 1050, 2400, 4800, 7200, 9600, 38400, 0, 0, 0 };
-static const int baud_rate_ACR_1[] = { 75, 110, 134, 150, 300, 600, 1200, 2000, 2400, 4800, 1800, 9600, 19200, 0, 0, 0 };
+static const int baud_rate_ACR_0[] =     { 50, 110, 134, 200, 300,  600,   1200,  1050,  2400,   4800, 7200, 9600, 38400, 0, 0, 0 }; /* xr68c681 X=0 */
+static const int baud_rate_ACR_0_X_1[] = { 75, 110, 134, 150, 3600, 14400, 28800, 57600, 115200, 4800, 1800, 9600, 19200, 0, 0, 0 };
+static const int baud_rate_ACR_1[] =     { 75, 110, 134, 150, 300,  600,   1200,  2000,  2400,   4800, 1800, 9600, 19200, 0, 0, 0 }; /* xr68c681 X=0 */
+static const int baud_rate_ACR_1_X_1[] = { 50, 110, 134, 200, 3600, 14400, 28800, 57600, 115200, 4800, 7200, 9600, 38400, 0, 0, 0 };
 
 #define INT_INPUT_PORT_CHANGE       0x80
 #define INT_DELTA_BREAK_B           0x40
@@ -63,6 +89,7 @@ static const int baud_rate_ACR_1[] = { 75, 110, 134, 150, 300, 600, 1200, 2000, 
 #define STATUS_RECEIVER_READY       0x01
 
 #define MODE_RX_INT_SELECT_BIT      0x40
+#define MODE_BLOCK_ERROR            0x20
 
 #define CHANA_TAG   "cha"
 #define CHANB_TAG   "chb"
@@ -74,6 +101,7 @@ DEFINE_DEVICE_TYPE(SCN2681, scn2681_device, "scn2681", "SCN2681 DUART")
 DEFINE_DEVICE_TYPE(MC68681, mc68681_device, "mc68681", "MC68681 DUART")
 DEFINE_DEVICE_TYPE(SC28C94, sc28c94_device, "sc28c94", "SC28C94 QUART")
 DEFINE_DEVICE_TYPE(MC68340_DUART, mc68340_duart_device, "mc68340duart", "MC68340 DUART Device")
+DEFINE_DEVICE_TYPE(XR68C681, xr68c681_device, "xr68c681", "XR68C681 DUART")
 DEFINE_DEVICE_TYPE(DUART_CHANNEL, duart_channel, "duart_channel", "DUART channel")
 
 
@@ -108,9 +136,14 @@ scn2681_device::scn2681_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: duart_base_device(mconfig, MC68681, tag, owner, clock),
+mc68681_device::mc68681_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: duart_base_device(mconfig, type, tag, owner, clock),
 	m_read_vector(false)
+{
+}
+
+mc68681_device::mc68681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68681_device(mconfig, MC68681, tag, owner, clock)
 {
 }
 
@@ -133,6 +166,15 @@ mc68340_duart_device::mc68340_duart_device(const machine_config &mconfig, device
 
 mc68340_duart_device::mc68340_duart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc68340_duart_device(mconfig, MC68340_DUART, tag, owner, clock)
+{
+}
+
+xr68c681_device::xr68c681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc68681_device(mconfig, XR68C681, tag, owner, clock),
+	m_XTXA(false),
+	m_XRXA(false),
+	m_XTXB(false),
+	m_XRXB(false)
 {
 }
 
@@ -182,6 +224,16 @@ void mc68681_device::device_start()
 	save_item(NAME(IVR));
 }
 
+void xr68c681_device::device_start()
+{
+	mc68681_device::device_start();
+
+	save_item(NAME(m_XTXA));
+	save_item(NAME(m_XRXA));
+	save_item(NAME(m_XTXB));
+	save_item(NAME(m_XRXB));
+}
+
 /*-------------------------------------------------
     device reset callback
 -------------------------------------------------*/
@@ -207,6 +259,13 @@ void mc68681_device::device_reset()
 
 	IVR = 0x0f;  /* Interrupt Vector Register */
 	m_read_vector = false;
+}
+
+void xr68c681_device::device_reset()
+{
+	mc68681_device::device_reset();
+
+	m_XTXA = m_XRXA = m_XTXB = m_XRXB = false;
 }
 
 MACHINE_CONFIG_START(duart_base_device::device_add_mconfig)
@@ -243,42 +302,42 @@ void duart_base_device::update_interrupts()
 	ISR: bit 1: RxRDYA/FFULLA: this is handled here; depending on whether MSR1A bit 6 is 0 or 1, this bit holds the state of SRA bit 0 or bit 1 respectively
 	ISR: bit 0: TxRDYA: this is handled here; it mirrors SRA bit 2
 	*/
-	if ( (ISR & IMR) != 0 )
+	if ((ISR & IMR) != 0)
 	{
-		LOG( "68681: Interrupt line active (IMR & ISR = %02X)\n", (ISR & IMR) );
+		LOG("68681: Interrupt line active (IMR & ISR = %02X)\n", (ISR & IMR));
 		write_irq(ASSERT_LINE);
 	}
 	else
 	{
-		LOG( "68681: Interrupt line not active (IMR & ISR = %02X)\n", ISR & IMR);
+		LOG("68681: Interrupt line not active (IMR & ISR = %02X)\n", ISR & IMR);
 		write_irq(CLEAR_LINE);
 	}
-	if(OPCR & 0xf0)
+	if (OPCR & 0xf0)
 	{
-		if(BIT(OPCR, 4))
+		if (BIT(OPCR, 4))
 		{
-			if(BIT(ISR, 1))
+			if (BIT(ISR, 1))
 				OPR |= 0x10;
 			else
 				OPR &= ~0x10;
 		}
-		if(BIT(OPCR, 5))
+		if (BIT(OPCR, 5))
 		{
-			if(BIT(ISR, 5))
+			if (BIT(ISR, 5))
 				OPR |= 0x20;
 			else
 				OPR &= ~0x20;
 		}
-		if(BIT(OPCR, 6))
+		if (BIT(OPCR, 6))
 		{
-			if(BIT(ISR, 0))
+			if (BIT(ISR, 0))
 				OPR |= 0x40;
 			else
 				OPR &= ~0x40;
 		}
-		if(BIT(OPCR, 7))
+		if (BIT(OPCR, 7))
 		{
-			if(BIT(ISR, 4))
+			if (BIT(ISR, 4))
 				OPR |= 0x80;
 			else
 				OPR &= ~0x80;
@@ -304,17 +363,17 @@ double duart_base_device::get_ct_rate()
 		// Timer mode
 		switch ((ACR >> 4) & 3)
 		{
-			case 0: // IP2
-			case 1: // IP2 / 16
-				//logerror( "68681 (%s): Unhandled timer/counter mode %d\n", duart68681->tag(), (duart68681->ACR >> 4) & 3);
-				rate = clock();
-				break;
-			case 2: // X1/CLK
-				rate = clock();
-				break;
-			case 3: // X1/CLK / 16
-				rate = clock() / 16;
-				break;
+		case 0: // IP2
+		case 1: // IP2 / 16
+			//logerror( "68681 (%s): Unhandled timer/counter mode %d\n", duart68681->tag(), (duart68681->ACR >> 4) & 3);
+			rate = clock();
+			break;
+		case 2: // X1/CLK
+			rate = clock();
+			break;
+		case 3: // X1/CLK / 16
+			rate = clock() / 16;
+			break;
 		}
 	}
 	else
@@ -322,15 +381,15 @@ double duart_base_device::get_ct_rate()
 		// Counter mode
 		switch ((ACR >> 4) & 3)
 		{
-			case 0: // IP2
-			case 1: // TxCA
-			case 2: // TxCB
-				//logerror( "68681 (%s): Unhandled timer/counter mode %d\n", device->tag(), (duart68681->ACR >> 4) & 3);
-				rate = clock();
-				break;
-			case 3: // X1/CLK / 16
-				rate = clock() / 16;
-				break;
+		case 0: // IP2
+		case 1: // TxCA
+		case 2: // TxCB
+			//logerror( "68681 (%s): Unhandled timer/counter mode %d\n", device->tag(), (duart68681->ACR >> 4) & 3);
+			rate = clock();
+			break;
+		case 3: // X1/CLK / 16
+			rate = clock() / 16;
+			break;
 		}
 	}
 
@@ -349,7 +408,7 @@ void duart_base_device::start_ct(int count)
 	duart_timer->adjust(attotime::from_hz(clock) * count, 0);
 }
 
-TIMER_CALLBACK_MEMBER( duart_base_device::duart_timer_callback )
+TIMER_CALLBACK_MEMBER(duart_base_device::duart_timer_callback)
 {
 	if (ACR & 0x40)
 	{
@@ -403,12 +462,12 @@ TIMER_CALLBACK_MEMBER( duart_base_device::duart_timer_callback )
 
 }
 
-READ8_MEMBER( mc68681_device::read )
+uint8_t mc68681_device::read(offs_t offset)
 {
 	if (offset == 0x0c)
 		return IVR;
 
-	uint8_t r = duart_base_device::read(space, offset, mem_mask);
+	uint8_t r = duart_base_device::read(offset);
 
 	if (offset == 0x0d)
 	{
@@ -422,294 +481,378 @@ READ8_MEMBER( mc68681_device::read )
 	return r;
 }
 
-READ8_MEMBER( mc68340_duart_device::read )
+uint8_t mc68340_duart_device::read(offs_t offset)
 {
 	uint8_t r = 0;
 
 	switch (offset)
 	{
-		case 0x00: /* MR1A - does not share register address with MR2A */
-			r = m_chanA->read_MR1();
-			break;
-		case 0x08: /* MR1B - does not share register address with MR2B */
-			r = m_chanB->read_MR1();
-			break;
-		case 0x10: /* MR2A - does not share register address with MR1A */
-			r = m_chanA->read_MR2();
-			break;
-		case 0x11: /* MR2B - does not share register address with MR1B */
-			r = m_chanB->read_MR2();
-			break;
-		default:
-			r = duart_base_device::read(space, offset, mem_mask);
+	case 0x00: /* MR1A - does not share register address with MR2A */
+		r = m_chanA->read_MR1();
+		break;
+	case 0x08: /* MR1B - does not share register address with MR2B */
+		r = m_chanB->read_MR1();
+		break;
+	case 0x10: /* MR2A - does not share register address with MR1A */
+		r = m_chanA->read_MR2();
+		break;
+	case 0x11: /* MR2B - does not share register address with MR1B */
+		r = m_chanB->read_MR2();
+		break;
+	default:
+		r = duart_base_device::read(offset);
 	}
 	return r;
 }
 
-READ8_MEMBER( sc28c94_device::read )
+uint8_t sc28c94_device::read(offs_t offset)
 {
 	uint8_t r = 0;
 	offset &= 0x1f;
 
 	if (offset < 0x10)
 	{
-		return duart_base_device::read(space, offset, mem_mask);
+		return duart_base_device::read(offset);
 	}
 
 	switch (offset)
 	{
-		case 0x10: /* MR1A/MR2C */
-		case 0x11: /* SRC */
-		case 0x13: /* Rx Holding Register C */
-			r = m_chanC->read_chan_reg(offset & 3);
-			break;
+	case 0x10: /* MR1A/MR2C */
+	case 0x11: /* SRC */
+	case 0x13: /* Rx Holding Register C */
+		r = m_chanC->read_chan_reg(offset & 3);
+		break;
 
-		case 0x18: /* MR1D/MR2D */
-		case 0x19: /* SRD */
-		case 0x1b: /* RHRD */
-			r = m_chanD->read_chan_reg(offset & 3);
-			break;
+	case 0x18: /* MR1D/MR2D */
+	case 0x19: /* SRD */
+	case 0x1b: /* RHRD */
+		r = m_chanD->read_chan_reg(offset & 3);
+		break;
 	}
 
 	return r;
 }
 
-READ8_MEMBER( duart_base_device::read )
+uint8_t xr68c681_device::read(offs_t offset)
+{
+	if (offset == 0x02)
+	{
+		LOG("Reading XR68C681 (%s) reg 0x02 (MISR)\n", tag());
+		return ISR & IMR;
+	}
+	else
+		return mc68681_device::read(offset);
+}
+
+uint8_t duart_base_device::read(offs_t offset)
 {
 	uint8_t r = 0xff;
 
 	offset &= 0xf;
 
-	LOG( "Reading 68681 (%s) reg %x (%s)\n", tag(), offset, duart68681_reg_read_names[offset] );
+	LOG("Reading 68681 (%s) reg %x (%s)\n", tag(), offset, duart68681_reg_read_names[offset]);
 
 	switch (offset)
 	{
-		case 0x00: /* MR1A/MR2A */
-		case 0x01: /* SRA */
-		case 0x03: /* Rx Holding Register A */
-			r = m_chanA->read_chan_reg(offset & 3);
-			break;
-
-		case 0x04: /* IPCR */
-		{
-			r = IPCR;
-
-			// reading this clears all the input change bits
-			IPCR &= 0x0f;
-			clear_ISR_bits(INT_INPUT_PORT_CHANGE);
-		}
+	case 0x00: /* MR1A/MR2A */
+	case 0x01: /* SRA */
+	case 0x03: /* Rx Holding Register A */
+		r = m_chanA->read_chan_reg(offset & 3);
 		break;
 
-		case 0x05: /* ISR */
-			r = ISR;
-			break;
+	case 0x04: /* IPCR */
+		r = IPCR;
 
-		case 0x06: /* CUR */
-			r = get_ct_count() >> 8;
-			break;
+		// reading this clears all the input change bits
+		IPCR &= 0x0f;
+		clear_ISR_bits(INT_INPUT_PORT_CHANGE);
+		break;
 
-		case 0x07: /* CLR */
-			r = get_ct_count() & 0xff;
-			break;
+	case 0x05: /* ISR */
+		r = ISR;
+		break;
 
-		case 0x08: /* MR1B/MR2B */
-		case 0x09: /* SRB */
-		case 0x0b: /* RHRB */
-			r = m_chanB->read_chan_reg(offset & 3);
-			break;
+	case 0x06: /* CUR */
+		r = get_ct_count() >> 8;
+		break;
 
-		case 0x0a: /* 1X/16X Test */
-			r = 0x61;   // the old 68681 returned this and it makes Apollo happy
-			break;
+	case 0x07: /* CLR */
+		r = get_ct_count() & 0xff;
+		break;
 
-		case 0x0d: /* IP */
-			if (!read_inport.isnull())
-			{
-				r = read_inport();  // TODO: go away
-			}
-			else
-			{
-				r = IP_last_state;
-			}
+	case 0x08: /* MR1B/MR2B */
+	case 0x09: /* SRB */
+	case 0x0b: /* RHRB */
+		r = m_chanB->read_chan_reg(offset & 3);
+		break;
 
-			r |= 0x80;  // bit 7 is always set
-			break;
+	case 0x0a: /* 1X/16X Test */
+		r = 0x61;   // the old 68681 returned this and it makes Apollo happy
+		break;
 
-		case 0x0e: /* Start counter command */
+	case 0x0d: /* IP */
+		if (!read_inport.isnull())
 		{
-			if (ACR & 0x40)
-			{
-				// Reset the timer
-				half_period = 0;
-			}
-
-			int count = std::max(CTR.w.l, uint16_t(1));
-			start_ct(count);
-			break;
+			r = read_inport();  // TODO: go away
+		}
+		else
+		{
+			r = IP_last_state;
 		}
 
-		case 0x0f: /* Stop counter command */
-			clear_ISR_bits(INT_COUNTER_READY);
+		r |= 0x80;  // bit 7 is always set
+		break;
 
-			// Stop the counter only
-			if (!(ACR & 0x40))
-				duart_timer->adjust(attotime::never);
+	case 0x0e: /* Start counter command */
+	{
+		if (ACR & 0x40)
+		{
+			// Reset the timer
+			half_period = 0;
+		}
 
-			break;
+		int count = std::max(CTR.w.l, uint16_t(1));
+		start_ct(count);
+		break;
+	}
 
-		default:
-			LOG( "Reading unhandled 68681 reg %x\n", offset );
-			break;
+	case 0x0f: /* Stop counter command */
+		clear_ISR_bits(INT_COUNTER_READY);
+
+		// Stop the counter only
+		if (!(ACR & 0x40))
+			duart_timer->adjust(attotime::never);
+
+		break;
+
+	default:
+		LOG("Reading unhandled 68681 reg %x\n", offset);
+		break;
 	}
 	LOG("returned %02x\n", r);
 
 	return r;
 }
 
-WRITE8_MEMBER( mc68681_device::write )
+void mc68681_device::write(offs_t offset, uint8_t data)
 {
 	if (offset == 0x0c)
 		IVR = data;
 	else
-		duart_base_device::write(space, offset, data, mem_mask);
+		duart_base_device::write(offset, data);
 }
 
-WRITE8_MEMBER( mc68340_duart_device::write )
+void mc68340_duart_device::write(offs_t offset, uint8_t data)
 {
 	//printf("Duart write %02x -> %02x\n", data, offset);
 
 	switch(offset)
 	{
-		case 0x00: /* MR1A - does not share register address with MR2A */
-			m_chanA->write_MR1(data);
-			break;
-		case 0x08: /* MR1B - does not share register address with MR2B */
-			m_chanB->write_MR1(data);
-			break;
-		case 0x10: /* MR2A - does not share register address with MR1A */
-			m_chanA->write_MR2(data);
-			break;
-		case 0x11: /* MR2B - does not share register address with MR1B */
-			m_chanB->write_MR2(data);
-			break;
-		default:
-			duart_base_device::write(space, offset, data, mem_mask);
+	case 0x00: /* MR1A - does not share register address with MR2A */
+		m_chanA->write_MR1(data);
+		break;
+	case 0x08: /* MR1B - does not share register address with MR2B */
+		m_chanB->write_MR1(data);
+		break;
+	case 0x10: /* MR2A - does not share register address with MR1A */
+		m_chanA->write_MR2(data);
+		break;
+	case 0x11: /* MR2B - does not share register address with MR1B */
+		m_chanB->write_MR2(data);
+		break;
+	default:
+		duart_base_device::write(offset, data);
 	}
 }
 
-WRITE8_MEMBER( sc28c94_device::write )
+void sc28c94_device::write(offs_t offset, uint8_t data)
 {
 	offset &= 0x1f;
 
 	if (offset < 0x10)
 	{
-		duart_base_device::write(space, offset, data, mem_mask);
+		duart_base_device::write(offset, data);
 	}
 
-	switch(offset)
+	switch (offset)
 	{
-		case 0x10: /* MRC */
-		case 0x11: /* CSRC */
-		case 0x12: /* CRC */
-		case 0x13: /* THRC */
-			m_chanC->write_chan_reg(offset&3, data);
-			break;
+	case 0x10: /* MRC */
+	case 0x11: /* CSRC */
+	case 0x12: /* CRC */
+	case 0x13: /* THRC */
+		m_chanC->write_chan_reg(offset&3, data);
+		break;
 
-		case 0x18: /* MRC */
-		case 0x19: /* CSRC */
-		case 0x1a: /* CRC */
-		case 0x1b: /* THRC */
-			m_chanD->write_chan_reg(offset&3, data);
-			break;
+	case 0x18: /* MRC */
+	case 0x19: /* CSRC */
+	case 0x1a: /* CRC */
+	case 0x1b: /* THRC */
+		m_chanD->write_chan_reg(offset&3, data);
+		break;
 	}
 }
 
-WRITE8_MEMBER( duart_base_device::write )
+void xr68c681_device::write(offs_t offset, uint8_t data)
 {
-	offset &= 0x0f;
-	LOG( "Writing 68681 (%s) reg %x (%s) with %04x\n", tag(), offset, duart68681_reg_write_names[offset], data );
-	switch(offset)
-	{
-		case 0x00: /* MRA */
-		case 0x01: /* CSRA */
-		case 0x02: /* CRA */
-		case 0x03: /* THRA */
-			m_chanA->write_chan_reg(offset&3, data);
+	if (offset == 0x02) /* CRA */
+		switch (data >> 4)
+		{
+		case 0x08: /* set RX extend bit */
+			m_XRXA = true;
+			m_chanA->baud_updated();
+			data &= 0x0f; /* disable command before we send it off to 68681 */
 			break;
 
-		case 0x04: /* ACR */
-		{
-			uint8_t old_acr = ACR;
-			ACR = data;
+		case 0x09: /* clear RX extend bit */
+			m_XRXA = false;
+			m_chanA->baud_updated();
+			data &= 0x0f;
+			break;
 
-			//       bits 6-4: Counter/Timer Mode And Clock Source Select
-			//       bits 3-0: IP3-0 Change-Of-State Interrupt Enable
-			if ((old_acr ^ data) & 0x40)
-			{
-				if (data & 0x40)
-				{
-					// Entering timer mode
-					uint16_t count = std::max(CTR.w.l, uint16_t(1));
-					half_period = 0;
+		case 0x0a: /* set TX extend bit */
+			m_XTXA = true;
+			m_chanA->baud_updated();
+			data &= 0x0f;
+			break;
 
-					start_ct(count);
-				}
-				else
-				{
-					// Leaving timer mode (TODO: is this correct?)
-					duart_timer->adjust(attotime::never);
-				}
-			}
+		case 0x0b: /* clear TX extend bit */
+			m_XTXA = false;
+			m_chanA->baud_updated();
+			data &= 0x0f;
+			break;
 
-			// check for pending input port delta interrupts
-			if ((((IPCR>>4) & data) & 0x0f) != 0)
-				set_ISR_bits(INT_INPUT_PORT_CHANGE);
-
-			m_chanA->ACR_updated();
-			m_chanB->ACR_updated();
-			m_chanA->update_interrupts();
-			m_chanB->update_interrupts();
+		case 0x0c: /* enter low power mode TODO: unimplemented */
+		case 0x0d: /* leave low power mode */
+		case 0x0e: /* reserved */
+		case 0x0f: /* reserved */
+			data &= 0x0f;
 			break;
 		}
-		case 0x05: /* IMR */
-			IMR = data;
-			update_interrupts();
+
+	else if (offset == 0x0a) /* CRB */
+		switch (data >> 4)
+		{
+		case 0x08: /* set RX extend bit */
+			m_XRXB = true;
+			m_chanB->baud_updated();
+			data &= 0x0f;
 			break;
 
-		case 0x06: /* CTUR */
-			CTR.b.h = data;
+		case 0x09: /* clear RX extend bit */
+			m_XRXB = false;
+			m_chanB->baud_updated();
+			data &= 0x0f;
 			break;
 
-		case 0x07: /* CTLR */
-			CTR.b.l = data;
+		case 0x0a: /* set TX extend bit */
+			m_XTXB = true;
+			m_chanB->baud_updated();
+			data &= 0x0f;
 			break;
 
-		case 0x08: /* MRB */
-		case 0x09: /* CSRB */
-		case 0x0a: /* CRB */
-		case 0x0b: /* THRB */
-			m_chanB->write_chan_reg(offset&3, data);
+		case 0x0b: /* clear TX extend bit */
+			m_XTXB = false;
+			m_chanB->baud_updated();
+			data &= 0x0f;
 			break;
 
-		case 0x0d: /* OPCR */
-			if (((data & 0xf) != 0x00) && ((data & 0xc) != 0x4))
-				logerror( "68681 (%s): Unhandled OPCR value: %02x\n", tag(), data);
-			OPCR = data;
+		case 0x0c: /* enter low power mode TODO: unimplemented */
+		case 0x0d: /* leave low power mode */
+		case 0x0e: /* reserved */
+		case 0x0f: /* reserved */
+			data &= 0x0f;
 			break;
+		}
 
-		case 0x0e: /* Set Output Port Bits */
-			OPR |= data;
-			write_outport(OPR ^ 0xff);
-			break;
+	mc68681_device::write(offset, data); /* pass on 68681 command */
+}
 
-		case 0x0f: /* Reset Output Port Bits */
-			OPR &= ~data;
-			write_outport(OPR ^ 0xff);
-			break;
+void duart_base_device::write(offs_t offset, uint8_t data)
+{
+	offset &= 0x0f;
+	LOG("Writing 68681 (%s) reg %x (%s) with %04x\n", tag(), offset, duart68681_reg_write_names[offset], data);
+	switch (offset)
+	{
+	case 0x00: /* MRA */
+	case 0x01: /* CSRA */
+	case 0x02: /* CRA */
+	case 0x03: /* THRA */
+		m_chanA->write_chan_reg(offset&3, data);
+		break;
+
+	case 0x04: /* ACR */
+	{
+		uint8_t old_acr = ACR;
+		ACR = data;
+
+		//       bits 6-4: Counter/Timer Mode And Clock Source Select
+		//       bits 3-0: IP3-0 Change-Of-State Interrupt Enable
+		if ((old_acr ^ data) & 0x40)
+		{
+			if (data & 0x40)
+			{
+				// Entering timer mode
+				uint16_t count = std::max(CTR.w.l, uint16_t(1));
+				half_period = 0;
+
+				start_ct(count);
+			}
+			else
+			{
+				// Leaving timer mode (TODO: is this correct?)
+				duart_timer->adjust(attotime::never);
+			}
+		}
+
+		// check for pending input port delta interrupts
+		if ((((IPCR>>4) & data) & 0x0f) != 0)
+			set_ISR_bits(INT_INPUT_PORT_CHANGE);
+
+		m_chanA->baud_updated();
+		m_chanB->baud_updated();
+		m_chanA->update_interrupts();
+		m_chanB->update_interrupts();
+		break;
+	}
+	case 0x05: /* IMR */
+		IMR = data;
+		update_interrupts();
+		break;
+
+	case 0x06: /* CTUR */
+		CTR.b.h = data;
+		break;
+
+	case 0x07: /* CTLR */
+		CTR.b.l = data;
+		break;
+
+	case 0x08: /* MRB */
+	case 0x09: /* CSRB */
+	case 0x0a: /* CRB */
+	case 0x0b: /* THRB */
+		m_chanB->write_chan_reg(offset&3, data);
+		break;
+
+	case 0x0d: /* OPCR */
+		if (((data & 0xf) != 0x00) && ((data & 0xc) != 0x4))
+			logerror("68681 (%s): Unhandled OPCR value: %02x\n", tag(), data);
+		OPCR = data;
+		break;
+
+	case 0x0e: /* Set Output Port Bits */
+		OPR |= data;
+		write_outport(OPR ^ 0xff);
+		break;
+
+	case 0x0f: /* Reset Output Port Bits */
+		OPR &= ~data;
+		write_outport(OPR ^ 0xff);
+		break;
 	}
 }
 
-WRITE_LINE_MEMBER( duart_base_device::ip0_w )
+WRITE_LINE_MEMBER(duart_base_device::ip0_w)
 {
 	uint8_t newIP = (IP_last_state & ~0x01) | ((state == ASSERT_LINE) ? 1 : 0);
 
@@ -726,7 +869,7 @@ WRITE_LINE_MEMBER( duart_base_device::ip0_w )
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER( duart_base_device::ip1_w )
+WRITE_LINE_MEMBER(duart_base_device::ip1_w)
 {
 	uint8_t newIP = (IP_last_state & ~0x02) | ((state == ASSERT_LINE) ? 2 : 0);
 
@@ -743,7 +886,7 @@ WRITE_LINE_MEMBER( duart_base_device::ip1_w )
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER( duart_base_device::ip2_w )
+WRITE_LINE_MEMBER(duart_base_device::ip2_w)
 {
 	uint8_t newIP = (IP_last_state & ~0x04) | ((state == ASSERT_LINE) ? 4 : 0);
 
@@ -760,7 +903,7 @@ WRITE_LINE_MEMBER( duart_base_device::ip2_w )
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER( duart_base_device::ip3_w )
+WRITE_LINE_MEMBER(duart_base_device::ip3_w)
 {
 	uint8_t newIP = (IP_last_state & ~0x08) | ((state == ASSERT_LINE) ? 8 : 0);
 
@@ -777,21 +920,21 @@ WRITE_LINE_MEMBER( duart_base_device::ip3_w )
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER( duart_base_device::ip4_w )
+WRITE_LINE_MEMBER(duart_base_device::ip4_w)
 {
 	uint8_t newIP = (IP_last_state & ~0x10) | ((state == ASSERT_LINE) ? 0x10 : 0);
 // TODO: special mode for ip4 (Ch. A Rx clock)
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER( duart_base_device::ip5_w )
+WRITE_LINE_MEMBER(duart_base_device::ip5_w)
 {
 	uint8_t newIP = (IP_last_state & ~0x20) | ((state == ASSERT_LINE) ? 0x20 : 0);
 // TODO: special mode for ip5 (Ch. B Tx clock)
 	IP_last_state = newIP;
 }
 
-WRITE_LINE_MEMBER( duart_base_device::ip6_w )
+WRITE_LINE_MEMBER(duart_base_device::ip6_w)
 {
 	uint8_t newIP = (IP_last_state & ~0x40) | ((state == ASSERT_LINE) ? 0x40 : 0);
 // TODO: special mode for ip6 (Ch. B Rx clock)
@@ -808,11 +951,11 @@ duart_channel *duart_base_device::get_channel(int chan)
 	return m_chanB;
 }
 
-int duart_base_device::calc_baud(int ch, uint8_t data)
+int duart_base_device::calc_baud(int ch, bool rx, uint8_t data)
 {
 	int baud_rate;
 
-	if ( BIT(ACR, 7) == 0 )
+	if (BIT(ACR, 7) == 0)
 	{
 		baud_rate = baud_rate_ACR_0[data & 0x0f];
 
@@ -846,7 +989,46 @@ int duart_base_device::calc_baud(int ch, uint8_t data)
 
 	if ((baud_rate == 0) && ((data & 0xf) != 0xd))
 	{
-		LOG( "Unsupported transmitter clock: channel %d, clock select = %02x\n", ch, data );
+		LOG("Unsupported transmitter clock: channel %d, clock select = %02x\n", ch, data);
+	}
+
+	//printf("%s ch %d setting baud to %d\n", tag(), ch, baud_rate);
+	return baud_rate;
+}
+
+int xr68c681_device::calc_baud(int ch, bool rx, uint8_t data)
+{
+	int baud_rate;
+
+
+	baud_rate = baud_rate_ACR_0[data & 0x0f];
+
+	if (ch == 0)
+	{
+		if ((data & 0x0f) == 0x0e)
+			baud_rate = ip3clk/16;
+		else if ((data & 0x0f) == 0x0f)
+			baud_rate = ip3clk;
+		else if ((rx && m_XRXA) || (!rx && m_XTXA)) /* X = 1 */
+			baud_rate = BIT(ACR, 7) == 0 ? baud_rate_ACR_0_X_1[data & 0x0f] : baud_rate_ACR_1_X_1[data & 0x0f];
+		else /* X = 0 */
+			baud_rate = BIT(ACR, 7) == 0 ? baud_rate_ACR_0[data & 0x0f] : baud_rate_ACR_1[data & 0x0f];
+	}
+	else if (ch == 1)
+	{
+		if ((data & 0x0f) == 0x0e)
+			baud_rate = ip5clk/16;
+		else if ((data & 0x0f) == 0x0f)
+			baud_rate = ip5clk;
+		else if ((rx && m_XRXB) || (!rx && m_XTXB)) /* X = 1 */
+			baud_rate = BIT(ACR, 7) == 0 ? baud_rate_ACR_0_X_1[data & 0x0f] : baud_rate_ACR_1_X_1[data & 0x0f];
+		else /* X = 0 */
+			baud_rate = BIT(ACR, 7) == 0 ? baud_rate_ACR_0[data & 0x0f] : baud_rate_ACR_1[data & 0x0f];
+	}
+
+	if ((baud_rate == 0) && ((data & 0xf) != 0xd))
+	{
+		LOG("Unsupported transmitter clock: channel %d, clock select = %02x\n", ch, data);
 	}
 
 	//printf("%s ch %d setting baud to %d\n", tag(), ch, baud_rate);
@@ -874,15 +1056,16 @@ void duart_base_device::set_ISR_bits(int mask)
 // DUART channel class stuff
 
 duart_channel::duart_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DUART_CHANNEL, tag, owner, clock),
-	device_serial_interface(mconfig, *this),
-	MR1(0),
-	MR2(0),
-	SR(0),
-	rx_enabled(0),
-	rx_fifo_num(0),
-	tx_enabled(0)
+	: device_t(mconfig, DUART_CHANNEL, tag, owner, clock)
+	, device_serial_interface(mconfig, *this)
+	, MR1(0)
+	, MR2(0)
+	, SR(0)
+	, rx_enabled(0)
+	, rx_fifo_num(0)
+	, tx_enabled(0)
 {
+	std::fill_n(&rx_fifo[0], MC68681_RX_FIFO_SIZE, 0);
 }
 
 void duart_channel::device_start()
@@ -928,22 +1111,40 @@ void duart_channel::rcv_complete()
 
 	//printf("%s ch %d rcv complete\n", tag(), m_ch);
 
-	if ( rx_enabled )
+	if (rx_enabled)
 	{
-		if ( rx_fifo_num >= MC68681_RX_FIFO_SIZE )
-		{
-			logerror("68681: FIFO overflow\n");
-			SR |= STATUS_OVERRUN_ERROR;
-			return;
-		}
-		rx_fifo[rx_fifo_write_ptr++] = get_received_char();
-		if ( rx_fifo_write_ptr == MC68681_RX_FIFO_SIZE )
-		{
-			rx_fifo_write_ptr = 0;
-		}
-		rx_fifo_num++;
-		update_interrupts();
+		uint8_t errors = 0;
+		if (is_receive_framing_error())
+			errors |= STATUS_FRAMING_ERROR;
+		if (is_receive_parity_error())
+			errors |= STATUS_PARITY_ERROR;
+		rx_fifo_push(get_received_char(), errors);
 	}
+}
+
+void duart_channel::rx_fifo_push(uint8_t data, uint8_t errors)
+{
+	if (rx_fifo_num >= MC68681_RX_FIFO_SIZE)
+	{
+		logerror("68681: FIFO overflow\n");
+		SR |= STATUS_OVERRUN_ERROR;
+		return;
+	}
+
+	rx_fifo[rx_fifo_write_ptr++] = data | (errors << 8);
+	if (rx_fifo_write_ptr == MC68681_RX_FIFO_SIZE)
+		rx_fifo_write_ptr = 0;
+
+	if (rx_fifo_num++ == 0)
+	{
+		SR |= STATUS_RECEIVER_READY;
+		if (!(MR1 & MODE_BLOCK_ERROR))
+			SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR);
+		SR |= errors;
+	}
+	if (rx_fifo_num == MC68681_RX_FIFO_SIZE)
+		SR |= STATUS_FIFO_FULL;
+	update_interrupts();
 }
 
 void duart_channel::tra_complete()
@@ -958,23 +1159,8 @@ void duart_channel::tra_complete()
 		m_uart->clear_ISR_bits(INT_TXRDYB);
 
 	// if local loopback is on, write the transmitted data as if a byte had been received
-	if ((MR2 & 0xC0) == 0x80)
-	{
-		if (rx_fifo_num >= MC68681_RX_FIFO_SIZE)
-		{
-			LOG( "68681: FIFO overflow\n" );
-			SR |= STATUS_OVERRUN_ERROR;
-		}
-		else
-		{
-			rx_fifo[rx_fifo_write_ptr++]= tx_data;
-			if (rx_fifo_write_ptr == MC68681_RX_FIFO_SIZE)
-			{
-				rx_fifo_write_ptr = 0;
-			}
-			rx_fifo_num++;
-		}
-	}
+	if ((MR2 & 0xc0) == 0x80)
+		rx_fifo_push(tx_data, 0);
 
 	update_interrupts();
 }
@@ -982,7 +1168,7 @@ void duart_channel::tra_complete()
 void duart_channel::tra_callback()
 {
 	// don't actually send in loopback mode
-	if ((MR2&0xC0) != 0x80)
+	if ((MR2 & 0xc0) != 0x80)
 	{
 		int bit = transmit_register_get_data_bit();
 		//printf("%s ch %d transmit %d\n", tag(), m_ch, bit);
@@ -1011,61 +1197,34 @@ void duart_channel::tra_callback()
 
 void duart_channel::update_interrupts()
 {
-	if (rx_enabled)
+	// Handle the TxEMT and TxRDY bits based on mode
+	switch (MR2 & 0xc0) // what mode are we in?
 	{
-		if (rx_fifo_num > 0)
-		{
-			SR |= STATUS_RECEIVER_READY;
-		}
+	case 0x00: // normal mode
+		if (tx_enabled)
+			SR |= STATUS_TRANSMITTER_EMPTY;
 		else
-		{
-			SR &= ~STATUS_RECEIVER_READY;
-		}
-		if ( rx_fifo_num == MC68681_RX_FIFO_SIZE )
-		{
-			SR |= STATUS_FIFO_FULL;
-		}
+			SR &= ~STATUS_TRANSMITTER_EMPTY;
+		break;
+	case 0x40: // automatic echo mode
+		SR &= ~STATUS_TRANSMITTER_EMPTY;
+		SR &= ~STATUS_TRANSMITTER_READY;
+		break;
+	case 0x80: // local loopback mode
+		if (tx_enabled)
+			SR |= STATUS_TRANSMITTER_EMPTY;
 		else
-		{
-			SR &= ~STATUS_FIFO_FULL;
-		}
+			SR &= ~STATUS_TRANSMITTER_EMPTY;
+		break;
+	case 0xc0: // remote loopback mode
+		// write me, what the txrdy/txemt regs do for remote loopback mode is undocumented afaik, for now just clear both
+		SR &= ~STATUS_TRANSMITTER_EMPTY;
+		SR &= ~STATUS_TRANSMITTER_READY;
+		break;
 	}
 
-	// Handle the TxEMT and TxRDY bits based on mode
-	switch(MR2&0xC0) // what mode are we in?
-		{
-		case 0x00: // normal mode
-			if ( tx_enabled )
-			{
-				SR |= STATUS_TRANSMITTER_EMPTY;
-			}
-			else
-			{
-				SR &= ~STATUS_TRANSMITTER_EMPTY;
-			}
-		break;
-		case 0x40: // automatic echo mode
-			SR &= ~STATUS_TRANSMITTER_EMPTY;
-			SR &= ~STATUS_TRANSMITTER_READY;
-		break;
-		case 0x80: // local loopback mode
-			if ( tx_enabled )
-			{
-				SR |= STATUS_TRANSMITTER_EMPTY;
-			}
-			else
-			{
-				SR &= ~STATUS_TRANSMITTER_EMPTY;
-			}
-		break;
-		case 0xC0: // remote loopback mode
-			// write me, what the txrdy/txemt regs do for remote loopback mode is undocumented afaik, for now just clear both
-			SR &= ~STATUS_TRANSMITTER_EMPTY;
-			SR &= ~STATUS_TRANSMITTER_READY;
-		break;
-		}
 	// now handle the ISR bits
-	if ( SR & STATUS_TRANSMITTER_READY )
+	if (SR & STATUS_TRANSMITTER_READY)
 	{
 		if (m_ch == 0)
 			m_uart->set_ISR_bits(INT_TXRDYA);
@@ -1080,9 +1239,9 @@ void duart_channel::update_interrupts()
 			m_uart->clear_ISR_bits(INT_TXRDYB);
 	}
 	//logerror("DEBUG: 68681 int check: before receiver test, SR%c is %02X, ISR is %02X\n", (ch+0x41), duart68681->channel[ch].SR, duart68681->ISR);
-	if ( MR1 & MODE_RX_INT_SELECT_BIT )
+	if (MR1 & MODE_RX_INT_SELECT_BIT)
 	{
-		if ( SR & STATUS_FIFO_FULL )
+		if (SR & STATUS_FIFO_FULL)
 		{
 			m_uart->set_ISR_bits((m_ch == 0) ? INT_RXRDY_FFULLA : INT_RXRDY_FFULLB);
 		}
@@ -1093,7 +1252,7 @@ void duart_channel::update_interrupts()
 	}
 	else
 	{
-		if ( SR & STATUS_RECEIVER_READY )
+		if (SR & STATUS_RECEIVER_READY)
 		{
 			m_uart->set_ISR_bits((m_ch == 0) ? INT_RXRDY_FFULLA : INT_RXRDY_FFULLB);
 		}
@@ -1112,20 +1271,27 @@ uint8_t duart_channel::read_rx_fifo()
 
 	//printf("read_rx_fifo: rx_fifo_num %d\n", rx_fifo_num);
 
-	if ( rx_fifo_num == 0 )
+	if (rx_fifo_num == 0)
 	{
-		LOG( "68681 channel: rx fifo underflow\n" );
+		LOG("68681 channel: rx fifo underflow\n");
 		update_interrupts();
 		return 0;
 	}
 
 	rv = rx_fifo[rx_fifo_read_ptr++];
-	if ( rx_fifo_read_ptr == MC68681_RX_FIFO_SIZE )
+	if (rx_fifo_read_ptr == MC68681_RX_FIFO_SIZE)
 	{
 		rx_fifo_read_ptr = 0;
 	}
 
 	rx_fifo_num--;
+	SR &= ~STATUS_FIFO_FULL;
+	if (!(MR1 & MODE_BLOCK_ERROR))
+		SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR);
+	if (rx_fifo_num == 0)
+		SR &= ~STATUS_RECEIVER_READY;
+	else
+		SR |= rx_fifo[rx_fifo_read_ptr] >> 8;
 	update_interrupts();
 
 	//printf("Rx read %02x\n", rv);
@@ -1139,28 +1305,28 @@ uint8_t duart_channel::read_chan_reg(int reg)
 
 	switch (reg)
 	{
-		case 0: // MR1/MR2
-			if ( MR_ptr == 0 )
-			{
-				rv = MR1;
-				MR_ptr = 1;
-			}
-			else
-			{
-				rv = MR2;
-			}
-			break;
+	case 0: // MR1/MR2
+		if (MR_ptr == 0)
+		{
+			rv = MR1;
+			MR_ptr = 1;
+		}
+		else
+		{
+			rv = MR2;
+		}
+		break;
 
-		case 1: // SRA
-			rv = SR;
-			break;
+	case 1: // SRA
+		rv = SR;
+		break;
 
-		case 2: // CSRA: reading this is prohibited
-			break;
+	case 2: // CSRA: reading this is prohibited
+		break;
 
-		case 3: // Rx holding register A
-			rv = read_rx_fifo();
-			break;
+	case 3: // Rx holding register A
+		rv = read_rx_fifo();
+		break;
 	}
 
 	return rv;
@@ -1176,8 +1342,8 @@ void duart_channel::write_chan_reg(int reg, uint8_t data)
 
 	case 0x01: /* CSR */
 		CSR = data;
-		tx_baud_rate = m_uart->calc_baud(m_ch, data & 0xf);
-		rx_baud_rate = m_uart->calc_baud(m_ch, (data>>4) & 0xf);
+		tx_baud_rate = m_uart->calc_baud(m_ch, false, data & 0xf);
+		rx_baud_rate = m_uart->calc_baud(m_ch, true, (data>>4) & 0xf);
 	//printf("%s ch %d CSR %02x Tx baud %d Rx baud %d\n", tag(), m_ch, data, tx_baud_rate, rx_baud_rate);
 		set_rcv_rate(rx_baud_rate);
 		set_tra_rate(tx_baud_rate);
@@ -1195,7 +1361,7 @@ void duart_channel::write_chan_reg(int reg, uint8_t data)
 
 void duart_channel::write_MR(uint8_t data)
 {
-	if ( MR_ptr == 0 )
+	if (MR_ptr == 0)
 	{
 		MR1 = data;
 		MR_ptr = 1;
@@ -1211,120 +1377,112 @@ void duart_channel::write_MR(uint8_t data)
 void duart_channel::recalc_framing()
 {
 	parity_t parity = PARITY_NONE;
-	switch ((MR1>>3) & 3)
+	switch ((MR1 >> 3) & 3)
 	{
-		case 0: // with parity
-			if (MR1 & 4)
-			{
-				parity = PARITY_ODD;
-			}
-			else
-			{
-				parity = PARITY_EVEN;
-			}
-			break;
+	case 0: // with parity
+		if (MR1 & 4)
+			parity = PARITY_ODD;
+		else
+			parity = PARITY_EVEN;
+		break;
 
-		case 1: // force parity
-			if (MR1 & 4)
-			{
-				parity = PARITY_MARK;
-			}
-			else
-			{
-				parity = PARITY_SPACE;
-			}
-			break;
+	case 1: // force parity
+		if (MR1 & 4)
+			parity = PARITY_MARK;
+		else
+			parity = PARITY_SPACE;
+		break;
 
-		case 2: // no parity
-			parity = PARITY_NONE;
-			break;
+	case 2: // no parity
+		parity = PARITY_NONE;
+		break;
 
-		case 3: // multidrop mode
-			// fatalerror("68681: multidrop parity not supported\n");
-			// Apollo DEX CPU will test this; omit to abort the emulation
-			logerror("68681: multidrop parity not supported\n");
-			break;
+	case 3: // multidrop mode
+		// fatalerror("68681: multidrop parity not supported\n");
+		// Apollo DEX CPU will test this; omit to abort the emulation
+		logerror("68681: multidrop parity not supported\n");
+		break;
 	}
 
 	stop_bits_t stopbits = STOP_BITS_0;
 	switch ((MR2 >> 2) & 3)
 	{
-		case 0:
-		case 1:
-			stopbits = STOP_BITS_1;
-			break;
+	case 0:
+	case 1:
+		stopbits = STOP_BITS_1;
+		break;
 
-		case 2: // "1.5 async, 2 sync"
-			stopbits = STOP_BITS_1_5;
-			break;
+	case 2: // "1.5 async, 2 sync"
+		stopbits = STOP_BITS_1_5;
+		break;
 
-		case 3:
-			stopbits = STOP_BITS_2;
-			break;
+	case 3:
+		stopbits = STOP_BITS_2;
+		break;
 	}
 
 	//printf("%s ch %d MR1 %02x MR2 %02x => %d bits / char, %d stop bits, parity %d\n", tag(), m_ch, MR1, MR2, (MR1 & 3)+5, stopbits, parity);
 
-	set_data_frame(1, (MR1 & 3)+5, parity, stopbits);
+	set_data_frame(1, (MR1 & 3) + 5, parity, stopbits);
 }
 
 void duart_channel::write_CR(uint8_t data)
 {
 	CR = data;
 
-	switch( (data >> 4) & 0x07 )
+	switch ((data >> 4) & 0x07)
 	{
-		case 0: /* No command */
-			break;
-		case 1: /* Reset MR pointer. Causes the channel MR pointer to point to MR1 */
-			MR_ptr = 0;
-			break;
-		case 2: /* Reset channel receiver (disable receiver and flush fifo) */
-			rx_enabled = 0;
-			SR &= ~STATUS_RECEIVER_READY;
-			SR &= ~STATUS_OVERRUN_ERROR; // is this correct?
-			rx_fifo_read_ptr = 0;
-			rx_fifo_write_ptr = 0;
-			rx_fifo_num = 0;
-			receive_register_reset();
-			break;
-		case 3: /* Reset channel transmitter */
-			tx_enabled = 0;
-			SR &= ~STATUS_TRANSMITTER_READY;
-			if (m_ch == 0)
-				m_uart->clear_ISR_bits(INT_TXRDYA);
-			else
-				m_uart->clear_ISR_bits(INT_TXRDYB);
-			transmit_register_reset();
-			break;
-		case 4: /* Reset Error Status */
-			SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR | STATUS_OVERRUN_ERROR);
-			break;
-		case 5: /* Reset Channel break change interrupt */
-			if ( m_ch == 0 )
-			{
-				m_uart->clear_ISR_bits(INT_DELTA_BREAK_A);
-			}
-			else
-			{
-				m_uart->clear_ISR_bits(INT_DELTA_BREAK_B);
-			}
-			break;
-		/* TODO: case 6 and case 7 are start break and stop break respectively, which start or stop holding the TxDA or TxDB line low (space) after whatever data is in the buffer finishes transmitting (following the stop bit?), or after two bit-times if no data is being transmitted  */
-		default:
-			LOG( "68681: Unhandled command (%x) in CR%d\n", (data >> 4) & 0x07, m_ch );
-			break;
+	case 0: /* No command */
+		break;
+	case 1: /* Reset MR pointer. Causes the channel MR pointer to point to MR1 */
+		MR_ptr = 0;
+		break;
+	case 2: /* Reset channel receiver (disable receiver and flush fifo) */
+		rx_enabled = 0;
+		SR &= ~STATUS_RECEIVER_READY;
+		SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR);
+		SR &= ~STATUS_OVERRUN_ERROR; // is this correct?
+		rx_fifo_read_ptr = 0;
+		rx_fifo_write_ptr = 0;
+		rx_fifo_num = 0;
+		receive_register_reset();
+		break;
+	case 3: /* Reset channel transmitter */
+		tx_enabled = 0;
+		SR &= ~STATUS_TRANSMITTER_READY;
+		if (m_ch == 0)
+			m_uart->clear_ISR_bits(INT_TXRDYA);
+		else
+			m_uart->clear_ISR_bits(INT_TXRDYB);
+		transmit_register_reset();
+		break;
+	case 4: /* Reset Error Status */
+		SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR | STATUS_OVERRUN_ERROR);
+		break;
+	case 5: /* Reset Channel break change interrupt */
+		if (m_ch == 0)
+			m_uart->clear_ISR_bits(INT_DELTA_BREAK_A);
+		else
+			m_uart->clear_ISR_bits(INT_DELTA_BREAK_B);
+		break;
+	/* TODO: case 6 and case 7 are start break and stop break respectively, which start or stop holding the TxDA or TxDB line low (space) after whatever data is in the buffer finishes transmitting (following the stop bit?), or after two bit-times if no data is being transmitted  */
+	default:
+		LOG("68681: Unhandled command (%x) in CR%d\n", (data >> 4) & 0x07, m_ch);
+		break;
 	}
 
-	if (BIT(data, 0)) {
+	if (BIT(data, 0))
+	{
 		rx_enabled = 1;
 	}
-	if (BIT(data, 1)) {
+	if (BIT(data, 1))
+	{
 		rx_enabled = 0;
 		SR &= ~STATUS_RECEIVER_READY;
 	}
 
-	if (BIT(data, 2)) {
+	if (BIT(data, 2))
+	{
 		tx_enabled = 1;
 		tx_ready = 1;
 		SR |= STATUS_TRANSMITTER_READY;
@@ -1333,7 +1491,8 @@ void duart_channel::write_CR(uint8_t data)
 		else
 			m_uart->set_ISR_bits(INT_TXRDYB);
 	}
-	if (BIT(data, 3)) {
+	if (BIT(data, 3))
+	{
 		tx_enabled = 0;
 		tx_ready = 0;
 		SR &= ~STATUS_TRANSMITTER_READY;
@@ -1371,7 +1530,7 @@ void duart_channel::write_TX(uint8_t data)
 	update_interrupts();
 }
 
-void duart_channel::ACR_updated()
+void duart_channel::baud_updated()
 {
 	write_chan_reg(1, CSR);
 }

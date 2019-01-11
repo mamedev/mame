@@ -32,7 +32,7 @@ void graph_link_hle_device::device_start()
 {
 	m_buffer = std::make_unique<u8 []>(BUFLEN);
 
-	save_pointer(NAME(m_buffer.get()), BUFLEN);
+	save_pointer(NAME(m_buffer), BUFLEN);
 }
 
 
@@ -49,10 +49,11 @@ void graph_link_hle_device::device_reset()
 }
 
 
-MACHINE_CONFIG_START(graph_link_hle_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, graph_link_hle_device, rx_w))
-MACHINE_CONFIG_END
+void graph_link_hle_device::device_add_mconfig(machine_config &config)
+{
+	RS232_PORT(config, m_serial_port, default_rs232_devices, nullptr);
+	m_serial_port->rxd_handler().set(FUNC(graph_link_hle_device::rx_w));
+}
 
 
 void graph_link_hle_device::byte_collision()

@@ -28,12 +28,6 @@ enum
 #define T11_TRAP        0x01C   /* TRAP instruction vector */
 
 
-#define MCFG_T11_INITIAL_MODE(_mode) \
-	downcast<t11_device &>(*device).set_initial_mode(_mode);
-
-#define MCFG_T11_RESET(_devcb) \
-	devcb = &downcast<t11_device &>(*device).set_out_reset_func(DEVCB_##_devcb);
-
 class t11_device :  public cpu_device
 {
 public:
@@ -42,7 +36,7 @@ public:
 
 	// configuration helpers
 	void set_initial_mode(const uint16_t mode) { c_initial_mode = mode; }
-	template <class Object> devcb_base &set_out_reset_func(Object &&cb) { return m_out_reset_func.set_callback(std::forward<Object>(cb)); }
+	auto out_reset() { return m_out_reset_func.bind(); }
 
 protected:
 	t11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

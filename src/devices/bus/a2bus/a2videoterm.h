@@ -45,7 +45,7 @@ protected:
 	int m_framecnt;
 
 	required_device<mc6845_device> m_crtc;
-	required_device<palette_device> m_palette;
+	required_device<device_palette_interface> m_palette;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);

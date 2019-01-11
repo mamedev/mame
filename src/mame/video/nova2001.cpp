@@ -10,61 +10,44 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(nova2001_state,nova2001)
+void nova2001_state::nova2001_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	/* Color #1 is used for palette animation.          */
+	/*
+	  Color #1 is used for palette animation.
+	  To handle this, color entries 0-15 are based on
+	  the primary 16 colors, while color entries 16-31
+	  are based on the secondary set.
 
-	/* To handle this, color entries 0-15 are based on  */
-	/* the primary 16 colors, while color entries 16-31 */
-	/* are based on the secondary set.                  */
-
-	/* The only difference between 0-15 and 16-31 is that */
-	/* color #1 changes each time */
-
-	for (i = 0; i < 0x200; ++i)
+	  The only difference between 0-15 and 16-31 is that
+	  color #1 changes each time
+	*/
+	for (int i = 0; i < 0x200; ++i)
 	{
 		int entry;
-		int intensity,r,g,b;
-
 		if ((i & 0xf) == 1)
-		{
 			entry = ((i & 0xf0) >> 4) | ((i & 0x100) >> 4);
-		}
 		else
-		{
 			entry = ((i & 0x0f) >> 0) | ((i & 0x100) >> 4);
-		}
 
-		intensity = (color_prom[entry] >> 0) & 0x03;
-		/* red component */
-		r = (((color_prom[entry] >> 0) & 0x0c) | intensity) * 0x11;
-		/* green component */
-		g = (((color_prom[entry] >> 2) & 0x0c) | intensity) * 0x11;
-		/* blue component */
-		b = (((color_prom[entry] >> 4) & 0x0c) | intensity) * 0x11;
-
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, BBGGRRII(color_prom[entry]));
 	}
 }
 
-PALETTE_DECODER_MEMBER( nova2001_state, BBGGRRII )
+rgb_t nova2001_state::BBGGRRII(uint32_t raw)
 {
-	uint8_t i = raw & 3;
-	uint8_t r = (raw >> 0) & 0x0c;
-	uint8_t g = (raw >> 2) & 0x0c;
-	uint8_t b = (raw >> 4) & 0x0c;
+	uint8_t const i = raw & 3;
+	uint8_t const r = ((raw >> 0) & 0x0c) | i;
+	uint8_t const g = ((raw >> 2) & 0x0c) | i;
+	uint8_t const b = ((raw >> 4) & 0x0c) | i;
 
-	return rgb_t(pal4bit(r | i), pal4bit(g | i), pal4bit(b | i));
+	return rgb_t(r | (r << 4), g | (g << 4), b | (b << 4));
 }
 
 WRITE8_MEMBER(nova2001_state::ninjakun_paletteram_w)
 {
-	int i;
-
-	m_palette->write8(space,offset,data);
+	m_palette->write8(space, offset, data);
 
 	// expand the sprite palette to full length
 	if (offset < 16)
@@ -73,7 +56,7 @@ WRITE8_MEMBER(nova2001_state::ninjakun_paletteram_w)
 
 		if (offset != 1)
 		{
-			for (i = 0; i < 16; i++)
+			for (int i = 0; i < 16; i++)
 			{
 				m_palette->write8(space, 0x200 + offset + i * 16, data);
 			}

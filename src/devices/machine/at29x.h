@@ -91,28 +91,19 @@ private:
 class at29c020_device : public at29x_device
 {
 public:
-	at29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	at29c020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class at29c040_device : public at29x_device
 {
 public:
-	at29c040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	at29c040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class at29c040a_device : public at29x_device
 {
 public:
-	at29c040a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	at29c040a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
-
-#define MCFG_AT29C020_ADD(_tag )    \
-	MCFG_DEVICE_ADD(_tag, AT29C020, 0)
-
-#define MCFG_AT29C040_ADD(_tag )    \
-	MCFG_DEVICE_ADD(_tag, AT29C040, 0)
-
-#define MCFG_AT29C040A_ADD(_tag )    \
-	MCFG_DEVICE_ADD(_tag, AT29C040A, 0)
 
 #endif // MAME_MACHINE_AT29X_H

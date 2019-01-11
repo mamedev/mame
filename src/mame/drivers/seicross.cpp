@@ -115,10 +115,10 @@ void seicross_state::main_map(address_map &map)
 	map(0x0000, 0x77ff).rom();
 	map(0x7800, 0x7fff).ram().share("share1");
 	map(0x8820, 0x887f).ram().share("spriteram");
-	map(0x9000, 0x93ff).ram().w(this, FUNC(seicross_state::videoram_w)).share("videoram"); /* video RAM */
+	map(0x9000, 0x93ff).ram().w(FUNC(seicross_state::videoram_w)).share("videoram"); /* video RAM */
 	map(0x9800, 0x981f).ram().share("row_scroll");
 	map(0x9880, 0x989f).writeonly().share("spriteram2");
-	map(0x9c00, 0x9fff).ram().w(this, FUNC(seicross_state::colorram_w)).share("colorram");
+	map(0x9c00, 0x9fff).ram().w(FUNC(seicross_state::colorram_w)).share("colorram");
 	map(0xa000, 0xa000).portr("IN0");        /* IN0 */
 	map(0xa800, 0xa800).portr("IN1");        /* IN1 */
 	map(0xb000, 0xb000).portr("TEST");       /* test */
@@ -137,7 +137,7 @@ void seicross_state::mcu_nvram_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram();
 	map(0x1000, 0x10ff).ram().share("nvram");
-	map(0x2000, 0x2000).w(this, FUNC(seicross_state::dac_w));
+	map(0x2000, 0x2000).w(FUNC(seicross_state::dac_w));
 	map(0x8000, 0xf7ff).rom().region("maincpu", 0);
 	map(0xf800, 0xffff).ram().share("share1");
 }
@@ -148,7 +148,7 @@ void seicross_state::mcu_no_nvram_map(address_map &map)
 	map(0x1003, 0x1003).portr("DSW1");       /* DSW1 */
 	map(0x1005, 0x1005).portr("DSW2");       /* DSW2 */
 	map(0x1006, 0x1006).portr("DSW3");       /* DSW3 */
-	map(0x2000, 0x2000).w(this, FUNC(seicross_state::dac_w));
+	map(0x2000, 0x2000).w(FUNC(seicross_state::dac_w));
 	map(0x8000, 0xf7ff).rom().region("maincpu", 0);
 	map(0xf800, 0xffff).ram().share("share1");
 }
@@ -409,7 +409,7 @@ MACHINE_CONFIG_START(seicross_state::no_nvram)
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))  /* 20 CPU slices per frame - an high value to ensure proper */
 						/* synchronization of the CPUs */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -420,17 +420,16 @@ MACHINE_CONFIG_START(seicross_state::no_nvram)
 	MCFG_SCREEN_UPDATE_DRIVER(seicross_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seicross)
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INIT_OWNER(seicross_state, seicross)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seicross);
+	PALETTE(config, m_palette, FUNC(seicross_state::seicross_palette), 64);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000) / 12)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, seicross_state, portB_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, seicross_state, portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(18'432'000) / 12));
+	aysnd.port_b_read_callback().set(FUNC(seicross_state::portB_r));
+	aysnd.port_b_write_callback().set(FUNC(seicross_state::portB_w));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -445,7 +444,7 @@ MACHINE_CONFIG_START(seicross_state::nvram)
 	MCFG_DEVICE_MODIFY("mcu")
 	MCFG_DEVICE_PROGRAM_MAP(mcu_nvram_map)
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", seicross_state, nvram_init)
+	NVRAM(config, "nvram").set_custom_handler(FUNC(seicross_state::nvram_init));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seicross_state::friskytb)

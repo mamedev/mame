@@ -27,13 +27,13 @@ ROM_START( tvc_hbf )
 	ROM_REGION(0x4000, "hbf", 0)
 	ROM_DEFAULT_BIOS("basic")
 	ROM_SYSTEM_BIOS( 0, "basic", "BASIC" )
-	ROMX_LOAD("hbf.rom",        0x0000, 0x4000, CRC(ae34982b) SHA1(96c4154c04086c537ae1272fe051a256d2f5be3f), ROM_BIOS(1))
+	ROMX_LOAD("hbf.rom",        0x0000, 0x4000, CRC(ae34982b) SHA1(96c4154c04086c537ae1272fe051a256d2f5be3f), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "upm", "UPM" )
-	ROMX_LOAD("d_tvcupm.128",   0x0000, 0x4000, CRC(b3a567ad) SHA1(f92df6074b07f5f19e8c96ff1315da0cfeec9f74), ROM_BIOS(2))
+	ROMX_LOAD("d_tvcupm.128",   0x0000, 0x4000, CRC(b3a567ad) SHA1(f92df6074b07f5f19e8c96ff1315da0cfeec9f74), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "vtdos11", "VT-DOS v1.1" )
-	ROMX_LOAD("d_tvcdos.128",   0x0000, 0x4000, CRC(2acf8477) SHA1(07bf39b633a564f98dd4b2e93bd889501b341550), ROM_BIOS(3))
+	ROMX_LOAD("d_tvcdos.128",   0x0000, 0x4000, CRC(2acf8477) SHA1(07bf39b633a564f98dd4b2e93bd889501b341550), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "vtdos12", "VT-DOS v1.2" )
-	ROMX_LOAD("d_dos12.128",    0x0000, 0x4000, CRC(f5c35597) SHA1(2fa44ad089a51f453b580e0b13e3be96a0f14649), ROM_BIOS(4))
+	ROMX_LOAD("d_dos12.128",    0x0000, 0x4000, CRC(f5c35597) SHA1(2fa44ad089a51f453b580e0b13e3be96a0f14649), ROM_BIOS(3))
 
 	ROM_REGION(0x1000, "ram", ROMREGION_ERASE)
 ROM_END
@@ -84,11 +84,13 @@ void tvc_hbf_device::device_reset()
 //  device_add_mconfig
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(tvc_hbf_device::device_add_mconfig)
-	MCFG_FD1793_ADD("fdc", XTAL(16'000'000) / 16)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats)
-MACHINE_CONFIG_END
+void tvc_hbf_device::device_add_mconfig(machine_config &config)
+{
+	FD1793(config, m_fdc, 16_MHz_XTAL / 16);
+
+	FLOPPY_CONNECTOR(config, "fdc:0", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", tvc_hbf_floppies, "525qd", tvc_hbf_device::floppy_formats);
+}
 
 
 //-------------------------------------------------
@@ -133,7 +135,7 @@ READ8_MEMBER(tvc_hbf_device::io_read)
 	switch((offset>>2) & 0x03)
 	{
 		case 0x00:
-			return m_fdc->read(space, offset & 3);
+			return m_fdc->read(offset & 3);
 		case 0x01:
 			return (m_fdc->drq_r()<<7) | (m_fdc->intrq_r() ? 0x01 : 0x00);
 		default:
@@ -150,7 +152,7 @@ WRITE8_MEMBER(tvc_hbf_device::io_write)
 	switch((offset>>2) & 0x03)
 	{
 		case 0x00:
-			m_fdc->write(space, offset & 3, data);
+			m_fdc->write(offset & 3, data);
 			break;
 		case 0x01:
 		{

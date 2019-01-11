@@ -27,6 +27,7 @@ protected:
 	tiny_rom_entry const *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 
 	// device_sound_interface implementation

@@ -369,13 +369,13 @@ READ8_MEMBER(atarisy1_state::switch_6502_r)
 
 WRITE8_MEMBER(atarisy1_state::via_pa_w)
 {
-	m_tms->data_w(space, 0, data);
+	m_tms->data_w(data);
 }
 
 
 READ8_MEMBER(atarisy1_state::via_pa_r)
 {
-	return m_tms->status_r(space, 0);
+	return m_tms->status_r();
 }
 
 
@@ -429,23 +429,23 @@ void atarisy1_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x087fff).rom(); /* slapstic maps here */
-	map(0x2e0000, 0x2e0001).r(this, FUNC(atarisy1_state::atarisy1_int3state_r));
+	map(0x2e0000, 0x2e0001).r(FUNC(atarisy1_state::atarisy1_int3state_r));
 	map(0x400000, 0x401fff).ram();
-	map(0x800000, 0x800001).w(this, FUNC(atarisy1_state::atarisy1_xscroll_w)).share("xscroll");
-	map(0x820000, 0x820001).w(this, FUNC(atarisy1_state::atarisy1_yscroll_w)).share("yscroll");
-	map(0x840000, 0x840001).w(this, FUNC(atarisy1_state::atarisy1_priority_w));
-	map(0x860000, 0x860001).w(this, FUNC(atarisy1_state::atarisy1_bankselect_w)).share("bankselect");
+	map(0x800000, 0x800001).w(FUNC(atarisy1_state::atarisy1_xscroll_w)).share("xscroll");
+	map(0x820000, 0x820001).w(FUNC(atarisy1_state::atarisy1_yscroll_w)).share("yscroll");
+	map(0x840000, 0x840001).w(FUNC(atarisy1_state::atarisy1_priority_w));
+	map(0x860000, 0x860001).w(FUNC(atarisy1_state::atarisy1_bankselect_w)).share("bankselect");
 	map(0x880000, 0x880001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x8a0000, 0x8a0001).w(this, FUNC(atarisy1_state::video_int_ack_w));
+	map(0x8a0000, 0x8a0001).w(FUNC(atarisy1_state::video_int_ack_w));
 	map(0x8c0000, 0x8c0001).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x900000, 0x9fffff).ram();
 	map(0xa00000, 0xa01fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
-	map(0xa02000, 0xa02fff).ram().w(this, FUNC(atarisy1_state::atarisy1_spriteram_w)).share("mob");
+	map(0xa02000, 0xa02fff).ram().w(FUNC(atarisy1_state::atarisy1_spriteram_w)).share("mob");
 	map(0xa03000, 0xa03fff).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
 	map(0xb00000, 0xb007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xf00000, 0xf00fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
-	map(0xf20000, 0xf20007).r(this, FUNC(atarisy1_state::trakball_r));
-	map(0xf40000, 0xf4001f).rw(this, FUNC(atarisy1_state::adc_r), FUNC(atarisy1_state::adc_w)).umask16(0x00ff);
+	map(0xf20000, 0xf20007).r(FUNC(atarisy1_state::trakball_r));
+	map(0xf40000, 0xf4001f).rw(FUNC(atarisy1_state::adc_r), FUNC(atarisy1_state::adc_w)).umask16(0x00ff);
 	map(0xf60000, 0xf60003).portr("F60000");
 	map(0xf80001, 0xf80001).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w)); /* used by roadbls2 */
 	map(0xfc0001, 0xfc0001).r(m_soundcomm, FUNC(atari_sound_comm_device::main_response_r));
@@ -466,7 +466,7 @@ void atarisy1_state::sound_map(address_map &map)
 	map(0x1000, 0x100f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0x1800, 0x1801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x1810, 0x1810).rw(m_soundcomm, FUNC(atari_sound_comm_device::sound_command_r), FUNC(atari_sound_comm_device::sound_response_w));
-	map(0x1820, 0x1820).r(this, FUNC(atarisy1_state::switch_6502_r));
+	map(0x1820, 0x1820).r(FUNC(atarisy1_state::switch_6502_r));
 	map(0x1820, 0x1827).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0x1870, 0x187f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x4000, 0xffff).rom();
@@ -707,6 +707,23 @@ GFXDECODE_END
  *
  *************************************/
 
+void atarisy1_state::add_adc(machine_config &config)
+{
+	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
+	m_adc->eoc_callback().set(m_ajsint, FUNC(input_merger_device::in_w<1>));
+	// IN7 = J102 pin 2
+	// IN6 = J102 pin 3
+	// IN5 = J102 pin 4
+	// IN4 = J102 pin 6
+	// IN3 = J102 pin 8
+	// IN2 = J102 pin 9
+	// IN1 = J102 pin 7
+	// IN0 = J102 pin 5
+
+	INPUT_MERGER_ALL_HIGH(config, m_ajsint);
+	m_ajsint->output_handler().set(FUNC(atarisy1_state::joystick_int));
+}
+
 MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 
 	/* basic machine hardware */
@@ -719,31 +736,16 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_MACHINE_START_OVERRIDE(atarisy1_state,atarisy1)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy1_state,atarisy1)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
-	MCFG_ADC0808_EOC_CB(WRITELINE("ajsint", input_merger_device, in_w<1>))
-	// IN7 = J102 pin 2
-	// IN6 = J102 pin 3
-	// IN5 = J102 pin 4
-	// IN4 = J102 pin 6
-	// IN3 = J102 pin 8
-	// IN2 = J102 pin 9
-	// IN1 = J102 pin 7
-	// IN0 = J102 pin 5
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_INPUT_MERGER_ALL_HIGH("ajsint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, atarisy1_state, joystick_int))
+	LS259(config, m_outlatch); // 15H (TTL) or 14F (LSI)
+	m_outlatch->q_out_cb<0>().set("ymsnd", FUNC(ym2151_device::reset_w));
+	m_outlatch->q_out_cb<4>().set_output("led0").invert(); // J106 pin 4
+	m_outlatch->q_out_cb<5>().set_output("led1").invert(); // J106 pin 3
+	m_outlatch->q_out_cb<6>().set(FUNC(atarisy1_state::coin_counter_right_w));
+	m_outlatch->q_out_cb<7>().set(FUNC(atarisy1_state::coin_counter_left_w));
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
-
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 15H (TTL) or 14F (LSI)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("ymsnd", ym2151_device, reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // J106 pin 4
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // J106 pin 3
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, atarisy1_state, coin_counter_right_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, atarisy1_state, coin_counter_left_w))
-
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_TIMER_DRIVER_ADD("scan_timer", atarisy1_state, atarisy1_int3_callback)
 	MCFG_TIMER_DRIVER_ADD("int3off_timer", atarisy1_state, atarisy1_int3off_callback)
@@ -752,14 +754,13 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarisy1)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::IRGB_4444, 1024);
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, atarisy1_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, atarisy1_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
 
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", atarisy1_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, atarisy1_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -767,20 +768,21 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	/* video timing comes from an 82S163 (H) and an 82S129 (V) */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarisy1_state, screen_update_atarisy1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarisy1_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(atarisy1_state,atarisy1)
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_6))
+	ATARI_SOUND_COMM(config, "soundcomm", "audiocpu")
+		.int_callback().set_inputline("maincpu", M68K_IRQ_6);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", ATARI_CLOCK_14MHz/4));
+	ymsnd.irq_handler().set(m_soundcomm, FUNC(atari_sound_comm_device::ym2151_irq_gen));
+	ymsnd.add_route(0, "lspeaker", 0.80);
+	ymsnd.add_route(1, "rspeaker", 0.80);
 
 	MCFG_DEVICE_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
@@ -791,73 +793,76 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, ATARI_CLOCK_14MHz/8)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, atarisy1_state, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, atarisy1_state, via_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, atarisy1_state, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, atarisy1_state, via_pb_w))
+	via6522_device &via(VIA6522(config, "via6522_0", ATARI_CLOCK_14MHz/8));
+	via.readpa_handler().set(FUNC(atarisy1_state::via_pa_r));
+	via.readpb_handler().set(FUNC(atarisy1_state::via_pb_r));
+	via.writepa_handler().set(FUNC(atarisy1_state::via_pa_w));
+	via.writepb_handler().set(FUNC(atarisy1_state::via_pb_w));
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(atarisy1_state::marble)
+void atarisy1_state::marble(machine_config &config)
+{
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 103)
+	add_adc(config);
+	SLAPSTIC(config, "slapstic", 103, true);
+}
 
-	// No joystick
-	MCFG_DEVICE_REMOVE("adc")
-	MCFG_DEVICE_REMOVE("ajsint")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(atarisy1_state::peterpak)
+void atarisy1_state::peterpak(machine_config &config)
+{
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 107)
+	add_adc(config);
+	SLAPSTIC(config, "slapstic", 107, true);
 
 	// Digital joystick read through ADC
-	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0808_IN0_CB(READ8(*this, atarisy1_state, digital_joystick_r<0>))
-	MCFG_ADC0808_IN1_CB(READ8(*this, atarisy1_state, digital_joystick_r<1>))
-	MCFG_ADC0808_IN2_CB(READ8(*this, atarisy1_state, digital_joystick_r<2>))
-	MCFG_ADC0808_IN3_CB(READ8(*this, atarisy1_state, digital_joystick_r<3>))
-MACHINE_CONFIG_END
+	m_adc->in_callback<0>().set(FUNC(atarisy1_state::digital_joystick_r<0>));
+	m_adc->in_callback<1>().set(FUNC(atarisy1_state::digital_joystick_r<1>));
+	m_adc->in_callback<2>().set(FUNC(atarisy1_state::digital_joystick_r<2>));
+	m_adc->in_callback<3>().set(FUNC(atarisy1_state::digital_joystick_r<3>));
+}
 
-MACHINE_CONFIG_START(atarisy1_state::indytemp)
+void atarisy1_state::indytemp(machine_config &config)
+{
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 105)
+	add_adc(config);
+	SLAPSTIC(config, "slapstic", 105, true);
 
 	// Digital joystick read through ADC
-	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0808_IN0_CB(READ8(*this, atarisy1_state, digital_joystick_r<0>))
-	MCFG_ADC0808_IN1_CB(READ8(*this, atarisy1_state, digital_joystick_r<1>))
-	MCFG_ADC0808_IN2_CB(READ8(*this, atarisy1_state, digital_joystick_r<2>))
-	MCFG_ADC0808_IN3_CB(READ8(*this, atarisy1_state, digital_joystick_r<3>))
-MACHINE_CONFIG_END
+	m_adc->in_callback<0>().set(FUNC(atarisy1_state::digital_joystick_r<0>));
+	m_adc->in_callback<1>().set(FUNC(atarisy1_state::digital_joystick_r<1>));
+	m_adc->in_callback<2>().set(FUNC(atarisy1_state::digital_joystick_r<2>));
+	m_adc->in_callback<3>().set(FUNC(atarisy1_state::digital_joystick_r<3>));
+}
 
-MACHINE_CONFIG_START(atarisy1_state::roadrunn)
+void atarisy1_state::roadrunn(machine_config &config)
+{
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 108)
+	add_adc(config);
+	SLAPSTIC(config, "slapstic", 108, true);
 
 	// Hall-effect analog joystick
-	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0808_IN6_CB(IOPORT("IN0"))
-	MCFG_ADC0808_IN7_CB(IOPORT("IN1"))
-MACHINE_CONFIG_END
+	m_adc->in_callback<6>().set_ioport("IN0");
+	m_adc->in_callback<7>().set_ioport("IN1");
+}
 
-MACHINE_CONFIG_START(atarisy1_state::roadb109)
+void atarisy1_state::roadb109(machine_config &config)
+{
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 109)
+	add_adc(config);
+	SLAPSTIC(config, "slapstic", 109, true);
 
 	// Road Blasters gas pedal
-	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0808_IN2_CB(IOPORT("IN1"))
-MACHINE_CONFIG_END
+	m_adc->in_callback<2>().set_ioport("IN1");
+}
 
-MACHINE_CONFIG_START(atarisy1_state::roadb110)
+void atarisy1_state::roadb110(machine_config &config)
+{
 	atarisy1(config);
-	MCFG_SLAPSTIC_ADD("slapstic", 110)
+	add_adc(config);
+	SLAPSTIC(config, "slapstic", 110, true);
 
 	// Road Blasters gas pedal
-	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0808_IN2_CB(IOPORT("IN1"))
-MACHINE_CONFIG_END
+	m_adc->in_callback<2>().set_ioport("IN1");
+}
 
 
 
@@ -879,10 +884,10 @@ MACHINE_CONFIG_END
 */
 
 #define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1) | ROM_SKIP(1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios) | ROM_SKIP(1))
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define MOTHERBOARD_BIOS                                                                                                       \
 	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (Rev 2)" )                                                                     \
@@ -1913,7 +1918,11 @@ ROM_START( roadblstgu )
 	ROM_LOAD( "136048-1174.a7", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )//
 	ROM_LOAD( "136048-1173.a5", 0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )//
 
+	// FIXME: this game requires the LSI BIOS, so why are we loading the PROMs that are only present on TTL boards?
 	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (Rev 2)" )
+	ROM_SYSTEM_BIOS( 1, "ttl1", "TTL Motherboard (Rev 1)" )
+	ROM_SYSTEM_BIOS( 2, "lsi", "LSI Motherboard" )
 	MOTHERBOARD_PROMS
 ROM_END
 
@@ -2404,7 +2413,11 @@ ROM_START( roadblstcg )
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
 
+	// FIXME: this game requires the LSI BIOS, so why are we loading the PROMs that are only present on TTL boards?
 	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (Rev 2)" )
+	ROM_SYSTEM_BIOS( 1, "ttl1", "TTL Motherboard (Rev 1)" )
+	ROM_SYSTEM_BIOS( 2, "lsi", "LSI Motherboard" )
 	MOTHERBOARD_PROMS
 ROM_END
 

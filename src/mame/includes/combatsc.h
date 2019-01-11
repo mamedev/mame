@@ -5,18 +5,23 @@
     Combat School
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_COMBATSC_H
+#define MAME_INCLUDES_COMBATSC_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/upd7759.h"
 #include "sound/msm5205.h"
 #include "video/k007121.h"
+#include "emupal.h"
 #include "screen.h"
 
 class combatsc_state : public driver_device
 {
 public:
-	combatsc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	combatsc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121_1(*this, "k007121_1"),
@@ -106,10 +111,10 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(combatsc);
 	DECLARE_VIDEO_START(combatsc);
-	DECLARE_PALETTE_INIT(combatsc);
+	void combatsc_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(combatscb);
 	DECLARE_VIDEO_START(combatscb);
-	DECLARE_PALETTE_INIT(combatscb);
+	void combatscb_palette(palette_device &palette) const;
 	uint32_t screen_update_combatsc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_combatscb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit, bitmap_ind8 &priority_bitmap, uint32_t pri_mask );
@@ -121,3 +126,5 @@ public:
 	void combatscb_map(address_map &map);
 	void combatscb_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_COMBATSC_H

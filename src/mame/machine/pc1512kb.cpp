@@ -50,17 +50,18 @@ const tiny_rom_entry *pc1512_keyboard_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1512_keyboard_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(I8048_TAG, I8048, XTAL(6'000'000))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, pc1512_keyboard_device, kb_bus_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, pc1512_keyboard_device, kb_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, pc1512_keyboard_device, kb_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, pc1512_keyboard_device, kb_p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, pc1512_keyboard_device, kb_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, pc1512_keyboard_device, kb_t1_r))
+void pc1512_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	I8048(config, m_maincpu, XTAL(6'000'000));
+	m_maincpu->bus_in_cb().set(FUNC(pc1512_keyboard_device::kb_bus_r));
+	m_maincpu->p1_out_cb().set(FUNC(pc1512_keyboard_device::kb_p1_w));
+	m_maincpu->p2_in_cb().set(FUNC(pc1512_keyboard_device::kb_p2_r));
+	m_maincpu->p2_out_cb().set(FUNC(pc1512_keyboard_device::kb_p2_w));
+	m_maincpu->t0_in_cb().set(FUNC(pc1512_keyboard_device::kb_t0_r));
+	m_maincpu->t1_in_cb().set(FUNC(pc1512_keyboard_device::kb_t1_r));
 
-	MCFG_VCS_CONTROL_PORT_ADD("joy", vcs_control_port_devices, nullptr)
-MACHINE_CONFIG_END
+	VCS_CONTROL_PORT(config, "joy", vcs_control_port_devices, nullptr);
+}
 
 
 //-------------------------------------------------
@@ -204,7 +205,7 @@ pc1512_keyboard_device::pc1512_keyboard_device(const machine_config &mconfig, co
 	m_maincpu(*this, I8048_TAG),
 	m_joy(*this, "joy"),
 	m_y(*this, "Y%u", 1),
-	m_led(*this, "led%u", 0U),
+	m_leds(*this, "led%u", 0U),
 	m_write_clock(*this),
 	m_write_data(*this),
 	m_data_in(1),
@@ -223,7 +224,7 @@ pc1512_keyboard_device::pc1512_keyboard_device(const machine_config &mconfig, co
 
 void pc1512_keyboard_device::device_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 	// allocate timers
 	m_reset_timer = timer_alloc();
 
@@ -350,10 +351,7 @@ READ8_MEMBER( pc1512_keyboard_device::kb_bus_r )
 	if (!BIT(m_kb_y, 8)) data &= m_y[8]->read();
 	if (!BIT(m_kb_y, 9)) data &= m_y[9]->read();
 	if (!BIT(m_kb_y, 10)) data &= m_y[10]->read();
-	if (!m_joy_com)
-	{
-		data &= m_joy->joy_r();
-	}
+	if (!m_joy_com) data &= m_joy->read_joy();
 
 	return data;
 }
@@ -442,10 +440,10 @@ WRITE8_MEMBER( pc1512_keyboard_device::kb_p2_w )
 	m_write_clock(BIT(data, 1));
 
 	// CAPS LOCK
-	m_led[LED_CAPS] = BIT(data, 2);
+	m_leds[LED_CAPS] = BIT(data, 2);
 
 	// NUM LOCK
-	m_led[LED_NUM] = BIT(data, 3);
+	m_leds[LED_NUM] = BIT(data, 3);
 
 	// keyboard row
 	m_kb_y = (((data >> 4) & 0x07) << 8) | (m_kb_y & 0xff);

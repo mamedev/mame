@@ -161,20 +161,20 @@ WRITE8_MEMBER(bottom9_state::sound_bank_w)
 
 void bottom9_state::main_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(this, FUNC(bottom9_state::k052109_051960_r), FUNC(bottom9_state::k052109_051960_w));
-	map(0x0000, 0x07ff).rw(this, FUNC(bottom9_state::bottom9_bankedram1_r), FUNC(bottom9_state::bottom9_bankedram1_w));
-	map(0x1f80, 0x1f80).w(this, FUNC(bottom9_state::bankswitch_w));
-	map(0x1f90, 0x1f90).w(this, FUNC(bottom9_state::bottom9_1f90_w));
+	map(0x0000, 0x3fff).rw(FUNC(bottom9_state::k052109_051960_r), FUNC(bottom9_state::k052109_051960_w));
+	map(0x0000, 0x07ff).rw(FUNC(bottom9_state::bottom9_bankedram1_r), FUNC(bottom9_state::bottom9_bankedram1_w));
+	map(0x1f80, 0x1f80).w(FUNC(bottom9_state::bankswitch_w));
+	map(0x1f90, 0x1f90).w(FUNC(bottom9_state::bottom9_1f90_w));
 	map(0x1fa0, 0x1fa0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x1fb0, 0x1fb0).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x1fc0, 0x1fc0).w(this, FUNC(bottom9_state::bottom9_sh_irqtrigger_w));
+	map(0x1fc0, 0x1fc0).w(FUNC(bottom9_state::bottom9_sh_irqtrigger_w));
 	map(0x1fd0, 0x1fd0).portr("SYSTEM");
 	map(0x1fd1, 0x1fd1).portr("P1");
 	map(0x1fd2, 0x1fd2).portr("P2");
 	map(0x1fd3, 0x1fd3).portr("DSW1");
 	map(0x1fe0, 0x1fe0).portr("DSW2");
 	map(0x1ff0, 0x1fff).w(m_k051316, FUNC(k051316_device::ctrl_w));
-	map(0x2000, 0x27ff).rw(this, FUNC(bottom9_state::bottom9_bankedram2_r), FUNC(bottom9_state::bottom9_bankedram2_w)).share("palette");
+	map(0x2000, 0x27ff).rw(FUNC(bottom9_state::bottom9_bankedram2_r), FUNC(bottom9_state::bottom9_bankedram2_w)).share("palette");
 	map(0x4000, 0x5fff).ram();
 	map(0x6000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom();
@@ -184,11 +184,11 @@ void bottom9_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(bottom9_state::sound_bank_w));
+	map(0x9000, 0x9000).w(FUNC(bottom9_state::sound_bank_w));
 	map(0xa000, 0xa00d).rw(m_k007232_1, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xb000, 0xb00d).rw(m_k007232_2, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xd000, 0xd000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xf000, 0xf000).w(this, FUNC(bottom9_state::nmi_enable_w));
+	map(0xf000, 0xf000).w(FUNC(bottom9_state::nmi_enable_w));
 }
 
 
@@ -300,60 +300,59 @@ void bottom9_state::machine_reset()
 	m_nmienable = 0;
 }
 
-MACHINE_CONFIG_START(bottom9_state::bottom9)
-
+void bottom9_state::bottom9(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8) // 63C09E
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); // 63C09E
+	m_maincpu->set_addrmap(AS_PROGRAM, &bottom9_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bottom9_state, bottom9_sound_interrupt, 8*60)  /* irq is triggered by the main CPU */
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bottom9_state::audio_map);
+	m_audiocpu->set_periodic_int(FUNC(bottom9_state::bottom9_sound_interrupt), attotime::from_hz(8*60));  /* irq is triggered by the main CPU */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(bottom9_state, screen_update_bottom9)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bottom9_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(bottom9_state::screen_update_bottom9));
+	screen.screen_vblank().set(FUNC(bottom9_state::vblank_irq));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0) // 051961 on schematics
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(bottom9_state, tile_callback)
+	K052109(config, m_k052109, 0); // 051961 on schematics
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(bottom9_state::tile_callback), this);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(bottom9_state, sprite_callback)
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette(m_palette);
+	m_k051960->set_screen_tag("screen");
+	m_k051960->set_sprite_callback(FUNC(bottom9_state::sprite_callback), this);
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_CB(bottom9_state, zoom_callback)
+	K051316(config, m_k051316, 0);
+	m_k051316->set_palette(m_palette);
+	m_k051316->set_zoom_callback(FUNC(bottom9_state::zoom_callback), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("k007232_1", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, bottom9_state, volume_callback0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
+	K007232(config, m_k007232_1, XTAL(3'579'545));
+	m_k007232_1->port_write().set(FUNC(bottom9_state::volume_callback0));
+	m_k007232_1->add_route(0, "mono", 0.40);
+	m_k007232_1->add_route(1, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("k007232_2", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, bottom9_state, volume_callback1))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-MACHINE_CONFIG_END
+	K007232(config, m_k007232_2, XTAL(3'579'545));
+	m_k007232_2->port_write().set(FUNC(bottom9_state::volume_callback1));
+	m_k007232_2->add_route(0, "mono", 0.40);
+	m_k007232_2->add_route(1, "mono", 0.40);
+}
 
 
 /***************************************************************************

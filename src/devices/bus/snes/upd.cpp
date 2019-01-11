@@ -114,7 +114,7 @@ READ16_MEMBER( sns_rom20_necdsp_device::necdsp_data_r )
 
 void sns_rom20_necdsp_device::dsp_prg_map_lorom(address_map &map)
 {
-	map(0x0000, 0x07ff).r(this, FUNC(sns_rom20_necdsp_device::necdsp_prg_r));
+	map(0x0000, 0x07ff).r(FUNC(sns_rom20_necdsp_device::necdsp_prg_r));
 }
 
 
@@ -124,7 +124,7 @@ void sns_rom20_necdsp_device::dsp_prg_map_lorom(address_map &map)
 
 void sns_rom20_necdsp_device::dsp_data_map_lorom(address_map &map)
 {
-	map(0x0000, 0x03ff).r(this, FUNC(sns_rom20_necdsp_device::necdsp_data_r));
+	map(0x0000, 0x03ff).r(FUNC(sns_rom20_necdsp_device::necdsp_data_r));
 }
 
 
@@ -172,7 +172,7 @@ READ16_MEMBER( sns_rom21_necdsp_device::necdsp_data_r )
 
 void sns_rom21_necdsp_device::dsp_prg_map_hirom(address_map &map)
 {
-	map(0x0000, 0x07ff).r(this, FUNC(sns_rom21_necdsp_device::necdsp_prg_r));
+	map(0x0000, 0x07ff).r(FUNC(sns_rom21_necdsp_device::necdsp_prg_r));
 }
 
 
@@ -182,7 +182,7 @@ void sns_rom21_necdsp_device::dsp_prg_map_hirom(address_map &map)
 
 void sns_rom21_necdsp_device::dsp_data_map_hirom(address_map &map)
 {
-	map(0x0000, 0x03ff).r(this, FUNC(sns_rom21_necdsp_device::necdsp_data_r));
+	map(0x0000, 0x03ff).r(FUNC(sns_rom21_necdsp_device::necdsp_data_r));
 }
 
 //-------------------------------------------------
@@ -282,7 +282,7 @@ READ16_MEMBER( sns_rom_setadsp_device::setadsp_data_r )
 
 void sns_rom_setadsp_device::st01x_prg_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(sns_rom_setadsp_device::setadsp_prg_r));
+	map(0x0000, 0x3fff).r(FUNC(sns_rom_setadsp_device::setadsp_prg_r));
 }
 
 
@@ -292,7 +292,7 @@ void sns_rom_setadsp_device::st01x_prg_map(address_map &map)
 
 void sns_rom_setadsp_device::st01x_data_map(address_map &map)
 {
-	map(0x0000, 0x07ff).r(this, FUNC(sns_rom_setadsp_device::setadsp_data_r));
+	map(0x0000, 0x07ff).r(FUNC(sns_rom_setadsp_device::setadsp_data_r));
 }
 
 

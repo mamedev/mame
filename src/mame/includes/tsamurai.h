@@ -1,13 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
+#ifndef MAME_INCLUDES_TSAMURAI_H
+#define MAME_INCLUDES_TSAMURAI_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class tsamurai_state : public driver_device
 {
 public:
-	tsamurai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tsamurai_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_audio2(*this, "audio2"),
@@ -18,8 +23,16 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_bg_videoram(*this, "bg_videoram"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
+	void tsamurai(machine_config &config);
+	void m660(machine_config &config);
+	void vsgongf(machine_config &config);
+
+	void init_the26thz();
+
+private:
 	// common
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
@@ -64,7 +77,6 @@ public:
 	DECLARE_VIDEO_START(m660);
 	DECLARE_VIDEO_START(tsamurai);
 	DECLARE_VIDEO_START(vsgongf);
-	void init_the26thz();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -72,9 +84,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(vsgongf_sound_interrupt);
 
-	void tsamurai(machine_config &config);
-	void m660(machine_config &config);
-	void vsgongf(machine_config &config);
 	void m660_map(address_map &map);
 	void main_map(address_map &map);
 	void sound1_m660_map(address_map &map);
@@ -88,11 +97,10 @@ public:
 	void vsgongf_map(address_map &map);
 	void z80_io_map(address_map &map);
 	void z80_m660_io_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_audio2;
@@ -133,3 +141,5 @@ private:
 	TILE_GET_INFO_MEMBER(get_vsgongf_tile_info);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
+
+#endif // MAME_INCLUDES_TSAMURAI_H

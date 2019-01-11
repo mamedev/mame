@@ -51,7 +51,7 @@ void tv965_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x01fff).ram().share("nvram");
 	map(0x02000, 0x02007).rw("crtc", FUNC(scn2672_device::read), FUNC(scn2672_device::write));
-	map(0x04000, 0x04000).r(this, FUNC(tv965_state::ga_hack_r));
+	map(0x04000, 0x04000).r(FUNC(tv965_state::ga_hack_r));
 	map(0x06200, 0x06203).rw("acia1", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x06400, 0x06403).rw("acia2", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x08000, 0x09fff).ram().mirror(0x2000).share("charram");
@@ -70,30 +70,31 @@ void tv965_state::program_map(address_map &map)
 static INPUT_PORTS_START( tv965 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tv965_state::tv965)
-	MCFG_DEVICE_ADD("maincpu", G65816, 44.4528_MHz_XTAL / 10)
-	MCFG_DEVICE_DATA_MAP(mem_map)
-	MCFG_DEVICE_PROGRAM_MAP(program_map)
+void tv965_state::tv965(machine_config &config)
+{
+	G65816(config, m_maincpu, 44.4528_MHz_XTAL / 10);
+	m_maincpu->set_addrmap(AS_DATA, &tv965_state::mem_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tv965_state::program_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // CXK5864BP-10L + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // CXK5864BP-10L + battery
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(26.9892_MHz_XTAL, 1020, 0, 800, 441, 0, 416)
-	//MCFG_SCREEN_RAW_PARAMS(44.4528_MHz_XTAL, 1680, 0, 1320, 441, 0, 416)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2672_device, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(26.9892_MHz_XTAL, 1020, 0, 800, 441, 0, 416);
+	//m_screen->set_raw(44.4528_MHz_XTAL, 1680, 0, 1320, 441, 0, 416);
+	m_screen->set_screen_update("crtc", FUNC(scn2672_device::screen_update));
 
-	MCFG_DEVICE_ADD("crtc", SCN2672, 26.9892_MHz_XTAL / 10)
-	MCFG_SCN2672_CHARACTER_WIDTH(10)
-	MCFG_SCN2672_DRAW_CHARACTER_CALLBACK_OWNER(tv965_state, draw_character)
-	MCFG_SCN2672_INTR_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	scn2672_device &crtc(SCN2672(config, "crtc", 26.9892_MHz_XTAL / 10));
+	crtc.set_character_width(10);
+	crtc.set_display_callback(FUNC(tv965_state::draw_character));
+	crtc.intr_callback().set_inputline("maincpu", INPUT_LINE_NMI);
+	crtc.set_screen("screen");
 
-	MCFG_DEVICE_ADD("acia1", MOS6551, 0)
-	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL / 2) // divider not verified, possibly even programmable
+	mos6551_device &acia1(MOS6551(config, "acia1", 0));
+	acia1.set_xtal(3.6864_MHz_XTAL / 2); // divider not verified, possibly even programmable
 
-	MCFG_DEVICE_ADD("acia2", MOS6551, 0)
-	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL / 2) // divider not verified, possibly even programmable
-MACHINE_CONFIG_END
+	mos6551_device &acia2(MOS6551(config, "acia2", 0));
+	acia2.set_xtal(3.6864_MHz_XTAL / 2); // divider not verified, possibly even programmable
+}
 
 /**************************************************************************************************************
 

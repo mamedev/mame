@@ -278,8 +278,8 @@ void slapfght_state::perfrman_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x8800, 0x8fff).ram().share("share1");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(slapfght_state::videoram_w)).share("videoram");
-	map(0x9800, 0x9fff).ram().w(this, FUNC(slapfght_state::colorram_w)).share("colorram");
+	map(0x9000, 0x97ff).ram().w(FUNC(slapfght_state::videoram_w)).share("videoram");
+	map(0x9800, 0x9fff).ram().w(FUNC(slapfght_state::colorram_w)).share("colorram");
 	map(0xa000, 0xa7ff).ram().share("spriteram");
 }
 
@@ -289,14 +289,14 @@ void slapfght_state::tigerh_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xcfff).ram().share("share1");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(slapfght_state::videoram_w)).share("videoram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(slapfght_state::colorram_w)).share("colorram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(slapfght_state::videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(slapfght_state::colorram_w)).share("colorram");
 	map(0xe000, 0xe7ff).ram().share("spriteram");
-	map(0xe800, 0xe800).w(this, FUNC(slapfght_state::scrollx_lo_w));
-	map(0xe801, 0xe801).w(this, FUNC(slapfght_state::scrollx_hi_w));
-	map(0xe802, 0xe802).w(this, FUNC(slapfght_state::scrolly_w));
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(slapfght_state::fixram_w)).share("fixvideoram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(slapfght_state::fixcol_w)).share("fixcolorram");
+	map(0xe800, 0xe800).w(FUNC(slapfght_state::scrollx_lo_w));
+	map(0xe801, 0xe801).w(FUNC(slapfght_state::scrollx_hi_w));
+	map(0xe802, 0xe802).w(FUNC(slapfght_state::scrolly_w));
+	map(0xf000, 0xf7ff).ram().w(FUNC(slapfght_state::fixram_w)).share("fixvideoram");
+	map(0xf800, 0xffff).ram().w(FUNC(slapfght_state::fixcol_w)).share("fixcolorram");
 }
 
 void slapfght_state::tigerh_map_mcu(address_map &map)
@@ -308,7 +308,7 @@ void slapfght_state::tigerh_map_mcu(address_map &map)
 void slapfght_state::tigerhb1_map(address_map &map)
 {
 	tigerh_map(map);
-	map(0xe803, 0xe803).rw(this, FUNC(slapfght_state::tigerhb1_prot_r), FUNC(slapfght_state::tigerhb1_prot_w));
+	map(0xe803, 0xe803).rw(FUNC(slapfght_state::tigerhb1_prot_r), FUNC(slapfght_state::tigerhb1_prot_w));
 }
 
 void slapfght_state::tigerhb2_map(address_map &map)
@@ -324,14 +324,14 @@ void slapfght_state::slapfigh_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xcfff).ram().share("share1");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(slapfght_state::videoram_w)).share("videoram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(slapfght_state::colorram_w)).share("colorram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(slapfght_state::videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(slapfght_state::colorram_w)).share("colorram");
 	map(0xe000, 0xe7ff).ram().share("spriteram");
-	map(0xe800, 0xe800).w(this, FUNC(slapfght_state::scrollx_lo_w));
-	map(0xe801, 0xe801).w(this, FUNC(slapfght_state::scrollx_hi_w));
-	map(0xe802, 0xe802).w(this, FUNC(slapfght_state::scrolly_w));
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(slapfght_state::fixram_w)).share("fixvideoram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(slapfght_state::fixcol_w)).share("fixcolorram");
+	map(0xe800, 0xe800).w(FUNC(slapfght_state::scrollx_lo_w));
+	map(0xe801, 0xe801).w(FUNC(slapfght_state::scrollx_hi_w));
+	map(0xe802, 0xe802).w(FUNC(slapfght_state::scrolly_w));
+	map(0xf000, 0xf7ff).ram().w(FUNC(slapfght_state::fixram_w)).share("fixvideoram");
+	map(0xf800, 0xffff).ram().w(FUNC(slapfght_state::fixcol_w)).share("fixcolorram");
 }
 
 void slapfght_state::slapfigh_map_mcu(address_map &map)
@@ -349,7 +349,7 @@ void slapfght_state::slapfighb1_map(address_map &map)
 void slapfght_state::getstar_map(address_map &map)
 {
 	slapfigh_map(map);
-	map(0xe803, 0xe803).rw(this, FUNC(slapfght_state::getstar_mcusim_r), FUNC(slapfght_state::getstar_mcusim_w));
+	map(0xe803, 0xe803).rw(FUNC(slapfght_state::getstar_mcusim_r), FUNC(slapfght_state::getstar_mcusim_w));
 }
 
 void slapfght_state::slapfighb2_map(address_map &map)
@@ -358,15 +358,15 @@ void slapfght_state::slapfighb2_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xcfff).ram().share("share1");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(slapfght_state::videoram_w)).share("videoram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(slapfght_state::colorram_w)).share("colorram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(slapfght_state::videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(slapfght_state::colorram_w)).share("colorram");
 	map(0xe000, 0xe7ff).ram().share("spriteram");
-	map(0xe800, 0xe800).w(this, FUNC(slapfght_state::scrollx_hi_w));
-	map(0xe802, 0xe802).w(this, FUNC(slapfght_state::scrolly_w));
-	map(0xe803, 0xe803).w(this, FUNC(slapfght_state::scrollx_lo_w));
+	map(0xe800, 0xe800).w(FUNC(slapfght_state::scrollx_hi_w));
+	map(0xe802, 0xe802).w(FUNC(slapfght_state::scrolly_w));
+	map(0xe803, 0xe803).w(FUNC(slapfght_state::scrollx_lo_w));
 	map(0xec00, 0xefff).rom(); // it reads a copy of the logo from here!
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(slapfght_state::fixram_w)).share("fixvideoram");
-	map(0xf800, 0xffff).ram().w(this, FUNC(slapfght_state::fixcol_w)).share("fixcolorram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(slapfght_state::fixram_w)).share("fixvideoram");
+	map(0xf800, 0xffff).ram().w(FUNC(slapfght_state::fixcol_w)).share("fixcolorram");
 }
 
 
@@ -402,28 +402,28 @@ READ8_MEMBER(slapfght_state::vblank_r)
 void slapfght_state::io_map_nomcu(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(slapfght_state::vblank_r));
+	map(0x00, 0x00).r(FUNC(slapfght_state::vblank_r));
 	map(0x00, 0x0f).w("mainlatch", FUNC(ls259_device::write_a0));
 }
 
 void slapfght_state::io_map_mcu(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(slapfght_state::tigerh_mcu_status_r));
+	map(0x00, 0x00).r(FUNC(slapfght_state::tigerh_mcu_status_r));
 	map(0x00, 0x0f).w("mainlatch", FUNC(ls259_device::write_a0));
 }
 
 void slapfght_state::getstarb1_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(slapfght_state::getstarb1_prot_r));
+	map(0x00, 0x00).r(FUNC(slapfght_state::getstarb1_prot_r));
 	map(0x00, 0x0f).w("mainlatch", FUNC(ls259_device::write_a0));
 }
 
 void slapfght_state::getstarb2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(slapfght_state::getstar_mcusim_status_r));
+	map(0x00, 0x00).r(FUNC(slapfght_state::getstar_mcusim_status_r));
 	map(0x00, 0x0f).w("mainlatch", FUNC(ls259_device::write_a0));
 }
 
@@ -456,7 +456,7 @@ void slapfght_state::perfrman_sound_map(address_map &map)
 	map(0xa090, 0xa090).w("ay2", FUNC(ay8910_device::address_w));
 	map(0xa091, 0xa091).r("ay2", FUNC(ay8910_device::data_r));
 	map(0xa092, 0xa092).w("ay2", FUNC(ay8910_device::data_w));
-	map(0xa0e0, 0xa0e0).select(0x0010).w(this, FUNC(slapfght_state::sound_nmi_enable_w));
+	map(0xa0e0, 0xa0e0).select(0x0010).w(FUNC(slapfght_state::sound_nmi_enable_w));
 }
 
 void slapfght_state::tigerh_sound_map(address_map &map)
@@ -468,7 +468,7 @@ void slapfght_state::tigerh_sound_map(address_map &map)
 	map(0xa090, 0xa090).w("ay2", FUNC(ay8910_device::address_w));
 	map(0xa091, 0xa091).r("ay2", FUNC(ay8910_device::data_r));
 	map(0xa092, 0xa092).w("ay2", FUNC(ay8910_device::data_w));
-	map(0xa0e0, 0xa0e0).select(0x0010).w(this, FUNC(slapfght_state::sound_nmi_enable_w));
+	map(0xa0e0, 0xa0e0).select(0x0010).w(FUNC(slapfght_state::sound_nmi_enable_w));
 	map(0xc800, 0xcfff).ram().share("share1");
 	map(0xd000, 0xffff).ram();
 }
@@ -896,11 +896,11 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	MCFG_DEVICE_PROGRAM_MAP(perfrman_map)
 	MCFG_DEVICE_IO_MAP(io_map_nomcu)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, slapfght_state, sound_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, slapfght_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, slapfght_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, slapfght_state, palette_bank_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(slapfght_state::sound_reset_w));
+	mainlatch.q_out_cb<1>().set(FUNC(slapfght_state::flipscreen_w));
+	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
+	mainlatch.q_out_cb<6>().set(FUNC(slapfght_state::palette_bank_w));
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/8) // 2MHz? XTAL is known, divider is guessed
 	MCFG_DEVICE_PROGRAM_MAP(perfrman_sound_map)
@@ -909,34 +909,34 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_perfrman)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, slapfght_state, vblank_irq))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(slapfght_state::screen_update_perfrman));
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
+	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_perfrman)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, perfrman)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(16'000'000)/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(16'000'000)/8));
+	ay1.port_a_read_callback().set_ioport("IN0");
+	ay1.port_b_read_callback().set_ioport("IN1");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(16'000'000)/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(16'000'000)/8));
+	ay2.port_a_read_callback().set_ioport("DSW1");
+	ay2.port_b_read_callback().set_ioport("DSW2");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 
@@ -947,48 +947,48 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	MCFG_DEVICE_PROGRAM_MAP(tigerh_map_mcu)
 	MCFG_DEVICE_IO_MAP(io_map_mcu)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, slapfght_state, sound_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, slapfght_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, slapfght_state, irq_enable_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(slapfght_state::sound_reset_w));
+	mainlatch.q_out_cb<1>().set(FUNC(slapfght_state::flipscreen_w));
+	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
 	MCFG_DEVICE_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 360) // music speed, verified with pcb recording
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU_TIGER, XTAL(36'000'000)/12) // 3MHz
+	TAITO68705_MCU_TIGER(config, m_bmcu, 36_MHz_XTAL/12); // 3MHz
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8-1, 32*8-1-1)
-	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, slapfght_state, vblank_irq))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(1*8, 36*8-1, 2*8-1, 32*8-1-1);
+	m_screen->set_screen_update(FUNC(slapfght_state::screen_update_slapfight));
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
+	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(36'000'000)/24) // 1.5MHz
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(36'000'000)/24)); // 1.5MHz
+	ay1.port_a_read_callback().set_ioport("IN0");
+	ay1.port_b_read_callback().set_ioport("IN1");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(36'000'000)/24) // 1.5MHz
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(36'000'000)/24)); // 1.5MHz
+	ay2.port_a_read_callback().set_ioport("DSW1");
+	ay2.port_b_read_callback().set_ioport("DSW2");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(slapfght_state::tigerhb1)
@@ -1018,50 +1018,50 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	MCFG_DEVICE_PROGRAM_MAP(slapfigh_map_mcu)
 	MCFG_DEVICE_IO_MAP(io_map_mcu)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, slapfght_state, sound_reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, slapfght_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, slapfght_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1"))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(slapfght_state::sound_reset_w));
+	mainlatch.q_out_cb<1>().set(FUNC(slapfght_state::flipscreen_w));
+	mainlatch.q_out_cb<3>().set(FUNC(slapfght_state::irq_enable_w));
+	mainlatch.q_out_cb<4>().set_membank("bank1");
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
 	MCFG_DEVICE_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 180)
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(36'000'000)/12) // 3MHz
-	MCFG_TAITO_M68705_AUX_STROBE_CB(WRITE8(*this, slapfght_state, scroll_from_mcu_w))
+	TAITO68705_MCU(config, m_bmcu, 36_MHz_XTAL/12); // 3MHz
+	m_bmcu->aux_strobe_cb().set(FUNC(slapfght_state::scroll_from_mcu_w));
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8-1, 32*8-1-1)
-	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, slapfght_state, vblank_irq))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(1*8, 36*8-1, 2*8-1, 32*8-1-1);
+	m_screen->set_screen_update(FUNC(slapfght_state::screen_update_slapfight));
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	m_screen->screen_vblank().append(FUNC(slapfght_state::vblank_irq));
+	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapfght)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(slapfght_state, slapfight)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(36'000'000)/24) // 1.5MHz
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(36'000'000)/24)); // 1.5MHz
+	ay1.port_a_read_callback().set_ioport("IN0");
+	ay1.port_b_read_callback().set_ioport("IN1");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(36'000'000)/24) // 1.5MHz
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(36'000'000)/24)); // 1.5MHz
+	ay2.port_a_read_callback().set_ioport("DSW1");
+	ay2.port_b_read_callback().set_ioport("DSW2");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(slapfght_state::slapfighb1)
@@ -1923,39 +1923,46 @@ ROM_START( getstarj )
 ROM_END
 
 ROM_START( getstarb1 )
-	ROM_REGION( 0x18000, "maincpu", 0 )     /* Region 0 - main cpu code */
-	ROM_LOAD( "gs_rb_1.bin",  0x00000, 0x4000, CRC(9afad7e0) SHA1(6b2e82a6b7fcbfed5f4d250959ecc571fdf0cbc2) )
-	ROM_LOAD( "gs_rb_2.bin",  0x04000, 0x4000, CRC(5feb0a60) SHA1(b1300055180ddf6ca96475eb3a27a17722273fc6) )
-	ROM_LOAD( "gs_rb_3.bin",  0x10000, 0x8000, CRC(e3cfb1ba) SHA1(bd21655c82a14e18ff9df4539c4d0bb2484c73f1) )
+	ROM_REGION( 0x18000, "maincpu", 0 )  /* Region 0 - main cpu code */
+	ROM_LOAD( "getstar_14_b.8p",  0x00000, 0x4000, CRC(9afad7e0) SHA1(6b2e82a6b7fcbfed5f4d250959ecc571fdf0cbc2) ) // gs_rb_1 // 27128 (matches the socket label)
+	ROM_LOAD( "getstar_13_b.8n",  0x04000, 0x4000, CRC(5feb0a60) SHA1(b1300055180ddf6ca96475eb3a27a17722273fc6) ) // gs_rb_2 // 27128 (matches the socket label)
+	ROM_LOAD( "getstar_12_b.8k",  0x10000, 0x8000, CRC(e3cfb1ba) SHA1(bd21655c82a14e18ff9df4539c4d0bb2484c73f1) ) // gs_rb_3 // 27256 (The socket is labeled as 27128)
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Region 3 - sound cpu code */
-	ROM_LOAD( "a68-03",       0x00000, 0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Region 3 - sound cpu code */
+	ROM_LOAD( "getstar_5_a.12e",  0x00000, 0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) ) // a68-03 // 2764 (matches the socket label)
 
-	ROM_REGION( 0x04000, "gfx1", 0 )    /* Region 1 - temporary for gfx */
-	/* these roms were in the set, but they're corrupt */
-//  ROM_LOAD( "gs_rb_8.bin",  0x00000, 0x2000, CRC(a30aaf04) SHA1(2509554c3851a68eaec1cadc01f4d69c7aa2c09d) )  /* Chars */
-//  ROM_LOAD( "gs_rb_7.bin",  0x02000, 0x2000, CRC(f47a93c6) SHA1(441fee1fb195bb2583d220f30dfcff617a31742a) )
-	/* use the original roms instead */
-	ROM_LOAD( "a68_05.bin",   0x00000, 0x2000, CRC(e3d409e7) SHA1(0b6be4767f110729f4dd1a472ef8d9a0c718b684) )  /* Chars */
-	ROM_LOAD( "a68_04.bin",   0x02000, 0x2000, CRC(6e5ac9d4) SHA1(74f90b7a1ceb3b1c2fd92dff100d92dea0155530) )
+	ROM_REGION( 0x04000, "gfx1", 0 )     /* Region 1 - temporary for gfx */  /* Chars */  /* Verified on new bootleg PCB found */
+	ROM_LOAD( "getstar_7_b.6f",   0x00000, 0x2000, CRC(e3d409e7) SHA1(0b6be4767f110729f4dd1a472ef8d9a0c718b684) ) // 2764 (matches the socket label)
+	ROM_LOAD( "getstar_8_b.6g",   0x02000, 0x2000, CRC(6e5ac9d4) SHA1(74f90b7a1ceb3b1c2fd92dff100d92dea0155530) ) // 2764 (matches the socket label)
 
+	ROM_REGION( 0x20000, "gfx2", 0 )     /* Region 1 - temporary for gfx */  /* Tiles */
+	ROM_LOAD( "getstar_6_b.4m",   0x00000, 0x8000, CRC(a293cc2e) SHA1(a2c2598e92982d13b51cbb6efb4b963142233433) ) // a68_09 // 27256 (the socket is labeled as 27128)
+	ROM_LOAD( "getstar_9_b.6m",   0x08000, 0x8000, CRC(37662375) SHA1(46ba8a3f0b553d476ecf431d0d20556896b4ca43) ) // a68_08 // 27256 (The socket is labeled as 27128)
+	ROM_LOAD( "getstar_10_b.6n",  0x10000, 0x8000, CRC(cf1a964c) SHA1(e9223c8d4f3bdafed193a1ded63e377f16f45e17) ) // a68_07 // 27256 (The socket is labeled as 27128)
+	ROM_LOAD( "getstar_11_b.6p",  0x18000, 0x8000, CRC(05f9eb9a) SHA1(a71640a63b259799086d361ef293aa26cec46a0c) ) // a68_06 // 27256 (The socket is labeled as 27128)
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    /* Region 1 - temporary for gfx */
-	ROM_LOAD( "a68_09",       0x00000, 0x8000, CRC(a293cc2e) SHA1(a2c2598e92982d13b51cbb6efb4b963142233433) )  /* Tiles */
-	ROM_LOAD( "a68_08",       0x08000, 0x8000, CRC(37662375) SHA1(46ba8a3f0b553d476ecf431d0d20556896b4ca43) )
-	ROM_LOAD( "a68_07",       0x10000, 0x8000, CRC(cf1a964c) SHA1(e9223c8d4f3bdafed193a1ded63e377f16f45e17) )
-	ROM_LOAD( "a68_06",       0x18000, 0x8000, CRC(05f9eb9a) SHA1(a71640a63b259799086d361ef293aa26cec46a0c) )
-
-	ROM_REGION( 0x20000, "gfx3", 0 )    /* Region 1 - temporary for gfx */
-	ROM_LOAD( "a68-13",       0x00000, 0x8000, CRC(643fb282) SHA1(d904d3c27c2b56341929c5eed4ea97e948c53c34) )  /* Sprites */
-	ROM_LOAD( "a68-12",       0x08000, 0x8000, CRC(11f74e32) SHA1(02d8b4cc679f45a02c4989f2b62cde91b7418235) )
-	ROM_LOAD( "a68-11",       0x10000, 0x8000, CRC(f24158cf) SHA1(db4c6b68a488b0798ea5f793ac8ced283a8ecab2) )
-	ROM_LOAD( "a68-10",       0x18000, 0x8000, CRC(83161ed0) SHA1(a6aa28f22f487dc3a2ec07935e6d42bcdd1eff81) )
+	ROM_REGION( 0x20000, "gfx3", 0 )     /* Region 1 - temporary for gfx */  /* Sprites */
+	ROM_LOAD( "getstar_4_a.8j",   0x00000, 0x8000, CRC(643fb282) SHA1(d904d3c27c2b56341929c5eed4ea97e948c53c34) ) // a68-13 // 27256 (the socket is labeled as 27128)
+	ROM_LOAD( "getstar_2_a.7j",   0x08000, 0x8000, CRC(11f74e32) SHA1(02d8b4cc679f45a02c4989f2b62cde91b7418235) ) // a68-12 // 27256 (the socket is labeled as 27128)
+	ROM_LOAD( "getstar_3_a.8h",   0x10000, 0x8000, CRC(f24158cf) SHA1(db4c6b68a488b0798ea5f793ac8ced283a8ecab2) ) // a68-11 // 27256 (the socket is labeled as 27128)
+	ROM_LOAD( "getstar_1_a.7h",   0x18000, 0x8000, CRC(83161ed0) SHA1(a6aa28f22f487dc3a2ec07935e6d42bcdd1eff81) ) // a68-10 // 27256 (the socket is labeled as 27128)
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "rom21",        0x0000,  0x0100, CRC(d6360b4d) SHA1(3e64548c82a3378fc091e104cdc2b0c7e592fc44) )
-	ROM_LOAD( "rom20",        0x0100,  0x0100, CRC(4ca01887) SHA1(2892c89d5e60f1d10593adffff55c1a9654e8209) )
-	ROM_LOAD( "rom19",        0x0200,  0x0100, CRC(513224f0) SHA1(15b34612206138f6fc5f7478925b1fff2ed56aa8) )
+	ROM_LOAD( "getstar_p7_a.12q", 0x0000,  0x0100, CRC(d6360b4d) SHA1(3e64548c82a3378fc091e104cdc2b0c7e592fc44) ) // rom21 // 82S129N (matches the socket label)
+	ROM_LOAD( "getstar_p5_a.12m", 0x0100,  0x0100, CRC(4ca01887) SHA1(2892c89d5e60f1d10593adffff55c1a9654e8209) ) // rom20 // 82S129N (matches the socket label)
+	ROM_LOAD( "getstar_p6_a.12n", 0x0200,  0x0100, CRC(35eefbbb) SHA1(b885938cc7ef322b354a0d60f9c7614686bb33ea) ) // rom19 //82S129N (matches the socket label)
+
+	/* Unused. Weren't on the first dump, but verified to be on the PCB */
+	ROM_REGION( 0x0500, "proms2", 0 )
+	ROM_LOAD( "getstar_p1_a.1c",  0x0000,  0x0100, CRC(d492e6c2) SHA1(5789adda3a63ef8656ebd012416fcf3f991241fe) ) // 82S129N (matches the socket label)
+	ROM_LOAD( "getstar_p2_a.1e",  0x0100,  0x0100, CRC(59490887) SHA1(c894edecbcfc67972ad893cd7c8197d07862a20a) ) // 82S129N (matches the socket label)
+	ROM_LOAD( "getstar_p3_a.2b",  0x0200,  0x0020, CRC(aa0ca5a5) SHA1(4c45be71658f40ebb05634febba5822f1a8a7f79) ) // 82S123N (matches the socket label)
+	ROM_LOAD( "getstar_p8_b.2c",  0x0300,  0x0100, CRC(4dc04453) SHA1(524e5a212ab496c52adc0def995b75e89aba48e7) ) // 82S129N (matches the socket label)
+	ROM_LOAD( "getstar_p9_b.8b",  0x0400,  0x0100, CRC(48ac3db4) SHA1(6a73fe21529bc760b8df1893aee9e89fb60976eb) ) // 82S129N (matches the socket label)
+
+	/* Unused, but verified to be on the PCB */
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "getstar_p4_a.2e",  0x0000,  0x0104, NO_DUMP ) // PAL16R4ACN - Protected
 ROM_END
 
 ROM_START( getstarb2 )

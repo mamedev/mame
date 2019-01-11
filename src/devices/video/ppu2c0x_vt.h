@@ -16,24 +16,6 @@
 
 #include "video/ppu2c0x.h"
 
-#define MCFG_PPU_VT03_ADD(_tag)   \
-	MCFG_PPU2C0X_ADD(_tag, PPU_VT03)
-
-#define MCFG_PPU_VT03_READ_BG_CB(_devcb) \
-	devcb = &downcast<ppu_vt03_device &>(*device).set_read_bg_callback(DEVCB_##_devcb);
-
-#define MCFG_PPU_VT03_READ_SP_CB(_devcb) \
-	devcb = &downcast<ppu_vt03_device &>(*device).set_read_sp_callback(DEVCB_##_devcb);
-
-#define MCFG_PPU_VT03_MODIFY MCFG_DEVICE_MODIFY
-
-#define MCFG_PPU_VT03_SET_PAL_MODE(pmode) \
-	downcast<ppu_vt03_device &>(*device).set_palette_mode(pmode);
-
-#define MCFG_PPU_VT03_SET_DESCRAMBLE(dsc) \
-	downcast<ppu_vt03_device &>(*device).set_201x_descramble(dsc);
-
-
 enum vtxx_pal_mode {
 	PAL_MODE_VT0x,
 	PAL_MODE_NEW_RGB,
@@ -43,10 +25,10 @@ enum vtxx_pal_mode {
 
 class ppu_vt03_device : public ppu2c0x_device {
 public:
-	ppu_vt03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ppu_vt03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> devcb_base &set_read_bg_callback(Object &&cb) { return m_read_bg.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_sp_callback(Object &&cb) { return m_read_sp.set_callback(std::forward<Object>(cb)); }
+	auto read_bg() { return m_read_bg.bind(); }
+	auto read_sp() { return m_read_sp.bind(); }
 
 	void set_palette_mode(vtxx_pal_mode pmode) { m_pal_mode = pmode; }
 	void set_201x_descramble(const uint8_t descramble[6]) { for (int i = 0; i < 6; i++) m_2012_2017_descramble[i] = descramble[i]; }

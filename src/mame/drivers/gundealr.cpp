@@ -107,25 +107,25 @@ void gundealr_state::base_map(address_map &map)
 	map(0xc004, 0xc004).portr("IN0");
 	map(0xc005, 0xc005).portr("IN1");
 	map(0xc006, 0xc006).portr("IN2");
-	map(0xc016, 0xc016).w(this, FUNC(gundealr_state::bankswitch_w));
-	map(0xc400, 0xc7ff).ram().w(this, FUNC(gundealr_state::paletteram_w)).share("paletteram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(gundealr_state::bg_videoram_w)).share("bg_videoram");
-	map(0xd000, 0xdfff).ram().w(this, FUNC(gundealr_state::fg_videoram_w)).share("fg_videoram");
+	map(0xc016, 0xc016).w(FUNC(gundealr_state::bankswitch_w));
+	map(0xc400, 0xc7ff).ram().w(FUNC(gundealr_state::paletteram_w)).share("paletteram");
+	map(0xc800, 0xcfff).ram().w(FUNC(gundealr_state::bg_videoram_w)).share("bg_videoram");
+	map(0xd000, 0xdfff).ram().w(FUNC(gundealr_state::fg_videoram_w)).share("fg_videoram");
 	map(0xe000, 0xffff).ram().share("rambase");
 }
 
 void gundealr_state::gundealr_main_map(address_map &map)
 {
 	base_map(map);
-	map(0xc014, 0xc014).w(this, FUNC(gundealr_state::flipscreen_w<0>));
-	map(0xc020, 0xc023).w(this, FUNC(gundealr_state::fg_scroll_w<1>));
+	map(0xc014, 0xc014).w(FUNC(gundealr_state::flipscreen_w<0>));
+	map(0xc020, 0xc023).w(FUNC(gundealr_state::fg_scroll_w<1>));
 }
 
 void gundealr_state::yamyam_main_map(address_map &map)
 {
 	base_map(map);
-	map(0xc010, 0xc013).w(this, FUNC(gundealr_state::fg_scroll_w<0>));
-	map(0xc014, 0xc014).w(this, FUNC(gundealr_state::flipscreen_w<7>));
+	map(0xc010, 0xc013).w(FUNC(gundealr_state::fg_scroll_w<0>));
+	map(0xc014, 0xc014).w(FUNC(gundealr_state::flipscreen_w<7>));
 	map(0xc015, 0xc015).nopw(); // Bit 7 = MCU reset?
 }
 

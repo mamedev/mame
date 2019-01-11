@@ -26,6 +26,7 @@ displayed.
 #include "video/hd63484.h"
 #include "audio/seibu.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -33,19 +34,21 @@ displayed.
 class shanghai_state : public driver_device
 {
 public:
-	shanghai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	shanghai_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this,"screen")
-		{ }
-
-	DECLARE_WRITE8_MEMBER(shanghai_coin_w);
-	DECLARE_PALETTE_INIT(shanghai);
-	INTERRUPT_GEN_MEMBER(half_vblank_irq);
+	{ }
 
 	void shanghai(machine_config &config);
 	void shangha2(machine_config &config);
 	void kothello(machine_config &config);
+
+private:
+	DECLARE_WRITE8_MEMBER(shanghai_coin_w);
+	void shanghai_palette(palette_device &palette) const;
+	INTERRUPT_GEN_MEMBER(half_vblank_irq);
+
 	void hd63484_map(address_map &map);
 	void kothello_map(address_map &map);
 	void kothello_sound_map(address_map &map);
@@ -53,37 +56,37 @@ public:
 	void shangha2_portmap(address_map &map);
 	void shanghai_map(address_map &map);
 	void shanghai_portmap(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 };
 
 
-PALETTE_INIT_MEMBER(shanghai_state,shanghai)
+void shanghai_state::shanghai_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = (i >> 2) & 0x01;
-		bit1 = (i >> 3) & 0x01;
-		bit2 = (i >> 4) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (i >> 5) & 0x01;
-		bit1 = (i >> 6) & 0x01;
-		bit2 = (i >> 7) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
+		// red component
+		bit0 = BIT(i, 2);
+		bit1 = BIT(i, 3);
+		bit2 = BIT(i, 4);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// green component
+		bit0 = BIT(i, 5);
+		bit1 = BIT(i, 6);
+		bit2 = BIT(i, 7);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		// blue component
 		bit0 = 0;
-		bit1 = (i >> 0) & 0x01;
-		bit2 = (i >> 1) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(i, 0);
+		bit2 = BIT(i, 1);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -123,7 +126,7 @@ void shanghai_state::shanghai_portmap(address_map &map)
 	map(0x40, 0x41).portr("P1");
 	map(0x44, 0x45).portr("P2");
 	map(0x48, 0x49).portr("SYSTEM");
-	map(0x4c, 0x4c).w(this, FUNC(shanghai_state::shanghai_coin_w));
+	map(0x4c, 0x4c).w(FUNC(shanghai_state::shanghai_coin_w));
 }
 
 
@@ -135,7 +138,7 @@ void shanghai_state::shangha2_portmap(address_map &map)
 	map(0x30, 0x31).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
 	map(0x32, 0x33).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
 	map(0x40, 0x43).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
-	map(0x50, 0x50).w(this, FUNC(shanghai_state::shanghai_coin_w));
+	map(0x50, 0x50).w(FUNC(shanghai_state::shanghai_coin_w));
 }
 
 void shanghai_state::kothello_map(address_map &map)
@@ -412,22 +415,20 @@ MACHINE_CONFIG_START(shanghai_state::shanghai)
 	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_PALETTE_INIT_OWNER(shanghai_state,shanghai)
+	PALETTE(config, "palette", FUNC(shanghai_state::shanghai_palette)).set_format(palette_device::xBGR_444, 256);
 
-	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
+	HD63484(config, "hd63484", 0).set_addrmap(0, &shanghai_state::hd63484_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(16'000'000)/4));
+	ymsnd.port_a_read_callback().set_ioport("DSW1");
+	ymsnd.port_b_read_callback().set_ioport("DSW2");
+	ymsnd.add_route(0, "mono", 0.15);
+	ymsnd.add_route(1, "mono", 0.15);
+	ymsnd.add_route(2, "mono", 0.15);
+	ymsnd.add_route(3, "mono", 0.80);
 MACHINE_CONFIG_END
 
 
@@ -448,21 +449,20 @@ MACHINE_CONFIG_START(shanghai_state::shangha2)
 	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
-	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
+	HD63484(config, "hd63484", 0).set_addrmap(0, &shanghai_state::hd63484_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(16'000'000)/4));
+	ymsnd.port_a_read_callback().set_ioport("DSW1");
+	ymsnd.port_b_read_callback().set_ioport("DSW2");
+	ymsnd.add_route(0, "mono", 0.15);
+	ymsnd.add_route(1, "mono", 0.15);
+	ymsnd.add_route(2, "mono", 0.15);
+	ymsnd.add_route(3, "mono", 0.80);
 MACHINE_CONFIG_END
 
 
@@ -475,6 +475,7 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)
 	MCFG_DEVICE_PROGRAM_MAP(kothello_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -487,30 +488,30 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
-	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
-	MCFG_HD63484_EXTERNAL_SKEW(2)
+	hd63484_device &hd63484(HD63484(config, "hd63484", 0));
+	hd63484.set_addrmap(0, &shanghai_state::hd63484_map);
+	hd63484.set_external_skew(2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	/* same as standard seibu ym2203, but also reads "DSW" */
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(16'000'000)/4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(16'000'000)/4));
+	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.port_a_read_callback().set_ioport("DSW1");
+	ymsnd.port_b_read_callback().set_ioport("DSW2");
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2203_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2203_device, write))
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound.int_callback().set_inputline("audiocpu", 0);
+	seibu_sound.set_rom_tag("audiocpu");
+	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym2203_device::read));
+	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym2203_device::write));
 
-	MCFG_DEVICE_ADD("adpcm", SEIBU_ADPCM, 8000) // actually MSM5205
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SEIBU_ADPCM(config, "adpcm", 8000).add_route(ALL_OUTPUTS, "mono", 0.80); // actually MSM5205
 MACHINE_CONFIG_END
 
 /***************************************************************************

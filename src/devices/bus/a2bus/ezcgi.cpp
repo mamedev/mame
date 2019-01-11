@@ -40,36 +40,38 @@ DEFINE_DEVICE_TYPE(A2BUS_EZCGI_9958, a2bus_ezcgi_9958_device, "a2ezcgi5", "E-Z C
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_ezcgi_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( TMS_TAG, TMS9918A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k of VRAM
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, a2bus_ezcgi_device, tms_irq_w))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS_TAG, tms9918a_device, screen_update )
-MACHINE_CONFIG_END
+void a2bus_ezcgi_device::device_add_mconfig(machine_config &config)
+{
+	TMS9918A(config, m_tms, XTAL(10'738'635)).set_screen(SCREEN_TAG);
+	m_tms->set_vram_size(0x4000); // 16k of VRAM
+	m_tms->int_callback().set(FUNC(a2bus_ezcgi_device::tms_irq_w));
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+}
 
 MACHINE_CONFIG_START(a2bus_ezcgi_9938_device::device_add_mconfig)
-	MCFG_V9938_ADD(TMS_TAG, SCREEN_TAG, 0x30000, XTAL(21'477'272))    // 192K of VRAM / typical 9938 clock, not verified
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, a2bus_ezcgi_9938_device, tms_irq_w))
+	V9938(config, m_tms, XTAL(21'477'272));    // typical 9938 clock, not verified
+	m_tms->set_vram_size(0x30000);    // 192K of VRAM
+	m_tms->set_screen(SCREEN_TAG);
+	m_tms->int_cb().set(FUNC(a2bus_ezcgi_9938_device::tms_irq_w));
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE(TMS_TAG, v9938_device, screen_update)
 	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, 262*2)
 	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a2bus_ezcgi_9958_device::device_add_mconfig)
-	MCFG_V9958_ADD(TMS_TAG, SCREEN_TAG, 0x30000, XTAL(21'477'272))    // 192K of VRAM / typcial 9938/9958 clock, not verified
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, a2bus_ezcgi_9958_device, tms_irq_w))
+	V9958(config, m_tms, XTAL(21'477'272));    // typical 9938/9958 clock, not verified
+	m_tms->set_vram_size(0x30000);    // 192K of VRAM
+	m_tms->set_screen(SCREEN_TAG);
+	m_tms->int_cb().set(FUNC(a2bus_ezcgi_9958_device::tms_irq_w));
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE(TMS_TAG, v9938_device, screen_update)
 	MCFG_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, 262*2)
 	MCFG_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
 MACHINE_CONFIG_END

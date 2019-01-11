@@ -46,15 +46,15 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-
 	void maygayep(machine_config &config);
+
+	void init_maygayep();
+
+private:
 	void maygayep_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-public:
-	void init_maygayep();
 };
 
 // bp 29e58 in ep_simp reads the 'INITIALISE . . .' string

@@ -6,6 +6,10 @@
     Success Joe / Ashita no Joe
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ASHNOJOE_H
+#define MAME_INCLUDES_ASHNOJOE_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
@@ -13,8 +17,8 @@
 class ashnojoe_state : public driver_device
 {
 public:
-	ashnojoe_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ashnojoe_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_tileram_3(*this, "tileram_3"),
 		m_tileram_4(*this, "tileram_4"),
 		m_tileram_5(*this, "tileram_5"),
@@ -27,7 +31,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	/* memory pointers */
 	uint16_t *    m_tileram_1;
@@ -51,7 +56,7 @@ public:
 
 	/* sound-related */
 	uint8_t       m_adpcm_byte;
-	int         m_msm5205_vclk_toggle;
+	int           m_msm5205_vclk_toggle;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -92,3 +97,5 @@ public:
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
 };
+
+#endif // MAME_INCLUDES_ASHNOJOE_H

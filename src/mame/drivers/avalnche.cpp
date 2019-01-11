@@ -39,8 +39,6 @@
 
 #include "avalnche.lh"
 
-#define MASTER_CLOCK XTAL(12'096'000)
-
 
 /*************************************
  *
@@ -107,7 +105,7 @@ void avalnche_state::main_map(address_map &map)
 	map(0x2003, 0x2003).mirror(0x0ffc).nopr();
 	map(0x3000, 0x3000).mirror(0x0fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x4000, 0x4007).mirror(0x0ff8).w("latch", FUNC(f9334_device::write_d0));
-	map(0x5000, 0x5000).mirror(0x0fff).w(this, FUNC(avalnche_state::avalnche_noise_amplitude_w));
+	map(0x5000, 0x5000).mirror(0x0fff).w(FUNC(avalnche_state::avalnche_noise_amplitude_w));
 	map(0x6000, 0x7fff).rom();
 }
 
@@ -121,7 +119,7 @@ void avalnche_state::catch_map(address_map &map)
 	map(0x2003, 0x2003).mirror(0x0ffc).nopr();
 	map(0x3000, 0x3000).mirror(0x0fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x4000, 0x4007).mirror(0x0ff8).w("latch", FUNC(f9334_device::write_d0));
-	map(0x6000, 0x6000).mirror(0x0fff).w(this, FUNC(avalnche_state::catch_coin_counter_w));
+	map(0x6000, 0x6000).mirror(0x0fff).w(FUNC(avalnche_state::catch_coin_counter_w));
 	map(0x7000, 0x7fff).rom();
 }
 
@@ -220,25 +218,22 @@ void avalnche_state::machine_start()
 MACHINE_CONFIG_START(avalnche_state::avalnche_base)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502,MASTER_CLOCK/16)     /* clock input is the "2H" signal divided by two */
+	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL / 16)     /* clock input is the "2H" signal divided by two */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(avalnche_state, nmi_line_pulse, 8*60)
 
-	MCFG_DEVICE_ADD("latch", F9334, 0) // F8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // 1 CREDIT LAMP
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, avalnche_state, video_invert_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) // 2 CREDIT LAMP
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led2")) // START LAMP
+	F9334(config, m_latch); // F8
+	m_latch->q_out_cb<0>().set_output("led0"); // 1 CREDIT LAMP
+	m_latch->q_out_cb<2>().set(FUNC(avalnche_state::video_invert_w));
+	m_latch->q_out_cb<3>().set_output("led1"); // 2 CREDIT LAMP
+	m_latch->q_out_cb<7>().set_output("led2"); // START LAMP
 	// Q1, Q4, Q5, Q6 are configured in audio/avalnche.cpp
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 16, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(avalnche_state, screen_update_avalnche)
 MACHINE_CONFIG_END
 

@@ -24,9 +24,9 @@ DEFINE_DEVICE_TYPE(TK02_80COL, tk02_device, "tk02", "TK02 80 Column Monochrome U
 void tk02_device::map(address_map &map)
 {
 //  AM_RANGE(0x00, 0x07) AM_SELECT(0xff00) AM_READWRITE(ram_r, ram_w) // no AM_SELECT (or AM_MASK) support here
-	map(0x08, 0x08).mirror(0xff00).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x09, 0x09).mirror(0xff00).w("crtc", FUNC(mc6845_device::register_w));
-	map(0x0c, 0x0c).mirror(0xff00).r(this, FUNC(tk02_device::status_r));
+	map(0x08, 0x08).mirror(0xff00).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x09, 0x09).mirror(0xff00).w(m_crtc, FUNC(mc6845_device::register_w));
+	map(0x0c, 0x0c).mirror(0xff00).r(FUNC(tk02_device::status_r));
 }
 
 //-------------------------------------------------
@@ -96,23 +96,26 @@ GFXDECODE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(tk02_device::device_add_mconfig)
-	MCFG_SCREEN_ADD_MONOCHROME("mono", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(8'000'000) * 2, 1024, 0, 640, 312, 0, 250)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+void tk02_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "mono", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_raw(XTAL(8'000'000) * 2, 1024, 0, 640, 312, 0, 250);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tk02)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_tk02);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "mono", XTAL(8'000'000) / 4)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(tk02_device, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, tk02_device, de_w))
+	MC6845(config, m_crtc, XTAL(8'000'000) / 4);
+	m_crtc->set_screen("mono");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(tk02_device::crtc_update_row), this);
+	m_crtc->out_de_callback().set(FUNC(tk02_device::de_w));
 
-	MCFG_TATUNG_PIPE_ADD("pipe")
-MACHINE_CONFIG_END
+	TATUNG_PIPE(config, m_pipe, DERIVED_CLOCK(1, 1), tatung_pipe_cards, nullptr);
+}
 
 
 //**************************************************************************
@@ -146,7 +149,7 @@ void tk02_device::device_start()
 	memset(m_ram.get(), 0xff, 0x800);
 
 	// register for save states
-	save_pointer(NAME(m_ram.get()), 0x800);
+	save_pointer(NAME(m_ram), 0x800);
 	save_item(NAME(m_de));
 }
 

@@ -87,7 +87,7 @@ void goindol_state::goindol_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc7ff).ram().share("ram");
 	map(0xc800, 0xc800).nopr().w("soundlatch", FUNC(generic_latch_8_device::write)); // watchdog?
-	map(0xc810, 0xc810).w(this, FUNC(goindol_state::goindol_bankswitch_w));
+	map(0xc810, 0xc810).w(FUNC(goindol_state::goindol_bankswitch_w));
 	map(0xc820, 0xc820).portr("DIAL");
 	map(0xc820, 0xd820).writeonly().share("fg_scrolly");
 	map(0xc830, 0xc830).portr("P1");
@@ -95,17 +95,17 @@ void goindol_state::goindol_map(address_map &map)
 	map(0xc834, 0xc834).portr("P2");
 	map(0xd000, 0xd03f).ram().share("spriteram");
 	map(0xd040, 0xd7ff).ram();
-	map(0xd800, 0xdfff).ram().w(this, FUNC(goindol_state::goindol_bg_videoram_w)).share("bg_videoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(goindol_state::goindol_bg_videoram_w)).share("bg_videoram");
 	map(0xe000, 0xe03f).ram().share("spriteram2");
 	map(0xe040, 0xe7ff).ram();
-	map(0xe800, 0xefff).ram().w(this, FUNC(goindol_state::goindol_fg_videoram_w)).share("fg_videoram");
+	map(0xe800, 0xefff).ram().w(FUNC(goindol_state::goindol_fg_videoram_w)).share("fg_videoram");
 	map(0xf000, 0xf000).portr("DSW1");
-	map(0xf422, 0xf422).r(this, FUNC(goindol_state::prot_f422_r));
+	map(0xf422, 0xf422).r(FUNC(goindol_state::prot_f422_r));
 	map(0xf800, 0xf800).portr("DSW2");
-	map(0xfc44, 0xfc44).w(this, FUNC(goindol_state::prot_fc44_w));
-	map(0xfc66, 0xfc66).w(this, FUNC(goindol_state::prot_fc66_w));
-	map(0xfcb0, 0xfcb0).w(this, FUNC(goindol_state::prot_fcb0_w));
-	map(0xfd99, 0xfd99).w(this, FUNC(goindol_state::prot_fd99_w));
+	map(0xfc44, 0xfc44).w(FUNC(goindol_state::prot_fc44_w));
+	map(0xfc66, 0xfc66).w(FUNC(goindol_state::prot_fc66_w));
+	map(0xfcb0, 0xfcb0).w(FUNC(goindol_state::prot_fcb0_w));
+	map(0xfd99, 0xfd99).w(FUNC(goindol_state::prot_fd99_w));
 }
 
 void goindol_state::sound_map(address_map &map)
@@ -254,15 +254,15 @@ MACHINE_CONFIG_START(goindol_state::goindol)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goindol_state, screen_update_goindol)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goindol)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000)/8)   /* Confirmed pitch from recording */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

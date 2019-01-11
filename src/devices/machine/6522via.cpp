@@ -7,8 +7,6 @@
     This is based on the M6821 emulation in MAME.
 
     To do:
-
-    T2 pulse counting mode
     Pulse mode handshake output
 
 **********************************************************************/
@@ -139,6 +137,29 @@ uint16_t via6522_device::get_counter1_value()
 	return val;
 }
 
+void via6522_device::counter2_decrement()
+{
+	if (!T2_COUNT_PB6(m_acr))
+		return;
+
+	// count down on T2CL
+	if (m_t2cl-- != 0)
+		return;
+
+	// borrow from T2CH
+	if (m_t2ch-- != 0)
+		return;
+
+	// underflow causes only one interrupt between T2CH writes
+	if (m_t2_active)
+	{
+		m_t2_active = 0;
+
+		LOGINT("T2 INT request ");
+		set_int(INT_T2);
+	}
+}
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -149,7 +170,7 @@ DEFINE_DEVICE_TYPE(VIA6522, via6522_device, "via6522", "6522 VIA")
 
 void via6522_device::map(address_map &map)
 {
-	map(0x00, 0x0f).rw(this, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x00, 0x0f).rw(FUNC(via6522_device::read), FUNC(via6522_device::write));
 }
 
 //-------------------------------------------------
@@ -170,7 +191,7 @@ via6522_device::via6522_device(const machine_config &mconfig, const char *tag, d
 		m_in_ca1(0),
 		m_in_ca2(0),
 		m_out_ca2(0),
-		m_in_b(0),
+		m_in_b(0xff),
 		m_in_cb1(0),
 		m_in_cb2(0),
 		m_pcr(0),
@@ -283,6 +304,12 @@ void via6522_device::device_reset()
 	m_ca2_handler(m_out_ca2);
 	m_cb1_handler(m_out_cb1);
 	m_cb2_handler(m_out_cb2);
+
+	m_t1->adjust(attotime::never);
+	m_t2->adjust(attotime::never);
+	m_ca2_timer->adjust(attotime::never);
+	m_shift_timer->adjust(attotime::never);
+	m_shift_irq_timer->adjust(attotime::never);
 }
 
 
@@ -436,7 +463,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			{
 				if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 				{
-					m_shift_timer->adjust(clocks_to_attotime(1) / 2);
+					m_shift_timer->adjust(clocks_to_attotime(1));
 				}
 				else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
 				{
@@ -487,16 +514,15 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 uint8_t via6522_device::input_pa()
 {
+	uint8_t pa = m_in_a & ~m_ddr_a;
+
 	/// TODO: REMOVE THIS
-	if (!m_in_a_handler.isnull())
-	{
-		if (m_ddr_a != 0xff)
-			m_in_a = m_in_a_handler(0);
+	if (m_ddr_a != 0xff && !m_in_a_handler.isnull())
+		pa &= m_in_a_handler();
 
-		return (m_out_a & m_ddr_a) + (m_in_a & ~m_ddr_a);
-	}
+	pa |= m_out_a & m_ddr_a;
 
-	return m_in_a & (m_out_a | ~m_ddr_a);
+	return pa;
 }
 
 void via6522_device::output_pa()
@@ -507,13 +533,15 @@ void via6522_device::output_pa()
 
 uint8_t via6522_device::input_pb()
 {
+	uint8_t pb = m_in_b & ~m_ddr_b;
+
 	/// TODO: REMOVE THIS
 	if (m_ddr_b != 0xff && !m_in_b_handler.isnull())
 	{
-		m_in_b = m_in_b_handler(0);
+		pb &= m_in_b_handler();
 	}
 
-	uint8_t pb = (m_out_b & m_ddr_b) + (m_in_b & ~m_ddr_b);
+	pb |= m_out_b & m_ddr_b;
 
 	if (T1_SET_PB7(m_acr))
 		pb = (pb & 0x7f) | (m_t1_pb7 << 7);
@@ -535,12 +563,9 @@ void via6522_device::output_pb()
     via_r - CPU interface for VIA read
 -------------------------------------------------*/
 
-READ8_MEMBER( via6522_device::read )
+u8 via6522_device::read(offs_t offset)
 {
 	int val = 0;
-	if (machine().side_effects_disabled())
-		return 0;
-
 	offset &= 0xf;
 
 	switch (offset)
@@ -556,8 +581,11 @@ READ8_MEMBER( via6522_device::read )
 			val = m_latch_b;
 		}
 
-		LOGINT("PB INT ");
-		CLR_PB_INT();
+		if (!machine().side_effects_disabled())
+		{
+			LOGINT("PB INT ");
+			CLR_PB_INT();
+		}
 		break;
 
 	case VIA_PA:
@@ -571,17 +599,20 @@ READ8_MEMBER( via6522_device::read )
 			val = m_latch_a;
 		}
 
-		LOGINT("PA INT ");
-		CLR_PA_INT();
-
-		if (m_out_ca2 && (CA2_PULSE_OUTPUT(m_pcr) || CA2_AUTO_HS(m_pcr)))
+		if (!machine().side_effects_disabled())
 		{
-			m_out_ca2 = 0;
-			m_ca2_handler(m_out_ca2);
-		}
+			LOGINT("PA INT ");
+			CLR_PA_INT();
 
-		if (CA2_PULSE_OUTPUT(m_pcr))
-			m_ca2_timer->adjust(clocks_to_attotime(1));
+			if (m_out_ca2 && (CA2_PULSE_OUTPUT(m_pcr) || CA2_AUTO_HS(m_pcr)))
+			{
+				m_out_ca2 = 0;
+				m_ca2_handler(m_out_ca2);
+			}
+
+			if (CA2_PULSE_OUTPUT(m_pcr))
+				m_ca2_timer->adjust(clocks_to_attotime(1));
+		}
 
 		break;
 
@@ -606,8 +637,11 @@ READ8_MEMBER( via6522_device::read )
 		break;
 
 	case VIA_T1CL:
-		LOGINT("T1CL INT ");
-		clear_int(INT_T1);
+		if (!machine().side_effects_disabled())
+		{
+			LOGINT("T1CL INT ");
+			clear_int(INT_T1);
+		}
 		val = get_counter1_value() & 0xFF;
 		break;
 
@@ -624,9 +658,12 @@ READ8_MEMBER( via6522_device::read )
 		break;
 
 	case VIA_T2CL:
-		LOGINT("T2CL INT ");
-		clear_int(INT_T2);
-		if (m_t2_active)
+		if (!machine().side_effects_disabled())
+		{
+			LOGINT("T2CL INT ");
+			clear_int(INT_T2);
+		}
+		if (m_t2_active && m_t2->enabled())
 		{
 			val = attotime_to_clocks(m_t2->remaining()) & 0xff;
 		}
@@ -644,7 +681,7 @@ READ8_MEMBER( via6522_device::read )
 		break;
 
 	case VIA_T2CH:
-		if (m_t2_active)
+		if (m_t2_active && m_t2->enabled())
 		{
 			val = attotime_to_clocks(m_t2->remaining()) >> 8;
 		}
@@ -664,28 +701,31 @@ READ8_MEMBER( via6522_device::read )
 	case VIA_SR:
 		LOGSHIFT("Read SR: %02x ", m_sr);
 		val = m_sr;
-		m_out_cb1 = 1;
-		m_cb1_handler(m_out_cb1);
-		m_shift_counter = 0x0f;
-		LOGINT("SR INT ");
-		clear_int(INT_SR);
-		LOGSHIFT(" - ACR: %02x ", m_acr);
-		if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
+		if (!machine().side_effects_disabled())
 		{
-			m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 flanks to start shifter from a read
-			LOGSHIFT(" - read SR starts O2 timer ");
+			m_out_cb1 = 1;
+			m_cb1_handler(m_out_cb1);
+			m_shift_counter = 0x0f;
+			LOGINT("SR INT ");
+			clear_int(INT_SR);
+			LOGSHIFT(" - ACR: %02x ", m_acr);
+			if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
+			{
+				m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 flanks to start shifter from a read
+				LOGSHIFT(" - read SR starts O2 timer ");
+			}
+			else if (SI_T2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr))
+			{
+				m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
+				LOGSHIFT(" - read SR starts T2 timer ");
+			}
+			else if (!SO_T2_RATE(m_acr))
+			{
+				m_shift_timer->adjust(attotime::never);
+				LOGSHIFT("Timer stops");
+			}
+			LOGSHIFT("\n");
 		}
-		else if (SI_T2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr))
-		{
-			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
-			LOGSHIFT(" - read SR starts T2 timer ");
-		}
-		else if (! SO_T2_RATE(m_acr))
-		{
-			m_shift_timer->adjust(attotime::never);
-			LOGSHIFT("Timer stops");
-		}
-		LOGSHIFT("\n");
 		break;
 
 	case VIA_PCR:
@@ -715,7 +755,7 @@ READ8_MEMBER( via6522_device::read )
     via_w - CPU interface for VIA write
 -------------------------------------------------*/
 
-WRITE8_MEMBER( via6522_device::write )
+void via6522_device::write(offs_t offset, u8 data)
 {
 	offset &=0x0f;
 
@@ -839,7 +879,7 @@ WRITE8_MEMBER( via6522_device::write )
 		}
 		else
 		{
-			m_t2->adjust(clocks_to_attotime(TIMER2_VALUE));
+			//m_t2->adjust(clocks_to_attotime(TIMER2_VALUE));
 			m_t2_active = 1;
 			m_time2 = machine().time();
 		}
@@ -954,7 +994,7 @@ WRITE8_MEMBER( via6522_device::write )
 	}
 }
 
-void via6522_device::write_pa(int line, int state)
+void via6522_device::set_pa_line(int line, int state)
 {
 	if (state)
 		m_in_a |= (1 << line);
@@ -1020,16 +1060,24 @@ WRITE_LINE_MEMBER( via6522_device::write_ca2 )
 	}
 }
 
-void via6522_device::write_pb(int line, int state)
+void via6522_device::set_pb_line(int line, int state)
 {
 	if (state)
 		m_in_b |= (1 << line);
 	else
+	{
+		if (line == 6 && BIT(m_in_b, 6))
+			counter2_decrement();
+
 		m_in_b &= ~(1 << line);
+	}
 }
 
 WRITE8_MEMBER( via6522_device::write_pb )
 {
+	if (!BIT(data, 6) && BIT(m_in_b, 6))
+		counter2_decrement();
+
 	m_in_b = data;
 }
 

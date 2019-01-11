@@ -40,6 +40,7 @@ HSync - 15.510kHz
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,6 +55,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void ichibanjyan(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
@@ -63,7 +67,6 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void ichibanjyan(machine_config &config);
 	void ichibanjyan_io(address_map &map);
 	void ichibanjyan_map(address_map &map);
 };
@@ -138,12 +141,11 @@ MACHINE_CONFIG_START(ichibanjyan_state::ichibanjyan)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ichibanjyan)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
+	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", YM2149, MAIN_CLOCK/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YM2149(config, "aysnd", MAIN_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2413, MAIN_CLOCK/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)

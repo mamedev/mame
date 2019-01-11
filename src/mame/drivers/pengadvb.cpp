@@ -49,10 +49,11 @@ public:
 		, m_bank(*this, "bank%u", 0U)
 	{ }
 
-	void init_pengadvb();
 	void pengadvb(machine_config &config);
 
-protected:
+	void init_pengadvb();
+
+private:
 	DECLARE_READ8_MEMBER(mem_r);
 	DECLARE_WRITE8_MEMBER(mem_w);
 	DECLARE_WRITE8_MEMBER(megarom_bank_w);
@@ -70,7 +71,6 @@ protected:
 	void io_mem(address_map &map);
 	void program_mem(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<address_map_bank_device, 4> m_page;
 	required_memory_bank_array<4> m_bank;
@@ -103,7 +103,7 @@ WRITE8_MEMBER(pengadvb_state::megarom_bank_w)
 
 void pengadvb_state::program_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(pengadvb_state::mem_r), FUNC(pengadvb_state::mem_w)); // 4 pages of 16KB
+	map(0x0000, 0xffff).rw(FUNC(pengadvb_state::mem_r), FUNC(pengadvb_state::mem_w)); // 4 pages of 16KB
 }
 
 void pengadvb_state::bank_mem(address_map &map)
@@ -116,7 +116,7 @@ void pengadvb_state::bank_mem(address_map &map)
 	map(0x16000, 0x17fff).bankr("bank1");
 	map(0x18000, 0x19fff).bankr("bank2");
 	map(0x1a000, 0x1bfff).bankr("bank3");
-	map(0x14000, 0x1bfff).w(this, FUNC(pengadvb_state::megarom_bank_w));
+	map(0x14000, 0x1bfff).w(FUNC(pengadvb_state::megarom_bank_w));
 
 	// slot 3, 16KB RAM
 	map(0x3c000, 0x3ffff).ram();
@@ -126,8 +126,8 @@ void pengadvb_state::io_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x98, 0x98).rw("tms9128", FUNC(tms9128_device::vram_read), FUNC(tms9128_device::vram_write));
-	map(0x99, 0x99).rw("tms9128", FUNC(tms9128_device::register_read), FUNC(tms9128_device::register_write));
+	map(0x98, 0x98).rw("tms9128", FUNC(tms9128_device::vram_r), FUNC(tms9128_device::vram_w));
+	map(0x99, 0x99).rw("tms9128", FUNC(tms9128_device::register_r), FUNC(tms9128_device::register_w));
 	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xa2, 0xa2).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -215,62 +215,37 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_c_w)
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(pengadvb_state::pengadvb)
+void pengadvb_state::pengadvb(machine_config &config)
+{   /* basic machine hardware */
+	Z80(config, m_maincpu, XTAL(10'738'635)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pengadvb_state::program_mem);
+	m_maincpu->set_addrmap(AS_IO, &pengadvb_state::io_mem);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'738'635)/3)
-	MCFG_DEVICE_PROGRAM_MAP(program_mem)
-	MCFG_DEVICE_IO_MAP(io_mem)
+	ADDRESS_MAP_BANK(config, "page0").set_map(&pengadvb_state::bank_mem).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
+	ADDRESS_MAP_BANK(config, "page1").set_map(&pengadvb_state::bank_mem).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
+	ADDRESS_MAP_BANK(config, "page2").set_map(&pengadvb_state::bank_mem).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
+	ADDRESS_MAP_BANK(config, "page3").set_map(&pengadvb_state::bank_mem).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 
-	// -_-;
-	MCFG_DEVICE_ADD("page0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
-
-	MCFG_DEVICE_ADD("page1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
-
-	MCFG_DEVICE_ADD("page2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
-
-	MCFG_DEVICE_ADD("page3", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_mem)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
-
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pengadvb_state, pengadvb_ppi_port_a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pengadvb_state, pengadvb_ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pengadvb_state, pengadvb_ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pengadvb_state, pengadvb_ppi_port_c_w))
+	i8255_device &ppi(I8255(config, "ppi8255"));
+	ppi.in_pa_callback().set(FUNC(pengadvb_state::pengadvb_ppi_port_a_r));
+	ppi.out_pa_callback().set(FUNC(pengadvb_state::pengadvb_ppi_port_a_w));
+	ppi.in_pb_callback().set(FUNC(pengadvb_state::pengadvb_ppi_port_b_r));
+	ppi.out_pc_callback().set(FUNC(pengadvb_state::pengadvb_ppi_port_c_w));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tms9128", TMS9128, XTAL(10'738'635)/2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE("tms9128", tms9128_device, screen_update)
+	tms9128_device &vdp(TMS9128(config, "tms9128", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(10'738'635)/6)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pengadvb_state, pengadvb_psg_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(10'738'635)/6));
+	aysnd.port_a_read_callback().set_ioport("IN0");
+	aysnd.port_b_write_callback().set(FUNC(pengadvb_state::pengadvb_psg_port_b_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /***************************************************************************

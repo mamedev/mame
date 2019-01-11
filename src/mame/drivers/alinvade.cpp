@@ -38,6 +38,9 @@ public:
 		, m_discrete(*this, "discrete")
 	{ }
 
+	void alinvade(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(irqmask_r);
 	DECLARE_WRITE8_MEMBER(irqmask_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
@@ -45,9 +48,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void alinvade(machine_config &config);
 	void alinvade_map(address_map &map);
-private:
+
 	uint8_t m_irqmask;
 	uint8_t m_irqff;
 	virtual void machine_start() override;
@@ -80,7 +82,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER( alinvade_state::sound_w )
 {
-	m_discrete->write(space, NODE_01, (data^0x3f)<<2);
+	m_discrete->write(NODE_01, (data^0x3f)<<2);
 }
 
 WRITE8_MEMBER( alinvade_state::sounden_w )
@@ -107,7 +109,7 @@ void alinvade_state::alinvade_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0400, 0x0bff).ram().share("videoram");
 	map(0x0c00, 0x0dff).ram();
-	map(0x2000, 0x2000).w(this, FUNC(alinvade_state::sound_w));
+	map(0x2000, 0x2000).w(FUNC(alinvade_state::sound_w));
 	map(0x4000, 0x4000).portr("COIN");
 	map(0x6000, 0x6000).portr("DSW");
 	map(0x8000, 0x8000).portr("IN0");
@@ -118,8 +120,8 @@ void alinvade_state::alinvade_map(address_map &map)
 	map(0xa000, 0xa000).nopw(); //??
 	map(0xc000, 0xc00f).mirror(0xff0).rom().region("proms", 0);
 	map(0xe000, 0xe3ff).rom();
-	map(0xe400, 0xe400).w(this, FUNC(alinvade_state::sounden_w));
-	map(0xe800, 0xe800).rw(this, FUNC(alinvade_state::irqmask_r), FUNC(alinvade_state::irqmask_w)); //??
+	map(0xe400, 0xe400).w(FUNC(alinvade_state::sounden_w));
+	map(0xe800, 0xe800).rw(FUNC(alinvade_state::irqmask_r), FUNC(alinvade_state::irqmask_w)); //??
 	map(0xec00, 0xffff).rom();
 }
 

@@ -60,6 +60,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void wico(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(lampst_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(muxen_w);
@@ -73,10 +76,9 @@ public:
 	DECLARE_READ8_MEMBER(gentmrcl_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_housekeeping);
 	TIMER_DEVICE_CALLBACK_MEMBER(firq_housekeeping);
-	void wico(machine_config &config);
 	void ccpu_map(address_map &map);
 	void hcpu_map(address_map &map);
-private:
+
 	bool m_zcen;
 	bool m_gten;
 	bool m_disp_on;
@@ -95,22 +97,22 @@ private:
 void wico_state::hcpu_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("sharedram");
-	map(0x1fe0, 0x1fe0).w(this, FUNC(wico_state::muxld_w));
+	map(0x1fe0, 0x1fe0).w(FUNC(wico_state::muxld_w));
 	//AM_RANGE(0x1fe1, 0x1fe1) AM_WRITE(store_w)
-	map(0x1fe2, 0x1fe2).w(this, FUNC(wico_state::muxen_w));
+	map(0x1fe2, 0x1fe2).w(FUNC(wico_state::muxen_w));
 	//AM_RANGE(0x1fe3, 0x1fe3) AM_WRITE(csols_w)
 	map(0x1fe4, 0x1fe4).noprw();
-	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::write));
-	map(0x1fe6, 0x1fe6).w(this, FUNC(wico_state::wdogcl_w));
-	map(0x1fe7, 0x1fe7).w(this, FUNC(wico_state::zcres_w));
-	map(0x1fe8, 0x1fe8).w(this, FUNC(wico_state::dled0_w));
-	map(0x1fe9, 0x1fe9).w(this, FUNC(wico_state::dled1_w));
-	map(0x1fea, 0x1fea).r(this, FUNC(wico_state::gentmrcl_r));
-	map(0x1feb, 0x1feb).r(this, FUNC(wico_state::lampst_r));
+	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::command_w));
+	map(0x1fe6, 0x1fe6).w(FUNC(wico_state::wdogcl_w));
+	map(0x1fe7, 0x1fe7).w(FUNC(wico_state::zcres_w));
+	map(0x1fe8, 0x1fe8).w(FUNC(wico_state::dled0_w));
+	map(0x1fe9, 0x1fe9).w(FUNC(wico_state::dled1_w));
+	map(0x1fea, 0x1fea).r(FUNC(wico_state::gentmrcl_r));
+	map(0x1feb, 0x1feb).r(FUNC(wico_state::lampst_r));
 	//AM_RANGE(0x1fec, 0x1fec) AM_READ(sast_r)
 	//AM_RANGE(0x1fed, 0x1fed) AM_READ(solst1_r)
 	//AM_RANGE(0x1fee, 0x1fee) AM_READ(solst0_r)
-	map(0x1fef, 0x1fef).r(this, FUNC(wico_state::switch_r));
+	map(0x1fef, 0x1fef).r(FUNC(wico_state::switch_r));
 	map(0xf000, 0xffff).rom();
 }
 
@@ -120,15 +122,15 @@ void wico_state::ccpu_map(address_map &map)
 	map(0x0000, 0x07ff).ram().share("sharedram"); // 2128  2k RAM
 	//AM_RANGE(0x1fe0, 0x1fe0) AM_WRITE(muxld_w) // to display module
 	//AM_RANGE(0x1fe1, 0x1fe1) AM_WRITE(store_w) // enable save to nvram
-	map(0x1fe2, 0x1fe2).w(this, FUNC(wico_state::muxen_w)); // digit to display on diagnostic LED; d0=L will disable main displays
-	map(0x1fe3, 0x1fe3).w(this, FUNC(wico_state::csols_w)); // solenoid column
-	map(0x1fe4, 0x1fe4).w(this, FUNC(wico_state::msols_w)); // solenoid row
-	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::write));
-	map(0x1fe6, 0x1fe6).w(this, FUNC(wico_state::wdogcl_w)); // watchdog clear
-	map(0x1fe7, 0x1fe7).w(this, FUNC(wico_state::zcres_w)); // enable IRQ on hcpu
-	map(0x1fe8, 0x1fe8).w(this, FUNC(wico_state::dled0_w)); // turn off diagnostic LED
-	map(0x1fe9, 0x1fe9).w(this, FUNC(wico_state::dled1_w)); // turn on diagnostic LED
-	map(0x1fea, 0x1fea).r(this, FUNC(wico_state::gentmrcl_r)); // enable IRQ on ccpu
+	map(0x1fe2, 0x1fe2).w(FUNC(wico_state::muxen_w)); // digit to display on diagnostic LED; d0=L will disable main displays
+	map(0x1fe3, 0x1fe3).w(FUNC(wico_state::csols_w)); // solenoid column
+	map(0x1fe4, 0x1fe4).w(FUNC(wico_state::msols_w)); // solenoid row
+	map(0x1fe5, 0x1fe5).w("sn76494", FUNC(sn76494_device::command_w));
+	map(0x1fe6, 0x1fe6).w(FUNC(wico_state::wdogcl_w)); // watchdog clear
+	map(0x1fe7, 0x1fe7).w(FUNC(wico_state::zcres_w)); // enable IRQ on hcpu
+	map(0x1fe8, 0x1fe8).w(FUNC(wico_state::dled0_w)); // turn off diagnostic LED
+	map(0x1fe9, 0x1fe9).w(FUNC(wico_state::dled1_w)); // turn on diagnostic LED
+	map(0x1fea, 0x1fea).r(FUNC(wico_state::gentmrcl_r)); // enable IRQ on ccpu
 	//AM_RANGE(0x1feb, 0x1feb) AM_READ(lampst_r) // lamps?
 	//AM_RANGE(0x1fec, 0x1fec) AM_READ(sast_r) // a pwron pulse to d0 L->H
 	//AM_RANGE(0x1fed, 0x1fed) AM_READ(solst1_r) // switches
@@ -446,10 +448,10 @@ MACHINE_CONFIG_START(wico_state::wico)
 	MCFG_DEVICE_PROGRAM_MAP(hcpu_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", wico_state, irq_housekeeping, attotime::from_hz(120)) // zero crossing
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq", wico_state, firq_housekeeping, attotime::from_hz(750)) // time generator
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_wico)
+	config.set_default_layout(layout_wico);
 
 	/* Sound */
 	genpin_audio(config);

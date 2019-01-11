@@ -131,8 +131,8 @@ void phc25_state::phc25_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x40, 0x40).rw(this, FUNC(phc25_state::port40_r), FUNC(phc25_state::port40_w));
+	map(0x00, 0x00).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x40, 0x40).rw(FUNC(phc25_state::port40_r), FUNC(phc25_state::port40_w));
 	map(0x80, 0x80).portr("KEY0");
 	map(0x81, 0x81).portr("KEY1");
 	map(0x82, 0x82).portr("KEY2");
@@ -316,10 +316,10 @@ MACHINE_CONFIG_START(phc25_state::phc25)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(AY8910_TAG, AY8910, 1996750)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("JOY1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ay8910_device &psg(AY8910(config, AY8910_TAG, 1996750));
+	psg.port_a_read_callback().set_ioport("JOY0");
+	psg.port_b_read_callback().set_ioport("JOY1");
+	psg.add_route(ALL_OUTPUTS, "mono", 1.00);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	/* devices */
@@ -328,14 +328,13 @@ MACHINE_CONFIG_START(phc25_state::phc25)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_CASSETTE_INTERFACE("phc25_cass")
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, phc25_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
+	RAM(config, RAM_TAG).set_default_size("16K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "phc25_cass")

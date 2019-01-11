@@ -47,6 +47,7 @@
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -64,6 +65,11 @@ public:
 	{
 	}
 
+	void mjsenpu(machine_config &config);
+
+	void init_mjsenpu();
+
+private:
 	/* devices */
 	required_device<e132xt_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -93,14 +99,12 @@ public:
 	DECLARE_READ32_MEMBER(vram_r);
 	DECLARE_WRITE32_MEMBER(vram_w);
 
-	void init_mjsenpu();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mjsenpu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<palette_device> m_palette;
-	void mjsenpu(machine_config &config);
 	void mjsenpu_32bit_map(address_map &map);
 	void mjsenpu_io(address_map &map);
 };
@@ -219,10 +223,10 @@ void mjsenpu_state::mjsenpu_32bit_map(address_map &map)
 	map(0x00000000, 0x001fffff).ram().share("mainram");
 	map(0x40000000, 0x401fffff).rom().region("user2", 0); // main game rom
 
-	map(0x80000000, 0x8001ffff).rw(this, FUNC(mjsenpu_state::vram_r), FUNC(mjsenpu_state::vram_w));
+	map(0x80000000, 0x8001ffff).rw(FUNC(mjsenpu_state::vram_r), FUNC(mjsenpu_state::vram_w));
 
-	map(0xffc00000, 0xffc000ff).rw(this, FUNC(mjsenpu_state::palette_low_r), FUNC(mjsenpu_state::palette_low_w));
-	map(0xffd00000, 0xffd000ff).rw(this, FUNC(mjsenpu_state::palette_high_r), FUNC(mjsenpu_state::palette_high_w));
+	map(0xffc00000, 0xffc000ff).rw(FUNC(mjsenpu_state::palette_low_r), FUNC(mjsenpu_state::palette_low_w));
+	map(0xffd00000, 0xffd000ff).rw(FUNC(mjsenpu_state::palette_high_r), FUNC(mjsenpu_state::palette_high_w));
 
 	map(0xffe00000, 0xffe007ff).ram().share("nvram");
 
@@ -232,16 +236,16 @@ void mjsenpu_state::mjsenpu_32bit_map(address_map &map)
 
 void mjsenpu_state::mjsenpu_io(address_map &map)
 {
-	map(0x4000, 0x4003).r(this, FUNC(mjsenpu_state::muxed_inputs_r));
+	map(0x4000, 0x4003).r(FUNC(mjsenpu_state::muxed_inputs_r));
 	map(0x4010, 0x4013).portr("IN1");
 
-	map(0x4023, 0x4023).w(this, FUNC(mjsenpu_state::control_w));
+	map(0x4023, 0x4023).w(FUNC(mjsenpu_state::control_w));
 
 	map(0x4030, 0x4033).portr("DSW1");
 	map(0x4040, 0x4043).portr("DSW2");
 	map(0x4050, 0x4053).portr("DSW3");
 
-	map(0x4063, 0x4063).w(this, FUNC(mjsenpu_state::mux_w));
+	map(0x4063, 0x4063).w(FUNC(mjsenpu_state::mux_w));
 
 	map(0x4073, 0x4073).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
@@ -467,7 +471,7 @@ MACHINE_CONFIG_START(mjsenpu_state::mjsenpu)
 	MCFG_DEVICE_IO_MAP(mjsenpu_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mjsenpu_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// more likely coins out?
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)

@@ -230,9 +230,9 @@ void glasgow_state::glasgow_mem(address_map &map)
 {
 	map.global_mask(0x1ffff);
 	map(0x000000, 0x00ffff).rom();
-	map(0x010000, 0x010000).w(this, FUNC(glasgow_state::glasgow_lcd_w));
-	map(0x010002, 0x010002).rw(this, FUNC(glasgow_state::glasgow_keys_r), FUNC(glasgow_state::glasgow_keys_w));
-	map(0x010004, 0x010004).w(this, FUNC(glasgow_state::glasgow_lcd_flag_w));
+	map(0x010000, 0x010000).w(FUNC(glasgow_state::glasgow_lcd_w));
+	map(0x010002, 0x010002).rw(FUNC(glasgow_state::glasgow_keys_r), FUNC(glasgow_state::glasgow_keys_w));
+	map(0x010004, 0x010004).w(FUNC(glasgow_state::glasgow_lcd_flag_w));
 	map(0x010006, 0x010006).rw("board", FUNC(mephisto_board_device::input_r), FUNC(mephisto_board_device::led_w));
 	map(0x010008, 0x010008).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x01c000, 0x01ffff).ram(); // 16KB
@@ -242,12 +242,12 @@ void amsterd_state::amsterd_mem(address_map &map)
 {
 	// ADDRESS_MAP_GLOBAL_MASK(0x7FFFF)
 	map(0x000000, 0x00ffff).rom();
-	map(0x800002, 0x800002).w(this, FUNC(amsterd_state::write_lcd));
-	map(0x800008, 0x800008).w(this, FUNC(amsterd_state::write_lcd_flag));
-	map(0x800004, 0x800004).w(this, FUNC(amsterd_state::write_beeper));
-	map(0x800010, 0x800010).w(this, FUNC(amsterd_state::write_board));
+	map(0x800002, 0x800002).w(FUNC(amsterd_state::write_lcd));
+	map(0x800008, 0x800008).w(FUNC(amsterd_state::write_lcd_flag));
+	map(0x800004, 0x800004).w(FUNC(amsterd_state::write_beeper));
+	map(0x800010, 0x800010).w(FUNC(amsterd_state::write_board));
 	map(0x800020, 0x800020).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x800040, 0x800040).r(this, FUNC(amsterd_state::read_newkeys));
+	map(0x800040, 0x800040).r(FUNC(amsterd_state::read_newkeys));
 	map(0x800088, 0x800088).w("board", FUNC(mephisto_board_device::led_w));
 	map(0xffc000, 0xffffff).ram(); // 16KB
 }
@@ -257,12 +257,12 @@ void amsterd_state::dallas32_mem(address_map &map)
 	// ADDRESS_MAP_GLOBAL_MASK(0x1FFFF)
 	map(0x000000, 0x00ffff).rom();
 	map(0x010000, 0x01ffff).ram(); // 64KB
-	map(0x800002, 0x800002).w(this, FUNC(amsterd_state::write_lcd32));
-	map(0x800004, 0x800004).w(this, FUNC(amsterd_state::write_beeper));
-	map(0x800008, 0x800008).w(this, FUNC(amsterd_state::write_lcd_flag));
-	map(0x800010, 0x800010).w(this, FUNC(amsterd_state::write_board));
+	map(0x800002, 0x800002).w(FUNC(amsterd_state::write_lcd32));
+	map(0x800004, 0x800004).w(FUNC(amsterd_state::write_beeper));
+	map(0x800008, 0x800008).w(FUNC(amsterd_state::write_lcd_flag));
+	map(0x800010, 0x800010).w(FUNC(amsterd_state::write_board));
 	map(0x800020, 0x800020).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x800040, 0x800040).r(this, FUNC(amsterd_state::read_newkeys));
+	map(0x800040, 0x800040).r(FUNC(amsterd_state::read_newkeys));
 	map(0x800088, 0x800088).w("board", FUNC(mephisto_board_device::led_w));
 }
 
@@ -316,10 +316,10 @@ MACHINE_CONFIG_START(glasgow_state::glasgow)
 	MCFG_DEVICE_ADD("maincpu", M68000, 12_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(glasgow_mem)
 
-	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
+	MEPHISTO_SENSORS_BOARD(config, m_board, 0);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_glasgow)
+	config.set_default_layout(layout_glasgow);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 44)

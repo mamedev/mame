@@ -185,6 +185,7 @@ Nearly everything.
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -237,7 +238,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(comebaby_state::comebaby)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PENTIUM, (66666666*19)/2) /* Actually a Celeron */
+	MCFG_DEVICE_ADD("maincpu", PENTIUM2, (66666666*19)/2) /* Actually a Celeron */
 	MCFG_DEVICE_PROGRAM_MAP(comebaby_map)
 	MCFG_DEVICE_IO_MAP(comebaby_io)
 

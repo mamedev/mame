@@ -51,6 +51,10 @@ public:
 			, m_cartslot(*this, "snsslot")
 	{ }
 
+	void snespal(machine_config &config);
+	void snes(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( snes20_hi_r );
 	DECLARE_WRITE8_MEMBER( snes20_hi_w );
 	DECLARE_READ8_MEMBER( snes20_lo_r );
@@ -106,8 +110,7 @@ public:
 	required_device<snes_control_port_device> m_ctrl1;
 	required_device<snes_control_port_device> m_ctrl2;
 	optional_device<sns_cart_slot_device> m_cartslot;
-	void snespal(machine_config &config);
-	void snes(machine_config &config);
+
 	void snes_map(address_map &map);
 	void spc_map(address_map &map);
 };
@@ -1023,7 +1026,7 @@ void snes_console_state::spc_map(address_map &map)
 {
 	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
 	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
-	map(0x0100, 0xffff).rw(this, FUNC(snes_console_state::spc_ram_100_r), FUNC(snes_console_state::spc_ram_100_w));
+	map(0x0100, 0xffff).rw(FUNC(snes_console_state::spc_ram_100_r), FUNC(snes_console_state::spc_ram_100_w));
 }
 
 
@@ -1349,9 +1352,9 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 
-	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snes_state, snes_open_bus_r))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	SNES_PPU(config, m_ppu, MCLK_NTSC);
+	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
+	m_ppu->set_screen("screen");
 
 	MCFG_SNES_CONTROL_PORT_ADD("ctrl1", snes_control_port_devices, "joypad")
 	MCFG_SNESCTRL_ONSCREEN_CB(snes_console_state, onscreen_cb)
@@ -1366,7 +1369,9 @@ MACHINE_CONFIG_START(snes_console_state::snes)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_SNS_CARTRIDGE_ADD("snsslot", snes_cart, nullptr)
+	SNS_CART_SLOT(config, m_cartslot, MCLK_NTSC, snes_cart, nullptr);
+	m_cartslot->irq_callback().set_inputline(m_maincpu, G65816_LINE_IRQ);
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list","snes")
 	MCFG_SOFTWARE_LIST_ADD("bsx_list","snes_bspack")
 	MCFG_SOFTWARE_LIST_ADD("st_list","snes_strom")
@@ -1379,6 +1384,9 @@ MACHINE_CONFIG_START(snes_console_state::snespal)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_PAL, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_PAL, 0, SNES_SCR_HEIGHT_PAL)
+
+	m_ppu->set_clock(MCLK_PAL);
+	m_cartslot->set_clock(MCLK_PAL);
 MACHINE_CONFIG_END
 
 

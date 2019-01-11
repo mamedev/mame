@@ -11,7 +11,7 @@ public:
 	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
 	void set_tx_region(int txregion) { m_txnum = txregion; }
 	void set_col_base(int col) { m_col_base = col; }
@@ -57,12 +57,11 @@ public:
 	/* Undrfire needs to read this for a sprite/tile priority hack */
 	DECLARE_READ8_MEMBER( pri_reg_r );
 
-	void postload();
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 private:
 	// internal state
@@ -109,27 +108,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(TC0480SCP, tc0480scp_device)
-
-
-#define MCFG_TC0480SCP_GFX_REGION(_region) \
-	downcast<tc0480scp_device &>(*device).set_gfx_region(_region);
-
-#define MCFG_TC0480SCP_TX_REGION(_region) \
-	downcast<tc0480scp_device &>(*device).set_tx_region(_region);
-
-#define MCFG_TC0480SCP_OFFSETS(_xoffs, _yoffs) \
-	downcast<tc0480scp_device &>(*device).set_offsets(_xoffs, _yoffs);
-
-#define MCFG_TC0480SCP_OFFSETS_TX(_xoffs, _yoffs) \
-	downcast<tc0480scp_device &>(*device).set_offsets_tx(_xoffs, _yoffs);
-
-#define MCFG_TC0480SCP_OFFSETS_FLIP(_xoffs, _yoffs) \
-	downcast<tc0480scp_device &>(*device).set_offsets_flip(_xoffs, _yoffs);
-
-#define MCFG_TC0480SCP_COL_BASE(_col) \
-	downcast<tc0480scp_device &>(*device).set_col_base(_col);
-
-#define MCFG_TC0480SCP_GFXDECODE(_gfxtag) \
-	downcast<tc0480scp_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_TC0480SCP_H

@@ -11,6 +11,7 @@
 #ifndef MAME_INCLUDES_LISA_H
 #define MAME_INCLUDES_LISA_H
 
+#include "cpu/m6502/m6504.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/74259.h"
 #include "machine/6522via.h"
@@ -20,6 +21,7 @@
 #include "machine/nvram.h"
 #include "machine/sonydriv.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define COP421_TAG      "u9f"
@@ -103,8 +105,8 @@ struct lisa_features_t
 class lisa_state : public driver_device
 {
 public:
-	lisa_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	lisa_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via0(*this, "via6522_0"),
 		m_via1(*this, "via6522_1"),
@@ -113,6 +115,7 @@ public:
 		m_speaker(*this, "speaker"),
 		m_nvram(*this, "nvram"),
 		m_latch(*this, "latch"),
+		m_fdc_cpu(*this,"fdccpu"),
 		m_fdc_rom(*this,"fdc_rom"),
 		m_fdc_ram(*this,"fdc_ram"),
 		m_io_line0(*this, "LINE0"),
@@ -129,6 +132,15 @@ public:
 		m_screen(*this, SCREEN_TAG)
 	{ }
 
+	void lisa(machine_config &config);
+	void lisa210(machine_config &config);
+	void macxl(machine_config &config);
+
+	void init_lisa210();
+	void init_mac_xl();
+	void init_lisa2();
+
+private:
 	required_device<m68000_base_device> m_maincpu;
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
@@ -137,6 +149,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<nvram_device> m_nvram;
 	required_device<ls259_device> m_latch;
+	required_device<m6504_device> m_fdc_cpu;
 
 	required_shared_ptr<uint8_t> m_fdc_rom;
 	required_shared_ptr<uint8_t> m_fdc_ram;
@@ -212,9 +225,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sfmsk_w);
 	DECLARE_WRITE_LINE_MEMBER(hdmsk_w);
 
-	void init_lisa210();
-	void init_mac_xl();
-	void init_lisa2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -242,9 +252,6 @@ public:
 	void scan_keyboard();
 	void unplug_keyboard();
 	void plug_keyboard();
-	void lisa(machine_config &config);
-	void lisa210(machine_config &config);
-	void macxl(machine_config &config);
 	void lisa210_fdc_map(address_map &map);
 	void lisa_fdc_map(address_map &map);
 	void lisa_map(address_map &map);

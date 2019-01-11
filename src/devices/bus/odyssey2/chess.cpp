@@ -31,7 +31,7 @@ o2_chess_device::o2_chess_device(const machine_config &mconfig, const char *tag,
 
 void o2_chess_device::chess_mem(address_map &map)
 {
-	map(0x0000, 0x07ff).r(this, FUNC(o2_chess_device::read_rom04));
+	map(0x0000, 0x07ff).r(FUNC(o2_chess_device::read_rom04));
 }
 
 void o2_chess_device::chess_io(address_map &map)

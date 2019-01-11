@@ -153,7 +153,7 @@ void fitfight_state::fitfight_main_map(address_map &map)
 	//      @0x000037a6/0x000030e6: 0x??dd byte from 0xe08c05, 0xF101 then 0xF001/0xF157 then 0xF057
 
 //  AM_RANGE(0x700000, 0x700001) AM_READ(xxxx) /* see init */
-	map(0x700000, 0x700001).w(this, FUNC(fitfight_state::fitfight_700000_w)).share("fof_700000");
+	map(0x700000, 0x700001).w(FUNC(fitfight_state::fitfight_700000_w)).share("fof_700000");
 	//  kept at 0xe07900/0xe04c56
 
 	map(0x800000, 0x800001).ram().share("fof_800000");
@@ -168,9 +168,9 @@ void fitfight_state::fitfight_main_map(address_map &map)
 	//  histryma: @0x000031be,@0x00001d8e
 
 	map(0xb00000, 0xb03fff).ram(); /* unused layer? */
-	map(0xb04000, 0xb07fff).ram().w(this, FUNC(fitfight_state::fof_bak_tileram_w)).share("fof_bak_tileram");
-	map(0xb08000, 0xb0bfff).ram().w(this, FUNC(fitfight_state::fof_mid_tileram_w)).share("fof_mid_tileram");
-	map(0xb0c000, 0xb0ffff).ram().w(this, FUNC(fitfight_state::fof_txt_tileram_w)).share("fof_txt_tileram");
+	map(0xb04000, 0xb07fff).ram().w(FUNC(fitfight_state::fof_bak_tileram_w)).share("fof_bak_tileram");
+	map(0xb08000, 0xb0bfff).ram().w(FUNC(fitfight_state::fof_mid_tileram_w)).share("fof_mid_tileram");
+	map(0xb0c000, 0xb0ffff).ram().w(FUNC(fitfight_state::fof_txt_tileram_w)).share("fof_txt_tileram");
 
 	map(0xb10000, 0xb13fff).ram(); //used by histryma @0x0000b25a
 	map(0xb14000, 0xb17fff).ram(); //used by histryma @0x0000b25a,b270
@@ -197,16 +197,16 @@ void fitfight_state::bbprot_main_map(address_map &map)
 
 	map(0x600000, 0x600001).writeonly().share("fof_600000");
 
-	map(0x700000, 0x700001).rw(this, FUNC(fitfight_state::bbprot_700000_r), FUNC(fitfight_state::fitfight_700000_w)).share("fof_700000");
+	map(0x700000, 0x700001).rw(FUNC(fitfight_state::bbprot_700000_r), FUNC(fitfight_state::fitfight_700000_w)).share("fof_700000");
 
 	map(0x800000, 0x800001).writeonly().share("fof_800000");
 	map(0x900000, 0x900001).writeonly().share("fof_900000");
 	map(0xa00000, 0xa00001).writeonly().share("fof_a00000");
 
 	map(0xb00000, 0xb03fff).nopw(); /* unused layer? */
-	map(0xb04000, 0xb07fff).ram().w(this, FUNC(fitfight_state::fof_bak_tileram_w)).share("fof_bak_tileram");
-	map(0xb08000, 0xb0bfff).ram().w(this, FUNC(fitfight_state::fof_mid_tileram_w)).share("fof_mid_tileram");
-	map(0xb0c000, 0xb0ffff).ram().w(this, FUNC(fitfight_state::fof_txt_tileram_w)).share("fof_txt_tileram");
+	map(0xb04000, 0xb07fff).ram().w(FUNC(fitfight_state::fof_bak_tileram_w)).share("fof_bak_tileram");
+	map(0xb08000, 0xb0bfff).ram().w(FUNC(fitfight_state::fof_mid_tileram_w)).share("fof_mid_tileram");
+	map(0xb0c000, 0xb0ffff).ram().w(FUNC(fitfight_state::fof_txt_tileram_w)).share("fof_txt_tileram");
 
 	map(0xc00000, 0xc00fff).readonly();
 	map(0xc00000, 0xc03fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -257,11 +257,6 @@ WRITE8_MEMBER(fitfight_state::snd_portb_w)
 WRITE8_MEMBER(fitfight_state::snd_portc_w)
 {
 	//logerror("PC W %x %s\n",data,machine().describe_context());
-}
-
-INTERRUPT_GEN_MEMBER(fitfight_state::snd_irq)
-{
-	device.execute().pulse_input_line(UPD7810_INTF2, device.execute().minimum_quantum_time());
 }
 
 
@@ -731,29 +726,27 @@ MACHINE_CONFIG_START(fitfight_state::fitfight)
 	MCFG_DEVICE_PROGRAM_MAP(fitfight_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", UPD7810, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(snd_mem)
-	MCFG_UPD7810_PORTA_READ_CB(READ8(*this, fitfight_state, snd_porta_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, fitfight_state, snd_porta_w))
-	MCFG_UPD7810_PORTB_READ_CB(READ8(*this, fitfight_state, snd_portb_r))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(*this, fitfight_state, snd_portb_w))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(*this, fitfight_state, snd_portc_r))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, fitfight_state, snd_portc_w))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fitfight_state,  snd_irq)
+	upd7810_device &audiocpu(UPD7810(config, m_audiocpu, 12000000));
+	audiocpu.set_addrmap(AS_PROGRAM, &fitfight_state::snd_mem);
+	audiocpu.pa_in_cb().set(FUNC(fitfight_state::snd_porta_r));
+	audiocpu.pa_out_cb().set(FUNC(fitfight_state::snd_porta_w));
+	audiocpu.pb_in_cb().set(FUNC(fitfight_state::snd_portb_r));
+	audiocpu.pb_out_cb().set(FUNC(fitfight_state::snd_portb_w));
+	audiocpu.pc_in_cb().set(FUNC(fitfight_state::snd_portc_r));
+	audiocpu.pc_out_cb().set(FUNC(fitfight_state::snd_portc_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fitfight)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fitfight);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(2*8, 39*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fitfight_state, screen_update_fitfight)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(2*8, 39*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(fitfight_state::screen_update_fitfight));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF2, m_audiocpu->minimum_quantum_time()); });
 
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x800);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -767,8 +760,7 @@ MACHINE_CONFIG_START(fitfight_state::bbprot)
 	MCFG_DEVICE_PROGRAM_MAP(bbprot_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_prot)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_prot);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -778,9 +770,7 @@ MACHINE_CONFIG_START(fitfight_state::bbprot)
 	MCFG_SCREEN_UPDATE_DRIVER(fitfight_state, screen_update_fitfight)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x2000);
 
 	SPEAKER(config, "mono").front_center();
 

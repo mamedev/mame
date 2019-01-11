@@ -19,88 +19,6 @@
 
 
 /***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-// SIO callbacks
-#define MCFG_TMPZ84C015_OUT_TXDA_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_txda_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_DTRA_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_dtra_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_RTSA_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_rtsa_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_WRDYA_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_wrdya_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_SYNCA_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_synca_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_TXDB_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_txdb_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_DTRB_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_dtrb_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_RTSB_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_rtsb_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_WRDYB_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_wrdyb_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_SYNCB_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_syncb_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_RXDRQA_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_rxdrqa_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_TXDRQA_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_txdrqa_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_RXDRQB_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_rxdrqb_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_TXDRQB_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_txdrqb_callback(DEVCB_##_devcb);
-
-
-// CTC callbacks
-#define MCFG_TMPZ84C015_ZC0_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_zc_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_ZC1_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_zc_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_ZC2_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_zc_callback<2>(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_ZC3_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_zc_callback<3>(DEVCB_##_devcb);
-
-
-// PIO callbacks
-#define MCFG_TMPZ84C015_IN_PA_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_PA_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_ARDY_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_ardy_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_IN_PB_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_PB_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
-
-#define MCFG_TMPZ84C015_OUT_BRDY_CB(_devcb) \
-	devcb = &downcast<tmpz84c015_device &>(*device).set_out_brdy_callback(DEVCB_##_devcb);
-
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -110,32 +28,36 @@ public:
 	tmpz84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 
 	// configuration helpers
-	template<class Object> devcb_base &set_out_txda_callback(Object &&cb) { return m_out_txda_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_out_dtra_callback(Object &&cb) { return m_out_dtra_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_out_rtsa_callback(Object &&cb) { return m_out_rtsa_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_out_wrdya_callback(Object &&cb) { return m_out_wrdya_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_out_synca_callback(Object &&cb) { return m_out_synca_cb.set_callback(std::forward<Object>(cb)); }
 
-	template<class Object> devcb_base &set_out_txdb_callback(Object &&cb) { return m_out_txdb_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_out_dtrb_callback(Object &&cb) { return m_out_dtrb_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_out_rtsb_callback(Object &&cb) { return m_out_rtsb_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_out_wrdyb_callback(Object &&cb) { return m_out_wrdyb_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_out_syncb_callback(Object &&cb) { return m_out_syncb_cb.set_callback(std::forward<Object>(cb)); }
+	// SIO callbacks
+	auto out_txda_callback() { return m_out_txda_cb.bind(); }
+	auto out_dtra_callback() { return m_out_dtra_cb.bind(); }
+	auto out_rtsa_callback() { return m_out_rtsa_cb.bind(); }
+	auto out_wrdya_callback() { return m_out_wrdya_cb.bind(); }
+	auto out_synca_callback() { return m_out_synca_cb.bind(); }
 
-	template<class Object> devcb_base &set_out_rxdrqa_callback(Object &&cb) { return m_out_rxdrqa_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_out_txdrqa_callback(Object &&cb) { return m_out_txdrqa_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_out_rxdrqb_callback(Object &&cb) { return m_out_rxdrqb_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_out_txdrqb_callback(Object &&cb) { return m_out_txdrqb_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_txdb_callback() { return m_out_txdb_cb.bind(); }
+	auto out_dtrb_callback() { return m_out_dtrb_cb.bind(); }
+	auto out_rtsb_callback() { return m_out_rtsb_cb.bind(); }
+	auto out_wrdyb_callback() { return m_out_wrdyb_cb.bind(); }
+	auto out_syncb_callback() { return m_out_syncb_cb.bind(); }
 
-	template<unsigned N, class Object> devcb_base &set_zc_callback(Object &&cb) { return m_zc_cb[N].set_callback(std::forward<Object>(cb)); }
+	auto out_rxdrqa_callback() { return m_out_rxdrqa_cb.bind(); }
+	auto out_txdrqa_callback() { return m_out_txdrqa_cb.bind(); }
+	auto out_rxdrqb_callback() { return m_out_rxdrqb_cb.bind(); }
+	auto out_txdrqb_callback() { return m_out_txdrqb_cb.bind(); }
 
-	template<class Object> devcb_base &set_in_pa_callback(Object &&cb) { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_out_pa_callback(Object &&cb) { return m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_out_ardy_callback(Object &&cb) { return m_out_ardy_cb.set_callback(std::forward<Object>(cb)); }
+	// CTC callbacks
+	template<unsigned N> auto zc_callback() { return m_zc_cb[N].bind(); }
 
-	template<class Object> devcb_base &set_in_pb_callback(Object &&cb) { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_out_pb_callback(Object &&cb) { return m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_out_brdy_callback(Object &&cb) { return m_out_brdy_cb.set_callback(std::forward<Object>(cb)); }
+	// PIO callbacks
+	auto in_pa_callback() { return m_in_pa_cb.bind(); }
+	auto out_pa_callback() { return m_out_pa_cb.bind(); }
+	auto out_ardy_callback() { return m_out_ardy_cb.bind(); }
+
+	auto in_pb_callback() { return m_in_pb_cb.bind(); }
+	auto out_pb_callback() { return m_out_pb_cb.bind(); }
+	auto out_brdy_callback() { return m_out_brdy_cb.bind(); }
 
 	// SIO public interface
 	DECLARE_WRITE_LINE_MEMBER( rxa_w ) { m_sio->rxa_w(state); }
@@ -150,7 +72,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rxcb_w ) { m_sio->rxcb_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( txca_w ) { m_sio->txca_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( txcb_w ) { m_sio->txcb_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxtxcb_w ) { m_sio->rxtxcb_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( synca_w ) { m_sio->synca_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( syncb_w ) { m_sio->syncb_w(state); }
 

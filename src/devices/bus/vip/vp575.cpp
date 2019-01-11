@@ -267,11 +267,12 @@ int vp575_device::vip_ef4_r()
 //  vip_sc_w - status code write
 //-------------------------------------------------
 
-void vp575_device::vip_sc_w(int data)
+void vp575_device::vip_sc_w(int n, int sc)
 {
+	address_space &space = machine().dummy_space();
 	for (auto & elem : m_expansion_slot)
 	{
-		elem->sc_w(data);
+		elem->sc_w(space, n, sc);
 	}
 }
 
@@ -285,6 +286,19 @@ void vp575_device::vip_q_w(int state)
 	for (auto & elem : m_expansion_slot)
 	{
 		elem->q_w(state);
+	}
+}
+
+
+//-------------------------------------------------
+//  vip_tpb_w - TPB write
+//-------------------------------------------------
+
+void vp575_device::vip_tpb_w(int state)
+{
+	for (auto & elem : m_expansion_slot)
+	{
+		elem->tpb_w(state);
 	}
 }
 

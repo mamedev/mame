@@ -77,8 +77,8 @@ WRITE16_MEMBER(foodf_state::foodf_paletteram_w)
 {
 	int newword, r, g, b, bit0, bit1, bit2;
 
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	newword = m_generic_paletteram_16[offset];
+	COMBINE_DATA(&m_paletteram[offset]);
+	newword = m_paletteram[offset];
 
 	/* only the bottom 8 bits are used */
 	/* red component */

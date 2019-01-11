@@ -39,7 +39,7 @@
 #define RS232_TAG   "rs232"
 #define KBDC_TAG    "ay3600"
 
-#define MASTER_CLOCK XTAL(13'608'000)
+#define MASTER_CLOCK 13.608_MHz_XTAL
 
 class tv910_state : public driver_device
 {
@@ -59,6 +59,9 @@ public:
 		, m_charset(*this, "CHARSET")
 	{ }
 
+	void tv910(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -80,9 +83,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
 
-	void tv910(machine_config &config);
 	void tv910_mem(address_map &map);
-private:
+
 	required_device<m6502_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
 	required_device<r6545_1_device> m_crtc;
@@ -108,15 +110,15 @@ void tv910_state::tv910_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
 	map(0x4000, 0x47ff).ram().share("vram"); // VRAM
-	map(0x8010, 0x801f).r(this, FUNC(tv910_state::charset_r));
+	map(0x8010, 0x801f).r(FUNC(tv910_state::charset_r));
 	map(0x8020, 0x8020).rw(m_crtc, FUNC(r6545_1_device::status_r), FUNC(r6545_1_device::address_w));
 	map(0x8021, 0x8021).rw(m_crtc, FUNC(r6545_1_device::register_r), FUNC(r6545_1_device::register_w));
 	map(0x8030, 0x8033).rw(ACIA_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0x8040, 0x804f).w(this, FUNC(tv910_state::vbl_ack_w));
-	map(0x8050, 0x805f).w(this, FUNC(tv910_state::nmi_ack_w));
-	map(0x8060, 0x806f).r(this, FUNC(tv910_state::kbd_ascii_r));
-	map(0x8070, 0x807f).r(this, FUNC(tv910_state::kbd_flags_r));
-	map(0x9000, 0x9000).w(this, FUNC(tv910_state::control_w));
+	map(0x8040, 0x804f).w(FUNC(tv910_state::vbl_ack_w));
+	map(0x8050, 0x805f).w(FUNC(tv910_state::nmi_ack_w));
+	map(0x8060, 0x806f).r(FUNC(tv910_state::kbd_ascii_r));
+	map(0x8070, 0x807f).r(FUNC(tv910_state::kbd_flags_r));
+	map(0x9000, 0x9000).w(FUNC(tv910_state::control_w));
 	map(0x9001, 0x9001).portr("DSW1");
 	map(0x9002, 0x9002).portr("DSW2");
 	map(0xf000, 0xffff).rom().region("maincpu", 0);
@@ -519,38 +521,39 @@ MACHINE_CONFIG_START(tv910_state::tv910)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 840, 0, 640, 270, 0, 240)
 	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, r6545_1_device, screen_update )
 
-	MCFG_MC6845_ADD(CRTC_TAG, R6545_1, "screen", MASTER_CLOCK/8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(tv910_state, crtc_update_row)
-	MCFG_MC6845_ADDR_CHANGED_CB(tv910_state, crtc_update_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, tv910_state, vbl_w))
+	R6545_1(config, m_crtc, MASTER_CLOCK/8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(tv910_state::crtc_update_row), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(tv910_state::crtc_update_addr), this);
+	m_crtc->out_vsync_callback().set(FUNC(tv910_state::vbl_w));
 
-	MCFG_DEVICE_ADD(KBDC_TAG, AY3600, 0)
-	MCFG_AY3600_MATRIX_X0(IOPORT("X0"))
-	MCFG_AY3600_MATRIX_X1(IOPORT("X1"))
-	MCFG_AY3600_MATRIX_X2(IOPORT("X2"))
-	MCFG_AY3600_MATRIX_X3(IOPORT("X3"))
-	MCFG_AY3600_MATRIX_X4(IOPORT("X4"))
-	MCFG_AY3600_MATRIX_X5(IOPORT("X5"))
-	MCFG_AY3600_MATRIX_X6(IOPORT("X6"))
-	MCFG_AY3600_MATRIX_X7(IOPORT("X7"))
-	MCFG_AY3600_MATRIX_X8(IOPORT("X8"))
-	MCFG_AY3600_SHIFT_CB(READLINE(*this, tv910_state, ay3600_shift_r))
-	MCFG_AY3600_CONTROL_CB(READLINE(*this, tv910_state, ay3600_control_r))
-	MCFG_AY3600_DATA_READY_CB(WRITELINE(*this, tv910_state, ay3600_data_ready_w))
-	MCFG_AY3600_AKO_CB(WRITELINE(*this, tv910_state, ay3600_ako_w))
+	AY3600(config, m_ay3600, 0);
+	m_ay3600->x0().set_ioport("X0");
+	m_ay3600->x1().set_ioport("X1");
+	m_ay3600->x2().set_ioport("X2");
+	m_ay3600->x3().set_ioport("X3");
+	m_ay3600->x4().set_ioport("X4");
+	m_ay3600->x5().set_ioport("X5");
+	m_ay3600->x6().set_ioport("X6");
+	m_ay3600->x7().set_ioport("X7");
+	m_ay3600->x8().set_ioport("X8");
+	m_ay3600->shift().set(FUNC(tv910_state::ay3600_shift_r));
+	m_ay3600->control().set(FUNC(tv910_state::ay3600_control_r));
+	m_ay3600->data_ready().set(FUNC(tv910_state::ay3600_data_ready_w));
+	m_ay3600->ako().set(FUNC(tv910_state::ay3600_ako_w));
 
-	MCFG_DEVICE_ADD(ACIA_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_MOS6551_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	mos6551_device &acia(MOS6551(config, ACIA_TAG, 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
+	acia.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	acia.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	acia.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(ACIA_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(ACIA_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(ACIA_TAG, mos6551_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(ACIA_TAG, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(ACIA_TAG, FUNC(mos6551_device::write_dcd));
+	rs232.cts_handler().set(ACIA_TAG, FUNC(mos6551_device::write_cts));
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("bell", BEEP, MASTER_CLOCK / 8400) // 1620 Hz (Row 10 signal)

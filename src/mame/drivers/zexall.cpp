@@ -32,13 +32,15 @@ class zexall_state : public driver_device
 {
 public:
 	zexall_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, "terminal"),
-		m_main_ram(*this, "main_ram")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+		, m_main_ram(*this, "main_ram")
+	{ }
 
+	void zexall(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( output_ack_r );
 	DECLARE_READ8_MEMBER( output_req_r );
 	DECLARE_READ8_MEMBER( output_data_r );
@@ -46,9 +48,8 @@ public:
 	DECLARE_WRITE8_MEMBER( output_req_w );
 	DECLARE_WRITE8_MEMBER( output_data_w );
 
-	void zexall(machine_config &config);
-	void z80_mem(address_map &map);
-private:
+	void mem_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<uint8_t> m_main_ram;
@@ -136,12 +137,12 @@ WRITE8_MEMBER( zexall_state::output_data_w )
  Address Maps
 ******************************************************************************/
 
-void zexall_state::z80_mem(address_map &map)
+void zexall_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("main_ram");
-	map(0xfffd, 0xfffd).rw(this, FUNC(zexall_state::output_ack_r), FUNC(zexall_state::output_ack_w));
-	map(0xfffe, 0xfffe).rw(this, FUNC(zexall_state::output_req_r), FUNC(zexall_state::output_req_w));
-	map(0xffff, 0xffff).rw(this, FUNC(zexall_state::output_data_r), FUNC(zexall_state::output_data_w));
+	map(0xfffd, 0xfffd).rw(FUNC(zexall_state::output_ack_r), FUNC(zexall_state::output_ack_w));
+	map(0xfffe, 0xfffe).rw(FUNC(zexall_state::output_req_r), FUNC(zexall_state::output_req_w));
+	map(0xffff, 0xffff).rw(FUNC(zexall_state::output_data_r), FUNC(zexall_state::output_data_w));
 }
 
 
@@ -157,14 +158,15 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
-MACHINE_CONFIG_START(zexall_state::zexall)
+void zexall_state::zexall(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
+	Z80(config, m_maincpu, XTAL(3'579'545));
+	m_maincpu->set_addrmap(AS_PROGRAM, &zexall_state::mem_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-MACHINE_CONFIG_END
+	GENERIC_TERMINAL(config, m_terminal, 0);
+}
 
 
 /******************************************************************************

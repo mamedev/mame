@@ -229,9 +229,9 @@ void mcs40_cpu_device_base::device_start()
 	save_item(NAME(m_4289_first));
 	save_item(NAME(m_a));
 	save_item(NAME(m_c));
-	save_pointer(NAME(m_addr_stack.get()), m_stack_ptr_mask + 1);
+	save_pointer(NAME(m_addr_stack), m_stack_ptr_mask + 1);
 	save_item(NAME(m_stack_ptr));
-	save_pointer(NAME(m_index_regs.get()), m_index_reg_cnt >> 1);
+	save_pointer(NAME(m_index_regs), m_index_reg_cnt >> 1);
 	save_item(NAME(m_index_reg_bank));
 	save_item(NAME(m_cr));
 	save_item(NAME(m_pending_cr3));

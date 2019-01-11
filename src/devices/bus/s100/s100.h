@@ -77,55 +77,55 @@
 
 
 #define MCFG_S100_IRQ_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_NMI_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI0_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi0_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi0_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI1_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi1_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi1_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI2_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi2_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi2_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI3_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi3_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi3_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI4_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi4_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi4_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI5_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi5_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi5_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI6_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi6_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi6_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_VI7_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_vi7_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_vi7_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_DMA0_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_dma0_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_dma0_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_DMA1_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_dma1_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_dma1_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_DMA2_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_dma2_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_dma2_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_DMA3_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_dma3_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_dma3_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_RDY_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_rdy_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_rdy_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_HOLD_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_hold_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_hold_wr_callback(DEVCB_##_write);
 
 #define MCFG_S100_ERROR_CALLBACK(_write) \
-	devcb = &downcast<s100_bus_device &>(*device).set_error_wr_callback(DEVCB_##_write);
+	downcast<s100_bus_device &>(*device).set_error_wr_callback(DEVCB_##_write);
 
 
 
@@ -148,7 +148,7 @@ public:
 	// interrupts
 	virtual void s100_int_w(int state) { }
 	virtual void s100_nmi_w(int state) { }
-	virtual uint8_t s100_sinta_r(offs_t offset) { return 0; }
+	virtual uint8_t s100_sinta_r(offs_t offset) { return 0xff; }
 
 	// vectored interrupts
 	virtual void s100_vi0_w(int state) { }
@@ -161,11 +161,11 @@ public:
 	virtual void s100_vi7_w(int state) { }
 
 	// memory access
-	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) { return 0; }
+	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) { return 0xff; }
 	virtual void s100_mwrt_w(address_space &space, offs_t offset, uint8_t data) { }
 
 	// I/O access
-	virtual uint8_t s100_sinp_r(address_space &space, offs_t offset) { return 0; }
+	virtual uint8_t s100_sinp_r(address_space &space, offs_t offset) { return 0xff; }
 	virtual void s100_sout_w(address_space &space, offs_t offset, uint8_t data) { }
 
 	// configuration access

@@ -457,6 +457,7 @@
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -480,9 +481,18 @@ public:
 		m_rom_bank(*this, "rom_bank"),
 		m_fg_vram(*this, "fg_vram"),
 		m_bg_vram(*this, "bg_vram"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void majorpkr(machine_config &config);
+
+	void init_majorpkr();
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(rom_bank_w);
 	DECLARE_WRITE8_MEMBER(palette_bank_w);
 	DECLARE_WRITE8_MEMBER(vram_bank_w);
@@ -495,19 +505,13 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_a_w);
 	DECLARE_WRITE8_MEMBER(lamps_b_w);
 	DECLARE_WRITE8_MEMBER(pulses_w);
-	void init_majorpkr();
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	uint32_t screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void majorpkr(machine_config &config);
 	void map(address_map &map);
 	void palettebanks(address_map &map);
 	void portmap(address_map &map);
 	void vrambanks(address_map &map);
-
-protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
-	virtual void video_start() override;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<address_map_bank_device> m_palette_bank;
@@ -521,7 +525,7 @@ protected:
 
 	int m_mux_data;
 	int m_flip_state;
-	output_finder<13> m_lamp;
+	output_finder<13> m_lamps;
 };
 
 
@@ -684,13 +688,13 @@ WRITE8_MEMBER(majorpkr_state::lamps_a_w)
     -x-- ----   Small lamp.
     x--- ----   Unknown.
 */
-	m_lamp[0] = BIT(data, 0);       // Lamp 0: Hold 1.
-	m_lamp[1] = BIT(data, 1);  // Lamp 1: Hold 2.
-	m_lamp[2] = BIT(data, 2);  // Lamp 2: Hold 3.
-	m_lamp[3] = BIT(data, 3);  // Lamp 3: Hold 4.
-	m_lamp[4] = BIT(data, 4);  // Lamp 4: Hold 5.
-	m_lamp[5] = BIT(data, 5);  // Lamp 5: Big or Small (need identification).
-	m_lamp[6] = BIT(data, 6);  // Lamp 6: Big or Small (need identification).
+	m_lamps[0] = BIT(data, 0);       // Lamp 0: Hold 1.
+	m_lamps[1] = BIT(data, 1);  // Lamp 1: Hold 2.
+	m_lamps[2] = BIT(data, 2);  // Lamp 2: Hold 3.
+	m_lamps[3] = BIT(data, 3);  // Lamp 3: Hold 4.
+	m_lamps[4] = BIT(data, 4);  // Lamp 4: Hold 5.
+	m_lamps[5] = BIT(data, 5);  // Lamp 5: Big or Small (need identification).
+	m_lamps[6] = BIT(data, 6);  // Lamp 6: Big or Small (need identification).
 
 	if (data & 0x80)
 		logerror("Lamps A: Write to 13h: %02x\n", data);
@@ -710,12 +714,12 @@ WRITE8_MEMBER(majorpkr_state::lamps_b_w)
     --x- ----   Fever lamp.
     xx-- ----   Unknown.
 */
-	m_lamp[7] = BIT(data, 0);        // Lamp 7: Bet.
-	m_lamp[8] = BIT(data, 1);   // Lamp 8: Draw.
-	m_lamp[9] = BIT(data, 2);   // Lamp 9: Cancel.
-	m_lamp[10] = BIT(data, 3);  // Lamp 10: Take.
-	m_lamp[11] = BIT(data, 4);  // Lamp 11: D-UP.
-	m_lamp[12] = BIT(data, 5);  // Lamp 12: Fever.
+	m_lamps[7] = BIT(data, 0);        // Lamp 7: Bet.
+	m_lamps[8] = BIT(data, 1);   // Lamp 8: Draw.
+	m_lamps[9] = BIT(data, 2);   // Lamp 9: Cancel.
+	m_lamps[10] = BIT(data, 3);  // Lamp 10: Take.
+	m_lamps[11] = BIT(data, 4);  // Lamp 11: D-UP.
+	m_lamps[12] = BIT(data, 5);  // Lamp 12: Fever.
 
 	if (data & 0xc0)
 		logerror("Lamps B: Write to 14h: %02x\n", data);
@@ -764,8 +768,8 @@ void majorpkr_state::palettebanks(address_map &map)
 
 void majorpkr_state::vrambanks(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(this, FUNC(majorpkr_state::fg_vram_w)).share("fg_vram");
-	map(0x0800, 0x0fff).ram().w(this, FUNC(majorpkr_state::bg_vram_w)).share("bg_vram");
+	map(0x0000, 0x07ff).ram().w(FUNC(majorpkr_state::fg_vram_w)).share("fg_vram");
+	map(0x0800, 0x0fff).ram().w(FUNC(majorpkr_state::bg_vram_w)).share("bg_vram");
 	map(0x1000, 0x1fff).ram(); // spare vram? cleared during boot along with fg and bg
 }
 
@@ -793,20 +797,20 @@ void majorpkr_state::vrambanks(address_map &map)
 void majorpkr_state::portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(majorpkr_state::rom_bank_w));
-	map(0x01, 0x01).w(this, FUNC(majorpkr_state::palette_bank_w));
-	map(0x02, 0x02).w(this, FUNC(majorpkr_state::vram_bank_w));
+	map(0x00, 0x00).w(FUNC(majorpkr_state::rom_bank_w));
+	map(0x01, 0x01).w(FUNC(majorpkr_state::palette_bank_w));
+	map(0x02, 0x02).w(FUNC(majorpkr_state::vram_bank_w));
 
-	map(0x10, 0x10).r(this, FUNC(majorpkr_state::mux_port2_r));   // muxed set of controls.
-	map(0x10, 0x10).w(this, FUNC(majorpkr_state::pulses_w));     // kind of watchdog on bit4... mech counters on bits 0-1-2-3.
+	map(0x10, 0x10).r(FUNC(majorpkr_state::mux_port2_r));   // muxed set of controls.
+	map(0x10, 0x10).w(FUNC(majorpkr_state::pulses_w));     // kind of watchdog on bit4... mech counters on bits 0-1-2-3.
 	map(0x11, 0x11).portr("IN1");
-	map(0x11, 0x11).w(this, FUNC(majorpkr_state::mux_sel_w));    // multiplexer selector.
+	map(0x11, 0x11).w(FUNC(majorpkr_state::mux_sel_w));    // multiplexer selector.
 	map(0x12, 0x12).portr("IN2");
-	map(0x12, 0x12).w(this, FUNC(majorpkr_state::vidreg_w));     // video registers: normal or up down screen.
-	map(0x13, 0x13).r(this, FUNC(majorpkr_state::mux_port_r));    // all 4 DIP switches banks multiplexed.
-	map(0x13, 0x13).w(this, FUNC(majorpkr_state::lamps_a_w));    // lamps a out.
+	map(0x12, 0x12).w(FUNC(majorpkr_state::vidreg_w));     // video registers: normal or up down screen.
+	map(0x13, 0x13).r(FUNC(majorpkr_state::mux_port_r));    // all 4 DIP switches banks multiplexed.
+	map(0x13, 0x13).w(FUNC(majorpkr_state::lamps_a_w));    // lamps a out.
 	map(0x14, 0x14).portr("TEST");   // "freeze" switch.
-	map(0x14, 0x14).w(this, FUNC(majorpkr_state::lamps_b_w));    // lamps b out.
+	map(0x14, 0x14).w(FUNC(majorpkr_state::lamps_b_w));    // lamps b out.
 
 	map(0x30, 0x30).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x31, 0x31).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -1007,21 +1011,10 @@ MACHINE_CONFIG_START(majorpkr_state::majorpkr)
 	MCFG_DEVICE_IO_MAP(portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", majorpkr_state, irq0_line_hold)
 
-	MCFG_DEVICE_ADD("palette_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(palettebanks)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
+	ADDRESS_MAP_BANK(config, "palette_bank").set_map(&majorpkr_state::palettebanks).set_options(ENDIANNESS_LITTLE, 8, 13, 0x800);
+	ADDRESS_MAP_BANK(config, "vram_bank").set_map(&majorpkr_state::vrambanks).set_options(ENDIANNESS_LITTLE, 8, 13, 0x800);
 
-	MCFG_DEVICE_ADD("vram_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vrambanks)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1029,15 +1022,15 @@ MACHINE_CONFIG_START(majorpkr_state::majorpkr)
 	MCFG_SCREEN_UPDATE_DRIVER(majorpkr_state, screen_update_majorpkr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_majorpkr)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_majorpkr);
 
-	MCFG_PALETTE_ADD("palette", 0x100 * 16)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 0x100 * 16);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)  // verified.
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_VISAREA_ADJUST(0, -16, 0, 0)
-	MCFG_MC6845_CHAR_WIDTH(16)
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));  // verified.
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_visarea_adjust(0, -16, 0, 0);
+	crtc.set_char_width(16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

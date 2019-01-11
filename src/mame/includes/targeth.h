@@ -6,13 +6,14 @@
 #pragma once
 
 #include "machine/74259.h"
+#include "emupal.h"
 #include "screen.h"
 
 class targeth_state : public driver_device
 {
 public:
-	targeth_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	targeth_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -21,10 +22,14 @@ public:
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
-		m_shareram(*this, "shareram")
+		m_shareram(*this, "shareram"),
+		m_okibank(*this, "okibank")
 	{ }
 
-	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
+	void targeth(machine_config &config);
+
+private:
+	DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(output_latch_w);
 	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
@@ -33,25 +38,22 @@ public:
 
 	DECLARE_WRITE16_MEMBER(vram_w);
 
-	TILE_GET_INFO_MEMBER(get_tile_info_screen0);
-	TILE_GET_INFO_MEMBER(get_tile_info_screen1);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
 	TIMER_CALLBACK_MEMBER(gun1_irq);
 	TIMER_CALLBACK_MEMBER(gun2_irq);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void targeth(machine_config &config);
 	void main_map(address_map &map);
 	void mcu_hostmem_map(address_map &map);
 	void oki_map(address_map &map);
-protected:
+
 	virtual void video_start() override;
 	virtual void machine_start() override;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -61,7 +63,9 @@ private:
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_shareram;
+	required_shared_ptr<uint16_t> m_shareram;
+
+	required_memory_bank m_okibank;
 
 	emu_timer       *m_gun_irq_timer[2];
 

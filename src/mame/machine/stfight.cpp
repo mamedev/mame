@@ -168,6 +168,9 @@ WRITE8_MEMBER(stfight_state::stfight_coin_w)
 
 WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
 {
+	if (!state)
+		return;
+
 	// Falling edge triggered interrupt at half the rate of /VCK?
 	m_mcu->set_input_line(M68705_IRQ_LINE, m_vck2 ? ASSERT_LINE : CLEAR_LINE);
 	m_vck2 = !m_vck2;
@@ -180,7 +183,7 @@ WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
 			adpcm_data >>= 4;
 		++m_adpcm_data_offs;
 
-		m_msm->data_w(adpcm_data & 0x0f);
+		m_msm->write_data(adpcm_data & 0x0f);
 	}
 }
 

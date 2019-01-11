@@ -25,6 +25,7 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -32,8 +33,8 @@
 class metlfrzr_state : public driver_device
 {
 public:
-	metlfrzr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	metlfrzr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_work_ram(*this, "wram"),
@@ -43,6 +44,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void metlfrzr(machine_config &config);
+
+	void init_metlfrzr();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -58,12 +64,10 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	void init_metlfrzr();
 	DECLARE_WRITE8_MEMBER(output_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	uint8_t m_fg_tilebank;
 	bool m_rowscroll_enable;
-	void metlfrzr(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void metlfrzr_map(address_map &map);
 };
@@ -195,7 +199,7 @@ void metlfrzr_state::metlfrzr_map(address_map &map)
 	map(0xd604, 0xd604).portr("DSW2");
 	map(0xd600, 0xd61f).writeonly().share("vregs");
 
-	map(0xd700, 0xd700).w(this, FUNC(metlfrzr_state::output_w));
+	map(0xd700, 0xd700).w(FUNC(metlfrzr_state::output_w));
 	map(0xd710, 0xd710).w("t5182", FUNC(t5182_device::sound_irq_w));
 	map(0xd711, 0xd711).r("t5182", FUNC(t5182_device::sharedram_semaphore_snd_r));
 	// following two do swapped access compared to darkmist
@@ -372,11 +376,9 @@ MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256*2)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x200).set_indirect_entries(256 * 2);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_metlfrzr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_metlfrzr);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -385,16 +387,15 @@ MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 16, 256 - 16 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(metlfrzr_state, screen_update_metlfrzr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181) / 4)    /* 3.579545 MHz */
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("t5182", t5182_device, ym2151_irq_handler))
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181) / 4));    /* 3.579545 MHz */
+	ymsnd.irq_handler().set("t5182", FUNC(t5182_device::ym2151_irq_handler));
+	ymsnd.add_route(0, "mono", 1.0);
+	ymsnd.add_route(1, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

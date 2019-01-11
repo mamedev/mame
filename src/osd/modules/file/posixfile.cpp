@@ -217,6 +217,8 @@ osd_file::error osd_file::open(std::string const &path, std::uint32_t openflags,
 		return posix_open_socket(path, openflags, file, filesize);
 	else if (posix_check_ptty_path(path))
 		return posix_open_ptty(openflags, file, filesize, dst);
+	else if (posix_check_domain_path(path))
+		return posix_open_domain(path, openflags, file, filesize);
 
 	// select the file open modes
 	int access;

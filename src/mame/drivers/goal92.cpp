@@ -55,20 +55,20 @@ void goal92_state::goal92_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x1007ff).ram();
-	map(0x100800, 0x100fff).ram().w(this, FUNC(goal92_state::goal92_background_w)).share("bg_data");
-	map(0x101000, 0x1017ff).ram().w(this, FUNC(goal92_state::goal92_foreground_w)).share("fg_data");
+	map(0x100800, 0x100fff).ram().w(FUNC(goal92_state::goal92_background_w)).share("bg_data");
+	map(0x101000, 0x1017ff).ram().w(FUNC(goal92_state::goal92_foreground_w)).share("fg_data");
 	map(0x101800, 0x101fff).ram(); // it has tiles for clouds, but they aren't used
-	map(0x102000, 0x102fff).ram().w(this, FUNC(goal92_state::goal92_text_w)).share("tx_data");
+	map(0x102000, 0x102fff).ram().w(FUNC(goal92_state::goal92_text_w)).share("tx_data");
 	map(0x103000, 0x103fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x104000, 0x13ffff).ram();
 	map(0x140000, 0x1407ff).ram().share("spriteram");
 	map(0x140800, 0x140801).nopw();
 	map(0x140802, 0x140803).nopw();
-	map(0x180000, 0x18000f).r(this, FUNC(goal92_state::goal92_inputs_r));
-	map(0x180008, 0x180009).w(this, FUNC(goal92_state::goal92_sound_command_w));
+	map(0x180000, 0x18000f).r(FUNC(goal92_state::goal92_inputs_r));
+	map(0x180008, 0x180009).w(FUNC(goal92_state::goal92_sound_command_w));
 	map(0x18000a, 0x18000b).nopw();
 	map(0x180010, 0x180017).writeonly().share("scrollram");
-	map(0x18001c, 0x18001d).rw(this, FUNC(goal92_state::goal92_fg_bank_r), FUNC(goal92_state::goal92_fg_bank_w));
+	map(0x18001c, 0x18001d).rw(FUNC(goal92_state::goal92_fg_bank_r), FUNC(goal92_state::goal92_fg_bank_w));
 }
 
 /* Sound CPU */
@@ -89,8 +89,8 @@ void goal92_state::sound_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xe000, 0xe000).w(this, FUNC(goal92_state::adpcm_control_w));
-	map(0xe400, 0xe400).w(this, FUNC(goal92_state::adpcm_data_w));
+	map(0xe000, 0xe000).w(FUNC(goal92_state::adpcm_control_w));
+	map(0xe400, 0xe400).w(FUNC(goal92_state::adpcm_data_w));
 	map(0xe800, 0xe801).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xec00, 0xec01).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xf000, 0xf7ff).ram();
@@ -223,7 +223,7 @@ WRITE_LINE_MEMBER(goal92_state::irqhandler)
 
 WRITE_LINE_MEMBER(goal92_state::goal92_adpcm_int)
 {
-	m_msm->data_w(m_msm5205next);
+	m_msm->write_data(m_msm5205next);
 	m_msm5205next >>= 4;
 	m_adpcm_toggle^= 1;
 
@@ -296,49 +296,46 @@ void goal92_state::machine_reset()
 	m_adpcm_toggle = 0;
 }
 
-MACHINE_CONFIG_START(goal92_state::goal92)
-
+void goal92_state::goal92(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,12000000)
-	MCFG_DEVICE_PROGRAM_MAP(goal92_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", goal92_state,  irq6_line_hold) /* VBL */
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &goal92_state::goal92_map);
+	m_maincpu->set_vblank_int("screen", FUNC(goal92_state::irq6_line_hold)); /* VBL */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 2500000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
-								/* IRQs are triggered by the main CPU */
-
+	Z80(config, m_audiocpu, 2500000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &goal92_state::sound_cpu);	/* IRQs are triggered by the main CPU */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1) // black border at bottom is a game bug...
-	MCFG_SCREEN_UPDATE_DRIVER(goal92_state, screen_update_goal92)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, goal92_state, screen_vblank_goal92))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1); // black border at bottom is a game bug...
+	screen.set_screen_update(FUNC(goal92_state::screen_update_goal92));
+	screen.screen_vblank().set(FUNC(goal92_state::screen_vblank_goal92));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_goal92)
-	MCFG_PALETTE_ADD("palette", 128*16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goal92);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 128*16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 2500000/2)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, goal92_state, irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2203_device &ym1(YM2203(config, "ym1", 2500000/2));
+	ym1.irq_handler().set(FUNC(goal92_state::irqhandler));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 2500000/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2203_device &ym2(YM2203(config, "ym2", 2500000/2));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, goal92_state, goal92_adpcm_int))   /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4KHz 4-bit */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(goal92_state::goal92_adpcm_int));   /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);      /* 4KHz 4-bit */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
 /*
 

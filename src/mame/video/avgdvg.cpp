@@ -580,7 +580,7 @@ int avg_device::avg_common_strobe2()
 				 * loop. I.e. at one point the AVG jumps to address 0
 				 * and starts over again. The main CPU updates vector
 				 * RAM while AVG is running. The hardware takes care
-				 * that the AVG dosen't read vector RAM while the CPU
+				 * that the AVG doesn't read vector RAM while the CPU
 				 * writes to it. Usually we wait until the AVG stops
 				 * (halt flag) and then draw all vectors at once. This
 				 * doesn't work for Tempest and Quantum so we wait for
@@ -892,7 +892,7 @@ void avg_mhavoc_device::update_databus() // mhavoc_data
 
 	if (m_pc & 0x2000)
 	{
-		bank = &machine().root_device().memregion("alpha")->base()[0x18000];
+		bank = &machine().root_device().memregion("avgdvg")->base()[0];
 		m_data = bank[(m_map << 13) | ((m_pc ^ 1) & 0x1fff)];
 	}
 	else

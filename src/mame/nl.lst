@@ -49,9 +49,9 @@ youjyudn                        // (c) 1986 (Japan)
 
 // mario.cpp
 mario                           // (c) 1983 Nintendo of America
+mariof                          // (c) 1983 Nintendo of America
 marioe                          // (c) 1983 Nintendo of America
 marioj                          // (c) 1983 Nintendo
-marioo                          // (c) 1983 Nintendo of America
 masao                           // bootleg
 
 // popeye.cpp
@@ -170,6 +170,9 @@ pongf                           // (c) 1972 Atari
 //trivia                        // (c) 1976 Ramtek
 //vollyrmt                      // (c) 1973 Ramtek
 //wipeormt                      // (c) 1974 Ramtek
+
+// segattl.cpp
+//fonz                          // (c) 1976 Sega
 
 // taitottl.cpp
 //gunman                        // (c) 1977 Taito

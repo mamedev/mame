@@ -44,12 +44,11 @@ public:
 	void init_gaminator();
 	void gaminator(machine_config &config);
 
-protected:
+private:
 	void gaminator_map(address_map &map);
 
 	DECLARE_WRITE32_MEMBER(gamtor_unk_w);
 
-private:
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -63,7 +62,7 @@ void gaminator_state::gaminator_map(address_map &map)
 {
 	map(0x00000000, 0x07ffffff).rom();
 	map(0x08000000, 0x0bffffff).ram();
-	map(0x1e040008, 0x1e04000b).w(this, FUNC(gaminator_state::gamtor_unk_w));
+	map(0x1e040008, 0x1e04000b).w(FUNC(gaminator_state::gamtor_unk_w));
 
 	map(0x20000000, 0x2003ffff).ram();
 
@@ -90,7 +89,7 @@ MACHINE_CONFIG_START(gaminator_state::gaminator)
 	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000) /* definitely Coldfire, model / clock uncertain */
 	MCFG_DEVICE_PROGRAM_MAP(gaminator_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaminator_state,  irq6_line_hold) // irq6 seems to be needed to get past the ROM checking
-	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)

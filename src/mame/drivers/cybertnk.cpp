@@ -38,7 +38,7 @@ IC22 (1F4*2 bytes starting @ 0x0c0000, code at 0x0000069E) \ Tested as 0x3e8 (10
 IC23 (1F4*2 bytes starting @ 0x0c0001, code at 0x000006AA) / Cleared at 0x00000440 as 0x4000 bytes.
 IC24 (1F4*2 bytes starting @ 0x100001, code at 0x000006B8) > Shared RAM
 
-The shared ram is tested and cleared almost the same as the other RAM,
+The shared RAM is tested and cleared almost the same as the other RAM,
 and is mapped into the master at E0000. Only every odd byte is used.
 
 The first 0x10 bytes are used heavily as registers
@@ -174,6 +174,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/8950intf.h"
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -182,22 +183,32 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 class cybertnk_state : public driver_device
 {
 public:
-	cybertnk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cybertnk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_spr_ram(*this, "spr_ram"),
-		m_tilemap0_vram(*this, "tilemap0_vram"),
-		m_tilemap1_vram(*this, "tilemap1_vram"),
-		m_tilemap2_vram(*this, "tilemap2_vram"),
-		m_tilemap0scroll(*this, "tilemap1_scroll"),
-		m_tilemap1scroll(*this, "tilemap1_scroll"),
-		m_tilemap2scroll(*this, "tilemap2_scroll"),
-		m_roadram(*this, "roadram")  { }
+		m_vram(*this, "tilemap%u_vram", 0U),
+		m_scroll(*this, "tilemap%u_scroll", 0U),
+		m_roadram(*this, "roadram"),
+		m_spr_gfx(*this, "spr_gfx"),
+		m_traverse_io(*this, "TRAVERSE"),
+		m_elevate_io(*this, "ELEVATE"),
+		m_accel_io(*this, "ACCEL"),
+		m_handle_io(*this, "HANDLE")
+	{ }
 
+	void init_cybertnk();
+
+	void cybertnk(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -205,40 +216,33 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint16_t> m_spr_ram;
-	required_shared_ptr<uint16_t> m_tilemap0_vram;
-	required_shared_ptr<uint16_t> m_tilemap1_vram;
-	required_shared_ptr<uint16_t> m_tilemap2_vram;
-	required_shared_ptr<uint16_t> m_tilemap0scroll;
-	required_shared_ptr<uint16_t> m_tilemap1scroll;
-	required_shared_ptr<uint16_t> m_tilemap2scroll;
+	required_shared_ptr_array<uint16_t, 3> m_vram;
+	required_shared_ptr_array<uint16_t, 3> m_scroll;
 	required_shared_ptr<uint16_t> m_roadram;
 
-	tilemap_t *m_tilemap0_tilemap;
-	tilemap_t *m_tilemap1_tilemap;
-	tilemap_t *m_tilemap2_tilemap;
+	required_memory_region m_spr_gfx;
+	required_ioport m_traverse_io;
+	required_ioport m_elevate_io;
+	required_ioport m_accel_io;
+	required_ioport m_handle_io;
 
-	DECLARE_WRITE16_MEMBER(tilemap0_vram_w);
-	DECLARE_WRITE16_MEMBER(tilemap1_vram_w);
-	DECLARE_WRITE16_MEMBER(tilemap2_vram_w);
+	tilemap_t *m_tilemap[3];
+
+	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
 
 	uint8_t m_mux_data;
-	DECLARE_WRITE8_MEMBER(cybertnk_sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(cybertnk_mux_w);
-	DECLARE_READ8_MEMBER(cybertnk_io_rdy_r);
-	DECLARE_READ8_MEMBER(cybertnk_mux_r);
-	DECLARE_WRITE8_MEMBER(cybertnk_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(cybertnk_cnt_w);
-	void init_cybertnk();
-	TILE_GET_INFO_MEMBER(get_tilemap0_tile_info);
-	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);
-	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
-	virtual void video_start() override;
+	DECLARE_WRITE8_MEMBER(sound_cmd_w);
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_READ8_MEMBER(io_rdy_r);
+	DECLARE_READ8_MEMBER(mux_r);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_WRITE8_MEMBER(cnt_w);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift, int pri);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
 	uint32_t screen_update_cybertnk_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cybertnk_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cybertnk(machine_config &config);
 	void master_mem(address_map &map);
 	void slave_mem(address_map &map);
 	void sound_mem(address_map &map);
@@ -255,37 +259,14 @@ public:
 
 */
 
-TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap0_tile_info)
+template<int Layer>
+TILE_GET_INFO_MEMBER(cybertnk_state::get_tile_info)
 {
-	int code = m_tilemap0_vram[tile_index];
+	int code = m_vram[Layer][tile_index];
 	int pal = (code & 0xe000) >> 13;
 	pal     |=(code & 0x1c00) >> 7;
 
-	SET_TILE_INFO_MEMBER(0,
-			code & 0x1fff,
-			pal,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap1_tile_info)
-{
-	int code = m_tilemap1_vram[tile_index];
-	int pal = (code & 0xe000) >> 13;
-	pal     |=(code & 0x1c00) >> 7;
-
-	SET_TILE_INFO_MEMBER(1,
-			code & 0x1fff,
-			pal,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap2_tile_info)
-{
-	int code = m_tilemap2_vram[tile_index];
-	int pal = (code & 0xe000) >> 13;
-	pal     |=(code & 0x1c00) >> 7;
-
-	SET_TILE_INFO_MEMBER(2,
+	SET_TILE_INFO_MEMBER(Layer,
 			code & 0x1fff,
 			pal,
 			0);
@@ -293,14 +274,14 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap2_tile_info)
 
 void cybertnk_state::video_start()
 {
-	m_tilemap0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
-	m_tilemap0_tilemap->set_transparent_pen(0);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap[0]->set_transparent_pen(0);
 
-	m_tilemap1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
-	m_tilemap1_tilemap->set_transparent_pen(0);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap[1]->set_transparent_pen(0);
 
-	m_tilemap2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tilemap2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,32);
-	m_tilemap2_tilemap->set_transparent_pen(0);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tile_info<2>),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap[2]->set_transparent_pen(0);
 }
 
 
@@ -331,7 +312,7 @@ void cybertnk_state::draw_road(screen_device &screen, bitmap_ind16 &bitmap, cons
 // check if these are similar / the same as weclemans
 void cybertnk_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift)
 {
-	const uint32_t *sprrom = (uint32_t*)memregion("spr_gfx")->base();
+	const uint32_t *sprrom = (uint32_t*)m_spr_gfx->base();
 	const pen_t *paldata = m_palette->pens();
 
 	int miny = cliprect.min_y;
@@ -483,15 +464,15 @@ void cybertnk_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 uint32_t cybertnk_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift)
 {
-	m_tilemap0_tilemap->set_scrolldx(screen_shift, screen_shift);
-	m_tilemap1_tilemap->set_scrolldx(screen_shift, screen_shift);
-	m_tilemap2_tilemap->set_scrolldx(screen_shift, screen_shift);
+	m_tilemap[0]->set_scrolldx(screen_shift, screen_shift);
+	m_tilemap[1]->set_scrolldx(screen_shift, screen_shift);
+	m_tilemap[2]->set_scrolldx(screen_shift, screen_shift);
 
-	m_tilemap1_tilemap->set_scrolly(m_tilemap1scroll[2]);
-	m_tilemap2_tilemap->set_scrolly(m_tilemap2scroll[2]);
+	m_tilemap[1]->set_scrolly(m_scroll[1][2]);
+	m_tilemap[2]->set_scrolly(m_scroll[2][2]);
 
-	m_tilemap1_tilemap->set_scrollx(m_tilemap1scroll[0]);
-	m_tilemap2_tilemap->set_scrollx(m_tilemap2scroll[0]);
+	m_tilemap[1]->set_scrollx(m_scroll[1][0]);
+	m_tilemap[2]->set_scrollx(m_scroll[2][0]);
 
 
 
@@ -500,14 +481,14 @@ uint32_t cybertnk_state::update_screen(screen_device &screen, bitmap_ind16 &bitm
 
 	draw_road(screen,bitmap,cliprect,screen_shift, 0x00);
 
-	m_tilemap2_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	m_tilemap1_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_tilemap[2]->draw(screen, bitmap, cliprect, 0,0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0,0);
 
 	draw_road(screen,bitmap,cliprect,screen_shift, 0x80);
 
 	draw_sprites(screen,bitmap,cliprect,screen_shift);
 
-	m_tilemap0_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0,0);
 
 
 	return 0;
@@ -516,74 +497,74 @@ uint32_t cybertnk_state::update_screen(screen_device &screen, bitmap_ind16 &bitm
 uint32_t cybertnk_state::screen_update_cybertnk_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 0); }
 uint32_t cybertnk_state::screen_update_cybertnk_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, -256); }
 
-
-WRITE16_MEMBER(cybertnk_state::tilemap0_vram_w)
+template<int Layer>
+WRITE16_MEMBER(cybertnk_state::vram_w)
 {
-	COMBINE_DATA(&m_tilemap0_vram[offset]);
-	m_tilemap0_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(cybertnk_state::tilemap1_vram_w)
-{
-	COMBINE_DATA(&m_tilemap1_vram[offset]);
-	m_tilemap1_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE16_MEMBER(cybertnk_state::tilemap2_vram_w)
-{
-	COMBINE_DATA(&m_tilemap2_vram[offset]);
-	m_tilemap2_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	m_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
 
-
-WRITE8_MEMBER( cybertnk_state::cybertnk_sound_cmd_w )
+WRITE8_MEMBER( cybertnk_state::sound_cmd_w )
 {
 	if (offset == 0)
 	{
-		printf("cybertnk_sound_cmd_w offset 0 %02x\n", data);
+		printf("sound_cmd_w offset 0 %02x\n", data);
 	}
 	else if (offset == 1)
 	{
 		m_soundlatch->write(space, offset, data & 0xff);
-		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
 
-WRITE8_MEMBER( cybertnk_state::cybertnk_mux_w )
+WRITE8_MEMBER( cybertnk_state::mux_w )
 {
 	if (offset == 0)
 	{
-//      printf("cybertnk_mux_w offset 0 %02x\n", data);
+//      printf("mux_w offset 0 %02x\n", data);
 	}
 	else if (offset == 1)
 	{
-//      printf("cybertnk_mux_w offset 1 %02x\n", data);
+//      printf("mux_w offset 1 %02x\n", data);
 		m_mux_data = data & 0x60;
 		/* Other bits are unknown */
 	}
 }
 
-READ8_MEMBER( cybertnk_state::cybertnk_io_rdy_r )
+READ8_MEMBER( cybertnk_state::io_rdy_r )
 {
 	// bit 0: i/o controller busy?
 	return 0;
 }
 
-READ8_MEMBER( cybertnk_state::cybertnk_mux_r )
+READ8_MEMBER( cybertnk_state::mux_r )
 {
-	const char *const innames[] = { "TRAVERSE", "ELEVATE", "ACCEL", "HANDLE" };
-	return ioport(innames[(m_mux_data & 0x60) >> 5])->read();
+	switch (m_mux_data & 0x60)
+	{
+		case 0x00:
+			return m_traverse_io->read();
+			break;
+		case 0x20:
+			return m_elevate_io->read();
+			break;
+		case 0x40:
+			return m_accel_io->read();
+			break;
+		case 0x60:
+			return m_handle_io->read();
+			break;
+	}
+	return 0;
 }
 
 /* Amusingly the data written here is pretty weird, it seems suited for an unused protection device (attract = coin count, in-game = return status of some inputs) */
-WRITE8_MEMBER( cybertnk_state::cybertnk_irq_ack_w )
+WRITE8_MEMBER( cybertnk_state::irq_ack_w )
 {
 	if (offset == 0)
 	{
 		// unused?
-		logerror("cybertnk_irq_ack_w offset 0 %02x\n", data);
+		logerror("irq_ack_w offset 0 %02x\n", data);
 	}
 	else if (offset == 1)
 	{
@@ -591,7 +572,7 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_irq_ack_w )
 	}
 }
 
-WRITE8_MEMBER( cybertnk_state::cybertnk_cnt_w )
+WRITE8_MEMBER( cybertnk_state::cnt_w )
 {
 	if (offset == 0)
 	{
@@ -602,7 +583,7 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_cnt_w )
 	else if (offset == 1)
 	{
 		// unused?
-		logerror("cybertnk_cnt_w offset 1 %02x\n", data);
+		logerror("cnt_w offset 1 %02x\n", data);
 	}
 }
 
@@ -612,26 +593,26 @@ void cybertnk_state::master_mem(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x087fff).ram(); /*Work RAM*/
 	map(0x0a0000, 0x0a0fff).ram().share("spr_ram"); // non-tile based sprite ram
-	map(0x0c0000, 0x0c1fff).ram().w(this, FUNC(cybertnk_state::tilemap0_vram_w)).share("tilemap0_vram");
-	map(0x0c4000, 0x0c5fff).ram().w(this, FUNC(cybertnk_state::tilemap1_vram_w)).share("tilemap1_vram");
-	map(0x0c8000, 0x0c9fff).ram().w(this, FUNC(cybertnk_state::tilemap2_vram_w)).share("tilemap2_vram");
+	map(0x0c0000, 0x0c1fff).ram().w(FUNC(cybertnk_state::vram_w<0>)).share("tilemap0_vram");
+	map(0x0c4000, 0x0c5fff).ram().w(FUNC(cybertnk_state::vram_w<1>)).share("tilemap1_vram");
+	map(0x0c8000, 0x0c9fff).ram().w(FUNC(cybertnk_state::vram_w<2>)).share("tilemap2_vram");
 	map(0x0e0000, 0x0e0fff).ram().share("sharedram");
 	map(0x100000, 0x107fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* 2x palettes, one for each screen */
 
-	map(0x110000, 0x110001).w(this, FUNC(cybertnk_state::cybertnk_sound_cmd_w));
+	map(0x110000, 0x110001).w(FUNC(cybertnk_state::sound_cmd_w));
 	map(0x110002, 0x110003).portr("DSW1").nopw();// watchdog?
-	map(0x110004, 0x110004).r(this, FUNC(cybertnk_state::cybertnk_io_rdy_r));
+	map(0x110004, 0x110004).r(FUNC(cybertnk_state::io_rdy_r));
 	map(0x110006, 0x110007).portr("IN0");
-	map(0x110006, 0x110007).w(this, FUNC(cybertnk_state::cybertnk_mux_w));
-	map(0x110008, 0x110009).portr("IN1").w(this, FUNC(cybertnk_state::cybertnk_cnt_w));
+	map(0x110006, 0x110007).w(FUNC(cybertnk_state::mux_w));
+	map(0x110008, 0x110009).portr("IN1").w(FUNC(cybertnk_state::cnt_w));
 	map(0x11000a, 0x11000b).portr("DSW2");
-	map(0x11000c, 0x11000d).w(this, FUNC(cybertnk_state::cybertnk_irq_ack_w));
+	map(0x11000c, 0x11000d).w(FUNC(cybertnk_state::irq_ack_w));
 
 	map(0x110040, 0x110045).ram().share("tilemap0_scroll");
 	map(0x110048, 0x11004d).ram().share("tilemap1_scroll");
 	map(0x110080, 0x110085).ram().share("tilemap2_scroll");
 
-	map(0x1100d5, 0x1100d5).r(this, FUNC(cybertnk_state::cybertnk_mux_r));
+	map(0x1100d5, 0x1100d5).r(FUNC(cybertnk_state::mux_r));
 }
 
 void cybertnk_state::slave_mem(address_map &map)
@@ -853,7 +834,7 @@ MACHINE_CONFIG_START(cybertnk_state::cybertnk)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))//arbitrary value,needed to get the communication to work
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -861,7 +842,7 @@ MACHINE_CONFIG_START(cybertnk_state::cybertnk)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cybertnk_state, screen_update_cybertnk_left)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -869,24 +850,23 @@ MACHINE_CONFIG_START(cybertnk_state::cybertnk)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cybertnk_state, screen_update_cybertnk_right)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cybertnk)
-	MCFG_PALETTE_ADD("palette", 0x4000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cybertnk);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x4000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
+	// Splited output per chip
 	MCFG_DEVICE_ADD("ym1", Y8950, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("ym2", Y8950, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -983,7 +963,7 @@ ROM_END
 
 void cybertnk_state::init_cybertnk()
 {
-	uint32_t *spr = (uint32_t*)memregion("spr_gfx")->base();
+	uint32_t *spr = (uint32_t*)m_spr_gfx->base();
 	for (int x = 0; x< 0x200000/4;x++)
 	{
 		// reorder the data to simplify sprite drawing

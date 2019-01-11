@@ -6,6 +6,10 @@
     Williams/Midway Y/Z-unit system
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_MIDYUNIT_H
+#define MAME_INCLUDES_MIDYUNIT_H
+
+#pragma once
 
 #include "audio/williams.h"
 
@@ -14,36 +18,12 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
-
-/* protection data types */
-struct protection_data
-{
-	uint16_t  reset_sequence[3];
-	uint16_t  data_sequence[100];
-};
-
-struct dma_state_t
-{
-	uint32_t      offset;         /* source offset, in bits */
-	int32_t       rowbytes;       /* source bytes to skip each row */
-	int32_t       xpos;           /* x position, clipped */
-	int32_t       ypos;           /* y position, clipped */
-	int32_t       width;          /* horizontal pixel count */
-	int32_t       height;         /* vertical pixel count */
-	uint16_t      palette;        /* palette base */
-	uint16_t      color;          /* current foreground color with palette */
-};
+#include "emupal.h"
 
 
 class midyunit_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_DMA,
-		TIMER_AUTOERASE_LINE
-	};
-
 	midyunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -55,6 +35,7 @@ public:
 		, m_adpcm_sound(*this, "adpcm")
 		, m_soundlatch(*this, "soundlatch")
 		, m_term2_adc(*this, "adc")
+		, m_nvram(*this, "nvram")
 		, m_generic_paletteram_16(*this, "paletteram")
 		, m_gfx_rom(*this, "gfx_rom", 16)
 		, m_mainram(*this, "mainram")
@@ -62,8 +43,62 @@ public:
 	{
 	}
 
+	void term2(machine_config &config);
+	void yunit_cvsd_4bit_fast(machine_config &config);
+	void yunit_adpcm_6bit_fast(machine_config &config);
+	void yunit_cvsd_6bit_slow(machine_config &config);
+	void yunit_cvsd_4bit_slow(machine_config &config);
+	void mkyawdim(machine_config &config);
+	void yunit_core(machine_config &config);
+	void zunit(machine_config &config);
+	void yunit_adpcm_6bit_faster(machine_config &config);
 
-	required_device<cpu_device> m_maincpu;
+	void init_smashtv();
+	void init_strkforc();
+	void init_narc();
+	void init_term2();
+	void init_term2la1();
+	void init_term2la3();
+	void init_mkyunit();
+	void init_trog();
+	void init_totcarn();
+	void init_mkyawdim();
+	void init_shimpact();
+	void init_hiimpact();
+	void init_mkyturbo();
+	void init_term2la2();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_strobe_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_data_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(adpcm_irq_state_r);
+
+private:
+	/* protection data types */
+	struct protection_data
+	{
+		uint16_t  reset_sequence[3];
+		uint16_t  data_sequence[100];
+	};
+
+	struct dma_state_t
+	{
+		uint32_t      offset;         // source offset, in bits
+		int32_t       rowbytes;       // source bytes to skip each row
+		int32_t       xpos;           // x position, clipped
+		int32_t       ypos;           // y position, clipped
+		int32_t       width;          // horizontal pixel count
+		int32_t       height;         // vertical pixel count
+		uint16_t      palette;        // palette base
+		uint16_t      color;          // current foreground color with palette
+	};
+
+	enum
+	{
+		TIMER_DMA,
+		TIMER_AUTOERASE_LINE
+	};
+
+	required_device<tms34010_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
 	required_device<palette_device> m_palette;
@@ -72,6 +107,7 @@ public:
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<adc0844_device> m_term2_adc;
+	required_device<nvram_device> m_nvram;
 
 	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 	optional_shared_ptr<uint8_t> m_gfx_rom;
@@ -119,27 +155,10 @@ public:
 	DECLARE_WRITE16_MEMBER(midyunit_paletteram_w);
 	DECLARE_READ16_MEMBER(midyunit_dma_r);
 	DECLARE_WRITE16_MEMBER(midyunit_dma_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_strobe_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_data_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(adpcm_irq_state_r);
 	DECLARE_WRITE8_MEMBER(yawdim_oki_bank_w);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
-	void init_smashtv();
-	void init_strkforc();
-	void init_narc();
-	void init_term2();
-	void init_term2la1();
-	void init_term2la3();
-	void init_mkyunit();
-	void init_trog();
-	void init_totcarn();
-	void init_mkyawdim();
-	void init_shimpact();
-	void init_hiimpact();
-	void init_mkyturbo();
-	void init_term2la2();
 	DECLARE_MACHINE_RESET(midyunit);
 	DECLARE_VIDEO_START(midzunit);
 	DECLARE_VIDEO_START(midyunit_4bit);
@@ -149,20 +168,13 @@ public:
 	TIMER_CALLBACK_MEMBER(dma_callback);
 	TIMER_CALLBACK_MEMBER(autoerase_line);
 
-	void term2(machine_config &config);
-	void yunit_cvsd_4bit_fast(machine_config &config);
-	void yunit_adpcm_6bit_fast(machine_config &config);
-	void yunit_cvsd_6bit_slow(machine_config &config);
-	void yunit_cvsd_4bit_slow(machine_config &config);
-	void mkyawdim(machine_config &config);
-	void yunit_core(machine_config &config);
-	void zunit(machine_config &config);
-	void yunit_adpcm_6bit_faster(machine_config &config);
 	void main_map(address_map &map);
 	void yawdim_sound_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void dma_draw(uint16_t command);
 	void init_generic(int bpp, int sound, int prot_start, int prot_end);
 	void term2_init_common(write16_delegate hack_w);
 };
+
+#endif // MAME_INCLUDES_MIDYUNIT_H

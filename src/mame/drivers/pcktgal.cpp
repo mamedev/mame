@@ -50,7 +50,7 @@ WRITE8_MEMBER(pcktgal_state::sound_w)
 
 WRITE_LINE_MEMBER(pcktgal_state::adpcm_int)
 {
-	m_msm->data_w(m_msm5205next >> 4);
+	m_msm->write_data(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_toggle = 1 - m_toggle;
@@ -74,14 +74,14 @@ READ8_MEMBER(pcktgal_state::adpcm_reset_r)
 void pcktgal_state::pcktgal_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0fff).rw(m_tilegen1, FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
+	map(0x0800, 0x0fff).rw(m_tilegen, FUNC(deco_bac06_device::pf_data_8bit_r), FUNC(deco_bac06_device::pf_data_8bit_w));
 	map(0x1000, 0x11ff).ram().share("spriteram");
 	map(0x1800, 0x1800).portr("P1");
-	map(0x1800, 0x1807).w(m_tilegen1, FUNC(deco_bac06_device::pf_control0_8bit_w));
-	map(0x1810, 0x181f).rw(m_tilegen1, FUNC(deco_bac06_device::pf_control1_8bit_r), FUNC(deco_bac06_device::pf_control1_8bit_w));
+	map(0x1800, 0x1807).w(m_tilegen, FUNC(deco_bac06_device::pf_control0_8bit_w));
+	map(0x1810, 0x181f).rw(m_tilegen, FUNC(deco_bac06_device::pf_control1_8bit_r), FUNC(deco_bac06_device::pf_control1_8bit_w));
 
-	map(0x1a00, 0x1a00).portr("P2").w(this, FUNC(pcktgal_state::sound_w));
-	map(0x1c00, 0x1c00).portr("DSW").w(this, FUNC(pcktgal_state::bank_w));
+	map(0x1a00, 0x1a00).portr("P2").w(FUNC(pcktgal_state::sound_w));
+	map(0x1c00, 0x1c00).portr("DSW").w(FUNC(pcktgal_state::bank_w));
 	map(0x4000, 0x5fff).bankr("bank1");
 	map(0x6000, 0x7fff).bankr("bank2");
 	map(0x8000, 0xffff).rom();
@@ -95,10 +95,10 @@ void pcktgal_state::pcktgal_sound_map(address_map &map)
 	map(0x0000, 0x07ff).ram();
 	map(0x0800, 0x0801).w("ym1", FUNC(ym2203_device::write));
 	map(0x1000, 0x1001).w("ym2", FUNC(ym3812_device::write));
-	map(0x1800, 0x1800).w(this, FUNC(pcktgal_state::adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
-	map(0x2000, 0x2000).w(this, FUNC(pcktgal_state::sound_bank_w));
+	map(0x1800, 0x1800).w(FUNC(pcktgal_state::adpcm_data_w)); /* ADPCM data for the MSM5205 chip */
+	map(0x2000, 0x2000).w(FUNC(pcktgal_state::sound_bank_w));
 	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x3400, 0x3400).r(this, FUNC(pcktgal_state::adpcm_reset_r)); /* ? not sure */
+	map(0x3400, 0x3400).r(FUNC(pcktgal_state::adpcm_reset_r)); /* ? not sure */
 	map(0x4000, 0x7fff).bankr("bank3");
 	map(0x8000, 0xffff).rom();
 }
@@ -223,67 +223,61 @@ void pcktgal_state::machine_start()
 	save_item(NAME(m_toggle));
 }
 
-MACHINE_CONFIG_START(pcktgal_state::pcktgal)
-
+void pcktgal_state::pcktgal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(pcktgal_map)
+	M6502(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcktgal_state::pcktgal_map);
 
-	MCFG_DEVICE_ADD("audiocpu", DECO_222, 1500000)
-	MCFG_DEVICE_PROGRAM_MAP(pcktgal_sound_map)
-							/* IRQs are caused by the ADPCM chip */
-							/* NMIs are caused by the main CPU */
+	DECO_222(config, m_audiocpu, 1500000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &pcktgal_state::pcktgal_sound_map);
+	/* IRQs are caused by the ADPCM chip */
+	/* NMIs are caused by the main CPU */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pcktgal_state, screen_update_pcktgal)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(pcktgal_state::screen_update_pcktgal));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pcktgal)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(pcktgal_state, pcktgal)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_pcktgal);
+	PALETTE(config, m_palette, FUNC(pcktgal_state::pcktgal_palette), 512);
 
-
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 0, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen, 0);
+	m_tilegen->set_gfx_region_wide(0, 0, 0);
+	m_tilegen->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	YM2203(config, "ym1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.60);
+	YM3812(config, "ym2", 3000000).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("ym2", YM3812, 3000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(pcktgal_state::adpcm_int));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	// 8kHz
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.70);
+}
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, pcktgal_state, adpcm_int))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz            */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(pcktgal_state::bootleg)
+void pcktgal_state::bootleg(machine_config &config)
+{
 	pcktgal(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bootleg)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(pcktgal_state, screen_update_pcktgalb)
+	m_gfxdecode->set_info(gfx_bootleg);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(pcktgal_state::screen_update_pcktgalb));
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(pcktgal_state::pcktgal2)
+void pcktgal_state::pcktgal2(machine_config &config)
+{
 	pcktgal(config);
-	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000) /* doesn't use the encrypted 222 */
-	MCFG_DEVICE_PROGRAM_MAP(pcktgal_sound_map)
-MACHINE_CONFIG_END
+	M6502(config.replace(), m_audiocpu, 1500000); /* doesn't use the encrypted 222 */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &pcktgal_state::pcktgal_sound_map);
+}
 
 /***************************************************************************/
 

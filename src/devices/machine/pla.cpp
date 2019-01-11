@@ -13,13 +13,15 @@
 
 
 DEFINE_DEVICE_TYPE(PLA, pla_device, "pla", "PLA")
+DEFINE_DEVICE_TYPE(PLS100, pls100_device, "pls100", "82S100-series PLA")
+DEFINE_DEVICE_TYPE(MOS8721, mos8721_device, "mos8721", "MOS 8721 PLA")
 
 //-------------------------------------------------
 //  pla_device - constructor
 //-------------------------------------------------
 
-pla_device::pla_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PLA, tag, owner, clock)
+pla_device::pla_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_region(*this, DEVICE_SELF)
 	, m_format(FMT::JEDBIN)
 	, m_inputs(0)
@@ -31,6 +33,27 @@ pla_device::pla_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
+pla_device::pla_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pla_device(mconfig, PLA, tag, owner, clock)
+{
+}
+
+pls100_device::pls100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pla_device(mconfig, PLS100, tag, owner, clock)
+{
+	set_num_inputs(16);
+	set_num_outputs(8);
+	set_num_terms(48);
+}
+
+mos8721_device::mos8721_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pla_device(mconfig, MOS8721, tag, owner, clock)
+{
+	// TODO: actual number of terms is unknown
+	set_num_inputs(27);
+	set_num_outputs(18);
+	set_num_terms(379);
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

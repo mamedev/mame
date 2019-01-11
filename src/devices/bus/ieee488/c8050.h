@@ -60,6 +60,7 @@ protected:
 	virtual void ieee488_atn(int state) override;
 	virtual void ieee488_ifc(int state) override;
 
+	void add_common_devices(machine_config &config);
 	inline void update_ieee_signals();
 
 	required_device<m6502_device> m_maincpu;
@@ -72,7 +73,7 @@ protected:
 	optional_device<floppy_connector> m_floppy1;
 	required_device<c8050_fdc_device> m_fdc;
 	required_ioport m_address;
-	output_finder<4> m_led;
+	output_finder<4> m_leds;
 
 	// IEEE-488 bus
 	int m_rfdo;                         // not ready for data output

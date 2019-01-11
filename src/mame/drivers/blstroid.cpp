@@ -25,6 +25,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -69,19 +70,19 @@ void blstroid_state::main_map(address_map &map)
 	map.global_mask(0x83ffff);
 	map(0x000000, 0x03ffff).mirror(0x000000).rom();
 	map(0x800000, 0x800001).mirror(0x0381fe).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x800200, 0x800201).mirror(0x0381fe).w(this, FUNC(blstroid_state::scanline_int_ack_w));
-	map(0x800400, 0x800401).mirror(0x0381fe).w(this, FUNC(blstroid_state::video_int_ack_w));
+	map(0x800200, 0x800201).mirror(0x0381fe).w(FUNC(blstroid_state::scanline_int_ack_w));
+	map(0x800400, 0x800401).mirror(0x0381fe).w(FUNC(blstroid_state::video_int_ack_w));
 	map(0x800600, 0x800601).mirror(0x0381fe).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x800800, 0x8009ff).mirror(0x038000).writeonly().share("priorityram");
 	map(0x800a01, 0x800a01).mirror(0x0381fe).w(m_jsa, FUNC(atari_jsa_i_device::main_command_w));
 	map(0x800c00, 0x800c01).mirror(0x0381fe).w(m_jsa, FUNC(atari_jsa_i_device::sound_reset_w));
-	map(0x800e00, 0x800e01).mirror(0x0381fe).w(this, FUNC(blstroid_state::blstroid_halt_until_hblank_0_w));
+	map(0x800e00, 0x800e01).mirror(0x0381fe).w(FUNC(blstroid_state::blstroid_halt_until_hblank_0_w));
 	map(0x801401, 0x801401).mirror(0x0383fe).r(m_jsa, FUNC(atari_jsa_i_device::main_response_r));
 	map(0x801800, 0x801801).mirror(0x0383f8).portr("DIAL0");
 	map(0x801804, 0x801805).mirror(0x0383f8).portr("DIAL1");
 	map(0x801c00, 0x801c01).mirror(0x0383fc).portr("IN0");
 	map(0x801c02, 0x801c03).mirror(0x0383fc).portr("IN1");
-	map(0x802000, 0x8023ff).mirror(0x038c00).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x802000, 0x8023ff).mirror(0x038c00).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x803000, 0x8033ff).mirror(0x038c00).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x804000, 0x804fff).mirror(0x038000).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x805000, 0x805fff).mirror(0x038000).ram().share("mob");
@@ -180,20 +181,19 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blstroid)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_blstroid);
 
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 512);
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, blstroid_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", blstroid_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, blstroid_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -210,12 +210,13 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_ATARI_JSA_TEST_PORT("IN0", 7)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	MCFG_DEVICE_REMOVE("jsa:pokey")
-	MCFG_DEVICE_REMOVE("jsa:tms")
+	ATARI_JSA_I(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	m_jsa->test_read_cb().set_ioport("IN0").bit(7);
+	m_jsa->add_route(0, "lspeaker", 1.0);
+	m_jsa->add_route(1, "rspeaker", 1.0);
+	config.device_remove("jsa:pokey");
+	config.device_remove("jsa:tms");
 MACHINE_CONFIG_END
 
 

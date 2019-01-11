@@ -44,8 +44,10 @@ public:
 	gammagic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag) { }
 
-	virtual void machine_start() override;
 	void gammagic(machine_config &config);
+
+private:
+	virtual void machine_start() override;
 	void gammagic_io(address_map &map);
 	void gammagic_map(address_map &map);
 };
@@ -136,7 +138,7 @@ MACHINE_CONFIG_START(gammagic_state::gammagic)
 
 	pcat_common(config);
 
-//  MCFG_I82371SB_ADD("i82371sb")
+//  I82371SB(config, "i82371sb", 0);
 //  MCFG_I82439TX_ADD("i82439tx", "maincpu", "user")
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 //  MCFG_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)

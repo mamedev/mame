@@ -12,6 +12,7 @@
 #include "machine/z80daisy.h"
 #include "formats/tiki100_dsk.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
@@ -19,6 +20,7 @@
 #include "machine/z80pio.h"
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 
 #define Z80_TAG         "z80"
 #define Z80DART_TAG     "z80dart"
@@ -67,6 +69,9 @@ public:
 		m_vire(1)
 	{ }
 
+	void tiki100(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( mrq_r );
@@ -97,14 +102,13 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( busrq_w );
 
-	void tiki100(machine_config &config);
 	void tiki100_io(address_map &map);
 	void tiki100_mem(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<fd1797_device> m_fdc;
 	required_device<z80pio_device> m_pio;

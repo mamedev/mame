@@ -5,6 +5,10 @@
     Atari System 1 hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ATARISY1_H
+#define MAME_INCLUDES_ATARISY1_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "machine/adc0808.h"
@@ -14,31 +18,35 @@
 #include "sound/tms5220.h"
 #include "sound/ym2151.h"
 #include "video/atarimo.h"
+#include "emupal.h"
 
 class atarisy1_state : public atarigen_state
 {
 public:
 	atarisy1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag),
-			m_audiocpu(*this, "audiocpu"),
-			m_soundcomm(*this, "soundcomm"),
-			m_bankselect(*this, "bankselect"),
-			m_mob(*this, "mob"),
-			m_adc(*this, "adc"),
-			m_ajsint(*this, "ajsint"),
-			m_playfield_tilemap(*this, "playfield"),
-			m_alpha_tilemap(*this, "alpha"),
-			m_yscroll_reset_timer(*this, "yreset_timer"),
-			m_scanline_timer(*this, "scan_timer"),
-			m_int3off_timer(*this, "int3off_timer"),
-			m_tms(*this, "tms"),
-			m_outlatch(*this, "outlatch") { }
+		: atarigen_state(mconfig, type, tag)
+		, m_audiocpu(*this, "audiocpu")
+		, m_soundcomm(*this, "soundcomm")
+		, m_bankselect(*this, "bankselect")
+		, m_mob(*this, "mob")
+		, m_palette(*this, "palette")
+		, m_adc(*this, "adc")
+		, m_ajsint(*this, "ajsint")
+		, m_playfield_tilemap(*this, "playfield")
+		, m_alpha_tilemap(*this, "alpha")
+		, m_yscroll_reset_timer(*this, "yreset_timer")
+		, m_scanline_timer(*this, "scan_timer")
+		, m_int3off_timer(*this, "int3off_timer")
+		, m_tms(*this, "tms")
+		, m_outlatch(*this, "outlatch")
+	{ }
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<atari_sound_comm_device> m_soundcomm;
 
 	required_shared_ptr<uint16_t> m_bankselect;
 	required_device<atari_motion_objects_device> m_mob;
+	required_device<palette_device> m_palette;
 
 	uint8_t           m_joystick_type;
 	uint8_t           m_trackball_type;
@@ -108,6 +116,7 @@ public:
 	DECLARE_WRITE16_MEMBER( atarisy1_priority_w );
 
 	static const atari_motion_objects_config s_mob_config;
+	void add_adc(machine_config &config);
 	void atarisy1(machine_config &config);
 	void indytemp(machine_config &config);
 	void roadb110(machine_config &config);
@@ -118,3 +127,5 @@ public:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_ATARISY1_H

@@ -139,21 +139,21 @@ ROM_START( luxor_55_10828 )
 	ROM_DEFAULT_BIOS("basf6106")
 	// ABC 830
 	ROM_SYSTEM_BIOS( 0, "basf6106", "BASF 6106/08" )
-	ROMX_LOAD( "basf .02.7c", 0x000, 0x800, CRC(5daba200) SHA1(7881933760bed3b94f27585c0a6fc43e5d5153f5), ROM_BIOS(1) )
+	ROMX_LOAD( "basf .02.7c", 0x000, 0x800, CRC(5daba200) SHA1(7881933760bed3b94f27585c0a6fc43e5d5153f5), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "mpi02", "MPI 51" )
-	ROMX_LOAD( "mpi .02.7c",  0x000, 0x800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349), ROM_BIOS(2) )
+	ROMX_LOAD( "mpi .02.7c",  0x000, 0x800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "mpi02n", "MPI 51 (newer)" )
-	ROMX_LOAD( "new mpi .02.7c", 0x000, 0x800, CRC(ab788171) SHA1(c8e29965c04c85f2f2648496ea10c9c7ff95392f), ROM_BIOS(3) )
+	ROMX_LOAD( "new mpi .02.7c", 0x000, 0x800, CRC(ab788171) SHA1(c8e29965c04c85f2f2648496ea10c9c7ff95392f), ROM_BIOS(2) )
 	// ABC 832
 	ROM_SYSTEM_BIOS( 3, "micr1015", "Micropolis 1015 (v1.4)" )
-	ROMX_LOAD( "micr 1.4.7c", 0x000, 0x800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307), ROM_BIOS(4) )
+	ROMX_LOAD( "micr 1.4.7c", 0x000, 0x800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "micr1115", "Micropolis 1115 (v2.3)" )
-	ROMX_LOAD( "micr 2.3.7c", 0x000, 0x800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b), ROM_BIOS(5) )
+	ROMX_LOAD( "micr 2.3.7c", 0x000, 0x800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 5, "basf6118", "BASF 6118 (v1.2)" )
-	ROMX_LOAD( "basf 1.2.7c", 0x000, 0x800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1), ROM_BIOS(6) )
+	ROMX_LOAD( "basf 1.2.7c", 0x000, 0x800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1), ROM_BIOS(5) )
 	// ABC 838
 	ROM_SYSTEM_BIOS( 6, "basf6104", "BASF 6104, BASF 6115 (v1.0)" )
-	ROMX_LOAD( "basf 8 1.0.7c", 0x000, 0x800, NO_DUMP, ROM_BIOS(7) )
+	ROMX_LOAD( "basf 8 1.0.7c", 0x000, 0x800, NO_DUMP, ROM_BIOS(6) )
 ROM_END
 
 
@@ -186,10 +186,10 @@ void luxor_55_10828_device::luxor_55_10828_mem(address_map &map)
 void luxor_55_10828_device::luxor_55_10828_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x70, 0x73).mirror(0x0c).rw(Z80PIO_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0xb0, 0xb3).mirror(0x0c).rw(this, FUNC(luxor_55_10828_device::fdc_r), FUNC(luxor_55_10828_device::fdc_w));
-	map(0xd0, 0xd0).mirror(0x0f).w(this, FUNC(luxor_55_10828_device::status_w));
-	map(0xe0, 0xe0).mirror(0x0f).w(this, FUNC(luxor_55_10828_device::ctrl_w));
+	map(0x70, 0x73).mirror(0x0c).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0xb0, 0xb3).mirror(0x0c).rw(FUNC(luxor_55_10828_device::fdc_r), FUNC(luxor_55_10828_device::fdc_w));
+	map(0xd0, 0xd0).mirror(0x0f).w(FUNC(luxor_55_10828_device::status_w));
+	map(0xe0, 0xe0).mirror(0x0f).w(FUNC(luxor_55_10828_device::ctrl_w));
 }
 
 
@@ -320,26 +320,27 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(luxor_55_10828_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(luxor_55_10828_mem)
-	MCFG_DEVICE_IO_MAP(luxor_55_10828_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+void luxor_55_10828_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_maincpu, 4_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &luxor_55_10828_device::luxor_55_10828_mem);
+	m_maincpu->set_addrmap(AS_IO, &luxor_55_10828_device::luxor_55_10828_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(4'000'000)/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, luxor_55_10828_device, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, luxor_55_10828_device, pio_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, luxor_55_10828_device, pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, luxor_55_10828_device, pio_pb_w))
+	Z80PIO(config, m_pio, 4_MHz_XTAL / 2);
+	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(luxor_55_10828_device::pio_pa_r));
+	m_pio->out_pa_callback().set(FUNC(luxor_55_10828_device::pio_pa_w));
+	m_pio->in_pb_callback().set(FUNC(luxor_55_10828_device::pio_pb_r));
+	m_pio->out_pb_callback().set(FUNC(luxor_55_10828_device::pio_pb_w));
 
-	MCFG_MB8876_ADD(MB8876_TAG, XTAL(4'000'000)/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, luxor_55_10828_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, luxor_55_10828_device, fdc_drq_w))
+	MB8876(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(luxor_55_10828_device::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(luxor_55_10828_device::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":0", abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":1", abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats);
+}
 
 
 //-------------------------------------------------
@@ -665,7 +666,7 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 
 	if (m_wait_enable)
 	{
-		data = m_fdc->gen_r(offset);
+		data = m_fdc->read(offset);
 	}
 	else if (!m_fdc_irq && !m_fdc_drq)
 	{
@@ -673,7 +674,7 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 	}
 	else
 	{
-		data = m_fdc->gen_r(offset);
+		data = m_fdc->read(offset);
 	}
 
 	return data;
@@ -689,7 +690,7 @@ WRITE8_MEMBER( luxor_55_10828_device::fdc_w )
 	if (machine().side_effects_disabled())
 		return;
 
-	m_fdc->gen_w(offset, data);
+	m_fdc->write(offset, data);
 
 	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
 	{

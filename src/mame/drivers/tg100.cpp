@@ -43,9 +43,11 @@ public:
 		m_ymw258(*this, "ymw258")
 	{ }
 
+	void tg100(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<multipcm_device> m_ymw258;
-	void tg100(machine_config &config);
 	void tg100_io_map(address_map &map);
 	void tg100_map(address_map &map);
 	void ymw258_map(address_map &map);

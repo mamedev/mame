@@ -12,6 +12,7 @@
 #include "validity.h"
 
 #include "emuopts.h"
+#include "romload.h"
 #include "video/rgbutil.h"
 
 #include <ctype.h>
@@ -80,7 +81,7 @@ void validity_checker::validate_tag(const char *tag)
 		osd_printf_error("Invalid generic tag '%s' used\n", tag);
 
 	// scan for invalid characters
-	static const char *validchars = "abcdefghijklmnopqrstuvwxyz0123456789_.:^$";
+	static char const *const validchars = "abcdefghijklmnopqrstuvwxyz0123456789_.:^$";
 	for (const char *p = tag; *p != 0; p++)
 	{
 		// only lower-case permitted
@@ -1461,7 +1462,7 @@ void validity_checker::validate_driver()
 	if (compatible_with != nullptr && strcmp(compatible_with, "0") == 0)
 		compatible_with = nullptr;
 
-	// check for this driver being compatible with a non-existant driver
+	// check for this driver being compatible with a nonexistent driver
 	if (compatible_with != nullptr && m_drivlist.find(m_current_driver->compatible_with) == -1)
 		osd_printf_error("Driver is listed as compatible with nonexistent driver %s\n", m_current_driver->compatible_with);
 
@@ -1516,7 +1517,7 @@ void validity_checker::validate_roms(device_t &root)
 		char const *last_name = "???";
 		u32 current_length = 0;
 		int items_since_region = 1;
-		int last_bios = 0;
+		int last_bios = 0, max_bios = 0;
 		int total_files = 0;
 		std::unordered_map<std::string, int> bios_names;
 		std::unordered_map<std::string, std::string> bios_descs;
@@ -1557,7 +1558,7 @@ void validity_checker::validate_roms(device_t &root)
 				int const bios_flags = ROM_GETBIOSFLAGS(romp);
 				char const *const biosname = romp->name;
 				if (bios_flags != last_bios + 1)
-					osd_printf_error("Non-sequential BIOS %s (specified as %d, expected to be %d)\n", biosname, bios_flags, last_bios + 1);
+					osd_printf_error("Non-sequential BIOS %s (specified as %d, expected to be %d)\n", biosname, bios_flags - 1, last_bios);
 				last_bios = bios_flags;
 
 				// validate the name
@@ -1575,7 +1576,7 @@ void validity_checker::validate_roms(device_t &root)
 				// check for duplicate names/descriptions
 				auto const nameins = bios_names.emplace(biosname, bios_flags);
 				if (!nameins.second)
-					osd_printf_error("Duplicate BIOS name %s specified (%d and %d)\n", biosname, nameins.first->second, bios_flags);
+					osd_printf_error("Duplicate BIOS name %s specified (%d and %d)\n", biosname, nameins.first->second, bios_flags - 1);
 				auto const descins = bios_descs.emplace(romp->hashdata, biosname);
 				if (!descins.second)
 					osd_printf_error("BIOS %s has duplicate description '%s' (was %s)\n", biosname, romp->hashdata, descins.first->second.c_str());
@@ -1589,6 +1590,7 @@ void validity_checker::validate_roms(device_t &root)
 				// track the last filename we found
 				last_name = romp->name;
 				total_files++;
+				max_bios = std::max<int>(max_bios, ROM_GETBIOSFLAGS(romp));
 
 				// validate the name
 				if (strlen(last_name) > 127)
@@ -1622,6 +1624,10 @@ void validity_checker::validate_roms(device_t &root)
 			osd_printf_error("Default BIOS '%s' not found\n", defbios);
 		if (!device.get_default_bios_tag().empty() && (bios_names.find(device.get_default_bios_tag()) == bios_names.end()))
 			osd_printf_error("Configured BIOS '%s' not found\n", device.get_default_bios_tag().c_str());
+
+		// check that there aren't ROMs for a non-existent BIOS option
+		if (max_bios > last_bios)
+			osd_printf_error("BIOS %d set on file is higher than maximum system BIOS number %d\n", max_bios - 1, last_bios - 1);
 
 		// final check for empty regions
 		if (items_since_region == 0)
@@ -1938,14 +1944,7 @@ void validity_checker::validate_devices()
 		m_current_device = &device;
 
 		// validate auto-finders
-		device.findit(true, true);
-		device.findit(false, true);
-
-		// validate callbacks
-		for (auto &cb : device.input_callbacks())
-			cb->validity_check(*this);
-		for (auto &cb : device.output_callbacks())
-			cb->validity_check(*this);
+		device.findit(true);
 
 		// validate the device tag
 		validate_tag(device.basetag());
@@ -2011,8 +2010,7 @@ void validity_checker::validate_devices()
 				for (device_t &card_dev : device_iterator(*card))
 				{
 					m_current_device = &card_dev;
-					card_dev.findit(true, true);
-					card_dev.findit(false, true);
+					card_dev.findit(true);
 					card_dev.validity_check(*this);
 					m_current_device = nullptr;
 				}

@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -17,14 +18,18 @@ class uknc_state : public driver_device
 {
 public:
 	uknc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
+	void uknc(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_uknc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	void uknc(machine_config &config);
+	required_device<k1801vm2_device> m_maincpu;
+
 	void uknc_mem(address_map &map);
 	void uknc_sub_mem(address_map &map);
 };
@@ -62,28 +67,28 @@ uint32_t uknc_state::screen_update_uknc(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-MACHINE_CONFIG_START(uknc_state::uknc)
+void uknc_state::uknc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", K1801VM2, 8000000)
-	MCFG_T11_INITIAL_MODE(0x8000)
-	MCFG_DEVICE_PROGRAM_MAP(uknc_mem)
+	K1801VM2(config, m_maincpu, 8000000);
+	m_maincpu->set_initial_mode(0x8000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &uknc_state::uknc_mem);
 
-	MCFG_DEVICE_ADD("subcpu",  K1801VM2, 6000000)
-	MCFG_T11_INITIAL_MODE(0x8000)
-	MCFG_DEVICE_PROGRAM_MAP(uknc_sub_mem)
-
+	k1801vm2_device &subcpu(K1801VM2(config, "subcpu", 6000000));
+	subcpu.set_initial_mode(0x8000);
+	subcpu.set_addrmap(AS_PROGRAM, &uknc_state::uknc_sub_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(uknc_state, screen_update_uknc)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(uknc_state::screen_update_uknc));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-MACHINE_CONFIG_END
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+}
 
 /* ROM definition */
 ROM_START( uknc )

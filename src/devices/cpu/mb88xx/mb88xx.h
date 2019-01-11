@@ -49,58 +49,6 @@
 
 
 /***************************************************************************
-    PORT CONFIGURATION
-***************************************************************************/
-
-// K (K3-K0): input-only port
-#define MCFG_MB88XX_READ_K_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_read_k_callback(DEVCB_##_devcb);
-
-// O (O7-O4 = OH, O3-O0 = OL): output through PLA
-#define MCFG_MB88XX_WRITE_O_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_write_o_callback(DEVCB_##_devcb);
-
-// P (P3-P0): output-only port
-#define MCFG_MB88XX_WRITE_P_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_write_p_callback(DEVCB_##_devcb);
-
-// R0 (R3-R0): input/output port
-#define MCFG_MB88XX_READ_R0_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_read_r_callback(0, DEVCB_##_devcb);
-#define MCFG_MB88XX_WRITE_R0_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_write_r_callback(0, DEVCB_##_devcb);
-
-// R1 (R7-R4): input/output port
-#define MCFG_MB88XX_READ_R1_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_read_r_callback(1, DEVCB_##_devcb);
-#define MCFG_MB88XX_WRITE_R1_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_write_r_callback(1, DEVCB_##_devcb);
-
-// R2 (R11-R8): input/output port
-#define MCFG_MB88XX_READ_R2_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_read_r_callback(2, DEVCB_##_devcb);
-#define MCFG_MB88XX_WRITE_R2_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_write_r_callback(2, DEVCB_##_devcb);
-
-// R3 (R15-R12): input/output port
-#define MCFG_MB88XX_READ_R3_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_read_r_callback(3, DEVCB_##_devcb);
-#define MCFG_MB88XX_WRITE_R3_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_write_r_callback(3, DEVCB_##_devcb);
-
-// SI: serial input
-#define MCFG_MB88XX_READ_SI_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_read_si_callback(DEVCB_##_devcb);
-
-// SO: serial output
-#define MCFG_MB88XX_WRITE_SO_CB(_devcb) \
-	devcb = &downcast<mb88_cpu_device &>(*device).set_write_so_callback(DEVCB_##_devcb);
-
-// Configure 32 byte PLA; if nullptr (default) assume direct output
-#define MCFG_MB88XX_OUTPUT_PLA(_pla) \
-	downcast<mb88_cpu_device &>(*device).set_pla(_pla);
-
-/***************************************************************************
     REGISTER ENUMERATION
 ***************************************************************************/
 
@@ -126,13 +74,26 @@ class mb88_cpu_device : public cpu_device
 {
 public:
 	// configuration helpers
-	template <class Object> devcb_base &set_read_k_callback(Object &&cb) { return m_read_k.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_o_callback(Object &&cb) { return m_write_o.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_p_callback(Object &&cb) { return m_write_p.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_r_callback(int n, Object &&cb) { assert(n >= 0 && n < 4); return m_read_r[n].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_r_callback(int n, Object &&cb) { assert(n >= 0 && n < 4); return m_write_r[n].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_si_callback(Object &&cb) { return m_read_si.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_so_callback(Object &&cb) { return m_write_so.set_callback(std::forward<Object>(cb)); }
+
+	// K (K3-K0): input-only port
+	auto read_k() { return m_read_k.bind(); }
+
+	// O (O7-O4 = OH, O3-O0 = OL): output through PLA
+	auto write_o() { return m_write_o.bind(); }
+
+	// P (P3-P0): output-only port
+	auto write_p() { return m_write_p.bind(); }
+
+	// R0 (R3-R0): input/output port
+	template <std::size_t Port> auto read_r() { return m_read_r[Port].bind(); }
+	template <std::size_t Port> auto write_r() { return m_write_r[Port].bind(); }
+
+	// SI: serial input
+	auto read_si() { return m_read_si.bind(); }
+
+	// SO: serial output
+	auto write_so() { return m_write_so.bind(); }
+
 	void set_pla(uint8_t *pla) { m_PLA = pla; }
 
 	DECLARE_WRITE_LINE_MEMBER( clock_w );

@@ -15,12 +15,12 @@
 
 #ifdef GLSL_SOURCE_ON_DISK
 
-static const char * glsl_mamebm_vsh_files [GLSL_VERTEX_SHADER_INT_NUMBER] =
+static char const *const glsl_mamebm_vsh_files [GLSL_VERTEX_SHADER_INT_NUMBER] =
 {
 	"/tmp/glsl_general.vsh"                             // general
 };
 
-static const char * glsl_mamebm_fsh_files [GLSL_SHADER_FEAT_INT_NUMBER] =
+static char const *const glsl_mamebm_fsh_files [GLSL_SHADER_FEAT_INT_NUMBER] =
 {
 	"/tmp/glsl_plain_rgb32_dir.fsh",                           // rgb32 dir plain
 	"/tmp/glsl_bilinear_rgb32_dir.fsh",                         // rgb32 dir bilinear
@@ -35,12 +35,12 @@ static const char * glsl_mamebm_fsh_files [GLSL_SHADER_FEAT_INT_NUMBER] =
 #include "shader/glsl_bilinear_rgb32_dir.fsh.c"
 #include "shader/glsl_bicubic_rgb32_dir.fsh.c"
 
-static const char * glsl_mamebm_vsh_sources [GLSL_VERTEX_SHADER_INT_NUMBER] =
+static char const *const glsl_mamebm_vsh_sources [GLSL_VERTEX_SHADER_INT_NUMBER] =
 {
 	glsl_general_vsh_src                                    // general
 };
 
-static const char * glsl_mamebm_fsh_sources [GLSL_SHADER_FEAT_INT_NUMBER] =
+static char const *const glsl_mamebm_fsh_sources [GLSL_SHADER_FEAT_INT_NUMBER] =
 {
 	glsl_plain_rgb32_dir_fsh_src,                            // rgb32 dir plain
 	glsl_bilinear_rgb32_dir_fsh_src,                         // rgb32 dir bilinear
@@ -49,7 +49,7 @@ static const char * glsl_mamebm_fsh_sources [GLSL_SHADER_FEAT_INT_NUMBER] =
 
 #endif // GLSL_SOURCE_ON_DISK
 
-static const char * glsl_mamebm_filter_names [GLSL_SHADER_FEAT_MAX_NUMBER] =
+static char const *const glsl_mamebm_filter_names [GLSL_SHADER_FEAT_MAX_NUMBER] =
 {
 	"plain",
 	"bilinear",

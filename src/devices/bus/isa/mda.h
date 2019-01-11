@@ -6,7 +6,9 @@
 #pragma once
 
 #include "isa.h"
+#include "machine/pc_lpt.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -43,6 +45,9 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	required_device<mc6845_device> m_crtc;
+	optional_device<pc_lpt_device> m_lpt;
 
 private:
 	WRITE_LINE_MEMBER(pc_cpu_line);

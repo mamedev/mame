@@ -16,6 +16,16 @@ public:
 		m_mainbank(*this, "mainbank")
 	{ }
 
+	void st0016(machine_config &config);
+	void renju(machine_config &config);
+	void mayjinsn(machine_config &config);
+
+	void init_nratechu();
+	void init_mayjinsn();
+	void init_mayjisn2();
+	void init_renju();
+
+private:
 	int mux_port;
 	// uint32_t m_st0016_rom_bank;
 
@@ -33,17 +43,12 @@ public:
 	DECLARE_WRITE8_MEMBER(latch8_w);
 
 	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
-	void init_nratechu();
-	void init_mayjinsn();
-	void init_mayjisn2();
-	void init_renju();
+
 	virtual void machine_start() override;
 	DECLARE_VIDEO_START(st0016);
 	uint32_t screen_update_st0016(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(st0016_int);
-	void st0016(machine_config &config);
-	void renju(machine_config &config);
-	void mayjinsn(machine_config &config);
+
 	void renju_mem(address_map &map);
 	void st0016_io(address_map &map);
 	void st0016_m2_io(address_map &map);

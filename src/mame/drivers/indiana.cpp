@@ -35,10 +35,14 @@ public:
 	indiana_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, M68K_TAG) { }
+
+	void indiana(machine_config &config);
+
 	void init_indiana();
+
+private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	void indiana(machine_config &config);
 	void indiana_mem(address_map &map);
 };
 
@@ -96,34 +100,35 @@ MACHINE_CONFIG_START(indiana_state::indiana)
 	MCFG_DEVICE_PROGRAM_MAP(indiana_mem)
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD(ISABUS_TAG, ISA16, 0)
-	MCFG_ISA16_CPU(M68K_TAG)
-	MCFG_ISA16_BUS_CUSTOM_SPACES()
+	isa16_device &isa(ISA16(config, ISABUS_TAG, 0));
+	isa.set_cputag(M68K_TAG);
+	isa.set_custom_spaces();
+
 	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, ISABUS_TAG, indiana_isa_cards, "vga", false)
 	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, ISABUS_TAG, indiana_isa_cards, "fdc_at", false)
 	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, ISABUS_TAG, indiana_isa_cards, "comat", false)
 	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, ISABUS_TAG, indiana_isa_cards, "ide", false)
 
-	MCFG_DEVICE_ADD(MFP_TAG, MC68901, XTAL(16'000'000)/4)
-	MCFG_MC68901_TIMER_CLOCK(XTAL(16'000'000)/4)
-	MCFG_MC68901_RX_CLOCK(0)
-	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_SO_CB(WRITELINE("keyboard", rs232_port_device, write_txd))
+	mc68901_device &mfp(MC68901(config, MFP_TAG, XTAL(16'000'000)/4));
+	mfp.set_timer_clock(XTAL(16'000'000)/4);
+	mfp.set_rx_clock(0);
+	mfp.set_tx_clock(0);
+	mfp.out_so_cb().set("keyboard", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("keyboard", RS232_PORT, default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(MFP_TAG, mc68901_device, write_rx))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	rs232_port_device &keyboard(RS232_PORT(config, "keyboard", default_rs232_devices, "keyboard"));
+	keyboard.rxd_handler().set(MFP_TAG, FUNC(mc68901_device::write_rx));
+	keyboard.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( indiana )
 	ROM_REGION32_BE( 0x10000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v9", "ver 0.9" )
-	ROMX_LOAD( "prom0_9.bin", 0x0000, 0x10000, CRC(746ad75e) SHA1(7d5c123c8568b1e02ab683e8f3188d0fef78d740), ROM_BIOS(1))
+	ROMX_LOAD( "prom0_9.bin", 0x0000, 0x10000, CRC(746ad75e) SHA1(7d5c123c8568b1e02ab683e8f3188d0fef78d740), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v8", "ver 0.8" )
-	ROMX_LOAD( "prom0_8.bin", 0x0000, 0x10000, CRC(9d8dafee) SHA1(c824e5fe6eec08f51ef287c651a5034fe3c8b718), ROM_BIOS(2))
+	ROMX_LOAD( "prom0_8.bin", 0x0000, 0x10000, CRC(9d8dafee) SHA1(c824e5fe6eec08f51ef287c651a5034fe3c8b718), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "v7", "ver 0.7" )
-	ROMX_LOAD( "prom0_7.bin", 0x0000, 0x10000, CRC(d6a3b6bc) SHA1(01d8cee989ab29646d9d3f8b7262b10055653d41), ROM_BIOS(3))
+	ROMX_LOAD( "prom0_7.bin", 0x0000, 0x10000, CRC(d6a3b6bc) SHA1(01d8cee989ab29646d9d3f8b7262b10055653d41), ROM_BIOS(2))
 ROM_END
 
 /* Driver */

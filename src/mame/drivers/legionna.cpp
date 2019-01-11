@@ -54,7 +54,7 @@ Denjin Makai
 Godzilla
 --------
 
-The COP-MCU appears to write to the work ram area,otherwise it resets in mid-animation
+The COP-MCU appears to write to the work ram area, otherwise it resets in mid-animation
 of the title screen.
 
 
@@ -94,13 +94,13 @@ Preliminary COP MCU memory map
 
 /*****************************************************************************/
 
-READ8_MEMBER(legionna_state::denjinmk_sound_comms_r)
+u8 legionna_state::denjinmk_sound_comms_r(offs_t offset)
 {
 	// Routine at 5FDC spins indefinitely until the lowest bit becomes 1
 	if (offset == 10) // ($100714)
 		return 1;
 
-	return m_seibu_sound->main_r(space, (offset >> 1) & 7);
+	return m_seibu_sound->main_r((offset >> 1) & 7);
 }
 
 void legionna_state::legionna_cop_map(address_map &map)
@@ -145,8 +145,8 @@ void legionna_state::legionna_cop_map(address_map &map)
 	map(0x10045a, 0x10045b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_val_w)); //palette DMA brightness val, used by X Se Dae / Zero Team
 	map(0x10045c, 0x10045d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_mode_w));  //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
 
-//  map(0x100470, 0x100471).rw(this, FUNC(legionna_state::cop_tile_bank_2_r), FUNC(legionna_state::cop_tile_bank_2_w));
-//  map(0x100474, 0x100475).w(m_raiden2cop, FUNC(raiden2cop_device::...)); // this gets set to a pointer to spriteram (relative to start of ram) on all games excecpt raiden 2, where it isn't set
+//  map(0x100470, 0x100471).rw(FUNC(legionna_state::cop_tile_bank_2_r), FUNC(legionna_state::cop_tile_bank_2_w));
+//  map(0x100474, 0x100475).w(m_raiden2cop, FUNC(raiden2cop_device::...)); // this gets set to a pointer to spriteram (relative to start of ram) on all games except raiden 2, where it isn't set
 	map(0x100476, 0x100477).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_adr_rel_w));
 	map(0x100478, 0x100479).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_src_w));
 	map(0x10047a, 0x10047b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_size_w));
@@ -159,7 +159,7 @@ void legionna_state::legionna_cop_map(address_map &map)
 	map(0x1004a0, 0x1004ad).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_reg_high_r), FUNC(raiden2cop_device::cop_reg_high_w));
 	map(0x1004c0, 0x1004cd).rw(m_raiden2cop, FUNC(raiden2cop_device::cop_reg_low_r), FUNC(raiden2cop_device::cop_reg_low_w));
 
-//  map(0x100500, 0x100505).w(this, FUNC(legionna_state::cop_cmd_w)); // ADD ME
+//  map(0x100500, 0x100505).w(FUNC(legionna_state::cop_cmd_w)); // ADD ME
 	map(0x100500, 0x100505).w(m_raiden2cop, FUNC(raiden2cop_device::LEGACY_cop_cmd_w)); // REMOVE ME
 
 	map(0x100580, 0x100581).r(m_raiden2cop, FUNC(raiden2cop_device::cop_collision_status_r));
@@ -189,20 +189,16 @@ void legionna_state::legionna_map(address_map &map)
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
 	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
-								 [this](address_space &space, offs_t offset, u8 mem_mask) {
-									 return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
-								 },
-								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-									 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
-								 }).umask16(0x00ff);
+								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
+								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
 	map(0x100740, 0x100741).portr("DSW1");
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
-	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x102000, 0x1027ff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102800, 0x103fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x102000, 0x1027ff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102800, 0x103fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
 	map(0x104000, 0x104fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");    /* palette xRRRRxGGGGxBBBBx ? */
 	map(0x105000, 0x105fff).ram().share("spriteram");
 	map(0x106000, 0x107fff).ram();
@@ -215,7 +211,7 @@ void legionna_state::heatbrl_map(address_map &map)
 	legionna_cop_map(map);
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x1003ff).ram();
-	map(0x100470, 0x100471).w(this, FUNC(legionna_state::heatbrl_setgfxbank));
+	map(0x100470, 0x100471).w(FUNC(legionna_state::heatbrl_setgfxbank));
 	map(0x100600, 0x100601).nopw(); // irq ack?
 	map(0x100640, 0x10068f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100740, 0x100741).portr("DSW1");
@@ -223,16 +219,12 @@ void legionna_state::heatbrl_map(address_map &map)
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
 	map(0x1007c0, 0x1007df).lrw8("seibu_sound_rw",
-								 [this](address_space &space, offs_t offset, u8 mem_mask) {
-									 return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
-								 },
-								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-									 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
-								 }).umask16(0x00ff);
-	map(0x100800, 0x100fff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102000, 0x102fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
+								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
 	map(0x103000, 0x103fff).ram().share("spriteram");
 	map(0x104000, 0x104fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
 	map(0x108000, 0x11ffff).ram();
@@ -243,25 +235,21 @@ void legionna_state::godzilla_map(address_map &map)
 	legionna_cop_map(map);
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x1003ff).ram();
-	map(0x100470, 0x100471).w(this, FUNC(legionna_state::denjinmk_setgfxbank));
+	map(0x100470, 0x100471).w(FUNC(legionna_state::denjinmk_setgfxbank));
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
 	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
-								 [this](address_space &space, offs_t offset, u8 mem_mask) {
-									 return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
-								 },
-								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-									 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
-								 }).umask16(0x00ff);
+								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
+								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
 	map(0x100740, 0x100741).portr("DSW1");
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
 	map(0x100800, 0x100fff).ram();
-	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x102000, 0x1027ff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102800, 0x103fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x102000, 0x1027ff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102800, 0x103fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
 	map(0x103800, 0x103fff).ram(); // check?
 	map(0x104000, 0x104fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
 	map(0x105000, 0x105fff).ram().share("spriteram");
@@ -286,7 +274,7 @@ WRITE8_MEMBER(legionna_state::godzilla_oki_bank_w)
 void legionna_state::godzilla_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(legionna_state::godzilla_oki_bank_w));
+	map(0x00, 0x00).w(FUNC(legionna_state::godzilla_oki_bank_w));
 }
 
 // Denjin Makai: Looks like they specifically swapped address line A1 in this range?
@@ -302,25 +290,22 @@ void legionna_state::denjinmk_map(address_map &map)
 	legionna_cop_map(map);
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x1003ff).ram();
-	map(0x100470, 0x100471).w(this, FUNC(legionna_state::denjinmk_setgfxbank));
+	map(0x100470, 0x100471).w(FUNC(legionna_state::denjinmk_setgfxbank));
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
-	map(0x100700, 0x10071f).r(this, FUNC(legionna_state::denjinmk_sound_comms_r))
-		.lw8("seibu_sound_w",
-			 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-				 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
-			 }).umask16(0x00ff);
+	map(0x100700, 0x10071f).r(FUNC(legionna_state::denjinmk_sound_comms_r))
+		.lw8("seibu_sound_w", [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
 	map(0x100740, 0x100741).portr("DSW1");
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
 	map(0x10075c, 0x10075d).portr("DSW2");
 	map(0x100800, 0x100fff).ram();
-	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x102000, 0x1027ff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102800, 0x103fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
-	map(0x104000, 0x104fff).ram().w(this, FUNC(legionna_state::palette_swap_w)).share("swappal");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x102000, 0x1027ff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102800, 0x103fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x104000, 0x104fff).ram().w(FUNC(legionna_state::palette_swap_w)).share("swappal");
 	map(0x105000, 0x105fff).ram().share("spriteram");
 	map(0x106000, 0x107fff).ram();
 	map(0x108000, 0x11dfff).ram();
@@ -333,27 +318,23 @@ void legionna_state::grainbow_map(address_map &map)
 	legionna_cop_map(map);
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x1003ff).ram();
-	map(0x100480, 0x100487).w(this, FUNC(legionna_state::grainbow_layer_config_w)); // probably a COP feature
+	map(0x100480, 0x100487).w(FUNC(legionna_state::grainbow_layer_config_w)); // probably a COP feature
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
 	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
-								 [this](address_space &space, offs_t offset, u8 mem_mask) {
-									 return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
-								 },
-								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-									 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
-								 }).umask16(0x00ff);
+								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
+								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
 	map(0x100740, 0x100741).portr("DSW1");
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
 	map(0x10075c, 0x10075d).portr("DSW2");
-	map(0x100800, 0x100fff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102000, 0x102fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
 	map(0x103000, 0x103fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
-	map(0x104000, 0x104fff).ram(); // .w(this, FUNC(legionna_state::paletteram_xBBBBBGGGGGRRRRR_word_w)).share("paletteram");
+	map(0x104000, 0x104fff).ram(); // .w(FUNC(legionna_state::paletteram_xBBBBBGGGGGRRRRR_word_w)).share("paletteram");
 	map(0x105000, 0x105fff).ram();
 	map(0x106000, 0x106fff).ram();
 	map(0x107000, 0x107fff).ram().share("spriteram");
@@ -368,21 +349,17 @@ void legionna_state::cupsoc_map(address_map &map)
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
 	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
-								 [this](address_space &space, offs_t offset, u8 mem_mask) {
-									 return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
-								 },
-								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-									 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
-								 }).umask16(0x00ff);
+								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
+								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
 	map(0x100740, 0x100741).portr("DSW1");
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
 	map(0x10075c, 0x10075d).portr("DSW2");
-	map(0x100800, 0x100fff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102000, 0x102fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
 	map(0x103000, 0x103fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
 	map(0x104000, 0x104fff).ram();
 	map(0x105000, 0x106fff).ram();
@@ -413,16 +390,12 @@ void legionna_state::cupsocs_map(address_map &map)
 	map(0x10070c, 0x10070d).portr("SYSTEM");
 	map(0x10071c, 0x10071d).portr("DSW2");
 	map(0x100740, 0x10075f).lrw8("seibu_sound_rw",
-								 [this](address_space &space, offs_t offset, u8 mem_mask) {
-									 return m_seibu_sound->main_r(space, offset >> 1, mem_mask);
-								 },
-								 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-									 m_seibu_sound->main_w(space, offset >> 1, data, mem_mask);
-								 }).umask16(0x00ff);
-	map(0x100800, 0x100fff).ram(); // .w(this, FUNC(legionna_state::legionna_background_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram(); // .w(this, FUNC(legionna_state::legionna_foreground_w).share("fore_data");
-	map(0x101800, 0x101fff).ram(); // .w(this, FUNC(legionna_state::legionna_midground_w).share("mid_data");
-	map(0x102000, 0x102fff).ram(); // .w(this, FUNC(legionna_state::legionna_text_w).share("textram");
+								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
+								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::legionna_background_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::legionna_foreground_w).share("fore_data");
+	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::legionna_midground_w).share("mid_data");
+	map(0x102000, 0x102fff).ram(); // .w(FUNC(legionna_state::legionna_text_w).share("textram");
 	map(0x103000, 0x103fff).ram(); // .w("palette", FUNC(palette_device::write)).share("palette");
 	map(0x104000, 0x104fff).ram();
 	map(0x105000, 0x106fff).ram();
@@ -1224,328 +1197,336 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-MACHINE_CONFIG_START(legionna_state::legionna)
-
+void legionna_state::legionna(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)  /* ??? */
-	MCFG_DEVICE_PROGRAM_MAP(legionna_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
+	M68000(config, m_maincpu, 20000000/2);  /* ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &legionna_state::legionna_map);
+	m_maincpu->set_vblank_int("screen", FUNC(legionna_state::irq4_line_hold)); /* VBL */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	Z80(config, m_audiocpu, 14318180/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &legionna_state::seibu_sound_map);
+	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(36*8, 36*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_legionna)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(36*8, 36*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(legionna_state::screen_update_legionna));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
+	SEIBU_CRTC(config, m_crtc, 0);
+	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
+	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
+	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_legionna)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_legionna);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,legionna)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14318180/4));
+	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	OKIM6295(config, m_oki, 1320000, okim6295_device::PIN7_LOW);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
-MACHINE_CONFIG_END
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
+}
 
-
-MACHINE_CONFIG_START(legionna_state::heatbrl)
-
+void legionna_state::heatbrl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)  /* ??? */
-	MCFG_DEVICE_PROGRAM_MAP(heatbrl_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
+	M68000(config, m_maincpu, 20000000/2);  /* ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &legionna_state::heatbrl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(legionna_state::irq4_line_hold)); /* VBL */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	Z80(config, m_audiocpu, 14318180/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &legionna_state::seibu_sound_map);
+	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(36*8, 36*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_heatbrl)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(36*8, 36*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(legionna_state::screen_update_heatbrl));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
+	SEIBU_CRTC(config, m_crtc, 0);
+	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
+	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
+	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
-
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_heatbrl);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,heatbrl)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14318180/4));
+	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	OKIM6295(config, m_oki, 1320000, okim6295_device::PIN7_LOW);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
-MACHINE_CONFIG_END
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
+}
 
-MACHINE_CONFIG_START(legionna_state::godzilla)
-
+void legionna_state::godzilla(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 20000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(godzilla_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
+	M68000(config, m_maincpu, 20000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &legionna_state::godzilla_map);
+	m_maincpu->set_vblank_int("screen", FUNC(legionna_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
-	MCFG_DEVICE_IO_MAP(godzilla_sound_io_map)
+	Z80(config, m_audiocpu, 14318180/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &legionna_state::seibu_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &legionna_state::godzilla_sound_io_map);
+	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(61)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-//  MCFG_SCREEN_SIZE(42*8, 36*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_RAW_PARAMS(14318180/2,455,0,320,258,0,224) // ~61 Hz, 15.734 kHz
-	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_godzilla)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(61);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+//  screen.set_size(42*8, 36*8);
+//  screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	screen.set_raw(14318180/2,455,0,320,258,0,224); // ~61 Hz, 15.734 kHz
+	screen.set_screen_update(FUNC(legionna_state::screen_update_godzilla));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_BASE_CB(WRITE16(*this, legionna_state, tile_scroll_base_w))
+	SEIBU_CRTC(config, m_crtc, 0);
+	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
+	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
+	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
+	m_crtc->layer_scroll_base_callback().set(FUNC(legionna_state::tile_scroll_base_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
-
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_heatbrl);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,godzilla)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 14318180/4));
+	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	OKIM6295(config, m_oki, 1320000, okim6295_device::PIN7_LOW);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
-MACHINE_CONFIG_END
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
+}
 
-MACHINE_CONFIG_START(legionna_state::denjinmk)
-
+void legionna_state::denjinmk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 20000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(denjinmk_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
+	M68000(config, m_maincpu, 20000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &legionna_state::denjinmk_map);
+	m_maincpu->set_vblank_int("screen", FUNC(legionna_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	Z80(config, m_audiocpu, 14318180/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &legionna_state::seibu_sound_map);
+	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(42*8, 36*8)
-	MCFG_SCREEN_REFRESH_RATE(61)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_godzilla)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(42*8, 36*8);
+	screen.set_refresh_hz(61);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_visarea(0*8, 40*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(legionna_state::screen_update_godzilla));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_heatbrl)
+	SEIBU_CRTC(config, m_crtc, 0);
+	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
+	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
+	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
-
-
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_heatbrl);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,denjinmk)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 14318180/4));
+	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	OKIM6295(config, m_oki, 1320000, okim6295_device::PIN7_LOW);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
-MACHINE_CONFIG_END
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
+}
 
-MACHINE_CONFIG_START(legionna_state::grainbow)
-
+void legionna_state::grainbow(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 20000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(grainbow_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
+	M68000(config, m_maincpu, 20000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &legionna_state::grainbow_map);
+	m_maincpu->set_vblank_int("screen", FUNC(legionna_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	Z80(config, m_audiocpu, 14318180/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &legionna_state::seibu_sound_map);
+	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(64*8, 36*8)
-	MCFG_SCREEN_VISIBLE_AREA(2*8, 42*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_grainbow)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(64*8, 36*8);
+	screen.set_visarea(2*8, 42*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(legionna_state::screen_update_grainbow));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
+	SEIBU_CRTC(config, m_crtc, 0);
+	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
+	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
+	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_grainbow)
-
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_grainbow);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,grainbow)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 14318180/4));
+	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	OKIM6295(config, m_oki, 1320000, okim6295_device::PIN7_LOW);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
-MACHINE_CONFIG_END
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
+}
 
-
-MACHINE_CONFIG_START(legionna_state::cupsoc)
-
+void legionna_state::cupsoc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(cupsoc_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
+	M68000(config, m_maincpu, 20000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &legionna_state::cupsoc_map);
+	m_maincpu->set_vblank_int("screen", FUNC(legionna_state::irq4_line_hold)); /* VBL */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
+	Z80(config, m_audiocpu, 14318180/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &legionna_state::seibu_sound_map);
+	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
-	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(*this, legionna_state, videowrite_cb_w))
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(42*8, 36*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_grainbow)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(42*8, 36*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(legionna_state::screen_update_grainbow));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, legionna_state, tilemap_enable_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, legionna_state, tile_scroll_w))
-	MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, legionna_state, tile_vreg_1a_w))
+	SEIBU_CRTC(config, m_crtc, 0);
+	m_crtc->layer_en_callback().set(FUNC(legionna_state::tilemap_enable_w));
+	m_crtc->layer_scroll_callback().set(FUNC(legionna_state::tile_scroll_w));
+	m_crtc->reg_1a_callback().set(FUNC(legionna_state::tile_vreg_1a_w));
 
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cupsoc)
-
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	//MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cupsoc);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 	MCFG_VIDEO_START_OVERRIDE(legionna_state,cupsoc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14318180/4));
+	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	OKIM6295(config, m_oki, 1320000, okim6295_device::PIN7_LOW);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
-MACHINE_CONFIG_END
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
+}
 
-MACHINE_CONFIG_START(legionna_state::cupsocs)
+void legionna_state::cupsocs(machine_config &config)
+{
 	cupsoc(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(cupsocs_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &legionna_state::cupsocs_map);
+}
+
 
 /***************************************************************************
 
@@ -1783,6 +1764,48 @@ ROM_START( heatbrl2 )
 	ROM_LOAD( "copx-d2.u0339",  0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) ) /* not dumped from this PCB assumed to be the same */
 ROM_END
 
+ROM_START( heatbrl3 ) // only the maincpu and audiocpu ROMs were provided for this set. This is the only known set with a different audiocpu ROM, though it's quite similar.
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD32_BYTE( "barrel_1.u025.9k",   0x00000, 0x20000, CRC(b360c9cd) SHA1(3722c7220f99c28ac47ef5abac027ac62f838caa) )
+	ROM_LOAD32_BYTE( "barrel_2.u024.9m",   0x00001, 0x20000, CRC(06730aac) SHA1(451ebe6fdc9f983b05cfd20c5b6e89f2c1e7d17a) )
+	ROM_LOAD32_BYTE( "barrel_3.u026.9f",   0x00002, 0x20000, CRC(63fff651) SHA1(4bf060e3338fce8d0eecdcb7418d353ca3616382) )
+	ROM_LOAD32_BYTE( "barrel_4.u023.9h",   0x00003, 0x20000, CRC(7a119fd5) SHA1(ffccb7cec9b6f420edb658705a7434041854e77e) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )    /* Z80 code, banked data */
+	ROM_LOAD( "u1110.a6", 0x00000, 0x08000, CRC(790bdba4) SHA1(9030ddcf06b632a53ec49cbb7c94d1a5195e0316) ) // no label
+	ROM_CONTINUE(               0x10000, 0x08000 )  /* banked stuff */
+	ROM_COPY( "audiocpu", 0x000000,    0x18000, 0x08000 )
+
+	ROM_REGION( 0x020000, "char", 0 )   /* chars */
+	ROM_LOAD16_BYTE( "barrel_6.u077.5t", 0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )
+	ROM_LOAD16_BYTE( "barrel_5.u072.5v", 0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
+
+	ROM_REGION( 0x200000, "sprite", 0 )   /* sprites */
+	ROM_LOAD( "heated-barrel_obj1.u085",  0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )
+	ROM_LOAD( "heated-barrel_obj2.u0814", 0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )   /* MBK tiles */
+	ROM_LOAD( "heated-barrel_bg-1.u075", 0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
+
+	ROM_REGION( 0x020000, "gfx4", 0 )   /* not used? */
+	ROM_COPY( "char", 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
+
+	ROM_REGION( 0x080000, "gfx5", 0 )   /* BK3 tiles */
+	ROM_LOAD( "heated-barrel_bg-3.u076", 0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
+
+	ROM_REGION( 0x080000, "gfx6", 0 )   /* LBK tiles */
+	ROM_LOAD( "heated-barrel_bg-2.u074", 0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
+
+	ROM_REGION( 0x40000, "oki", 0 )     /* ADPCM samples */
+	ROM_LOAD( "barrel_8.u106",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
+
+	ROM_REGION( 0x200, "proms", 0 )     /* Priority */
+	ROM_LOAD( "heat07.u0910",   0x000000, 0x000200, CRC(265eccc8) SHA1(cf650c69f97b887251b5079e5518497721692af3) ) /* N82S147N type BPROM */
+
+	ROM_REGION( 0x080000, "user1", 0 )  /* SEI300 data rom */
+	ROM_LOAD( "copx-d2.u0339",  0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) ) /* not dumped from this PCB assumed to be the same */
+ROM_END
+
 ROM_START( heatbrlo )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD32_BYTE( "barrel.1h",   0x00000, 0x20000, CRC(d5a85c36) SHA1(421a42863faa940057ed5637748f791152a15502) )
@@ -1916,12 +1939,13 @@ ROM_START( heatbrle )
 	ROM_LOAD( "copx-d2.u0339",  0x000000, 0x080000, CRC(7c52581b) SHA1(7e668476f886806b0c06fa0bcf4bbc955878c87c) ) /* not dumped from this PCB assumed to be the same */
 ROM_END
 
+
 /*
 
 Godzilla
 Banpresto 1993
 
-This game runs on Seibu hardware, similar to Legionairre.
+This game runs on Seibu hardware, similar to Legionnaire.
 
 PCB Layout
 |----------------------------------------------------|
@@ -2015,7 +2039,7 @@ Denjin Makai
 Banpresto, 1994
 
 This game runs on early 90's Seibu hardware.
-(i.e. Raiden II, Godzilla, Seibu Cup Soccer, Legionairre, Heated Barrel etc).
+(i.e. Raiden II, Godzilla, Seibu Cup Soccer, Legionnaire, Heated Barrel etc).
 The PCB looks to have been converted from some other game (a lot of flux traces are
 left on the PCB). The game might be a simple ROM swap for some other Seibu-based game.
 
@@ -2589,7 +2613,7 @@ ROM_END
 
    In Seibu Cup Soccer Selection the only way I've found to not display debug text is by changing this
    area, and for Olympic Soccer '92 it appears to be the only way to get the Olympic Soccer '92 titles
-   to be used instead of the reagular Seibu Cup Soccer one (and AFAIK both dumps are confirmed to show
+   to be used instead of the regular Seibu Cup Soccer one (and AFAIK both dumps are confirmed to show
    that on hardware, as are all early versions with the advertising boards of dubious legality)
 
    You can also enable other debug menus by patching this area of ROM, but some initial tests appear to
@@ -2643,7 +2667,7 @@ void legionna_state::init_legiongfx()
 void legionna_state::init_godzilla()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-	// TODO: some game elements doesn't collide properly, @see seibucop.cpp
+	// TODO: some game elements don't collide properly, @see seibucop.cpp
 	ROM[(0xbe0e + 0x0a)/2] = 0xb000;
 	ROM[(0xbe0e + 0x1a)/2] = 0xb800;
 	ROM[(0xbb0a + 0x0a)/2] = 0xb000;
@@ -2658,6 +2682,7 @@ GAME( 1992, legionnaj, legionna, legionna, legionna, legionna_state, init_legion
 
 GAME( 1992, heatbrl,   0,        heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation", "Heated Barrel (World version 3)", 0 )
 GAME( 1992, heatbrl2,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation", "Heated Barrel (World version 2)", 0 )
+GAME( 1992, heatbrl3,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation", "Heated Barrel (World version ?)", 0 )
 GAME( 1992, heatbrlo,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation", "Heated Barrel (World old version)", 0 )
 GAME( 1992, heatbrlu,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation", "Heated Barrel (US)", 0 )
 GAME( 1992, heatbrle,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,     ROT0, "TAD Corporation (Electronic Devices license)", "Heated Barrel (Electronic Devices license)", 0 )
@@ -2665,7 +2690,7 @@ GAME( 1992, heatbrle,  heatbrl,  heatbrl,  heatbrl,  legionna_state, empty_init,
 GAME( 1993, godzilla,  0,        godzilla, godzilla, legionna_state, init_godzilla,  ROT0, "Banpresto", "Godzilla (Japan)", 0 )
 GAME( 1993, grainbow,  0,        grainbow, grainbow, legionna_state, empty_init,     ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1993, grainbowk, grainbow, grainbow, grainbow, legionna_state, empty_init,     ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1993, denjinmk,  0,        denjinmk, denjinmk, legionna_state, empty_init,     ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", 0 )
+GAME( 1994, denjinmk,  0,        denjinmk, denjinmk, legionna_state, empty_init,     ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", 0 )
 
 GAME( 1992, cupsoc,    0,        cupsoc,   cupsoc,   legionna_state, init_cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1992, cupsoca,   cupsoc,   cupsoc,   cupsoc,   legionna_state, init_cupsoc,    ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

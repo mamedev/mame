@@ -109,11 +109,12 @@ Vsync : 60.58hz
 #include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
+#include "video/orca40c.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-void vastar_state::machine_start()
+void vastar_common_state::machine_start()
 {
 	save_item(NAME(m_nmi_mask));
 }
@@ -134,7 +135,7 @@ WRITE_LINE_MEMBER(vastar_state::flip_screen_w)
 	flip_screen_set(state);
 }
 
-WRITE_LINE_MEMBER(vastar_state::nmi_mask_w)
+WRITE_LINE_MEMBER(vastar_common_state::nmi_mask_w)
 {
 	m_nmi_mask = state;
 }
@@ -143,22 +144,22 @@ WRITE_LINE_MEMBER(vastar_state::nmi_mask_w)
 void vastar_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).ram().w(this, FUNC(vastar_state::bg2videoram_w)).share("bg2videoram").mirror(0x2000);
-	map(0x9000, 0x9fff).ram().w(this, FUNC(vastar_state::bg1videoram_w)).share("bg1videoram").mirror(0x2000);
+	map(0x8000, 0x8fff).ram().w(FUNC(vastar_state::bg2videoram_w)).share("bg2videoram").mirror(0x2000);
+	map(0x9000, 0x9fff).ram().w(FUNC(vastar_state::bg1videoram_w)).share("bg1videoram").mirror(0x2000);
 	map(0xc000, 0xc000).writeonly().share("sprite_priority");   /* sprite/BG priority */
-	map(0xc400, 0xcfff).ram().w(this, FUNC(vastar_state::fgvideoram_w)).share("fgvideoram"); // fg videoram + sprites
+	map(0xc400, 0xcfff).ram().w(FUNC(vastar_state::fgvideoram_w)).share("fgvideoram"); // fg videoram + sprites
 	map(0xe000, 0xe000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
 	map(0xf000, 0xf7ff).ram().share("sharedram");
 }
 
-void vastar_state::main_port_map(address_map &map)
+void vastar_common_state::main_port_map(address_map &map)
 {
 	map.global_mask(0x0f);
 	map(0x00, 0x07).w("mainlatch", FUNC(ls259_device::write_d0));
 }
 
 
-void vastar_state::cpu2_map(address_map &map)
+void vastar_common_state::cpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram().share("sharedram");
@@ -167,13 +168,25 @@ void vastar_state::cpu2_map(address_map &map)
 	map(0x8080, 0x8080).portr("SYSTEM");
 }
 
-void vastar_state::cpu2_port_map(address_map &map)
+void vastar_common_state::cpu2_port_map(address_map &map)
 {
 	map.global_mask(0x0f);
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
 }
 
+void dogfightp_state::dogfightp_main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x9000, 0x903f).ram().w("videopcb", FUNC(orca_ovg_40c_device::attributes_w)).share("videopcb:attributeram");
+	map(0x9040, 0x905f).ram().share("videopcb:spriteram");
+	map(0x9060, 0x907f).ram().share("videopcb:bulletsram");
+	map(0x9080, 0x93ff).ram();
+	map(0xa000, 0xa3ff).ram().w("videopcb", FUNC(orca_ovg_40c_device::videoram_w)).share("videopcb:videoram");
+	map(0xb000, 0xb3ff).ram().w("videopcb", FUNC(orca_ovg_40c_device::videoram2_w)).share("videopcb:videoram_2");
+	map(0xe000, 0xe000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
+	map(0xf000, 0xf7ff).ram().share("sharedram");
+}
 
 static INPUT_PORTS_START( vastar )
 	PORT_START("P1")
@@ -361,8 +374,6 @@ static INPUT_PORTS_START( pprobe )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
 INPUT_PORTS_END
 
-
-
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -411,56 +422,77 @@ static GFXDECODE_START( gfx_vastar )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(vastar_state::vblank_irq)
+INTERRUPT_GEN_MEMBER(vastar_common_state::vblank_irq)
 {
 	if(m_nmi_mask)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(vastar_state::vastar)
-
+void vastar_common_state::common(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_port_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vastar_state,  vblank_irq)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);
+	m_maincpu->set_addrmap(AS_IO, &vastar_common_state::main_port_map);
 
-	MCFG_DEVICE_ADD("sub", Z80, XTAL(18'432'000)/6)
-	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
-	MCFG_DEVICE_IO_MAP(cpu2_port_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(vastar_state, irq0_line_hold, 242) /* 4 * vsync_freq(60.58) measured, it is not known yet how long it is asserted so we'll use HOLD_LINE for now */
+	Z80(config, m_subcpu, XTAL(18'432'000)/6);
+	m_subcpu->set_addrmap(AS_PROGRAM, &vastar_common_state::cpu2_map);
+	m_subcpu->set_addrmap(AS_IO, &vastar_common_state::cpu2_port_map);
+	m_subcpu->set_periodic_int(FUNC(vastar_common_state::irq0_line_hold), attotime::from_hz(242)); /* 4 * vsync_freq(60.58) measured, it is not known yet how long it is asserted so we'll use HOLD_LINE for now */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - seems enough to ensure proper synchronization of the CPUs */
+	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - seems enough to ensure proper synchronization of the CPUs */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, vastar_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, vastar_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(vastar_common_state::nmi_mask_w));
+	mainlatch.q_out_cb<2>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
-	MCFG_WATCHDOG_ADD("watchdog")
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vastar_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vastar)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000)/12)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(18'432'000)/12));
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
+void vastar_state::vastar(machine_config &config)
+{
+	common(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &vastar_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vastar_common_state::vblank_irq));
+
+	ls259_device &mainlatch(*subdevice<ls259_device>("mainlatch"));
+	mainlatch.q_out_cb<1>().set(FUNC(vastar_state::flip_screen_w));
+
+	/* video hardware */
+	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60.58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(vastar_state::screen_update));
+	screen.set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vastar);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
+}
+
+void dogfightp_state::dogfightp(machine_config &config)
+{
+	common(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &dogfightp_state::dogfightp_main_map);
+	m_maincpu->set_vblank_int("videopcb:screen", FUNC(vastar_common_state::vblank_irq));
+
+	ls259_device &mainlatch(*subdevice<ls259_device>("mainlatch"));
+	mainlatch.q_out_cb<1>().set("videopcb", FUNC(orca_ovg_40c_device::flipscreen_w));
+
+	orca_ovg_40c_device& videopcb(ORCA_OVG_40C(config, "videopcb", 0));
+	videopcb.set_palette("videopcb:palette");
+	videopcb.set_percuss_hardware(true);
+}
 
 /***************************************************************************
 
@@ -622,6 +654,28 @@ ROM_START( vastar4 ) /* minimal changes (2 bytes) from parent set */
 	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )    /* ???? */
 ROM_END
 
+ROM_START( dogfightp ) // all 2732
+	ROM_REGION( 0x10000, "maincpu", 0 ) // on ORCA OVG-34c board
+	ROM_LOAD( "1.4f",      0x0000, 0x1000, CRC(03f21fc8) SHA1(0210f4a05e32ff962a85d1a35e60453bb16585cd) )
+	ROM_LOAD( "4.4k",      0x1000, 0x1000, CRC(5f93c5fc) SHA1(bd0eb02fe3bcec526879c3a43f925a617f9b1696) )
+	ROM_LOAD( "2.4h",      0x2000, 0x1000, CRC(1739b24e) SHA1(71ef31b71b6f35e57c34c46f66556b75b2bf9197) )
+	ROM_LOAD( "5.4l",      0x3000, 0x1000, CRC(8f3fda8d) SHA1(b88bcabeb7bfb6b8420c0f70fc8eb7e624540f04) )
+	ROM_LOAD( "3.4j",      0x4000, 0x1000, CRC(5bdf8ddc) SHA1(1636389adcd87c5c725be9847ef3304a20d59def) )
+	ROM_LOAD( "6.4n",      0x5000, 0x1000, CRC(7c445c30) SHA1(220b8cc52dbce5aa126be114acb84e1376391522) )
+
+	ROM_REGION( 0x10000, "sub", 0 ) // on ORCA OVG-34c board
+	ROM_LOAD( "7.2f",      0x0000, 0x1000, CRC(61c14b5d) SHA1(570e6bb67988807f8539740ba3c7ca2aa2767067) )
+
+	ROM_REGION( 0x3000, "videopcb", 0 ) // on ORCA OVG-40c sub board
+	ROM_LOAD( "8.4r",      0x0000, 0x0800, CRC(c62f2ea1) SHA1(8742008225518fb6131083514484900012476681) )
+	ROM_IGNORE(0x0800) // is this used? Where?
+	ROM_LOAD( "9.7m",      0x0800, 0x1000, CRC(ffe05fee) SHA1(70b9d0808defd936e2c3567f8e6996a19753de81) )
+	ROM_LOAD( "10.7p",     0x1800, 0x1000, CRC(2cb51793) SHA1(d90177ef28730774202a04a0846281537a1883df) )
+
+	ROM_REGION( 0x0040, "videopcb:proms", 0 ) // on ORCA OVG-40c sub board
+	ROM_LOAD( "blue.2a.82s123", 0x0000, 0x0020, CRC(aa839a24) SHA1(9b8217e1c257d24e873888fd083c099fc93c7878) ) //doesn't match parent
+	ROM_LOAD( "pink.2b.82s123", 0x0020, 0x0020, CRC(596ae457) SHA1(1c1a3130d88c5fd5c66ce9f91d97a09c0a0b535f) )
+ROM_END
 
 ROM_START( pprobe )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -655,9 +709,9 @@ ROM_START( pprobe )
 	ROM_LOAD( "mmi6301-1.bin",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )  /* ???? == vastar - tbp24s10.8n */
 ROM_END
 
-
-GAME( 1983, vastar,  0,      vastar, vastar,  vastar_state, empty_init, ROT90, "Orca (Sesame Japan license)", "Vastar (set 1)",            MACHINE_SUPPORTS_SAVE ) // Sesame Japan was a brand of Fujikousan
-GAME( 1983, vastar2, vastar, vastar, vastar,  vastar_state, empty_init, ROT90, "Orca (Sesame Japan license)", "Vastar (set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1983, vastar3, vastar, vastar, vastar,  vastar_state, empty_init, ROT90, "Orca (Sesame Japan license)", "Vastar (set 3)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1983, vastar4, vastar, vastar, vastar4, vastar_state, empty_init, ROT90, "Orca (Sesame Japan license)", "Vastar (set 4)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pprobe,  0,      vastar, pprobe,  vastar_state, empty_init, ROT90, "Crux / Kyugo?",               "Planet Probe (prototype?)", MACHINE_SUPPORTS_SAVE ) // has no Copyright, probably because Crux didn't have a trading name at this point?
+GAME( 1983, vastar,    0,        vastar,    vastar,  vastar_state,    empty_init, ROT90,  "Orca (Sesame Japan license)", "Vastar (set 1)",              MACHINE_SUPPORTS_SAVE ) // Sesame Japan was a brand of Fujikousan
+GAME( 1983, vastar2,   vastar,   vastar,    vastar,  vastar_state,    empty_init, ROT90,  "Orca (Sesame Japan license)", "Vastar (set 2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1983, vastar3,   vastar,   vastar,    vastar,  vastar_state,    empty_init, ROT90,  "Orca (Sesame Japan license)", "Vastar (set 3)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1983, vastar4,   vastar,   vastar,    vastar4, vastar_state,    empty_init, ROT90,  "Orca (Sesame Japan license)", "Vastar (set 4)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dogfightp, dogfight, dogfightp, vastar,  dogfightp_state, empty_init, ROT270, "Orca",                        "Dog Fight (Orca, prototype)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) /* bullet color needs to be verified */
+GAME( 1985, pprobe,    0,        vastar,    pprobe,  vastar_state,    empty_init, ROT90,  "Crux / Kyugo?",               "Planet Probe (prototype?)",   MACHINE_SUPPORTS_SAVE ) // has no Copyright, probably because Crux didn't have a trading name at this point?

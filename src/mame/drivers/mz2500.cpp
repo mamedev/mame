@@ -31,218 +31,10 @@
     - Sound Gal Music Editor: wants a "master disk", that apparently isn't available;
     - Yukar K2 (normal version): moans about something, DFJustin: "please put the system disk back to normal", disk write-protected?
 
-    memory map:
-    0x00000-0x3ffff Work RAM
-    0x40000-0x5ffff CG RAM
-    0x60000-0x67fff "Read modify write" area (related to the CG RAM) (0x30-0x33)
-    0x68000-0x6ffff IPL ROM (0x34-0x37)
-    0x70000-0x71fff TVRAM (0x38)
-    0x72000-0x73fff Kanji ROM / PCG RAM (banked) (0x39)
-    0x74000-0x75fff Dictionary ROM (banked) (0x3a)
-    0x76000-0x77fff NOP (0x3b)
-    0x78000-0x7ffff Phone ROM (0x3c-0x3f)
-
 ********************************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/i8255.h"
-#include "machine/pit8253.h"
-#include "machine/rp5c15.h"
-#include "machine/wd_fdc.h"
-#include "machine/z80sio.h"
-#include "machine/z80pio.h"
-#include "sound/2203intf.h"
-#include "sound/beep.h"
-#include "screen.h"
-#include "softlist.h"
-#include "speaker.h"
-
-//#include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
-
-#define RP5C15_TAG      "rp5c15"
-
-class mz2500_state : public driver_device
-{
-public:
-	mz2500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
-		m_rtc(*this, RP5C15_TAG),
-		m_pit(*this, "pit"),
-		m_beeper(*this, "beeper"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_fdc(*this, "mb8877a"),
-		m_floppy0(*this, "mb8877a:0"),
-		m_floppy1(*this, "mb8877a:1"),
-		m_floppy2(*this, "mb8877a:2"),
-		m_floppy3(*this, "mb8877a:3"),
-		m_floppy(nullptr),
-		m_palette(*this, "palette")
-	{ }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<rp5c15_device> m_rtc;
-	required_device<pit8253_device> m_pit;
-	required_device<beep_device> m_beeper;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<mb8877_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-
-	floppy_image_device *m_floppy;
-
-	std::unique_ptr<uint8_t[]> m_main_ram;
-	uint8_t *m_ipl_rom;
-	uint8_t *m_kanji_rom;
-	uint8_t *m_kanji2_rom;
-	std::unique_ptr<uint8_t[]> m_pcg_ram;
-	std::unique_ptr<uint8_t[]> m_emm_ram;
-	uint8_t *m_dic_rom;
-	uint8_t *m_phone_rom;
-	uint8_t *m_iplpro_rom;
-
-	uint8_t m_bank_val[8];
-	uint8_t m_bank_addr;
-	uint8_t m_irq_sel;
-	uint8_t m_irq_vector[4];
-	uint8_t m_irq_mask[4];
-	uint8_t m_irq_pending[4];
-	uint8_t m_kanji_bank;
-	uint8_t m_dic_bank;
-	uint8_t m_fdc_reverse;
-	uint8_t m_key_mux;
-	uint8_t m_monitor_type;
-	uint8_t m_text_reg[0x100];
-	uint8_t m_text_reg_index;
-	uint8_t m_text_col_size;
-	uint8_t m_text_font_reg;
-	uint8_t m_pal_select;
-	uint16_t m_cg_vs;
-	uint16_t m_cg_ve;
-	uint16_t m_cg_hs;
-	uint16_t m_cg_he;
-	int16_t m_tv_vs;
-	int16_t m_tv_ve;
-	int16_t m_tv_hs;
-	int16_t m_tv_he;
-	uint8_t m_cg_latch[4];
-	uint8_t m_cg_reg_index;
-	uint8_t m_cg_reg[0x20];
-	uint8_t m_clut16[0x10];
-	uint16_t m_clut256[0x100];
-	uint8_t m_cg_mask;
-	int m_scr_x_size;
-	int m_scr_y_size;
-	uint8_t m_cg_clear_flag;
-	uint32_t m_rom_index;
-	uint8_t m_hrom_index;
-	uint8_t m_lrom_index;
-	struct { uint8_t r,g,b; } m_pal[16];
-	uint8_t m_joy_mode;
-	uint16_t m_kanji_index;
-	uint32_t m_emm_offset;
-	uint8_t m_old_portc;
-	uint8_t m_prev_col_val;
-	uint8_t m_pio_latchb;
-	uint8_t m_ym_porta;
-	uint8_t m_screen_enable;
-	DECLARE_READ8_MEMBER(bank0_r);
-	DECLARE_READ8_MEMBER(bank1_r);
-	DECLARE_READ8_MEMBER(bank2_r);
-	DECLARE_READ8_MEMBER(bank3_r);
-	DECLARE_READ8_MEMBER(bank4_r);
-	DECLARE_READ8_MEMBER(bank5_r);
-	DECLARE_READ8_MEMBER(bank6_r);
-	DECLARE_READ8_MEMBER(bank7_r);
-	DECLARE_WRITE8_MEMBER(bank0_w);
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(bank2_w);
-	DECLARE_WRITE8_MEMBER(bank3_w);
-	DECLARE_WRITE8_MEMBER(bank4_w);
-	DECLARE_WRITE8_MEMBER(bank5_w);
-	DECLARE_WRITE8_MEMBER(bank6_w);
-	DECLARE_WRITE8_MEMBER(bank7_w);
-	DECLARE_READ8_MEMBER(mz2500_bank_addr_r);
-	DECLARE_WRITE8_MEMBER(mz2500_bank_addr_w);
-	DECLARE_READ8_MEMBER(mz2500_bank_data_r);
-	DECLARE_WRITE8_MEMBER(mz2500_bank_data_w);
-	DECLARE_WRITE8_MEMBER(mz2500_kanji_bank_w);
-	DECLARE_WRITE8_MEMBER(mz2500_dictionary_bank_w);
-	DECLARE_READ8_MEMBER(mz2500_crtc_hvblank_r);
-	DECLARE_WRITE8_MEMBER(mz2500_tv_crtc_w);
-	DECLARE_WRITE8_MEMBER(mz2500_irq_sel_w);
-	DECLARE_WRITE8_MEMBER(mz2500_irq_data_w);
-	DECLARE_READ8_MEMBER(mz2500_rom_r);
-	DECLARE_WRITE8_MEMBER(mz2500_rom_w);
-	DECLARE_WRITE8_MEMBER(palette4096_io_w);
-	DECLARE_READ8_MEMBER(mz2500_bplane_latch_r);
-	DECLARE_READ8_MEMBER(mz2500_rplane_latch_r);
-	DECLARE_READ8_MEMBER(mz2500_gplane_latch_r);
-	DECLARE_READ8_MEMBER(mz2500_iplane_latch_r);
-	DECLARE_WRITE8_MEMBER(mz2500_cg_addr_w);
-	DECLARE_WRITE8_MEMBER(mz2500_cg_data_w);
-	DECLARE_WRITE8_MEMBER(timer_w);
-	DECLARE_READ8_MEMBER(mz2500_joystick_r);
-	DECLARE_WRITE8_MEMBER(mz2500_joystick_w);
-	DECLARE_READ8_MEMBER(mz2500_kanji_r);
-	DECLARE_WRITE8_MEMBER(mz2500_kanji_w);
-	DECLARE_READ8_MEMBER(rp5c15_8_r);
-	DECLARE_WRITE8_MEMBER(rp5c15_8_w);
-	DECLARE_READ8_MEMBER(mz2500_emm_data_r);
-	DECLARE_WRITE8_MEMBER(mz2500_emm_addr_w);
-	DECLARE_WRITE8_MEMBER(mz2500_emm_data_w);
-	uint8_t mz2500_cg_latch_compare();
-	uint8_t mz2500_ram_read(uint16_t offset, uint8_t bank_num);
-	void mz2500_ram_write(uint16_t offset, uint8_t data, uint8_t bank_num);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mz2500);
-	uint32_t screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mz2500_vbl);
-
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_WRITE8_MEMBER(floppy_select_w);
-	DECLARE_WRITE8_MEMBER(floppy_side_w);
-
-	DECLARE_READ8_MEMBER(mz2500_porta_r);
-	DECLARE_READ8_MEMBER(mz2500_portb_r);
-	DECLARE_READ8_MEMBER(mz2500_portc_r);
-	DECLARE_WRITE8_MEMBER(mz2500_porta_w);
-	DECLARE_WRITE8_MEMBER(mz2500_portb_w);
-	DECLARE_WRITE8_MEMBER(mz2500_portc_w);
-	DECLARE_WRITE8_MEMBER(mz2500_pio1_porta_w);
-	DECLARE_READ8_MEMBER(mz2500_pio1_porta_r);
-	DECLARE_READ8_MEMBER(opn_porta_r);
-	DECLARE_WRITE8_MEMBER(opn_porta_w);
-	DECLARE_WRITE_LINE_MEMBER(pit8253_clk0_irq);
-	DECLARE_WRITE_LINE_MEMBER(mz2500_rtc_alarm_irq);
-	IRQ_CALLBACK_MEMBER( mz2500_irq_ack );
-
-	void draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,uint16_t map_addr);
-	void draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,uint16_t map_addr);
-	void draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
-	void draw_cg16_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int x_size,int pri);
-	void draw_cg256_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int pri);
-	void draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void draw_cg_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
-
-	void mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,uint16_t  pen,uint8_t width,uint8_t height);
-	void mz2500_reconfigure_screen();
-	uint8_t pal_256_param(int index, int param);
-	void mz2500_reset(mz2500_state *state, uint8_t type);
-	required_device<palette_device> m_palette;
-	void mz2500(machine_config &config);
-	void mz2500_io(address_map &map);
-	void mz2500_map(address_map &map);
-};
+#include "includes/mz2500.h"
 
 
 /* machine stuff */
@@ -250,7 +42,7 @@ public:
 #define WRAM_RESET 0
 #define IPL_RESET 1
 
-static const uint8_t bank_reset_val[2][8] =
+static constexpr uint8_t bank_reset_val[2][8] =
 {
 	{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 },
 	{ 0x34, 0x35, 0x36, 0x37, 0x04, 0x05, 0x06, 0x07 }
@@ -298,7 +90,7 @@ void mz2500_state::mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,uint16_t  
 
 void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,uint16_t map_addr)
 {
-	uint8_t *vram = m_main_ram.get(); // TODO
+	uint8_t *vram = m_tvram;
 	int x,y,count,xi,yi;
 	uint8_t *gfx_data;
 	uint8_t y_step;
@@ -315,10 +107,10 @@ void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,uin
 	{
 		for (x=0;x<80;x++)
 		{
-			int tile = vram[0x70000+count+0x0000] & 0xff;
-			int attr = vram[0x70000+count+0x0800];
-			int tile_bank = vram[0x70000+count+0x1000] & 0x3f;
-			int gfx_sel = (attr & 0x38) | (vram[0x70000+count+0x1000] & 0xc0);
+			int tile = vram[count+0x0000] & 0xff;
+			int attr = vram[count+0x0800];
+			int tile_bank = vram[count+0x1000] & 0x3f;
+			int gfx_sel = (attr & 0x38) | (vram[count+0x1000] & 0xc0);
 			int color = attr & 7;
 			int inv_col = (attr & 0x40) >> 6;
 
@@ -387,7 +179,7 @@ void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,uin
 
 void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,uint16_t map_addr)
 {
-	uint8_t *vram = m_main_ram.get(); // TODO
+	uint8_t *vram = m_tvram;
 	int x,y,count,xi,yi;
 	uint8_t *gfx_data;
 	uint8_t y_step;
@@ -404,10 +196,10 @@ void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int
 	{
 		for (x=0;x<40;x++)
 		{
-			int tile = vram[0x70000+count+0x0000] & 0xff;
-			int attr = vram[0x70000+count+0x0800];
-			int tile_bank = vram[0x70000+count+0x1000] & 0x3f;
-			int gfx_sel = (attr & 0x38) | (vram[0x70000+count+0x1000] & 0xc0);
+			int tile = vram[count+0x0000] & 0xff;
+			int attr = vram[count+0x0800];
+			int tile_bank = vram[count+0x1000] & 0x3f;
+			int gfx_sel = (attr & 0x38) | (vram[count+0x1000] & 0xc0);
 			//int gfx_num;
 			int color = attr & 7;
 			int inv_col = (attr & 0x40) >> 6;
@@ -478,12 +270,12 @@ void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int
 void mz2500_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
 	uint32_t count;
-	uint8_t *vram = m_main_ram.get(); // TODO
+	uint8_t *vram = m_cgram;
 	uint8_t pen,pen_bit[2];
 	int x,y,xi,pen_i;
 	int res_x,res_y;
 
-	count = 0x40000;
+	count = 0x0000;
 
 	for(y=0;y<400;y++)
 	{
@@ -519,7 +311,7 @@ void mz2500_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprec
 void mz2500_state::draw_cg16_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int x_size,int pri)
 {
 	uint32_t count;
-	uint8_t *vram = m_main_ram.get(); //TODO
+	uint8_t *vram = m_cgram; //TODO
 	uint8_t pen,pen_bit[4];
 	int x,y,xi,pen_i;
 	uint32_t wa_reg;
@@ -553,10 +345,10 @@ void mz2500_state::draw_cg16_screen(bitmap_ind16 &bitmap,const rectangle &clipre
 				if(res_x < m_cg_hs || res_x >= m_cg_he || res_y < m_cg_vs || res_y >= m_cg_ve)
 					continue;
 
-				pen_bit[0] = (vram[count+0x40000+((plane & 1) * 0x2000)+(((plane & 2)>>1) * 0x10000)]>>(xi)) & 1 ? (pen_mask & 0x01) : 0; //B
-				pen_bit[1] = (vram[count+0x44000+((plane & 1) * 0x2000)+(((plane & 2)>>1) * 0x10000)]>>(xi)) & 1 ? (pen_mask & 0x02) : 0; //R
-				pen_bit[2] = (vram[count+0x48000+((plane & 1) * 0x2000)+(((plane & 2)>>1) * 0x10000)]>>(xi)) & 1 ? (pen_mask & 0x04) : 0; //G
-				pen_bit[3] = (vram[count+0x4c000+((plane & 1) * 0x2000)+(((plane & 2)>>1) * 0x10000)]>>(xi)) & 1 ? (pen_mask & 0x08) : 0; //I
+				pen_bit[0] = (vram[count+0x0000+((plane & 1) * 0x2000)+(((plane & 2)>>1) * 0x10000)]>>(xi)) & 1 ? (pen_mask & 0x01) : 0; //B
+				pen_bit[1] = (vram[count+0x4000+((plane & 1) * 0x2000)+(((plane & 2)>>1) * 0x10000)]>>(xi)) & 1 ? (pen_mask & 0x02) : 0; //R
+				pen_bit[2] = (vram[count+0x8000+((plane & 1) * 0x2000)+(((plane & 2)>>1) * 0x10000)]>>(xi)) & 1 ? (pen_mask & 0x04) : 0; //G
+				pen_bit[3] = (vram[count+0xc000+((plane & 1) * 0x2000)+(((plane & 2)>>1) * 0x10000)]>>(xi)) & 1 ? (pen_mask & 0x08) : 0; //I
 
 				pen = 0;
 				for(pen_i=0;pen_i<4;pen_i++)
@@ -576,7 +368,7 @@ void mz2500_state::draw_cg16_screen(bitmap_ind16 &bitmap,const rectangle &clipre
 void mz2500_state::draw_cg256_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int pri)
 {
 	uint32_t count;
-	uint8_t *vram = m_main_ram.get();
+	uint8_t *vram = m_cgram;
 	uint8_t pen,pen_bit[8];
 	int x,y,xi,pen_i;
 	uint32_t wa_reg;
@@ -606,14 +398,14 @@ void mz2500_state::draw_cg256_screen(bitmap_ind16 &bitmap,const rectangle &clipr
 				if(res_x < m_cg_hs || res_x >= m_cg_he || res_y < m_cg_vs || res_y >= m_cg_ve)
 					continue;
 
-				pen_bit[0] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x2000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x10) : 0; // B1
-				pen_bit[1] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x0000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x01) : 0; // B0
-				pen_bit[2] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x6000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x20) : 0; // R1
-				pen_bit[3] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x4000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x02) : 0; // R0
-				pen_bit[4] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xa000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x40) : 0; // G1
-				pen_bit[5] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x8000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x04) : 0; // G0
-				pen_bit[6] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xe000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x80) : 0; // I1
-				pen_bit[7] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xc000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x08) : 0; // I0
+				pen_bit[0] = (vram[count + 0x0000 + (((plane & 2)>>1) * 0x10000) + 0x2000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x10) : 0; // B1
+				pen_bit[1] = (vram[count + 0x0000 + (((plane & 2)>>1) * 0x10000) + 0x0000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x01) : 0; // B0
+				pen_bit[2] = (vram[count + 0x0000 + (((plane & 2)>>1) * 0x10000) + 0x6000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x20) : 0; // R1
+				pen_bit[3] = (vram[count + 0x0000 + (((plane & 2)>>1) * 0x10000) + 0x4000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x02) : 0; // R0
+				pen_bit[4] = (vram[count + 0x0000 + (((plane & 2)>>1) * 0x10000) + 0xa000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x40) : 0; // G1
+				pen_bit[5] = (vram[count + 0x0000 + (((plane & 2)>>1) * 0x10000) + 0x8000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x04) : 0; // G0
+				pen_bit[6] = (vram[count + 0x0000 + (((plane & 2)>>1) * 0x10000) + 0xe000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x80) : 0; // I1
+				pen_bit[7] = (vram[count + 0x0000 + (((plane & 2)>>1) * 0x10000) + 0xc000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x08) : 0; // I0
 
 				pen = 0;
 				for(pen_i=0;pen_i<8;pen_i++)
@@ -805,202 +597,6 @@ uint8_t mz2500_state::mz2500_cg_latch_compare()
 	return res;
 }
 
-uint8_t mz2500_state::mz2500_ram_read(uint16_t offset, uint8_t bank_num)
-{
-	uint8_t *ram = m_main_ram.get(); // TODO
-	uint8_t cur_bank = m_bank_val[bank_num];
-
-	switch(cur_bank)
-	{
-		case 0x30:
-		case 0x31:
-		case 0x32:
-		case 0x33:
-		{
-			// READ MODIFY WRITE
-			if(m_cg_reg[0x0e] == 0x3)
-			{
-				// ...
-			}
-			else
-			{
-				int plane;
-				m_cg_latch[0] = ram[offset+((cur_bank & 3)*0x2000)+0x40000]; //B
-				m_cg_latch[1] = ram[offset+((cur_bank & 3)*0x2000)+0x44000]; //R
-				m_cg_latch[2] = ram[offset+((cur_bank & 3)*0x2000)+0x48000]; //G
-				m_cg_latch[3] = ram[offset+((cur_bank & 3)*0x2000)+0x4c000]; //I
-				plane = m_cg_reg[0x07] & 3;
-
-				if(m_cg_reg[0x07] & 0x10)
-					return mz2500_cg_latch_compare();
-				else
-					return m_cg_latch[plane];
-			}
-		}
-		break;
-		case 0x39:
-		{
-			if(m_kanji_bank & 0x80) //kanji ROM
-				return m_kanji_rom[(offset & 0x7ff)+((m_kanji_bank & 0x7f)*0x800)];
-			else //PCG RAM
-				return m_pcg_ram[offset];
-		}
-		case 0x3a:
-		{
-			return m_dic_rom[(offset & 0x1fff) + ((m_dic_bank & 0x1f)*0x2000)];
-		}
-		case 0x3c:
-		case 0x3d:
-		case 0x3e:
-		case 0x3f:
-		{
-			return m_phone_rom[offset+(cur_bank & 3)*0x2000];
-		}
-		default: return ram[offset+cur_bank*0x2000];
-	}
-
-	// never executed
-	return 0xff;
-}
-
-void mz2500_state::mz2500_ram_write(uint16_t offset, uint8_t data, uint8_t bank_num)
-{
-	uint8_t *ram = m_main_ram.get(); // TODO
-	uint8_t cur_bank = m_bank_val[bank_num];
-
-//  if(cur_bank >= 0x30 && cur_bank <= 0x33)
-//      printf("CG REG = %02x %02x %02x %02x | offset = %04x | data = %02x\n",m_cg_reg[0],m_cg_reg[1],m_cg_reg[2],m_cg_reg[3],offset,data);
-
-	switch(cur_bank)
-	{
-		case 0x30:
-		case 0x31:
-		case 0x32:
-		case 0x33:
-		{
-			// READ MODIFY WRITE
-			if(m_cg_reg[0x0e] == 0x3)
-			{
-				// ...
-			}
-			else
-			{
-				if((m_cg_reg[0x05] & 0xc0) == 0x00) //replace
-				{
-					if(m_cg_reg[5] & 1) //B
-					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x40000] &= ~m_cg_reg[6];
-						ram[offset+((cur_bank & 3)*0x2000)+0x40000] |= (m_cg_reg[4] & 1) ? (data & m_cg_reg[0] & m_cg_reg[6]) : 0;
-					}
-					if(m_cg_reg[5] & 2) //R
-					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x44000] &= ~m_cg_reg[6];
-						ram[offset+((cur_bank & 3)*0x2000)+0x44000] |= (m_cg_reg[4] & 2) ? (data & m_cg_reg[1] & m_cg_reg[6]) : 0;
-					}
-					if(m_cg_reg[5] & 4) //G
-					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x48000] &= ~m_cg_reg[6];
-						ram[offset+((cur_bank & 3)*0x2000)+0x48000] |= (m_cg_reg[4] & 4) ? (data & m_cg_reg[2] & m_cg_reg[6]) : 0;
-					}
-					if(m_cg_reg[5] & 8) //I
-					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] &= ~m_cg_reg[6];
-						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] |= (m_cg_reg[4] & 8) ? (data & m_cg_reg[3] & m_cg_reg[6]) : 0;
-					}
-				}
-				else if((m_cg_reg[0x05] & 0xc0) == 0x40) //pset
-				{
-					if(m_cg_reg[5] & 1) //B
-					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x40000] &= ~data;
-						ram[offset+((cur_bank & 3)*0x2000)+0x40000] |= (m_cg_reg[4] & 1) ? (data & m_cg_reg[0]) : 0;
-					}
-					if(m_cg_reg[5] & 2) //R
-					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x44000] &= ~data;
-						ram[offset+((cur_bank & 3)*0x2000)+0x44000] |= (m_cg_reg[4] & 2) ? (data & m_cg_reg[1]) : 0;
-					}
-					if(m_cg_reg[5] & 4) //G
-					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x48000] &= ~data;
-						ram[offset+((cur_bank & 3)*0x2000)+0x48000] |= (m_cg_reg[4] & 4) ? (data & m_cg_reg[2]) : 0;
-					}
-					if(m_cg_reg[5] & 8) //I
-					{
-						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] &= ~data;
-						ram[offset+((cur_bank & 3)*0x2000)+0x4c000] |= (m_cg_reg[4] & 8) ? (data & m_cg_reg[3]) : 0;
-					}
-				}
-			}
-			break;
-		}
-		case 0x34:
-		case 0x35:
-		case 0x36:
-		case 0x37:
-		{
-			// IPL ROM, WRITENOP
-			//printf("%04x %02x\n",offset+bank_num*0x2000,data);
-			break;
-		}
-		case 0x38:
-		{
-			// TVRAM
-			ram[offset+cur_bank*0x2000] = data;
-			break;
-		}
-		case 0x39:
-		{
-			ram[offset+cur_bank*0x2000] = data;
-			if(m_kanji_bank & 0x80) //kanji ROM
-			{
-				//NOP
-			}
-			else //PCG RAM
-			{
-				m_pcg_ram[offset] = data;
-				if((offset & 0x1800) == 0x0000)
-					m_gfxdecode->gfx(3)->mark_dirty((offset) >> 3);
-				else
-					m_gfxdecode->gfx(4)->mark_dirty((offset & 0x7ff) >> 3);
-			}
-			break;
-		}
-		case 0x3a:
-		{
-			// DIC ROM, WRITENOP
-			break;
-		}
-		case 0x3c:
-		case 0x3d:
-		case 0x3e:
-		case 0x3f:
-		{
-			// PHONE ROM, WRITENOP
-			break;
-		}
-		default: ram[offset+cur_bank*0x2000] = data; break;
-	}
-}
-
-READ8_MEMBER(mz2500_state::bank0_r){ return mz2500_ram_read(offset, 0); }
-READ8_MEMBER(mz2500_state::bank1_r){ return mz2500_ram_read(offset, 1); }
-READ8_MEMBER(mz2500_state::bank2_r){ return mz2500_ram_read(offset, 2); }
-READ8_MEMBER(mz2500_state::bank3_r){ return mz2500_ram_read(offset, 3); }
-READ8_MEMBER(mz2500_state::bank4_r){ return mz2500_ram_read(offset, 4); }
-READ8_MEMBER(mz2500_state::bank5_r){ return mz2500_ram_read(offset, 5); }
-READ8_MEMBER(mz2500_state::bank6_r){ return mz2500_ram_read(offset, 6); }
-READ8_MEMBER(mz2500_state::bank7_r){ return mz2500_ram_read(offset, 7); }
-WRITE8_MEMBER(mz2500_state::bank0_w){ mz2500_ram_write(offset, data, 0); }
-WRITE8_MEMBER(mz2500_state::bank1_w){ mz2500_ram_write(offset, data, 1); }
-WRITE8_MEMBER(mz2500_state::bank2_w){ mz2500_ram_write(offset, data, 2); }
-WRITE8_MEMBER(mz2500_state::bank3_w){ mz2500_ram_write(offset, data, 3); }
-WRITE8_MEMBER(mz2500_state::bank4_w){ mz2500_ram_write(offset, data, 4); }
-WRITE8_MEMBER(mz2500_state::bank5_w){ mz2500_ram_write(offset, data, 5); }
-WRITE8_MEMBER(mz2500_state::bank6_w){ mz2500_ram_write(offset, data, 6); }
-WRITE8_MEMBER(mz2500_state::bank7_w){ mz2500_ram_write(offset, data, 7); }
-
-
 READ8_MEMBER(mz2500_state::mz2500_bank_addr_r)
 {
 	return m_bank_addr;
@@ -1026,9 +622,8 @@ READ8_MEMBER(mz2500_state::mz2500_bank_data_r)
 
 WRITE8_MEMBER(mz2500_state::mz2500_bank_data_w)
 {
-//  static const char *const bank_name[] = { "bank0", "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7" };
-
 	m_bank_val[m_bank_addr] = data & 0x3f;
+	m_rambank[m_bank_addr]->set_bank(m_bank_val[m_bank_addr]);
 
 //  if((data*2) >= 0x70)
 //  printf("%s %02x\n",bank_name[m_bank_addr],m_bank_val[m_bank_addr]*2);
@@ -1226,19 +821,141 @@ WRITE8_MEMBER(mz2500_state::floppy_side_w)
 		m_floppy->ss_w(BIT(data, 0));
 }
 
-
 void mz2500_state::mz2500_map(address_map &map)
 {
-	map(0x0000, 0x1fff).rw(this, FUNC(mz2500_state::bank0_r), FUNC(mz2500_state::bank0_w));
-	map(0x2000, 0x3fff).rw(this, FUNC(mz2500_state::bank1_r), FUNC(mz2500_state::bank1_w));
-	map(0x4000, 0x5fff).rw(this, FUNC(mz2500_state::bank2_r), FUNC(mz2500_state::bank2_w));
-	map(0x6000, 0x7fff).rw(this, FUNC(mz2500_state::bank3_r), FUNC(mz2500_state::bank3_w));
-	map(0x8000, 0x9fff).rw(this, FUNC(mz2500_state::bank4_r), FUNC(mz2500_state::bank4_w));
-	map(0xa000, 0xbfff).rw(this, FUNC(mz2500_state::bank5_r), FUNC(mz2500_state::bank5_w));
-	map(0xc000, 0xdfff).rw(this, FUNC(mz2500_state::bank6_r), FUNC(mz2500_state::bank6_w));
-	map(0xe000, 0xffff).rw(this, FUNC(mz2500_state::bank7_r), FUNC(mz2500_state::bank7_w));
+	map(0x0000, 0x1fff).m(m_rambank[0], FUNC(address_map_bank_device::amap8));
+	map(0x2000, 0x3fff).m(m_rambank[1], FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0x5fff).m(m_rambank[2], FUNC(address_map_bank_device::amap8));
+	map(0x6000, 0x7fff).m(m_rambank[3], FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0x9fff).m(m_rambank[4], FUNC(address_map_bank_device::amap8));
+	map(0xa000, 0xbfff).m(m_rambank[5], FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xdfff).m(m_rambank[6], FUNC(address_map_bank_device::amap8));
+	map(0xe000, 0xffff).m(m_rambank[7], FUNC(address_map_bank_device::amap8));
 }
 
+READ8_MEMBER(mz2500_state::rmw_r)
+{
+	// TODO: correct?
+	if(m_cg_reg[0x0e] == 0x3)
+		return 0xff;
+
+	int plane;
+	m_cg_latch[0] = m_cgram[offset+0x0000]; //B
+	m_cg_latch[1] = m_cgram[offset+0x4000]; //R
+	m_cg_latch[2] = m_cgram[offset+0x8000]; //G
+	m_cg_latch[3] = m_cgram[offset+0xc000]; //I
+	plane = m_cg_reg[0x07] & 3;
+
+	if(m_cg_reg[0x07] & 0x10)
+		return mz2500_cg_latch_compare();
+
+	return m_cg_latch[plane];
+}
+
+WRITE8_MEMBER(mz2500_state::rmw_w)
+{
+	// TODO: correct?
+	if(m_cg_reg[0x0e] == 0x3)
+		return;
+
+	if((m_cg_reg[0x05] & 0xc0) == 0x00) //replace
+	{
+		if(m_cg_reg[5] & 1) //B
+		{
+			m_cgram[offset+0x0000] &= ~m_cg_reg[6];
+			m_cgram[offset+0x0000] |= (m_cg_reg[4] & 1) ? (data & m_cg_reg[0] & m_cg_reg[6]) : 0;
+		}
+		if(m_cg_reg[5] & 2) //R
+		{
+			m_cgram[offset+0x4000] &= ~m_cg_reg[6];
+			m_cgram[offset+0x4000] |= (m_cg_reg[4] & 2) ? (data & m_cg_reg[1] & m_cg_reg[6]) : 0;
+		}
+		if(m_cg_reg[5] & 4) //G
+		{
+			m_cgram[offset+0x8000] &= ~m_cg_reg[6];
+			m_cgram[offset+0x8000] |= (m_cg_reg[4] & 4) ? (data & m_cg_reg[2] & m_cg_reg[6]) : 0;
+		}
+		if(m_cg_reg[5] & 8) //I
+		{
+			m_cgram[offset+0xc000] &= ~m_cg_reg[6];
+			m_cgram[offset+0xc000] |= (m_cg_reg[4] & 8) ? (data & m_cg_reg[3] & m_cg_reg[6]) : 0;
+		}
+	}
+	else if((m_cg_reg[0x05] & 0xc0) == 0x40) //pset
+	{
+		if(m_cg_reg[5] & 1) //B
+		{
+			m_cgram[offset+0x0000] &= ~data;
+			m_cgram[offset+0x0000] |= (m_cg_reg[4] & 1) ? (data & m_cg_reg[0]) : 0;
+		}
+		if(m_cg_reg[5] & 2) //R
+		{
+			m_cgram[offset+0x4000] &= ~data;
+			m_cgram[offset+0x4000] |= (m_cg_reg[4] & 2) ? (data & m_cg_reg[1]) : 0;
+		}
+		if(m_cg_reg[5] & 4) //G
+		{
+			m_cgram[offset+0x8000] &= ~data;
+			m_cgram[offset+0x8000] |= (m_cg_reg[4] & 4) ? (data & m_cg_reg[2]) : 0;
+		}
+		if(m_cg_reg[5] & 8) //I
+		{
+			m_cgram[offset+0xc000] &= ~data;
+			m_cgram[offset+0xc000] |= (m_cg_reg[4] & 8) ? (data & m_cg_reg[3]) : 0;
+		}
+	}
+}
+
+READ8_MEMBER(mz2500_state::kanji_pcg_r)
+{
+	if(m_kanji_bank & 0x80) //kanji ROM
+		return m_kanji_rom[(offset & 0x7ff)+((m_kanji_bank & 0x7f)*0x800)];
+
+	//PCG RAM
+	return m_pcg_ram[offset];
+}
+
+WRITE8_MEMBER(mz2500_state::kanji_pcg_w)
+{
+	if((m_kanji_bank & 0x80) == 0) ////PCG RAM
+	{
+		m_pcg_ram[offset] = data;
+		if((offset & 0x1800) == 0x0000)
+			m_gfxdecode->gfx(3)->mark_dirty((offset) >> 3);
+		else
+			m_gfxdecode->gfx(4)->mark_dirty((offset & 0x7ff) >> 3);
+	}
+	// kanji ROM is read only
+}
+
+READ8_MEMBER(mz2500_state::dict_rom_r)
+{
+	return m_dic_rom[(offset & 0x1fff) + ((m_dic_bank & 0x1f)*0x2000)];
+}
+
+/*
+    memory map:
+    0x00000-0x3ffff Work RAM
+    0x40000-0x5ffff CG RAM
+    0x60000-0x67fff "Read modify write" area (related to the CG RAM) (0x30-0x33)
+    0x68000-0x6ffff IPL ROM (0x34-0x37)
+    0x70000-0x71fff TVRAM (0x38)
+    0x72000-0x73fff Kanji ROM / PCG RAM (banked) (0x39)
+    0x74000-0x75fff Dictionary ROM (banked) (0x3a)
+    0x76000-0x77fff NOP (0x3b)
+    0x78000-0x7ffff Phone ROM (0x3c-0x3f)
+*/
+void mz2500_state::mz2500_bank_window_map(address_map &map)
+{
+	map(0x00000,0x3ffff).ram().share("wram");
+	map(0x40000,0x5ffff).ram().share("cgram");
+	map(0x60000,0x67fff).rw(FUNC(mz2500_state::rmw_r),FUNC(mz2500_state::rmw_w));
+	map(0x68000,0x6ffff).rom().region("ipl", 0);
+	map(0x70000,0x71fff).ram().share("tvram");
+	map(0x72000,0x73fff).rw(FUNC(mz2500_state::kanji_pcg_r),FUNC(mz2500_state::kanji_pcg_w));
+	map(0x74000,0x75fff).r(FUNC(mz2500_state::dict_rom_r));
+	map(0x78000,0x7ffff).rom().region("phone", 0);
+}
 
 READ8_MEMBER(mz2500_state::mz2500_rom_r)
 {
@@ -1279,12 +996,12 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 
 READ8_MEMBER(mz2500_state::fdc_r)
 {
-	return m_fdc->read(space, offset) ^ 0xff;
+	return m_fdc->read(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(mz2500_state::fdc_w)
 {
-	m_fdc->write(space, offset, data ^ 0xff);
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)
@@ -1368,7 +1085,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
 	if((m_cg_reg_index & 0x1f) == 0x05 && (m_cg_reg[0x05] & 0xc0) == 0x80) //clear bitmap buffer
 	{
 		uint32_t i;
-		uint8_t *vram = m_main_ram.get(); // TODO
+		uint8_t *vram = m_cgram;
 		uint32_t layer_bank;
 
 		layer_bank = (m_cg_reg[0x0e] & 0x80) ? 0x10000 : 0x00000;
@@ -1377,22 +1094,22 @@ WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
 		if(m_cg_reg[0x05] & 1)
 		{
 			for(i=0;i<0x4000;i++)
-				vram[i+0x40000+layer_bank] = 0x00; //clear B
+				vram[i+0x0000+layer_bank] = 0x00; //clear B
 		}
 		if(m_cg_reg[0x05] & 2)
 		{
 			for(i=0;i<0x4000;i++)
-				vram[i+0x44000+layer_bank] = 0x00; //clear R
+				vram[i+0x4000+layer_bank] = 0x00; //clear R
 		}
 		if(m_cg_reg[0x05] & 4)
 		{
 			for(i=0;i<0x4000;i++)
-				vram[i+0x48000+layer_bank] = 0x00; //clear G
+				vram[i+0x8000+layer_bank] = 0x00; //clear G
 		}
 		if(m_cg_reg[0x05] & 8)
 		{
 			for(i=0;i<0x4000;i++)
-				vram[i+0x4c000+layer_bank] = 0x00; //clear I
+				vram[i+0xc000+layer_bank] = 0x00; //clear I
 		}
 		m_cg_clear_flag = 1;
 	}
@@ -1520,37 +1237,37 @@ void mz2500_state::mz2500_io(address_map &map)
 //  AM_RANGE(0x98, 0x99) ADPCM, unknown type, custom?
 	map(0xa0, 0xa3).rw("z80sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 //  AM_RANGE(0xa4, 0xa5) AM_READWRITE(sasi_r, sasi_w)
-	map(0xa8, 0xa8).w(this, FUNC(mz2500_state::mz2500_rom_w));
-	map(0xa9, 0xa9).r(this, FUNC(mz2500_state::mz2500_rom_r));
-	map(0xac, 0xac).w(this, FUNC(mz2500_state::mz2500_emm_addr_w));
-	map(0xad, 0xad).r(this, FUNC(mz2500_state::mz2500_emm_data_r)).w(this, FUNC(mz2500_state::mz2500_emm_data_w));
-	map(0xae, 0xae).w(this, FUNC(mz2500_state::palette4096_io_w));
+	map(0xa8, 0xa8).w(FUNC(mz2500_state::mz2500_rom_w));
+	map(0xa9, 0xa9).r(FUNC(mz2500_state::mz2500_rom_r));
+	map(0xac, 0xac).w(FUNC(mz2500_state::mz2500_emm_addr_w));
+	map(0xad, 0xad).r(FUNC(mz2500_state::mz2500_emm_data_r)).w(FUNC(mz2500_state::mz2500_emm_data_w));
+	map(0xae, 0xae).w(FUNC(mz2500_state::palette4096_io_w));
 //  AM_RANGE(0xb0, 0xb3) AM_READWRITE(sio_r,sio_w)
-	map(0xb4, 0xb4).rw(this, FUNC(mz2500_state::mz2500_bank_addr_r), FUNC(mz2500_state::mz2500_bank_addr_w));
-	map(0xb5, 0xb5).rw(this, FUNC(mz2500_state::mz2500_bank_data_r), FUNC(mz2500_state::mz2500_bank_data_w));
+	map(0xb4, 0xb4).rw(FUNC(mz2500_state::mz2500_bank_addr_r), FUNC(mz2500_state::mz2500_bank_addr_w));
+	map(0xb5, 0xb5).rw(FUNC(mz2500_state::mz2500_bank_data_r), FUNC(mz2500_state::mz2500_bank_data_w));
 	map(0xb7, 0xb7).nopw();
-	map(0xb8, 0xb9).rw(this, FUNC(mz2500_state::mz2500_kanji_r), FUNC(mz2500_state::mz2500_kanji_w));
-	map(0xbc, 0xbc).r(this, FUNC(mz2500_state::mz2500_bplane_latch_r)).w(this, FUNC(mz2500_state::mz2500_cg_addr_w));
-	map(0xbd, 0xbd).r(this, FUNC(mz2500_state::mz2500_rplane_latch_r)).w(this, FUNC(mz2500_state::mz2500_cg_data_w));
-	map(0xbe, 0xbe).r(this, FUNC(mz2500_state::mz2500_gplane_latch_r));
-	map(0xbf, 0xbf).r(this, FUNC(mz2500_state::mz2500_iplane_latch_r));
-	map(0xc6, 0xc6).w(this, FUNC(mz2500_state::mz2500_irq_sel_w));
-	map(0xc7, 0xc7).w(this, FUNC(mz2500_state::mz2500_irq_data_w));
+	map(0xb8, 0xb9).rw(FUNC(mz2500_state::mz2500_kanji_r), FUNC(mz2500_state::mz2500_kanji_w));
+	map(0xbc, 0xbc).r(FUNC(mz2500_state::mz2500_bplane_latch_r)).w(FUNC(mz2500_state::mz2500_cg_addr_w));
+	map(0xbd, 0xbd).r(FUNC(mz2500_state::mz2500_rplane_latch_r)).w(FUNC(mz2500_state::mz2500_cg_data_w));
+	map(0xbe, 0xbe).r(FUNC(mz2500_state::mz2500_gplane_latch_r));
+	map(0xbf, 0xbf).r(FUNC(mz2500_state::mz2500_iplane_latch_r));
+	map(0xc6, 0xc6).w(FUNC(mz2500_state::mz2500_irq_sel_w));
+	map(0xc7, 0xc7).w(FUNC(mz2500_state::mz2500_irq_data_w));
 	map(0xc8, 0xc9).rw("ym", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 //  AM_RANGE(0xca, 0xca) AM_READWRITE(voice_r,voice_w)
-	map(0xcc, 0xcc).rw(this, FUNC(mz2500_state::rp5c15_8_r), FUNC(mz2500_state::rp5c15_8_w));
-	map(0xce, 0xce).w(this, FUNC(mz2500_state::mz2500_dictionary_bank_w));
-	map(0xcf, 0xcf).w(this, FUNC(mz2500_state::mz2500_kanji_bank_w));
-	map(0xd8, 0xdb).rw(this, FUNC(mz2500_state::fdc_r), FUNC(mz2500_state::fdc_w));
-	map(0xdc, 0xdc).w(this, FUNC(mz2500_state::floppy_select_w));
-	map(0xdd, 0xdd).w(this, FUNC(mz2500_state::floppy_side_w));
+	map(0xcc, 0xcc).rw(FUNC(mz2500_state::rp5c15_8_r), FUNC(mz2500_state::rp5c15_8_w));
+	map(0xce, 0xce).w(FUNC(mz2500_state::mz2500_dictionary_bank_w));
+	map(0xcf, 0xcf).w(FUNC(mz2500_state::mz2500_kanji_bank_w));
+	map(0xd8, 0xdb).rw(FUNC(mz2500_state::fdc_r), FUNC(mz2500_state::fdc_w));
+	map(0xdc, 0xdc).w(FUNC(mz2500_state::floppy_select_w));
+	map(0xdd, 0xdd).w(FUNC(mz2500_state::floppy_side_w));
 	map(0xde, 0xde).nopw();
 	map(0xe0, 0xe3).rw("i8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe4, 0xe7).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xe8, 0xeb).rw("z80pio_1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0xef, 0xef).rw(this, FUNC(mz2500_state::mz2500_joystick_r), FUNC(mz2500_state::mz2500_joystick_w));
-	map(0xf0, 0xf3).w(this, FUNC(mz2500_state::timer_w));
-	map(0xf4, 0xf7).r(this, FUNC(mz2500_state::mz2500_crtc_hvblank_r)).w(this, FUNC(mz2500_state::mz2500_tv_crtc_w));
+	map(0xef, 0xef).rw(FUNC(mz2500_state::mz2500_joystick_r), FUNC(mz2500_state::mz2500_joystick_w));
+	map(0xf0, 0xf3).w(FUNC(mz2500_state::timer_w));
+	map(0xf4, 0xf7).r(FUNC(mz2500_state::mz2500_crtc_hvblank_r)).w(FUNC(mz2500_state::mz2500_tv_crtc_w));
 //  AM_RANGE(0xf8, 0xf9) AM_READWRITE(extrom_r,extrom_w)
 }
 
@@ -1732,12 +1449,15 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-void mz2500_state::mz2500_reset(mz2500_state *state, uint8_t type)
+void mz2500_state::reset_banks(uint8_t type)
 {
 	int i;
 
 	for(i=0;i<8;i++)
+	{
 		m_bank_val[i] = bank_reset_val[type][i];
+		m_rambank[i]->set_bank(m_bank_val[i]);
+	}
 }
 
 static const gfx_layout mz2500_pcg_layout_1bpp =
@@ -1764,8 +1484,6 @@ static const gfx_layout mz2500_pcg_layout_3bpp =
 
 void mz2500_state::machine_start()
 {
-	/* TODO: main RAM actually needs to be splitted */
-	m_main_ram = make_unique_clear<uint8_t[]>(0x80000);
 	m_pcg_ram = make_unique_clear<uint8_t[]>(0x2000);
 	m_ipl_rom = memregion("ipl")->base();
 	m_kanji_rom = memregion("kanji")->base();
@@ -1775,9 +1493,8 @@ void mz2500_state::machine_start()
 	m_phone_rom = memregion("phone")->base();
 	m_iplpro_rom = memregion("iplpro")->base();
 
-	save_pointer(NAME(m_main_ram.get()), 0x80000);
-	save_pointer(NAME(m_pcg_ram.get()), 0x2000);
-	save_pointer(NAME(m_emm_ram.get()), 0x100000);
+	save_pointer(NAME(m_pcg_ram), 0x2000);
+	save_pointer(NAME(m_emm_ram), 0x100000);
 
 	/* TODO: gfx[4] crashes as per now */
 	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, mz2500_pcg_layout_1bpp, m_pcg_ram.get(), 0, 0x10, 0));
@@ -1788,23 +1505,16 @@ void mz2500_state::machine_reset()
 {
 	uint32_t i;
 
-	mz2500_reset(this, IPL_RESET);
+	reset_banks(IPL_RESET);
 
 	//m_irq_vector[0] = 0xef; /* RST 28h - vblank */
 
 	m_text_col_size = 0;
 	m_text_font_reg = 0;
 
-	/* copy IPL to its natural bank ROM/RAM position */
-	for(i=0;i<0x8000;i++)
-	{
-		//m_main_ram[i] = IPL[i];
-		m_main_ram[i+0x68000] = m_ipl_rom[i];
-	}
-
 	/* clear CG RAM */
 	for(i=0;i<0x20000;i++)
-		m_main_ram[i+0x40000] = 0x00;
+		m_cgram[i] = 0x00;
 
 	/* disable IRQ */
 	for(i=0;i<4;i++)
@@ -1934,7 +1644,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 	/* work RAM reset */
 	if((m_old_portc & 0x02) == 0x00 && (data & 0x02))
 	{
-		mz2500_reset(this, WRAM_RESET);
+		reset_banks(WRAM_RESET);
 		/* correct? */
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
@@ -1943,7 +1653,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 
 	/* IPL reset */
 	if((m_old_portc & 0x08) == 0x00 && (data & 0x08))
-		mz2500_reset(this, IPL_RESET);
+		reset_banks(IPL_RESET);
 
 	m_old_portc = data;
 
@@ -2020,42 +1730,36 @@ WRITE8_MEMBER(mz2500_state::opn_porta_w)
 	m_ym_porta = data;
 }
 
-PALETTE_INIT_MEMBER(mz2500_state, mz2500)
+void mz2500_state::mz2500_palette(palette_device &palette) const
 {
-	int i;
-
-	for(i=0;i<0x200;i++)
+	for (int i = 0; i < 0x200; i++)
 		palette.set_pen_color(i,pal1bit(0),pal1bit(0),pal1bit(0));
 
-	/* set up 8 colors (PCG) */
-	for(i=0;i<8;i++)
-		m_palette->set_pen_color(i+8,pal1bit((i & 2)>>1),pal1bit((i & 4)>>2),pal1bit((i & 1)>>0));
+	// set up 8 colors (PCG)
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(i+8,pal1bit((i & 2)>>1),pal1bit((i & 4)>>2),pal1bit((i & 1)>>0));
 
-	/* set up 16 colors (PCG / CG) */
+	// set up 16 colors (PCG / CG)
 
-	/* set up 256 colors (CG) */
+	// set up 256 colors (CG)
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r,g,b;
+		int bit0, bit1, bit2;
 
-		for(i = 0;i < 0x100;i++)
-		{
-			int bit0,bit1,bit2;
+		bit0 = pal_256_param(i,0) ? 1 : 0;
+		bit1 = i & 0x01 ? 2 : 0;
+		bit2 = i & 0x10 ? 4 : 0;
+		int const b = bit0|bit1|bit2;
+		bit0 = pal_256_param(i,0) ? 1 : 0;
+		bit1 = i & 0x02 ? 2 : 0;
+		bit2 = i & 0x20 ? 4 : 0;
+		int const r = bit0|bit1|bit2;
+		bit0 = pal_256_param(i,0) ? 1 : 0;
+		bit1 = i & 0x04 ? 2 : 0;
+		bit2 = i & 0x40 ? 4 : 0;
+		int const g = bit0|bit1|bit2;
 
-			bit0 = pal_256_param(i,0) ? 1 : 0;
-			bit1 = i & 0x01 ? 2 : 0;
-			bit2 = i & 0x10 ? 4 : 0;
-			b = bit0|bit1|bit2;
-			bit0 = pal_256_param(i,0) ? 1 : 0;
-			bit1 = i & 0x02 ? 2 : 0;
-			bit2 = i & 0x20 ? 4 : 0;
-			r = bit0|bit1|bit2;
-			bit0 = pal_256_param(i,0) ? 1 : 0;
-			bit1 = i & 0x04 ? 2 : 0;
-			bit2 = i & 0x40 ? 4 : 0;
-			g = bit0|bit1|bit2;
-
-			m_palette->set_pen_color(i+0x100,pal3bit(r),pal3bit(g),pal3bit(b));
-		}
+		palette.set_pen_color(i + 0x100, pal3bit(r), pal3bit(g), pal3bit(b));
 	}
 }
 
@@ -2083,7 +1787,6 @@ static void mz2500_floppies(device_slot_interface &device)
 	device.option_add("dd", FLOPPY_35_DD);
 }
 
-
 MACHINE_CONFIG_START(mz2500_state::mz2500)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, 6000000)
@@ -2092,33 +1795,38 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mz2500_state,  mz2500_vbl)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mz2500_state,mz2500_irq_ack)
 
-	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mz2500_state, mz2500_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz2500_state, mz2500_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz2500_state, mz2500_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mz2500_state, mz2500_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz2500_state, mz2500_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz2500_state, mz2500_portc_w))
+	for (int bank = 0; bank < 8; bank++)
+	{
+		ADDRESS_MAP_BANK(config, m_rambank[bank]).set_map(&mz2500_state::mz2500_bank_window_map).set_options(ENDIANNESS_LITTLE, 8, 16+3, 0x2000);
+	}
 
-	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, 6000000)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mz2500_state, mz2500_pio1_porta_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz2500_state, mz2500_pio1_porta_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mz2500_state, mz2500_pio1_porta_r))
+	i8255_device &ppi(I8255(config, "i8255_0"));
+	ppi.in_pa_callback().set(FUNC(mz2500_state::mz2500_porta_r));
+	ppi.out_pa_callback().set(FUNC(mz2500_state::mz2500_porta_w));
+	ppi.in_pb_callback().set(FUNC(mz2500_state::mz2500_portb_r));
+	ppi.out_pb_callback().set(FUNC(mz2500_state::mz2500_portb_w));
+	ppi.in_pc_callback().set(FUNC(mz2500_state::mz2500_portc_r));
+	ppi.out_pc_callback().set(FUNC(mz2500_state::mz2500_portc_w));
 
-	MCFG_DEVICE_ADD("z80sio", Z80SIO, 6000000)
+	z80pio_device& pio(Z80PIO(config, "z80pio_1", 6000000));
+	pio.in_pa_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_r));
+	pio.out_pa_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_w));
+	pio.in_pb_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_r));
 
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
-	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(*this, mz2500_state, mz2500_rtc_alarm_irq))
+	Z80SIO(config, "z80sio", 6000000);
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(31250)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, mz2500_state, pit8253_clk0_irq))
+	RP5C15(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->alarm().set(FUNC(mz2500_state::mz2500_rtc_alarm_irq));
+
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(31250);
+	m_pit->out_handler<0>().set(FUNC(mz2500_state::pit8253_clk0_irq));
 	// TODO: is this really right?
-	MCFG_PIT8253_CLK1(0)
-	MCFG_PIT8253_CLK2(16) //CH2, used by Super MZ demo / The Black Onyx and a few others (TODO: timing of this)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pit", pit8253_device, write_clk1))
+	m_pit->set_clk<1>(0);
+	m_pit->set_clk<2>(16); //CH2, used by Super MZ demo / The Black Onyx and a few others (TODO: timing of this)
+	m_pit->out_handler<2>().set(m_pit, FUNC(pit8253_device::write_clk1));
 
-	MCFG_MB8877_ADD("mb8877a", XTAL(1'000'000))
+	MB8877(config, m_fdc, 1_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
@@ -2129,26 +1837,25 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(21'477'272), 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
+	MCFG_SCREEN_RAW_PARAMS(21'477'272, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
 	MCFG_SCREEN_UPDATE_DRIVER(mz2500_state, screen_update_mz2500)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(mz2500_state, mz2500)
+	PALETTE(config, m_palette, FUNC(mz2500_state::mz2500_palette), 0x200);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz2500)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mz2500);
 
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym", YM2203, 2000000) //unknown clock / divider
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, mz2500_state, opn_porta_r))  // read A
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))   // read B
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mz2500_state, opn_porta_w))  // write A
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.50)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym(YM2203(config, "ym", 2000000)); //unknown clock / divider
+	ym.port_a_read_callback().set(FUNC(mz2500_state::opn_porta_r));
+	ym.port_b_read_callback().set_ioport("DSW1");
+	ym.port_a_write_callback().set(FUNC(mz2500_state::opn_porta_w));
+	ym.add_route(0, "mono", 0.25);
+	ym.add_route(1, "mono", 0.25);
+	ym.add_route(2, "mono", 0.50);
+	ym.add_route(3, "mono", 0.50);
 
 	MCFG_DEVICE_ADD("beeper", BEEP, 4096)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)

@@ -59,11 +59,11 @@ WRITE8_MEMBER(madalien_state::madalien_output_w)
 
 WRITE8_MEMBER(madalien_state::madalien_portA_w)
 {
-	m_discrete->write(space, MADALIEN_8910_PORTA, data);
+	m_discrete->write(MADALIEN_8910_PORTA, data);
 }
 WRITE8_MEMBER(madalien_state::madalien_portB_w)
 {
-	m_discrete->write(space, MADALIEN_8910_PORTB, data);
+	m_discrete->write(MADALIEN_8910_PORTB, data);
 }
 
 
@@ -71,17 +71,17 @@ void madalien_state::main_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
 
-	map(0x6000, 0x63ff).ram().w(this, FUNC(madalien_state::madalien_videoram_w)).share("videoram");
+	map(0x6000, 0x63ff).ram().w(FUNC(madalien_state::madalien_videoram_w)).share("videoram");
 	map(0x6400, 0x67ff).ram();
-	map(0x6800, 0x7fff).ram().w(this, FUNC(madalien_state::madalien_charram_w)).share("charram");
+	map(0x6800, 0x7fff).ram().w(FUNC(madalien_state::madalien_charram_w)).share("charram");
 
 	map(0x8000, 0x8000).mirror(0x0ff0).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x8001, 0x8001).mirror(0x0ff0).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x8004, 0x8004).mirror(0x0ff0).writeonly().share("video_control");
-	map(0x8005, 0x8005).mirror(0x0ff0).w(this, FUNC(madalien_state::madalien_output_w));
+	map(0x8005, 0x8005).mirror(0x0ff0).w(FUNC(madalien_state::madalien_output_w));
 	map(0x8006, 0x8006).mirror(0x0ff0).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x8008, 0x8008).mirror(0x07f0).ram().r(this, FUNC(madalien_state::shift_r)).share("shift_hi");
-	map(0x8009, 0x8009).mirror(0x07f0).ram().r(this, FUNC(madalien_state::shift_rev_r)).share("shift_lo");
+	map(0x8008, 0x8008).mirror(0x07f0).ram().r(FUNC(madalien_state::shift_r)).share("shift_hi");
+	map(0x8009, 0x8009).mirror(0x07f0).ram().r(FUNC(madalien_state::shift_rev_r)).share("shift_lo");
 	map(0x800b, 0x800b).mirror(0x07f0).writeonly().share("video_flags");
 	map(0x800c, 0x800c).mirror(0x07f0).writeonly().share("headlight_pos");
 	map(0x800d, 0x800d).mirror(0x07f0).writeonly().share("edge1_pos");
@@ -165,17 +165,17 @@ MACHINE_CONFIG_START(madalien_state::madalien)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0)) // 7400 at 3A used as R/S latch
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0); // 7400 at 3A used as R/S latch
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SOUND_CLOCK / 4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, madalien_state, madalien_portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, madalien_state, madalien_portB_w))
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 2)
+	ay8910_device &aysnd(AY8910(config, "aysnd", SOUND_CLOCK / 4));
+	aysnd.port_a_write_callback().set(FUNC(madalien_state::madalien_portA_w));
+	aysnd.port_b_write_callback().set(FUNC(madalien_state::madalien_portB_w));
+	aysnd.add_route(0, "discrete", 1.0, 0);
+	aysnd.add_route(1, "discrete", 1.0, 1);
+	aysnd.add_route(2, "discrete", 1.0, 2);
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, madalien_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

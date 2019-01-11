@@ -31,6 +31,7 @@ Notes:
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -48,6 +49,12 @@ public:
 	{
 	}
 
+	void ettrivia(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	int m_palreg;
 	int m_gfx_bank;
 	int m_question_bank;
@@ -67,15 +74,13 @@ public:
 	DECLARE_WRITE8_MEMBER(b800_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ettrivia);
+	void ettrivia_palette(palette_device &palette) const;
 	uint32_t screen_update_ettrivia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ettrivia_interrupt);
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, uint8_t *vidram, int gfx_code);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device_array<ay8912_device, 3> m_ay;
-	void ettrivia(machine_config &config);
 	void cpu_map(address_map &map);
 	void io_map(address_map &map);
 };
@@ -159,18 +164,18 @@ void ettrivia_state::cpu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x9000, 0x9000).w(this, FUNC(ettrivia_state::ettrivia_control_w));
+	map(0x9000, 0x9000).w(FUNC(ettrivia_state::ettrivia_control_w));
 	map(0x9800, 0x9800).nopw();
 	map(0xa000, 0xa000).nopw();
-	map(0xb000, 0xb000).r(this, FUNC(ettrivia_state::b000_r)).w(this, FUNC(ettrivia_state::b000_w));
-	map(0xb800, 0xb800).w(this, FUNC(ettrivia_state::b800_w));
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(ettrivia_state::ettrivia_fg_w)).share("fg_videoram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(ettrivia_state::ettrivia_bg_w)).share("bg_videoram");
+	map(0xb000, 0xb000).r(FUNC(ettrivia_state::b000_r)).w(FUNC(ettrivia_state::b000_w));
+	map(0xb800, 0xb800).w(FUNC(ettrivia_state::b800_w));
+	map(0xc000, 0xc7ff).ram().w(FUNC(ettrivia_state::ettrivia_fg_w)).share("fg_videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(ettrivia_state::ettrivia_bg_w)).share("bg_videoram");
 }
 
 void ettrivia_state::io_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(this, FUNC(ettrivia_state::ettrivia_question_r));
+	map(0x0000, 0xffff).r(FUNC(ettrivia_state::ettrivia_question_r));
 }
 
 static INPUT_PORTS_START( ettrivia )
@@ -234,38 +239,36 @@ TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_fg)
 	get_tile_info(tileinfo, tile_index, m_fg_videoram, 1);
 }
 
-PALETTE_INIT_MEMBER(ettrivia_state, ettrivia)
+void ettrivia_state::ettrivia_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances[2] = { 270, 130 };
-	double weights[2];
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
+	static constexpr int resistances[2] = { 270, 130 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double weights[2];
 	compute_resistor_weights(0, 255, -1.0,
 			2, resistances, weights, 0, 0,
 			2, resistances, weights, 0, 0,
 			0, nullptr, nullptr, 0, 0);
 
-	for (i = 0;i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i+0x100] >> 0) & 0x01;
-		r = combine_2_weights(weights, bit0, bit1);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i+0x100], 0);
+		int const r = combine_2_weights(weights, bit0, bit1);
 
-		/* green component */
-		bit0 = (color_prom[i] >> 2) & 0x01;
-		bit1 = (color_prom[i+0x100] >> 2) & 0x01;
-		g = combine_2_weights(weights, bit0, bit1);
+		// green component
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i+0x100], 2);
+		int const g = combine_2_weights(weights, bit0, bit1);
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 1) & 0x01;
-		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
-		b = combine_2_weights(weights, bit0, bit1);
+		// blue component
+		bit0 = BIT(color_prom[i], 1);
+		bit1 = BIT(color_prom[i+0x100], 1);
+		int const b = combine_2_weights(weights, bit0, bit1);
 
 		palette.set_pen_color(bitswap<8>(i,5,7,6,2,1,0,4,3), rgb_t(r, g, b));
 	}
@@ -300,7 +303,7 @@ MACHINE_CONFIG_START(ettrivia_state::ettrivia)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ettrivia_state,  ettrivia_interrupt)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -311,23 +314,21 @@ MACHINE_CONFIG_START(ettrivia_state::ettrivia)
 	MCFG_SCREEN_UPDATE_DRIVER(ettrivia_state, screen_update_ettrivia)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ettrivia)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(ettrivia_state, ettrivia)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_ettrivia);
+	PALETTE(config, "palette", FUNC(ettrivia_state::ettrivia_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_ay[0], 1500000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8912, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_ay[1], 1500000);
+	m_ay[1]->port_a_read_callback().set_ioport("IN1");
+	m_ay[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay3", AY8912, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_ay[2], 1500000);
+	m_ay[2]->port_a_read_callback().set_ioport("IN0");
+	m_ay[2]->add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 ROM_START( promutrv )

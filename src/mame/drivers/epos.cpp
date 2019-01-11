@@ -95,7 +95,7 @@ void epos_state::epos_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("DSW").w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x01, 0x01).portr("SYSTEM").w(this, FUNC(epos_state::port_1_w));
+	map(0x01, 0x01).portr("SYSTEM").w(FUNC(epos_state::port_1_w));
 	map(0x02, 0x02).portr("INPUTS").w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x03, 0x03).portr("UNK");
 	map(0x06, 0x06).w("aysnd", FUNC(ay8910_device::address_w));
@@ -104,9 +104,9 @@ void epos_state::epos_io_map(address_map &map)
 void epos_state::dealer_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).w(this, FUNC(epos_state::dealer_pal_w));
+	map(0x00, 0x0f).w(FUNC(epos_state::dealer_pal_w));
 	map(0x10, 0x13).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x20, 0x24).w(this, FUNC(epos_state::dealer_decrypt_rom));
+	map(0x20, 0x24).w(FUNC(epos_state::dealer_decrypt_rom));
 	map(0x34, 0x34).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x38, 0x38).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x3c, 0x3c).w("aysnd", FUNC(ay8910_device::address_w));
@@ -465,7 +465,7 @@ MACHINE_CONFIG_START(epos_state::epos) /* EPOS TRISTAR 8000 PCB */
 	MCFG_DEVICE_IO_MAP(epos_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -475,13 +475,11 @@ MACHINE_CONFIG_START(epos_state::epos) /* EPOS TRISTAR 8000 PCB */
 	MCFG_SCREEN_VISIBLE_AREA(0, 271, 0, 235)
 	MCFG_SCREEN_UPDATE_DRIVER(epos_state, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(epos_state, epos)
+	PALETTE(config, m_palette, FUNC(epos_state::epos_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(11'000'000)/16) /*  0.6875 MHz, confirmed from schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	AY8912(config, "aysnd", XTAL(11'000'000)/16).add_route(ALL_OUTPUTS, "mono", 1.0); /*  0.6875 MHz, confirmed from schematics */
 MACHINE_CONFIG_END
 
 
@@ -493,19 +491,18 @@ MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 	MCFG_DEVICE_IO_MAP(dealer_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, epos_state, i8255_porta_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, epos_state, i8255_portc_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set(FUNC(epos_state::i8255_porta_r));
+	ppi.out_pc_callback().set(FUNC(epos_state::i8255_portc_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(epos_state,dealer)
 
 	// RAM-based palette instead of prom
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 32)
-//  MCFG_PALETTE_INIT_OWNER(epos_state, epos)
+	PALETTE(config, m_palette, palette_device::BLACK, 32);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -517,11 +514,11 @@ MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(22'118'400)/32)    /* 0.6912 MHz (measured) */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, epos_state, ay_porta_mpx_r))
+	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(22'118'400)/32)); /* 0.6912 MHz (measured) */
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	aysnd.port_a_read_callback().set(FUNC(epos_state::ay_porta_mpx_r));
 	// port a writes?
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, epos_state, flip_screen_w)) // flipscreen and ay port a multiplex control
+	aysnd.port_b_write_callback().set(FUNC(epos_state::flip_screen_w)); // flipscreen and ay port a multiplex control
 MACHINE_CONFIG_END
 
 

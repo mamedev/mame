@@ -47,22 +47,27 @@ I dumped it with this configuration. In case I'll redump it desoldering pin 16 f
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class egghunt_state : public driver_device
 {
 public:
-	egghunt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	egghunt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
 		m_atram(*this, "atram"),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
+	void egghunt(machine_config &config);
+
+private:
 	/* video-related */
 	tilemap_t   *m_bg_tilemap;
 	uint8_t     m_vidram_bank;
@@ -97,7 +102,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void egghunt(machine_config &config);
 	void egghunt_map(address_map &map);
 	void io_map(address_map &map);
 	void sound_map(address_map &map);
@@ -242,8 +246,8 @@ void egghunt_state::egghunt_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(egghunt_state::egghunt_atram_w)).share("atram");
-	map(0xd000, 0xdfff).rw(this, FUNC(egghunt_state::egghunt_bgram_r), FUNC(egghunt_state::egghunt_bgram_w));
+	map(0xc800, 0xcfff).ram().w(FUNC(egghunt_state::egghunt_atram_w)).share("atram");
+	map(0xd000, 0xdfff).rw(FUNC(egghunt_state::egghunt_bgram_r), FUNC(egghunt_state::egghunt_bgram_w));
 	map(0xe000, 0xffff).ram();
 }
 
@@ -251,10 +255,10 @@ void egghunt_state::egghunt_map(address_map &map)
 void egghunt_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("DSW1").w(this, FUNC(egghunt_state::egghunt_vidram_bank_w));
-	map(0x01, 0x01).portr("SYSTEM").w(this, FUNC(egghunt_state::egghunt_gfx_banking_w));
+	map(0x00, 0x00).portr("DSW1").w(FUNC(egghunt_state::egghunt_vidram_bank_w));
+	map(0x01, 0x01).portr("SYSTEM").w(FUNC(egghunt_state::egghunt_gfx_banking_w));
 	map(0x02, 0x02).portr("P1");
-	map(0x03, 0x03).portr("P2").w(this, FUNC(egghunt_state::egghunt_soundlatch_w));
+	map(0x03, 0x03).portr("P2").w(FUNC(egghunt_state::egghunt_soundlatch_w));
 	map(0x04, 0x04).portr("DSW2");
 	map(0x06, 0x06).portr("UNK").nopw();
 	map(0x07, 0x07).nopw();
@@ -264,7 +268,7 @@ void egghunt_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe001, 0xe001).rw(this, FUNC(egghunt_state::egghunt_okibanking_r), FUNC(egghunt_state::egghunt_okibanking_w));
+	map(0xe001, 0xe001).rw(FUNC(egghunt_state::egghunt_okibanking_r), FUNC(egghunt_state::egghunt_okibanking_w));
 	map(0xe004, 0xe004).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xf000, 0xffff).ram();
 }
@@ -443,17 +447,16 @@ MACHINE_CONFIG_START(egghunt_state::egghunt)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(egghunt_state, screen_update_egghunt)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_egghunt)
 
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x400);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

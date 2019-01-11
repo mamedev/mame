@@ -1,17 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_SCRAMBLE_H
+#define MAME_INCLUDES_SCRAMBLE_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "includes/galaxold.h"
-#include "sound/tms5110.h"
 #include "sound/digitalk.h"
+#include "sound/flt_rc.h"
+#include "sound/tms5110.h"
+#include "emupal.h"
 
 class scramble_state : public galaxold_state
 {
 public:
-	scramble_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galaxold_state(mconfig, type, tag),
+	scramble_state(const machine_config &mconfig, device_type type, const char *tag) :
+		galaxold_state(mconfig, type, tag),
 		m_konami_7474(*this, "konami_7474"),
 		m_ppi8255_0(*this, "ppi8255_0"),
 		m_ppi8255_1(*this, "ppi8255_1"),
@@ -41,8 +47,6 @@ public:
 	DECLARE_READ8_MEMBER(hustler_portB_r);
 	DECLARE_WRITE8_MEMBER(hotshock_sh_irqtrigger_w);
 	DECLARE_READ8_MEMBER(hotshock_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(scramble_filter_w);
-	DECLARE_WRITE8_MEMBER(frogger_filter_w);
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_0_w);
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_1_w);
 	DECLARE_WRITE8_MEMBER(ad2083_tms5110_ctrl_w);
@@ -58,7 +62,6 @@ public:
 	void init_mariner();
 	void init_scramble_ppi();
 	void init_mars();
-	void init_ckongs();
 	void init_mimonscr();
 	void init_hotshock();
 	void init_ad2083();
@@ -70,6 +73,7 @@ public:
 	void init_scobra();
 	void init_stratgyx();
 	void init_tazmani2();
+	void init_tazmaniet();
 	void init_darkplnt();
 	void init_mimonkey();
 	void init_mimonsco();
@@ -131,6 +135,7 @@ public:
 	void scramble_sound_map(address_map &map);
 	void triplep_io_map(address_map &map);
 	void triplep_map(address_map &map);
+
 private:
 	void cavelon_banksw();
 	inline int bit(int i,int n);
@@ -146,3 +151,5 @@ private:
 	std::unique_ptr<uint8_t[]> m_harem_decrypted_data;
 	std::unique_ptr<uint8_t[]> m_harem_decrypted_opcodes;
 };
+
+#endif // MAME_INCLUDES_SCRAMBLE_H

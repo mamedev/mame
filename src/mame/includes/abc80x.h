@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
-
 #ifndef MAME_INCLUDES_ABC800_H
 #define MAME_INCLUDES_ABC800_H
+
+#pragma once
 
 #include "bus/abcbus/abcbus.h"
 #include "bus/rs232/rs232.h"
@@ -23,6 +23,7 @@
 #include "sound/discrete.h"
 #include "video/mc6845.h"
 #include "video/saa5050.h"
+#include "emupal.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -59,11 +60,11 @@
 #define Z80SIO_TAG          "z80sio"
 #define Z80DART_TAG         "z80dart"
 #define DISCRETE_TAG        "discrete"
-#define CASSETTE_TAG		"cassette"
+#define CASSETTE_TAG        "cassette"
 #define RS232_A_TAG         "rs232a"
 #define RS232_B_TAG         "rs232b"
 #define ABC_KEYBOARD_PORT_TAG   "kb"
-#define TIMER_CTC_TAG		"timer_ctc"
+#define TIMER_CTC_TAG       "timer_ctc"
 #define TIMER_CASSETTE_TAG  "timer_cass"
 
 
@@ -98,7 +99,7 @@ public:
 		m_tape_ctr(4)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;
 	required_device<z80sio_device> m_sio;
@@ -151,6 +152,7 @@ public:
 	emu_timer *m_cassette_timer;
 	void common(machine_config &config);
 	void abc800_m1(address_map &map);
+	void abc800_io(address_map &map);
 	void abc800c_io(address_map &map);
 	void abc800m_io(address_map &map);
 	void abc800m_mem(address_map &map);
@@ -207,7 +209,7 @@ public:
 
 	DECLARE_READ8_MEMBER( m1_r ) override;
 	DECLARE_READ8_MEMBER( char_ram_r );
-	DECLARE_PALETTE_INIT( abc800c );
+	void abc800c_palette(palette_device &palette) const;
 	void abc800c(machine_config &config);
 	void abc800c_video(machine_config &config);
 	void abc800c_mem(address_map &map);
@@ -309,7 +311,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( keydtr_w );
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
-	DECLARE_PALETTE_INIT( abc806 );
+	void abc806_palette(palette_device &palette) const;
 	MC6845_UPDATE_ROW( abc806_update_row );
 
 	// memory state

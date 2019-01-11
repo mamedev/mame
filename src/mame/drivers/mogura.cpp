@@ -8,6 +8,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -15,8 +16,8 @@
 class mogura_state : public driver_device
 {
 public:
-	mogura_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mogura_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ldac(*this, "ldac"),
 		m_rdac(*this, "rdac"),
@@ -25,6 +26,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void mogura(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_ldac;
 	required_device<dac_byte_interface> m_rdac;
@@ -39,43 +43,40 @@ public:
 	TILE_GET_INFO_MEMBER(get_mogura_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mogura);
+	void mogura_palette(palette_device &palette) const;
 	uint32_t screen_update_mogura(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mogura(machine_config &config);
 	void mogura_io_map(address_map &map);
 	void mogura_map(address_map &map);
 };
 
 
-PALETTE_INIT_MEMBER(mogura_state, mogura)
+void mogura_state::mogura_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i, j;
-
-	j = 0;
-	for (i = 0; i < 0x20; i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0, j = 0; i < 0x20; i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		/* red component */
+		// red component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
 		bit0 = 0;
 		bit1 = BIT(color_prom[i], 6);
 		bit2 = BIT(color_prom[i], 7);
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(j, rgb_t(r, g, b));
 		j += 4;
-		if (j > 31) j -= 31;
+		if (j > 31)
+			j -= 31;
 	}
 }
 
@@ -141,8 +142,8 @@ void mogura_state::mogura_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xdfff).ram(); // main ram
-	map(0xe000, 0xefff).ram().w(this, FUNC(mogura_state::mogura_gfxram_w)).share("gfxram"); // ram based characters
-	map(0xf000, 0xffff).ram().w(this, FUNC(mogura_state::mogura_tileram_w)).share("tileram"); // tilemap
+	map(0xe000, 0xefff).ram().w(FUNC(mogura_state::mogura_gfxram_w)).share("gfxram"); // ram based characters
+	map(0xf000, 0xffff).ram().w(FUNC(mogura_state::mogura_tileram_w)).share("tileram"); // tilemap
 }
 
 void mogura_state::mogura_io_map(address_map &map)
@@ -155,7 +156,7 @@ void mogura_state::mogura_io_map(address_map &map)
 	map(0x0e, 0x0e).portr("P3");
 	map(0x0f, 0x0f).portr("P4");
 	map(0x10, 0x10).portr("SERVICE");
-	map(0x14, 0x14).w(this, FUNC(mogura_state::mogura_dac_w)); /* 4 bit DAC x 2. MSB = left, LSB = right */
+	map(0x14, 0x14).w(FUNC(mogura_state::mogura_dac_w)); /* 4 bit DAC x 2. MSB = left, LSB = right */
 }
 
 static INPUT_PORTS_START( mogura )
@@ -224,9 +225,8 @@ MACHINE_CONFIG_START(mogura_state::mogura)
 	MCFG_SCREEN_UPDATE_DRIVER(mogura_state, screen_update_mogura)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mogura)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(mogura_state, mogura)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mogura);
+	PALETTE(config, "palette", FUNC(mogura_state::mogura_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

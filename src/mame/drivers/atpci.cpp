@@ -43,7 +43,7 @@ private:
 WRITE8_MEMBER(at586_state::boot_state_w)
 {
 	logerror("Boot state %02x\n", data);
-	printf("[%02x]",data);
+	printf("[%02X]",data);
 }
 
 void at586_state::tx_config(device_t *device)
@@ -54,21 +54,19 @@ void at586_state::tx_config(device_t *device)
 
 void at586_state::sb_config(device_t *device)
 {
-	devcb_base *devcb = nullptr;
-	(void)devcb;
-	MCFG_I82371SB_BOOT_STATE_HOOK(WRITE8(":", at586_state, boot_state_w))
-	MCFG_I82371SB_SMI_CB(INPUTLINE(":maincpu", INPUT_LINE_SMI))
+	i82371sb_device &sb = *downcast<i82371sb_device *>(device);
+	sb.boot_state_hook().set(":", FUNC(at586_state::boot_state_w));
+	sb.smi().set_inputline(":maincpu", INPUT_LINE_SMI);
 }
 
 
 void at586_state::superio_config(device_t *device)
 {
-	devcb_base *devcb = nullptr;
-	(void)devcb;
-	MCFG_FDC37C93X_SYSOPT(1)
-	MCFG_FDC37C93X_GP20_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
-	MCFG_FDC37C93X_GP25_GATEA20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
-	MCFG_FDC37C93X_IRQ1_CB(WRITELINE(":pcibus:7:i82371sb:pic8259_master", pic8259_device, ir1_w))
+	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
+	fdc.set_sysopt_pin(1);
+	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pcibus:7:i82371sb:pic8259_master", FUNC(pic8259_device::ir1_w));
 }
 
 
@@ -79,7 +77,7 @@ static void isa_internal_devices(device_slot_interface &device)
 
 static void pci_devices(device_slot_interface &device)
 {
-	device.option_add_internal("i82439tx", I82439TX);
+	device.option_add_internal("i82439tx", I82439TX_LEGACY);
 	device.option_add_internal("i82371ab", I82371AB);
 	device.option_add_internal("i82371sb", I82371SB);
 }
@@ -98,159 +96,148 @@ void at586_state::at586_io(address_map &map)
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 }
 
-MACHINE_CONFIG_START(at586_state::at_softlists)
+void at586_state::at_softlists(machine_config &config)
+{
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
-	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
-	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
+	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+}
 
-MACHINE_CONFIG_START(at586_state::at586)
-	MCFG_DEVICE_ADD("maincpu", PENTIUM, 60000000)
-	MCFG_DEVICE_PROGRAM_MAP(at586_map)
-	MCFG_DEVICE_IO_MAP(at586_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pcibus:1:i82371ab:pic8259_master", pic8259_device, inta_cb)
+void at586_state::at586(machine_config &config)
+{
+	pentium_device &maincpu(PENTIUM(config, m_maincpu, 60000000));
+	maincpu.set_addrmap(AS_PROGRAM, &at586_state::at586_map);
+	maincpu.set_addrmap(AS_IO, &at586_state::at586_io);
+	maincpu.set_irq_acknowledge_callback("pcibus:1:i82371ab:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M,128M,256M")
+	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M,256M");
 
-	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("i82439tx", tx_config)
-
-	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371ab", true)
+	PCI_BUS(config, "pcibus", 0).set_busnum(0);
+	PCI_CONNECTOR(config, "pcibus:0", pci_devices, "i82439tx", true).set_option_machine_config("i82439tx", tx_config);
+	PCI_CONNECTOR(config, "pcibus:1", pci_devices, "i82371ab", true);
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, "svga_et4k", false)
-	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false)
+	ISA16_SLOT(config, "isa1", 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa2", 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "pcibus:1:i82371ab:isabus", pc_isa16_cards, nullptr, false);
 
 	at_softlists(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(at586_state::at586x3)
-	MCFG_DEVICE_ADD("maincpu", PENTIUM, 60000000)
-	MCFG_DEVICE_PROGRAM_MAP(at586_map)
-	MCFG_DEVICE_IO_MAP(at586_io)
-	MCFG_I386_SMIACT(WRITELINE("pcibus:0:i82439tx", i82439tx_device, smi_act_w))
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pcibus:1:i82371sb:pic8259_master", pic8259_device, inta_cb)
+void at586_state::at586x3(machine_config &config)
+{
+	pentium_device &maincpu(PENTIUM(config, m_maincpu, 60000000));
+	maincpu.set_addrmap(AS_PROGRAM, &at586_state::at586_map);
+	maincpu.set_addrmap(AS_IO, &at586_state::at586_io);
+	maincpu.smiact().set("pcibus:0:i82439tx", FUNC(i82439tx_device::smi_act_w));
+	maincpu.set_irq_acknowledge_callback("pcibus:1:i82371sb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M,128M,256M")
+	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M,256M");
 
-	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("i82439tx", tx_config)
-
-	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371sb", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("i82371sb", sb_config)
+	PCI_BUS(config, "pcibus", 0).set_busnum(0);
+	PCI_CONNECTOR(config, "pcibus:0", pci_devices, "i82439tx", true).set_option_machine_config("i82439tx", tx_config);
+	PCI_CONNECTOR(config, "pcibus:1", pci_devices, "i82371sb", true).set_option_machine_config("i82371sb", sb_config);
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, "svga_et4k", false)
-	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false)
+	ISA16_SLOT(config, "isa1", 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa2", 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "pcibus:1:i82371sb:isabus", pc_isa16_cards, nullptr, false);
 
 	at_softlists(config);
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START(at586m55)
 	PORT_INCLUDE(at_keyboard)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(at586_state::at586m55)
-	MCFG_DEVICE_ADD("maincpu", PENTIUM, 60000000)
-	MCFG_DEVICE_PROGRAM_MAP(at586_map)
-	MCFG_DEVICE_IO_MAP(at586_io)
-	MCFG_I386_SMIACT(WRITELINE("pcibus:0:i82439tx", i82439tx_device, smi_act_w))
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pcibus:7:i82371sb:pic8259_master", pic8259_device, inta_cb)
+void at586_state::at586m55(machine_config &config)
+{
+	pentium_device &pentium(PENTIUM(config, m_maincpu, 60000000));
+	pentium.set_addrmap(AS_PROGRAM, &at586_state::at586_map);
+	pentium.set_addrmap(AS_IO, &at586_state::at586_io);
+	pentium.smiact().set("pcibus:0:i82439tx", FUNC(i82439tx_device::smi_act_w));
+	pentium.set_irq_acknowledge_callback("pcibus:7:i82371sb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M,128M,256M")
+	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M,256M");
 
-	MCFG_PCI_BUS_ADD("pcibus", 0)
-	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("i82439tx", tx_config)
+	PCI_BUS(config, "pcibus", 0).set_busnum(0);
+	PCI_CONNECTOR(config, "pcibus:0", pci_devices, "i82439tx", true).set_option_machine_config("i82439tx", tx_config);
+	PCI_CONNECTOR(config, "pcibus:7", pci_devices, "i82371sb", true).set_option_machine_config("i82371sb", sb_config);
 
-	MCFG_PCI_BUS_DEVICE("pcibus:7", pci_devices, "i82371sb", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("i82371sb", sb_config)
-
-	MCFG_DEVICE_ADD("board4", ISA16_SLOT, 0, "pcibus:7:i82371sb:isabus",  isa_internal_devices, "fdc37c93x", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc37c93x", superio_config)
-	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, "svga_et4k", false)
-	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false)
+	ISA16_SLOT(config, "board4", 0, "pcibus:7:i82371sb:isabus",  isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", superio_config);
+	ISA16_SLOT(config, "isa1", 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa2", 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "pcibus:7:i82371sb:isabus",  pc_isa16_cards, nullptr, false);
 
 	at_softlists(config);
-MACHINE_CONFIG_END
+}
 
 ROM_START( at586 )
 	ROM_REGION32_LE(0x40000, "isa", 0)
 	ROM_SYSTEM_BIOS(0, "sptx", "SP-586TX")
-	ROMX_LOAD("sp586tx.bin",   0x20000, 0x20000, CRC(1003d72c) SHA1(ec9224ff9b0fdfd6e462cb7bbf419875414739d6), ROM_BIOS(1))
+	ROMX_LOAD("sp586tx.bin",   0x20000, 0x20000, CRC(1003d72c) SHA1(ec9224ff9b0fdfd6e462cb7bbf419875414739d6), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "unisys", "Unisys 586") // probably bad dump due to need of hack in i82439tx to work
-	ROMX_LOAD("at586.bin",     0x20000, 0x20000, CRC(717037f5) SHA1(1d49d1b7a4a40d07d1a897b7f8c827754d76f824), ROM_BIOS(2))
+	ROMX_LOAD("at586.bin",     0x20000, 0x20000, CRC(717037f5) SHA1(1d49d1b7a4a40d07d1a897b7f8c827754d76f824), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(2, "ga586t2", "Gigabyte GA-586T2") // ITE 8679 I/O
-	ROMX_LOAD("gb_ga586t2.bin",  0x20000, 0x20000, CRC(3a50a6e1) SHA1(dea859b4f1492d0d08aacd260ed1e83e00ebac08), ROM_BIOS(3))
+	ROMX_LOAD("gb_ga586t2.bin",  0x20000, 0x20000, CRC(3a50a6e1) SHA1(dea859b4f1492d0d08aacd260ed1e83e00ebac08), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "5tx52", "Acorp 5TX52") // W83877TF I/O
-	ROMX_LOAD("acorp_5tx52.bin", 0x20000, 0x20000, CRC(04d69419) SHA1(983377674fef05e710c8665c14cc348c99166fb6), ROM_BIOS(4))
+	ROMX_LOAD("acorp_5tx52.bin", 0x20000, 0x20000, CRC(04d69419) SHA1(983377674fef05e710c8665c14cc348c99166fb6), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "txp4", "ASUS TXP4") // W83977TF-A I/O
-	ROMX_LOAD("asus_txp4.bin",   0x20000, 0x20000, CRC(a1321bb1) SHA1(92e5f14d8505119f85b148a63510617ac12bcdf3), ROM_BIOS(5))
+	ROMX_LOAD("asus_txp4.bin",   0x20000, 0x20000, CRC(a1321bb1) SHA1(92e5f14d8505119f85b148a63510617ac12bcdf3), ROM_BIOS(4))
 ROM_END
 
 ROM_START(at586x3)
 	ROM_REGION32_LE(0x40000, "isa", 0)
 	ROM_SYSTEM_BIOS(0, "5hx29", "5HX29")
-	ROMX_LOAD("5hx29.bin", 0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68), ROM_BIOS(1))
+	ROMX_LOAD("5hx29.bin", 0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "n7ns04", "Version 21/01/98, without integrated sound") // Micronics M7S-HI with SMSC FDC37C93X I/O
-	ROMX_LOAD("m7ns04.rom", 0x00000, 0x40000, CRC(9c1f656b) SHA1(f4a0a522d8c47b6ddb6c01fe9a34ddf5b1977f8d), ROM_BIOS(2))
+	ROMX_LOAD("m7ns04.rom", 0x00000, 0x40000, CRC(9c1f656b) SHA1(f4a0a522d8c47b6ddb6c01fe9a34ddf5b1977f8d), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(2, "n7s04", "Version 21/01/98, with integrated sound")
-	ROMX_LOAD("m7s04.rom", 0x00000, 0x40000, CRC(3689f5a9) SHA1(8daacdb0dc6783d2161680564ffe83ac2515f7ef), ROM_BIOS(3))
+	ROMX_LOAD("m7s04.rom", 0x00000, 0x40000, CRC(3689f5a9) SHA1(8daacdb0dc6783d2161680564ffe83ac2515f7ef), ROM_BIOS(2))
 
 	ROM_SYSTEM_BIOS(3, "m7shi03", "m7shi03") // Micronics M7S-Hi
-	ROMX_LOAD("m7shi03.snd", 0x00000, 0x40000, CRC(3a35a939) SHA1(74af69eb5ca546b0960540e7c3ea62a532157f2a), ROM_BIOS(4))
+	ROMX_LOAD("m7shi03.snd", 0x00000, 0x40000, CRC(3a35a939) SHA1(74af69eb5ca546b0960540e7c3ea62a532157f2a), ROM_BIOS(3))
 ROM_END
 
 /* FIC VT-503 (Intel TX chipset, ITE 8679 Super I/O) */
 ROM_START( ficvt503 )
 	ROM_REGION32_LE(0x40000, "isa", 0)
 	ROM_SYSTEM_BIOS(0, "109gi13", "1.09GI13") /* 1997-10-02 */
-	ROMX_LOAD("109gi13.bin", 0x20000, 0x20000, CRC(0c32af48) SHA1(2cce40a98598f1ed1f398975f7a90c8be4200667), ROM_BIOS(1))
+	ROMX_LOAD("109gi13.bin", 0x20000, 0x20000, CRC(0c32af48) SHA1(2cce40a98598f1ed1f398975f7a90c8be4200667), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "109gi14", "1.09GI14") /* 1997-11-07 */
-	ROMX_LOAD("109gi14.awd", 0x20000, 0x20000, CRC(588c5cc8) SHA1(710e5405850fd975b362a422bfe9bc6d6c9a36cd), ROM_BIOS(2))
+	ROMX_LOAD("109gi14.awd", 0x20000, 0x20000, CRC(588c5cc8) SHA1(710e5405850fd975b362a422bfe9bc6d6c9a36cd), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "109gi15", "1.09GI15") /* 1997-11-07 */
-	ROMX_LOAD("109gi15.awd", 0x20000, 0x20000, CRC(649a3481) SHA1(e681c6ab55a67cec5978dfffa75fcddc2aa0de4d), ROM_BIOS(3))
+	ROMX_LOAD("109gi15.awd", 0x20000, 0x20000, CRC(649a3481) SHA1(e681c6ab55a67cec5978dfffa75fcddc2aa0de4d), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "109gi16", "1.09GI16") /* 2000-03-23 */
-	ROMX_LOAD("109gi16.bin", 0x20000, 0x20000, CRC(a928f271) SHA1(127a83a60752cc33b3ca49774488e511ec7bac55), ROM_BIOS(4))
+	ROMX_LOAD("109gi16.bin", 0x20000, 0x20000, CRC(a928f271) SHA1(127a83a60752cc33b3ca49774488e511ec7bac55), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "115gk140", "1.15GK140") /* 1999-03-03 */
-	ROMX_LOAD("115gk140.awd", 0x20000, 0x20000, CRC(65e88956) SHA1(f94bb0732e00b5b0f18f4e349db24a289f8379c5), ROM_BIOS(5))
+	ROMX_LOAD("115gk140.awd", 0x20000, 0x20000, CRC(65e88956) SHA1(f94bb0732e00b5b0f18f4e349db24a289f8379c5), ROM_BIOS(4))
 ROM_END
 
 /* Micronics M55Hi-Plus (Intel 430HX chipset, SMSC FDC37C93X Super I/O) */
 ROM_START(m55hipl)
 	ROM_REGION32_LE(0x40000, "isa", 0)
 	ROM_SYSTEM_BIOS(0, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
-	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116B2B0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(1))
+	ROMX_LOAD("m55-04ns.rom", 0x20000, 0x20000, CRC(0116b2b0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "m55s04", "m55s04") // with sound
-	ROMX_LOAD("m55-04s.rom", 0x20000, 0x20000, CRC(34A7422E) SHA1(68753fe373c97844beff83ea75c634c77cfedb8f), ROM_BIOS(2))
+	ROMX_LOAD("m55-04s.rom", 0x20000, 0x20000, CRC(34a7422e) SHA1(68753fe373c97844beff83ea75c634c77cfedb8f), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS(2, "m55ns03", "m55ns03") // Micronics M55HI-Plus with no sound
-	ROMX_LOAD("m55ns03.rom", 0x20000, 0x20000, CRC(6a3deb49) SHA1(78bfc20e0f8699f4d153d241a757153afcde3efb), ROM_BIOS(3))
+	ROMX_LOAD("m55ns03.rom", 0x20000, 0x20000, CRC(6a3deb49) SHA1(78bfc20e0f8699f4d153d241a757153afcde3efb), ROM_BIOS(2))
 
 	ROM_SYSTEM_BIOS(3, "m55hi03", "m55hi03") // with sound
-	ROMX_LOAD("m55hi03.rom", 0x20000, 0x20000, CRC(bd476200) SHA1(7633ba27819ad45c6253abb728b1ef0c49229743), ROM_BIOS(4))
+	ROMX_LOAD("m55hi03.rom", 0x20000, 0x20000, CRC(bd476200) SHA1(7633ba27819ad45c6253abb728b1ef0c49229743), ROM_BIOS(3))
 ROM_END
 
 //    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     CLASS        INIT        COMPANY      FULLNAME             FLAGS

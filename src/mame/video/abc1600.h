@@ -12,6 +12,7 @@
 
 
 #include "video/mc6845.h"
+#include "emupal.h"
 
 
 
@@ -20,12 +21,6 @@
 ///*************************************************************************
 
 #define ABC1600_MOVER_TAG "mover"
-
-
-#define MCFG_ABC1600_MOVER_ADD() \
-	MCFG_DEVICE_ADD(ABC1600_MOVER_TAG, ABC1600_MOVER, 0)
-
-
 
 ///*************************************************************************
 //  TYPE DEFINITIONS

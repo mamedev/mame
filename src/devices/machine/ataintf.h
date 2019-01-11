@@ -26,7 +26,7 @@ class ata_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	device_ata_interface *dev() { return m_dev; }
 
@@ -42,32 +42,7 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ATA_SLOT, ata_slot_device)
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-#define MCFG_ATA_INTERFACE_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<abstract_ata_interface_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_ATA_INTERFACE_DMARQ_HANDLER(_devcb) \
-	devcb = &downcast<abstract_ata_interface_device &>(*device).set_dmarq_handler(DEVCB_##_devcb);
-
-#define MCFG_ATA_INTERFACE_DASP_HANDLER(_devcb) \
-	devcb = &downcast<abstract_ata_interface_device &>(*device).set_dasp_handler(DEVCB_##_devcb);
-
 void ata_devices(device_slot_interface &device);
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_ATA_INTERFACE_ADD(_tag, _slot_intf, _master, _slave, _fixed) \
-	MCFG_DEVICE_ADD(_tag, ATA_INTERFACE, 0) \
-	MCFG_DEVICE_MODIFY(_tag ":0") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _master, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag ":1") \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _slave, _fixed) \
-	MCFG_DEVICE_MODIFY(_tag)
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -82,6 +57,38 @@ public:
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_dmarq_handler(Object &&cb) { return m_dmarq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_dasp_handler(Object &&cb) { return m_dasp_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
+	auto dmarq_handler() { return m_dmarq_handler.bind(); }
+	auto dasp_handler() { return m_dasp_handler.bind(); }
+
+	template <typename T> abstract_ata_interface_device &set_slot_options(int index, T &&opts, const char *dflt, bool fixed)
+	{
+		ata_slot_device &dev = slot(index);
+		dev.option_reset();
+		opts(dev);
+		dev.set_default_option(dflt);
+		dev.set_fixed(fixed);
+		return *this;
+	}
+	template <typename T> abstract_ata_interface_device &master(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		set_slot(0, std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> abstract_ata_interface_device &slave(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		set_slot(1, std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> abstract_ata_interface_device &options(T &&opts, const char *master_default = nullptr, const char *slave_default = nullptr, bool fixed = false)
+	{
+		set_slot_options(0, std::forward<T>(opts), master_default, fixed);
+		set_slot_options(1, std::forward<T>(opts), slave_default, fixed);
+		return *this;
+	}
+
+	ata_slot_device &slot(int index);
+	virtual void set_default_ata_devices(const char* _master, const char* _slave);
 
 	uint16_t read_dma();
 	void write_dma(uint16_t data);
@@ -103,6 +110,14 @@ protected:
 	virtual void set_dmarq(int state);
 	virtual void set_dasp(int state);
 
+	enum : size_t
+	{
+		SLOT_MASTER,
+		SLOT_SLAVE,
+
+		SLOT_COUNT
+	};
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(irq0_write_line);
 	DECLARE_WRITE_LINE_MEMBER(dmarq0_write_line);
@@ -114,11 +129,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dasp1_write_line);
 	DECLARE_WRITE_LINE_MEMBER(pdiag1_write_line);
 
-	ata_slot_device *m_slot[2];
-	int m_irq[2];
-	int m_dmarq[2];
-	int m_dasp[2];
-	int m_pdiag[2];
+	required_device_array<ata_slot_device, SLOT_COUNT> m_slot;
+	int m_irq[SLOT_COUNT];
+	int m_dmarq[SLOT_COUNT];
+	int m_dasp[SLOT_COUNT];
+	int m_pdiag[SLOT_COUNT];
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_dmarq_handler;
@@ -128,17 +143,38 @@ private:
 class ata_interface_device : public abstract_ata_interface_device
 {
 public:
-	ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ata_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	template <typename T> ata_interface_device &master(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::master(std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> ata_interface_device &slave(T &&opts, const char *dflt = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::slave(std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
+	template <typename T> ata_interface_device &options(T &&opts, const char *master_default = nullptr, const char *slave_default = nullptr, bool fixed = false)
+	{
+		abstract_ata_interface_device::options(std::forward<T>(opts), master_default, slave_default, fixed);
+		return *this;
+	}
+	template <typename T> ata_interface_device &set_slot_options(int index, T &&opts, const char *dflt, bool fixed)
+	{
+		abstract_ata_interface_device::set_slot_options(index, std::forward<T>(opts), dflt, fixed);
+		return *this;
+	}
 
 	uint16_t read_cs0(offs_t offset, uint16_t mem_mask = 0xffff) { return internal_read_cs0(offset, mem_mask); }
 	uint16_t read_cs1(offs_t offset, uint16_t mem_mask = 0xffff) { return internal_read_cs1(offset, mem_mask); }
 	void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { internal_write_cs0(offset, data, mem_mask); }
 	void write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { internal_write_cs1(offset, data, mem_mask); }
 
-	DECLARE_READ16_MEMBER(read_cs0) { return read_cs0(offset, mem_mask); }
-	DECLARE_READ16_MEMBER(read_cs1) { return read_cs1(offset, mem_mask); }
-	DECLARE_WRITE16_MEMBER(write_cs0) { write_cs0(offset, data, mem_mask); }
-	DECLARE_WRITE16_MEMBER(write_cs1) { write_cs1(offset, data, mem_mask); }
+	DECLARE_READ16_MEMBER(cs0_r) { return read_cs0(offset, mem_mask); }
+	DECLARE_READ16_MEMBER(cs1_r) { return read_cs1(offset, mem_mask); }
+	DECLARE_WRITE16_MEMBER(cs0_w) { write_cs0(offset, data, mem_mask); }
+	DECLARE_WRITE16_MEMBER(cs1_w) { write_cs1(offset, data, mem_mask); }
 };
 
 DECLARE_DEVICE_TYPE(ATA_INTERFACE, ata_interface_device)

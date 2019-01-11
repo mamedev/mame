@@ -5,6 +5,10 @@
     Sega System 16B hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_SEGAS16B_H
+#define MAME_INCLUDES_SEGAS16B_H
+
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
@@ -65,34 +69,26 @@ public:
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_bootleg_scroll(*this, "bootleg_scroll")
 		, m_bootleg_page(*this, "bootleg_page")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	// memory mapping
-	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
-
-	// main CPU read/write handlers
-	DECLARE_WRITE16_MEMBER( rom_5704_bank_w );
-	DECLARE_READ16_MEMBER( rom_5797_bank_math_r );
-	DECLARE_WRITE16_MEMBER( rom_5797_bank_math_w );
-	DECLARE_READ16_MEMBER( unknown_rgn2_r );
-	DECLARE_WRITE16_MEMBER( unknown_rgn2_w );
-	DECLARE_READ16_MEMBER( standard_io_r );
-	DECLARE_WRITE16_MEMBER( standard_io_w );
-	DECLARE_WRITE16_MEMBER( atomicp_sound_w );
-
-	DECLARE_READ16_MEMBER( bootleg_custom_io_r );
-	DECLARE_WRITE16_MEMBER( bootleg_custom_io_w );
-
-	// sound CPU read/write handlers
-	DECLARE_WRITE8_MEMBER( upd7759_control_w );
-	DECLARE_READ8_MEMBER( upd7759_status_r );
-	DECLARE_WRITE16_MEMBER( sound_w16 );
-
-	// other callbacks
-	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_nmi);
-	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
-	DECLARE_WRITE8_MEMBER(spin_68k_w);
+	void rom_5797_fragment(machine_config &config);
+	void system16b_fd1094_5797(machine_config &config);
+	void fpointbla(machine_config &config);
+	void atomicp(machine_config &config);
+	void aceattacb_fd1094(machine_config &config);
+	void system16b_i8751(machine_config &config);
+	void system16c(machine_config &config);
+	void system16b_mc8123(machine_config &config);
+	void system16b_i8751_5797(machine_config &config);
+	void system16b_fd1089a(machine_config &config);
+	void system16b_5797(machine_config &config);
+	void system16b_split(machine_config &config);
+	void system16b_fd1089b(machine_config &config);
+	void system16b(machine_config &config);
+	void system16b_fd1094(machine_config &config);
+	void fpointbl(machine_config &config);
+	void lockonph(machine_config &config);
 
 	// ROM board-specific driver init
 	void init_generic_5521();
@@ -129,6 +125,33 @@ public:
 	void init_altbeas4_5521();
 	void init_aliensyn7_5358_small();
 
+protected:
+	// memory mapping
+	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
+
+	// main CPU read/write handlers
+	DECLARE_WRITE16_MEMBER( rom_5704_bank_w );
+	DECLARE_READ16_MEMBER( rom_5797_bank_math_r );
+	DECLARE_WRITE16_MEMBER( rom_5797_bank_math_w );
+	DECLARE_READ16_MEMBER( unknown_rgn2_r );
+	DECLARE_WRITE16_MEMBER( unknown_rgn2_w );
+	DECLARE_READ16_MEMBER( standard_io_r );
+	DECLARE_WRITE16_MEMBER( standard_io_w );
+	DECLARE_WRITE16_MEMBER( atomicp_sound_w );
+
+	DECLARE_READ16_MEMBER( bootleg_custom_io_r );
+	DECLARE_WRITE16_MEMBER( bootleg_custom_io_w );
+
+	// sound CPU read/write handlers
+	DECLARE_WRITE8_MEMBER( upd7759_control_w );
+	DECLARE_READ8_MEMBER( upd7759_status_r );
+	DECLARE_WRITE16_MEMBER( sound_w16 );
+
+	// other callbacks
+	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_nmi);
+	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
+	DECLARE_WRITE8_MEMBER(spin_68k_w);
+
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -138,23 +161,6 @@ public:
 	// bootleg stuff
 	void tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram);
 
-	void rom_5797_fragment(machine_config &config);
-	void system16b_fd1094_5797(machine_config &config);
-	void fpointbla(machine_config &config);
-	void atomicp(machine_config &config);
-	void aceattacb_fd1094(machine_config &config);
-	void system16b_i8751(machine_config &config);
-	void system16c(machine_config &config);
-	void system16b_mc8123(machine_config &config);
-	void system16b_i8751_5797(machine_config &config);
-	void system16b_fd1089a(machine_config &config);
-	void system16b_5797(machine_config &config);
-	void system16b_split(machine_config &config);
-	void system16b_fd1089b(machine_config &config);
-	void system16b(machine_config &config);
-	void system16b_fd1094(machine_config &config);
-	void fpointbl(machine_config &config);
-	void lockonph(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void decrypted_opcodes_map_fpointbla(address_map &map);
 	void decrypted_opcodes_map_x(address_map &map);
@@ -173,7 +179,7 @@ public:
 	void system16b_bootleg_map(address_map &map);
 	void system16b_map(address_map &map);
 	void system16c_map(address_map &map);
-protected:
+
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
 
@@ -198,7 +204,7 @@ protected:
 
 	// device overrides
 	virtual void video_start() override;
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -224,7 +230,6 @@ protected:
 	DECLARE_READ16_MEMBER( sjryuko_custom_io_r );
 	DECLARE_WRITE16_MEMBER( sjryuko_custom_io_w );
 
-protected:
 	// devices
 	optional_device<sega_315_5195_mapper_device> m_mapper;
 	required_device<m68000_device> m_maincpu;
@@ -272,7 +277,7 @@ protected:
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 	optional_shared_ptr<uint16_t> m_bootleg_scroll;
 	optional_shared_ptr<uint16_t> m_bootleg_page;
-	output_finder<2> m_lamp;
+	output_finder<2> m_lamps;
 };
 
 class afighter_16b_analog_state : public segas16b_state
@@ -289,7 +294,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_left_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_right_r);
 
-	protected:
+private:
 	required_ioport     m_accel;
 	required_ioport     m_steer;
 };
@@ -318,11 +323,14 @@ public:
 			m_rle_byte(0)
 	{ }
 
+	void isgsm(machine_config &config);
+
 	// driver init
 	void init_isgsm();
 	void init_shinfz();
 	void init_tetrbx();
 
+private:
 	// read/write handlers
 	DECLARE_WRITE16_MEMBER( cart_addr_high_w );
 	DECLARE_WRITE16_MEMBER( cart_addr_low_w );
@@ -342,7 +350,6 @@ public:
 	uint32_t shinfz_security(uint32_t input);
 	uint32_t tetrbx_security(uint32_t input);
 
-//protected:
 	// driver overrides
 	virtual void machine_reset() override;
 
@@ -364,6 +371,7 @@ public:
 	uint8_t           m_rle_control_byte;
 	bool            m_rle_latched;
 	uint8_t           m_rle_byte;
-	void isgsm(machine_config &config);
 	void isgsm_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SEGAS16B_H

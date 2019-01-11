@@ -9,25 +9,33 @@
 #include "screen.h"
 #include "video/bt459.h"
 #include "video/dp8510.h"
+#include "machine/ram.h"
+#include "machine/z80scc.h"
+
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/loopback.h"
+
+#include "bus/interpro/keyboard/keyboard.h"
+#include "bus/interpro/mouse/mouse.h"
 
 class gt_device_base : public device_t
 {
 protected:
-	gt_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gt_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool double_buffered, const bool masked_reads);
 
 	virtual void map(address_map &map);
 
 public:
-	static const int GT_BUFFER_SIZE = 0x100000;   // 1 megabyte
-	static const u32 GT_BUFFER_MASK = (GT_BUFFER_SIZE - 1);
+	static constexpr u32 GT_MASK_BITS   = 0x80808080; // mask RAM presents on high bit in each pixel/byte
 
 	// FIXME: enable delays to pass diagnostic tests
-	static const bool GT_DIAG = false;
+	static constexpr bool GT_DIAG = false;
 
 	enum control_mask
 	{
 		GFX_VERT_BLNK               = 0x00000001,
-		GFX_HILITE_SEL              = 0x00000004,
+		GFX_BUF1_SEL                = 0x00000002, // write to buffer 1
+		GFX_HILITE_SEL              = 0x00000004, // select highlight ram
 		GFX_SOFT_BLNK               = 0x00000008,
 		GFX_DRAW_FIRST              = 0x00000010, // draw first point
 		GFX_BLIT_DIR                = 0x00000020, // bitblt addresses decrement
@@ -49,36 +57,19 @@ public:
 		GFX_STEREO_POLRITY_NORMAL   = 0x00200000,
 		GFX_STEREO_GLASSES_EN       = 0x00400000,
 		GFX_FIELD_1                 = 0x00800000,
-		//GFX_MASK_READ               = 0x01000000, // enable pixel read mask?
+		GFX_MASK_READ_ENA           = 0x01000000, // enable pixel read mask?
 		GFX_MONSENSE_MASK           = 0x0e000000,
-		GFX_MONSENSE_60HZ           = 0x0e000000
+		GFX_MONSENSE_60HZ           = 0x0e000000,
 	};
 
-	DECLARE_READ32_MEMBER(control_r) { return m_control | (get_gt(0).screen->vblank() ? GFX_VERT_BLNK : 0); }
+	DECLARE_READ32_MEMBER(control_r) { return m_control | (m_screen[0]->vblank() ? GFX_VERT_BLNK : 0); }
 	DECLARE_WRITE32_MEMBER(control_w);
 
-	DECLARE_READ8_MEMBER(contrast_dac_r) { return m_contrast_dac; }
-	DECLARE_WRITE8_MEMBER(contrast_dac_w) { m_contrast_dac = data; }
+	DECLARE_WRITE8_MEMBER(contrast_dac_w);
 
-	DECLARE_READ32_MEMBER(blit_src_address_r) { return m_blit_src_address; }
 	DECLARE_WRITE32_MEMBER(blit_src_address_w) { COMBINE_DATA(&m_blit_src_address); }
-	DECLARE_READ32_MEMBER(blit_dst_address_r) { return m_blit_dst_address; }
 	DECLARE_WRITE32_MEMBER(blit_dst_address_w) { COMBINE_DATA(&m_blit_dst_address); }
-	DECLARE_READ16_MEMBER(blit_width_r) { return m_blit_width; }
 	DECLARE_WRITE16_MEMBER(blit_width_w);
-
-	enum blit_control_mask
-	{
-		BLIT0_CONTROL_FS = 0x000000f0,
-		BLIT1_CONTROL_FS = 0x0000000f,
-		BLIT0_CONTROL_SN = 0x0000f000,
-		BLIT1_CONTROL_SN = 0x00000f00,
-		BLIT0_CONTROL_LM = 0x00f00000,
-		BLIT1_CONTROL_LM = 0x000f0000,
-		BLIT0_CONTROL_RM = 0xf0000000,
-		BLIT1_CONTROL_RM = 0x0f000000
-	};
-	virtual DECLARE_WRITE32_MEMBER(blit_control_w) = 0;
 
 	DECLARE_READ8_MEMBER(plane_enable_r) { return m_plane_enable; }
 	DECLARE_WRITE8_MEMBER(plane_enable_w);
@@ -91,44 +82,44 @@ public:
 	DECLARE_WRITE16_MEMBER(bsga_tmp_w) { COMBINE_DATA(&m_bsga_tmp); }
 
 	DECLARE_READ16_MEMBER(bsga_xmin_r) { return m_bsga_xmin; }
-	DECLARE_WRITE16_MEMBER(bsga_xmin_w) { COMBINE_DATA(&m_bsga_xmin); logerror("xmin = %04x\n", m_bsga_xmin); }
+	DECLARE_WRITE16_MEMBER(bsga_xmin_w) { COMBINE_DATA(&m_bsga_xmin); }
 	DECLARE_READ16_MEMBER(bsga_ymin_r) { return m_bsga_ymin; }
-	DECLARE_WRITE16_MEMBER(bsga_ymin_w) { COMBINE_DATA(&m_bsga_ymin); logerror("ymin = %04x\n", m_bsga_ymin); }
+	DECLARE_WRITE16_MEMBER(bsga_ymin_w) { COMBINE_DATA(&m_bsga_ymin); }
 
 	DECLARE_READ16_MEMBER(bsga_acc0_r) { return (m_bsga_width - m_bsga_xin1); }
 	DECLARE_READ16_MEMBER(bsga_acc1_r) { return -(m_bsga_width - m_bsga_xin1); }
 
 	DECLARE_READ16_MEMBER(bsga_xmax_r) { return m_bsga_xmax; }
-	DECLARE_WRITE16_MEMBER(bsga_xmax_w) { COMBINE_DATA(&m_bsga_xmax); logerror("xmax = %04x\n", m_bsga_xmax); }
+	DECLARE_WRITE16_MEMBER(bsga_xmax_w) { COMBINE_DATA(&m_bsga_xmax); }
 	DECLARE_READ16_MEMBER(bsga_ymax_r) { return m_bsga_ymax; }
-	DECLARE_WRITE16_MEMBER(bsga_ymax_w) { COMBINE_DATA(&m_bsga_ymax); logerror("ymax = %04x\n", m_bsga_ymax); bsga_clip_status(m_bsga_xin1, m_bsga_yin1); }
+	DECLARE_WRITE16_MEMBER(bsga_ymax_w) { COMBINE_DATA(&m_bsga_ymax); bsga_clip_status(m_bsga_xin1, m_bsga_yin1); }
 
 	DECLARE_READ16_MEMBER(bsga_src0_r) { return m_bsga_xin1; }
 	DECLARE_READ16_MEMBER(bsga_src1_r) { return m_bsga_xin1; }
 
-	DECLARE_WRITE16_MEMBER(bsga_xin1_w) { COMBINE_DATA(&m_bsga_xin1); m_bsga_xin = m_bsga_xin1; m_bsga_tmp = m_bsga_xin1; logerror("xin = %04x\n", m_bsga_xin1); }
-	DECLARE_WRITE16_MEMBER(bsga_yin1_w) { COMBINE_DATA(&m_bsga_yin1); m_bsga_yin = m_bsga_yin1; logerror("yin = %04x\n", m_bsga_yin1); }
+	DECLARE_WRITE16_MEMBER(bsga_xin1_w) { COMBINE_DATA(&m_bsga_xin1); m_bsga_xin = m_bsga_xin1; m_bsga_tmp = m_bsga_xin1; }
+	DECLARE_WRITE16_MEMBER(bsga_yin1_w) { COMBINE_DATA(&m_bsga_yin1); m_bsga_yin = m_bsga_yin1; }
 	DECLARE_WRITE32_MEMBER(bsga_xin1yin1_w);
 
-	enum bsga_status_mask
+	enum bsga_status_mask : u16
 	{
-		STATUS_CLIP0_YMAX = 0x1000, // y1 > max y
-		STATUS_CLIP0_YMIN = 0x0800, // y1 < min y
-		STATUS_CLIP0_XMAX = 0x0400, // x1 > max x
-		STATUS_CLIP0_XMIN = 0x0200, // x1 < min x
-		STATUS_CLIP1_YMAX = 0x0100, // y2 > max y
-		STATUS_CLIP1_YMIN = 0x0080, // y2 < min y
-		STATUS_CLIP1_XMAX = 0x0040, // x2 > max x
-		STATUS_CLIP1_XMIN = 0x0020, // x2 < min x
-
+		STATUS_DATA_VALID  = 0x0001,
+		STATUS_COMPLETE    = 0x0002,
+		STATUS_ACCEPT      = 0x0004,
+		STATUS_REJECT      = 0x0008,
 		STATUS_FLOAT_OFLOW = 0x0010,
+		STATUS_LEFT        = 0x0020,
+		STATUS_RIGHT       = 0x0040,
+		STATUS_ABOVE       = 0x0080,
+		STATUS_BELOW       = 0x0100,
+		STATUS_PREV_LEFT   = 0x0200,
+		STATUS_PREV_RIGHT  = 0x0400,
+		STATUS_PREV_ABOVE  = 0x0800,
+		STATUS_PREV_BELOW  = 0x1000,
 
-		STATUS_CLIP_BOTH = 0x0008, // set if both inputs fall outside clipping region
-		STATUS_CLIP_ANY = 0x0004, // set if any input falls outside clipping region
-
-		STATUS_CLIP0_MASK = 0x1e00, // x1,y1 clip result
-		STATUS_CLIP1_MASK = 0x01e0, // x2,y2 clip result
-		STATUS_CLIP_MASK = 0x1fe0  // both clip results
+		STATUS_CLIP0_MASK  = 0x1e00,
+		STATUS_CLIP1_MASK  = 0x01e0,
+		STATUS_CLIP_MASK   = 0x1fe0
 	};
 	DECLARE_READ16_MEMBER(bsga_status_r);
 
@@ -141,75 +132,84 @@ public:
 	DECLARE_READ16_MEMBER(bsga_xin_r) { return m_bsga_xin; }
 	DECLARE_READ16_MEMBER(bsga_yin_r) { return m_bsga_yin; }
 
-	DECLARE_READ32_MEMBER(ri_initial_distance_r) { return m_ri_initial_distance; }
 	DECLARE_WRITE32_MEMBER(ri_initial_distance_w) { COMBINE_DATA(&m_ri_initial_distance); }
-	DECLARE_READ32_MEMBER(ri_distance_both_r) { return m_ri_distance_both; }
 	DECLARE_WRITE32_MEMBER(ri_distance_both_w) { COMBINE_DATA(&m_ri_distance_both); }
-	DECLARE_READ32_MEMBER(ri_distance_major_r) { return m_ri_distance_major; }
 	DECLARE_WRITE32_MEMBER(ri_distance_major_w) { COMBINE_DATA(&m_ri_distance_major); }
-	DECLARE_READ32_MEMBER(ri_initial_address_r) { return m_ri_initial_address; }
 	DECLARE_WRITE32_MEMBER(ri_initial_address_w) { COMBINE_DATA(&m_ri_initial_address); }
-	DECLARE_READ32_MEMBER(ri_address_both_r) { return m_ri_address_both; }
 	DECLARE_WRITE32_MEMBER(ri_address_both_w) { COMBINE_DATA(&m_ri_address_both); }
-	DECLARE_READ32_MEMBER(ri_address_major_r) { return m_ri_address_major; }
 	DECLARE_WRITE32_MEMBER(ri_address_major_w) { COMBINE_DATA(&m_ri_address_major); }
-	DECLARE_READ32_MEMBER(ri_initial_error_r) { return m_ri_initial_error; }
 	DECLARE_WRITE32_MEMBER(ri_initial_error_w) { COMBINE_DATA(&m_ri_initial_error); }
-	DECLARE_READ32_MEMBER(ri_error_both_r) { return m_ri_error_both; }
 	DECLARE_WRITE32_MEMBER(ri_error_both_w) { COMBINE_DATA(&m_ri_error_both); }
-	DECLARE_READ32_MEMBER(ri_error_major_r) { return m_ri_error_major; }
 	DECLARE_WRITE32_MEMBER(ri_error_major_w) { COMBINE_DATA(&m_ri_error_major); }
 
-	DECLARE_READ32_MEMBER(ri_stop_count_r) { return m_ri_stop_count; }
 	DECLARE_WRITE32_MEMBER(ri_stop_count_w) { COMBINE_DATA(&m_ri_stop_count); }
-	DECLARE_READ32_MEMBER(ri_control_r) { return m_ri_control; }
 	DECLARE_WRITE32_MEMBER(ri_control_w) { COMBINE_DATA(&m_ri_control); }
-	DECLARE_READ32_MEMBER(ri_xfer_r) { return m_ri_xfer; }
 	DECLARE_WRITE32_MEMBER(ri_xfer_w);
 
 	DECLARE_WRITE32_MEMBER(bsga_float_w);
 
 protected:
 	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 
-	typedef struct
+	u32 buffer_r(const offs_t offset);
+	void buffer_w(const offs_t offset, u32 data, u32 mem_mask);
+	virtual u32 vram_r(offs_t offset, const bool linear = false) const;
+	virtual void vram_w(offs_t offset, const u32 data, u32 mem_mask, const bool linear = false) const;
+	u32 mram_r(const offs_t offset) const;
+	void mram_w(const offs_t offset, const u32 data, const u32 mem_mask) const;
+
+	template <int N> u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	{
-		required_device<screen_device> screen;
-		required_device<bt459_device> ramdac;
-		required_device<dp8510_device> bpu;
+		m_ramdac[N]->screen_update(screen, bitmap, cliprect, m_double_buffered && (m_control & (N == 0 ? GFX_SCREEN0_DISP_BUF1 : GFX_SCREEN1_DISP_BUF1)) ?
+			m_vram[N]->pointer() + (m_vram[N]->size() >> 1) :
+			m_vram[N]->pointer());
 
-		std::unique_ptr<u8[]> buffer;
-		std::unique_ptr<u8[]> mask;
+		return 0;
 	}
-	gt_t;
 
-	virtual const int get_screen_count() const = 0;
-	virtual gt_t &get_gt(const int number) = 0;
-	virtual const gt_t &active_gt() const = 0;
-
-	u32 buffer_read(const gt_t &gt, const offs_t offset) const;
-	void buffer_write(const gt_t &gt, const offs_t offset, const u32 data, const u32 mask);
+	struct bpu_pair_t
+	{
+		u16 hi;
+		u16 lo;
+	};
 
 	TIMER_CALLBACK_MEMBER(blit);
 	TIMER_CALLBACK_MEMBER(line);
 	TIMER_CALLBACK_MEMBER(done);
 
 	void bsga_clip_status(s16 xin, s16 yin);
-
 	bool kuzmin_clip(s16 sx1, s16 sy1, s16 sx2, s16 sy2, s16 wx1, s16 wy1, s16 wx2, s16 wy2);
 	void bresenham_line(s16 major, s16 minor, s16 major_step, s16 minor_step, int steps, s16 error, s16 error_major, s16 error_minor, bool shallow);
-	void write_vram(const gt_t &gt, const offs_t offset, const u8 data);
 
-	u8 m_contrast_dac;
+	void bpu_control_w(const u32 data);
+	void bpu_source_w(const u32 data, const bool fifo_write = true);
+	void bpu_destination_w(const u32 data, const bool fifo_write = false);
+	u32 bpu_output_r();
+	void bpu_reset();
+	void bpu_barrel_input_select(const int state);
+	void bpu_left_mask_enable(const int state);
+	void bpu_right_mask_enable(const int state);
+	bpu_pair_t bpu_from_u32(const u32 data) const;
+	u32 bpu_to_u32(bpu_pair_t data) const;
 
+	// sub-devices
+	optional_device_array<screen_device, 2> m_screen;
+	optional_device_array<bt459_device, 2> m_ramdac;
+	optional_device_array<ram_device, 2> m_vram;
+	optional_device_array<ram_device, 2> m_mram;
+	required_device_array<dp8510_device, 2> m_bpu;
+
+	// device state
 	u32 m_control;
 
 	u32 m_blit_src_address;
 	u32 m_blit_dst_address;
 	u16 m_blit_width;
 
-	u8 m_plane_enable;
-	u8 m_plane_data;
+	u32 m_plane_enable;
+	u32 m_plane_data;
 
 	u16 m_bsga_width;
 	u16 m_bsga_tmp;
@@ -242,135 +242,140 @@ protected:
 	u32 m_ri_control;
 	u32 m_ri_xfer;
 
+private:
 	emu_timer *m_blit_timer;
 	emu_timer *m_line_timer;
 	emu_timer *m_done_timer;
+
+	const bool m_double_buffered;
+	const bool m_masked_reads;
 };
 
-class single_gt_device_base : public gt_device_base
+class gt_device : public gt_device_base, public device_cbus_card_interface
 {
 protected:
-	single_gt_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gt_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool double_buffered);
 
 	virtual void map(address_map &map) override;
-
-	virtual DECLARE_WRITE32_MEMBER(blit_control_w) override;
-
-	DECLARE_READ32_MEMBER(buffer_r) { return buffer_read(m_gt[0], offset); }
-	DECLARE_WRITE32_MEMBER(buffer_w) { buffer_write(m_gt[0], offset, data, mem_mask); }
-
-	virtual const int get_screen_count() const override { return GT_SCREEN_COUNT; }
-	virtual gt_t &get_gt(const int number) override { return m_gt[number]; }
-	virtual const gt_t &active_gt() const override { return m_gt[0]; }
-
-	u32 screen_update0(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-private:
-	static const int GT_SCREEN_COUNT = 1;
-
-	gt_t m_gt[GT_SCREEN_COUNT];
 };
 
-class dual_gt_device_base : public gt_device_base
+class gtdb_device : public gt_device_base, public device_srx_card_interface
 {
 protected:
-	dual_gt_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	gtdb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
+	virtual void map_dynamic(address_map &map);
 
-	virtual DECLARE_WRITE32_MEMBER(blit_control_w) override;
+	DECLARE_WRITE_LINE_MEMBER(serial_irq);
+	DECLARE_WRITE32_MEMBER(mouse_status_w);
+	DECLARE_WRITE32_MEMBER(srx_mapping_w);
 
-	DECLARE_READ32_MEMBER(buffer_r) { return buffer_read(m_gt[(offset & 0x80000) ? 1 : 0], offset); }
-	DECLARE_WRITE32_MEMBER(buffer_w) { buffer_write(m_gt[(offset & 0x80000) ? 1 : 0], offset, data, mem_mask); }
+	enum int_status_mask
+	{
+		MOUSE_BTN = 0x08,
+		// MOUSE_MOVED? = 0x10,
+		MOUSE_X   = 0x20,
+		MOUSE_Y   = 0x40,
+		SERIAL    = 0x80,
+	};
+	DECLARE_READ32_MEMBER(mouse_int_r) { return m_mouse_int; }
+	DECLARE_WRITE32_MEMBER(mouse_int_w) { mem_mask &= ~0x7; COMBINE_DATA(&m_mouse_int); }
+	DECLARE_READ32_MEMBER(mouse_x_r);
+	DECLARE_READ32_MEMBER(mouse_y_r);
 
-	virtual const int get_screen_count() const override { return GT_SCREEN_COUNT; }
-	virtual gt_t &get_gt(const int number) override { return m_gt[number]; }
-	virtual const gt_t &active_gt() const override { return m_gt[(m_control & GFX_SCR1_SEL) ? 1 : 0]; }
+	enum vfifo_control_mask
+	{
+		FIFO_LW_ENB  = 0x08,
+		FIFO_LW_INTR = 0x40,
+		FIFO_HW_INTR = 0x80,
+	};
+	DECLARE_READ32_MEMBER(fifo_control_r) { return m_fifo_control; }
 
-	u32 screen_update0(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	u32 screen_update1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	//virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual u32 vram_r(offs_t offset, const bool linear = false) const override;
+	virtual void vram_w(offs_t offset, const u32 data, u32 mem_mask, const bool linear = false) const override;
+
+	optional_device_array<ram_device, 2> m_hram;
+	required_device<z80scc_device> m_scc;
 
 private:
-	static const int GT_SCREEN_COUNT = 2;
+	u8 m_mouse_int;
+	u32 m_fifo_control;
 
-	gt_t m_gt[GT_SCREEN_COUNT];
+	u8 m_mouse_x;
+	u8 m_mouse_y;
 };
 
-class mpcb963_device : public single_gt_device_base, public cbus_card_device_base
+class mpcb963_device : public gt_device
 {
 public:
 	mpcb963_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
-
-	virtual void map(address_map &map) override { cbus_card_device_base::map(map); single_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
-class mpcba79_device : public dual_gt_device_base, public cbus_card_device_base
+class mpcba79_device : public gt_device
 {
 public:
 	mpcba79_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
-
-	virtual void map(address_map &map) override { cbus_card_device_base::map(map); dual_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
-class msmt070_device : public single_gt_device_base, public cbus_card_device_base
+class msmt070_device : public gt_device
 {
 public:
 	msmt070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
-
-	virtual void map(address_map &map) override { cbus_card_device_base::map(map); single_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
-class msmt071_device : public dual_gt_device_base, public cbus_card_device_base
+class msmt071_device : public gt_device
 {
 public:
 	msmt071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
-
-	virtual void map(address_map &map) override { cbus_card_device_base::map(map); dual_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
-class msmt081_device : public single_gt_device_base, public cbus_card_device_base
+class msmt081_device : public gt_device
 {
 public:
 	msmt081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
-
-	virtual void map(address_map &map) override { cbus_card_device_base::map(map); single_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
 
-class mpcbb92_device : public single_gt_device_base, public srx_card_device_base
+class mpcbb68_device : public gtdb_device
+{
+public:
+	mpcbb68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+class mpcbb92_device : public gtdb_device
 {
 public:
 	mpcbb92_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override { gt_device_base::device_start(); set_bus_device(); }
-
-	virtual void map(address_map &map) override { srx_card_device_base::map(map); single_gt_device_base::map(map); }
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 };
@@ -381,6 +386,7 @@ DECLARE_DEVICE_TYPE(MPCBA79, mpcba79_device)
 DECLARE_DEVICE_TYPE(MSMT070, msmt070_device)
 DECLARE_DEVICE_TYPE(MSMT071, msmt071_device)
 DECLARE_DEVICE_TYPE(MSMT081, msmt081_device)
+DECLARE_DEVICE_TYPE(MPCBB68, mpcbb68_device)
 DECLARE_DEVICE_TYPE(MPCBB92, mpcbb92_device)
 
 #endif // MAME_BUS_INTERPRO_SR_GT_H

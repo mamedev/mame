@@ -8,6 +8,7 @@
 #include "emu.h"
 #include "cpu/alto2/alto2cpu.h"
 #include "machine/diablo_hd.h"
+#include "emupal.h"
 #include "screen.h"
 #include "rendlay.h"
 #include "speaker.h"
@@ -289,18 +290,15 @@ MACHINE_CONFIG_START(alto2_state::alto2)
 	MCFG_DEVICE_IO_MAP(alto2_iomem_map)
 
 	// Video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(20'160'000),
-			 A2_DISP_TOTAL_WIDTH, 0, A2_DISP_WIDTH,
-			 A2_DISP_TOTAL_HEIGHT, 0, A2_DISP_HEIGHT)
-	// Two interlaced fields at 60Hz => 30Hz frame rate
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", alto2_cpu_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::white());
+	screen.set_physical_aspect(3, 4); // Portrait CRT
+	screen.set_raw(XTAL(20'160'000), A2_DISP_TOTAL_WIDTH, 0, A2_DISP_WIDTH, A2_DISP_TOTAL_HEIGHT, 0, A2_DISP_HEIGHT);
+	screen.set_refresh_hz(30); // Two interlaced fields at 60Hz => 30Hz frame rate
+	screen.set_screen_update("maincpu", FUNC(alto2_cpu_device::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEFAULT_LAYOUT( layout_vertical )
-
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();

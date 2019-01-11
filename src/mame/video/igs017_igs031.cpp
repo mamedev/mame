@@ -18,24 +18,24 @@ void igs017_igs031_device::map(address_map &map)
 {
 	map(0x1000, 0x17ff).ram().share("spriteram");
 //  map(0x1800, 0x1bff).ram() //.w("palette", FUNC(palette_device::write).share("palette");
-	map(0x1800, 0x1bff).ram().w(this, FUNC(igs017_igs031_device::palram_w)).share("palram");
+	map(0x1800, 0x1bff).ram().w(FUNC(igs017_igs031_device::palram_w)).share("palram");
 	map(0x1c00, 0x1fff).ram();
 
-	map(0x2010, 0x2013).r(this, FUNC(igs017_igs031_device::i8255_r));
-	map(0x2012, 0x2012).w(this, FUNC(igs017_igs031_device::video_disable_w));
+	map(0x2010, 0x2013).r(FUNC(igs017_igs031_device::i8255_r));
+	map(0x2012, 0x2012).w(FUNC(igs017_igs031_device::video_disable_w));
 
-	map(0x2014, 0x2014).w(this, FUNC(igs017_igs031_device::nmi_enable_w));
-	map(0x2015, 0x2015).w(this, FUNC(igs017_igs031_device::irq_enable_w));
+	map(0x2014, 0x2014).w(FUNC(igs017_igs031_device::nmi_enable_w));
+	map(0x2015, 0x2015).w(FUNC(igs017_igs031_device::irq_enable_w));
 
-	map(0x4000, 0x5fff).ram().w(this, FUNC(igs017_igs031_device::fg_w)).share("fg_videoram");
-	map(0x6000, 0x7fff).ram().w(this, FUNC(igs017_igs031_device::bg_w)).share("bg_videoram");
+	map(0x4000, 0x5fff).ram().w(FUNC(igs017_igs031_device::fg_w)).share("fg_videoram");
+	map(0x6000, 0x7fff).ram().w(FUNC(igs017_igs031_device::bg_w)).share("bg_videoram");
 
 }
 
 READ8_MEMBER(igs017_igs031_device::i8255_r)
 {
 	if (m_i8255)
-		return m_i8255->read(space, offset);
+		return m_i8255->read(offset);
 
 	logerror("igs017_igs031_device::i8255_r(%02x) with no 8255 device\n", offset);
 	return 0;

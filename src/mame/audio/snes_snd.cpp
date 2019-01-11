@@ -171,7 +171,7 @@ void snes_sound_device::device_start()
 	m_tick_timer = timer_alloc(TIMER_TICK_ID);
 
 	state_register();
-	save_pointer(NAME(m_ram.get()), SNES_SPCRAM_SIZE);
+	save_pointer(NAME(m_ram), SNES_SPCRAM_SIZE);
 }
 
 //-------------------------------------------------

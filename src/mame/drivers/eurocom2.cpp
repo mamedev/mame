@@ -24,6 +24,7 @@
     - http://machines.hyperreal.org/manufacturers/PPG/info/ppg.waveterm.revisions.txt
     - http://www.flexusergroup.com/flexusergroup/default.htm
     - http://web.archive.org/web/20091026234737/http://geocities.com/flexemu/
+    - http://oldcomputer.info/8bit/microtrol/index.htm
 
 ****************************************************************************/
 
@@ -32,12 +33,14 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
 #include "formats/ppg_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "machine/keyboard.h"
 #include "machine/wd_fdc.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -76,6 +79,9 @@ public:
 	{
 	}
 
+	void eurocom2(machine_config &config);
+	void microtrol(machine_config &config);
+protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(fdc_aux_r);
@@ -92,9 +98,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(pia1_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
 
-	void eurocom2(machine_config &config);
 	void eurocom2_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -336,10 +341,10 @@ void eurocom2_state::eurocom2_map(address_map &map)
 	map(0xf000, 0xfcef).rom().region("maincpu", 0);
 	map(0xfcf0, 0xfcf3).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xfcf4, 0xfcf5).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0xfcf6, 0xfcf7).w(this, FUNC(eurocom2_state::vico_w));
+	map(0xfcf6, 0xfcf7).w(FUNC(eurocom2_state::vico_w));
 	map(0xfcf8, 0xfcfb).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xfd30, 0xfd37).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
-	map(0xfd38, 0xfd38).rw(this, FUNC(eurocom2_state::fdc_aux_r), FUNC(eurocom2_state::fdc_aux_w));
+	map(0xfd38, 0xfd38).rw(FUNC(eurocom2_state::fdc_aux_r), FUNC(eurocom2_state::fdc_aux_w));
 	map(0xfd40, 0xffff).rom().region("maincpu", 0xd40).nopw();
 }
 
@@ -349,7 +354,7 @@ void waveterm_state::waveterm_map(address_map &map)
 	map(0xfd00, 0xfd03).rw(m_pia3, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xfd08, 0xfd0f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0xfd10, 0xfd17).unmaprw();
-	map(0xfd18, 0xfd18).r(this, FUNC(waveterm_state::waveterm_adc));  //  AD558 ADC
+	map(0xfd18, 0xfd18).r(FUNC(waveterm_state::waveterm_adc));  //  AD558 ADC
 //  AM_RANGE(0xfd20, 0xfd20) AM_READ(waveterm_dac)  //  ZN432 DAC ??
 }
 
@@ -434,42 +439,42 @@ static void eurocom_floppies(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(eurocom2_state::eurocom2)
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(10'717'200)/2) // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
+	MCFG_DEVICE_ADD("maincpu", MC6809, 10.7172_MHz_XTAL / 2) // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
 	MCFG_DEVICE_PROGRAM_MAP(eurocom2_map)
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'717'200), VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT)
+	MCFG_SCREEN_RAW_PARAMS(10.7172_MHz_XTAL, VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT)
 	MCFG_SCREEN_UPDATE_DRIVER(eurocom2_state, screen_update)
-
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(eurocom2_state, kbd_put))
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, eurocom2_state, pia1_ca1_r))  // keyboard strobe
-	MCFG_PIA_READCA2_HANDLER(READLINE(*this, eurocom2_state, pia1_ca2_r))  // SST output Q14
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, eurocom2_state, pia1_cb1_r))  // SST output Q6
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, eurocom2_state, pia1_cb2_w)) // SST reset input
-	MCFG_PIA_READPA_HANDLER(READ8(*this, eurocom2_state, kbd_get))
-//  MCFG_PIA_READPB_HANDLER(READ8(*this, eurocom2_state, kbd_get))
-//  MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-//  MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(eurocom2_state::kbd_put));
 
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-//  MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
-//  MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->readca1_handler().set(FUNC(eurocom2_state::pia1_ca1_r));  // keyboard strobe
+	m_pia1->readca2_handler().set(FUNC(eurocom2_state::pia1_ca2_r));  // SST output Q14
+	m_pia1->readcb1_handler().set(FUNC(eurocom2_state::pia1_cb1_r));  // SST output Q6
+	m_pia1->cb2_handler().set(FUNC(eurocom2_state::pia1_cb2_w)); // SST reset input
+	m_pia1->readpa_handler().set(FUNC(eurocom2_state::kbd_get));
+//  m_pia1->readpb_handler().set(FUNC(eurocom2_state::kbd_get));
+//  m_pia1->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
+//  m_pia1->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE ("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE ("rs232", rs232_port_device, write_rts))
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE ("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE ("acia", acia6850_device, write_cts))
+	PIA6821(config, m_pia2, 0);
+//  m_pia2->irqa_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
+//  m_pia2->irqb_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 
-	MCFG_FD1793_ADD("fdc", XTAL(2'000'000)/2)
-//  MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
+
+	FD1793(config, m_fdc, 2_MHz_XTAL / 2);
+//  m_fdc->intrq_wr_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", eurocom_floppies, "525qd", eurocom2_state::floppy_formats)
 //  MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", eurocom_floppies, "525qd", eurocom2_state::floppy_formats)
@@ -481,50 +486,62 @@ MACHINE_CONFIG_START(waveterm_state::waveterm)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(waveterm_map)
 
-	MCFG_DEVICE_MODIFY("pia2")
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, waveterm_state, waveterm_kbh_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, waveterm_state, waveterm_kb_w))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, waveterm_state, waveterm_kb_r))
+	m_pia2->cb2_handler().set(FUNC(waveterm_state::waveterm_kbh_w));
+	m_pia2->writepb_handler().set(FUNC(waveterm_state::waveterm_kb_w));
+	m_pia2->readpb_handler().set(FUNC(waveterm_state::waveterm_kb_r));
 
 	// ports A(in/out), B(out), CA1(in), CA2(in), and CB2(out) = interface to PPG bus via DIL socket on WTI board
 	// CB1 -- front panel "End" button
-	MCFG_DEVICE_ADD("pia3", PIA6821, 0)
-//  MCFG_PIA_READPA_HANDLER(READ8(*this, waveterm_state, pia3_pa_r))
-//  MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, waveterm_state, pia3_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, waveterm_state, pia3_pb_w))
-//  MCFG_PIA_READCA1_HANDLER(READLINE(*this, waveterm_state, pia3_ca1_r))
-//  MCFG_PIA_READCA2_HANDLER(READLINE(*this, waveterm_state, pia3_ca2_r))
-	MCFG_PIA_READCB1_HANDLER(IOPORT("FP"))
-//  MCFG_PIA_CB2_HANDLER(WRITELINE(*this, waveterm_state, pia3_cb2_w))
+	PIA6821(config, m_pia3, 0);
+//  m_pia3->readpa_handler().set(FUNC(waveterm_state::pia3_pa_r));
+//  m_pia3->writepa_handler().set(FUNC(waveterm_state::pia3_pa_w));
+	m_pia3->writepb_handler().set(FUNC(waveterm_state::pia3_pb_w));
+//  m_pia3->readca1_handler().set(FUNC(waveterm_state::pia3_ca1_r));
+//  m_pia3->readca2_handler().set(FUNC(waveterm_state::pia3_ca2_r));
+	m_pia3->readcb1_handler().set_ioport("FP");
+//  m_pia3->cb2_handler().set(FUNC(waveterm_state::pia3_cb2_w));
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "waveterm")
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(eurocom2_state::microtrol)
+	eurocom2(config);
+
+	// TODO: Second board has WD2793A FDC and what looks like a RAM disk
+MACHINE_CONFIG_END
+
 
 ROM_START(eurocom2)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x1000, "maincpu", 0)
 
 	ROM_DEFAULT_BIOS("mon54")
 	ROM_SYSTEM_BIOS(0, "mon24", "Eurocom Control V2.4")
-	ROMX_LOAD("mon24.bin", 0x0000, 0x1000, CRC(abf5e115) SHA1(d056705779e109bb56c82f906e2e5a52efe77ec1), ROM_BIOS(1))
+	ROMX_LOAD("mon24.bin", 0x0000, 0x1000, CRC(abf5e115) SHA1(d056705779e109bb56c82f906e2e5a52efe77ec1), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "mon53", "Eurocom Control V5.3")
-	ROMX_LOAD("mon53.bin", 0x0000, 0x1000, CRC(fb39c2ad) SHA1(8ce07c349c56f92503f11bb63e32e32c139c003a), ROM_BIOS(2))
+	ROMX_LOAD("mon53.bin", 0x0000, 0x1000, CRC(fb39c2ad) SHA1(8ce07c349c56f92503f11bb63e32e32c139c003a), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "mon54", "Eurocom Control V5.4")
-	ROMX_LOAD("mon54.bin", 0x0000, 0x1000, CRC(2c5a4ad2) SHA1(67b9deec5a6a71d768e35ac97c16cb8992ae159f), ROM_BIOS(3))
+	ROMX_LOAD("mon54.bin", 0x0000, 0x1000, CRC(2c5a4ad2) SHA1(67b9deec5a6a71d768e35ac97c16cb8992ae159f), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "monu546", "Eurocom Control U5.4")
-	ROMX_LOAD("monu54-6.bin", 0x0000, 0x1000, CRC(80c82fa8) SHA1(7255bc2dd536d3dd08cca3ea46992e5ca59323b1), ROM_BIOS(4))
+	ROMX_LOAD("monu54-6.bin", 0x0000, 0x1000, CRC(80c82fa8) SHA1(7255bc2dd536d3dd08cca3ea46992e5ca59323b1), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "neumon54", "New Monitor 5.4")
-	ROMX_LOAD("neumon54.bin", 0x0000, 0x1000, CRC(2b60ca41) SHA1(c7252d2e9b267b046f4f3ea6cd77e40d4744a33e), ROM_BIOS(5))
+	ROMX_LOAD("neumon54.bin", 0x0000, 0x1000, CRC(2b60ca41) SHA1(c7252d2e9b267b046f4f3ea6cd77e40d4744a33e), ROM_BIOS(4))
 ROM_END
 
 ROM_START(waveterm)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD("rom.bin", 0x0000, 0x1000, CRC(add3c20f) SHA1(4d47d99231bff2209634e6aac5710e782ee2f6da))
 ROM_END
 
+ROM_START(microtrol)
+	ROM_REGION(0x1000, "maincpu", 0)
+	ROM_LOAD("mon1.bin", 0x0000, 0x0800, CRC(4e82af0f) SHA1(a708f0c8a4d7ab216bc065e82a4ad42009cc3696)) // "microtrol Control V5.1"
+	ROM_LOAD("mon2.bin", 0x0800, 0x0800, CRC(577a2b4c) SHA1(e7097a96417fa249a62c967039f039e637079cb6))
+ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME         FLAGS
-COMP( 1981, eurocom2, 0,        0,      eurocom2, eurocom2, eurocom2_state, empty_init, "Eltec", "Eurocom II V7", MACHINE_IS_SKELETON )
-COMP( 1982, waveterm, eurocom2, 0,      waveterm, waveterm, waveterm_state, empty_init, "PPG",   "Waveterm A",    MACHINE_IS_SKELETON )
+
+//    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY      FULLNAME                     FLAGS
+COMP( 1981, eurocom2,  0,        0,      eurocom2,  eurocom2, eurocom2_state, empty_init, "Eltec",     "Eurocom II V7",             MACHINE_IS_SKELETON )
+COMP( 1982, waveterm,  eurocom2, 0,      waveterm,  waveterm, waveterm_state, empty_init, "PPG",       "Waveterm A",                MACHINE_IS_SKELETON )
+COMP( 1985, microtrol, eurocom2, 0,      microtrol, eurocom2, eurocom2_state, empty_init, "Microtrol", "unknown Microtrol portable computer", MACHINE_IS_SKELETON )

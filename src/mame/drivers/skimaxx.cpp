@@ -40,6 +40,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -57,6 +58,9 @@ public:
 		m_fg_buffer(*this, "fg_buffer")
 	{ }
 
+	void skimaxx(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<tms34010_device> m_tms;
@@ -91,7 +95,6 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void skimaxx(machine_config &config);
 	void m68030_1_map(address_map &map);
 	void m68030_2_map(address_map &map);
 	void tms_program_map(address_map &map);
@@ -313,7 +316,7 @@ READ32_MEMBER(skimaxx_state::skimaxx_analog_r)
 void skimaxx_state::m68030_1_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom();
-	map(0x10000000, 0x10000003).w(this, FUNC(skimaxx_state::skimaxx_sub_ctrl_w));
+	map(0x10000000, 0x10000003).w(FUNC(skimaxx_state::skimaxx_sub_ctrl_w));
 	map(0x10100000, 0x1010000f).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w)).umask32(0x0000ffff);
 //  AM_RANGE(0x10180000, 0x10187fff) AM_RAM AM_SHARE("share1")
 	map(0x10180000, 0x1018ffff).ram().share("share1");  // above 10188000 accessed at level end (game bug?)
@@ -324,15 +327,15 @@ void skimaxx_state::m68030_1_map(address_map &map)
 	map(0x2000001b, 0x2000001b).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // right
 	map(0x2000001f, 0x2000001f).rw("oki4", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // right
 
-	map(0x20000020, 0x20000023).r(this, FUNC(skimaxx_state::skimaxx_unk1_r));   // units linking?
-	map(0x20000024, 0x20000027).w(this, FUNC(skimaxx_state::skimaxx_unk1_w));  // ""
+	map(0x20000020, 0x20000023).r(FUNC(skimaxx_state::skimaxx_unk1_r));   // units linking?
+	map(0x20000024, 0x20000027).w(FUNC(skimaxx_state::skimaxx_unk1_w));  // ""
 
 	map(0x20000040, 0x20000043).ram(); // write
 	map(0x20000044, 0x20000047).portr("DSW");
 	map(0x20000048, 0x2000004b).portr("COIN");
-	map(0x2000004c, 0x2000004f).r(this, FUNC(skimaxx_state::unk_r)); // bit 7, bit 0
+	map(0x2000004c, 0x2000004f).r(FUNC(skimaxx_state::unk_r)); // bit 7, bit 0
 
-	map(0x20000050, 0x20000057).r(this, FUNC(skimaxx_state::skimaxx_analog_r)).nopw(); // read (0-1f), write motor?
+	map(0x20000050, 0x20000057).r(FUNC(skimaxx_state::skimaxx_analog_r)).nopw(); // read (0-1f), write motor?
 
 	map(0xfffc0000, 0xfffdffff).ram().mirror(0x00020000);
 }
@@ -348,10 +351,10 @@ void skimaxx_state::m68030_2_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).rom();
 
-	map(0x20000000, 0x2007ffff).r(this, FUNC(skimaxx_state::skimaxx_blitter_r));    // do blit
-	map(0x30000000, 0x3000000f).w(this, FUNC(skimaxx_state::skimaxx_blitter_w)).share("blitter_regs");
+	map(0x20000000, 0x2007ffff).r(FUNC(skimaxx_state::skimaxx_blitter_r));    // do blit
+	map(0x30000000, 0x3000000f).w(FUNC(skimaxx_state::skimaxx_blitter_w)).share("blitter_regs");
 
-	map(0x40000000, 0x40000003).w(this, FUNC(skimaxx_state::skimaxx_fpga_ctrl_w)).share("fpga_ctrl");
+	map(0x40000000, 0x40000003).w(FUNC(skimaxx_state::skimaxx_fpga_ctrl_w)).share("fpga_ctrl");
 
 	map(0x50000000, 0x5007ffff).bankrw("bank1");    // background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
 //  AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE("share1")
@@ -510,15 +513,15 @@ MACHINE_CONFIG_START(skimaxx_state::skimaxx)
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tms", TMS34010, XTAL(50'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(tms_program_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(50000000/8) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(skimaxx_state, scanline_update)     /* scanline updater (indexed16) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, skimaxx_state, tms_irq))
-	MCFG_TMS340X0_TO_SHIFTREG_CB(skimaxx_state, to_shiftreg)  /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(skimaxx_state, from_shiftreg) /* read from shiftreg function */
+	TMS34010(config, m_tms, XTAL(50'000'000));
+	m_tms->set_addrmap(AS_PROGRAM, &skimaxx_state::tms_program_map);
+	m_tms->set_halt_on_reset(false);
+	m_tms->set_pixel_clock(50000000/8);
+	m_tms->set_pixels_per_clock(2);
+	m_tms->set_scanline_ind16_callback(FUNC(skimaxx_state::scanline_update));
+	m_tms->output_int().set(FUNC(skimaxx_state::tms_irq));
+	m_tms->set_shiftreg_in_callback(FUNC(skimaxx_state::to_shiftreg));
+	m_tms->set_shiftreg_out_callback(FUNC(skimaxx_state::from_shiftreg));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_RAW_PARAMS(40000000/4, 156*4, 0, 100*4, 328, 0, 300) // TODO - Wrong but TMS overrides it anyway
@@ -531,7 +534,7 @@ MACHINE_CONFIG_START(skimaxx_state::skimaxx)
 
 //  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skimaxx)
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

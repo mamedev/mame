@@ -40,6 +40,7 @@
 #include "machine/nvram.h"
 #include "sound/ymz280b.h"
 #include "video/k057714.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -58,7 +59,7 @@ public:
 
 	void konendev(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ32_MEMBER(mcu2_r);
 	DECLARE_READ32_MEMBER(ifu2_r);
 	DECLARE_READ32_MEMBER(ctrl0_r);
@@ -79,7 +80,6 @@ protected:
 
 	void konendev_map(address_map &map);
 
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<k057714_device> m_gcu;
@@ -217,14 +217,14 @@ WRITE32_MEMBER(konendev_state::sound_data_w)
 void konendev_state::konendev_map(address_map &map)
 {
 	map(0x00000000, 0x00ffffff).ram();
-	map(0x78000000, 0x78000003).r(this, FUNC(konendev_state::mcu2_r));
-	map(0x78080000, 0x7808000f).rw(this, FUNC(konendev_state::rtc_r), FUNC(konendev_state::rtc_w));
-	map(0x780c0000, 0x780c0003).rw(this, FUNC(konendev_state::sound_data_r), FUNC(konendev_state::sound_data_w));
-	map(0x78100000, 0x78100003).w(this, FUNC(konendev_state::eeprom_w));
-	map(0x78800000, 0x78800003).r(this, FUNC(konendev_state::ifu2_r));
-	map(0x78800004, 0x78800007).r(this, FUNC(konendev_state::ctrl0_r));
-	map(0x78a00000, 0x78a0001f).r(this, FUNC(konendev_state::ctrl1_r));
-	map(0x78e00000, 0x78e00003).r(this, FUNC(konendev_state::ctrl2_r));
+	map(0x78000000, 0x78000003).r(FUNC(konendev_state::mcu2_r));
+	map(0x78080000, 0x7808000f).rw(FUNC(konendev_state::rtc_r), FUNC(konendev_state::rtc_w));
+	map(0x780c0000, 0x780c0003).rw(FUNC(konendev_state::sound_data_r), FUNC(konendev_state::sound_data_w));
+	map(0x78100000, 0x78100003).w(FUNC(konendev_state::eeprom_w));
+	map(0x78800000, 0x78800003).r(FUNC(konendev_state::ifu2_r));
+	map(0x78800004, 0x78800007).r(FUNC(konendev_state::ctrl0_r));
+	map(0x78a00000, 0x78a0001f).r(FUNC(konendev_state::ctrl1_r));
+	map(0x78e00000, 0x78e00003).r(FUNC(konendev_state::ctrl2_r));
 	map(0x79000000, 0x79000003).w(m_gcu, FUNC(k057714_device::fifo_w));
 	map(0x79800000, 0x798000ff).rw(m_gcu, FUNC(k057714_device::read), FUNC(k057714_device::write));
 	map(0x7a000000, 0x7a01ffff).ram().share("nvram0");
@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(konendev_state::konendev)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konendev_state, vbl_interrupt)
 
 	/* video hardware */
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -321,13 +321,13 @@ MACHINE_CONFIG_START(konendev_state::konendev)
 	MCFG_SCREEN_UPDATE_DRIVER(konendev_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gcu", K057714, 0)
-	MCFG_K057714_IRQ_CALLBACK(WRITELINE(*this, konendev_state, gcu_interrupt))
+	K057714(config, m_gcu, 0);
+	m_gcu->irq_callback().set(FUNC(konendev_state::gcu_interrupt));
 
-	MCFG_NVRAM_ADD_0FILL("nvram0")
-	MCFG_NVRAM_ADD_0FILL("nvram1")
+	NVRAM(config, "nvram0", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+	EEPROM_93C56_16BIT(config, "eeprom");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

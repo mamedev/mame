@@ -72,8 +72,12 @@ public:
 		, m_bram(*this, "bram")
 		{ }
 
-	DECLARE_MACHINE_RESET(tosh1000);
+	void tosh1000(machine_config &config);
+
 	void init_tosh1000();
+
+private:
+	DECLARE_MACHINE_RESET(tosh1000);
 
 	DECLARE_WRITE8_MEMBER(romdos_bank_w);
 	DECLARE_READ8_MEMBER(romdos_bank_r);
@@ -82,16 +86,14 @@ public:
 	DECLARE_READ8_MEMBER(bram_r);
 
 	static void cfg_fdc_35(device_t *device);
-	void tosh1000(machine_config &config);
 	void tosh1000_io(address_map &map);
 	void tosh1000_map(address_map &map);
 	void tosh1000_romdos(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<tosh1000_bram_device> m_bram;
 
-private:
 	enum {
 		IDLE, READ_DATA, WRITE_DATA
 	};
@@ -239,8 +241,8 @@ void tosh1000_state::tosh1000_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
-	map(0x00c0, 0x00c3).rw(this, FUNC(tosh1000_state::bram_r), FUNC(tosh1000_state::bram_w));
-	map(0x00c8, 0x00c8).w(this, FUNC(tosh1000_state::romdos_bank_w));    // ROM-DOS page select [p. B-15]
+	map(0x00c0, 0x00c3).rw(FUNC(tosh1000_state::bram_r), FUNC(tosh1000_state::bram_w));
+	map(0x00c8, 0x00c8).w(FUNC(tosh1000_state::romdos_bank_w));    // ROM-DOS page select [p. B-15]
 	map(0x02c0, 0x02df).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
 }
 
@@ -258,18 +260,13 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 	MCFG_DEVICE_IO_MAP(tosh1000_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(tosh1000_romdos)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "bankdev").set_map(&tosh1000_state::tosh1000_romdos).set_options(ENDIANNESS_LITTLE, 8, 20, 0x10000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(tosh1000_state, tosh1000)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
+	TC8521(config, "rtc", XTAL(32'768));
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false)
@@ -285,17 +282,16 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 	// uses a 80C50 instead of 8042 for KBDC
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
+	RAM(config, RAM_TAG).set_default_size("512K");
 
-	MCFG_TOSH1000_BRAM_ADD("bram")
+	TOSH1000_BRAM(config, m_bram, 0);
 MACHINE_CONFIG_END
 
 
 ROM_START( tosh1000 )
 	ROM_REGION16_LE(0x8000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "v410", "V4.10")
-	ROMX_LOAD( "026f.27c256.ic25", 0x0000, 0x8000, CRC(a854939f) SHA1(0ff532f295a40716f53949a2fd64d02bf76d575a), ROM_BIOS(1))
+	ROMX_LOAD( "026f.27c256.ic25", 0x0000, 0x8000, CRC(a854939f) SHA1(0ff532f295a40716f53949a2fd64d02bf76d575a), ROM_BIOS(0))
 
 	ROM_REGION16_LE(0x80000, "romdos", 0)
 	ROM_LOAD("tc534000p__b004.dos.ic26", 0x0000, 0x80000, CRC(716027f6) SHA1(563e3a7e1961d4cda216169bd1ecc66925a101aa))

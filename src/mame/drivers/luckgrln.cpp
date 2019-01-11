@@ -79,6 +79,7 @@
 #include "cpu/z180/z180.h"
 #include "machine/msm6242.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -301,20 +302,20 @@ void luckgrln_state::mainmap(address_map &map)
 	map(0x10000, 0x1ffff).rom().region("rom_data", 0x10000);
 	map(0x20000, 0x2ffff).rom().region("rom_data", 0x00000);
 
-	map(0x0c000, 0x0c1ff).ram().w(this, FUNC(luckgrln_state::reel_ram_w<0>)).share("reel_ram.0"); // only written to half way
-	map(0x0c800, 0x0c9ff).ram().w(this, FUNC(luckgrln_state::reel_attr_w<0>)).share("reel_attr.0");
+	map(0x0c000, 0x0c1ff).ram().w(FUNC(luckgrln_state::reel_ram_w<0>)).share("reel_ram.0"); // only written to half way
+	map(0x0c800, 0x0c9ff).ram().w(FUNC(luckgrln_state::reel_attr_w<0>)).share("reel_attr.0");
 	map(0x0d000, 0x0d03f).ram().share("reel_scroll.0").mirror(0x000c0);
 
-	map(0x0c200, 0x0c3ff).ram().w(this, FUNC(luckgrln_state::reel_ram_w<1>)).share("reel_ram.1");
-	map(0x0ca00, 0x0cbff).ram().w(this, FUNC(luckgrln_state::reel_attr_w<1>)).share("reel_attr.1");
+	map(0x0c200, 0x0c3ff).ram().w(FUNC(luckgrln_state::reel_ram_w<1>)).share("reel_ram.1");
+	map(0x0ca00, 0x0cbff).ram().w(FUNC(luckgrln_state::reel_attr_w<1>)).share("reel_attr.1");
 	map(0x0d200, 0x0d23f).ram().share("reel_scroll.1").mirror(0x000c0);
 
-	map(0x0c400, 0x0c5ff).ram().w(this, FUNC(luckgrln_state::reel_ram_w<2>)).share("reel_ram.2");
-	map(0x0cc00, 0x0cdff).ram().w(this, FUNC(luckgrln_state::reel_attr_w<2>)).share("reel_attr.2");
+	map(0x0c400, 0x0c5ff).ram().w(FUNC(luckgrln_state::reel_ram_w<2>)).share("reel_ram.2");
+	map(0x0cc00, 0x0cdff).ram().w(FUNC(luckgrln_state::reel_attr_w<2>)).share("reel_attr.2");
 	map(0x0d400, 0x0d43f).ram().share("reel_scroll.2").mirror(0x000c0);
 
-	map(0x0c600, 0x0c7ff).ram().w(this, FUNC(luckgrln_state::reel_ram_w<3>)).share("reel_ram.3");
-	map(0x0ce00, 0x0cfff).ram().w(this, FUNC(luckgrln_state::reel_attr_w<3>)).share("reel_attr.3");
+	map(0x0c600, 0x0c7ff).ram().w(FUNC(luckgrln_state::reel_ram_w<3>)).share("reel_ram.3");
+	map(0x0ce00, 0x0cfff).ram().w(FUNC(luckgrln_state::reel_attr_w<3>)).share("reel_attr.3");
 	map(0x0d600, 0x0d63f).ram().share("reel_scroll.3");
 
 //  AM_RANGE(0x0d200, 0x0d2ff) AM_RAM
@@ -445,19 +446,19 @@ void luckgrln_state::common_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x0000, 0x003f).ram(); // Z180 internal regs
-	map(0x0060, 0x0060).w(this, FUNC(luckgrln_state::output_w));
+	map(0x0060, 0x0060).w(FUNC(luckgrln_state::output_w));
 
-	map(0x00a0, 0x00a0).w(this, FUNC(luckgrln_state::palette_offset_low_w));
-	map(0x00a1, 0x00a1).w(this, FUNC(luckgrln_state::palette_offset_high_w));
-	map(0x00a2, 0x00a2).w(this, FUNC(luckgrln_state::palette_w));
+	map(0x00a0, 0x00a0).w(FUNC(luckgrln_state::palette_offset_low_w));
+	map(0x00a1, 0x00a1).w(FUNC(luckgrln_state::palette_offset_high_w));
+	map(0x00a2, 0x00a2).w(FUNC(luckgrln_state::palette_w));
 
 	map(0x00b0, 0x00b0).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x00b1, 0x00b1).w("crtc", FUNC(mc6845_device::register_w));
 
 	map(0x00b8, 0x00b8).portr("IN0");
-	map(0x00b9, 0x00b9).portr("IN1").w(this, FUNC(luckgrln_state::counters_w));
-	map(0x00ba, 0x00ba).portr("IN2").w(this, FUNC(luckgrln_state::lamps_a_w));
-	map(0x00bb, 0x00bb).portr("IN3").w(this, FUNC(luckgrln_state::lamps_b_w));
+	map(0x00b9, 0x00b9).portr("IN1").w(FUNC(luckgrln_state::counters_w));
+	map(0x00ba, 0x00ba).portr("IN2").w(FUNC(luckgrln_state::lamps_a_w));
+	map(0x00bb, 0x00bb).portr("IN3").w(FUNC(luckgrln_state::lamps_b_w));
 	map(0x00bc, 0x00bc).portr("DSW1");
 
 	map(0x00c0, 0x00c3).nopw();
@@ -509,7 +510,7 @@ READ8_MEMBER(luckgrln_state::test_r)
 void luckgrln_state::_7smash_io(address_map &map)
 {
 	common_portmap(map);
-	map(0x66, 0x66).r(this, FUNC(luckgrln_state::test_r));
+	map(0x66, 0x66).r(FUNC(luckgrln_state::test_r));
 }
 
 static INPUT_PORTS_START( luckgrln )
@@ -866,9 +867,10 @@ MACHINE_CONFIG_START(luckgrln_state::luckgrln)
 	MCFG_DEVICE_IO_MAP(luckgrln_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", luckgrln_state, irq)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 6000000/4) /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	h46505_device &crtc(H46505(config, "crtc", 6000000/4)); /* unknown clock, hand tuned to get ~60 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, 0)
 

@@ -1,6 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_ZACCARIA_H
+#define MAME_INCLUDES_ZACCARIA_H
+
+#pragma once
+
 #include "audio/zaccaria.h"
+#include "emupal.h"
 
 class zaccaria_state : public driver_device
 {
@@ -18,6 +24,14 @@ public:
 		, m_dsw_port(*this, "DSW.%u", 0)
 	{ }
 
+	void zaccaria(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	DECLARE_READ8_MEMBER(dsw_r);
 	DECLARE_READ8_MEMBER(prot1_r);
 	DECLARE_READ8_MEMBER(prot2_r);
@@ -29,17 +43,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(dsw_sel_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(zaccaria);
+	void zaccaria_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,uint8_t *spriteram,int color,int section);
 
-	void zaccaria(machine_config &config);
 	void main_map(address_map &map);
-protected:
+
 	required_device<cpu_device>                 m_maincpu;
 	required_device<gfxdecode_device>           m_gfxdecode;
 	required_device<palette_device>             m_palette;
@@ -56,3 +66,5 @@ protected:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_nmi_mask;
 };
+
+#endif // MAME_INCLUDES_ZACCARIA_H

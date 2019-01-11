@@ -49,7 +49,7 @@ static lib_map_t read_lib_map(const pstring &lm)
 	while (reader.readline(line))
 	{
 		std::vector<pstring> split(plib::psplit(line, ","));
-		m[split[0].trim()] = { split[1].trim(), split[2].trim() };
+		m[plib::trim(split[0])] = { plib::trim(split[1]), plib::trim(split[2]) };
 	}
 	return m;
 }
@@ -185,21 +185,21 @@ const pstring nl_convert_base_t::get_nl_val(const double val)
 {
 	{
 		int i = 0;
-		while (pstring(m_units[i].m_unit, pstring::UTF8) != "-" )
+		while (pstring(m_units[i].m_unit) != "-" )
 		{
 			if (m_units[i].m_mult <= std::abs(val))
 				break;
 			i++;
 		}
-		return plib::pfmt(pstring(m_units[i].m_func, pstring::UTF8))(val / m_units[i].m_mult);
+		return plib::pfmt(pstring(m_units[i].m_func))(val / m_units[i].m_mult);
 	}
 }
 double nl_convert_base_t::get_sp_unit(const pstring &unit)
 {
 	int i = 0;
-	while (pstring(m_units[i].m_unit, pstring::UTF8) != "-")
+	while (pstring(m_units[i].m_unit) != "-")
 	{
-		if (pstring(m_units[i].m_unit, pstring::UTF8) == unit)
+		if (pstring(m_units[i].m_unit) == unit)
 			return m_units[i].m_mult;
 		i++;
 	}
@@ -212,9 +212,9 @@ double nl_convert_base_t::get_sp_val(const pstring &sin)
 	std::size_t p = 0;
 	while (p < sin.length() && (m_numberchars.find(sin.substr(p, 1)) != pstring::npos))
 		++p;
-	pstring val = sin.left(p);
+	pstring val = plib::left(sin, p);
 	pstring unit = sin.substr(p);
-	double ret = get_sp_unit(unit) * val.as_double();
+	double ret = get_sp_unit(unit) * plib::pstonum<double>(val);
 	return ret;
 }
 
@@ -255,8 +255,8 @@ void nl_convert_spice_t::convert(const pstring &contents)
 	for (std::size_t i=0; i < spnl.size(); i++)
 	{
 		// Basic preprocessing
-		pstring inl = spnl[i].trim().ucase();
-		if (inl.startsWith("+"))
+		pstring inl = plib::ucase(plib::trim(spnl[i]));
+		if (plib::startsWith(inl, "+"))
 			line = line + inl.substr(1);
 		else
 		{
@@ -285,13 +285,13 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				out("// {}\n", line.substr(1).c_str());
 				break;
 			case '.':
-				if (tt[0].equals(".SUBCKT"))
+				if (tt[0] == ".SUBCKT")
 				{
 					out("NETLIST_START({})\n", tt[1].c_str());
 					for (std::size_t i=2; i<tt.size(); i++)
 						add_ext_alias(tt[i]);
 				}
-				else if (tt[0].equals(".ENDS"))
+				else if (tt[0] == ".ENDS")
 				{
 					dump_nl();
 					out("NETLIST_END()\n");
@@ -301,15 +301,15 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				break;
 			case 'Q':
 			{
-				bool cerr = false;
 				/* check for fourth terminal ... should be numeric net
 				 * including "0" or start with "N" (ltspice)
 				 */
-				ATTR_UNUSED long nval(tt[4].as_long(&cerr));
 				pstring model;
 				pstring pins ="CBE";
+				bool err;
+				ATTR_UNUSED long nval = plib::pstonum_ne<long>(tt[4], err);
 
-				if ((!cerr || tt[4].startsWith("N")) && tt.size() > 5)
+				if ((err || plib::startsWith(tt[4], "N")) && tt.size() > 5)
 					model = tt[5];
 				else
 					model = tt[4];
@@ -318,7 +318,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				{
 					if (m[1].length() != 4)
 						fprintf(stderr, "error with model desc %s\n", model.c_str());
-					pins = m[1].left(3);
+					pins = plib::left(m[1], 3);
 				}
 				add_device("QBJT_EB", tt[0], m[0]);
 				add_term(tt[1], tt[0] + "." + pins.at(0));
@@ -327,7 +327,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 			}
 				break;
 			case 'R':
-				if (tt[0].startsWith("RV"))
+				if (plib::startsWith(tt[0], "RV"))
 				{
 					val = get_sp_val(tt[4]);
 					add_device("POT", tt[0], val);
@@ -351,7 +351,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				break;
 			case 'V':
 				// just simple Voltage sources ....
-				if (tt[2].equals("0"))
+				if (tt[2] == "0")
 				{
 					val = get_sp_val(tt[3]);
 					add_device("ANALOG_INPUT", tt[0], val);
@@ -381,7 +381,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				//        last element is component type
 				// FIXME: Parameter
 
-				pstring xname = tt[0].replace_all(".", "_");
+				pstring xname = plib::replace_all(tt[0], pstring("."), pstring("_"));
 				pstring tname = "TTL_" + tt[tt.size()-1] + "_DIP";
 				add_device(tname, xname);
 				for (std::size_t i=1; i < tt.size() - 1; i++)
@@ -407,7 +407,8 @@ nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert, plib::putf
 {
 	set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
 	set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers
-	set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
+	//set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
+	set_whitespace(pstring("") + ' ' + static_cast<char>(9) +  static_cast<char>(10) + static_cast<char>(13));
 	/* FIXME: gnetlist doesn't print comments */
 	set_comment("/*", "*/", "//");
 	set_string_char('\'');
@@ -487,12 +488,12 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 					}
 					break;
 				case 'P':
-					if (sval.ucase() == "HIGH")
+					if (plib::ucase(sval) == "HIGH")
 						add_device("TTL_INPUT", name, 1);
-					else if (sval.ucase() == "LOW")
+					else if (plib::ucase(sval) == "LOW")
 						add_device("TTL_INPUT", name, 0);
 					else
-						add_device("ANALOG_INPUT", name, sval.as_double());
+						add_device("ANALOG_INPUT", name, plib::pstonum<double>(sval));
 					add_pin_alias(name, "1", "Q");
 					break;
 				case 'D':
@@ -544,7 +545,8 @@ nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert, plib::putf8_
 {
 	set_identifier_chars(".abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-");
 	set_number_chars("0123456789", "0123456789eE-."); //FIXME: processing of numbers
-	set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
+	//set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
+	set_whitespace(pstring("") + ' ' + static_cast<char>(9) +  static_cast<char>(10) + static_cast<char>(13));
 	/* FIXME: gnetlist doesn't print comments */
 	set_comment("","","//"); // FIXME:needs to be confirmed
 	set_string_char('"');

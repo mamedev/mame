@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Sean Riddle
+// copyright-holders:hap, Sean Riddle, algestam
 // thanks-to:Igor, ChoccyHobNob, RColtrane
 /***************************************************************************
 
@@ -20,7 +20,6 @@
 #include "emu.h"
 #include "includes/hh_sm510.h"
 
-#include "cpu/sm510/sm510.h"
 #include "cpu/sm510/sm500.h"
 #include "rendlay.h"
 #include "screen.h"
@@ -280,30 +279,29 @@ static INPUT_PORTS_START( kdribble )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(kdribble_state::kdribble)
-
+void kdribble_state::kdribble(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(2) // confirmed
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1524, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1524-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1524, 1080);
+	screen.set_visarea(0, 1524-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -353,30 +351,30 @@ static INPUT_PORTS_START( ktopgun )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ktopgun_state::ktopgun)
-
+void ktopgun_state::ktopgun(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(2) // confirmed
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1515, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1515-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1515, 1080);
+	screen.set_visarea(0, 1515-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -428,29 +426,29 @@ static INPUT_PORTS_START( kcontra )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(kcontra_state::kcontra)
-
+void kcontra_state::kcontra(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1505, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1505-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1505, 1080);
+	screen.set_visarea(0, 1505-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -501,29 +499,29 @@ static INPUT_PORTS_START( ktmnt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ktmnt_state::ktmnt)
-
+void ktmnt_state::ktmnt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1505, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1505-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1505, 1080);
+	screen.set_visarea(0, 1505-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -571,29 +569,29 @@ static INPUT_PORTS_START( kgradius )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(kgradius_state::kgradius)
-
+void kgradius_state::kgradius(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1420, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1420-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1420, 1080);
+	screen.set_visarea(0, 1420-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -639,29 +637,29 @@ static INPUT_PORTS_START( kloneran )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(kloneran_state::kloneran)
-
+void kloneran_state::kloneran(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1497, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1497-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1497, 1080);
+	screen.set_visarea(0, 1497-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -711,28 +709,28 @@ static INPUT_PORTS_START( kblades )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(kblades_state::kblades)
-
+void kblades_state::kblades(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1516, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1516-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1516, 1080);
+	screen.set_visarea(0, 1516-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -784,28 +782,28 @@ static INPUT_PORTS_START( knfl )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(knfl_state::knfl)
-
+void knfl_state::knfl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1449, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1449-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1449, 1080);
+	screen.set_visarea(0, 1449-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -856,28 +854,28 @@ static INPUT_PORTS_START( kbilly )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(kbilly_state::kbilly)
-
+void kbilly_state::kbilly(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1490, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1490-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1490, 1080);
+	screen.set_visarea(0, 1490-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -922,28 +920,28 @@ static INPUT_PORTS_START( kbucky )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(kbucky_state::kbucky)
-
+void kbucky_state::kbucky(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1490, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1490-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1490, 1080);
+	screen.set_visarea(0, 1490-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -992,28 +990,28 @@ static INPUT_PORTS_START( kgarfld )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("All Clear")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(kgarfld_state::kgarfld)
-
+void kgarfld_state::kgarfld(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1500, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1500-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1500, 1080);
+	screen.set_visarea(0, 1500-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1085,65 +1083,239 @@ static INPUT_PORTS_START( exospace )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(gnw_mmouse_state::gnw_mmouse)
-
+void gnw_mmouse_state::gnw_mmouse(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM5A)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // ?
-	MCFG_SM500_WRITE_O_CB(WRITE8(*this, hh_sm510_state, sm500_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_input_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+	SM5A(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // ?
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	m_maincpu->read_ba().set_ioport("BA");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1711, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1711-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1711, 1080);
+	screen.set_visarea(0, 1711-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
-MACHINE_CONFIG_START(gnw_mmouse_state::gnw_egg)
+void gnw_mmouse_state::gnw_egg(machine_config &config)
+{
 	gnw_mmouse(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(1694, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1694-1, 0, 1080-1)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_size(1694, 1080);
+	subdevice<screen_device>("screen")->set_visarea(0, 1694-1, 0, 1080-1);
+}
 
-MACHINE_CONFIG_START(gnw_mmouse_state::nupogodi)
+void gnw_mmouse_state::nupogodi(machine_config &config)
+{
 	gnw_mmouse(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", KB1013VK12)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM500_WRITE_O_CB(WRITE8(*this, hh_sm510_state, sm500_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_input_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
+	KB1013VK12(config.replace(), m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // ?
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
+	m_maincpu->read_ba().set_ioport("BA");
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(1715, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1715-1, 0, 1080-1)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_size(1715, 1080);
+	subdevice<screen_device>("screen")->set_visarea(0, 1715-1, 0, 1080-1);
+}
 
-MACHINE_CONFIG_START(gnw_mmouse_state::exospace)
+void gnw_mmouse_state::exospace(machine_config &config)
+{
 	nupogodi(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(1756, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1756-1, 0, 1080-1)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_size(1756, 1080);
+	subdevice<screen_device>("screen")->set_visarea(0, 1756-1, 0, 1080-1);
+}
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Oil Panic (model OP-51)
+  * PCB label OP-51A
+  * Sharp SM510 label OP-51 28ZB (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_opanic_state : public hh_sm510_state
+{
+public:
+	gnw_opanic_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 2;
+	}
+
+	void gnw_opanic(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_opanic )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_opanic_state::gnw_opanic(machine_config &config)
+{
+	/* basic machine hardware */
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
+	screen_top.set_svg_region("svg_top");
+	screen_top.set_refresh_hz(50);
+	screen_top.set_size(1920/2, 1292/2);
+	screen_top.set_visarea(0, 1920/2-1, 0, 1292/2-1);
+
+	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
+	screen_bottom.set_svg_region("svg_bottom");
+	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_size(1920/2, 1230/2);
+	screen_bottom.set_visarea(0, 1920/2-1, 0, 1230/2-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_gnw_dualv);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Donkey Kong (model DK-52)
+  * PCB label DK-52C
+  * Sharp SM510 label DK-52 52ZD (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_dkong_state : public hh_sm510_state
+{
+public:
+	gnw_dkong_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 3;
+	}
+
+	void gnw_dkong(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_dkong )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Jump
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_dkong_state::gnw_dkong(machine_config &config)
+{
+	/* basic machine hardware */
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
+	screen_top.set_svg_region("svg_top");
+	screen_top.set_refresh_hz(50);
+	screen_top.set_size(1920/2, 1266/2);
+	screen_top.set_visarea(0, 1920/2-1, 0, 1266/2-1);
+
+	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
+	screen_bottom.set_svg_region("svg_bottom");
+	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_size(1920/2, 1266/2);
+	screen_bottom.set_visarea(0, 1920/2-1, 0, 1266/2-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_gnw_dualv);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1194,36 +1366,130 @@ static INPUT_PORTS_START( gnw_mickdon )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(gnw_mickdon_state::gnw_mickdon)
-
+void gnw_mickdon_state::gnw_mickdon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(2) // confirmed
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r2_w))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r2_w));
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen_top", "svg_top")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920/2, 1281/2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1281/2-1)
+	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
+	screen_top.set_svg_region("svg_top");
+	screen_top.set_refresh_hz(50);
+	screen_top.set_size(1920/2, 1281/2);
+	screen_top.set_visarea(0, 1920/2-1, 0, 1281/2-1);
 
-	MCFG_SCREEN_SVG_ADD("screen_bottom", "svg_bottom")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920/2, 1236/2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1236/2-1)
+	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
+	screen_bottom.set_svg_region("svg_bottom");
+	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_size(1920/2, 1236/2);
+	screen_bottom.set_visarea(0, 1920/2-1, 0, 1236/2-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_gnw_dualv)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_gnw_dualv);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Green House (model GH-54)
+  * PCB label GH-54
+  * Sharp SM510 label GH-54 52ZD (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_ghouse_state : public hh_sm510_state
+{
+public:
+	gnw_ghouse_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 3;
+	}
+
+	void gnw_ghouse(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_ghouse )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Spray
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_ghouse_state::gnw_ghouse(machine_config &config)
+{
+	/* basic machine hardware */
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
+	screen_top.set_svg_region("svg_top");
+	screen_top.set_refresh_hz(50);
+	screen_top.set_size(1920/2, 1303/2);
+	screen_top.set_visarea(0, 1920/2-1, 0, 1303/2-1);
+
+	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
+	screen_bottom.set_svg_region("svg_bottom");
+	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_size(1920/2, 1274/2);
+	screen_bottom.set_visarea(0, 1920/2-1, 0, 1274/2-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_gnw_dualv);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1278,36 +1544,38 @@ static INPUT_PORTS_START( gnw_dkong2 )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(gnw_dkong2_state::gnw_dkong2)
-
+void gnw_dkong2_state::gnw_dkong2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(2) // confirmed
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen_top", "svg_top")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920/2, 1241/2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1241/2-1)
+	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
+	screen_top.set_svg_region("svg_top");
+	screen_top.set_refresh_hz(50);
+	screen_top.set_size(1920/2, 1241/2);
+	screen_top.set_visarea(0, 1920/2-1, 0, 1241/2-1);
 
-	MCFG_SCREEN_SVG_ADD("screen_bottom", "svg_bottom")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920/2, 1237/2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920/2-1, 0, 1237/2-1)
+	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
+	screen_bottom.set_svg_region("svg_bottom");
+	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_size(1920/2, 1237/2);
+	screen_bottom.set_visarea(0, 1920/2-1, 0, 1237/2-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_gnw_dualv)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_gnw_dualv);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1363,37 +1631,290 @@ static INPUT_PORTS_START( gnw_mario )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(gnw_mario_state::gnw_mario)
-
+void gnw_mario_state::gnw_mario(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(2) // confirmed
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen_left", "svg_left")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(2258/2, 1440/2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 2258/2-1, 0, 1440/2-1)
+	screen_device &screen_left(SCREEN(config, "screen_left", SCREEN_TYPE_SVG));
+	screen_left.set_svg_region("svg_left");
+	screen_left.set_refresh_hz(50);
+	screen_left.set_size(2258/2, 1440/2);
+	screen_left.set_visarea(0, 2258/2-1, 0, 1440/2-1);
 
-	MCFG_SCREEN_SVG_ADD("screen_right", "svg_right")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(2261/2, 1440/2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 2261/2-1, 0, 1440/2-1)
+	screen_device &screen_right(SCREEN(config, "screen_right", SCREEN_TYPE_SVG));
+	screen_right.set_svg_region("svg_right");
+	screen_right.set_refresh_hz(50);
+	screen_right.set_size(2261/2, 1440/2);
+	screen_right.set_visarea(0, 2261/2-1, 0, 1440/2-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_gnw_dualh)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_gnw_dualh);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Lifeboat (model TC-58)
+  * PCB labels: TC-58-M (left), TC-58-S (right)
+  * Sharp SM510 label TC-58 281D (no decap)
+  * horizontal dual lcd screens with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_lboat_state : public hh_sm510_state
+{
+public:
+	gnw_lboat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 2;
+	}
+
+	void gnw_lboat(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_lboat )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_lboat_state::gnw_lboat(machine_config &config)
+{
+	/* basic machine hardware */
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen_left(SCREEN(config, "screen_left", SCREEN_TYPE_SVG));
+	screen_left.set_svg_region("svg_left");
+	screen_left.set_refresh_hz(50);
+	screen_left.set_size(2116/2, 1440/2);
+	screen_left.set_visarea(0, 2116/2-1, 0, 1440/2-1);
+
+	screen_device &screen_right(SCREEN(config, "screen_right", SCREEN_TYPE_SVG));
+	screen_right.set_svg_region("svg_right");
+	screen_right.set_refresh_hz(50);
+	screen_right.set_size(2057/2, 1440/2);
+	screen_right.set_visarea(0, 2057/2-1, 0, 1440/2-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_gnw_dualh);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Black Jack (model BJ-60)
+  * PCB label BJ-60
+  * Sharp SM512 label BJ-60 564D (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_bjack_state : public hh_sm510_state
+{
+public:
+	gnw_bjack_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 2;
+	}
+
+	void gnw_bjack(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_bjack )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Double Down")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Bet x10 / Hit")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Bet x1 / Stand")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Enter")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void gnw_bjack_state::gnw_bjack(machine_config &config)
+{
+	/* basic machine hardware */
+	SM512(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+
+	/* video hardware */
+	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
+	screen_top.set_svg_region("svg_top");
+	screen_top.set_refresh_hz(50);
+	screen_top.set_size(1920/2, 1290/2);
+	screen_top.set_visarea(0, 1920/2-1, 0, 1290/2-1);
+
+	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
+	screen_bottom.set_svg_region("svg_bottom");
+	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_size(1920/2, 1297/2);
+	screen_bottom.set_visarea(0, 1920/2-1, 0, 1297/2-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_gnw_dualv);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Squish (model MG-61)
+  * PCB label MG-61
+  * Sharp SM510 label MG-61 8841B (no decap)
+  * vertical dual lcd screens with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_squish_state : public hh_sm510_state
+{
+public:
+	gnw_squish_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 2;
+	}
+
+	void gnw_squish(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_squish )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Bonus Life (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_squish_state::gnw_squish(machine_config &config)
+{
+	/* basic machine hardware */
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen_top(SCREEN(config, "screen_top", SCREEN_TYPE_SVG));
+	screen_top.set_svg_region("svg_top");
+	screen_top.set_refresh_hz(50);
+	screen_top.set_size(1920/2, 1285/2);
+	screen_top.set_visarea(0, 1920/2-1, 0, 1285/2-1);
+
+	screen_device &screen_bottom(SCREEN(config, "screen_bottom", SCREEN_TYPE_SVG));
+	screen_bottom.set_svg_region("svg_bottom");
+	screen_bottom.set_refresh_hz(50);
+	screen_bottom.set_size(1920/2, 1287/2);
+	screen_bottom.set_visarea(0, 1920/2-1, 0, 1287/2-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+	config.set_default_layout(layout_gnw_dualv);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1455,32 +1976,32 @@ static INPUT_PORTS_START( gnw_dkjr )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(gnw_dkjr_state::gnw_dkjr)
-
+void gnw_dkjr_state::gnw_dkjr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(2) // confirmed
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1647, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1647-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1647, 1080);
+	screen.set_visarea(0, 1647-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1537,32 +2058,190 @@ static INPUT_PORTS_START( gnw_mariocm )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(gnw_mariocm_state::gnw_mariocm)
-
+void gnw_mariocm_state::gnw_mariocm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(2) // confirmed
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1647, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1647-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1647, 1080);
+	screen.set_visarea(0, 1647-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Manhole (model NH-103)
+  * PCB label NH-103
+  * Sharp SM510 label NH-103 538A (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  This is the new wide screen version, there's also a Gold Series version (MH-06)
+
+***************************************************************************/
+
+class gnw_manhole_state : public hh_sm510_state
+{
+public:
+	gnw_manhole_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 2;
+	}
+
+	void gnw_manhole(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_manhole )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("BA") // MCU BA(alpha) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_manhole_state::gnw_manhole(machine_config &config)
+{
+	/* basic machine hardware */
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1560, 1080);
+	screen.set_visarea(0, 1560-1, 0, 1080-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Game & Watch: Tropical Fish (model TF-104)
+  * PCB label TF-104
+  * Sharp SM510 label TF-104 8739A (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class gnw_tfish_state : public hh_sm510_state
+{
+public:
+	gnw_tfish_state(const machine_config &mconfig, device_type type, const char *tag)
+	: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 2;
+	}
+
+	void gnw_tfish(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_tfish )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game B")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_tfish_state::gnw_tfish(machine_config &config)
+{
+	/* basic machine hardware */
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1572, 1080);
+	screen.set_visarea(0, 1572-1, 0, 1080-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1622,30 +2301,30 @@ static INPUT_PORTS_START( gnw_smb )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(gnw_smb_state::gnw_smb)
-
+void gnw_smb_state::gnw_smb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1677, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1677-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1677, 1080);
+	screen.set_visarea(0, 1677-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1653,7 +2332,90 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Nintendo Game & Watch: Boxing (model BX-301)
+  Nintendo Game & Watch: Climber (model: see below)
+  * PCB label DR-106
+  * Sharp SM511 label DR-106 9038B (new wide screen version) (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+  First released in 1986 on Crystal Screen (model DR-802), rereleased on
+  New Wide Screen in 1988 (model DR-106). The graphic LCD elements look the same
+  in both versions but the graphical background is slightly different.
+  Until further proof, it's assumed that the ROM is the same for both models.
+
+***************************************************************************/
+
+class gnw_climber_state : public hh_sm510_state
+{
+public:
+	gnw_climber_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 3;
+	}
+
+	void gnw_climber(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( gnw_climber )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Game")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alarm")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) // Jump
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+
+	PORT_START("B") // MCU B(beta) pin pulled to GND
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)")
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void gnw_climber_state::gnw_climber(machine_config &config)
+{
+	/* basic machine hardware */
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1677, 1080);
+	screen.set_visarea(0, 1677-1, 0, 1080-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+
+
+
+
+/***************************************************************************
+
+  Nintendo Micro Vs. System: Boxing (model BX-301)
   * Sharp SM511 label BX-301 287C (die label KMS73B, KMS744)
   * wide lcd screen with custom segments, 1-bit sound
 
@@ -1724,31 +2486,31 @@ static INPUT_PORTS_START( gnw_boxing )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(gnw_boxing_state::gnw_boxing)
-
+void gnw_boxing_state::gnw_boxing(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 524)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 524-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 524);
+	screen.set_visarea(0, 1920-1, 0, 524-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -1834,41 +2596,41 @@ static INPUT_PORTS_START( trobhood )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Money")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tgaunt_state::tgaunt)
-
+void tgaunt_state::tgaunt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1425, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1425-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1425, 1080);
+	screen.set_visarea(0, 1425-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
-MACHINE_CONFIG_START(tgaunt_state::trobhood)
+void tgaunt_state::trobhood(machine_config &config)
+{
 	tgaunt(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(1468, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1468-1, 0, 1080-1)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_size(1468, 1080);
+	subdevice<screen_device>("screen")->set_visarea(0, 1468-1, 0, 1080-1);
+}
 
 
 
@@ -1937,32 +2699,32 @@ static INPUT_PORTS_START( tddragon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tddragon_state::tddragon)
-
+void tddragon_state::tddragon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1467, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1467-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1467, 1080);
+	screen.set_visarea(0, 1467-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -2032,32 +2794,32 @@ static INPUT_PORTS_START( tkarnov )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tkarnov_state::tkarnov)
-
+void tkarnov_state::tkarnov(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1477, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1477-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1477, 1080);
+	screen.set_visarea(0, 1477-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -2126,32 +2888,32 @@ static INPUT_PORTS_START( tvindictr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tvindictr_state::tvindictr)
-
+void tvindictr_state::tvindictr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1459, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1459-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1459, 1080);
+	screen.set_visarea(0, 1459-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -2243,32 +3005,32 @@ void tgaiden_state::machine_start()
 	m_led_out.resolve();
 }
 
-MACHINE_CONFIG_START(tgaiden_state::tgaiden)
-
+void tgaiden_state::tgaiden(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, tgaiden_state, write_r))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(tgaiden_state::write_r));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 1080);
+	screen.set_visarea(0, 1920-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -2333,32 +3095,32 @@ static INPUT_PORTS_START( tbatman )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tbatman_state::tbatman)
-
+void tbatman_state::tbatman(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1442, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1442-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1442, 1080);
+	screen.set_visarea(0, 1442-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -2427,32 +3189,32 @@ static INPUT_PORTS_START( tsharr2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tsharr2_state::tsharr2)
-
+void tsharr2_state::tsharr2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1493, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1493-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1493, 1080);
+	screen.set_visarea(0, 1493-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -2518,32 +3280,32 @@ static INPUT_PORTS_START( tstrider )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tstrider_state::tstrider)
-
+void tstrider_state::tstrider(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1479, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1479-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1479, 1080);
+	screen.set_visarea(0, 1479-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -2613,32 +3375,32 @@ static INPUT_PORTS_START( tgoldnaxe )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tgoldnaxe_state::tgoldnaxe)
-
+void tgoldnaxe_state::tgoldnaxe(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1456, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1456-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1456, 1080);
+	screen.set_visarea(0, 1456-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -2725,41 +3487,41 @@ static INPUT_PORTS_START( trockteer )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Fire Left")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(trobocop2_state::trobocop2)
-
+void trobocop2_state::trobocop2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1487, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1487-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1487, 1080);
+	screen.set_visarea(0, 1487-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
-MACHINE_CONFIG_START(trobocop2_state::trockteer)
+void trobocop2_state::trockteer(machine_config &config)
+{
 	trobocop2(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(1463, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1463-1, 0, 1080-1)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_size(1463, 1080);
+	subdevice<screen_device>("screen")->set_visarea(0, 1463-1, 0, 1080-1);
+}
 
 
 
@@ -2833,32 +3595,32 @@ static INPUT_PORTS_START( taltbeast )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(taltbeast_state::taltbeast)
-
+void taltbeast_state::taltbeast(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1455, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1455-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1455, 1080);
+	screen.set_visarea(0, 1455-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -2928,32 +3690,32 @@ static INPUT_PORTS_START( tsf2010 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tsf2010_state::tsf2010)
-
+void tsf2010_state::tsf2010(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1465, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1465-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1465, 1080);
+	screen.set_visarea(0, 1465-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3019,32 +3781,32 @@ static INPUT_PORTS_START( tswampt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tswampt_state::tswampt)
-
+void tswampt_state::tswampt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1450, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1450-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1450, 1080);
+	screen.set_visarea(0, 1450-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3114,32 +3876,32 @@ static INPUT_PORTS_START( tspidman )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tspidman_state::tspidman)
-
+void tspidman_state::tspidman(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1440, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1440-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1440, 1080);
+	screen.set_visarea(0, 1440-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3209,32 +3971,32 @@ static INPUT_PORTS_START( txmen )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(txmen_state::txmen)
-
+void txmen_state::txmen(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1467, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1467-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1467, 1080);
+	screen.set_visarea(0, 1467-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3304,32 +4066,32 @@ static INPUT_PORTS_START( tddragon3 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tddragon3_state::tddragon3)
-
+void tddragon3_state::tddragon3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1514, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1514-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1514, 1080);
+	screen.set_visarea(0, 1514-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3399,32 +4161,32 @@ static INPUT_PORTS_START( tflash )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tflash_state::tflash)
-
+void tflash_state::tflash(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1444, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1444-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1444, 1080);
+	screen.set_visarea(0, 1444-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3495,31 +4257,31 @@ static INPUT_PORTS_START( tmchammer )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tmchammer_state::tmchammer)
-
+void tmchammer_state::tmchammer(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1471, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1471-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1471, 1080);
+	screen.set_visarea(0, 1471-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3589,32 +4351,32 @@ static INPUT_PORTS_START( tbtoads )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tbtoads_state::tbtoads)
-
+void tbtoads_state::tbtoads(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1454, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1454-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1454, 1080);
+	screen.set_visarea(0, 1454-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3684,32 +4446,32 @@ static INPUT_PORTS_START( thook )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(thook_state::thook)
-
+void thook_state::thook(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1489, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1489-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1489, 1080);
+	screen.set_visarea(0, 1489-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3778,32 +4540,32 @@ static INPUT_PORTS_START( tbttf )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tbttf_state::tbttf)
-
+void tbttf_state::tbttf(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1466, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1466-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1466, 1080);
+	screen.set_visarea(0, 1466-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3875,32 +4637,32 @@ static INPUT_PORTS_START( taddams )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(taddams_state::taddams)
-
+void taddams_state::taddams(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1464, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1464-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1464, 1080);
+	screen.set_visarea(0, 1464-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -3970,32 +4732,32 @@ static INPUT_PORTS_START( thalone )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(thalone_state::thalone)
-
+void thalone_state::thalone(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1448, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1448-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1448, 1080);
+	screen.set_visarea(0, 1448-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -4061,32 +4823,32 @@ static INPUT_PORTS_START( txmenpx )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(txmenpx_state::txmenpx)
-
+void txmenpx_state::txmenpx(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1464, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1464-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1464, 1080);
+	screen.set_visarea(0, 1464-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -4156,32 +4918,32 @@ static INPUT_PORTS_START( thalone2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(thalone2_state::thalone2)
-
+void thalone2_state::thalone2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1454, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1454-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1454, 1080);
+	screen.set_visarea(0, 1454-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -4246,31 +5008,31 @@ static INPUT_PORTS_START( tsonic )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tsonic_state::tsonic)
-
+void tsonic_state::tsonic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, piezo2bit_input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo2bit_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::piezo2bit_input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo2bit_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1517, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1517-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1517, 1080);
+	screen.set_visarea(0, 1517-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, piezo2bit_r1_120k_s1_39k)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(4, piezo2bit_r1_120k_s1_39k);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -4340,32 +5102,32 @@ static INPUT_PORTS_START( trobocop3 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(trobocop3_state::trobocop3)
-
+void trobocop3_state::trobocop3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1464, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1464-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1464, 1080);
+	screen.set_visarea(0, 1464-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -4431,32 +5193,32 @@ static INPUT_PORTS_START( tdummies )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tdummies_state::tdummies)
-
+void tdummies_state::tdummies(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1441, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1441-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1441, 1080);
+	screen.set_visarea(0, 1441-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -4526,32 +5288,32 @@ static INPUT_PORTS_START( tsfight2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tsfight2_state::tsfight2)
-
+void tsfight2_state::tsfight2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1444, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1444-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1444, 1080);
+	screen.set_visarea(0, 1444-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -4621,32 +5383,32 @@ static INPUT_PORTS_START( twworld )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(twworld_state::twworld)
-
+void twworld_state::twworld(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1429, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1429-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1429, 1080);
+	screen.set_visarea(0, 1429-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -4712,32 +5474,32 @@ static INPUT_PORTS_START( tjpark )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tjpark_state::tjpark)
-
+void tjpark_state::tjpark(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1454, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1454-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1454, 1080);
+	screen.set_visarea(0, 1454-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -4802,31 +5564,31 @@ static INPUT_PORTS_START( tsonic2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tsonic2_state::tsonic2)
-
+void tsonic2_state::tsonic2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, piezo2bit_input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo2bit_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::piezo2bit_input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo2bit_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1475, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1475-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1475, 1080);
+	screen.set_visarea(0, 1475-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, piezo2bit_r1_120k_s1_39k)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(4, piezo2bit_r1_120k_s1_39k);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -4901,32 +5663,32 @@ static INPUT_PORTS_START( tsddragon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tsddragon_state::tsddragon)
-
+void tsddragon_state::tsddragon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1503, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1503-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1503, 1080);
+	screen.set_visarea(0, 1503-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -4997,32 +5759,32 @@ static INPUT_PORTS_START( tdennis )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tdennis_state::tdennis)
-
+void tdennis_state::tdennis(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1467, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1467-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1467, 1080);
+	screen.set_visarea(0, 1467-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -5096,32 +5858,32 @@ static INPUT_PORTS_START( tnmarebc )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tnmarebc_state::tnmarebc)
-
+void tnmarebc_state::tnmarebc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, tnmarebc_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(tnmarebc_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1456, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1456-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1456, 1080);
+	screen.set_visarea(0, 1456-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -5191,32 +5953,32 @@ static INPUT_PORTS_START( ttransf2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(ttransf2_state::ttransf2)
-
+void ttransf2_state::ttransf2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1476, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1476-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1476, 1080);
+	screen.set_visarea(0, 1476-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -5282,32 +6044,32 @@ static INPUT_PORTS_START( topaliens )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(topaliens_state::topaliens)
-
+void topaliens_state::topaliens(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1450, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1450-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1450, 1080);
+	screen.set_visarea(0, 1450-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -5378,32 +6140,32 @@ static INPUT_PORTS_START( tmkombat )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tmkombat_state::tmkombat)
-
+void tmkombat_state::tmkombat(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1468, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1468-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1468, 1080);
+	screen.set_visarea(0, 1468-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -5473,32 +6235,32 @@ static INPUT_PORTS_START( tshadow )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tshadow_state::tshadow)
-
+void tshadow_state::tshadow(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1484, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1484-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1484, 1080);
+	screen.set_visarea(0, 1484-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -5568,32 +6330,32 @@ static INPUT_PORTS_START( tskelwarr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tskelwarr_state::tskelwarr)
-
+void tskelwarr_state::tskelwarr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1444, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1444-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1444, 1080);
+	screen.set_visarea(0, 1444-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -5664,32 +6426,32 @@ static INPUT_PORTS_START( tbatfor )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tbatfor_state::tbatfor)
-
+void tbatfor_state::tbatfor(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1493, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1493-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1493, 1080);
+	screen.set_visarea(0, 1493-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -5760,32 +6522,32 @@ static INPUT_PORTS_START( tjdredd )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tjdredd_state::tjdredd)
-
+void tjdredd_state::tjdredd(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1444, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1444-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1444, 1080);
+	screen.set_visarea(0, 1444-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -5856,32 +6618,32 @@ static INPUT_PORTS_START( tapollo13 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tapollo13_state::tapollo13)
-
+void tapollo13_state::tapollo13(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1467, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1467-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1467, 1080);
+	screen.set_visarea(0, 1467-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -5952,123 +6714,32 @@ static INPUT_PORTS_START( tgoldeye )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tgoldeye_state::tgoldeye)
-
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
-
-	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1461, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1461-1, 0, 1080-1)
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
-
-
-
-
-
-/***************************************************************************
-
-  Tiger Independence Day (model 78-???)
-  * Sharp SM510 under epoxy (die label 10 16)
-  * lcd screen with custom segments, 1-bit sound
-
-***************************************************************************/
-
-class tinday_state : public hh_sm510_state
+void tgoldeye_state::tgoldeye(machine_config &config)
 {
-public:
-	tinday_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_sm510_state(mconfig, type, tag)
-	{
-		m_inp_lines = 5;
-		m_inp_fixed = 5;
-	}
-
-	void tinday(machine_config &config);
-};
-
-// config
-
-static INPUT_PORTS_START( tinday )
-	PORT_START("IN.0") // S1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Shield")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Fire")
-	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.1") // S2
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
-	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.2") // S3
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alert")
-	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.3") // S4
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Velocity")
-	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.4") // S5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Pause")
-	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN.5") // GND!
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Power On/Start")
-
-	PORT_START("BA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
-
-	PORT_START("B")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
-
-	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
-INPUT_PORTS_END
-
-MACHINE_CONFIG_START(tinday_state::tinday)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1463, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1463-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1461, 1080);
+	screen.set_visarea(0, 1461-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -6134,32 +6805,123 @@ static INPUT_PORTS_START( tsjam )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tsjam_state::tsjam)
-
+void tsjam_state::tsjam(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510) // no external XTAL
-	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM510(config, m_maincpu); // no external XTAL
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1421, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1421-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1421, 1080);
+	screen.set_visarea(0, 1421-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+
+
+
+
+/***************************************************************************
+
+  Tiger Independence Day (model 78-624)
+  * Sharp SM510 under epoxy (die label 10 16)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class tinday_state : public hh_sm510_state
+{
+public:
+	tinday_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_sm510_state(mconfig, type, tag)
+	{
+		m_inp_lines = 5;
+		m_inp_fixed = 5;
+	}
+
+	void tinday(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( tinday )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Shield")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Fire")
+	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Alert")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Velocity")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Pause")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void tinday_state::tinday(machine_config &config)
+{
+	/* basic machine hardware */
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1463, 1080);
+	screen.set_visarea(0, 1463-1, 0, 1080-1);
+
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -6225,31 +6987,31 @@ static INPUT_PORTS_START( tbatmana )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tbatmana_state::tbatmana)
-
+void tbatmana_state::tbatmana(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, piezo2bit_input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo2bit_r1_w))
-	MCFG_SM510_READ_BA_CB(IOPORT("BA"))
-	MCFG_SM510_READ_B_CB(IOPORT("B"))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::piezo2bit_input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo2bit_r1_w));
+	m_maincpu->read_ba().set_ioport("BA");
+	m_maincpu->read_b().set_ioport("B");
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1478, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1478-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1478, 1080);
+	screen.set_visarea(0, 1478-1, 0, 1080-1);
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, piezo2bit_r1_120k_s1_39k)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(4, piezo2bit_r1_120k_s1_39k);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -6329,30 +7091,30 @@ static INPUT_PORTS_START( tigarden )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, input_changed, nullptr) PORT_NAME("Sound")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tigarden_state::tigarden)
-
+void tigarden_state::tigarden(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM510)
-	MCFG_SM510_R_MASK_OPTION(2) // confirmed
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	SM510(config, m_maincpu);
+	m_maincpu->set_r_mask_option(2); // confirmed
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1515, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1515-1, 0, 1080-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1515, 1080);
+	screen.set_visarea(0, 1515-1, 0, 1080-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -6430,29 +7192,29 @@ static INPUT_PORTS_START( nummunch )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, acl_button, nullptr)
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(nummunch_state::nummunch)
-
+void nummunch_state::nummunch(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SM511)
-	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
-	MCFG_SM510_READ_K_CB(READ8(*this, hh_sm510_state, input_r))
-	MCFG_SM510_WRITE_S_CB(WRITE8(*this, hh_sm510_state, input_w))
-	MCFG_SM510_WRITE_R_CB(WRITE8(*this, hh_sm510_state, piezo_r1_w))
+	SM511(config, m_maincpu);
+	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->read_k().set(FUNC(hh_sm510_state::input_r));
+	m_maincpu->write_s().set(FUNC(hh_sm510_state::input_w));
+	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_r1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 875)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 875-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_svg_region("svg");
+	screen.set_refresh_hz(50);
+	screen.set_size(1920, 875);
+	screen.set_visarea(0, 1920-1, 0, 875-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_svg)
+	TIMER(config, "display_decay").configure_periodic(FUNC(hh_sm510_state::display_decay_tick), attotime::from_msec(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -6622,6 +7384,27 @@ ROM_START( exospace )
 	ROM_LOAD( "exospace.svg", 0, 66790, BAD_DUMP CRC(df31043a) SHA1(2d8caf42894df699e469652e5f448beaebbcc1ae) )
 ROM_END
 
+ROM_START( gnw_opanic )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "op-51", 0x0000, 0x1000, CRC(31c288c9) SHA1(4bfd0fba94a9927cefc925db8196b063c5dd9b19) )
+
+	ROM_REGION( 79616, "svg_top", 0)
+	ROM_LOAD( "gnw_opanic_top.svg", 0, 79616, CRC(208dccc5) SHA1(b3cd3dcc8a00ba3b1b8d93d902f756fe579e4dfc) )
+
+	ROM_REGION( 112809, "svg_bottom", 0)
+	ROM_LOAD( "gnw_opanic_bottom.svg", 0, 112809, CRC(919b9649) SHA1(f3d3c8ca3fed81782a1fcb5a7aff07faea86db07) )
+ROM_END
+
+ROM_START( gnw_dkong )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "dk-52", 0x0000, 0x1000, CRC(5180cbf8) SHA1(5174570a8d6a601226f51e972bac6735535fe11d) )
+
+	ROM_REGION( 176706, "svg_top", 0)
+	ROM_LOAD( "gnw_dkong_top.svg", 0, 176706, CRC(db041556) SHA1(fb0f979dea3ecd25288d341fa80e35b5fd0a8349) )
+
+	ROM_REGION( 145397, "svg_bottom", 0)
+	ROM_LOAD( "gnw_dkong_bottom.svg", 0, 145397, CRC(2c8c9d08) SHA1(658fd0bbccaabb0645b02e5cb81709c4b2a4250e) )
+ROM_END
 
 ROM_START( gnw_mickdon )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -6634,6 +7417,16 @@ ROM_START( gnw_mickdon )
 	ROM_LOAD( "gnw_mickdon_bottom.svg", 0, 122870, CRC(8f06ddf1) SHA1(69d4b785781600abcdfc01b3902df1d0ae3608cf) )
 ROM_END
 
+ROM_START( gnw_ghouse )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "gh-54", 0x0000, 0x1000, CRC(4df12b4d) SHA1(708be5fef8dbd9337f5ab35baaca5bdf21e1f36c) )
+
+	ROM_REGION( 159098, "svg_top", 0)
+	ROM_LOAD( "gnw_ghouse_top.svg", 0, 159098, CRC(96bc58d9) SHA1(eda6a0abde739fb71af3e150751a519e59ef021d) )
+
+	ROM_REGION( 149757, "svg_bottom", 0)
+	ROM_LOAD( "gnw_ghouse_bottom.svg", 0, 149757, CRC(d66ee72c) SHA1(dcbe1c81ee0c7ddb9692858749ce6934f4dd7f30) )
+ROM_END
 
 ROM_START( gnw_dkong2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -6659,6 +7452,45 @@ ROM_START( gnw_mario )
 ROM_END
 
 
+ROM_START( gnw_lboat )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tc-58", 0x0000, 0x1000, CRC(1f88f6a2) SHA1(22fd62127dda43a0ada2fe89b0518eec8cbe2a25) )
+
+	ROM_REGION( 156272, "svg_left", 0)
+	ROM_LOAD( "gnw_lboat_left.svg", 0, 156272, CRC(1f0c18bd) SHA1(ca11c83b4b4d6a91ecb0300cff392e010064ba25) )
+
+	ROM_REGION( 155093, "svg_right", 0)
+	ROM_LOAD( "gnw_lboat_right.svg", 0, 155093, CRC(6f68780a) SHA1(63488693fbb1a8ad4d59da9e4e003eef709926f9) )
+ROM_END
+
+
+ROM_START( gnw_bjack )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "bj-60.program", 0x0000, 0x1000, CRC(8e74f633) SHA1(54b0f65ee716d2820a9ed9c743755d2a2d99ce4d) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "bj-60.melody", 0x000, 0x100, BAD_DUMP CRC(2619224e) SHA1(b65dc590b6eb1de793e980af236ccf8360b3cfee) ) // dumped electronically, decap needed to verify accuracy
+
+	ROM_REGION( 75217, "svg_top", 0)
+	ROM_LOAD( "gnw_bjack_top.svg", 0, 75205, CRC(5eb0956e) SHA1(f7acd148e5478d4c2ddf06cff23c5e40faee2c24) )
+
+	ROM_REGION( 112450, "svg_bottom", 0)
+	ROM_LOAD( "gnw_bjack_bottom.svg", 0, 112438, CRC(9d985b1d) SHA1(cf8af6ce18994f687a5e6fbdda62af4d07a07cf8) )
+ROM_END
+
+
+ROM_START( gnw_squish )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "mg-61", 0x0000, 0x1000, CRC(79cd509c) SHA1(969e5425984ba9e5183c68b38b3588f53d1e8e5d) )
+
+	ROM_REGION( 70300, "svg_top", 0)
+	ROM_LOAD( "gnw_squish_top.svg", 0, 70300, CRC(f1358ba9) SHA1(414d29db64b83a50b20f31b857e4c3a77d19d3c8) )
+
+	ROM_REGION( 279606, "svg_bottom", 0)
+	ROM_LOAD( "gnw_squish_bottom.svg", 0, 279606, CRC(1d4ac23f) SHA1(d6eb78bae5ca18cc5fe5d8a300902766dd9601aa) )
+ROM_END
+
+
 ROM_START( gnw_dkjr )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dj-101", 0x0000, 0x1000, CRC(8dcfb5d1) SHA1(e0ef578e9362eb9a3cab631376df3cf55978f2de) )
@@ -6677,6 +7509,24 @@ ROM_START( gnw_mariocm )
 ROM_END
 
 
+ROM_START( gnw_manhole )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "nh-103", 0x0000, 0x1000, CRC(ec03acf7) SHA1(b74ae672d8f8a155b2ea4ecee9afbaed95ec0ceb) )
+
+	ROM_REGION( 223244, "svg", 0)
+	ROM_LOAD( "gnw_manhole.svg", 0, 223244, CRC(41848e77) SHA1(d7238d1a3f95d8d274f5ff767ebf783bb50e64eb) )
+ROM_END
+
+
+ROM_START( gnw_tfish )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "tf-104", 0x0000, 0x1000, CRC(53cde918) SHA1(bc1e1b8f8b282bb886bb076c1c7ce35d00eca6fc) )
+
+	ROM_REGION( 257278, "svg", 0)
+	ROM_LOAD( "gnw_tfish.svg", 0, 257278, CRC(fc970f4a) SHA1(a73f5ee35b60842707f13edc5d58869fb2ec98cf) )
+ROM_END
+
+
 ROM_START( gnw_smb )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "ym-105.program", 0x0000, 0x1000, CRC(0dff3b12) SHA1(3fa83f88e49ea9d7080fe935ec90ce69acbe8850) )
@@ -6686,6 +7536,18 @@ ROM_START( gnw_smb )
 
 	ROM_REGION( 648209, "svg", 0)
 	ROM_LOAD( "gnw_smb.svg", 0, 648209, CRC(4a6fdb28) SHA1(0a0bc48d82d5b8bf8ef96ef9ce2f87ba6ea850c1) )
+ROM_END
+
+
+ROM_START( gnw_climber )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "dr-106.program", 0x0000, 0x1000, CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "dr-106.melody", 0x000, 0x100, BAD_DUMP CRC(c99d7998) SHA1(4f8cf35b13f8b7654e7186bfd67d197d9053e949) ) // dumped electronically, decap needed to verify accuracy
+
+	ROM_REGION( 542332, "svg", 0)
+	ROM_LOAD( "gnw_climber.svg", 0, 542332, CRC(d7e84c21) SHA1(a5b5b68c8cdb3a09966bfb91b281791bef311248) )
 ROM_END
 
 
@@ -7122,21 +7984,21 @@ ROM_START( tgoldeye )
 ROM_END
 
 
-ROM_START( tinday )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "10_16", 0x0000, 0x1000, CRC(77c2c2f7) SHA1(06326b26d0f6757180724ba0bdeb4110cc7e29d6) )
-
-	ROM_REGION( 1162672, "svg", 0)
-	ROM_LOAD( "tinday.svg", 0, 1162672, CRC(9b9a8047) SHA1(2aeaa71a54cf897d2a5d91133c733613ca229aae) )
-ROM_END
-
-
 ROM_START( tsjam )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "10_23", 0x0000, 0x1000, CRC(6eaabfbd) SHA1(f0ecbd6f65fe72ce2d8a452685be2e77a63fc9f0) )
 
 	ROM_REGION( 1046147, "svg", 0)
 	ROM_LOAD( "tsjam.svg", 0, 1046147, CRC(6d24e1c9) SHA1(ddbfbd85f70ec964c68f982a8ee8070e3786a85e) )
+ROM_END
+
+
+ROM_START( tinday )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "10_16", 0x0000, 0x1000, CRC(77c2c2f7) SHA1(06326b26d0f6757180724ba0bdeb4110cc7e29d6) )
+
+	ROM_REGION( 1162672, "svg", 0)
+	ROM_LOAD( "tinday.svg", 0, 1162672, CRC(9b9a8047) SHA1(2aeaa71a54cf897d2a5d91133c733613ca229aae) )
 ROM_END
 
 
@@ -7175,6 +8037,7 @@ ROM_END
 
 
 //    YEAR  NAME         PARENT   COMP  MACHINE      INPUT        CLASS              INIT        COMPANY, FULLNAME, FLAGS
+// Konami
 CONS( 1989, kdribble,    0,          0, kdribble,    kdribble,    kdribble_state,    empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, ktopgun,     0,          0, ktopgun,     ktopgun,     ktopgun_state,     empty_init, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, kcontra,     0,          0, kcontra,     kcontra,     kcontra_state,     empty_init, "Konami", "Contra (handheld)", MACHINE_SUPPORTS_SAVE )
@@ -7187,26 +8050,35 @@ CONS( 1989, kbilly,      0,          0, kbilly,      kbilly,      kbilly_state, 
 CONS( 1991, kbucky,      0,          0, kbucky,      kbucky,      kbucky_state,      empty_init, "Konami", "Bucky O'Hare (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1991, kgarfld,     0,          0, kgarfld,     kgarfld,     kgarfld_state,     empty_init, "Konami", "Garfield (handheld)", MACHINE_SUPPORTS_SAVE )
 
-// wide screen
+// Nintendo G&W: wide screen
 CONS( 1981, gnw_mmouse,  0,          0, gnw_mmouse,  gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Mickey Mouse", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_egg,     gnw_mmouse, 0, gnw_egg,     gnw_mmouse,  gnw_mmouse_state,  empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, nupogodi,    gnw_mmouse, 0, nupogodi,    gnw_mmouse,  gnw_mmouse_state,  empty_init, "Elektronika", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, exospace,    gnw_mmouse, 0, exospace,    exospace,    gnw_mmouse_state,  empty_init, "Elektronika", "Explorers of Space", MACHINE_SUPPORTS_SAVE )
 
-// multi screen
+// Nintendo G&W: multi screen
+CONS( 1982, gnw_opanic,  0,          0, gnw_opanic,  gnw_opanic,  gnw_opanic_state,  empty_init, "Nintendo", "Game & Watch: Oil Panic", MACHINE_SUPPORTS_SAVE)
+CONS( 1982, gnw_dkong,   0,          0, gnw_dkong,   gnw_dkong,   gnw_dkong_state,   empty_init, "Nintendo", "Game & Watch: Donkey Kong", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gnw_mickdon, 0,          0, gnw_mickdon, gnw_mickdon, gnw_mickdon_state, empty_init, "Nintendo", "Game & Watch: Mickey & Donald", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gnw_ghouse,  0,          0, gnw_ghouse,  gnw_ghouse,  gnw_ghouse_state,  empty_init, "Nintendo", "Game & Watch: Green House", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_dkong2,  0,          0, gnw_dkong2,  gnw_dkong2,  gnw_dkong2_state,  empty_init, "Nintendo", "Game & Watch: Donkey Kong II", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mario,   0,          0, gnw_mario,   gnw_mario,   gnw_mario_state,   empty_init, "Nintendo", "Game & Watch: Mario Bros.", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_lboat,   0,          0, gnw_lboat,   gnw_lboat,   gnw_lboat_state,   empty_init, "Nintendo", "Game & Watch: Lifeboat", MACHINE_SUPPORTS_SAVE)
+CONS( 1985, gnw_bjack,   0,          0, gnw_bjack,   gnw_bjack,   gnw_bjack_state,   empty_init, "Nintendo", "Game & Watch: Black Jack", MACHINE_SUPPORTS_SAVE)
+CONS( 1986, gnw_squish,  0,          0, gnw_squish,  gnw_squish,  gnw_squish_state,  empty_init, "Nintendo", "Game & Watch: Squish", MACHINE_SUPPORTS_SAVE )
 
-// new wide screen
+// Nintendo G&W: new wide screen
 CONS( 1982, gnw_dkjr,    0,          0, gnw_dkjr,    gnw_dkjr,    gnw_dkjr_state,    empty_init, "Nintendo", "Game & Watch: Donkey Kong Jr. (new wide screen)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gnw_mariocm, 0,          0, gnw_mariocm, gnw_mariocm, gnw_mariocm_state, empty_init, "Nintendo", "Game & Watch: Mario's Cement Factory (new wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1983, gnw_manhole, 0,          0, gnw_manhole, gnw_manhole, gnw_manhole_state, empty_init, "Nintendo", "Game & Watch: Manhole (new wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1985, gnw_tfish,   0,          0, gnw_tfish,   gnw_tfish,   gnw_tfish_state,   empty_init, "Nintendo", "Game & Watch: Tropical Fish", MACHINE_SUPPORTS_SAVE )
 CONS( 1988, gnw_smb,     0,          0, gnw_smb,     gnw_smb,     gnw_smb_state,     empty_init, "Nintendo", "Game & Watch: Super Mario Bros. (new wide screen)", MACHINE_SUPPORTS_SAVE )
+CONS( 1988, gnw_climber, 0,          0, gnw_climber, gnw_climber, gnw_climber_state, empty_init, "Nintendo", "Game & Watch: Climber (new wide screen)", MACHINE_SUPPORTS_SAVE )
 
-// micro vs.
-CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  empty_init, "Nintendo", "Game & Watch: Boxing", MACHINE_SUPPORTS_SAVE )
+// Nintendo G&W: micro vs. system (actually, no official Game & Watch logo anywhere)
+CONS( 1984, gnw_boxing,  0,          0, gnw_boxing,  gnw_boxing,  gnw_boxing_state,  empty_init, "Nintendo", "Micro Vs. System: Boxing", MACHINE_SUPPORTS_SAVE )
 
-// 7-xxx/78-xxx models
+// Tiger 7-xxx/78-xxx models
 CONS( 1989, tgaunt,      0,          0, tgaunt,      tgaunt,      tgaunt_state,      empty_init, "Tiger Electronics (licensed from Tengen)", "Gauntlet (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1991, trobhood,    tgaunt,     0, trobhood,    trobhood,    tgaunt_state,      empty_init, "Tiger Electronics", "Robin Hood (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1989, tddragon,    0,          0, tddragon,    tddragon,    tddragon_state,    empty_init, "Tiger Electronics (licensed from Technos/Tradewest)", "Double Dragon (handheld)", MACHINE_SUPPORTS_SAVE )
@@ -7253,12 +8125,12 @@ CONS( 1995, tbatfor,     0,          0, tbatfor,     tbatfor,     tbatfor_state,
 CONS( 1995, tjdredd,     0,          0, tjdredd,     tjdredd,     tjdredd_state,     empty_init, "Tiger Electronics", "Judge Dredd (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1995, tapollo13,   0,          0, tapollo13,   tapollo13,   tapollo13_state,   empty_init, "Tiger Electronics", "Apollo 13 (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1995, tgoldeye,    0,          0, tgoldeye,    tgoldeye,    tgoldeye_state,    empty_init, "Tiger Electronics", "007: GoldenEye (handheld)", MACHINE_SUPPORTS_SAVE )
-CONS( 1996, tinday,      0,          0, tinday,      tinday,      tinday_state,      empty_init, "Tiger Electronics", "Independence Day (handheld)", MACHINE_SUPPORTS_SAVE )
 CONS( 1996, tsjam,       0,          0, tsjam,       tsjam,       tsjam_state,       empty_init, "Tiger Electronics", "Space Jam (handheld)", MACHINE_SUPPORTS_SAVE )
+CONS( 1996, tinday,      0,          0, tinday,      tinday,      tinday_state,      empty_init, "Tiger Electronics", "Independence Day (handheld)", MACHINE_SUPPORTS_SAVE )
 
-// 72-xxx models
+// Tiger 72-xxx models
 CONS( 1992, tbatmana,    0,          0, tbatmana,    tbatmana,    tbatmana_state,    empty_init, "Tiger Electronics", "Batman: The Animated Series (handheld)", MACHINE_SUPPORTS_SAVE )
 
+// misc
 CONS( 1983, tigarden,    0,          0, tigarden,    tigarden,    tigarden_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE )
-
 CONS( 1989, nummunch,    0,          0, nummunch,    nummunch,    nummunch_state,    empty_init, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE )

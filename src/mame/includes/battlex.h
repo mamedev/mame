@@ -6,6 +6,8 @@
 
 ***************************************************************************/
 
+#include "emupal.h"
+
 class battlex_state : public driver_device
 {
 public:

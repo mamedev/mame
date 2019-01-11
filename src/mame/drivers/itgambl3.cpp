@@ -43,6 +43,7 @@
 #include "emu.h"
 #include "cpu/h8/h83048.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -52,21 +53,27 @@
 class itgambl3_state : public driver_device
 {
 public:
-	itgambl3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	itgambl3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
+	void itgambl3(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	int m_test_x;
 	int m_test_y;
 	int m_start_offs;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(itgambl3);
-	uint32_t screen_update_itgambl3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	void itgambl3(machine_config &config);
+
+	void itgambl3_palette(palette_device &palette) const;
+	uint32_t screen_update_itgambl3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void itgambl3_map(address_map &map);
 };
 
@@ -243,16 +250,14 @@ void itgambl3_state::machine_reset()
 }
 
 /* default 444 palette for debug purpose*/
-PALETTE_INIT_MEMBER(itgambl3_state, itgambl3)
+void itgambl3_state::itgambl3_palette(palette_device &palette) const
 {
-	int x,r,g,b;
-
-	for(x=0;x<0x100;x++)
+	for (int x = 0; x < 0x100; x++)
 	{
-		r = (x & 0xf)*0x11;
-		g = ((x & 0x3c)>>2)*0x11;
-		b = ((x & 0xf0)>>4)*0x11;
-		palette.set_pen_color(x,rgb_t(r,g,b));
+		int const r = (x & 0xf) * 0x11;
+		int const g = ((x & 0x3c) >> 2) * 0x11;
+		int const b = ((x & 0xf0) >> 4) * 0x11;
+		palette.set_pen_color(x, rgb_t(r, g, b));
 	}
 }
 
@@ -263,11 +268,11 @@ PALETTE_INIT_MEMBER(itgambl3_state, itgambl3)
 
 MACHINE_CONFIG_START(itgambl3_state::itgambl3)
 
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", H83044, MAIN_CLOCK) /* wrong CPU, but we have not a M16C core ATM */
+	// basic machine hardware
+	MCFG_DEVICE_ADD("maincpu", H83044, MAIN_CLOCK) // wrong CPU, but we have not a M16C core ATM
 	MCFG_DEVICE_PROGRAM_MAP(itgambl3_map)
 
-	/* video hardware */
+	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -275,14 +280,12 @@ MACHINE_CONFIG_START(itgambl3_state::itgambl3)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(itgambl3_state, screen_update_itgambl3)
 
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_itgambl3);
+	PALETTE(config, m_palette, FUNC(itgambl3_state::itgambl3_palette), 0x200);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_itgambl3)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(itgambl3_state, itgambl3)
-
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, MAIN_CLOCK/16, okim6295_device::PIN7_HIGH) /* 1MHz */
+	MCFG_DEVICE_ADD("oki", OKIM6295, MAIN_CLOCK/16, okim6295_device::PIN7_HIGH) // 1MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

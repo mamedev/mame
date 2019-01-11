@@ -6,9 +6,10 @@
  * includes/vc4000.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_VC4000_H
 #define MAME_INCLUDES_VC4000_H
+
+#pragma once
 
 #include "audio/vc4000.h"
 #include "cpu/s2650/s2650.h"
@@ -19,6 +20,7 @@
 #include "bus/vc4000/slot.h"
 #include "bus/vc4000/rom.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 // define this to use digital inputs instead of the slow
@@ -26,60 +28,11 @@
 #define ANALOG_HACK
 
 
-struct SPRITE_HELPER
-{
-	uint8_t bitmap[10],x1,x2,y1,y2, res1, res2;
-};
-
-struct SPRITE
-{
-	const SPRITE_HELPER *data;
-	int mask;
-	int state;
-	int delay;
-	int size;
-	int y;
-	uint8_t scolor;
-	int finished;
-	int finished_now;
-};
-
-struct vc4000_video_t
-{
-	SPRITE sprites[4];
-	int line;
-	uint8_t sprite_collision;
-	uint8_t background_collision;
-	union
-	{
-		uint8_t data[0x100];
-		struct
-		{
-			SPRITE_HELPER sprites[3];
-			uint8_t res[0x10];
-			SPRITE_HELPER sprite4;
-			uint8_t res2[0x30];
-			uint8_t grid[20][2];
-			uint8_t grid_control[5];
-			uint8_t res3[0x13];
-			uint8_t sprite_sizes;
-			uint8_t sprite_colors[2];
-			uint8_t score_control;
-			uint8_t res4[2];
-			uint8_t background;
-			uint8_t sound;
-			uint8_t bcd[2];
-			uint8_t background_collision;
-			uint8_t sprite_collision;
-		} d;
-	} reg;
-} ;
-
 class vc4000_state : public driver_device
 {
 public:
-	vc4000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	vc4000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_cassette(*this, "cassette"),
@@ -103,6 +56,64 @@ public:
 #endif
 	{ }
 
+	void cx3000tc(machine_config &config);
+	void mpu1000(machine_config &config);
+	void vc4000(machine_config &config);
+	void database(machine_config &config);
+	void h21(machine_config &config);
+	void rwtrntcs(machine_config &config);
+	void elektor(machine_config &config);
+
+private:
+	struct SPRITE_HELPER
+	{
+		uint8_t bitmap[10],x1,x2,y1,y2, res1, res2;
+	};
+
+	struct SPRITE
+	{
+		const SPRITE_HELPER *data;
+		int mask;
+		int state;
+		int delay;
+		int size;
+		int y;
+		uint8_t scolor;
+		int finished;
+		int finished_now;
+	};
+
+	struct vc4000_video_t
+	{
+		SPRITE sprites[4];
+		int line;
+		uint8_t sprite_collision;
+		uint8_t background_collision;
+		union
+		{
+			uint8_t data[0x100];
+			struct
+			{
+				SPRITE_HELPER sprites[3];
+				uint8_t res[0x10];
+				SPRITE_HELPER sprite4;
+				uint8_t res2[0x30];
+				uint8_t grid[20][2];
+				uint8_t grid_control[5];
+				uint8_t res3[0x13];
+				uint8_t sprite_sizes;
+				uint8_t sprite_colors[2];
+				uint8_t score_control;
+				uint8_t res4[2];
+				uint8_t background;
+				uint8_t sound;
+				uint8_t bcd[2];
+				uint8_t background_collision;
+				uint8_t sprite_collision;
+			} d;
+		} reg;
+	} ;
+
 	DECLARE_WRITE8_MEMBER(vc4000_sound_ctl);
 	DECLARE_READ8_MEMBER(vc4000_key_r);
 	DECLARE_READ8_MEMBER(vc4000_video_r);
@@ -122,22 +133,15 @@ public:
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(vc4000);
+	void vc4000_palette(palette_device &palette) const;
 	uint32_t screen_update_vc4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vc4000_video_line);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(vc4000);
 
-	void cx3000tc(machine_config &config);
-	void mpu1000(machine_config &config);
-	void vc4000(machine_config &config);
-	void database(machine_config &config);
-	void h21(machine_config &config);
-	void rwtrntcs(machine_config &config);
-	void elektor(machine_config &config);
 	void elektor_mem(address_map &map);
 	void vc4000_mem(address_map &map);
-protected:
-	required_device<cpu_device> m_maincpu;
+
+	required_device<s2650_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	optional_device<cassette_image_device> m_cassette;
 	required_device<vc4000_cart_slot_device> m_cart;

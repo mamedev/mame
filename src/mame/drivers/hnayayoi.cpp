@@ -44,7 +44,6 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
-#include "machine/74259.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "video/mc6845.h"
@@ -81,7 +80,7 @@ WRITE8_MEMBER(hnayayoi_state::keyboard_w)
 
 WRITE8_MEMBER(hnayayoi_state::adpcm_data_w)
 {
-	m_msm->data_w(data);
+	m_msm->write_data(data);
 }
 
 
@@ -119,18 +118,18 @@ void hnayayoi_state::hnayayoi_io_map(address_map &map)
 	map(0x00, 0x01).w("ymsnd", FUNC(ym2203_device::write));
 	map(0x02, 0x03).r("ymsnd", FUNC(ym2203_device::read));
 	map(0x04, 0x04).portr("DSW3");
-	map(0x06, 0x06).w(this, FUNC(hnayayoi_state::adpcm_data_w));
+	map(0x06, 0x06).w(FUNC(hnayayoi_state::adpcm_data_w));
 	map(0x08, 0x08).w("crtc", FUNC(hd6845_device::address_w));
 	map(0x09, 0x09).w("crtc", FUNC(hd6845_device::register_w));
-	map(0x0a, 0x0a).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
-	map(0x0c, 0x0c).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
-	map(0x20, 0x27).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0x40, 0x40).w(this, FUNC(hnayayoi_state::keyboard_w));
-	map(0x41, 0x41).r(this, FUNC(hnayayoi_state::keyboard_0_r));
-	map(0x42, 0x42).r(this, FUNC(hnayayoi_state::keyboard_1_r));
+	map(0x0a, 0x0a).w(FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
+	map(0x0c, 0x0c).w(FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
+	map(0x20, 0x27).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0x40, 0x40).w(FUNC(hnayayoi_state::keyboard_w));
+	map(0x41, 0x41).r(FUNC(hnayayoi_state::keyboard_0_r));
+	map(0x42, 0x42).r(FUNC(hnayayoi_state::keyboard_1_r));
 	map(0x43, 0x43).portr("COIN");
-	map(0x60, 0x61).w(this, FUNC(hnayayoi_state::hnayayoi_palbank_w));
-	map(0x62, 0x67).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
+	map(0x60, 0x61).w(FUNC(hnayayoi_state::hnayayoi_palbank_w));
+	map(0x62, 0x67).w(FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
 }
 
 void hnayayoi_state::hnfubuki_map(address_map &map)
@@ -141,18 +140,18 @@ void hnayayoi_state::hnfubuki_map(address_map &map)
 	map(0xff00, 0xff01).w("ymsnd", FUNC(ym2203_device::write));
 	map(0xff02, 0xff03).r("ymsnd", FUNC(ym2203_device::read));
 	map(0xff04, 0xff04).portr("DSW3");
-	map(0xff06, 0xff06).w(this, FUNC(hnayayoi_state::adpcm_data_w));
+	map(0xff06, 0xff06).w(FUNC(hnayayoi_state::adpcm_data_w));
 	map(0xff08, 0xff08).w("crtc", FUNC(hd6845_device::address_w));
 	map(0xff09, 0xff09).w("crtc", FUNC(hd6845_device::register_w));
-	map(0xff0a, 0xff0a).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
-	map(0xff0c, 0xff0c).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
-	map(0xff20, 0xff27).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xff40, 0xff40).w(this, FUNC(hnayayoi_state::keyboard_w));
-	map(0xff41, 0xff41).r(this, FUNC(hnayayoi_state::keyboard_0_r));
-	map(0xff42, 0xff42).r(this, FUNC(hnayayoi_state::keyboard_1_r));
+	map(0xff0a, 0xff0a).w(FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
+	map(0xff0c, 0xff0c).w(FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
+	map(0xff20, 0xff27).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0xff40, 0xff40).w(FUNC(hnayayoi_state::keyboard_w));
+	map(0xff41, 0xff41).r(FUNC(hnayayoi_state::keyboard_0_r));
+	map(0xff42, 0xff42).r(FUNC(hnayayoi_state::keyboard_1_r));
 	map(0xff43, 0xff43).portr("COIN");
-	map(0xff60, 0xff61).w(this, FUNC(hnayayoi_state::hnayayoi_palbank_w));
-	map(0xff62, 0xff67).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
+	map(0xff60, 0xff61).w(FUNC(hnayayoi_state::hnayayoi_palbank_w));
+	map(0xff62, 0xff67).w(FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
 }
 
 void hnayayoi_state::untoucha_map(address_map &map)
@@ -168,16 +167,16 @@ void hnayayoi_state::untoucha_io_map(address_map &map)
 	map(0x10, 0x10).w("ymsnd", FUNC(ym2203_device::control_port_w));
 	map(0x11, 0x11).r("ymsnd", FUNC(ym2203_device::status_port_r));
 	map(0x12, 0x12).w("crtc", FUNC(hd6845_device::address_w));
-	map(0x13, 0x13).w(this, FUNC(hnayayoi_state::adpcm_data_w));
+	map(0x13, 0x13).w(FUNC(hnayayoi_state::adpcm_data_w));
 	map(0x14, 0x14).portr("COIN");
-	map(0x15, 0x15).r(this, FUNC(hnayayoi_state::keyboard_1_r));
-	map(0x16, 0x16).r(this, FUNC(hnayayoi_state::keyboard_0_r));  // bit 7 = blitter busy flag
-	map(0x17, 0x17).w(this, FUNC(hnayayoi_state::keyboard_w));
-	map(0x18, 0x19).w(this, FUNC(hnayayoi_state::hnayayoi_palbank_w));
-	map(0x1a, 0x1f).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
-	map(0x20, 0x20).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
-	map(0x28, 0x28).w(this, FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
-	map(0x30, 0x37).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x15, 0x15).r(FUNC(hnayayoi_state::keyboard_1_r));
+	map(0x16, 0x16).r(FUNC(hnayayoi_state::keyboard_0_r));  // bit 7 = blitter busy flag
+	map(0x17, 0x17).w(FUNC(hnayayoi_state::keyboard_w));
+	map(0x18, 0x19).w(FUNC(hnayayoi_state::hnayayoi_palbank_w));
+	map(0x1a, 0x1f).w(FUNC(hnayayoi_state::dynax_blitter_rev1_param_w));
+	map(0x20, 0x20).w(FUNC(hnayayoi_state::dynax_blitter_rev1_clear_w));
+	map(0x28, 0x28).w(FUNC(hnayayoi_state::dynax_blitter_rev1_start_w));
+	map(0x30, 0x37).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x50, 0x50).w("ymsnd", FUNC(ym2203_device::write_port_w));
 	map(0x51, 0x51).r("ymsnd", FUNC(ym2203_device::read_port_r));
 	map(0x52, 0x52).w("crtc", FUNC(hd6845_device::register_w));
@@ -543,82 +542,79 @@ void hnayayoi_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
-
+void hnayayoi_state::hnayayoi(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 20000000/4 )        /* 5 MHz ???? */
-	MCFG_DEVICE_PROGRAM_MAP(hnayayoi_map)
-	MCFG_DEVICE_IO_MAP(hnayayoi_io_map)
+	Z80(config, m_maincpu, 20000000/4);		/* 5 MHz ???? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &hnayayoi_state::hnayayoi_map);
+	m_maincpu->set_addrmap(AS_IO, &hnayayoi_state::hnayayoi_io_map);
 
-	MCFG_DEVICE_ADD("nmiclock", CLOCK, 8000)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, hnayayoi_state, nmi_clock_w))
+	CLOCK(config, "nmiclock", 8000).signal_handler().set(FUNC(hnayayoi_state::nmi_clock_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, hnayayoi_state, coin_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("msm", msm5205_device, vclk_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, hnayayoi_state, nmi_enable_w)) MCFG_DEVCB_INVERT
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(hnayayoi_state::coin_counter_w));
+	m_mainlatch->q_out_cb<2>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();
+	m_mainlatch->q_out_cb<3>().set(m_msm, FUNC(msm5205_device::vclk_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(hnayayoi_state::nmi_enable_w)).invert();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(20_MHz_XTAL / 2, 632, 0, 512, 263, 0, 243)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(20_MHz_XTAL / 2, 632, 0, 512, 263, 0, 243);
+	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
-	MCFG_DEVICE_ADD("crtc", HD6845, 20_MHz_XTAL / 8)
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
-	MCFG_MC6845_UPDATE_ROW_CB(hnayayoi_state, hnayayoi_update_row)
+	hd6845_device &crtc(HD6845(config, "crtc", 20_MHz_XTAL / 8));
+	crtc.set_screen("screen");
+	crtc.set_char_width(4);
+	crtc.set_show_border_area(false);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
+	crtc.set_update_row_callback(FUNC(hnayayoi_state::hnayayoi_update_row), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 20000000/8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, hnayayoi_state, irqhandler))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 20000000/8));
+	ymsnd.irq_handler().set(FUNC(hnayayoi_state::irqhandler));
+	ymsnd.port_a_read_callback().set_ioport("DSW1");
+	ymsnd.port_b_read_callback().set_ioport("DSW2");
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 0.25);
+	ymsnd.add_route(2, "mono", 0.25);
+	ymsnd.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(hnayayoi_state::hnfubuki)
+void hnayayoi_state::hnfubuki(machine_config &config)
+{
 	hnayayoi(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hnfubuki_map)
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
+	m_maincpu->set_addrmap(AS_PROGRAM, &hnayayoi_state::hnfubuki_map);
+	m_maincpu->set_addrmap(AS_IO, address_map_constructor());
 
-	MCFG_DEVICE_MODIFY("mainlatch") // D5
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, hnayayoi_state, nmi_enable_w))
-MACHINE_CONFIG_END
+	// D5
+	m_mainlatch->q_out_cb<4>().set(FUNC(hnayayoi_state::nmi_enable_w));
+}
 
-MACHINE_CONFIG_START(hnayayoi_state::untoucha)
+void hnayayoi_state::untoucha(machine_config &config)
+{
 	hnayayoi(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(untoucha_map)
-	MCFG_DEVICE_IO_MAP(untoucha_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &hnayayoi_state::untoucha_map);
+	m_maincpu->set_addrmap(AS_IO, &hnayayoi_state::untoucha_io_map);
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("msm", msm5205_device, vclk_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, hnayayoi_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // ?
+	m_mainlatch->q_out_cb<1>().set(m_msm, FUNC(msm5205_device::vclk_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(hnayayoi_state::nmi_enable_w));
+	m_mainlatch->q_out_cb<3>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();
+	m_mainlatch->q_out_cb<4>().set_nop(); // ?
 
-	MCFG_DEVICE_MODIFY("crtc")
-	MCFG_MC6845_UPDATE_ROW_CB(hnayayoi_state, untoucha_update_row)
+	subdevice<hd6845_device>("crtc")->set_update_row_callback(FUNC(hnayayoi_state::untoucha_update_row), this);
 
 	MCFG_VIDEO_START_OVERRIDE(hnayayoi_state,untoucha)
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

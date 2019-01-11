@@ -13,12 +13,6 @@
 
 #pragma once
 
-// port setup
-#define MCFG_MN10200_READ_PORT_CB(X, _devcb) \
-	devcb = &downcast<mn10200_device &>(*device).set_read_port##X##_callback(DEVCB_##_devcb);
-#define MCFG_MN10200_WRITE_PORT_CB(X, _devcb) \
-	devcb = &downcast<mn10200_device &>(*device).set_write_port##X##_callback(DEVCB_##_devcb);
-
 enum
 {
 	MN10200_PORT0 = 0,
@@ -43,17 +37,8 @@ class mn10200_device : public cpu_device
 {
 public:
 	// configuration helpers
-	template <class Object> devcb_base &set_read_port0_callback(Object &&cb) { return m_read_port0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_port1_callback(Object &&cb) { return m_read_port1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_port2_callback(Object &&cb) { return m_read_port2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_port3_callback(Object &&cb) { return m_read_port3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_port4_callback(Object &&cb) { return m_read_port4.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_write_port0_callback(Object &&cb) { return m_write_port0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_port1_callback(Object &&cb) { return m_write_port1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_port2_callback(Object &&cb) { return m_write_port2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_port3_callback(Object &&cb) { return m_write_port3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_port4_callback(Object &&cb) { return m_write_port4.set_callback(std::forward<Object>(cb)); }
+	template <std::size_t Port> auto read_port() { return m_read_port[Port].bind(); }
+	template <std::size_t Port> auto write_port() { return m_write_port[Port].bind(); }
 
 	DECLARE_READ8_MEMBER(io_control_r);
 	DECLARE_WRITE8_MEMBER(io_control_w);
@@ -95,8 +80,8 @@ private:
 	address_space *m_program;
 
 	// i/o handlers
-	devcb_read8 m_read_port0, m_read_port1, m_read_port2, m_read_port3, m_read_port4;
-	devcb_write8 m_write_port0, m_write_port1, m_write_port2, m_write_port3, m_write_port4;
+	devcb_read8 m_read_port[5];
+	devcb_write8 m_write_port[5];
 
 	int m_cycles;
 

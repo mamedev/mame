@@ -16,6 +16,8 @@
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
 
+#include "imagedev/floppy.h"
+
 #include "machine/i8255.h"
 #include "machine/mc146818.h"
 #include "machine/ram.h"
@@ -25,6 +27,7 @@
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 class orion_state : public radio86_state
@@ -51,6 +54,10 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
+	void orion128ms(machine_config &config);
+	void orion128(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(orion128_system_r);
 	DECLARE_WRITE8_MEMBER(orion128_system_w);
 	DECLARE_READ8_MEMBER(orion128_romdisk_r);
@@ -74,11 +81,7 @@ public:
 	DECLARE_WRITE8_MEMBER(orionpro_io_w);
 	DECLARE_MACHINE_START(orion128);
 	DECLARE_MACHINE_RESET(orion128);
-	DECLARE_VIDEO_START(orion128);
-	DECLARE_PALETTE_INIT(orion128);
-	DECLARE_MACHINE_START(orionz80);
-	DECLARE_MACHINE_RESET(orionz80);
-	DECLARE_MACHINE_RESET(orionpro);
+	void orion128_palette(palette_device &palette) const;
 	uint32_t screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(orionz80_interrupt);
 	DECLARE_READ8_MEMBER(orion_romdisk_porta_r);
@@ -86,18 +89,13 @@ public:
 	DECLARE_WRITE8_MEMBER(orion_romdisk_portc_w);
 	DECLARE_FLOPPY_FORMATS( orion_floppy_formats );
 
-	void orionz80(machine_config &config);
-	void orion128ms(machine_config &config);
-	void orion128(machine_config &config);
-	void orionpro(machine_config &config);
-	void orionz80ms(machine_config &config);
 	void orion128_io(address_map &map);
 	void orion128_mem(address_map &map);
 	void orionpro_io(address_map &map);
 	void orionpro_mem(address_map &map);
 	void orionz80_io(address_map &map);
 	void orionz80_mem(address_map &map);
-protected:
+
 	uint8_t m_orion128_video_mode;
 	uint8_t m_orion128_video_page;
 	uint8_t m_orion128_video_width;
@@ -139,6 +137,36 @@ protected:
 	void orionz80_switch_bank();
 	void orion_set_video_mode(int width);
 	void orionpro_bank_switch();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+};
+
+class orion_z80_state : public orion_state
+{
+public:
+	orion_z80_state(const machine_config &mconfig, device_type type, const char *tag)
+		: orion_state(mconfig, type, tag)
+	{ }
+
+	void orionz80(machine_config &config);
+	void orionz80ms(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+};
+
+class orion_pro_state : public orion_state
+{
+public:
+	orion_pro_state(const machine_config &mconfig, device_type type, const char *tag)
+		: orion_state(mconfig, type, tag)
+	{ }
+
+	void orionpro(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
 };
 
 #endif // MAME_INCLUDES_ORION_H

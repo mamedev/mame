@@ -69,7 +69,7 @@ public:
 
 	void globalvr(machine_config &config);
 	void globalvr_map(address_map &map);
-protected:
+private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;

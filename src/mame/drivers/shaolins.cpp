@@ -34,11 +34,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(shaolins_state::interrupt)
 
 void shaolins_state::shaolins_map(address_map &map)
 {
-	map(0x0000, 0x0000).w(this, FUNC(shaolins_state::nmi_w));   /* bit 0 = flip screen, bit 1 = nmi enable, bit 2 = ? */
+	map(0x0000, 0x0000).w(FUNC(shaolins_state::nmi_w));   /* bit 0 = flip screen, bit 1 = nmi enable, bit 2 = ? */
 														/* bit 3, bit 4 = coin counters */
 	map(0x0100, 0x0100).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x0300, 0x0300).w("sn1", FUNC(sn76489a_device::write)); /* trigger chip to read from latch. The program always */
-	map(0x0400, 0x0400).w("sn2", FUNC(sn76489a_device::write)); /* writes the same number as the latch, so we don't */
+	map(0x0300, 0x0300).w("sn1", FUNC(sn76489a_device::command_w)); /* trigger chip to read from latch. The program always */
+	map(0x0400, 0x0400).w("sn2", FUNC(sn76489a_device::command_w)); /* writes the same number as the latch, so we don't */
 															/* bother emulating them. */
 	map(0x0500, 0x0500).portr("DSW1");
 	map(0x0600, 0x0600).portr("DSW2");
@@ -48,13 +48,13 @@ void shaolins_state::shaolins_map(address_map &map)
 	map(0x0703, 0x0703).portr("DSW3");
 	map(0x0800, 0x0800).nopw();                    /* latch for 76496 #0 */
 	map(0x1000, 0x1000).nopw();                    /* latch for 76496 #1 */
-	map(0x1800, 0x1800).w(this, FUNC(shaolins_state::palettebank_w));
-	map(0x2000, 0x2000).w(this, FUNC(shaolins_state::scroll_w));
+	map(0x1800, 0x1800).w(FUNC(shaolins_state::palettebank_w));
+	map(0x2000, 0x2000).w(FUNC(shaolins_state::scroll_w));
 	map(0x2800, 0x2bff).ram();                         /* RAM BANK 2 */
 	map(0x3000, 0x30ff).ram();                         /* RAM BANK 1 */
 	map(0x3100, 0x33ff).ram().share("spriteram");
-	map(0x3800, 0x3bff).ram().w(this, FUNC(shaolins_state::colorram_w)).share("colorram");
-	map(0x3c00, 0x3fff).ram().w(this, FUNC(shaolins_state::videoram_w)).share("videoram");
+	map(0x3800, 0x3bff).ram().w(FUNC(shaolins_state::colorram_w)).share("colorram");
+	map(0x3c00, 0x3fff).ram().w(FUNC(shaolins_state::videoram_w)).share("videoram");
 	map(0x4000, 0x5fff).rom();                         /* Machine checks for extra rom */
 	map(0x6000, 0xffff).rom();
 }
@@ -199,7 +199,7 @@ MACHINE_CONFIG_START(shaolins_state::shaolins)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/12)        /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(shaolins_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", shaolins_state, interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -208,12 +208,10 @@ MACHINE_CONFIG_START(shaolins_state::shaolins)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(shaolins_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shaolins)
-	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(shaolins_state, shaolins)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shaolins);
+	PALETTE(config, m_palette, FUNC(shaolins_state::shaolins_palette), 16*8*16+16*8*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

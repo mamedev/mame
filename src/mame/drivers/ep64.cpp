@@ -188,11 +188,16 @@ public:
 		m_cassette1(*this, CASSETTE1_TAG),
 		m_cassette2(*this, CASSETTE2_TAG),
 		m_cart(*this, "cartslot"),
+		m_exp(*this, EP64_EXPANSION_BUS_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, Z80_TAG),
 		m_y(*this, "Y%u", 0)
 	{ }
 
+	void ep128(machine_config &config);
+	void ep64(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dave_device> m_dave;
 	required_device<nick_device> m_nick;
@@ -201,6 +206,7 @@ public:
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
 	required_device<generic_slot_device> m_cart;
+	required_device<ep64_expansion_bus_slot_device> m_exp;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_ioport_array<10> m_y;
@@ -217,8 +223,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
-	void ep128(machine_config &config);
-	void ep64(machine_config &config);
 	void dave_128k_mem(address_map &map);
 	void dave_64k_mem(address_map &map);
 	void dave_io(address_map &map);
@@ -410,9 +414,9 @@ void ep64_state::dave_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x80, 0x8f).m(m_nick, FUNC(nick_device::vio_map));
-	map(0xb5, 0xb5).rw(this, FUNC(ep64_state::rd0_r), FUNC(ep64_state::wr0_w));
-	map(0xb6, 0xb6).r(this, FUNC(ep64_state::rd1_r)).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0xb7, 0xb7).w(this, FUNC(ep64_state::wr2_w));
+	map(0xb5, 0xb5).rw(FUNC(ep64_state::rd0_r), FUNC(ep64_state::wr0_w));
+	map(0xb6, 0xb6).r(FUNC(ep64_state::rd1_r)).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0xb7, 0xb7).w(FUNC(ep64_state::wr2_w));
 }
 
 
@@ -554,7 +558,7 @@ void ep64_state::machine_reset()
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	wr0_w(program, 0, 0);
-	machine().device<output_latch_device>("cent_data_out")->write(program, 0, 0);
+	subdevice<output_latch_device>("cent_data_out")->write(0);
 	wr2_w(program, 0, 0);
 }
 
@@ -568,70 +572,82 @@ void ep64_state::machine_reset()
 //  MACHINE_CONFIG( ep64 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ep64_state::ep64)
+void ep64_state::ep64(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(ep64_mem)
-	MCFG_DEVICE_IO_MAP(ep64_io)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ep64_state::ep64_mem);
+	m_maincpu->set_addrmap(AS_IO, &ep64_state::ep64_io);
 
 	// video hardware
-	MCFG_NICK_ADD(NICK_TAG, SCREEN_TAG, XTAL(8'000'000))
-	MCFG_NICK_VIRQ_CALLBACK(WRITELINE(DAVE_TAG, dave_device, int1_w))
+	screen_device& screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(ENTERPRISE_SCREEN_WIDTH, ENTERPRISE_SCREEN_HEIGHT);
+	screen.set_visarea(0, ENTERPRISE_SCREEN_WIDTH-1, 0, ENTERPRISE_SCREEN_HEIGHT-1);
+	screen.set_screen_update(NICK_TAG, FUNC(nick_device::screen_update));
+
+	NICK(config, m_nick, XTAL(8'000'000), SCREEN_TAG);
+	m_nick->virq_wr_callback().set(m_dave, FUNC(dave_device::int1_w));
 
 	// sound hardware
-	MCFG_DAVE_ADD(DAVE_TAG, XTAL(8'000'000), dave_64k_mem, dave_io)
-	MCFG_DAVE_IRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	DAVE(config, m_dave, XTAL(8'000'000));
+	m_dave->set_addrmap(AS_PROGRAM, &ep64_state::dave_64k_mem);
+	m_dave->set_addrmap(AS_IO, &ep64_state::dave_io);
+	m_dave->irq_wr().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
+	m_dave->add_route(0, "lspeaker", 0.25);
+	m_dave->add_route(1, "rspeaker", 0.25);
 
 	// devices
-	MCFG_EP64_EXPANSION_BUS_SLOT_ADD(EP64_EXPANSION_BUS_TAG, nullptr)
-	MCFG_EP64_EXPANSION_BUS_SLOT_DAVE(DAVE_TAG)
-	MCFG_EP64_EXPANSION_BUS_SLOT_IRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_EP64_EXPANSION_BUS_SLOT_NMI_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_NMI))
-	MCFG_EP64_EXPANSION_BUS_SLOT_WAIT_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
+	EP64_EXPANSION_BUS_SLOT(config, m_exp, nullptr);
+	m_exp->set_dave_tag(m_dave);
+	m_exp->irq_wr().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_exp->nmi_wr().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_exp->wait_wr().set_inputline(m_maincpu, Z80_INPUT_LINE_BOGUSWAIT);
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, ep64_state, write_centronics_busy))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(ep64_state::write_centronics_busy));
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(WRITELINE(DAVE_TAG, dave_device, int2_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_dave, FUNC(dave_device::int2_w));
 
-	MCFG_CASSETTE_ADD(CASSETTE1_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
-	MCFG_CASSETTE_INTERFACE("ep64_cass")
+	CASSETTE(config, m_cassette1);
+	m_cassette1->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
+	m_cassette1->set_interface("ep64_cass");
 
-	MCFG_CASSETTE_ADD(CASSETTE2_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
-	MCFG_CASSETTE_INTERFACE("ep64_cass")
+	CASSETTE(config, m_cassette2);
+	m_cassette2->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
+	m_cassette2->set_interface("ep64_cass");
 
 	// internal RAM
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "ep64_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "ep64_cart", "bin,rom");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "ep64_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "ep64_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "ep64_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("ep64_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("ep64_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("ep64_flop");
+}
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( ep128 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ep64_state::ep128)
+void ep64_state::ep128(machine_config &config)
+{
 	ep64(config);
-	MCFG_DEVICE_MODIFY(DAVE_TAG)
-	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, dave_128k_mem)
+	m_dave->set_addrmap(AS_PROGRAM, &ep64_state::dave_128k_mem);
 
 	// internal RAM
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("128K");
+}
 
 
 

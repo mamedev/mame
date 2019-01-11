@@ -36,7 +36,7 @@ public:
 
 	void z80dev(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER( display_w );
 	DECLARE_READ8_MEMBER( test_r );
 
@@ -45,7 +45,6 @@ protected:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	output_finder<6> m_digits;
 };
@@ -84,9 +83,9 @@ void z80dev_state::io_map(address_map &map)
 	map(0x21, 0x21).portr("LINE1");
 	map(0x22, 0x22).portr("LINE2");
 	map(0x23, 0x23).portr("LINE3");
-	map(0x20, 0x25).w(this, FUNC(z80dev_state::display_w));
+	map(0x20, 0x25).w(FUNC(z80dev_state::display_w));
 
-	map(0x13, 0x13).r(this, FUNC(z80dev_state::test_r));
+	map(0x13, 0x13).r(FUNC(z80dev_state::test_r));
 }
 
 /* Input ports */
@@ -131,7 +130,7 @@ MACHINE_CONFIG_START(z80dev_state::z80dev)
 	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_z80dev)
+	config.set_default_layout(layout_z80dev);
 MACHINE_CONFIG_END
 
 /* ROM definition */

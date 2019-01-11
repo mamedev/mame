@@ -6,6 +6,7 @@
 #define MAME_INCLUDES_NEXT_H
 
 #include "cpu/m68000/m68000.h"
+#include "imagedev/floppy.h"
 #include "machine/nscsi_bus.h"
 #include "machine/mccs1850.h"
 #include "machine/8530scc.h"
@@ -31,8 +32,30 @@ public:
 			net(*this, "net"),
 			mo(*this, "mo"),
 			fdc(*this, "fdc"),
+			floppy0(*this, "fdc:0"),
 			vram(*this, "vram") { }
 
+	void next_base(machine_config &config);
+	void next_fdc_base(machine_config &config);
+	void nextst(machine_config &config);
+	void nextsc(machine_config &config);
+	void nextct(machine_config &config);
+	void nexts2(machine_config &config);
+	void nextctc(machine_config &config);
+	void next(machine_config &config);
+	void nextstc(machine_config &config);
+	void nexts(machine_config &config);
+
+	void init_nexts2();
+	void init_next();
+	void init_nextsc();
+	void init_nextst();
+	void init_nextct();
+	void init_nextstc();
+	void init_nextctc();
+	void init_nexts();
+
+private:
 	required_device<cpu_device> maincpu;
 	required_device<mccs1850_device> rtc;
 	required_device<scc8530_t> scc;
@@ -42,6 +65,7 @@ public:
 	required_device<mb8795_device> net;
 	required_device<nextmo_device> mo;
 	optional_device<n82077aa_device> fdc; // 040 only
+	optional_device<floppy_connector> floppy0; // 040 only
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -115,16 +139,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	void ncr5390(device_t *device);
-	void next_base(machine_config &config);
-	void next_fdc_base(machine_config &config);
-	void nextst(machine_config &config);
-	void nextsc(machine_config &config);
-	void nextct(machine_config &config);
-	void nexts2(machine_config &config);
-	void nextctc(machine_config &config);
-	void next(machine_config &config);
-	void nextstc(machine_config &config);
-	void nexts(machine_config &config);
 	void next_0b_m_mem(address_map &map);
 	void next_0b_m_nofdc_mem(address_map &map);
 	void next_0c_c_mem(address_map &map);
@@ -132,7 +146,7 @@ public:
 	void next_2c_c_mem(address_map &map);
 	void next_fdc_mem(address_map &map);
 	void next_mem(address_map &map);
-protected:
+
 	struct dma_slot {
 		uint32_t start, limit, chain_start, chain_limit, current;
 		uint8_t state;
@@ -157,10 +171,10 @@ protected:
 		DMA_BUSEXC       = 0x10
 	};
 
-	static const char *dma_targets[0x20];
-	static const int dma_irqs[0x20];
-	static const bool dma_has_saved[0x20];
-	static const int scsi_clocks[4];
+	static char const *const dma_targets[0x20];
+	static int const dma_irqs[0x20];
+	static bool const dma_has_saved[0x20];
+	static int const scsi_clocks[4];
 
 	dma_slot dma_slots[0x20];
 	uint32_t esp;
@@ -186,16 +200,6 @@ protected:
 	void dma_check_update(int slot);
 	void dma_check_end(int slot, bool eof);
 	void dma_end(int slot);
-
-public:
-	void init_nexts2();
-	void init_next();
-	void init_nextsc();
-	void init_nextst();
-	void init_nextct();
-	void init_nextstc();
-	void init_nextctc();
-	void init_nexts();
 };
 
 #endif

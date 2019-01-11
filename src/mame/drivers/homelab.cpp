@@ -40,6 +40,7 @@ MB7051 - fuse programmed prom.
 #include "sound/mea8000.h"
 #include "sound/volt_reg.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,8 +55,17 @@ public:
 		, m_p_chargen(*this, "chargen")
 		, m_dac(*this, "dac")
 		, m_cass(*this, "cassette")
-		{ }
+	{ }
 
+	void homelab3(machine_config &config);
+	void brailab4(machine_config &config);
+	void homelab(machine_config &config);
+
+	void init_brailab4();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(cass3_r);
+
+private:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(cass_w);
 	DECLARE_READ8_MEMBER(cass2_r);
@@ -64,8 +74,6 @@ public:
 	DECLARE_WRITE8_MEMBER(portff_w);
 	DECLARE_WRITE8_MEMBER(brailab4_port7f_w);
 	DECLARE_WRITE8_MEMBER(brailab4_portff_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(cass3_r);
-	void init_brailab4();
 	DECLARE_VIDEO_START(homelab2);
 	DECLARE_MACHINE_RESET(homelab3);
 	DECLARE_VIDEO_START(homelab3);
@@ -76,15 +84,12 @@ public:
 	uint32_t screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void homelab3(machine_config &config);
-	void brailab4(machine_config &config);
-	void homelab(machine_config &config);
 	void brailab4_io(address_map &map);
 	void brailab4_mem(address_map &map);
 	void homelab2_mem(address_map &map);
 	void homelab3_io(address_map &map);
 	void homelab3_mem(address_map &map);
-private:
+
 	const uint8_t *m_p_videoram;
 	bool m_nmi;
 	required_device<cpu_device> m_maincpu;
@@ -215,17 +220,17 @@ void homelab_state::homelab2_mem(address_map &map)
 	map(0x2000, 0x27ff).rom();  // ROM 5
 	map(0x2800, 0x2fff).rom();  // ROM 6
 	map(0x3000, 0x37ff).rom();  // Empty
-	map(0x3800, 0x3fff).rw(this, FUNC(homelab_state::key_r), FUNC(homelab_state::cass_w));
+	map(0x3800, 0x3fff).rw(FUNC(homelab_state::key_r), FUNC(homelab_state::cass_w));
 	map(0x4000, 0x7fff).ram();
 	map(0xc000, 0xc3ff).ram().region("maincpu", 0xc000);
-	map(0xe000, 0xe0ff).r(this, FUNC(homelab_state::cass2_r));
+	map(0xe000, 0xe0ff).r(FUNC(homelab_state::cass2_r));
 }
 
 void homelab_state::homelab3_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).ram();
-	map(0xe800, 0xefff).r(this, FUNC(homelab_state::exxx_r));
+	map(0xe800, 0xefff).r(FUNC(homelab_state::exxx_r));
 	map(0xf800, 0xffff).ram().region("maincpu", 0xf800);
 }
 
@@ -233,8 +238,8 @@ void homelab_state::homelab3_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x7f, 0x7f).w(this, FUNC(homelab_state::port7f_w));
-	map(0xff, 0xff).w(this, FUNC(homelab_state::portff_w));
+	map(0x7f, 0x7f).w(FUNC(homelab_state::port7f_w));
+	map(0xff, 0xff).w(FUNC(homelab_state::portff_w));
 }
 
 void homelab_state::brailab4_mem(address_map &map)
@@ -242,7 +247,7 @@ void homelab_state::brailab4_mem(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0xcfff).ram();
 	map(0xd000, 0xdfff).rom();
-	map(0xe800, 0xefff).r(this, FUNC(homelab_state::exxx_r));
+	map(0xe800, 0xefff).r(FUNC(homelab_state::exxx_r));
 	map(0xf800, 0xffff).bankrw("bank1");
 }
 
@@ -251,8 +256,8 @@ void homelab_state::brailab4_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0xf8, 0xf9).rw("mea8000", FUNC(mea8000_device::read), FUNC(mea8000_device::write));
-	map(0x7f, 0x7f).w(this, FUNC(homelab_state::brailab4_port7f_w));
-	map(0xff, 0xff).w(this, FUNC(homelab_state::brailab4_portff_w));
+	map(0x7f, 0x7f).w(FUNC(homelab_state::brailab4_port7f_w));
+	map(0xff, 0xff).w(FUNC(homelab_state::brailab4_portff_w));
 }
 
 
@@ -762,7 +767,7 @@ MACHINE_CONFIG_START(homelab_state::homelab)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -794,7 +799,7 @@ MACHINE_CONFIG_START(homelab_state::homelab3)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -826,7 +831,7 @@ MACHINE_CONFIG_START(homelab_state::brailab4)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homelab)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -1076,7 +1076,7 @@ DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
 	return image_init_result::PASS;
 }
 
-PALETTE_INIT_MEMBER(x07_state, x07)
+void x07_state::x07_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -1235,7 +1235,7 @@ void x07_state::x07_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(this, FUNC(x07_state::x07_io_r), FUNC(x07_state::x07_io_w));
+	map(0x00, 0xff).rw(FUNC(x07_state::x07_io_r), FUNC(x07_state::x07_io_w));
 }
 
 /* Input ports */
@@ -1495,10 +1495,8 @@ MACHINE_CONFIG_START(x07_state::x07)
 	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 32-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(x07_state, x07)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x07)
+	PALETTE(config, "palette", FUNC(x07_state::x07_palette), 2);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_x07);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1510,18 +1508,16 @@ MACHINE_CONFIG_START(x07_state::x07)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink_timer", x07_state, blink_timer, attotime::from_msec(300))
 
-	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", x07_state, nvram_init)   // t6834 RAM
-	MCFG_NVRAM_ADD_0FILL("nvram2") // RAM banks
+	NVRAM(config, "nvram1").set_custom_handler(FUNC(x07_state::nvram_init));   // t6834 RAM
+	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM banks
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
 	// 8KB  no expansion
 	// 12KB XM-100
 	// 16KB XR-100 or XM-101
 	// 20KB XR-100 and XM-100
 	// 24KB XR-100 and XM-101
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,12K,20K,24k")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("8K,12K,20K,24K");
 
 	/* Memory Card */
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_romram_plain_slot, "x07_card")

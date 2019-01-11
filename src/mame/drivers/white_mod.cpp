@@ -17,16 +17,17 @@ public:
 	{ }
 
 	void whitestar_mod(machine_config &config);
+
+	void init_whitestar_mod();
+
+private:
 	void whitestar_mod_map(address_map &map);
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
-public:
-	void init_whitestar_mod();
 };
 
 

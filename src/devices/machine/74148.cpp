@@ -49,6 +49,7 @@ DEFINE_DEVICE_TYPE(TTL74148, ttl74148_device, "74148", "74148 TTL")
 
 ttl74148_device::ttl74148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TTL74148, tag, owner, clock)
+	, m_output_cb(*this)
 	, m_enable_input(0)
 	, m_output(0)
 	, m_output_valid(0)
@@ -67,7 +68,7 @@ ttl74148_device::ttl74148_device(const machine_config &mconfig, const char *tag,
 
 void ttl74148_device::device_start()
 {
-	m_output_cb.bind_relative_to(*owner());
+	m_output_cb.resolve_safe();
 
 	save_item(NAME(m_input_lines));
 	save_item(NAME(m_enable_input));
@@ -164,7 +165,7 @@ void ttl74148_device::update()
 		m_last_output_valid = m_output_valid;
 		m_last_enable_output = m_enable_output;
 
-		m_output_cb();
+		m_output_cb(m_output);
 	}
 }
 

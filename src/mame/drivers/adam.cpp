@@ -544,24 +544,16 @@ READ8_MEMBER( adam_state::iorq_r )
 
 	case 5:
 		if (BIT(offset, 0))
-		{
-			data = m_vdc->register_read(space, 0);
-		}
+			data = m_vdc->register_read();
 		else
-		{
-			data = m_vdc->vram_read(space, 0);
-		}
+			data = m_vdc->vram_read();
 		break;
 
 	case 7:
 		if (BIT(offset, 1))
-		{
 			data = m_joy2->read();
-		}
 		else
-		{
 			data = m_joy1->read();
-		}
 		break;
 	}
 
@@ -600,13 +592,9 @@ WRITE8_MEMBER( adam_state::iorq_w )
 
 	case 5:
 		if (BIT(offset, 0))
-		{
-			m_vdc->register_write(space, 0, data);
-		}
+			m_vdc->register_write(data);
 		else
-		{
-			m_vdc->vram_write(space, 0, data);
-		}
+			m_vdc->vram_write(data);
 		break;
 
 	case 6:
@@ -617,7 +605,7 @@ WRITE8_MEMBER( adam_state::iorq_w )
 		break;
 
 	case 7:
-		m_psg->write(space, 0, data);
+		m_psg->write(data);
 		break;
 	}
 
@@ -876,7 +864,7 @@ WRITE8_MEMBER( adam_state::m6801_p4_w )
 
 void adam_state::adam_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(adam_state::mreq_r), FUNC(adam_state::mreq_w));
+	map(0x0000, 0xffff).rw(FUNC(adam_state::mreq_r), FUNC(adam_state::mreq_w));
 }
 
 
@@ -886,7 +874,7 @@ void adam_state::adam_mem(address_map &map)
 
 void adam_state::adam_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(adam_state::iorq_r), FUNC(adam_state::iorq_w));
+	map(0x0000, 0xffff).rw(FUNC(adam_state::iorq_r), FUNC(adam_state::iorq_w));
 }
 
 
@@ -899,19 +887,6 @@ void adam_state::m6801_mem(address_map &map)
 	map(0x0000, 0x001f).rw(m_netcpu, FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
 	map(0x0080, 0x00ff).ram();
 	map(0xf800, 0xffff).rom().region(M6801_TAG, 0);
-}
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( m6801_io )
-//-------------------------------------------------
-
-void adam_state::m6801_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).w(this, FUNC(adam_state::m6801_p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(adam_state::m6801_p2_r), FUNC(adam_state::m6801_p2_w));
-	map(M6801_PORT3, M6801_PORT3).rw(this, FUNC(adam_state::m6801_p3_r), FUNC(adam_state::m6801_p3_w));
-	map(M6801_PORT4, M6801_PORT4).w(this, FUNC(adam_state::m6801_p4_w));
 }
 
 
@@ -1048,76 +1023,79 @@ DEVICE_INPUT_DEFAULTS_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( adam )
+//  adam machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(adam_state::adam)
+void adam_state::adam(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(7'159'090)/2)
-	MCFG_DEVICE_PROGRAM_MAP(adam_mem)
-	MCFG_DEVICE_IO_MAP(adam_io)
+	Z80(config, m_maincpu, XTAL(7'159'090)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &adam_state::adam_mem);
+	m_maincpu->set_addrmap(AS_IO, &adam_state::adam_io);
 
-	MCFG_DEVICE_ADD(M6801_TAG, M6801, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(m6801_mem)
-	MCFG_DEVICE_IO_MAP(m6801_io)
-	MCFG_M6801_SC2(WRITELINE(*this, adam_state, os3_w))
+	M6801(config, m_netcpu, XTAL(4'000'000));
+	m_netcpu->set_addrmap(AS_PROGRAM, &adam_state::m6801_mem);
+	m_netcpu->out_p1_cb().set(FUNC(adam_state::m6801_p1_w));
+	m_netcpu->in_p2_cb().set(FUNC(adam_state::m6801_p2_r));
+	m_netcpu->out_p2_cb().set(FUNC(adam_state::m6801_p2_w));
+	m_netcpu->in_p3_cb().set(FUNC(adam_state::m6801_p3_r));
+	m_netcpu->out_p3_cb().set(FUNC(adam_state::m6801_p3_w));
+	m_netcpu->out_p4_cb().set(FUNC(adam_state::m6801_p4_w));
+	m_netcpu->out_sc2_cb().set(FUNC(adam_state::os3_w));
 	MCFG_QUANTUM_PERFECT_CPU(M6801_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD(TMS9928A_TAG, TMS9928A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, adam_state, vdc_int_w))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC(SCREEN_TAG)
-	MCFG_SCREEN_UPDATE_DEVICE(TMS9928A_TAG, tms9928a_device, screen_update)
+	TMS9928A(config, m_vdc, XTAL(10'738'635)).set_screen("screen");
+	m_vdc->set_vram_size(0x4000);
+	m_vdc->int_callback().set(FUNC(adam_state::vdc_int_w));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(SN76489A_TAG, SN76489A, XTAL(7'159'090)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, m_psg, XTAL(7'159'090)/2);
+	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 	// TODO: enable when Z80 has better WAIT pin emulation
-	//MCFG_SN76496_READY_HANDLER(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT)) MCFG_DEVCB_INVERT
+	//m_psg->ready_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT).invert();
 
 	// devices
-	MCFG_ADAMNET_BUS_ADD()
-	MCFG_ADAMNET_SLOT_ADD("net1", adamnet_devices, "kb")
-	MCFG_ADAMNET_SLOT_ADD("net2", adamnet_devices, "prn")
-	MCFG_ADAMNET_SLOT_ADD("net3", adamnet_devices, "ddp")
-	MCFG_ADAMNET_SLOT_ADD("net4", adamnet_devices, "fdc")
-	MCFG_ADAMNET_SLOT_ADD("net5", adamnet_devices, "fdc")
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("fdc", drive2)
-	MCFG_ADAMNET_SLOT_ADD("net6", adamnet_devices, nullptr)
-	MCFG_ADAMNET_SLOT_ADD("net7", adamnet_devices, nullptr)
-	MCFG_ADAMNET_SLOT_ADD("net8", adamnet_devices, nullptr)
-	MCFG_ADAMNET_SLOT_ADD("net9", adamnet_devices, nullptr)
-	MCFG_ADAMNET_SLOT_ADD("net10", adamnet_devices, nullptr)
-	MCFG_ADAMNET_SLOT_ADD("net11", adamnet_devices, nullptr)
-	MCFG_ADAMNET_SLOT_ADD("net12", adamnet_devices, nullptr)
-	MCFG_ADAMNET_SLOT_ADD("net13", adamnet_devices, nullptr)
-	MCFG_ADAMNET_SLOT_ADD("net14", adamnet_devices, nullptr)
-	MCFG_ADAMNET_SLOT_ADD("net15", adamnet_devices, nullptr)
+	ADAMNET(config, ADAMNET_TAG, 0);
+	ADAMNET_SLOT(config, "net1", adamnet_devices, "kb");
+	ADAMNET_SLOT(config, "net2", adamnet_devices, "prn");
+	ADAMNET_SLOT(config, "net3", adamnet_devices, "ddp");
+	ADAMNET_SLOT(config, "net4", adamnet_devices, "fdc");
+	ADAMNET_SLOT(config, "net5", adamnet_devices, "fdc").set_option_device_input_defaults("fdc", device_iptdef_drive2);
+	ADAMNET_SLOT(config, "net6", adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net7", adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net8", adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net9", adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net10", adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net11", adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net12", adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net13", adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net14", adamnet_devices, nullptr);
+	ADAMNET_SLOT(config, "net15", adamnet_devices, nullptr);
 
-	MCFG_COLECOVISION_CARTRIDGE_SLOT_ADD(COLECOVISION_CARTRIDGE_SLOT_TAG, colecovision_cartridges, nullptr)
-	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_LEFT_EXPANSION_SLOT_TAG, XTAL(7'159'090)/2, adam_slot1_devices, "adamlink")
-	MCFG_ADAM_EXPANSION_SLOT_IRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_CENTER_EXPANSION_SLOT_TAG, XTAL(7'159'090)/2, adam_slot2_devices, nullptr)
-	MCFG_ADAM_EXPANSION_SLOT_IRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_RIGHT_EXPANSION_SLOT_TAG, XTAL(7'159'090)/2, adam_slot3_devices, "ram")
+	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);
+	ADAM_EXPANSION_SLOT(config, m_slot1, XTAL(7'159'090)/2, adam_slot1_devices, "adamlink");
+	m_slot1->irq().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ADAM_EXPANSION_SLOT(config, m_slot2, XTAL(7'159'090)/2, adam_slot2_devices, nullptr);
+	m_slot2->irq().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ADAM_EXPANSION_SLOT(config, m_slot3, XTAL(7'159'090)/2, adam_slot3_devices, "ram");
 
-	MCFG_COLECOVISION_CONTROL_PORT_ADD(CONTROL1_TAG, colecovision_control_port_devices, "hand")
-	MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(WRITELINE(*this, adam_state, joy1_irq_w))
-	MCFG_COLECOVISION_CONTROL_PORT_ADD(CONTROL2_TAG, colecovision_control_port_devices, nullptr)
-	MCFG_COLECOVISION_CONTROL_PORT_IRQ_CALLBACK(WRITELINE(*this, adam_state, joy2_irq_w))
+	COLECOVISION_CONTROL_PORT(config, m_joy1, colecovision_control_port_devices, "hand");
+	m_joy1->irq().set(FUNC(adam_state::joy1_irq_w));
+	COLECOVISION_CONTROL_PORT(config, m_joy2, colecovision_control_port_devices, nullptr);
+	m_joy2->irq().set(FUNC(adam_state::joy2_irq_w));
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("colec_cart_list", "coleco")
-	MCFG_SOFTWARE_LIST_ADD("adam_cart_list", "adam_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "adam_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "adam_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "colec_cart_list").set_original("coleco");
+	SOFTWARE_LIST(config, "adam_cart_list").set_original("adam_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("adam_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("adam_flop");
+}
 
 
 

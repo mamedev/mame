@@ -40,10 +40,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(psi_keyboard_devices, _def_slot, false)
 
 #define MCFG_PSI_KEYBOARD_RX_HANDLER(_devcb) \
-	devcb = &downcast<psi_keyboard_bus_device &>(*device).set_rx_handler(DEVCB_##_devcb);
+	downcast<psi_keyboard_bus_device &>(*device).set_rx_handler(DEVCB_##_devcb);
 
 #define MCFG_PSI_KEYBOARD_KEY_STROBE_HANDLER(_devcb) \
-	devcb = &downcast<psi_keyboard_bus_device &>(*device).set_key_strobe_handler(DEVCB_##_devcb);
+	downcast<psi_keyboard_bus_device &>(*device).set_key_strobe_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

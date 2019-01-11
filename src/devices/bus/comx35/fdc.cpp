@@ -96,12 +96,13 @@ static void comx_fd_floppies(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(comx_fd_device::device_add_mconfig)
-	MCFG_WD1770_ADD(WD1770_TAG, XTAL(8'000'000))
+void comx_fd_device::device_add_mconfig(machine_config &config)
+{
+	WD1770(config, m_fdc, 8_MHz_XTAL);
 
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", comx_fd_floppies, "525sd35t", comx_fd_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":1", comx_fd_floppies, nullptr, comx_fd_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, comx_fd_floppies, "525sd35t", comx_fd_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, comx_fd_floppies, nullptr, comx_fd_device::floppy_formats);
+}
 
 
 
@@ -221,7 +222,7 @@ uint8_t comx_fd_device::comx_io_r(address_space &space, offs_t offset)
 		}
 		else
 		{
-			data = m_fdc->gen_r(m_addr);
+			data = m_fdc->read(m_addr);
 			if (m_addr==3) logerror("%s FDC read %u:%02x\n", machine().describe_context(), m_addr,data);
 		}
 	}
@@ -271,7 +272,7 @@ void comx_fd_device::comx_io_w(address_space &space, offs_t offset, uint8_t data
 		else
 		{
 			// write data to WD1770
-			m_fdc->gen_w(m_addr, data);
+			m_fdc->write(m_addr, data);
 		}
 	}
 }

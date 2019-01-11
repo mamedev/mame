@@ -59,6 +59,7 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/m6809/m6809.h"
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/timer.h"
@@ -71,7 +72,7 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK           XTAL(14'000'000)
+#define MAIN_CLOCK           14_MHz_XTAL
 #define AY_CLOCK             MAIN_CLOCK / 8     /* 1.75 Mhz */
 #define VIDEO_CLOCK          MAIN_CLOCK / 8     /* 1.75 Mhz */
 #define CPU_CLOCK            MAIN_CLOCK / 4     /* 3.50 Mhz */
@@ -94,6 +95,9 @@ public:
 		, m_cart(*this, "cartslot")
 	{ }
 
+	void squale(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_READ8_MEMBER(video_ram_read_reg1);
 	DECLARE_READ8_MEMBER(video_ram_read_reg2);
@@ -134,9 +138,8 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(squale_scanline);
 
-	void squale(machine_config &config);
 	void squale_mem(address_map &map);
-private:
+
 	required_device<acia6850_device> m_acia;
 	required_device<ay8910_device> m_ay8910;
 	required_device<pia6821_device> m_pia_u72;
@@ -622,16 +625,16 @@ void squale_state::squale_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0xefff).ram();
 	map(0xf000, 0xf00f).rw(m_ef9365, FUNC(ef9365_device::data_r), FUNC(ef9365_device::data_w));
-	map(0xf010, 0xf01f).w(this, FUNC(squale_state::ctrl_w));
-	map(0xf020, 0xf02f).r(this, FUNC(squale_state::video_ram_read_reg1));
-	map(0xf030, 0xf03f).r(this, FUNC(squale_state::video_ram_read_reg2));
+	map(0xf010, 0xf01f).w(FUNC(squale_state::ctrl_w));
+	map(0xf020, 0xf02f).r(FUNC(squale_state::video_ram_read_reg1));
+	map(0xf030, 0xf03f).r(FUNC(squale_state::video_ram_read_reg2));
 	map(0xf044, 0xf047).rw(m_pia_u75, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xf048, 0xf04b).rw(m_pia_u72, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xf050, 0xf05f).rw(m_acia, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));
 	map(0xf060, 0xf06f).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xf080, 0xf083).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
-	map(0xf08a, 0xf08a).rw(this, FUNC(squale_state::fdc_sel0_r), FUNC(squale_state::fdc_sel0_w));
-	map(0xf08b, 0xf08b).rw(this, FUNC(squale_state::fdc_sel1_r), FUNC(squale_state::fdc_sel1_w));
+	map(0xf08a, 0xf08a).rw(FUNC(squale_state::fdc_sel0_r), FUNC(squale_state::fdc_sel0_w));
+	map(0xf08b, 0xf08b).rw(FUNC(squale_state::fdc_sel1_r), FUNC(squale_state::fdc_sel1_w));
 	map(0xf100, 0xffff).bankr("rom_bank");
 
 }
@@ -784,31 +787,31 @@ MACHINE_CONFIG_START(squale_state::squale)
 	MCFG_DEVICE_PROGRAM_MAP(squale_mem)
 
 	/* Cartridge pia */
-	MCFG_DEVICE_ADD("pia_u72", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, squale_state, pia_u72_porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, squale_state, pia_u72_portb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, squale_state, pia_u72_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, squale_state, pia_u72_portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, squale_state, pia_u72_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, squale_state, pia_u72_cb2_w))
+	PIA6821(config, m_pia_u72, 0);
+	m_pia_u72->readpa_handler().set(FUNC(squale_state::pia_u72_porta_r));
+	m_pia_u72->readpb_handler().set(FUNC(squale_state::pia_u72_portb_r));
+	m_pia_u72->writepa_handler().set(FUNC(squale_state::pia_u72_porta_w));
+	m_pia_u72->writepb_handler().set(FUNC(squale_state::pia_u72_portb_w));
+	m_pia_u72->ca2_handler().set(FUNC(squale_state::pia_u72_ca2_w));
+	m_pia_u72->cb2_handler().set(FUNC(squale_state::pia_u72_cb2_w));
 
 	/* Keyboard pia */
-	MCFG_DEVICE_ADD("pia_u75", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, squale_state, pia_u75_porta_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, squale_state, pia_u75_portb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, squale_state, pia_u75_porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, squale_state, pia_u75_portb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, squale_state, pia_u75_cb2_w))
+	PIA6821(config, m_pia_u75, 0);
+	m_pia_u75->readpa_handler().set(FUNC(squale_state::pia_u75_porta_r));
+	m_pia_u75->readpb_handler().set(FUNC(squale_state::pia_u75_portb_r));
+	m_pia_u75->writepa_handler().set(FUNC(squale_state::pia_u75_porta_w));
+	m_pia_u75->writepb_handler().set(FUNC(squale_state::pia_u75_portb_w));
+	m_pia_u75->cb2_handler().set(FUNC(squale_state::pia_u75_cb2_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, AY_CLOCK)
+	AY8910(config, m_ay8910, AY_CLOCK);
 	// TODO : Add port I/O handler
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, squale_state, ay_porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, squale_state, ay_portb_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, squale_state, ay_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, squale_state, ay_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	m_ay8910->port_a_read_callback().set(FUNC(squale_state::ay_porta_r));
+	m_ay8910->port_b_read_callback().set(FUNC(squale_state::ay_portb_r));
+	m_ay8910->port_a_write_callback().set(FUNC(squale_state::ay_porta_w));
+	m_ay8910->port_b_write_callback().set(FUNC(squale_state::ay_portb_w));
+	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MCFG_DEVICE_ADD ("ef6850", ACIA6850, 0)
 
@@ -821,23 +824,22 @@ MACHINE_CONFIG_START(squale_state::squale)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_PALETTE_ADD("palette", 16)
 
-	MCFG_DEVICE_ADD("ef9365", EF9365, VIDEO_CLOCK)
-	MCFG_EF936X_PALETTE("palette")
-	MCFG_EF936X_BITPLANES_CNT(4);
-	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_256x256);
+	EF9365(config, m_ef9365, VIDEO_CLOCK);
+	m_ef9365->set_palette_tag("palette");
+	m_ef9365->set_nb_bitplanes(4);
+	m_ef9365->set_display_mode(ef9365_device::DISPLAY_MODE_256x256);
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("squale_sl", squale_state, squale_scanline, "screen", 0, 10)
 
 	/* Floppy */
-	MCFG_WD1770_ADD("wd1770", XTAL(8'000'000) )
+	WD1770(config, m_fdc, 8_MHz_XTAL);
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop525_list", "squale")
 
 	/* Cartridge slot */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "squale_cart")
-	MCFG_GENERIC_MANDATORY
 	MCFG_GENERIC_LOAD(squale_state, squale_cart)
-
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "squale_cart")
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -846,7 +848,7 @@ ROM_START( squale )
 	ROM_DEFAULT_BIOS("v201")
 
 	ROM_SYSTEM_BIOS(0, "v201", "Version 2.1")
-	ROMX_LOAD( "sqmon_2r1.bin", 0x0000, 0x2000, CRC(ed57c707) SHA1(c8bd33a6fb07fe7f881f2605ad867b7e82366bfc), ROM_BIOS(1) )
+	ROMX_LOAD( "sqmon_2r1.bin", 0x0000, 0x2000, CRC(ed57c707) SHA1(c8bd33a6fb07fe7f881f2605ad867b7e82366bfc), ROM_BIOS(0) )
 
 	// place ROM v1.2 signature here.
 ROM_END

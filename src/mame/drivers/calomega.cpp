@@ -644,7 +644,6 @@
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
-#include "machine/6821pia.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
@@ -788,33 +787,33 @@ WRITE8_MEMBER(calomega_state::pia1_bout_w)
 WRITE8_MEMBER(calomega_state::lamps_903a_w)
 {
 	/* First 5 bits of PIA0 port B */
-	m_lamp[1] = BIT(~data, 0);  /* L1 (Hold 1) */
-	m_lamp[2] = BIT(~data, 1);  /* L2 (Hold 2) */
-	m_lamp[3] = BIT(~data, 2);  /* L3 (Hold 3) */
-	m_lamp[4] = BIT(~data, 3);  /* L4 (Hold 4) */
-	m_lamp[5] = BIT(~data, 4);  /* L5 (Hold 5) */
+	m_lamps[0] = BIT(~data, 0);  /* L1 (Hold 1) */
+	m_lamps[1] = BIT(~data, 1);  /* L2 (Hold 2) */
+	m_lamps[2] = BIT(~data, 2);  /* L3 (Hold 3) */
+	m_lamps[3] = BIT(~data, 3);  /* L4 (Hold 4) */
+	m_lamps[4] = BIT(~data, 4);  /* L5 (Hold 5) */
 }
 
 WRITE8_MEMBER(calomega_state::lamps_903b_w)
 {
 	/* First 4 bits of PIA1 port A */
-	m_lamp[6] = BIT(~data, 0);  /* L6 (Cancel) */
-	m_lamp[7] = BIT(~data, 1);  /* L7 (Bet) */
-	m_lamp[8] = BIT(~data, 2);  /* L8 (Take) */
-	m_lamp[9] = BIT(~data, 3);  /* L9 (Door?) */
+	m_lamps[5] = BIT(~data, 0);  /* L6 (Cancel) */
+	m_lamps[6] = BIT(~data, 1);  /* L7 (Bet) */
+	m_lamps[7] = BIT(~data, 2);  /* L8 (Take) */
+	m_lamps[8] = BIT(~data, 3);  /* L9 (Door?) */
 }
 
 WRITE8_MEMBER(calomega_state::lamps_905_w)
 {
 	/* Whole 8 bits of PIA0 port B */
-	m_lamp[1] = BIT(~data, 0);  /* L1 (Hold 1) */
-	m_lamp[2] = BIT(~data, 1);  /* L2 (Hold 2) */
-	m_lamp[3] = BIT(~data, 2);  /* L3 (Hold 3) */
-	m_lamp[4] = BIT(~data, 3);  /* L4 (Hold 4) */
-	m_lamp[5] = BIT(~data, 4);  /* L5 (Hold 5) */
-	m_lamp[6] = BIT(~data, 5);  /* L6 (unknown) */
-	m_lamp[7] = BIT(~data, 6);  /* L7 (unknown) */
-	m_lamp[8] = BIT(~data, 7);  /* L8 (unknown) */
+	m_lamps[0] = BIT(~data, 0);  /* L1 (Hold 1) */
+	m_lamps[1] = BIT(~data, 1);  /* L2 (Hold 2) */
+	m_lamps[2] = BIT(~data, 2);  /* L3 (Hold 3) */
+	m_lamps[3] = BIT(~data, 3);  /* L4 (Hold 4) */
+	m_lamps[4] = BIT(~data, 4);  /* L5 (Hold 5) */
+	m_lamps[5] = BIT(~data, 5);  /* L6 (unknown) */
+	m_lamps[6] = BIT(~data, 6);  /* L7 (unknown) */
+	m_lamps[7] = BIT(~data, 7);  /* L8 (unknown) */
 }
 
 
@@ -832,8 +831,8 @@ void calomega_state::sys903_map(address_map &map)
 	map(0x08c4, 0x08c7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x08c8, 0x08cb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x08d0, 0x08d1).rw(m_acia6850_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
-	map(0x1400, 0x17ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x1400, 0x17ff).ram().w(FUNC(calomega_state::calomega_colorram_w)).share("colorram");
 	map(0x1800, 0x3fff).rom();
 }
 
@@ -846,8 +845,8 @@ void calomega_state::s903mod_map(address_map &map)
 	map(0x0881, 0x0881).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x08c4, 0x08c7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x08c8, 0x08cb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
-	map(0x1400, 0x17ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x1400, 0x17ff).ram().w(FUNC(calomega_state::calomega_colorram_w)).share("colorram");
 	map(0x1800, 0x3fff).rom();
 }
 
@@ -860,8 +859,8 @@ void calomega_state::sys905_map(address_map &map)
 	map(0x1081, 0x1081).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x10c4, 0x10c7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x10c8, 0x10cb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x2000, 0x23ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
-	map(0x2400, 0x27ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x2000, 0x23ff).ram().w(FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x2400, 0x27ff).ram().w(FUNC(calomega_state::calomega_colorram_w)).share("colorram");
 	map(0x2800, 0x7fff).rom();
 }
 
@@ -873,8 +872,8 @@ void calomega_state::sys906_map(address_map &map)
 	map(0x2c04, 0x2c04).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2c05, 0x2c05).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x2c08, 0x2c09).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-	map(0x2000, 0x23ff).ram().w(this, FUNC(calomega_state::calomega_videoram_w)).share("videoram");
-	map(0x2400, 0x27ff).ram().w(this, FUNC(calomega_state::calomega_colorram_w)).share("colorram");
+	map(0x2000, 0x23ff).ram().w(FUNC(calomega_state::calomega_videoram_w)).share("videoram");
+	map(0x2400, 0x27ff).ram().w(FUNC(calomega_state::calomega_colorram_w)).share("colorram");
 	map(0x6000, 0xffff).rom();
 }
 
@@ -2577,16 +2576,16 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 	MCFG_DEVICE_PROGRAM_MAP(sys903_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", calomega_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, calomega_state,s903_mux_port_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, calomega_state,lamps_903a_w))
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s903_mux_port_r));
+	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_903a_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("SW1"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, calomega_state, lamps_903b_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, calomega_state, s903_mux_w))
+	PIA6821(config, m_pia[1], 0);
+	m_pia[1]->readpa_handler().set_ioport("SW1");
+	m_pia[1]->writepa_handler().set(FUNC(calomega_state::lamps_903b_w));
+	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s903_mux_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2595,25 +2594,25 @@ MACHINE_CONFIG_START(calomega_state::sys903)
 	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 31*8-1)    /* Taken from MC6845 init, registers 01 & 06 */
 	MCFG_SCREEN_UPDATE_DRIVER(calomega_state, screen_update_calomega)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_calomega)
-	MCFG_PALETTE_ADD("palette", 256) /* or 128? is the upper half of the PROMs really valid colors? */
-	MCFG_PALETTE_INIT_OWNER(calomega_state, calomega)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_calomega);
+	PALETTE(config, m_palette, FUNC(calomega_state::calomega_palette), 256); // or 128? is the upper half of the PROMs really valid colors?
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK) /* 6845 @ CPU clock */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK)); /* 6845 @ CPU clock */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8912", AY8912, SND_CLOCK) /* confirmed */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW3"))                /* from schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	ay8912_device &ay8912(AY8912(config, "ay8912", SND_CLOCK)); /* confirmed */
+	ay8912.port_a_read_callback().set_ioport("SW3");                /* from schematics */
+	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, calomega_state, write_acia_tx))
+	ACIA6850(config, m_acia6850_0, 0);
+	m_acia6850_0->txd_handler().set(FUNC(calomega_state::write_acia_tx));
 
 	MCFG_DEVICE_ADD("aciabaud", CLOCK, UART_CLOCK)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, calomega_state, write_acia_clock))
@@ -2629,8 +2628,7 @@ MACHINE_CONFIG_START(calomega_state::s903mod)
 	MCFG_DEVICE_PROGRAM_MAP(s903mod_map)
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("ay8912")
-	MCFG_AY8910_PORT_A_READ_CB(NOOP)
+	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_constant(0);
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
 
@@ -2646,16 +2644,13 @@ MACHINE_CONFIG_START(calomega_state::sys905)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(sys905_map)
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, calomega_state,s905_mux_port_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, calomega_state,lamps_905_w))
+	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s905_mux_port_r));
+	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_905_w));
 
-	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, calomega_state, s905_mux_w))
+	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s905_mux_w));
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("ay8912")
-	MCFG_AY8910_PORT_A_READ_CB(NOOP)
+	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_constant(0);
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
 
@@ -2671,28 +2666,24 @@ MACHINE_CONFIG_START(calomega_state::sys906)
 	MCFG_DEVICE_REPLACE("maincpu", M65C02, CPU_CLOCK)  /* guess */
 	MCFG_DEVICE_PROGRAM_MAP(sys906_map)
 
-	MCFG_DEVICE_MODIFY("pia0")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, calomega_state, pia0_ain_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, calomega_state, pia0_bin_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, calomega_state, pia0_aout_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, calomega_state, pia0_bout_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, calomega_state, pia0_ca2_w))
+	m_pia[0]->readpa_handler().set(FUNC(calomega_state::pia0_ain_r));
+	m_pia[0]->readpb_handler().set(FUNC(calomega_state::pia0_bin_r));
+	m_pia[0]->writepa_handler().set(FUNC(calomega_state::pia0_aout_w));
+	m_pia[0]->writepb_handler().set(FUNC(calomega_state::pia0_bout_w));
+	m_pia[0]->ca2_handler().set(FUNC(calomega_state::pia0_ca2_w));
 
-	MCFG_DEVICE_MODIFY("pia1")
-	MCFG_PIA_READPA_HANDLER(READ8(*this, calomega_state, pia1_ain_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, calomega_state, pia1_bin_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, calomega_state, pia1_aout_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, calomega_state, pia1_bout_w))
+	m_pia[1]->readpa_handler().set(FUNC(calomega_state::pia1_ain_r));
+	m_pia[1]->readpb_handler().set(FUNC(calomega_state::pia1_bin_r));
+	m_pia[1]->writepa_handler().set(FUNC(calomega_state::pia1_aout_w));
+	m_pia[1]->writepb_handler().set(FUNC(calomega_state::pia1_bout_w));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sys906)
+	m_gfxdecode->set_info(gfx_sys906);
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("ay8912")
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW2"))    /* From PCB pic. Value is stored at $0539 */
+	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_ioport("SW2");    /* From PCB pic. Value is stored at $0539 */
 
-	MCFG_DEVICE_REMOVE("acia6850_0")
-
-	MCFG_DEVICE_REMOVE("aciabaud")
+	config.device_remove("acia6850_0");
+	config.device_remove("aciabaud");
 MACHINE_CONFIG_END
 
 

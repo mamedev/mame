@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, Robbbert
 /******************************************************************************************
 
 Commodore C900
@@ -17,20 +17,25 @@ It has a 6508 CPU.
 
 Disk drive is a Matsushita JA-560-012
 
-Our implementation of z80scc is currently incomplete and therefore unusable.
-
 Increasing the amount of RAM stops the error message, however it still keeps running
-into the weeds (jumps to 00000).
+into the weeds (jumps to 00000). Due to lack of banking, the stack is pointing at rom.
+
+To Do:
+- Banking
+- Pretty much everything
+- Need schematics, technical manuals and so on.
+- Eventually, will need software.
+- Disassembler needs fixing
 
 *******************************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/z8000/z8000.h"
-//#include "machine/z80scc.h"
-//#include "bus/rs232/rs232.h"
-#include "machine/terminal.h"
+#include "machine/z80scc.h"
+#include "bus/rs232/rs232.h"
 #include "machine/z8536.h"
+#include "emupal.h"
 
 
 class c900_state : public driver_device
@@ -39,21 +44,15 @@ public:
 	c900_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, "terminal")
 	{ }
 
-	DECLARE_READ16_MEMBER(key_r);
-	DECLARE_READ16_MEMBER(stat_r);
-	void kbd_put(u8 data);
-
 	void c900(machine_config &config);
+
+private:
 	void data_map(address_map &map);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
-	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
 };
 
 void c900_state::mem_map(address_map &map)
@@ -70,31 +69,11 @@ void c900_state::data_map(address_map &map)
 void c900_state::io_map(address_map &map)
 {
 	map(0x0000, 0x007f).rw("cio", FUNC(z8036_device::read), FUNC(z8036_device::write)).umask16(0x00ff);
-	//AM_RANGE(0x0100, 0x011f) AM_DEVREADWRITE8("scc", scc8030_device, zbus_r, zbus_w, 0x00ff)  // range for one channel
-	map(0x0100, 0x0101).r(this, FUNC(c900_state::stat_r));
-	map(0x0110, 0x0111).r(this, FUNC(c900_state::key_r));
-	map(0x0111, 0x0111).w(m_terminal, FUNC(generic_terminal_device::write));
+	map(0x0100, 0x013f).rw("scc", FUNC(scc8030_device::zbus_r), FUNC(scc8030_device::zbus_w)).umask16(0x00ff);
 }
 
 static INPUT_PORTS_START( c900 )
 INPUT_PORTS_END
-
-READ16_MEMBER( c900_state::key_r )
-{
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ16_MEMBER( c900_state::stat_r )
-{
-	return (m_term_data) ? 5 : 4;
-}
-
-void c900_state::kbd_put(u8 data)
-{
-	m_term_data = data;
-}
 
 /* F4 Character Displayer */
 static const gfx_layout c900_charlayout =
@@ -121,23 +100,21 @@ MACHINE_CONFIG_START(c900_state::c900)
 	MCFG_DEVICE_DATA_MAP(data_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(c900_state, kbd_put))
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c900)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("cio", Z8036, 6'000'000)
+	Z8036(config, "cio", 6'000'000);
 
-	//MCFG_SCC8030_ADD("scc", 6'000'000, 326400, 0, 326400, 0)
-	/* Port A */
-	//MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
-	//MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
-	//MCFG_Z80SCC_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
-	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, lwriter_state, scc_int))
+	scc8030_device& scc(SCC8030(config, "scc", 6'000'000)); // 5'850'000 is the ideal figure
+	/* Port B */
+	scc.out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	scc.out_dtrb_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	scc.out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	//scc.out_int_callback().set("rs232", FUNC(c900_state::scc_int));
 
-	//MCFG_RS232_PORT_ADD ("rs232a", default_rs232_devices, "terminal")
-	//MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc8030_device, rxa_w))
-	//MCFG_RS232_CTS_HANDLER (WRITELINE ("scc", scc8030_device, ctsa_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("scc", FUNC(scc8030_device::rxb_w));
+	rs232.cts_handler().set("scc", FUNC(scc8030_device::ctsb_w));
 MACHINE_CONFIG_END
 
 ROM_START( c900 )

@@ -66,7 +66,7 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 
 
@@ -895,7 +895,7 @@ static const nimbus_blocks ramblocks[] =
 
 void rmnimbus_state::nimbus_bank_memory()
 {
-	address_space &space = machine().device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int     ramsize = m_ram->size();
 	int     ramblock = 0;
 	int     blockno;
@@ -1485,7 +1485,7 @@ void rmnimbus_state::rmni_sound_reset()
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_porta_w)
 {
-	m_msm->data_w(data);
+	m_msm->write_data(data);
 
 	// Mouse code needs a copy of this.
 	m_ay8910_a=data;

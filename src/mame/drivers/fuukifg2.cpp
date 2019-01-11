@@ -94,17 +94,17 @@ void fuuki16_state::fuuki16_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                     // ROM
 	map(0x400000, 0x40ffff).ram();                                                                     // RAM
-	map(0x500000, 0x501fff).ram().w(this, FUNC(fuuki16_state::vram_w<0>)).share("vram.0");                  // Layers
-	map(0x502000, 0x503fff).ram().w(this, FUNC(fuuki16_state::vram_w<1>)).share("vram.1");                  //
-	map(0x504000, 0x505fff).ram().w(this, FUNC(fuuki16_state::vram_w<2>)).share("vram.2");                  //
-	map(0x506000, 0x507fff).ram().w(this, FUNC(fuuki16_state::vram_w<3>)).share("vram.3");                  //
+	map(0x500000, 0x501fff).ram().w(FUNC(fuuki16_state::vram_w<0>)).share("vram.0");                  // Layers
+	map(0x502000, 0x503fff).ram().w(FUNC(fuuki16_state::vram_w<1>)).share("vram.1");                  //
+	map(0x504000, 0x505fff).ram().w(FUNC(fuuki16_state::vram_w<2>)).share("vram.2");                  //
+	map(0x506000, 0x507fff).ram().w(FUNC(fuuki16_state::vram_w<3>)).share("vram.3");                  //
 	map(0x600000, 0x601fff).mirror(0x008000).rw(m_fuukivid, FUNC(fuukivid_device::fuuki_sprram_r), FUNC(fuukivid_device::fuuki_sprram_w)).share("spriteram");   // Sprites, mirrored?
 	map(0x700000, 0x703fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x800000, 0x800001).portr("SYSTEM");
 	map(0x810000, 0x810001).portr("P1_P2");
 	map(0x880000, 0x880001).portr("DSW");
-	map(0x8a0001, 0x8a0001).w(this, FUNC(fuuki16_state::sound_command_w));                                          // To Sound CPU
-	map(0x8c0000, 0x8c001f).ram().w(this, FUNC(fuuki16_state::vregs_w)).share("vregs");                        // Video Registers
+	map(0x8a0001, 0x8a0001).w(FUNC(fuuki16_state::sound_command_w));                                          // To Sound CPU
+	map(0x8c0000, 0x8c001f).ram().w(FUNC(fuuki16_state::vregs_w)).share("vregs");                        // Video Registers
 	map(0x8d0000, 0x8d0003).ram().share("unknown");                                         //
 	map(0x8e0000, 0x8e0001).ram().share("priority");                                            //
 }
@@ -146,9 +146,9 @@ void fuuki16_state::fuuki16_sound_map(address_map &map)
 void fuuki16_state::fuuki16_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(fuuki16_state::sound_rombank_w));  // ROM Bank
+	map(0x00, 0x00).w(FUNC(fuuki16_state::sound_rombank_w));  // ROM Bank
 	map(0x11, 0x11).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); // From Main CPU / ? To Main CPU ?
-	map(0x20, 0x20).w(this, FUNC(fuuki16_state::oki_banking_w));    // Oki Banking
+	map(0x20, 0x20).w(FUNC(fuuki16_state::oki_banking_w));    // Oki Banking
 	map(0x30, 0x30).nopw();    // ? In the NMI routine
 	map(0x40, 0x41).w("ym1", FUNC(ym2203_device::write));
 	map(0x50, 0x51).rw("ym2", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
@@ -445,53 +445,49 @@ void fuuki16_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(fuuki16_state::fuuki16)
-
+void fuuki16_state::fuuki16(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000) / 2) /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fuuki16_map)
+	M68000(config, m_maincpu, XTAL(32'000'000) / 2);	/* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fuuki16_state::fuuki16_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000) / 2) /* 6 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fuuki16_sound_map)
-	MCFG_DEVICE_IO_MAP(fuuki16_sound_io_map)
+	Z80(config, m_audiocpu, XTAL(12'000'000) / 2);		/* 6 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fuuki16_state::fuuki16_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &fuuki16_state::fuuki16_sound_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fuuki16_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(320, 256);
+	m_screen->set_visarea(0, 320-1, 0, 256-16-1);
+	m_screen->set_screen_update(FUNC(fuuki16_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fuuki16)
-	MCFG_PALETTE_ADD("palette", 0x4000 / 2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fuuki16);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x4000 / 2);
 
-	MCFG_DEVICE_ADD("fuukivid", FUUKI_VIDEO, 0)
-	MCFG_FUUKI_VIDEO_GFXDECODE("gfxdecode")
+	FUUKI_VIDEO(config, m_fuukivid, 0, m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(28'640'000) / 8) /* 3.58 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(28'640'000) / 8)); /* 3.58 MHz */
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(28'640'000) / 8) /* 3.58 MHz */
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ym3812_device &ym2(YM3812(config, "ym2", XTAL(28'640'000) / 8)); /* 3.58 MHz */
+	ym2.irq_handler().set_inputline(m_audiocpu, 0);
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(32'000'000) / 32, okim6295_device::PIN7_HIGH) /* 1 Mhz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(32'000'000) / 32, okim6295_device::PIN7_HIGH); /* 1 Mhz */
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.85);
+}
 
 
 /***************************************************************************
 
-
-                                ROMs Loading
-
+                                ROM Loading
 
 ***************************************************************************/
 

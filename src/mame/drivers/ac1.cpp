@@ -135,11 +135,11 @@ MACHINE_CONFIG_START(ac1_state::ac1)
 	MCFG_DEVICE_PROGRAM_MAP(ac1_mem)
 	MCFG_DEVICE_IO_MAP(ac1_io)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(8'000'000) / 4)
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, ac1_state, ac1_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, ac1_state, ac1_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, ac1_state, ac1_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, ac1_state, ac1_port_b_w))
+	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(8'000'000)/4));
+	pio.in_pa_callback().set(FUNC(ac1_state::ac1_port_a_r));
+	pio.out_pa_callback().set(FUNC(ac1_state::ac1_port_a_w));
+	pio.in_pb_callback().set(FUNC(ac1_state::ac1_port_b_r));
+	pio.out_pb_callback().set(FUNC(ac1_state::ac1_port_b_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -148,11 +148,11 @@ MACHINE_CONFIG_START(ac1_state::ac1)
 	MCFG_SCREEN_SIZE(64*6, 16*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 16*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ac1_state, screen_update_ac1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ac1 )
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -176,14 +176,14 @@ MACHINE_CONFIG_END
 ROM_START( ac1 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v1", "Version 3.1 (orig)" )
-	ROMX_LOAD( "mon_v31_16.bin",  0x0000, 0x0800, CRC(1ba65e4d) SHA1(3382b8d03f31166a56aea49fd1ec1e82a7108300), ROM_BIOS(1))
+	ROMX_LOAD("mon_v31_16.bin",  0x0000, 0x0800, CRC(1ba65e4d) SHA1(3382b8d03f31166a56aea49fd1ec1e82a7108300), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v2", "Version 3.1 (fixed)" )
-	ROMX_LOAD( "mon_v31_16_v2.bin",  0x0000, 0x0800, CRC(8904beb4) SHA1(db8d00a2537ac3a662e3c91e55eb2bf824a72062), ROM_BIOS(2))
+	ROMX_LOAD("mon_v31_16_v2.bin",  0x0000, 0x0800, CRC(8904beb4) SHA1(db8d00a2537ac3a662e3c91e55eb2bf824a72062), ROM_BIOS(1))
 	// from Funkamateur 01/85
-	ROM_LOAD( "minibasic.bin",   0x0800, 0x0800, CRC(06782639) SHA1(3fd57b3ae3f538374b0d794d8aa15d06bcaaddd8))
+	ROM_LOAD("minibasic.bin",   0x0800, 0x0800, CRC(06782639) SHA1(3fd57b3ae3f538374b0d794d8aa15d06bcaaddd8))
 	ROM_REGION(0x0800, "gfx1",0)
 	// 64 chars - U402 BM513
-	ROM_LOAD ("u402.bin", 0x0000, 0x0200, CRC(cfb67f28) SHA1(e3a62a3a8bce0d098887e31fd16410f38832fd18))
+	ROM_LOAD("u402.bin", 0x0000, 0x0200, CRC(cfb67f28) SHA1(e3a62a3a8bce0d098887e31fd16410f38832fd18))
 	ROM_COPY("gfx1", 0x0000, 0x0200, 0x0200)
 	ROM_COPY("gfx1", 0x0000, 0x0400, 0x0200)
 	ROM_COPY("gfx1", 0x0000, 0x0600, 0x0200)
@@ -191,35 +191,35 @@ ROM_END
 
 ROM_START( ac1_32 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "mon_v31_32.bin",  0x0000, 0x0800, CRC(bea78b1a) SHA1(8a3e2ac2033aa0bb016be742cfea7e4b09c0813b))
+	ROM_LOAD("mon_v31_32.bin",  0x0000, 0x0800, CRC(bea78b1a) SHA1(8a3e2ac2033aa0bb016be742cfea7e4b09c0813b))
 	// from Funkamateur 01/85
-	ROM_LOAD( "minibasic.bin",   0x0800, 0x0800, CRC(06782639) SHA1(3fd57b3ae3f538374b0d794d8aa15d06bcaaddd8))
+	ROM_LOAD("minibasic.bin",   0x0800, 0x0800, CRC(06782639) SHA1(3fd57b3ae3f538374b0d794d8aa15d06bcaaddd8))
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_SYSTEM_BIOS( 0, "128", "128 chars" )
 	// 128 chars - U555 or 2708 from Funkamateur 06/86 128 including pseudo graphics
-	ROMX_LOAD ("zg_128.bin", 0x0000, 0x0400, CRC(0a6f7796) SHA1(64d77639b1ea23f45b4bd38c251851acb2d03822), ROM_BIOS(1))
-	ROMX_LOAD ("zg_128.bin", 0x0400, 0x0400, CRC(0a6f7796) SHA1(64d77639b1ea23f45b4bd38c251851acb2d03822), ROM_BIOS(1))
+	ROMX_LOAD("zg_128.bin", 0x0000, 0x0400, CRC(0a6f7796) SHA1(64d77639b1ea23f45b4bd38c251851acb2d03822), ROM_BIOS(0))
+	ROMX_LOAD("zg_128.bin", 0x0400, 0x0400, CRC(0a6f7796) SHA1(64d77639b1ea23f45b4bd38c251851acb2d03822), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "256", "256 chars" )
 	// 256 chars - 2716 from Computerclub Dessau  including pseudo graphics
-	ROMX_LOAD ("zg_256.bin", 0x0000, 0x0800, CRC(b4171df5) SHA1(abdec4e00257f86b1a57e02b9c6b4d2df2a2a2db), ROM_BIOS(2))
+	ROMX_LOAD("zg_256.bin", 0x0000, 0x0800, CRC(b4171df5) SHA1(abdec4e00257f86b1a57e02b9c6b4d2df2a2a2db), ROM_BIOS(1))
 ROM_END
 
 ROM_START( ac1scch )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v7", "Version 7" )
-	ROMX_LOAD( "mon_v7.bin",  0x0000, 0x1000, CRC(fd17b0cf) SHA1(e47113025bd9dadc1522425e21703f43e584b00f),ROM_BIOS(1))
+	ROMX_LOAD("mon_v7.bin",  0x0000, 0x1000, CRC(fd17b0cf) SHA1(e47113025bd9dadc1522425e21703f43e584b00f), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v8", "Version 8" )
-	ROMX_LOAD( "mon_v8.bin",  0x0000, 0x1000, CRC(5af68da5) SHA1(e760d4400b9c937e7e789d52b8ec975ff253a122),ROM_BIOS(2))
+	ROMX_LOAD("mon_v8.bin",  0x0000, 0x1000, CRC(5af68da5) SHA1(e760d4400b9c937e7e789d52b8ec975ff253a122), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "v10", "Version 10" )
-	ROMX_LOAD( "mon_v10.bin",  0x0000, 0x1000, CRC(f8e67ecb) SHA1(7953676fc8c22824ceff464c7177e9ac0343b8ce),ROM_BIOS(3))
+	ROMX_LOAD("mon_v10.bin",  0x0000, 0x1000, CRC(f8e67ecb) SHA1(7953676fc8c22824ceff464c7177e9ac0343b8ce), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "v1088", "Version 10/88" )
-	ROMX_LOAD( "mon_v1088.bin",  0x0000, 0x1000, CRC(bbb0a6df) SHA1(de9389e142541a8b5ff238b59e98bf571c794bef),ROM_BIOS(4))
+	ROMX_LOAD("mon_v1088.bin",  0x0000, 0x1000, CRC(bbb0a6df) SHA1(de9389e142541a8b5ff238b59e98bf571c794bef), ROM_BIOS(3))
 	ROM_REGION(0x0800, "gfx1",0)
-	ROM_LOAD ("zg_scch.bin", 0x0000, 0x0800, CRC(fbfaf5da) SHA1(667568c5909e9a17675cf09dfbce2fc090c420ab))
+	ROM_LOAD("zg_scch.bin", 0x0000, 0x0800, CRC(fbfaf5da) SHA1(667568c5909e9a17675cf09dfbce2fc090c420ab))
 ROM_END
 
-/* Driver */
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT      COMPANY         FULLNAME                                 FLAGS */
+// Driver
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT      COMPANY         FULLNAME                                 FLAGS
 COMP( 1984, ac1,     0,      0,      ac1,     ac1,   ac1_state, init_ac1, "Frank Heyder", "Amateurcomputer AC1 Berlin",            0 )
 COMP( 1984, ac1_32,  ac1,    0,      ac1_32,  ac1,   ac1_state, init_ac1, "Frank Heyder", "Amateurcomputer AC1 Berlin (32 lines)", 0 )
 COMP( 1984, ac1scch, ac1,    0,      ac1_32,  ac1,   ac1_state, init_ac1, "Frank Heyder", "Amateurcomputer AC1 SCCH",              0 )

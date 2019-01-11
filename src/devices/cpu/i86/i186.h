@@ -16,10 +16,10 @@ public:
 	// construction/destruction
 	i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_read_slave_ack_callback(Object &&cb) { return m_read_slave_ack_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_chip_select_callback(Object &&cb) { return m_out_chip_select_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_tmrout0_handler(Object &&cb) { return m_out_tmrout0_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_tmrout1_handler(Object &&cb) { return m_out_tmrout1_func.set_callback(std::forward<Object>(cb)); }
+	auto read_slave_ack_callback() { return m_read_slave_ack_func.bind(); }
+	auto chip_select_callback() { return m_out_chip_select_func.bind(); }
+	auto tmrout0_handler() { return m_out_tmrout0_func.bind(); }
+	auto tmrout1_handler() { return m_out_tmrout1_func.bind(); }
 
 	IRQ_CALLBACK_MEMBER(int_callback);
 	DECLARE_WRITE_LINE_MEMBER(drq0_w) { if(state) drq_callback(0); m_dma[0].drq_state = state; }
@@ -155,17 +155,5 @@ public:
 	// construction/destruction
 	i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
-
-#define MCFG_80186_IRQ_SLAVE_ACK(_devcb) \
-	devcb = &downcast<i80186_cpu_device &>(*device).set_read_slave_ack_callback(DEVCB_##_devcb);
-
-#define MCFG_80186_CHIP_SELECT_CB(_devcb) \
-	devcb = &downcast<i80186_cpu_device &>(*device).set_chip_select_callback(DEVCB_##_devcb);
-
-#define MCFG_80186_TMROUT0_HANDLER(_devcb) \
-	devcb = &downcast<i80186_cpu_device &>(*device).set_tmrout0_handler(DEVCB_##_devcb);
-
-#define MCFG_80186_TMROUT1_HANDLER(_devcb) \
-	devcb = &downcast<i80186_cpu_device &>(*device).set_tmrout1_handler(DEVCB_##_devcb);
 
 #endif // MAME_CPU_I86_I186_H

@@ -47,13 +47,15 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void pmi80(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
-	void pmi80(machine_config &config);
 	void pmi80_io(address_map &map);
 	void pmi80_mem(address_map &map);
-private:
+
 	uint8_t m_keyrow;
 	bool m_ledready;
 	virtual void machine_reset() override;
@@ -97,8 +99,8 @@ void pmi80_state::pmi80_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0xf8, 0xf8).w(this, FUNC(pmi80_state::leds_w));
-	map(0xfa, 0xfa).rw(this, FUNC(pmi80_state::keyboard_r), FUNC(pmi80_state::keyboard_w));
+	map(0xf8, 0xf8).w(FUNC(pmi80_state::leds_w));
+	map(0xfa, 0xfa).rw(FUNC(pmi80_state::keyboard_r), FUNC(pmi80_state::keyboard_w));
 }
 
 /* Input ports */
@@ -174,7 +176,7 @@ MACHINE_CONFIG_START(pmi80_state::pmi80)
 
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_pmi80)
+	config.set_default_layout(layout_pmi80);
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -28,6 +28,7 @@
 #include "mips3com.h"
 #include "mips3fe.h"
 #include "mips3dsm.h"
+#include "ps2vu.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
@@ -162,7 +163,7 @@ void mips3_device::clear_fastram(uint32_t select_start)
 {
 	m_fastram_select=select_start;
 	// Set cache to dirty so that re-mapping occurs
-	m_cache_dirty = true;
+	m_drc_cache_dirty = true;
 }
 
 /*-------------------------------------------------
@@ -183,7 +184,7 @@ void mips3_device::add_fastram(offs_t start, offs_t end, uint8_t readonly, void 
 		m_fastram[m_fastram_select].offset_base32 = (uint32_t*)((uint8_t*)base - start);
 		m_fastram_select++;
 		// Set cache to dirty so that re-mapping occurs
-		m_cache_dirty = true;
+		m_drc_cache_dirty = true;
 	}
 }
 

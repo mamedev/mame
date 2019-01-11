@@ -1,17 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_CRSHRACE_H
+#define MAME_INCLUDES_CRSHRACE_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 #include "video/vsystem_spr.h"
 #include "video/k053936.h"
+#include "emupal.h"
 
 class crshrace_state : public driver_device
 {
 public:
-	crshrace_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	crshrace_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram1(*this, "videoram1"),
 		m_videoram2(*this, "videoram2"),
 		m_z80bank(*this, "bank1"),
@@ -23,7 +28,8 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram1;
@@ -70,3 +76,5 @@ public:
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CRSHRACE_H

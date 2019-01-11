@@ -79,21 +79,21 @@ static const z80_daisy_config daisy_chain[] =
 
 
 MACHINE_CONFIG_START(nichisnd_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("audiocpu", TMPZ84C011, 8000000) /* TMPZ84C011, 8.00 MHz */
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(nichisnd_map)
-	MCFG_DEVICE_IO_MAP(nichisnd_io_map)
-	MCFG_TMPZ84C011_PORTD_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(*this, nichisnd_device, soundbank_w))
-	MCFG_TMPZ84C011_PORTB_WRITE_CB(WRITE8("dac1", dac_byte_interface, write))
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8("dac2", dac_byte_interface, write))
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(*this, nichisnd_device, soundlatch_clear_w))
-	MCFG_TMPZ84C011_ZC0_CB(WRITELINE("audiocpu", tmpz84c011_device, trg3))
+	tmpz84c011_device& audiocpu(TMPZ84C011(config, "audiocpu", 8000000)); /* TMPZ84C011, 8.00 MHz */
+	audiocpu.set_daisy_config(daisy_chain);
+	audiocpu.set_addrmap(AS_PROGRAM, &nichisnd_device::nichisnd_map);
+	audiocpu.set_addrmap(AS_IO, &nichisnd_device::nichisnd_io_map);
+	audiocpu.in_pd_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	audiocpu.out_pa_callback().set(FUNC(nichisnd_device::soundbank_w));
+	audiocpu.out_pb_callback().set("dac1", FUNC(dac_byte_interface::data_w));
+	audiocpu.out_pc_callback().set("dac2", FUNC(dac_byte_interface::data_w));
+	audiocpu.out_pe_callback().set(FUNC(nichisnd_device::soundlatch_clear_w));
+	audiocpu.zc0_callback().set("audiocpu", FUNC(tmpz84c011_device::trg3));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

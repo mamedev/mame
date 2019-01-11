@@ -5,7 +5,13 @@
     Ojanko High School & other Video System mahjong series
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_OJANKOHS_H
+#define MAME_INCLUDES_OJANKOHS_H
+
+#pragma once
+
 #include "sound/msm5205.h"
+#include "emupal.h"
 #include "screen.h"
 
 class ojankohs_state : public driver_device
@@ -30,6 +36,15 @@ public:
 		m_dsw3(*this, "dsw3"), m_dsw4(*this, "dsw4")
 	{ }
 
+	void ojankohs(machine_config &config);
+	void ccasino(machine_config &config);
+	void ojankoc(machine_config &config);
+	void ojankoy(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
 	/* memory pointers */
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint8_t> m_colorram;
@@ -93,12 +108,11 @@ public:
 	DECLARE_READ8_MEMBER(ojankohs_dipsw2_r);
 	TILE_GET_INFO_MEMBER(ojankohs_get_tile_info);
 	TILE_GET_INFO_MEMBER(ojankoy_get_tile_info);
-	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(ojankohs);
 	DECLARE_VIDEO_START(ojankohs);
 	DECLARE_MACHINE_START(ojankoy);
 	DECLARE_VIDEO_START(ojankoy);
-	DECLARE_PALETTE_INIT(ojankoy);
+	void ojankoy_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(ccasino);
 	DECLARE_MACHINE_START(ojankoc);
 	DECLARE_VIDEO_START(ojankoc);
@@ -107,10 +121,7 @@ public:
 	uint32_t screen_update_ojankoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ojankoc_flipscreen( address_space &space, int data );
 	DECLARE_WRITE_LINE_MEMBER(ojankohs_adpcm_int);
-	void ojankohs(machine_config &config);
-	void ccasino(machine_config &config);
-	void ojankoc(machine_config &config);
-	void ojankoy(machine_config &config);
+
 	void ccasino_io_map(address_map &map);
 	void ojankoc_io_map(address_map &map);
 	void ojankoc_map(address_map &map);
@@ -119,3 +130,5 @@ public:
 	void ojankoy_io_map(address_map &map);
 	void ojankoy_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_OJANKOHS_H

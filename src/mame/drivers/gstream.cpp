@@ -136,6 +136,7 @@ RAM4 is HMC HM6264LP-70
 #include "cpu/e132xs/e132xs.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -154,6 +155,17 @@ public:
 		m_toggle = 0;
 	}
 
+	void x2222(machine_config &config);
+	void gstream(machine_config &config);
+
+	void init_gstream();
+	void init_x2222();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(x2222_toggle_r);
+
+private:
 	/* devices */
 	required_device<e132xt_device> m_maincpu;
 	optional_device_array<okim6295_device, 2> m_oki;
@@ -181,11 +193,6 @@ public:
 	DECLARE_READ32_MEMBER(gstream_speedup_r);
 	DECLARE_READ32_MEMBER(x2222_speedup_r);
 	DECLARE_READ32_MEMBER(x2222_speedup2_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(x2222_toggle_r);
-	void init_gstream();
-	void init_x2222();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -199,8 +206,6 @@ public:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void x2222(machine_config &config);
-	void gstream(machine_config &config);
 	void gstream_32bit_map(address_map &map);
 	void gstream_io(address_map &map);
 	void x2222_32bit_map(address_map &map);
@@ -265,15 +270,15 @@ void gstream_state::gstream_32bit_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("workram"); // work ram
 //  map(0x40000000, 0x40ffffff).ram(); // ?? lots of data gets copied here if present, but game runs without it??
-	map(0x80000000, 0x80003fff).ram().w(this, FUNC(gstream_state::vram_w)).share("vram"); // video ram
+	map(0x80000000, 0x80003fff).ram().w(FUNC(gstream_state::vram_w)).share("vram"); // video ram
 	map(0x4E000000, 0x4e1fffff).rom().region("maindata", 0); // main game rom
-	map(0x4f000000, 0x4f000003).w(this, FUNC(gstream_state::scrollx_w<2>)).umask32(0xffff0000).cswidth(32);
-	map(0x4f200000, 0x4f200003).w(this, FUNC(gstream_state::scrolly_w<2>)).umask32(0xffff0000).cswidth(32);
+	map(0x4f000000, 0x4f000003).w(FUNC(gstream_state::scrollx_w<2>)).umask32(0xffff0000).cswidth(32);
+	map(0x4f200000, 0x4f200003).w(FUNC(gstream_state::scrolly_w<2>)).umask32(0xffff0000).cswidth(32);
 	map(0x4f400000, 0x4f406fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x4f800000, 0x4f800003).w(this, FUNC(gstream_state::scrollx_w<0>)).umask32(0xffff0000).cswidth(32);
-	map(0x4fa00000, 0x4fa00003).w(this, FUNC(gstream_state::scrolly_w<0>)).umask32(0xffff0000).cswidth(32);
-	map(0x4fc00000, 0x4fc00003).w(this, FUNC(gstream_state::scrollx_w<1>)).umask32(0xffff0000).cswidth(32);
-	map(0x4fe00000, 0x4fe00003).w(this, FUNC(gstream_state::scrolly_w<1>)).umask32(0xffff0000).cswidth(32);
+	map(0x4f800000, 0x4f800003).w(FUNC(gstream_state::scrollx_w<0>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fa00000, 0x4fa00003).w(FUNC(gstream_state::scrolly_w<0>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fc00000, 0x4fc00003).w(FUNC(gstream_state::scrollx_w<1>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fe00000, 0x4fe00003).w(FUNC(gstream_state::scrolly_w<1>)).umask32(0xffff0000).cswidth(32);
 	map(0xffc00000, 0xffc01fff).ram().share("nvram"); // Backup RAM
 	map(0xfff80000, 0xffffffff).rom().region("maincpu", 0); // boot rom
 }
@@ -348,8 +353,8 @@ void gstream_state::gstream_io(address_map &map)
 	map(0x4000, 0x4003).portr("IN0");
 	map(0x4010, 0x4013).portr("IN1");
 	map(0x4020, 0x4023).portr("IN2");    // extra coin switches etc
-	map(0x4030, 0x4033).w(this, FUNC(gstream_state::gstream_oki_banking_w));    // oki banking
-	map(0x4040, 0x4043).w(this, FUNC(gstream_state::gstream_oki_4040_w));   // some clocking?
+	map(0x4030, 0x4033).w(FUNC(gstream_state::gstream_oki_banking_w));    // oki banking
+	map(0x4040, 0x4043).w(FUNC(gstream_state::gstream_oki_4040_w));   // some clocking?
 	map(0x4053, 0x4053).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // music and samples
 	map(0x4063, 0x4063).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // music and samples
 }
@@ -359,16 +364,16 @@ void gstream_state::x2222_32bit_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("workram"); // work ram
 	map(0x40000000, 0x403fffff).ram(); // ?? data gets copied here if present, but game runs without it??
-	map(0x80000000, 0x80003fff).ram().w(this, FUNC(gstream_state::vram_w)).share("vram"); // video ram
+	map(0x80000000, 0x80003fff).ram().w(FUNC(gstream_state::vram_w)).share("vram"); // video ram
 
-	map(0x4fc00000, 0x4fc00003).w(this, FUNC(gstream_state::scrolly_w<1>)).umask32(0xffff0000).cswidth(32);
-	map(0x4fd00000, 0x4fd00003).w(this, FUNC(gstream_state::scrollx_w<1>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fc00000, 0x4fc00003).w(FUNC(gstream_state::scrolly_w<1>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fd00000, 0x4fd00003).w(FUNC(gstream_state::scrollx_w<1>)).umask32(0xffff0000).cswidth(32);
 
-	map(0x4fa00000, 0x4fa00003).w(this, FUNC(gstream_state::scrolly_w<2>)).umask32(0xffff0000).cswidth(32);
-	map(0x4fb00000, 0x4fb00003).w(this, FUNC(gstream_state::scrollx_w<2>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fa00000, 0x4fa00003).w(FUNC(gstream_state::scrolly_w<2>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fb00000, 0x4fb00003).w(FUNC(gstream_state::scrollx_w<2>)).umask32(0xffff0000).cswidth(32);
 
-	map(0x4fe00000, 0x4fe00003).w(this, FUNC(gstream_state::scrolly_w<0>)).umask32(0xffff0000).cswidth(32);
-	map(0x4ff00000, 0x4ff00003).w(this, FUNC(gstream_state::scrollx_w<0>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fe00000, 0x4fe00003).w(FUNC(gstream_state::scrolly_w<0>)).umask32(0xffff0000).cswidth(32);
+	map(0x4ff00000, 0x4ff00003).w(FUNC(gstream_state::scrollx_w<0>)).umask32(0xffff0000).cswidth(32);
 
 	map(0xffc00000, 0xffc01fff).ram().share("nvram"); // Backup RAM (maybe)
 	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0); // boot rom
@@ -387,7 +392,7 @@ void gstream_state::x2222_io(address_map &map)
 	map(0x4004, 0x4007).portr("P2");
 	map(0x4008, 0x400b).portr("SYS");
 	map(0x4010, 0x4013).portr("DSW");
-	map(0x4028, 0x402b).w(this, FUNC(gstream_state::x2222_sound_w));
+	map(0x4028, 0x402b).w(FUNC(gstream_state::x2222_sound_w));
 	map(0x4034, 0x4037).portr("IN4");
 }
 
@@ -831,8 +836,7 @@ MACHINE_CONFIG_START(gstream_state::gstream)
 	MCFG_DEVICE_IO_MAP(gstream_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
-
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -842,10 +846,9 @@ MACHINE_CONFIG_START(gstream_state::gstream)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
-	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::BGR_565, 0x1000 + 0x400 + 0x400 + 0x400); // sprites + 3 bg layers
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gstream)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gstream);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -864,7 +867,7 @@ MACHINE_CONFIG_START(gstream_state::x2222)
 	MCFG_DEVICE_IO_MAP(x2222_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
-//  MCFG_NVRAM_ADD_1FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -874,9 +877,9 @@ MACHINE_CONFIG_START(gstream_state::x2222)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update)
 
-	MCFG_PALETTE_ADD_BBBBBGGGGGGRRRRR("palette")
+	PALETTE(config, m_palette, palette_device::BGR_565);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x2222)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x2222);
 
 	// unknown sound hw (no sound roms dumped)
 

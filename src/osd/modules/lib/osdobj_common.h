@@ -88,6 +88,7 @@
 #define OSDOPTION_BGFX_DEBUG            "bgfx_debug"
 #define OSDOPTION_BGFX_SCREEN_CHAINS    "bgfx_screen_chains"
 #define OSDOPTION_BGFX_SHADOW_MASK      "bgfx_shadow_mask"
+#define OSDOPTION_BGFX_LUT              "bgfx_lut"
 #define OSDOPTION_BGFX_AVI_NAME         "bgfx_avi_name"
 
 //============================================================
@@ -162,6 +163,7 @@ public:
 	bool bgfx_debug() const { return bool_value(OSDOPTION_BGFX_DEBUG); }
 	const char *bgfx_screen_chains() const { return value(OSDOPTION_BGFX_SCREEN_CHAINS); }
 	const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
+	const char *bgfx_lut() const { return value(OSDOPTION_BGFX_LUT); }
 	const char *bgfx_avi_name() const { return value(OSDOPTION_BGFX_AVI_NAME); }
 
 	// PortAudio options

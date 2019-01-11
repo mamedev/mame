@@ -21,13 +21,13 @@ class mightyframe_state : public driver_device
 public:
 	mightyframe_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//      , m_maincpu(*this, "maincpu")
+		//      , m_maincpu(*this, "maincpu")
 	{ }
 
-void mightyframe(machine_config &config);
-void mem_map(address_map &map);
+	void mightyframe(machine_config &config);
 private:
-//  required_device<cpu_device> m_maincpu;
+	void mem_map(address_map &map);
+	//  required_device<cpu_device> m_maincpu;
 };
 
 void mightyframe_state::mem_map(address_map &map)

@@ -12,8 +12,8 @@
 #pragma once
 
 
-void generic_plain_slot(device_slot_interface &device);
-void generic_linear_slot(device_slot_interface &device);
-void generic_romram_plain_slot(device_slot_interface &device);
+device_slot_interface &generic_plain_slot(device_slot_interface &device);
+device_slot_interface &generic_linear_slot(device_slot_interface &device);
+device_slot_interface &generic_romram_plain_slot(device_slot_interface &device);
 
 #endif // MAME_BUS_GENERIC_CARTS_H

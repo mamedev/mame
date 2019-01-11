@@ -1240,18 +1240,18 @@ WRITE_LINE_MEMBER(gba_state::dma_vblank_callback)
 void gba_state::gba_map(address_map &map)
 {
 	map.unmap_value_high(); // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
-	map(0x00000000, 0x00003fff).rom().mirror(0x01ffc000).r(this, FUNC(gba_state::gba_bios_r));
+	map(0x00000000, 0x00003fff).rom().mirror(0x01ffc000).r(FUNC(gba_state::gba_bios_r));
 	map(0x02000000, 0x0203ffff).ram().mirror(0xfc0000);
 	map(0x03000000, 0x03007fff).ram().mirror(0xff8000);
 	map(0x04000000, 0x0400005f).rw("lcd", FUNC(gba_lcd_device::video_r), FUNC(gba_lcd_device::video_w));
-	map(0x04000060, 0x040003ff).rw(this, FUNC(gba_state::gba_io_r), FUNC(gba_state::gba_io_w));
+	map(0x04000060, 0x040003ff).rw(FUNC(gba_state::gba_io_r), FUNC(gba_state::gba_io_w));
 	map(0x04000400, 0x04ffffff).noprw();                                         // Not used
 	map(0x05000000, 0x050003ff).mirror(0x00fffc00).rw("lcd", FUNC(gba_lcd_device::gba_pram_r), FUNC(gba_lcd_device::gba_pram_w));  // Palette RAM
 	map(0x06000000, 0x06017fff).mirror(0x00fe0000).rw("lcd", FUNC(gba_lcd_device::gba_vram_r), FUNC(gba_lcd_device::gba_vram_w));  // VRAM
 	map(0x06018000, 0x0601ffff).mirror(0x00fe0000).rw("lcd", FUNC(gba_lcd_device::gba_vram_r), FUNC(gba_lcd_device::gba_vram_w));  // VRAM
 	map(0x07000000, 0x070003ff).mirror(0x00fffc00).rw("lcd", FUNC(gba_lcd_device::gba_oam_r), FUNC(gba_lcd_device::gba_oam_w));    // OAM
 	//AM_RANGE(0x08000000, 0x0cffffff)  // cart ROM + mirrors, mapped here at machine_start if a cart is present
-	map(0x10000000, 0xffffffff).r(this, FUNC(gba_state::gba_10000000_r)); // for "Justice League Chronicles" (game bug)
+	map(0x10000000, 0xffffffff).r(FUNC(gba_state::gba_10000000_r)); // for "Justice League Chronicles" (game bug)
 }
 
 static INPUT_PORTS_START( gbadv )
@@ -1435,12 +1435,12 @@ MACHINE_CONFIG_START(gba_state::gbadv)
 	MCFG_DEVICE_ADD("maincpu", ARM7, XTAL(16'777'216))
 	MCFG_DEVICE_PROGRAM_MAP(gba_map)
 
-	MCFG_GBA_LCD_ADD("lcd")
-	MCFG_GBA_LCD_INT_HBLANK(WRITELINE(*this, gba_state, int_hblank_callback))
-	MCFG_GBA_LCD_INT_VBLANK(WRITELINE(*this, gba_state, int_vblank_callback))
-	MCFG_GBA_LCD_INT_VCOUNT(WRITELINE(*this, gba_state, int_vcount_callback))
-	MCFG_GBA_LCD_DMA_HBLANK(WRITELINE(*this, gba_state, dma_hblank_callback))
-	MCFG_GBA_LCD_DMA_VBLANK(WRITELINE(*this, gba_state, dma_vblank_callback))
+	gba_lcd_device &lcd(GBA_LCD(config, "lcd", 0));
+	lcd.int_hblank_callback().set(FUNC(gba_state::int_hblank_callback));
+	lcd.int_vblank_callback().set(FUNC(gba_state::int_vblank_callback));
+	lcd.int_vcount_callback().set(FUNC(gba_state::int_vcount_callback));
+	lcd.dma_hblank_callback().set(FUNC(gba_state::dma_hblank_callback));
+	lcd.dma_vblank_callback().set(FUNC(gba_state::dma_vblank_callback));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

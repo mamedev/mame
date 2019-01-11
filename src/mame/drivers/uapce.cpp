@@ -99,7 +99,6 @@ Alien Crush & Pac_Land: dumps made from PC-Engine dumps of JP versions
 #include "cpu/z80/z80.h"
 #include "video/huc6260.h"
 #include "video/huc6270.h"
-#include "sound/c6280.h"
 #include "sound/discrete.h"
 
 #include "screen.h"
@@ -113,6 +112,9 @@ public:
 		: pce_common_state(mconfig, type, tag),
 		m_discrete(*this, "discrete") { }
 
+	void uapce(machine_config &config);
+
+private:
 	uint8_t m_jamma_if_control_latch;
 	DECLARE_WRITE8_MEMBER(jamma_if_control_latch_w);
 	DECLARE_READ8_MEMBER(jamma_if_control_latch_r);
@@ -120,7 +122,7 @@ public:
 	virtual uint8_t joy_read() override;
 	virtual void machine_reset() override;
 	required_device<discrete_device> m_discrete;
-	void uapce(machine_config &config);
+
 	void pce_io(address_map &map);
 	void pce_mem(address_map &map);
 	void z80_map(address_map &map);
@@ -170,7 +172,7 @@ WRITE8_MEMBER(uapce_state::jamma_if_control_latch_w)
       752 Hz (D-3) square wave to be output on the common audio path.
       (1= Tone output ON, 0= Tone output OFF) */
 
-	m_discrete->write(space, UAPCE_SOUND_EN, BIT(data,3));
+	m_discrete->write(UAPCE_SOUND_EN, BIT(data,3));
 
 /* D2 : Not latched, though software writes to this bit like it is. */
 
@@ -247,10 +249,10 @@ void uapce_state::z80_map(address_map &map)
 {
 	map(0x0000, 0x07FF).rom();
 	map(0x0800, 0x0FFF).ram();
-	map(0x1000, 0x17FF).w(this, FUNC(uapce_state::jamma_if_control_latch_w));
-	map(0x1800, 0x1FFF).r(this, FUNC(uapce_state::jamma_if_read_dsw));
+	map(0x1000, 0x17FF).w(FUNC(uapce_state::jamma_if_control_latch_w));
+	map(0x1800, 0x1FFF).r(FUNC(uapce_state::jamma_if_read_dsw));
 	map(0x2000, 0x27FF).portr("COIN");
-	map(0x2800, 0x2FFF).r(this, FUNC(uapce_state::jamma_if_control_latch_r));
+	map(0x2800, 0x2FFF).r(FUNC(uapce_state::jamma_if_control_latch_r));
 }
 
 
@@ -293,10 +295,6 @@ void uapce_state::pce_mem(address_map &map)
 	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
 	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
 	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
-	map(0x1FE800, 0x1FEBFF).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
-	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
-	map(0x1FF000, 0x1FF3FF).rw(this, FUNC(uapce_state::pce_joystick_r), FUNC(uapce_state::pce_joystick_w));
-	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
 }
 
 void uapce_state::pce_io(address_map &map)
@@ -307,9 +305,13 @@ void uapce_state::pce_io(address_map &map)
 
 MACHINE_CONFIG_START(uapce_state::uapce)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
-	MCFG_DEVICE_PROGRAM_MAP(pce_mem)
-	MCFG_DEVICE_IO_MAP(pce_io)
+	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &uapce_state::pce_mem);
+	m_maincpu->set_addrmap(AS_IO, &uapce_state::pce_io);
+	m_maincpu->port_in_cb().set(FUNC(uapce_state::pce_joystick_r));
+	m_maincpu->port_out_cb().set(FUNC(uapce_state::pce_joystick_w));
+	m_maincpu->add_route(0, "lspeaker", 0.5);
+	m_maincpu->add_route(1, "rspeaker", 0.5);
 
 	MCFG_DEVICE_ADD("sub", Z80, 1400000)
 	MCFG_DEVICE_PROGRAM_MAP(z80_map)
@@ -322,21 +324,18 @@ MACHINE_CONFIG_START(uapce_state::uapce)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_common_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260")
 
-	MCFG_DEVICE_ADD( "huc6260", HUC6260, PCE_MAIN_CLOCK )
-	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6270", huc6270_device, next_pixel))
-	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(READ16("huc6270", huc6270_device, time_until_next_event))
-	MCFG_HUC6260_VSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, vsync_changed))
-	MCFG_HUC6260_HSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, hsync_changed))
-	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
-	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
+	HUC6260(config, m_huc6260, PCE_MAIN_CLOCK);
+	m_huc6260->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
+	m_huc6260->time_til_next_event().set("huc6270", FUNC(huc6270_device::time_until_next_event));
+	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
+	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
+
+	huc6270_device &huc6270(HUC6270(config, "huc6270", 0));
+	huc6270.set_vram_size(0x10000);
+	huc6270.irq().set_inputline(m_maincpu, 0);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
-	MCFG_C6280_CPU("maincpu")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, uapce_discrete)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)

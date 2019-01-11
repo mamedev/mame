@@ -329,7 +329,7 @@ void k054539_device::init_chip()
 	save_item(NAME(flags));
 
 	save_item(NAME(regs));
-	save_pointer(NAME(ram.get()), 0x4000);
+	save_pointer(NAME(ram), 0x4000);
 	save_item(NAME(reverb_pos));
 	save_item(NAME(cur_ptr));
 	save_item(NAME(cur_limit));
@@ -533,6 +533,11 @@ void k054539_device::device_start()
 		pantab[i] = sqrt((double)i) / sqrt((double)0xe);
 
 	init_chip();
+}
+
+void k054539_device::device_clock_changed()
+{
+	stream->set_sample_rate(clock() / 384);
 }
 
 void k054539_device::device_reset()

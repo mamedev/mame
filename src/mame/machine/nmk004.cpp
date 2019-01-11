@@ -71,10 +71,10 @@ void nmk004_device::nmk004_sound_mem_map(address_map &map)
 	map(0xf800, 0xf801).rw(":ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xf900, 0xf900).rw(":oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xfa00, 0xfa00).rw(":oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xfb00, 0xfb00).r(this, FUNC(nmk004_device::nmk004_tonmk004_r));    // from main cpu
-	map(0xfc00, 0xfc00).w(this, FUNC(nmk004_device::nmk004_tomain_w));  // to main cpu
-	map(0xfc01, 0xfc01).w(this, FUNC(nmk004_device::nmk004_oki0_bankswitch_w));
-	map(0xfc02, 0xfc02).w(this, FUNC(nmk004_device::nmk004_oki1_bankswitch_w));
+	map(0xfb00, 0xfb00).r(FUNC(nmk004_device::nmk004_tonmk004_r));    // from main cpu
+	map(0xfc00, 0xfc00).w(FUNC(nmk004_device::nmk004_tomain_w));  // to main cpu
+	map(0xfc01, 0xfc01).w(FUNC(nmk004_device::nmk004_oki0_bankswitch_w));
+	map(0xfc02, 0xfc02).w(FUNC(nmk004_device::nmk004_oki1_bankswitch_w));
 }
 
 
@@ -110,11 +110,12 @@ void nmk004_device::device_start()
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START(nmk004_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("mcu",TMP90840, DERIVED_CLOCK(1,1)) // Toshiba TMP90C840AF in QFP64 package with 8Kbyte internal ROM
-	MCFG_DEVICE_PROGRAM_MAP(nmk004_sound_mem_map)
-	MCFG_TLCS90_PORT_P4_WRITE_CB(WRITE8(*this, nmk004_device, nmk004_port4_w))
-MACHINE_CONFIG_END
+void nmk004_device::device_add_mconfig(machine_config &config)
+{
+	TMP90840(config, m_cpu, DERIVED_CLOCK(1,1)); // Toshiba TMP90C840AF in QFP64 package with 8Kbyte internal ROM
+	m_cpu->set_addrmap(AS_PROGRAM, &nmk004_device::nmk004_sound_mem_map);
+	m_cpu->port_write<4>().set(FUNC(nmk004_device::nmk004_port4_w));
+}
 
 //-------------------------------------------------
 //  device_rom_region - return a pointer to the

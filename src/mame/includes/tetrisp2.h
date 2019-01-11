@@ -2,6 +2,7 @@
 // copyright-holders:Luca Elia
 
 #include "machine/gen_latch.h"
+#include "emupal.h"
 
 class tetrisp2_state : public driver_device
 {
@@ -32,9 +33,28 @@ public:
 		m_sub_palette(*this, "sub_palette"),
 		m_paletteram(*this, "paletteram"),
 		m_sub_paletteram(*this, "sub_paletteram"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
 
+	void rockn2(machine_config &config);
+	void tetrisp2(machine_config &config);
+	void nndmseal(machine_config &config);
+	void rocknms(machine_config &config);
+	void rockn(machine_config &config);
+
+	void init_rockn2();
+	void init_rockn1();
+	void init_rockn();
+	void init_rockn3();
+	void init_rocknms();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(rocknms_main2sub_status_r);
+
+	TILE_GET_INFO_MEMBER(get_tile_info_bg);
+	TILE_GET_INFO_MEMBER(stepstag_get_tile_info_fg);
+	TILE_GET_INFO_MEMBER(get_tile_info_rot);
+
+protected:
 	DECLARE_WRITE16_MEMBER(rockn_systemregs_w);
 	DECLARE_WRITE16_MEMBER(rocknms_sub_systemregs_w);
 	DECLARE_READ16_MEMBER(rockn_adpcmbank_r);
@@ -65,19 +85,13 @@ public:
 	DECLARE_WRITE16_MEMBER(rocknms_sub_vram_bg_w);
 	DECLARE_WRITE16_MEMBER(rocknms_sub_vram_fg_w);
 	DECLARE_WRITE16_MEMBER(rocknms_sub_vram_rot_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(rocknms_main2sub_status_r);
-	void init_rockn2();
-	void init_rockn1();
-	void init_rockn();
-	void init_rockn3();
-	void init_rocknms();
-	TILE_GET_INFO_MEMBER(get_tile_info_bg);
+
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
-	TILE_GET_INFO_MEMBER(get_tile_info_rot);
+
 	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_fg);
 	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_rot);
-	TILE_GET_INFO_MEMBER(stepstag_get_tile_info_fg);
+
 	DECLARE_VIDEO_START(tetrisp2);
 	DECLARE_VIDEO_START(nndmseal);
 	DECLARE_VIDEO_START(rockntread);
@@ -91,11 +105,7 @@ public:
 	TIMER_CALLBACK_MEMBER(rockn_timer_level1_callback);
 	TIMER_CALLBACK_MEMBER(rockn_timer_sub_level1_callback);
 	void init_rockn_timer();
-	void rockn2(machine_config &config);
-	void tetrisp2(machine_config &config);
-	void nndmseal(machine_config &config);
-	void rocknms(machine_config &config);
-	void rockn(machine_config &config);
+
 	void nndmseal_map(address_map &map);
 	void rockn1_map(address_map &map);
 	void rockn2_map(address_map &map);
@@ -103,8 +113,7 @@ public:
 	void rocknms_sub_map(address_map &map);
 	void tetrisp2_map(address_map &map);
 
-protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
@@ -134,7 +143,7 @@ protected:
 	optional_device<palette_device> m_sub_palette;
 	required_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_sub_paletteram;
-	output_finder<45> m_led;
+	output_finder<45> m_leds;
 
 	uint16_t m_rocknms_sub_systemregs[0x10];
 	uint16_t m_rockn_protectdata;
@@ -176,6 +185,14 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void stepstag(machine_config &config);
+	void vjdash(machine_config &config);
+
+	void init_stepstag();
+
+	DECLARE_VIDEO_START(stepstag);
+
+private:
 	DECLARE_READ16_MEMBER(stepstag_coins_r);
 	uint16_t vj_upload_idx;
 	bool vj_upload_fini;
@@ -189,22 +206,20 @@ public:
 	DECLARE_WRITE16_MEMBER(stepstag_neon_w);
 	DECLARE_WRITE16_MEMBER(stepstag_step_leds_w);
 	DECLARE_WRITE16_MEMBER(stepstag_button_leds_w);
-	DECLARE_WRITE16_MEMBER( stepstag_palette_w );
-	void init_stepstag();
-	DECLARE_VIDEO_START(stepstag);
+	DECLARE_WRITE16_MEMBER( stepstag_palette_left_w );
+	DECLARE_WRITE16_MEMBER( stepstag_palette_mid_w );
+	DECLARE_WRITE16_MEMBER( stepstag_palette_right_w );
+
 	uint32_t screen_update_stepstag_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stepstag_mid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stepstag_main(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	inline int mypal(int x);
-
-	void stepstag(machine_config &config);
-	void vjdash(machine_config &config);
+//  inline int mypal(int x);
 
 	void stepstag_map(address_map &map);
 	void stepstag_sub_map(address_map &map);
 	void vjdash_map(address_map &map);
-private:
+
 	required_shared_ptr<uint16_t> m_spriteram1;
 	required_shared_ptr<uint16_t> m_spriteram3;
 	optional_device<gfxdecode_device> m_vj_gfxdecode_l;
@@ -217,4 +232,5 @@ private:
 	optional_shared_ptr<uint16_t> m_vj_paletteram_m;
 	optional_shared_ptr<uint16_t> m_vj_paletteram_r;
 	required_device<generic_latch_16_device> m_soundlatch;
+	void convert_yuv422_to_rgb888(palette_device *paldev, uint16_t *palram,uint32_t offset);
 };

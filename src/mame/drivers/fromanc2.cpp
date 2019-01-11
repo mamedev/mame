@@ -164,31 +164,31 @@ void fromanc2_state::fromanc2_main_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();                                 // MAIN ROM
 
 	map(0x802000, 0x802fff).nopr();                             // ???
-	map(0x800000, 0x803fff).w(this, FUNC(fromanc2_state::fromanc2_videoram_0_w));        // VRAM 0, 1 (1P)
-	map(0x880000, 0x883fff).w(this, FUNC(fromanc2_state::fromanc2_videoram_1_w));        // VRAM 2, 3 (1P)
-	map(0x900000, 0x903fff).w(this, FUNC(fromanc2_state::fromanc2_videoram_2_w));        // VRAM 0, 1 (2P)
-	map(0x980000, 0x983fff).w(this, FUNC(fromanc2_state::fromanc2_videoram_3_w));        // VRAM 2, 3 (2P)
+	map(0x800000, 0x803fff).w(FUNC(fromanc2_state::fromanc2_videoram_0_w));        // VRAM 0, 1 (1P)
+	map(0x880000, 0x883fff).w(FUNC(fromanc2_state::fromanc2_videoram_1_w));        // VRAM 2, 3 (1P)
+	map(0x900000, 0x903fff).w(FUNC(fromanc2_state::fromanc2_videoram_2_w));        // VRAM 0, 1 (2P)
+	map(0x980000, 0x983fff).w(FUNC(fromanc2_state::fromanc2_videoram_3_w));        // VRAM 2, 3 (2P)
 
 	map(0xa00000, 0xa00fff).ram().w(m_lpalette, FUNC(palette_device::write16)).share("lpalette"); // PALETTE (1P)
 	map(0xa80000, 0xa80fff).ram().w(m_rpalette, FUNC(palette_device::write16)).share("rpalette"); // PALETTE (2P)
 
-	map(0xd00000, 0xd00023).w(this, FUNC(fromanc2_state::fromanc2_gfxreg_0_w));          // SCROLL REG (1P/2P)
-	map(0xd00100, 0xd00123).w(this, FUNC(fromanc2_state::fromanc2_gfxreg_2_w));          // SCROLL REG (1P/2P)
-	map(0xd00200, 0xd00223).w(this, FUNC(fromanc2_state::fromanc2_gfxreg_1_w));          // SCROLL REG (1P/2P)
-	map(0xd00300, 0xd00323).w(this, FUNC(fromanc2_state::fromanc2_gfxreg_3_w));          // SCROLL REG (1P/2P)
+	map(0xd00000, 0xd00023).w(FUNC(fromanc2_state::fromanc2_gfxreg_0_w));          // SCROLL REG (1P/2P)
+	map(0xd00100, 0xd00123).w(FUNC(fromanc2_state::fromanc2_gfxreg_2_w));          // SCROLL REG (1P/2P)
+	map(0xd00200, 0xd00223).w(FUNC(fromanc2_state::fromanc2_gfxreg_1_w));          // SCROLL REG (1P/2P)
+	map(0xd00300, 0xd00323).w(FUNC(fromanc2_state::fromanc2_gfxreg_3_w));          // SCROLL REG (1P/2P)
 
 	map(0xd00400, 0xd00413).nopw();                            // ???
 	map(0xd00500, 0xd00513).nopw();                            // ???
 
-	map(0xd01000, 0xd01001).w(this, FUNC(fromanc2_state::sndcmd_w));                     // SOUND REQ (1P/2P)
+	map(0xd01000, 0xd01001).w(FUNC(fromanc2_state::sndcmd_w));                     // SOUND REQ (1P/2P)
 	map(0xd01100, 0xd01101).portr("SYSTEM");
-	map(0xd01200, 0xd01201).w(this, FUNC(fromanc2_state::subcpu_w));                     // SUB CPU WRITE
-	map(0xd01300, 0xd01301).r(this, FUNC(fromanc2_state::subcpu_r));                      // SUB CPU READ
-	map(0xd01400, 0xd01401).w(this, FUNC(fromanc2_state::fromanc2_gfxbank_0_w));         // GFXBANK (1P)
-	map(0xd01500, 0xd01501).w(this, FUNC(fromanc2_state::fromanc2_gfxbank_1_w));         // GFXBANK (2P)
+	map(0xd01200, 0xd01201).w(FUNC(fromanc2_state::subcpu_w));                     // SUB CPU WRITE
+	map(0xd01300, 0xd01301).r(FUNC(fromanc2_state::subcpu_r));                      // SUB CPU READ
+	map(0xd01400, 0xd01401).w(FUNC(fromanc2_state::fromanc2_gfxbank_0_w));         // GFXBANK (1P)
+	map(0xd01500, 0xd01501).w(FUNC(fromanc2_state::fromanc2_gfxbank_1_w));         // GFXBANK (2P)
 	map(0xd01600, 0xd01601).portw("EEPROMOUT");             // EEPROM DATA
-	map(0xd01800, 0xd01801).r(this, FUNC(fromanc2_state::keymatrix_r));                   // INPUT KEY MATRIX
-	map(0xd01a00, 0xd01a01).w(this, FUNC(fromanc2_state::portselect_w));                 // PORT SELECT (1P/2P)
+	map(0xd01800, 0xd01801).r(FUNC(fromanc2_state::keymatrix_r));                   // INPUT KEY MATRIX
+	map(0xd01a00, 0xd01a01).w(FUNC(fromanc2_state::portselect_w));                 // PORT SELECT (1P/2P)
 
 	map(0xd80000, 0xd8ffff).ram();                                 // WORK RAM
 }
@@ -197,27 +197,27 @@ void fromanc2_state::fromancr_main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                 // MAIN ROM
 
-	map(0x800000, 0x803fff).w(this, FUNC(fromanc2_state::fromancr_videoram_0_w));        // VRAM BG (1P/2P)
-	map(0x880000, 0x883fff).w(this, FUNC(fromanc2_state::fromancr_videoram_1_w));        // VRAM FG (1P/2P)
-	map(0x900000, 0x903fff).w(this, FUNC(fromanc2_state::fromancr_videoram_2_w));        // VRAM TEXT (1P/2P)
+	map(0x800000, 0x803fff).w(FUNC(fromanc2_state::fromancr_videoram_0_w));        // VRAM BG (1P/2P)
+	map(0x880000, 0x883fff).w(FUNC(fromanc2_state::fromancr_videoram_1_w));        // VRAM FG (1P/2P)
+	map(0x900000, 0x903fff).w(FUNC(fromanc2_state::fromancr_videoram_2_w));        // VRAM TEXT (1P/2P)
 	map(0x980000, 0x983fff).nopw();                            // VRAM Unused ?
 
 	map(0xa00000, 0xa00fff).ram().w(m_lpalette, FUNC(palette_device::write16)).share("lpalette"); // PALETTE (1P)
 	map(0xa80000, 0xa80fff).ram().w(m_rpalette, FUNC(palette_device::write16)).share("rpalette"); // PALETTE (2P)
 
-	map(0xd00000, 0xd00023).w(this, FUNC(fromanc2_state::fromancr_gfxreg_1_w));          // SCROLL REG (1P/2P)
+	map(0xd00000, 0xd00023).w(FUNC(fromanc2_state::fromancr_gfxreg_1_w));          // SCROLL REG (1P/2P)
 	map(0xd00200, 0xd002ff).nopw();                            // ?
 	map(0xd00400, 0xd00413).nopw();                            // ???
 	map(0xd00500, 0xd00513).nopw();                            // ???
-	map(0xd01000, 0xd01001).w(this, FUNC(fromanc2_state::sndcmd_w));                     // SOUND REQ (1P/2P)
-	map(0xd00100, 0xd00123).w(this, FUNC(fromanc2_state::fromancr_gfxreg_0_w));          // SCROLL REG (1P/2P)
+	map(0xd01000, 0xd01001).w(FUNC(fromanc2_state::sndcmd_w));                     // SOUND REQ (1P/2P)
+	map(0xd00100, 0xd00123).w(FUNC(fromanc2_state::fromancr_gfxreg_0_w));          // SCROLL REG (1P/2P)
 	map(0xd01100, 0xd01101).portr("SYSTEM");
-	map(0xd01200, 0xd01201).w(this, FUNC(fromanc2_state::subcpu_w));                     // SUB CPU WRITE
-	map(0xd01300, 0xd01301).r(this, FUNC(fromanc2_state::subcpu_r));                      // SUB CPU READ
+	map(0xd01200, 0xd01201).w(FUNC(fromanc2_state::subcpu_w));                     // SUB CPU WRITE
+	map(0xd01300, 0xd01301).r(FUNC(fromanc2_state::subcpu_r));                      // SUB CPU READ
 	map(0xd01400, 0xd01401).nopw();                            // COIN COUNTER ?
-	map(0xd01600, 0xd01601).w(this, FUNC(fromanc2_state::fromancr_gfxbank_eeprom_w));    // EEPROM DATA, GFXBANK (1P/2P)
-	map(0xd01800, 0xd01801).r(this, FUNC(fromanc2_state::keymatrix_r));                   // INPUT KEY MATRIX
-	map(0xd01a00, 0xd01a01).w(this, FUNC(fromanc2_state::portselect_w));                 // PORT SELECT (1P/2P)
+	map(0xd01600, 0xd01601).w(FUNC(fromanc2_state::fromancr_gfxbank_eeprom_w));    // EEPROM DATA, GFXBANK (1P/2P)
+	map(0xd01800, 0xd01801).r(FUNC(fromanc2_state::keymatrix_r));                   // INPUT KEY MATRIX
+	map(0xd01a00, 0xd01a01).w(FUNC(fromanc2_state::portselect_w));                 // PORT SELECT (1P/2P)
 
 	map(0xd80000, 0xd8ffff).ram();                                 // WORK RAM
 }
@@ -229,27 +229,27 @@ void fromanc2_state::fromanc4_main_map(address_map &map)
 
 	map(0x800000, 0x81ffff).ram();                             // WORK RAM
 
-	map(0xd00000, 0xd00001).w(this, FUNC(fromanc2_state::portselect_w));             // PORT SELECT (1P/2P)
+	map(0xd00000, 0xd00001).w(FUNC(fromanc2_state::portselect_w));             // PORT SELECT (1P/2P)
 
 	map(0xd10000, 0xd10001).nopw();                        // ?
 	map(0xd30000, 0xd30001).nopw();                        // ?
 	map(0xd50000, 0xd50001).portw("EEPROMOUT");         // EEPROM DATA
 
-	map(0xd70000, 0xd70001).w(this, FUNC(fromanc2_state::sndcmd_w));                 // SOUND REQ (1P/2P)
+	map(0xd70000, 0xd70001).w(FUNC(fromanc2_state::sndcmd_w));                 // SOUND REQ (1P/2P)
 
-	map(0xd80000, 0xd8ffff).w(this, FUNC(fromanc2_state::fromanc4_videoram_0_w));    // VRAM FG (1P/2P)
-	map(0xd90000, 0xd9ffff).w(this, FUNC(fromanc2_state::fromanc4_videoram_1_w));    // VRAM BG (1P/2P)
-	map(0xda0000, 0xdaffff).w(this, FUNC(fromanc2_state::fromanc4_videoram_2_w));    // VRAM TEXT (1P/2P)
+	map(0xd80000, 0xd8ffff).w(FUNC(fromanc2_state::fromanc4_videoram_0_w));    // VRAM FG (1P/2P)
+	map(0xd90000, 0xd9ffff).w(FUNC(fromanc2_state::fromanc4_videoram_1_w));    // VRAM BG (1P/2P)
+	map(0xda0000, 0xdaffff).w(FUNC(fromanc2_state::fromanc4_videoram_2_w));    // VRAM TEXT (1P/2P)
 
 	map(0xdb0000, 0xdb0fff).ram().w(m_lpalette, FUNC(palette_device::write16)).share("lpalette"); // PALETTE (1P)
 	map(0xdc0000, 0xdc0fff).ram().w(m_rpalette, FUNC(palette_device::write16)).share("rpalette"); // PALETTE (2P)
 
-	map(0xd10000, 0xd10001).r(this, FUNC(fromanc2_state::keymatrix_r));               // INPUT KEY MATRIX
+	map(0xd10000, 0xd10001).r(FUNC(fromanc2_state::keymatrix_r));               // INPUT KEY MATRIX
 	map(0xd20000, 0xd20001).portr("SYSTEM");
 
-	map(0xe00000, 0xe0001d).w(this, FUNC(fromanc2_state::fromanc4_gfxreg_0_w));      // SCROLL, GFXBANK (1P/2P)
-	map(0xe10000, 0xe1001d).w(this, FUNC(fromanc2_state::fromanc4_gfxreg_1_w));      // SCROLL, GFXBANK (1P/2P)
-	map(0xe20000, 0xe2001d).w(this, FUNC(fromanc2_state::fromanc4_gfxreg_2_w));      // SCROLL, GFXBANK (1P/2P)
+	map(0xe00000, 0xe0001d).w(FUNC(fromanc2_state::fromanc4_gfxreg_0_w));      // SCROLL, GFXBANK (1P/2P)
+	map(0xe10000, 0xe1001d).w(FUNC(fromanc2_state::fromanc4_gfxreg_1_w));      // SCROLL, GFXBANK (1P/2P)
+	map(0xe20000, 0xe2001d).w(FUNC(fromanc2_state::fromanc4_gfxreg_2_w));      // SCROLL, GFXBANK (1P/2P)
 
 	map(0xe30000, 0xe30013).nopw();                        // ???
 	map(0xe40000, 0xe40013).nopw();                        // ???
@@ -269,10 +269,10 @@ void fromanc2_state::fromanc2_sub_map(address_map &map)
 void fromanc2_state::fromanc2_sub_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(fromanc2_state::subcpu_rombank_w));
-	map(0x02, 0x02).rw(this, FUNC(fromanc2_state::maincpu_r_l), FUNC(fromanc2_state::maincpu_w_l)); // to/from MAIN CPU
-	map(0x04, 0x04).rw(this, FUNC(fromanc2_state::maincpu_r_h), FUNC(fromanc2_state::maincpu_w_h)); // to/from MAIN CPU
-	map(0x06, 0x06).w(this, FUNC(fromanc2_state::subcpu_nmi_clr));
+	map(0x00, 0x00).w(FUNC(fromanc2_state::subcpu_rombank_w));
+	map(0x02, 0x02).rw(FUNC(fromanc2_state::maincpu_r_l), FUNC(fromanc2_state::maincpu_w_l)); // to/from MAIN CPU
+	map(0x04, 0x04).rw(FUNC(fromanc2_state::maincpu_r_h), FUNC(fromanc2_state::maincpu_w_h)); // to/from MAIN CPU
+	map(0x06, 0x06).w(FUNC(fromanc2_state::subcpu_nmi_clr));
 }
 
 
@@ -288,7 +288,7 @@ void fromanc2_state::fromanc2_sound_io_map(address_map &map)
 	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw();     // snd cmd (1P) / ?
 	map(0x04, 0x04).r(m_soundlatch2, FUNC(generic_latch_8_device::read));                // snd cmd (2P)
 	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
-	map(0x0c, 0x0c).r(this, FUNC(fromanc2_state::sndcpu_nmi_clr));
+	map(0x0c, 0x0c).r(FUNC(fromanc2_state::sndcpu_nmi_clr));
 }
 
 
@@ -490,7 +490,7 @@ MACHINE_START_MEMBER(fromanc2_state,fromanc2)
 
 	save_item(NAME(m_subcpu_int_flag));
 	save_item(NAME(m_subcpu_nmi_flag));
-	save_pointer(NAME(m_bankedram.get()), 0x4000 * 3);
+	save_pointer(NAME(m_bankedram), 0x4000 * 3);
 }
 
 void fromanc2_state::machine_reset()
@@ -501,186 +501,180 @@ void fromanc2_state::machine_reset()
 	m_datalatch_2l = 0;
 }
 
-MACHINE_CONFIG_START(fromanc2_state::fromanc2)
-
+void fromanc2_state::fromanc2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromanc2_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
+	M68000(config, m_maincpu, 32000000/2);      /* 16.00 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromanc2_main_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(fromanc2_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sound_map)
-	MCFG_DEVICE_IO_MAP(fromanc2_sound_io_map)
+	Z80(config, m_audiocpu, 32000000/4);        /* 8.00 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromanc2_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &fromanc2_state::fromanc2_sound_io_map);
 
-	MCFG_DEVICE_ADD("sub", Z80,32000000/4)     /* 8.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sub_map)
-	MCFG_DEVICE_IO_MAP(fromanc2_sub_io_map)
+	Z80(config, m_subcpu, 32000000/4);     /* 8.00 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromanc2_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &fromanc2_state::fromanc2_sub_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc2)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromanc2)
+	GFXDECODE(config, m_gfxdecode, m_lpalette, gfx_fromanc2);
 
-	MCFG_PALETTE_ADD("lpalette", 2048)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
-	MCFG_PALETTE_ADD("rpalette", 2048)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	PALETTE(config, m_lpalette).set_format(palette_device::GRBx_555, 2048);
+	PALETTE(config, m_rpalette).set_format(palette_device::GRBx_555, 2048);
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("lpalette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(512, 512);
+	lscreen.set_visarea(0, 352-1, 0, 240-1);
+	lscreen.set_screen_update(FUNC(fromanc2_state::screen_update_left));
+	lscreen.set_palette(m_lpalette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("rpalette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(512, 512);
+	rscreen.set_visarea(0, 352-1, 0, 240-1);
+	rscreen.set_screen_update(FUNC(fromanc2_state::screen_update_right));
+	rscreen.set_palette(m_rpalette);
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromanc2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.75)
-	MCFG_SOUND_ROUTE(2, "mono", 0.75)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.75);
+	ymsnd.add_route(2, "mono", 0.75);
+}
 
-MACHINE_CONFIG_START(fromanc2_state::fromancr)
-
+void fromanc2_state::fromancr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromancr_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
+	M68000(config, m_maincpu, 32000000/2);      /* 16.00 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromancr_main_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(fromanc2_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sound_map)
-	MCFG_DEVICE_IO_MAP(fromanc2_sound_io_map)
+	Z80(config, m_audiocpu, 32000000/4);        /* 8.00 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromanc2_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &fromanc2_state::fromanc2_sound_io_map);
 
-	MCFG_DEVICE_ADD("sub", Z80,32000000/4)     /* 8.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sub_map)
-	MCFG_DEVICE_IO_MAP(fromanc2_sub_io_map)
+	Z80(config, m_subcpu, 32000000/4);     /* 8.00 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromanc2_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &fromanc2_state::fromanc2_sub_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc2)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromancr)
+	GFXDECODE(config, m_gfxdecode, m_lpalette, gfx_fromancr);
 
-	MCFG_PALETTE_ADD("lpalette", 2048)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
-	MCFG_PALETTE_ADD("rpalette", 2048)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, m_lpalette).set_format(palette_device::xGRB_555, 2048);
+	PALETTE(config, m_rpalette).set_format(palette_device::xGRB_555, 2048);
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("lpalette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(512, 512);
+	lscreen.set_visarea(0, 352-1, 0, 240-1);
+	lscreen.set_screen_update(FUNC(fromanc2_state::screen_update_left));
+	lscreen.set_palette(m_lpalette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("rpalette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(512, 512);
+	rscreen.set_visarea(0, 352-1, 0, 240-1);
+	rscreen.set_screen_update(FUNC(fromanc2_state::screen_update_right));
+	rscreen.set_palette(m_rpalette);
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromancr)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.75)
-	MCFG_SOUND_ROUTE(2, "mono", 0.75)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.75);
+	ymsnd.add_route(2, "mono", 0.75);
+}
 
-MACHINE_CONFIG_START(fromanc2_state::fromanc4)
-
+void fromanc2_state::fromanc4(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)      /* 16.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromanc4_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);      /* 16.00 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromanc4_main_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(fromanc2_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4)        /* 8.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sound_map)
-	MCFG_DEVICE_IO_MAP(fromanc2_sound_io_map)
+	Z80(config, m_audiocpu, XTAL(32'000'000)/4);        /* 8.00 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromanc2_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &fromanc2_state::fromanc2_sound_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc4)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_DEVICE_ADD("uart", NS16550, 2000000) // actual type is TL16C550CFN; clock unknown
-	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_2))
-	//MCFG_INS8250_OUT_TX_CB(WRITELINE("link", rs232_port_device, write_txd))
-	//MCFG_INS8250_OUT_RTS_CB(WRITELINE("link", rs232_port_device, write_rts))
+	NS16550(config, m_uart, 2000000); // actual type is TL16C550CFN; clock unknown
+	m_uart->out_int_callback().set_inputline("maincpu", M68K_IRQ_2);
+	//m_uart->out_tx_callback().set("link", FUNC(rs232_port_device::write_txd));
+	//m_uart->out_rts_callback().set("link", FUNC(rs232_port_device::write_rts));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromancr)
+	GFXDECODE(config, m_gfxdecode, m_lpalette, gfx_fromancr);
 
-	MCFG_PALETTE_ADD("lpalette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_ADD("rpalette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_lpalette).set_format(palette_device::xRGB_555, 2048);
+	PALETTE(config, m_rpalette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("lpalette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(512, 512);
+	lscreen.set_visarea(0, 352-1, 0, 240-1);
+	lscreen.set_screen_update(FUNC(fromanc2_state::screen_update_left));
+	lscreen.set_palette(m_lpalette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("rpalette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(512, 512);
+	rscreen.set_visarea(0, 352-1, 0, 240-1);
+	rscreen.set_screen_update(FUNC(fromanc2_state::screen_update_right));
+	rscreen.set_palette(m_rpalette);
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromanc4)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.75)
-	MCFG_SOUND_ROUTE(2, "mono", 0.75)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.75);
+	ymsnd.add_route(2, "mono", 0.75);
+}
 
 
 /*************************************

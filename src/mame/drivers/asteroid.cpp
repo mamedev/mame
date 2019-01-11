@@ -50,9 +50,69 @@ For kit 08-0303008 (from rev 02) swap the following:
 
 There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in any known Atari docs found to date.
 
+
+****************************************************************************
+
+For revision 3 of Asteroids Deluxe:
+
+U.S. Update
+New Program with Easier Game Play for Asteroids Deluxe
+
+The read-only memories (ROMs) in this kit contain a new program that changes the Asteroids Deluxe
+game play. To attract new players, the game play is now operator-adjustable to be either easy for
+approximately the first 30,000 points or hard through-out the game.
+
+The technical manual describes the game play correctly if the game PCB option switch at R5 is set
+to "hard". If you set the switch to "easy", then the following game-play changes happen:
+
+* FOUR large asteroids begin the game. The second wave of asteroids begins with FIVE, and the
+  subsequent waves start with SIX through NINE large asteroids. In addition, the asteriods move
+  much more slowly across the screen. (If the option switch is set to hard, the waves begin with
+  SIX to NINE large asteriods.)
+* The large ships ("death stars") when shot will break up into three slowly-moving diamonds. (If
+  the option switch is set to hard, diamonds would immediatly begin chasing the player's
+  spaceship at high speed.)
+
+After installing these five ROMs, we recommend you set your game to easy game play.  To do so, refer
+to the figure that follows. You should note also that the self-test now deisplays and addition 0 or 1
+to represent your game difficulty selection.
+
+
+ROM kit for Asteroids Deluxe Game PCB Assembly A036471-03 and -04  F
+
+Part Number   PCB Location
+--------------------------------
+036430-02      D1
+036431-02      E/F1
+036432-02      H1
+036433-03      J1
+036800-02      R2
+
+***********************
+
+Self-Test screen shows:
+
+ 0000     (left to right: Coin Bonus Adder, Left Mech Mutiplier, Right Mech Multiplier & Game Price)
+
+ 01000    (left to right: Game Language, Ships at Game Start, Minimum Plays, Difficulty, Bonus Ship)
+
+ ^^       (Graphic display of the number of ships per game [up to 7])
+
+ 10000    (Point score at which a bonus ship is granted, blank is no bonus ship)
+
+
+NOTE: Previous program versions, for the second line would only show 4 digits.  The 6th switch has
+      a currently unknown effect in the game. However, on the Minimum Number of Plays display (on the
+      Self-Test screen) changes the values shown from 0 for a 1-Play Minimum to show a 2 and from
+      1 for a 2-Play Minimum to show a 3. Known documentation for ealier game versions state the 6th
+      switch is "Unused"
+
+****************************************************************************
+
     Asteroids-deluxe state-prom added by HIGHWAYMAN.
     The prom pcb location is:C8 and is 256x4
     (i need to update the dump, this one is read in 8bit-mode)
+
 ****************************************************************************
 
     Asteroids Memory Map (preliminary)
@@ -189,7 +249,6 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 #include "includes/asteroid.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
-#include "machine/atari_vg.h"
 #include "machine/output_latch.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
@@ -227,6 +286,32 @@ WRITE_LINE_MEMBER(asteroid_state::coin_counter_right_w)
 
 /*************************************
  *
+ *  High score EAROM
+ *
+ *************************************/
+
+READ8_MEMBER(asteroid_state::earom_read)
+{
+	return m_earom->data();
+}
+
+WRITE8_MEMBER(asteroid_state::earom_write)
+{
+	m_earom->set_address(offset & 0x3f);
+	m_earom->set_data(data);
+}
+
+WRITE8_MEMBER(asteroid_state::earom_control_w)
+{
+	// CK = DB0, C1 = /DB2, C2 = DB1, CS1 = DB3, /CS2 = GND
+	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));
+	m_earom->set_clk(BIT(data, 0));
+}
+
+
+
+/*************************************
+ *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -237,16 +322,16 @@ void asteroid_state::asteroid_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x02ff).bankrw("ram1").share("ram1");
 	map(0x0300, 0x03ff).bankrw("ram2").share("ram2");
-	map(0x2000, 0x2007).r(this, FUNC(asteroid_state::asteroid_IN0_r)).nopw();    /* IN0 */
-	map(0x2400, 0x2407).r(this, FUNC(asteroid_state::asteroid_IN1_r));    /* IN1 */
-	map(0x2800, 0x2803).r(this, FUNC(asteroid_state::asteroid_DSW1_r)).nopw();   /* DSW1 */
+	map(0x2000, 0x2007).r(FUNC(asteroid_state::asteroid_IN0_r)).nopw();    /* IN0 */
+	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r));    /* IN1 */
+	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r)).nopw();   /* DSW1 */
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
-	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::write));
+	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::bus_w));
 	map(0x3400, 0x3400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x3600, 0x3600).w(this, FUNC(asteroid_state::asteroid_explode_w));
-	map(0x3a00, 0x3a00).w(this, FUNC(asteroid_state::asteroid_thump_w));
+	map(0x3600, 0x3600).w(FUNC(asteroid_state::asteroid_explode_w));
+	map(0x3a00, 0x3a00).w(FUNC(asteroid_state::asteroid_thump_w));
 	map(0x3c00, 0x3c07).w("audiolatch", FUNC(ls259_device::write_d7));
-	map(0x3e00, 0x3e00).w(this, FUNC(asteroid_state::asteroid_noise_reset_w));
+	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::asteroid_noise_reset_w));
 	map(0x4000, 0x47ff).ram().share("vectorram").region("maincpu", 0x4000);
 	map(0x5000, 0x57ff).rom();                     /* vector rom */
 	map(0x6800, 0x7fff).rom();
@@ -259,18 +344,18 @@ void asteroid_state::astdelux_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x02ff).bankrw("ram1").share("ram1");
 	map(0x0300, 0x03ff).bankrw("ram2").share("ram2");
-	map(0x2000, 0x2007).r(this, FUNC(asteroid_state::asteroid_IN0_r)).nopw();    /* IN0 */
-	map(0x2400, 0x2407).r(this, FUNC(asteroid_state::asteroid_IN1_r)).nopw();    /* IN1 */
-	map(0x2800, 0x2803).r(this, FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
+	map(0x2000, 0x2007).r(FUNC(asteroid_state::asteroid_IN0_r)).nopw();    /* IN0 */
+	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r)).nopw();    /* IN1 */
+	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
 	map(0x2c00, 0x2c0f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x2c40, 0x2c7f).r("earom", FUNC(atari_vg_earom_device::read));
+	map(0x2c40, 0x2c7f).r(FUNC(asteroid_state::earom_read));
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
-	map(0x3200, 0x323f).w("earom", FUNC(atari_vg_earom_device::write)).nopr();
+	map(0x3200, 0x323f).w(FUNC(asteroid_state::earom_write)).nopr();
 	map(0x3400, 0x3400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x3600, 0x3600).w(this, FUNC(asteroid_state::asteroid_explode_w));
-	map(0x3a00, 0x3a00).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
+	map(0x3600, 0x3600).w(FUNC(asteroid_state::asteroid_explode_w));
+	map(0x3a00, 0x3a00).w(FUNC(asteroid_state::earom_control_w));
 	map(0x3c00, 0x3c07).w("audiolatch", FUNC(ls259_device::write_d7));
-	map(0x3e00, 0x3e00).w(this, FUNC(asteroid_state::asteroid_noise_reset_w));
+	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::asteroid_noise_reset_w));
 	map(0x4000, 0x47ff).ram().share("vectorram").region("maincpu", 0x4000);
 	map(0x4800, 0x57ff).rom();                     /* vector rom */
 	map(0x6000, 0x7fff).rom();
@@ -282,14 +367,14 @@ void asteroid_state::llander_map(address_map &map)
 	map.global_mask(0x7fff);
 	map(0x0000, 0x00ff).ram().mirror(0x1f00);
 	map(0x2000, 0x2000).portr("IN0");
-	map(0x2400, 0x2407).r(this, FUNC(asteroid_state::asteroid_IN1_r));    /* IN1 */
-	map(0x2800, 0x2803).r(this, FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
+	map(0x2400, 0x2407).r(FUNC(asteroid_state::asteroid_IN1_r));    /* IN1 */
+	map(0x2800, 0x2803).r(FUNC(asteroid_state::asteroid_DSW1_r));   /* DSW1 */
 	map(0x2c00, 0x2c00).portr("THRUST");
 	map(0x3000, 0x3000).w(m_dvg, FUNC(dvg_device::go_w));
-	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::write));
+	map(0x3200, 0x3200).w("outlatch", FUNC(output_latch_device::bus_w));
 	map(0x3400, 0x3400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x3c00, 0x3c00).w(this, FUNC(asteroid_state::llander_sounds_w));
-	map(0x3e00, 0x3e00).w(this, FUNC(asteroid_state::llander_snd_reset_w));
+	map(0x3c00, 0x3c00).w(FUNC(asteroid_state::llander_sounds_w));
+	map(0x3e00, 0x3e00).w(FUNC(asteroid_state::llander_snd_reset_w));
 	map(0x4000, 0x47ff).ram().share("vectorram").region("maincpu", 0x4000);
 	map(0x4800, 0x5fff).rom();                     /* vector rom */
 	map(0x5800, 0x5800).nopw(); // INC access?
@@ -486,9 +571,9 @@ static INPUT_PORTS_START( astdelux )
 	PORT_DIPNAME( 0x10, 0x00, "Minimum Plays" )         PORT_DIPLOCATION("R5:5")
 	PORT_DIPSETTING (   0x00, "1" )
 	PORT_DIPSETTING (   0x10, "2" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("R5:6") /* Listed as "Unused" */
-	PORT_DIPSETTING (   0x00, DEF_STR( Hard ) )
-	PORT_DIPSETTING (   0x20, DEF_STR( Easy ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("R5:6") /* Listed as "Unused" for pre Revision 03 versions */
+	PORT_DIPSETTING (   0x20, DEF_STR( Hard ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( Easy ) )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("R5:7,8")
 	PORT_DIPSETTING (   0x00, "10000" )
 	PORT_DIPSETTING (   0x40, "12000" )
@@ -646,82 +731,83 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(asteroid_state::asteroid_base)
-
+void asteroid_state::asteroid_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(asteroid_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(asteroid_state, asteroid_interrupt, CLOCK_3KHZ/12)
+	M6502(config, m_maincpu, MASTER_CLOCK/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &asteroid_state::asteroid_map);
+	m_maincpu->set_periodic_int(FUNC(asteroid_state::asteroid_interrupt), attotime::from_hz(CLOCK_3KHZ/12));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("dsw_sel", TTL153)
+	TTL153(config, m_dsw_sel);
 
-	MCFG_DEVICE_ADD("outlatch", OUTPUT_LATCH, 0) // LS174 at N11
-	MCFG_OUTPUT_LATCH_BIT0_HANDLER(OUTPUT("led1")) MCFG_DEVCB_INVERT // 2 PLYR START LAMP
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(OUTPUT("led0")) MCFG_DEVCB_INVERT // 1 PLYR START LAMP
-	MCFG_OUTPUT_LATCH_BIT2_HANDLER(MEMBANK("ram1")) // RAMSEL
-	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("ram2"))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, asteroid_state, cocktail_inv_w))
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(WRITELINE(*this, asteroid_state, coin_counter_left_w)) // COIN CNTRL
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(WRITELINE(*this, asteroid_state, coin_counter_center_w)) // COIN CNTRC
-	MCFG_OUTPUT_LATCH_BIT5_HANDLER(WRITELINE(*this, asteroid_state, coin_counter_right_w)) // COIN CNTRR
+	output_latch_device &outlatch(OUTPUT_LATCH(config, "outlatch")); // LS174 at N11
+	outlatch.bit_handler<0>().set_output("led1").invert(); // 2 PLYR START LAMP
+	outlatch.bit_handler<1>().set_output("led0").invert(); // 1 PLYR START LAMP
+	outlatch.bit_handler<2>().set_membank("ram1"); // RAMSEL
+	outlatch.bit_handler<2>().append_membank("ram2");
+	outlatch.bit_handler<2>().append(FUNC(asteroid_state::cocktail_inv_w));
+	outlatch.bit_handler<3>().set(FUNC(asteroid_state::coin_counter_left_w)); // COIN CNTRL
+	outlatch.bit_handler<4>().set(FUNC(asteroid_state::coin_counter_center_w)); // COIN CNTRC
+	outlatch.bit_handler<5>().set(FUNC(asteroid_state::coin_counter_right_w)); // COIN CNTRR
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ/12/4)
-	MCFG_SCREEN_SIZE(400,300)
-	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 394, 1182)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	VECTOR(config, "vector");
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
+	screen.set_refresh_hz(CLOCK_3KHZ/12/4);
+	screen.set_size(400,300);
+	screen.set_visarea(522, 1566, 394, 1182);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	MCFG_DEVICE_ADD("dvg", DVG, 0)
-	MCFG_AVGDVG_VECTOR("vector")
-MACHINE_CONFIG_END
+	DVG(config, m_dvg, 0);
+	m_dvg->set_vector_tag("vector");
+}
 
-MACHINE_CONFIG_START(asteroid_state::asteroid)
+void asteroid_state::asteroid(machine_config &config)
+{
 	asteroid_base(config);
 
 	/* sound hardware */
 	asteroid_sound(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(asteroid_state::asterock)
+void asteroid_state::asterock(machine_config &config)
+{
 	asteroid(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(asteroid_state, asterock_interrupt, CLOCK_3KHZ/12)
-MACHINE_CONFIG_END
+	m_maincpu->set_periodic_int(FUNC(asteroid_state::asterock_interrupt), attotime::from_hz(CLOCK_3KHZ/12));
+}
 
-
-MACHINE_CONFIG_START(asteroid_state::astdelux)
+void asteroid_state::astdelux(machine_config &config)
+{
 	asteroid_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(astdelux_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &asteroid_state::astdelux_map);
 
-	MCFG_ATARIVGEAROM_ADD("earom")
+	ER2055(config, m_earom);
 
 	/* sound hardware */
 	astdelux_sound(config);
 
-	MCFG_DEVICE_ADD("pokey", POKEY, MASTER_CLOCK/8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
-	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	pokey_device &pokey(POKEY(config, "pokey", MASTER_CLOCK/8));
+	pokey.allpot_r().set_ioport("DSW2");
+	pokey.set_output_rc(RES_K(10), CAP_U(0.015), 5.0);
+	pokey.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_REMOVE("outlatch")
-	MCFG_DEVICE_MODIFY("audiolatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // START1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // START2
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("ram1")) // RAMSEL
-	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("ram2"))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, asteroid_state, cocktail_inv_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, asteroid_state, coin_counter_left_w)) // LEFT COIN
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, asteroid_state, coin_counter_center_w)) // CENTER COIN
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, asteroid_state, coin_counter_right_w)) // RIGHT COIN
+	config.device_remove("outlatch");
+
+	ls259_device &audiolatch(*subdevice<ls259_device>("audiolatch"));
+	audiolatch.q_out_cb<0>().set_output("led0").invert(); // START1
+	audiolatch.q_out_cb<1>().set_output("led1").invert(); // START2
+	audiolatch.q_out_cb<4>().set_membank("ram1"); // RAMSEL
+	audiolatch.q_out_cb<4>().append_membank("ram2");
+	audiolatch.q_out_cb<4>().append(FUNC(asteroid_state::cocktail_inv_w));
+	audiolatch.q_out_cb<5>().set(FUNC(asteroid_state::coin_counter_left_w)); // LEFT COIN
+	audiolatch.q_out_cb<6>().set(FUNC(asteroid_state::coin_counter_center_w)); // CENTER COIN
+	audiolatch.q_out_cb<7>().set(FUNC(asteroid_state::coin_counter_right_w)); // RIGHT COIN
 MACHINE_CONFIG_END
 
 
@@ -874,6 +960,23 @@ ROM_START( asterockv )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
 
+ROM_START( meteorite )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "2",       0x6800, 0x0400, CRC(cdf720c6) SHA1(85fe748096478e28a06bd98ff3aad73ab21b22a4) )
+	ROM_LOAD( "3",       0x6c00, 0x0400, CRC(ee58bdf0) SHA1(80094cb5dafd327aff6658ede33106f0493a809d) )
+	ROM_LOAD( "4",       0x7000, 0x0400, CRC(8d3e421e) SHA1(5f5719ab84d4755e69bef205d313b455bc59c413) )
+	ROM_LOAD( "5",       0x7400, 0x0400, CRC(d2ce7672) SHA1(b6012e09b2439a614a55bcf23be0692c42830e21) )
+	ROM_LOAD( "6",       0x7800, 0x0400, CRC(379072ed) SHA1(1ea788f58490f6d0aa6fda1374e33aa25fa343c6) )
+	ROM_LOAD( "7",       0x7c00, 0x0400, CRC(75a39768) SHA1(bf22998fd692fb01964d8894e421435c55d746a0) )
+	/* Vector ROM */
+	ROM_LOAD( "0",       0x5000, 0x0400, CRC(7a3ff3ac) SHA1(11dc452d2804bbaa7cee4dff85a2ab02e6f2c3a9) )
+	ROM_LOAD( "1",       0x5400, 0x0400, CRC(d62b2887) SHA1(8832953c7166d2f0ed1067c43ebf369db4a4aa70) )
+
+	/* DVG PROM */
+	ROM_REGION( 0x100, "user1", 0 )
+	ROM_LOAD( "meteorites_bprom.bin",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
+ROM_END
+
 ROM_START( meteorts )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "m0_c1.bin",    0x6800, 0x0800, CRC(dff88688) SHA1(7f4148a580fb6f605499c99e7dde7068eca1651a) )
@@ -930,6 +1033,8 @@ ROM_START( astdelux )
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
+
+	ROM_REGION( 0x40, "earom", ROMREGION_ERASE00 ) // default to zero fill to suppress invalid high score display
 ROM_END
 
 ROM_START( astdelux2 )
@@ -945,6 +1050,8 @@ ROM_START( astdelux2 )
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
+
+	ROM_REGION( 0x40, "earom", ROMREGION_ERASE00 ) // default to zero fill to suppress invalid high score display
 ROM_END
 
 /***************************************************************************
@@ -998,6 +1105,8 @@ ROM_START( astdelux1 )
 	/* DVG PROM */
 	ROM_REGION( 0x100, "user1", 0 )
 	ROM_LOAD( "034602-01.c8",  0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
+
+	ROM_REGION( 0x40, "earom", ROMREGION_ERASE00 ) // default to zero fill to suppress invalid high score display
 ROM_END
 
 ROM_START( llander )
@@ -1082,7 +1191,8 @@ GAME( 1981, spcrocks,  asteroid, asteroid, aerolitos, asteroid_state, empty_init
 GAME( 1980, aerolitos, asteroid, asteroid, aerolitos, asteroid_state, empty_init,     ROT0, "bootleg (Rodmar Elec.)","Aerolitos (Spanish bootleg of Asteroids)",        MACHINE_SUPPORTS_SAVE ) // 'Aerolitos' appears on the cabinet, this was distributed in Spain, the Spanish text is different to that contained in the original version (corrected)
 GAME( 1979, asterock,  asteroid, asterock, asterock,  asteroid_state, init_asterock,  ROT0, "bootleg (Sidam)",       "Asterock (Sidam bootleg of Asteroids)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1979, asterockv, asteroid, asterock, asterock,  asteroid_state, init_asterock,  ROT0, "bootleg (Videotron)",   "Asterock (Videotron bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, meteorts,  asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "bootleg (VGG)",         "Meteorites (bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, meteorite, asteroid, asterock, asterock,  asteroid_state, init_asterock,  ROT0, "bootleg (Proel)",       "Meteorite (Proel bootleg of Asteroids)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1979, meteorts,  asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "bootleg (VGG)",         "Meteorites (VGG bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, meteorho,  asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "bootleg (Hoei)",        "Meteor (bootleg of Asteroids)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1979, hyperspc,  asteroid, asteroid, asteroid,  asteroid_state, empty_init,     ROT0, "bootleg (Rumiano)",     "Hyperspace (bootleg of Asteroids)", MACHINE_SUPPORTS_SAVE )
 

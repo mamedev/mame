@@ -27,9 +27,9 @@ void fuukivid_device::device_start()
 	m_sprram_old = make_unique_clear<uint16_t[]>(0x2000 / 2);
 	m_sprram_old2 = make_unique_clear<uint16_t[]>(0x2000 / 2);
 
-	save_pointer(NAME(m_sprram.get()), 0x2000 / 2);
-	save_pointer(NAME(m_sprram_old.get()), 0x2000 / 2);
-	save_pointer(NAME(m_sprram_old2.get()), 0x2000 / 2);
+	save_pointer(NAME(m_sprram), 0x2000 / 2);
+	save_pointer(NAME(m_sprram_old), 0x2000 / 2);
+	save_pointer(NAME(m_sprram_old2), 0x2000 / 2);
 
 }
 

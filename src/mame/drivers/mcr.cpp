@@ -414,24 +414,24 @@ READ8_MEMBER(mcr_dpoker_state::ip0_r)
 WRITE8_MEMBER(mcr_dpoker_state::lamps1_w)
 {
 	// cpanel button lamps (white)
-	m_lamp[0] = BIT(data, 0); // hold 1
-	m_lamp[1] = BIT(data, 4); // hold 2
-	m_lamp[2] = BIT(data, 5); // hold 3
-	m_lamp[3] = BIT(data, 6); // hold 4
-	m_lamp[4] = BIT(data, 7); // hold 5
-	m_lamp[5] = BIT(data, 1); // deal
-	m_lamp[6] = BIT(data, 2); // cancel
-	m_lamp[7] = BIT(data, 3); // stand
+	m_lamps[0] = BIT(data, 0); // hold 1
+	m_lamps[1] = BIT(data, 4); // hold 2
+	m_lamps[2] = BIT(data, 5); // hold 3
+	m_lamps[3] = BIT(data, 6); // hold 4
+	m_lamps[4] = BIT(data, 7); // hold 5
+	m_lamps[5] = BIT(data, 1); // deal
+	m_lamps[6] = BIT(data, 2); // cancel
+	m_lamps[7] = BIT(data, 3); // stand
 }
 
 WRITE8_MEMBER(mcr_dpoker_state::lamps2_w)
 {
 	// d5: button lamp: service or change
-	m_lamp[8] = BIT(data, 5);
+	m_lamps[8] = BIT(data, 5);
 
 	// d0-d4: marquee lamps: coin 1 to 5 --> output lamps 9 to 13
 	for (int i = 0; i < 5; i++)
-		m_lamp[9 + i] = BIT(data, i);
+		m_lamps[9 + i] = BIT(data, i);
 
 	// d6, d7: unused?
 }
@@ -699,7 +699,7 @@ void mcr_state::cpu_90009_map(address_map &map)
 	map(0xf000, 0xf1ff).mirror(0x0200).ram().share("spriteram");
 	map(0xf400, 0xf41f).mirror(0x03e0).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf800, 0xf81f).mirror(0x03e0).w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xfc00, 0xffff).ram().w(this, FUNC(mcr_state::mcr_90009_videoram_w)).share("videoram");
+	map(0xfc00, 0xffff).ram().w(FUNC(mcr_state::mcr_90009_videoram_w)).share("videoram");
 }
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
@@ -707,7 +707,7 @@ void mcr_state::cpu_90009_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
+	midway_ssio_device::ssio_input_ports(map, "ssio");
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -728,7 +728,7 @@ void mcr_state::cpu_90010_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).mirror(0x1800).ram().share("nvram");
 	map(0xe000, 0xe1ff).mirror(0x1600).ram().share("spriteram");
-	map(0xe800, 0xefff).mirror(0x1000).ram().w(this, FUNC(mcr_state::mcr_90010_videoram_w)).share("videoram");
+	map(0xe800, 0xefff).mirror(0x1000).ram().w(FUNC(mcr_state::mcr_90010_videoram_w)).share("videoram");
 }
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
@@ -736,7 +736,7 @@ void mcr_state::cpu_90010_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
+	midway_ssio_device::ssio_input_ports(map, "ssio");
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -757,8 +757,8 @@ void mcr_state::cpu_91490_map(address_map &map)
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).ram().share("nvram");
 	map(0xe800, 0xe9ff).mirror(0x0200).ram().share("spriteram");
-	map(0xf000, 0xf7ff).ram().w(this, FUNC(mcr_state::mcr_91490_videoram_w)).share("videoram");
-	map(0xf800, 0xf87f).mirror(0x0780).w(this, FUNC(mcr_state::mcr_paletteram9_w)).share("paletteram");
+	map(0xf000, 0xf7ff).ram().w(FUNC(mcr_state::mcr_91490_videoram_w)).share("videoram");
+	map(0xf800, 0xf87f).mirror(0x0780).w(FUNC(mcr_state::mcr_paletteram9_w)).share("paletteram");
 }
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
@@ -766,7 +766,7 @@ void mcr_state::cpu_91490_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
+	midway_ssio_device::ssio_input_ports(map, "ssio");
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
 	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -797,8 +797,8 @@ void mcr_nflfoot_state::ipu_91695_portmap(address_map &map)
 	map(0x04, 0x07).mirror(0xe0).rw(m_ipu_sio, FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
 	map(0x08, 0x0b).mirror(0xe0).rw(m_ipu_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0c, 0x0f).mirror(0xe0).rw(m_ipu_pio1, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x10, 0x13).mirror(0xe0).w(this, FUNC(mcr_nflfoot_state::ipu_laserdisk_w));
-	map(0x1c, 0x1f).mirror(0xe0).rw(this, FUNC(mcr_nflfoot_state::ipu_watchdog_r), FUNC(mcr_nflfoot_state::ipu_watchdog_w));
+	map(0x10, 0x13).mirror(0xe0).w(FUNC(mcr_nflfoot_state::ipu_laserdisk_w));
+	map(0x1c, 0x1f).mirror(0xe0).rw(FUNC(mcr_nflfoot_state::ipu_watchdog_r), FUNC(mcr_nflfoot_state::ipu_watchdog_w));
 }
 
 
@@ -1749,167 +1749,163 @@ static const char *const twotiger_sample_names[] =
  *************************************/
 
 /* 90009 CPU board plus 90908/90913/91483 sound board */
-MACHINE_CONFIG_START(mcr_state::mcr_90009)
-
+void mcr_state::mcr_90009(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_OSC_MCR_I/8)
-	MCFG_Z80_DAISY_CHAIN(mcr_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_90009_map)
-	MCFG_DEVICE_IO_MAP(cpu_90009_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr_state, mcr_interrupt, "screen", 0, 1)
+	Z80(config, m_maincpu, MAIN_OSC_MCR_I/8);
+	m_maincpu->set_daisy_config(mcr_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr_state::cpu_90009_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr_state::cpu_90009_portmap);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_OSC_MCR_I/8 /* same as "maincpu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc", z80ctc_device, trg1))
+	TIMER(config, "scantimer").configure_scanline(FUNC(mcr_state::mcr_interrupt), "screen", 0, 1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
+	Z80CTC(config, m_ctc, MAIN_OSC_MCR_I/8 /* same as "maincpu" */);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 16);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*16, 30*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mcr_state, screen_update_mcr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(30);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*16, 30*16);
+	screen.set_visarea(0*16, 32*16-1, 0*16, 30*16-1);
+	screen.set_screen_update(FUNC(mcr_state::screen_update_mcr));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcr)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mcr);
+	PALETTE(config, m_palette).set_format(palette_device::xRBG_444, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ssio", MIDWAY_SSIO)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
+	MIDWAY_SSIO(config, m_ssio);
+	m_ssio->add_route(0, "lspeaker", 1.0);
+	m_ssio->add_route(1, "rspeaker", 1.0);
+}
 
 /* as above, but in a casino cabinet */
-MACHINE_CONFIG_START(mcr_dpoker_state::mcr_90009_dp)
+void mcr_dpoker_state::mcr_90009_dp(machine_config &config)
+{
 	mcr_90009(config);
 
 	/* basic machine hardware */
-	MCFG_TIMER_DRIVER_ADD("coinin", mcr_dpoker_state, coin_in_callback)
-	MCFG_TIMER_DRIVER_ADD("hopper", mcr_dpoker_state, hopper_callback)
-MACHINE_CONFIG_END
-
+	TIMER(config, "coinin").configure_generic(FUNC(mcr_dpoker_state::coin_in_callback));
+	TIMER(config, "hopper").configure_generic(FUNC(mcr_dpoker_state::hopper_callback));
+}
 
 /* 90010 CPU board plus 90908/90913/91483 sound board */
-MACHINE_CONFIG_START(mcr_state::mcr_90010)
+void mcr_state::mcr_90010(machine_config &config)
+{
 	mcr_90009(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(cpu_90010_map)
-	MCFG_DEVICE_IO_MAP(cpu_90010_portmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr_state::cpu_90010_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr_state::cpu_90010_portmap);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64)
-	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
-MACHINE_CONFIG_END
-
+	m_palette->set_format(palette_device::xRBG_444, 64);
+}
 
 /* as above, plus 8-track tape */
-MACHINE_CONFIG_START(mcr_state::mcr_90010_tt)
+void mcr_state::mcr_90010_tt(machine_config &config)
+{
 	mcr_90010(config);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(2)
-	MCFG_SAMPLES_NAMES(twotiger_sample_names)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
-MACHINE_CONFIG_END
-
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(2);
+	m_samples->set_samples_names(twotiger_sample_names);
+	m_samples->add_route(0, "lspeaker", 0.25);
+	m_samples->add_route(1, "rspeaker", 0.25);
+}
 
 /* 91475 CPU board plus 90908/90913/91483 sound board plus cassette interface */
-MACHINE_CONFIG_START(mcr_state::mcr_91475)
+void mcr_state::mcr_91475(machine_config &config)
+{
 	mcr_90010(config);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(128)
-	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
+	m_palette->set_format(palette_device::xRBG_444, 128);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(journey_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(journey_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_samples->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+}
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board */
-MACHINE_CONFIG_START(mcr_state::mcr_91490)
+void mcr_state::mcr_91490(machine_config & config)
+{
 	mcr_90010(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(5000000)
-	MCFG_DEVICE_PROGRAM_MAP(cpu_91490_map)
-	MCFG_DEVICE_IO_MAP(cpu_91490_portmap)
+	m_maincpu->set_clock(5000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr_state::cpu_91490_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr_state::cpu_91490_portmap);
 
-	MCFG_DEVICE_MODIFY("ctc")
-	MCFG_DEVICE_CLOCK(5000000 /* same as "maincpu" */)
-MACHINE_CONFIG_END
+	m_ctc->set_clock(5000000 /* same as "maincpu" */);
+}
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board */
-MACHINE_CONFIG_START(mcr_state::mcr_91490_snt)
+void mcr_state::mcr_91490_snt(machine_config &config)
+{
 	mcr_91490(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("snt", MIDWAY_SQUAWK_N_TALK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	MIDWAY_SQUAWK_N_TALK(config, m_squawk_n_talk);
+	m_squawk_n_talk->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_squawk_n_talk->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board plus IPU */
-MACHINE_CONFIG_START(mcr_nflfoot_state::mcr_91490_ipu)
+void mcr_nflfoot_state::mcr_91490_ipu(machine_config &config)
+{
 	mcr_91490_snt(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("ipu", Z80, 7372800/2)
-	MCFG_Z80_DAISY_CHAIN(mcr_ipu_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(ipu_91695_map)
-	MCFG_DEVICE_IO_MAP(ipu_91695_portmap)
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(mcr_nflfoot_state, ipu_interrupt)
+	Z80(config, m_ipu, 7372800/2);
+	m_ipu->set_daisy_config(mcr_ipu_daisy_chain);
+	m_ipu->set_addrmap(AS_PROGRAM, &mcr_nflfoot_state::ipu_91695_map);
+	m_ipu->set_addrmap(AS_IO, &mcr_nflfoot_state::ipu_91695_portmap);
 
-	MCFG_DEVICE_ADD("ipu_ctc", Z80CTC, 7372800/2 /* same as "ipu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(mcr_nflfoot_state::ipu_interrupt));
 
-	MCFG_DEVICE_ADD("ipu_pio0", Z80PIO, 7372800/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ipu_ctc, 7372800/2 /* same as "ipu" */);
+	m_ipu_ctc->intr_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ipu_pio1", Z80PIO, 7372800/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
+	Z80PIO(config, m_ipu_pio0, 7372800/2);
+	m_ipu_pio0->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ipu_sio", Z80SIO0, 7372800/2)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(*this, mcr_nflfoot_state, sio_txda_w))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(*this, mcr_nflfoot_state, sio_txdb_w))
-MACHINE_CONFIG_END
+	Z80PIO(config, m_ipu_pio1, 7372800/2);
+	m_ipu_pio1->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
+
+	Z80SIO0(config, m_ipu_sio, 7372800/2);
+	m_ipu_sio->out_int_callback().set_inputline(m_ipu, INPUT_LINE_IRQ0);
+	m_ipu_sio->out_txda_callback().set(FUNC(mcr_nflfoot_state::sio_txda_w));
+	m_ipu_sio->out_txdb_callback().set(FUNC(mcr_nflfoot_state::sio_txdb_w));
+}
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Turbo Cheap Squeak sound board */
-MACHINE_CONFIG_START(mcr_state::mcr_91490_tcs)
+void mcr_state::mcr_91490_tcs(machine_config &config)
+{
 	mcr_91490(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	MIDWAY_TURBO_CHEAP_SQUEAK(config, m_turbo_cheap_squeak);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 
@@ -2964,7 +2960,7 @@ void mcr_state::init_demoderb()
 	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::demoderb_op4_w),this));
 
 	/* the SSIO Z80 doesn't have any program to execute */
-	machine().device<cpu_device>("ssio:cpu")->suspend(SUSPEND_REASON_DISABLE, 1);
+	m_ssio->suspend_cpu();
 }
 
 

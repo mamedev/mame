@@ -10,6 +10,7 @@
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "machine/taito68705interface.h"

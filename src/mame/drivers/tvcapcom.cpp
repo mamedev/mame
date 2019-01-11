@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
+#include "emupal.h"
 #include "screen.h"
 
 class tvcapcom_state : public driver_device
@@ -21,11 +22,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	void tvcapcom(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_tvcapcom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<ppc_device> m_maincpu;
-	void tvcapcom(machine_config &config);
+
 	void gc_map(address_map &map);
 };
 

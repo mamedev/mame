@@ -40,8 +40,8 @@
 uint16_t bbc_state::calculate_video_address(uint16_t ma, uint8_t ra)
 {
 	/* output from IC32 74LS259 bits 4 and 5 */
-	int c0 = m_b4_video0;
-	int c1 = m_b5_video1;
+	int c0 = m_latch->q4_r();
+	int c1 = m_latch->q5_r();
 
 	/* the 4 bit input port b on IC39 are produced by 4 NAND gates. These NAND gates take their inputs
 	   from c0 and c1 (from IC32) and ma12 (from the 6845) */
@@ -117,9 +117,9 @@ inline rgb_t bbc_state::out_rgb(rgb_t entry)
 	}
 }
 
-PALETTE_INIT_MEMBER(bbc_state, bbc)
+void bbc_state::bbc_colours(palette_device &palette) const
 {
-	palette.set_pen_colors(0, bbc_palette, ARRAY_LENGTH(bbc_palette));
+	palette.set_pen_colors(0, bbc_palette);
 }
 
 /************************************************************************
@@ -141,7 +141,7 @@ void bbc_state::set_pixel_lookup()
 }
 
 
-WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
+WRITE8_MEMBER(bbc_state::video_ula_w)
 {
 	// Make sure vpos is never <0
 	int vpos = m_screen->vpos();
@@ -175,13 +175,13 @@ WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 
 		m_hd6845->set_hpixels_per_column(m_pixels_per_byte);
 		if (m_video_ula.clock_rate_6845)
-			m_hd6845->set_clock(XTAL(16'000'000) / 8);
+			m_hd6845->set_clock(16_MHz_XTAL / 8);
 		else
-			m_hd6845->set_clock(XTAL(16'000'000) / 16);
+			m_hd6845->set_clock(16_MHz_XTAL / 16);
 
 		// FIXME: double clock for MODE7 until interlace is implemented
 		if (m_video_ula.teletext_normal_select)
-			m_hd6845->set_clock(XTAL(16'000'000) / 8);
+			m_hd6845->set_clock(16_MHz_XTAL / 8);
 		break;
 	// Set a palette register in the Video ULA
 	case 1:
@@ -288,21 +288,20 @@ void bbc_state::setvideoshadow(int vdusel)
 	// as the video circuitry will already be looking at 0x3000 or so above
 	// the offset.
 	if (vdusel)
-		m_video_ram = m_region_maincpu->base() + 0x8000;
+		m_video_ram = m_ram->pointer() + 0x8000;
 	else
-		m_video_ram = m_region_maincpu->base();
+		m_video_ram = m_ram->pointer();
 }
 
 /************************************************************************
- * bbc_vh_start
  * Initialize the BBC video emulation
  ************************************************************************/
 
-VIDEO_START_MEMBER(bbc_state, bbc)
+void bbc_state::video_start()
 {
 	m_cursor_size = 1;
 
 	set_pixel_lookup();
 
-	m_video_ram = m_region_maincpu->base();
+	m_video_ram = m_ram->pointer();
 }

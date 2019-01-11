@@ -86,7 +86,21 @@ const res_net_info tnx1_state::txt_mb7051_net_info =
 	}
 };
 
-const res_net_info tnx1_state::bak_mb7051_net_info =
+const res_net_info tnx1_state::tnx1_bak_mb7051_net_info =
+{
+	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_MB7051 | RES_NET_MONITOR_SANYO_EZV20,
+	{
+		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1200, 680, 470 } },
+		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1200, 680, 470 } },
+#if USE_NEW_COLOR
+		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, {  680, 470,   0 } }
+#else
+		{ RES_NET_AMP_DARLINGTON, 680, 0, 2, { 1300, 470,   0 } }
+#endif
+	}
+};
+
+const res_net_info tpp1_state::tpp1_bak_mb7051_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_MB7051 | RES_NET_MONITOR_SANYO_EZV20,
 	{
@@ -107,12 +121,12 @@ const res_net_info tnx1_state::obj_mb7052_net_info =
 };
 
 
-PALETTE_INIT_MEMBER(tpp1_state, palette_init)
+void tpp1_state::tnx1_palette(palette_device &palette)
 {
-	/* Two of the PROM address pins are tied together */
+	// Two of the PROM address pins are tied together
 	for (int i = 0; i < 0x20; i++)
 	{
-		int color = (i & 0xf) | ((i & 0x8) << 1);
+		int const color = (i & 0xf) | ((i & 0x8) << 1);
 		m_color_prom[i + 0x20] = m_color_prom[color + 0x20];
 	}
 
@@ -121,12 +135,12 @@ PALETTE_INIT_MEMBER(tpp1_state, palette_init)
 	update_palette();
 }
 
-PALETTE_INIT_MEMBER(tnx1_state, palette_init)
+void tnx1_state::tnx1_palette(palette_device &palette)
 {
-	/* Two of the PROM address pins are tied together and one is not connected... */
+	// Two of the PROM address pins are tied together and one is not connected...
 	for (int i = 0;i < 0x100;i++)
 	{
-		int color = (i & 0x3f) | ((i & 0x20) << 1);
+		int const color = (i & 0x3f) | ((i & 0x20) << 1);
 		m_color_prom_spr[i] = m_color_prom_spr[color];
 	}
 
@@ -141,39 +155,10 @@ void tnx1_state::update_palette()
 	{
 		uint8_t *color_prom = m_color_prom + 16 * ((m_palette_bank & 0x08) >> 3);
 
-#if USE_NEW_COLOR
 		std::vector<rgb_t> rgb;
 
-		compute_res_net_all(rgb, color_prom, mb7051_decode_info, bak_mb7051_net_info);
+		compute_res_net_all(rgb, color_prom, mb7051_decode_info, bak_mb7051_net_info());
 		m_palette->set_pen_colors(0, rgb);
-#else
-		for (int i = 0; i < 16; i++)
-		{
-			/* red component */
-			int bit0 = (~color_prom[i] >> 0) & 0x01;
-			int bit1 = (~color_prom[i] >> 1) & 0x01;
-			int bit2 = (~color_prom[i] >> 2) & 0x01;
-			int r = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
-			/* green component */
-			bit0 = (~color_prom[i] >> 3) & 0x01;
-			bit1 = (~color_prom[i] >> 4) & 0x01;
-			bit2 = (~color_prom[i] >> 5) & 0x01;
-			int g = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
-			/* blue component */
-			bit0 = 0;
-			bit1 = (~color_prom[i] >> 6) & 0x01;
-			bit2 = (~color_prom[i] >> 7) & 0x01;
-			//if (m_bitmap_type == TYPE_TNX1)
-			//{
-			//  /* Sky Skipper has different weights */
-			//  bit0 = bit1;
-			//  bit1 = 0;
-			//}
-			int b = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
-
-			m_palette->set_pen_color(i, rgb_t(r, g, b));
-		}
-#endif
 	}
 
 	if ((m_palette_bank ^ m_palette_bank_cache) & 0x08)
@@ -181,7 +166,6 @@ void tnx1_state::update_palette()
 		uint8_t *color_prom = m_color_prom + 32 + 16 * ((m_palette_bank & 0x08) >> 3);
 
 		/* characters */
-#if USE_NEW_COLOR
 		for (int i = 0; i < 16; i++)
 		{
 			int r = compute_res_net((color_prom[i] >> 0) & 0x07, 0, txt_mb7051_net_info);
@@ -190,63 +174,16 @@ void tnx1_state::update_palette()
 			m_palette->set_pen_color(16 + (2 * i) + 0, rgb_t(0, 0, 0));
 			m_palette->set_pen_color(16 + (2 * i) + 1, rgb_t(r, g, b));
 		}
-#else
-		for (int i = 0; i < 16; i++)
-		{
-			/* red component */
-			int bit0 = (~color_prom[i] >> 0) & 0x01;
-			int bit1 = (~color_prom[i] >> 1) & 0x01;
-			int bit2 = (~color_prom[i] >> 2) & 0x01;
-			int r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-			/* green component */
-			bit0 = (~color_prom[i] >> 3) & 0x01;
-			bit1 = (~color_prom[i] >> 4) & 0x01;
-			bit2 = (~color_prom[i] >> 5) & 0x01;
-			int g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-			/* blue component */
-			bit0 = 0;
-			bit1 = (~color_prom[i] >> 6) & 0x01;
-			bit2 = (~color_prom[i] >> 7) & 0x01;
-			int b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-			m_palette->set_pen_color(16 + (2 * i) + 1, rgb_t(r, g, b));
-		}
-#endif
 	}
 
 	if ((m_palette_bank ^ m_palette_bank_cache) & 0x07)
 	{
 		uint8_t *color_prom = m_color_prom_spr + 32 * (m_palette_bank & 0x07);
 
-#if USE_NEW_COLOR
 		/* sprites */
 		std::vector<rgb_t> rgb;
 		compute_res_net_all(rgb, color_prom, mb7052_decode_info, obj_mb7052_net_info);
 		m_palette->set_pen_colors(48, rgb);
-#else
-		for (int i = 0; i < 32; i++)
-		{
-			int bit0, bit1, bit2, r, g, b;
-
-			/* red component */
-			bit0 = (~color_prom[i] >> 0) & 0x01;
-			bit1 = (~color_prom[i] >> 1) & 0x01;
-			bit2 = (~color_prom[i] >> 2) & 0x01;
-			r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-			/* green component */
-			bit0 = (~color_prom[i] >> 3) & 0x01;
-			bit1 = (~color_prom[i] >> 4) & 0x01;
-			bit2 = (~color_prom[i] >> 5) & 0x01;
-			g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-			/* blue component */
-			bit0 = 0;
-			bit1 = (~color_prom[i] >> 6) & 0x01;
-			bit2 = (~color_prom[i] >> 7) & 0x01;
-			b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-			m_palette->set_pen_color(48 + i, rgb_t(r, g, b));
-		}
-#endif
 	}
 
 	m_palette_bank_cache = m_palette_bank;
@@ -373,6 +310,7 @@ void tnx1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			}
 		}
 
+		int flipx = 0;
 		for (int i = 0; i < 64; i++)
 		{
 			struct attribute_memory *a = &attributes[i];
@@ -383,9 +321,23 @@ void tnx1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				const uint8_t *source_base = gfx->get_data(a->code % gfx->elements());
 				const uint8_t *source = source_base + (a->row ^ a->flipy) * gfx->rowbytes();
 
+				if (bootleg_sprites() && flipx != a->flipx)
+				{
+					int px = a->sx - 7;
+					if (px >= 0 && px < 512)
+					{
+						if (flip_screen())
+							px ^= 0x1ff;
+
+						m_sprite_bitmap->pix(y, px) = 0;
+					}
+
+					flipx = a->flipx;
+				}
+
 				for (int x = 0; x < 16; x++)
 				{
-					int px = a->sx + x - 8;
+					int px = a->sx + x - 6;
 					if (px >= 0 && px < 512)
 					{
 						if (flip_screen())
@@ -483,7 +435,7 @@ void tpp2_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect
 			else
 			{
 				// TODO: confirm the memory layout
-				int sx = x + (2 * m_background_scroll[0]) + 0x72;
+				int sx = x + (2 * m_background_scroll[0]) + 0x70;
 				int shift = (sy & 4);
 
 				bitmap.pix16(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;

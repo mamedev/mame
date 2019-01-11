@@ -86,7 +86,7 @@ private:
 	required_device<v9938_device>           m_video;
 	required_device<sn76496_base_device>    m_sound;
 	required_device<bus::ti99::colorbus::ti99_colorbus_device>   m_colorbus;
-	bus::ti99::internal::evpc_clock_connector*                   m_console_conn;
+	optional_device<bus::ti99::internal::evpc_clock_connector>   m_console_conn;
 };
 
 } } } // end namespace bus::ti99::peb

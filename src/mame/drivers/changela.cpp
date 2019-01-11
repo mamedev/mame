@@ -164,16 +164,16 @@ void changela_state::changela_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x83ff).ram().share("spriteram"); /* OBJ0 RAM */
 	map(0x9000, 0x97ff).ram().share("videoram");    /* OBJ1 RAM */
-	map(0xa000, 0xa07f).w(this, FUNC(changela_state::changela_colors_w)).share("colorram");   /* Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8-th bit data input (d0-d7->normal, a0->d8) */
+	map(0xa000, 0xa07f).w(FUNC(changela_state::changela_colors_w)).share("colorram");   /* Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8-th bit data input (d0-d7->normal, a0->d8) */
 	map(0xb000, 0xbfff).rom();
 
-	map(0xc000, 0xc7ff).rw(this, FUNC(changela_state::changela_mem_device_r), FUNC(changela_state::changela_mem_device_w)); /* RAM4 (River Bed RAM); RAM5 (Tree RAM) */
+	map(0xc000, 0xc7ff).rw(FUNC(changela_state::changela_mem_device_r), FUNC(changela_state::changela_mem_device_w)); /* RAM4 (River Bed RAM); RAM5 (Tree RAM) */
 
 	/* LS138 - U16 */
 	map(0xc800, 0xc800).nopw();                /* not connected */
-	map(0xc900, 0xc900).w(this, FUNC(changela_state::changela_mem_device_select_w)); /* selects the memory device to be accessible at 0xc000-0xc7ff */
-	map(0xca00, 0xca00).w(this, FUNC(changela_state::changela_slope_rom_addr_hi_w));
-	map(0xcb00, 0xcb00).w(this, FUNC(changela_state::changela_slope_rom_addr_lo_w));
+	map(0xc900, 0xc900).w(FUNC(changela_state::changela_mem_device_select_w)); /* selects the memory device to be accessible at 0xc000-0xc7ff */
+	map(0xca00, 0xca00).w(FUNC(changela_state::changela_slope_rom_addr_hi_w));
+	map(0xcb00, 0xcb00).w(FUNC(changela_state::changela_slope_rom_addr_lo_w));
 
 	map(0xd000, 0xd001).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xd010, 0xd011).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
@@ -182,14 +182,14 @@ void changela_state::changela_map(address_map &map)
 	map(0xd020, 0xd027).w("outlatch", FUNC(ls259_device::write_d0));
 
 	/* LS139 - U24 */
-	map(0xd024, 0xd024).r(this, FUNC(changela_state::changela_24_r));
-	map(0xd025, 0xd025).r(this, FUNC(changela_state::changela_25_r));
-	map(0xd028, 0xd028).r(this, FUNC(changela_state::mcu_r));
-	map(0xd02c, 0xd02c).r(this, FUNC(changela_state::changela_2c_r));
-	map(0xd02d, 0xd02d).r(this, FUNC(changela_state::changela_2d_r));
+	map(0xd024, 0xd024).r(FUNC(changela_state::changela_24_r));
+	map(0xd025, 0xd025).r(FUNC(changela_state::changela_25_r));
+	map(0xd028, 0xd028).r(FUNC(changela_state::mcu_r));
+	map(0xd02c, 0xd02c).r(FUNC(changela_state::changela_2c_r));
+	map(0xd02d, 0xd02d).r(FUNC(changela_state::changela_2d_r));
 
-	map(0xd030, 0xd030).rw(this, FUNC(changela_state::changela_30_r), FUNC(changela_state::mcu_w));
-	map(0xd031, 0xd031).r(this, FUNC(changela_state::changela_31_r));
+	map(0xd030, 0xd030).rw(FUNC(changela_state::changela_30_r), FUNC(changela_state::mcu_w));
+	map(0xd031, 0xd031).r(FUNC(changela_state::changela_31_r));
 
 	map(0xe000, 0xe000).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* Watchdog */
 
@@ -416,49 +416,48 @@ void changela_state::machine_reset()
 	m_dir_31 = 0;
 }
 
-MACHINE_CONFIG_START(changela_state::changela)
+void changela_state::changela(machine_config &config)
+{
+	Z80(config, m_maincpu, 5000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &changela_state::changela_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(changela_state::changela_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("maincpu", Z80,5000000)
-	MCFG_DEVICE_PROGRAM_MAP(changela_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", changela_state, changela_scanline, "screen", 0, 1)
+	M68705P3(config, m_mcu, 2500000);
+	m_mcu->portb_r().set_ioport("MCU");
+	m_mcu->porta_w().set(FUNC(changela_state::changela_68705_port_a_w));
+	m_mcu->portc_w().set(FUNC(changela_state::changela_68705_port_c_w));
+	m_mcu->set_vblank_int("screen", FUNC(changela_state::chl_mcu_irq));
 
-	MCFG_DEVICE_ADD("mcu", M68705P3, 2500000)
-	MCFG_M68705_PORTB_R_CB(IOPORT("MCU"))
-	MCFG_M68705_PORTA_W_CB(WRITE8(*this, changela_state, changela_68705_port_a_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(*this, changela_state, changela_68705_port_c_w))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", changela_state, chl_mcu_irq)
+	ls259_device &outlatch(LS259(config, "outlatch")); // U44 on Sound I/O Board
+	outlatch.q_out_cb<0>().set(FUNC(changela_state::collision_reset_0_w));
+	outlatch.q_out_cb<1>().set(FUNC(changela_state::coin_counter_1_w));
+	outlatch.q_out_cb<2>().set(FUNC(changela_state::coin_counter_2_w));
+	outlatch.q_out_cb<4>().set(FUNC(changela_state::mcu_pc_0_w));
+	outlatch.q_out_cb<5>().set(FUNC(changela_state::collision_reset_1_w));
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // U44 on Sound I/O Board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, changela_state, collision_reset_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, changela_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, changela_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, changela_state, mcu_pc_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, changela_state, collision_reset_1_w))
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(32*8, 262);  /* vert size is a guess */
+	m_screen->set_visarea(0*8, 32*8-1, 4*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(changela_state::screen_update_changela));
+	m_screen->set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)  /* vert size is a guess */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(changela_state, screen_update_changela)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 0x40)
-
+	PALETTE(config, m_palette).set_entries(0x40);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8910_device &ay1(AY8910(config, "ay1", 1250000));
+	ay1.port_a_read_callback().set_ioport("DSWA");
+	ay1.port_b_read_callback().set_ioport("DSWB");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWC"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWD"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	ay8910_device &ay2(AY8910(config, "ay2", 1250000));
+	ay2.port_a_read_callback().set_ioport("DSWC");
+	ay2.port_b_read_callback().set_ioport("DSWD");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 ROM_START( changela )

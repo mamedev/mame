@@ -140,32 +140,24 @@ WRITE8_MEMBER(sf_state::soundcmd_w)
 
 WRITE8_MEMBER(sf_state::sound2_bank_w)
 {
-	membank("bank1")->set_entry(data);
+	m_audiobank->set_entry(data);
 }
 
-WRITE8_MEMBER(sf_state::msm1_5205_w)
+template<int Chip>
+WRITE8_MEMBER(sf_state::msm_w)
 {
-	m_msm1->reset_w(BIT(data, 7));
+	m_msm[Chip]->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	m_msm1->data_w(data);
-	m_msm1->vclk_w(1);
-	m_msm1->vclk_w(0);
-}
-
-WRITE8_MEMBER(sf_state::msm2_5205_w)
-{
-	m_msm2->reset_w(BIT(data, 7));
-	/* ?? bit 6?? */
-	m_msm2->data_w(data);
-	m_msm2->vclk_w(1);
-	m_msm2->vclk_w(0);
+	m_msm[Chip]->write_data(data);
+	m_msm[Chip]->vclk_w(1);
+	m_msm[Chip]->vclk_w(0);
 }
 
 void sf_state::sfan_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x04ffff).rom();
-	map(0x800000, 0x800fff).ram().w(this, FUNC(sf_state::videoram_w)).share("videoram");
+	map(0x800000, 0x800fff).ram().w(FUNC(sf_state::videoram_w)).share("videoram");
 	map(0xb00000, 0xb007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc00001).portr("IN0");
 	map(0xc00002, 0xc00003).portr("IN1");
@@ -175,11 +167,11 @@ void sf_state::sfan_map(address_map &map)
 	map(0xc0000a, 0xc0000b).portr("DSW2");
 	map(0xc0000c, 0xc0000d).portr("SYSTEM");
 	map(0xc0000e, 0xc0000f).nopr();
-	map(0xc00011, 0xc00011).w(this, FUNC(sf_state::coin_w));
-	map(0xc00014, 0xc00015).w(this, FUNC(sf_state::fg_scroll_w));
-	map(0xc00018, 0xc00019).w(this, FUNC(sf_state::bg_scroll_w));
-	map(0xc0001a, 0xc0001b).w(this, FUNC(sf_state::gfxctrl_w));
-	map(0xc0001d, 0xc0001d).w(this, FUNC(sf_state::soundcmd_w));
+	map(0xc00011, 0xc00011).w(FUNC(sf_state::coin_w));
+	map(0xc00014, 0xc00015).w(FUNC(sf_state::fg_scroll_w));
+	map(0xc00018, 0xc00019).w(FUNC(sf_state::bg_scroll_w));
+	map(0xc0001a, 0xc0001b).w(FUNC(sf_state::gfxctrl_w));
+	map(0xc0001d, 0xc0001d).w(FUNC(sf_state::soundcmd_w));
 //  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	map(0xff8000, 0xffdfff).ram();
 	map(0xffe000, 0xffffff).ram().share("objectram");
@@ -189,7 +181,7 @@ void sf_state::sfus_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x04ffff).rom();
-	map(0x800000, 0x800fff).ram().w(this, FUNC(sf_state::videoram_w)).share("videoram");
+	map(0x800000, 0x800fff).ram().w(FUNC(sf_state::videoram_w)).share("videoram");
 	map(0xb00000, 0xb007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc00001).portr("IN0");
 	map(0xc00002, 0xc00003).portr("IN1");
@@ -199,11 +191,11 @@ void sf_state::sfus_map(address_map &map)
 	map(0xc0000a, 0xc0000b).portr("DSW2");
 	map(0xc0000c, 0xc0000d).portr("SYSTEM");
 	map(0xc0000e, 0xc0000f).nopr();
-	map(0xc00011, 0xc00011).w(this, FUNC(sf_state::coin_w));
-	map(0xc00014, 0xc00015).w(this, FUNC(sf_state::fg_scroll_w));
-	map(0xc00018, 0xc00019).w(this, FUNC(sf_state::bg_scroll_w));
-	map(0xc0001a, 0xc0001b).w(this, FUNC(sf_state::gfxctrl_w));
-	map(0xc0001d, 0xc0001d).w(this, FUNC(sf_state::soundcmd_w));
+	map(0xc00011, 0xc00011).w(FUNC(sf_state::coin_w));
+	map(0xc00014, 0xc00015).w(FUNC(sf_state::fg_scroll_w));
+	map(0xc00018, 0xc00019).w(FUNC(sf_state::bg_scroll_w));
+	map(0xc0001a, 0xc0001b).w(FUNC(sf_state::gfxctrl_w));
+	map(0xc0001d, 0xc0001d).w(FUNC(sf_state::soundcmd_w));
 //  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	map(0xff8000, 0xffdfff).ram();
 	map(0xffe000, 0xffffff).ram().share("objectram");
@@ -213,7 +205,7 @@ void sf_state::sfjp_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x04ffff).rom();
-	map(0x800000, 0x800fff).ram().w(this, FUNC(sf_state::videoram_w)).share("videoram");
+	map(0x800000, 0x800fff).ram().w(FUNC(sf_state::videoram_w)).share("videoram");
 	map(0xb00000, 0xb007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc00001).portr("IN0");
 	map(0xc00002, 0xc00003).portr("IN1");
@@ -223,12 +215,12 @@ void sf_state::sfjp_map(address_map &map)
 	map(0xc0000a, 0xc0000b).portr("DSW2");
 	map(0xc0000c, 0xc0000d).portr("SYSTEM");
 	map(0xc0000e, 0xc0000f).nopr();
-	map(0xc00011, 0xc00011).w(this, FUNC(sf_state::coin_w));
-	map(0xc00014, 0xc00015).w(this, FUNC(sf_state::fg_scroll_w));
-	map(0xc00018, 0xc00019).w(this, FUNC(sf_state::bg_scroll_w));
-	map(0xc0001a, 0xc0001b).w(this, FUNC(sf_state::gfxctrl_w));
-	map(0xc0001d, 0xc0001d).w(this, FUNC(sf_state::soundcmd_w));
-	map(0xc0001e, 0xc0001f).w(this, FUNC(sf_state::protection_w));
+	map(0xc00011, 0xc00011).w(FUNC(sf_state::coin_w));
+	map(0xc00014, 0xc00015).w(FUNC(sf_state::fg_scroll_w));
+	map(0xc00018, 0xc00019).w(FUNC(sf_state::bg_scroll_w));
+	map(0xc0001a, 0xc0001b).w(FUNC(sf_state::gfxctrl_w));
+	map(0xc0001d, 0xc0001d).w(FUNC(sf_state::soundcmd_w));
+	map(0xc0001e, 0xc0001f).w(FUNC(sf_state::protection_w));
 	map(0xff8000, 0xffdfff).ram();
 	map(0xffe000, 0xffffff).ram().share("objectram");
 }
@@ -245,17 +237,17 @@ void sf_state::sound_map(address_map &map)
 void sf_state::sound2_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xffff).bankr("bank1");
+	map(0x8000, 0xffff).bankr("audiobank");
 	map(0x0000, 0xffff).nopw(); /* avoid cluttering up error.log */
 }
 
 void sf_state::sound2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(sf_state::msm1_5205_w));
-	map(0x01, 0x01).w(this, FUNC(sf_state::msm2_5205_w));
+	map(0x00, 0x00).w(FUNC(sf_state::msm_w<0>));
+	map(0x01, 0x01).w(FUNC(sf_state::msm_w<1>));
 	map(0x01, 0x01).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x02, 0x02).w(this, FUNC(sf_state::sound2_bank_w));
+	map(0x02, 0x02).w(FUNC(sf_state::sound2_bank_w));
 }
 
 
@@ -497,8 +489,8 @@ static const gfx_layout char_layout =
 	RGN_FRAC(1,1),
 	2,
 	{ 4, 0 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP4(0,1), STEP4(4*2,1) },
+	{ STEP8(0,1*16) },
 	16*8
 };
 
@@ -508,10 +500,8 @@ static const gfx_layout sprite_layout =
 	RGN_FRAC(1,2),
 	4,
 	{ 4, 0, RGN_FRAC(1,2)+4, RGN_FRAC(1,2) },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3,
-			16*16+0, 16*16+1, 16*16+2, 16*16+3, 16*16+8+0, 16*16+8+1, 16*16+8+2, 16*16+8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP4(0,1), STEP4(4*2,1), STEP4(4*2*2*16,1), STEP4(4*2*2*16+8,1) },
+	{ STEP16(0,1*16) },
 	64*8
 };
 
@@ -530,7 +520,7 @@ void sf_state::machine_start()
 	save_item(NAME(m_bgscroll));
 	save_item(NAME(m_fgscroll));
 
-	membank("bank1")->configure_entries(0, 256, memregion("audio2")->base() + 0x8000, 0x8000);
+	m_audiobank->configure_entries(0, 256, memregion("audio2")->base() + 0x8000, 0x8000);
 }
 
 void sf_state::machine_reset()
@@ -540,83 +530,72 @@ void sf_state::machine_reset()
 	m_fgscroll = 0;
 }
 
-MACHINE_CONFIG_START(sf_state::sfan)
-
+void sf_state::sfan(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(sfan_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sf_state, irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(8'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sf_state::sfan_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sf_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))  /* ? xtal is 3.579545MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545));	/* ? xtal is 3.579545MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sf_state::sound_map);
 
-	MCFG_DEVICE_ADD("audio2", Z80, XTAL(3'579'545))    /* ? xtal is 3.579545MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound2_map)
-	MCFG_DEVICE_IO_MAP(sound2_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(sf_state, irq0_line_hold, 8000) // ?
+	z80_device &audio2(Z80(config, "audio2", XTAL(3'579'545)));	/* ? xtal is 3.579545MHz */
+	audio2.set_addrmap(AS_PROGRAM, &sf_state::sound2_map);
+	audio2.set_addrmap(AS_IO, &sf_state::sound2_io_map);
+	audio2.set_periodic_int(FUNC(sf_state::irq0_line_hold), attotime::from_hz(8000)); // ?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(sf_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(sf_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sf)
-
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sf);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.60);
+	ymsnd.add_route(1, "rspeaker", 0.60);
 
-	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* 8KHz playback ?    */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MSM5205(config, m_msm[0], 384000);
+	m_msm[0]->set_prescaler_selector(msm5205_device::SEX_4B);	/* 8KHz playback ? */
+	m_msm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_msm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* 8KHz playback ?    */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm[1], 384000);
+	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);	/* 8KHz playback ? */
+	m_msm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_msm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
-
-MACHINE_CONFIG_START(sf_state::sfus)
+void sf_state::sfus(machine_config &config)
+{
 	sfan(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sf_state::sfus_map);
+}
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sfus_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(sf_state::sfjp)
+void sf_state::sfjp(machine_config &config)
+{
 	sfan(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sf_state::sfjp_map);
+}
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sfjp_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(sf_state::sfp)
+void sf_state::sfp(machine_config &config)
+{
 	sfan(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sf_state, irq6_line_hold)
-MACHINE_CONFIG_END
+	m_maincpu->set_vblank_int("screen", FUNC(sf_state::irq6_line_hold));
+}
 
 
 
@@ -679,7 +658,7 @@ ROM_START( sf )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "sf-27.4d", 0x000000, 0x004000, CRC(2b09b36d) SHA1(9fe1dd3a9396fbb06f30247cfe526653553beca1) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x40000, "tilerom", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.4h", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) )
 	ROM_LOAD( "sf-36.3h", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) )
 	ROM_LOAD( "sf-32.3g", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) )
@@ -749,7 +728,7 @@ ROM_START( sfua )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "sf-27.4d", 0x000000, 0x004000, CRC(2b09b36d) SHA1(9fe1dd3a9396fbb06f30247cfe526653553beca1) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x40000, "tilerom", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.4h", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) )
 	ROM_LOAD( "sf-36.3h", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) )
 	ROM_LOAD( "sf-32.3g", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) )
@@ -819,7 +798,7 @@ ROM_START( sfj )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "sf-27.4d", 0x000000, 0x004000, CRC(2b09b36d) SHA1(9fe1dd3a9396fbb06f30247cfe526653553beca1) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x40000, "tilerom", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.4h", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) )
 	ROM_LOAD( "sf-36.3h", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) )
 	ROM_LOAD( "sf-32.3g", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) )
@@ -886,7 +865,7 @@ ROM_START( sfan )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "sf-27.4d", 0x000000, 0x004000, CRC(2b09b36d) SHA1(9fe1dd3a9396fbb06f30247cfe526653553beca1) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x40000, "tilerom", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.4h", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) )
 	ROM_LOAD( "sf-36.3h", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) )
 	ROM_LOAD( "sf-32.3g", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) )
@@ -954,7 +933,7 @@ ROM_START( sfjan )
 	ROM_LOAD( "sf_27.4d.27256", 0x000000, 0x004000, CRC(59416e03) SHA1(028e74e0b23c5063883d19f94da35719be4feada) ) //  First half FF, second half matches known
 	ROM_CONTINUE( 0, 0x004000 )
 
-	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x40000, "tilerom", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.4h", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) ) // sf_37.4h.27c512
 	ROM_LOAD( "sf-36.3h", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) ) // sf_36.3h.27c512
 	ROM_LOAD( "sf-32.3g", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) ) // sf_32.3g.27c512
@@ -1023,7 +1002,7 @@ ROM_START( sfw )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "sf-27.4d", 0x000000, 0x004000, CRC(2b09b36d) SHA1(9fe1dd3a9396fbb06f30247cfe526653553beca1) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x40000, "tilerom", 0 )    /* background tilemaps */
 	ROM_LOAD( "sf-37.4h", 0x000000, 0x010000, CRC(23d09d3d) SHA1(a0c71abc49c5fe59487a63b502e3d03021bfef13) )
 	ROM_LOAD( "sf-36.3h", 0x010000, 0x010000, CRC(ea16df6c) SHA1(68709a314b775c500817fc17d40a80204b2ae06c) )
 	ROM_LOAD( "sf-32.3g", 0x020000, 0x010000, CRC(72df2bd9) SHA1(9a0da618139673738b6b3302207255e44c5491a2) )
@@ -1087,7 +1066,7 @@ ROM_START( sfp )
 	ROM_REGION( 0x004000, "gfx4", 0 )
 	ROM_LOAD( "vram.4d", 0x000000, 0x004000, CRC(bfadfb32) SHA1(8443ad9f02da5fb032017fc0c657b1bdc15e4f27) ) /* Characters planes 1-2 */
 
-	ROM_REGION( 0x40000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION( 0x40000, "tilerom", 0 )    /* background tilemaps */
 	ROM_LOAD( "bks1j10.5h", 0x000000, 0x010000, CRC(4934aacd) SHA1(15274ae8b26799e15c7a66ff89ffd386de1659d3) )
 	ROM_LOAD( "bks1j18.3h", 0x010000, 0x010000, CRC(551ffc88) SHA1(4f9213f4e80033f910dd8aae44b2c6d9ba760d61) )
 	ROM_LOAD( "ms1j10.3g",  0x020000, 0x010000, CRC(f92958b8) SHA1(da8fa64ea9ad27c737225681c49f7c57cc7afeed) )

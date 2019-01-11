@@ -47,18 +47,23 @@ class cchance_state : public tnzs_base_state
 {
 public:
 	cchance_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tnzs_base_state(mconfig, type, tag) { }
+		: tnzs_base_state(mconfig, type, tag)
+	{ }
 
+	void cchance(machine_config &config);
+
+protected:
 	void machine_reset() override;
 	void machine_start() override;
 
-	uint8_t m_hop_io;
-	uint8_t m_bell_io;
+private:
 	DECLARE_WRITE8_MEMBER(output_0_w);
 	DECLARE_READ8_MEMBER(input_1_r);
 	DECLARE_WRITE8_MEMBER(output_1_w);
-	void cchance(machine_config &config);
 	void main_map(address_map &map);
+
+	uint8_t m_hop_io;
+	uint8_t m_bell_io;
 };
 
 
@@ -96,8 +101,8 @@ void cchance_state::main_map(address_map &map)
 	map(0xe800, 0xe800).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   /* enable / disable background transparency */
 
 	map(0xf000, 0xf000).nopr().nopw(); //???
-	map(0xf001, 0xf001).r(this, FUNC(cchance_state::input_1_r)).w(this, FUNC(cchance_state::output_0_w));
-	map(0xf002, 0xf002).portr("IN0").w(this, FUNC(cchance_state::output_1_w));
+	map(0xf001, 0xf001).r(FUNC(cchance_state::input_1_r)).w(FUNC(cchance_state::output_0_w));
+	map(0xf002, 0xf002).portr("IN0").w(FUNC(cchance_state::output_1_w));
 	map(0xf800, 0xf801).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xf801, 0xf801).r("aysnd", FUNC(ay8910_device::data_r));
 }
@@ -218,10 +223,10 @@ MACHINE_CONFIG_START(cchance_state::cchance)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cchance_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cchance)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_cchance);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag("gfxdecode");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -231,17 +236,16 @@ MACHINE_CONFIG_START(cchance_state::cchance)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cchance_state, screen_update_tnzs)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cchance_state, screen_vblank_tnzs))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
+	PALETTE(config, m_palette, FUNC(cchance_state::prompalette), 512);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, 1500000/2)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2149_device &aysnd(YM2149(config, "aysnd", 1500000/2));
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 ROM_START( cchance )

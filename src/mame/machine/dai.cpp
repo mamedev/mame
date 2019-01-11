@@ -190,12 +190,12 @@ WRITE8_MEMBER(dai_state::dai_io_discrete_devices_w)
 
 READ8_MEMBER(dai_state::dai_pit_r)
 {
-	return m_pit->read(space, (offset >> 1) & 3);
+	return m_pit->read((offset >> 1) & 3);
 }
 
 WRITE8_MEMBER(dai_state::dai_pit_w)
 {
-	m_pit->write(space, (offset >> 1) & 3, data);
+	m_pit->write((offset >> 1) & 3, data);
 }
 
 /***************************************************************************

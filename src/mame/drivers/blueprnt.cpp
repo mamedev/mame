@@ -105,21 +105,21 @@ void blueprnt_state::blueprnt_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); // service mode checks for 8 chips = 64K
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x93ff).ram().w(this, FUNC(blueprnt_state::blueprnt_videoram_w)).mirror(0x400).share("videoram");
+	map(0x9000, 0x93ff).ram().w(FUNC(blueprnt_state::blueprnt_videoram_w)).mirror(0x400).share("videoram");
 	map(0xa000, 0xa0ff).ram().share("scrollram");
 	map(0xb000, 0xb0ff).ram().share("spriteram");
-	map(0xc000, 0xc000).portr("P1").w(this, FUNC(blueprnt_state::blueprnt_coin_counter_w));
+	map(0xc000, 0xc000).portr("P1").w(FUNC(blueprnt_state::blueprnt_coin_counter_w));
 	map(0xc001, 0xc001).portr("P2");
-	map(0xc003, 0xc003).r(this, FUNC(blueprnt_state::blueprnt_sh_dipsw_r));
-	map(0xd000, 0xd000).w(this, FUNC(blueprnt_state::blueprnt_sound_command_w));
-	map(0xe000, 0xe000).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(this, FUNC(blueprnt_state::blueprnt_flipscreen_w));
-	map(0xf000, 0xf3ff).ram().w(this, FUNC(blueprnt_state::blueprnt_colorram_w)).mirror(0x400).share("colorram");
+	map(0xc003, 0xc003).r(FUNC(blueprnt_state::blueprnt_sh_dipsw_r));
+	map(0xd000, 0xd000).w(FUNC(blueprnt_state::blueprnt_sound_command_w));
+	map(0xe000, 0xe000).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(FUNC(blueprnt_state::blueprnt_flipscreen_w));
+	map(0xf000, 0xf3ff).ram().w(FUNC(blueprnt_state::blueprnt_colorram_w)).mirror(0x400).share("colorram");
 }
 
 void blueprnt_state::grasspin_map(address_map &map)
 {
 	blueprnt_map(map);
-	map(0xc003, 0xc003).r(this, FUNC(blueprnt_state::grasspin_sh_dipsw_r));
+	map(0xc003, 0xc003).r(FUNC(blueprnt_state::grasspin_sh_dipsw_r));
 }
 
 
@@ -361,7 +361,7 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -371,26 +371,25 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_VIDEO_START_OVERRIDE(blueprnt_state, blueprnt)
 	MCFG_SCREEN_UPDATE_DRIVER(blueprnt_state, screen_update_blueprnt)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blueprnt)
-	MCFG_PALETTE_ADD("palette", 128*4+8)
-	MCFG_PALETTE_INIT_OWNER(blueprnt_state, blueprnt)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_blueprnt)
+	PALETTE(config, m_palette, FUNC(blueprnt_state::blueprnt_palette), 128*4+8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 10000000/2/2/2)
-	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, blueprnt_state, dipsw_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", 10000000/2/2/2));
+	ay1.port_b_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	ay1.port_a_write_callback().set(FUNC(blueprnt_state::dipsw_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 10000000/2/2/2/2)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DILSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DILSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", 10000000/2/2/2/2));
+	ay2.port_a_read_callback().set_ioport("DILSW1");
+	ay2.port_b_read_callback().set_ioport("DILSW2");
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(blueprnt_state::grasspin)

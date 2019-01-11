@@ -83,6 +83,7 @@ Versions known to exist but not dumped:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/nmk112.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
@@ -112,7 +113,7 @@ void cave_state::update_irq_state()
 		m_maincpu->set_input_line(m_irq_level, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(cave_state::cave_vblank_end)
+TIMER_CALLBACK_MEMBER(cave_state::vblank_end)
 {
 	if (m_kludge == 3)  /* mazinger metmqstr */
 	{
@@ -122,29 +123,29 @@ TIMER_CALLBACK_MEMBER(cave_state::cave_vblank_end)
 	m_agallet_vblank_irq = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start)
+TIMER_DEVICE_CALLBACK_MEMBER(cave_state::vblank_start)
 {
 	m_vblank_irq = 1;
 	update_irq_state();
-	cave_get_sprite_info(0);
+	get_sprite_info(0);
 	m_agallet_vblank_irq = 1;
 	m_vblank_end_timer->adjust(attotime::from_usec(2000));
 }
-TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start_left)
+TIMER_DEVICE_CALLBACK_MEMBER(cave_state::vblank_start_left)
 {
-	cave_get_sprite_info(1);
+	get_sprite_info(1);
 }
-TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start_right)
+TIMER_DEVICE_CALLBACK_MEMBER(cave_state::vblank_start_right)
 {
-	cave_get_sprite_info(2);
+	get_sprite_info(2);
 }
 
 /* Called once/frame to generate the VBLANK interrupt */
-INTERRUPT_GEN_MEMBER(cave_state::cave_interrupt)
+INTERRUPT_GEN_MEMBER(cave_state::interrupt)
 {
 	m_int_timer->adjust(attotime::from_usec(17376 - m_time_vblank_irq));
 }
-INTERRUPT_GEN_MEMBER(cave_state::cave_interrupt_ppsatan)
+INTERRUPT_GEN_MEMBER(cave_state::interrupt_ppsatan)
 {
 	m_int_timer->adjust      (attotime::from_usec(17376 - m_time_vblank_irq));
 	m_int_timer_left->adjust (attotime::from_usec(17376 - m_time_vblank_irq));
@@ -175,7 +176,7 @@ WRITE_LINE_MEMBER(cave_state::sound_irq_gen)
 
 /* Reads the cause of the interrupt and clears the state */
 
-READ16_MEMBER(cave_state::cave_irq_cause_r)
+u16 cave_state::irq_cause_r(offs_t offset)
 {
 	int result = 0x0003;
 
@@ -217,12 +218,12 @@ READ16_MEMBER(cave_state::cave_irq_cause_r)
 /*  We need a FIFO buffer for sailormn, where the inter-CPUs
     communication is *really* tight */
 
-READ8_MEMBER(cave_state::soundflags_r)
+u8 cave_state::soundflags_r()
 {
 	// bit 2 is low: can read command (lo)
 	// bit 3 is low: can read command (hi)
-//  return  (m_sound_flag1 ? 0 : 4) |
-//          (m_sound_flag2 ? 0 : 8) ;
+//  return  (m_sound_flag[0] ? 0 : 4) |
+//          (m_sound_flag[1] ? 0 : 8) ;
 return 0;
 }
 
@@ -230,8 +231,8 @@ READ16_MEMBER(cave_state::soundflags_ack_r)
 {
 	// bit 0 is low: can write command
 	// bit 1 is low: can read answer
-//  return  ((m_sound_flag1 | m_sound_flag2) ? 1 : 0) |
-//          ((m_soundbuf_wptr != m_soundbuf_rptr) ? 0 : 2) ;
+//  return  ((m_sound_flag[0] | m_sound_flag[1]) ? 1 : 0) |
+//          (m_soundbuf_empty ? 0 : 2) ;
 
 	return m_soundbuf_empty ? 2 : 0;
 }
@@ -239,8 +240,8 @@ READ16_MEMBER(cave_state::soundflags_ack_r)
 /* Main CPU: write a 16 bit sound latch and generate a NMI on the sound CPU */
 WRITE16_MEMBER(cave_state::sound_cmd_w)
 {
-//  m_sound_flag1 = 1;
-//  m_sound_flag2 = 1;
+//  m_sound_flag[0] = 1;
+//  m_sound_flag[1] = 1;
 	m_soundlatch->write(space, offset, data, mem_mask);
 	m_maincpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
@@ -248,14 +249,14 @@ WRITE16_MEMBER(cave_state::sound_cmd_w)
 /* Sound CPU: read the low 8 bits of the 16 bit sound latch */
 READ8_MEMBER(cave_state::soundlatch_lo_r)
 {
-//  m_sound_flag1 = 0;
+//  m_sound_flag[0] = 0;
 	return m_soundlatch->read(space, offset, 0x00ff) & 0xff;
 }
 
 /* Sound CPU: read the high 8 bits of the 16 bit sound latch */
 READ8_MEMBER(cave_state::soundlatch_hi_r)
 {
-//  m_sound_flag2 = 0;
+//  m_sound_flag[1] = 0;
 	return m_soundlatch->read(space, offset, 0xff00) >> 8;
 }
 
@@ -300,51 +301,45 @@ WRITE8_MEMBER(cave_state::soundlatch_ack_w)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(cave_state::cave_eeprom_msb_w)
+void cave_state::eeprom_w(u8 data)
 {
-	if (data & ~0xfe00)
+	if (data & ~0xfe)
 		logerror("%s: Unknown EEPROM bit written %04X\n", machine().describe_context(), data);
 
-	if (ACCESSING_BITS_8_15)  // even address
-	{
-		machine().bookkeeping().coin_lockout_w(1,~data & 0x8000);
-		machine().bookkeeping().coin_lockout_w(0,~data & 0x4000);
-		machine().bookkeeping().coin_counter_w(1, data & 0x2000);
-		machine().bookkeeping().coin_counter_w(0, data & 0x1000);
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 7));
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 6));
+	machine().bookkeeping().coin_counter_w(1, BIT( data, 5));
+	machine().bookkeeping().coin_counter_w(0, BIT( data, 4));
 
-		// latch the bit
-		m_eeprom->di_write((data & 0x0800) >> 11);
+	// latch the bit
+	m_eeprom->di_write(BIT(data, 3));
 
-		// reset line asserted: reset.
-		m_eeprom->cs_write((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
+	// reset line asserted: reset.
+	m_eeprom->cs_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 
-		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
-	}
+	// clock line asserted: write latch or select next bit to read
+	m_eeprom->clk_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(cave_state::sailormn_eeprom_msb_w)
+void cave_state::sailormn_eeprom_w(u8 data)
 {
-	sailormn_tilebank_w(data & 0x0100);
-	cave_eeprom_msb_w(space, offset, data & ~0x0100, mem_mask);
+	sailormn_tilebank_w(BIT(data, 0));
+	eeprom_w(data & ~0x01);
 }
 
-WRITE16_MEMBER(cave_state::hotdogst_eeprom_msb_w)
+void cave_state::hotdogst_eeprom_w(u8 data)
 {
-	if (ACCESSING_BITS_8_15)  // even address
-	{
-		// latch the bit
-		m_eeprom->di_write((data & 0x0800) >> 11);
+	// latch the bit
+	m_eeprom->di_write(BIT(data, 3));
 
-		// reset line asserted: reset.
-		m_eeprom->cs_write((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
+	// reset line asserted: reset.
+	m_eeprom->cs_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 
-		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
-	}
+	// clock line asserted: write latch or select next bit to read
+	m_eeprom->clk_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(cave_state::ppsatan_eeprom_msb_w)
+void cave_state::ppsatan_eeprom_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (data & ~0x000f)
 		logerror("%s: Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
@@ -365,62 +360,50 @@ WRITE16_MEMBER(cave_state::ppsatan_eeprom_msb_w)
 }
 
 
-WRITE16_MEMBER(cave_state::cave_eeprom_lsb_w)
+void cave_state::guwange_eeprom_w(u8 data)
 {
-	if (data & ~0x00ef)
+	if (data & ~0xef)
 		logerror("%s: Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
 
-	if (ACCESSING_BITS_0_7)  // odd address
-	{
-		machine().bookkeeping().coin_lockout_w(1, ~data & 0x0008);
-		machine().bookkeeping().coin_lockout_w(0, ~data & 0x0004);
-		machine().bookkeeping().coin_counter_w(1,  data & 0x0002);
-		machine().bookkeeping().coin_counter_w(0,  data & 0x0001);
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 3));
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
+	machine().bookkeeping().coin_counter_w(1, BIT( data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT( data, 0));
 
-		// latch the bit
-		m_eeprom->di_write((data & 0x80) >> 7);
+	// latch the bit
+	m_eeprom->di_write(BIT(data, 7));
 
-		// reset line asserted: reset.
-		m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	// reset line asserted: reset.
+	m_eeprom->cs_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 
-		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	}
+	// clock line asserted: write latch or select next bit to read
+	m_eeprom->clk_write(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*  - No eeprom or lockouts */
-WRITE16_MEMBER(cave_state::gaia_coin_lsb_w)
+void cave_state::gaia_coin_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)  // odd address
-	{
-		machine().bookkeeping().coin_counter_w(1, data & 0x0002);
-		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
-	}
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
 /*  - No coin lockouts
-    - Writing 0xcf00 shouldn't send a 1 bit to the eeprom   */
-WRITE16_MEMBER(cave_state::metmqstr_eeprom_msb_w)
+    - Writing 0xcf shouldn't send a 1 bit to the EEPROM   */
+void cave_state::metmqstr_eeprom_w(u8 data)
 {
-	if (data & ~0xff00)
-		logerror("%s: Unknown EEPROM bit written %04X\n", machine().describe_context(), data);
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 
-	if (ACCESSING_BITS_8_15)  // even address
+	if (BIT(~data, 0))
 	{
-		machine().bookkeeping().coin_counter_w(1, data & 0x2000);
-		machine().bookkeeping().coin_counter_w(0, data & 0x1000);
+		// latch the bit
+		m_eeprom->di_write(BIT(data, 3));
 
-		if (~data & 0x0100)
-		{
-			// latch the bit
-			m_eeprom->di_write((data & 0x0800) >> 11);
+		// reset line asserted: reset.
+		m_eeprom->cs_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 
-			// reset line asserted: reset.
-			m_eeprom->cs_write((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
-
-			// clock line asserted: write latch or select next bit to read
-			m_eeprom->clk_write((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
-		}
+		// clock line asserted: write latch or select next bit to read
+		m_eeprom->clk_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -436,6 +419,7 @@ template<int Chip>
 WRITE16_MEMBER(cave_state::vram_w)
 {
 	uint16_t *VRAM = m_vram[Chip];
+	int TDIM = m_tiledim[Chip];
 	tilemap_t *TILEMAP = m_tilemap[Chip];
 
 	if ((VRAM[offset] & mem_mask) == (data & mem_mask))
@@ -443,7 +427,7 @@ WRITE16_MEMBER(cave_state::vram_w)
 
 	COMBINE_DATA(&VRAM[offset]);
 	offset /= 2;
-	if (offset < 0x1000 / 4)    // 16x16 tilemap
+	if ((offset < 0x1000 / 4) && (TDIM))    // 16x16 tilemap
 	{
 		offset = (offset % (512 / 16)) * 2 + (offset / (512 / 16)) * (512 / 8) * 2;
 		TILEMAP->mark_tile_dirty(offset + 0);
@@ -451,7 +435,7 @@ WRITE16_MEMBER(cave_state::vram_w)
 		TILEMAP->mark_tile_dirty(offset + 0 + 512 / 8);
 		TILEMAP->mark_tile_dirty(offset + 1 + 512 / 8);
 	}
-	else if (offset >= 0x4000 / 4)      // 8x8 tilemap
+	else if ((offset >= 0x4000 / 4) && (!TDIM))      // 8x8 tilemap
 		TILEMAP->mark_tile_dirty(offset - 0x4000 / 4);
 }
 
@@ -493,22 +477,22 @@ WRITE16_MEMBER(cave_state::vram_8x8_w)
 
 void cave_state::dfeveron_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                 // ROM
-	map(0x100000, 0x10ffff).ram();                                                                 // RAM
-	map(0x300000, 0x300003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);                   // YMZ280
-	map(0x400000, 0x40ffff).ram().share("spriteram.0");       // Sprites
-	map(0x500000, 0x507fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");         // Layer 0
-	map(0x600000, 0x607fff).ram().w(this, FUNC(cave_state::vram_w<1>)).share("vram.1");         // Layer 1
-	map(0x708000, 0x708fff).ram().share("paletteram.0");  // Palette
-	map(0x710000, 0x710bff).readonly();                                                            // ?
-	map(0x710c00, 0x710fff).ram();                                                                 // ?
-	map(0x800000, 0x80007f).writeonly().share("videoregs.0");                     // Video Regs
-	map(0x800000, 0x800007).r(this, FUNC(cave_state::cave_irq_cause_r));                                              // IRQ Cause
-	map(0x900000, 0x900005).ram().share("vctrl.0");                             // Layer 0 Control
-	map(0xa00000, 0xa00005).ram().share("vctrl.1");                             // Layer 1 Control
-	map(0xb00000, 0xb00001).portr("IN0");                                                    // Inputs
-	map(0xb00002, 0xb00003).portr("IN1");                                                    // Inputs + EEPROM
-	map(0xc00000, 0xc00001).w(this, FUNC(cave_state::cave_eeprom_msb_w));                                // EEPROM
+	map(0x000000, 0x0fffff).rom();                                                                              // ROM
+	map(0x100000, 0x10ffff).ram();                                                                              // RAM
+	map(0x300000, 0x300003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff); // YMZ280
+	map(0x400000, 0x40ffff).ram().share("spriteram.0");                                                         // Sprites
+	map(0x500000, 0x507fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                               // Layer 0
+	map(0x600000, 0x607fff).ram().w(FUNC(cave_state::vram_w<1>)).share("vram.1");                               // Layer 1
+	map(0x708000, 0x708fff).ram().share("paletteram.0");                                                        // Palette
+	map(0x710000, 0x710bff).readonly();                                                                         // ?
+	map(0x710c00, 0x710fff).ram();                                                                              // ?
+	map(0x800000, 0x80007f).writeonly().share("videoregs.0");                                                   // Video Regs
+	map(0x800000, 0x800007).r(FUNC(cave_state::irq_cause_r));                                                   // IRQ Cause
+	map(0x900000, 0x900005).ram().share("vctrl.0");                                                             // Layer 0 Control
+	map(0xa00000, 0xa00005).ram().share("vctrl.1");                                                             // Layer 1 Control
+	map(0xb00000, 0xb00001).portr("IN0");                                                                       // Inputs
+	map(0xb00002, 0xb00003).portr("IN1");                                                                       // Inputs + EEPROM
+	map(0xc00000, 0xc00000).w(FUNC(cave_state::eeprom_w));                                                      // EEPROM
 }
 
 
@@ -518,22 +502,22 @@ void cave_state::dfeveron_map(address_map &map)
 
 void cave_state::ddonpach_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                 // ROM
-	map(0x100000, 0x10ffff).ram();                                                                 // RAM
-	map(0x300000, 0x300003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);           // YMZ280
-	map(0x400000, 0x40ffff).ram().share("spriteram.0");       // Sprites
-	map(0x500000, 0x507fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");         // Layer 0
-	map(0x600000, 0x607fff).ram().w(this, FUNC(cave_state::vram_w<1>)).share("vram.1");         // Layer 1
-	map(0x700000, 0x70ffff).ram().w(this, FUNC(cave_state::vram_8x8_w<2>)).share("vram.2");     // Layer 2
-	map(0x800000, 0x80007f).writeonly().share("videoregs.0");                     // Video Regs
-	map(0x800000, 0x800007).r(this, FUNC(cave_state::cave_irq_cause_r));                                              // IRQ Cause
-	map(0x900000, 0x900005).ram().share("vctrl.0");                             // Layer 0 Control
-	map(0xa00000, 0xa00005).ram().share("vctrl.1");                             // Layer 1 Control
-	map(0xb00000, 0xb00005).ram().share("vctrl.2");                             // Layer 2 Control
-	map(0xc00000, 0xc0ffff).ram().share("paletteram.0");  // Palette
-	map(0xd00000, 0xd00001).portr("IN0");                                                    // Inputs
-	map(0xd00002, 0xd00003).portr("IN1");                                                    // Inputs + EEPROM
-	map(0xe00000, 0xe00001).w(this, FUNC(cave_state::cave_eeprom_msb_w));                                // EEPROM
+	map(0x000000, 0x0fffff).rom();                                                                              // ROM
+	map(0x100000, 0x10ffff).ram();                                                                              // RAM
+	map(0x300000, 0x300003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff); // YMZ280
+	map(0x400000, 0x40ffff).ram().share("spriteram.0");                                                         // Sprites
+	map(0x500000, 0x507fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                               // Layer 0
+	map(0x600000, 0x607fff).ram().w(FUNC(cave_state::vram_w<1>)).share("vram.1");                               // Layer 1
+	map(0x700000, 0x70ffff).ram().w(FUNC(cave_state::vram_8x8_w<2>)).share("vram.2");                           // Layer 2
+	map(0x800000, 0x80007f).writeonly().share("videoregs.0");                                                   // Video Regs
+	map(0x800000, 0x800007).r(FUNC(cave_state::irq_cause_r));                                                   // IRQ Cause
+	map(0x900000, 0x900005).ram().share("vctrl.0");                                                             // Layer 0 Control
+	map(0xa00000, 0xa00005).ram().share("vctrl.1");                                                             // Layer 1 Control
+	map(0xb00000, 0xb00005).ram().share("vctrl.2");                                                             // Layer 2 Control
+	map(0xc00000, 0xc0ffff).ram().share("paletteram.0");                                                        // Palette
+	map(0xd00000, 0xd00001).portr("IN0");                                                                       // Inputs
+	map(0xd00002, 0xd00003).portr("IN1");                                                                       // Inputs + EEPROM
+	map(0xe00000, 0xe00000).w(FUNC(cave_state::eeprom_w));                                                      // EEPROM
 }
 
 
@@ -548,7 +532,7 @@ READ16_MEMBER(cave_state::donpachi_videoregs_r)
 		case 0:
 		case 1:
 		case 2:
-		case 3: return cave_irq_cause_r(space, offset, 0xffff);
+		case 3: return irq_cause_r(offset);
 
 		default:    return 0x0000;
 	}
@@ -556,23 +540,23 @@ READ16_MEMBER(cave_state::donpachi_videoregs_r)
 
 void cave_state::donpachi_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                                                     // ROM
-	map(0x100000, 0x10ffff).ram();                                                                     // RAM
-	map(0x200000, 0x207fff).ram().w(this, FUNC(cave_state::vram_w<1>)).share("vram.1");             // Layer 1
-	map(0x300000, 0x307fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");             // Layer 0
-	map(0x400000, 0x407fff).ram().w(this, FUNC(cave_state::vram_8x8_w<2>)).share("vram.2");         // Layer 2
-	map(0x500000, 0x50ffff).ram().share("spriteram.0");           // Sprites
-	map(0x600000, 0x600005).ram().share("vctrl.1");                                 // Layer 1 Control
-	map(0x700000, 0x700005).ram().share("vctrl.0");                                 // Layer 0 Control
-	map(0x800000, 0x800005).ram().share("vctrl.2");                                 // Layer 2 Control
-	map(0x900000, 0x90007f).ram().r(this, FUNC(cave_state::donpachi_videoregs_r)).share("videoregs.0");    // Video Regs
-	map(0xa08000, 0xa08fff).ram().share("paletteram.0");      // Palette
-	map(0xb00000, 0xb00003).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);                 // M6295
-	map(0xb00010, 0xb00013).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);                 //
-	map(0xb00020, 0xb0002f).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);                       //
-	map(0xc00000, 0xc00001).portr("IN0");                                                        // Inputs
-	map(0xc00002, 0xc00003).portr("IN1");                                                        // Inputs + EEPROM
-	map(0xd00000, 0xd00001).w(this, FUNC(cave_state::cave_eeprom_msb_w));                                    // EEPROM
+	map(0x000000, 0x07ffff).rom();                                                                                 // ROM
+	map(0x100000, 0x10ffff).ram();                                                                                 // RAM
+	map(0x200000, 0x207fff).ram().w(FUNC(cave_state::vram_w<1>)).share("vram.1");                                  // Layer 1
+	map(0x300000, 0x307fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                                  // Layer 0
+	map(0x400000, 0x407fff).ram().w(FUNC(cave_state::vram_8x8_w<2>)).share("vram.2");                              // Layer 2
+	map(0x500000, 0x50ffff).ram().share("spriteram.0");                                                            // Sprites
+	map(0x600000, 0x600005).ram().share("vctrl.1");                                                                // Layer 1 Control
+	map(0x700000, 0x700005).ram().share("vctrl.0");                                                                // Layer 0 Control
+	map(0x800000, 0x800005).ram().share("vctrl.2");                                                                // Layer 2 Control
+	map(0x900000, 0x90007f).ram().r(FUNC(cave_state::donpachi_videoregs_r)).share("videoregs.0");                  // Video Regs
+	map(0xa08000, 0xa08fff).ram().share("paletteram.0");                                                           // Palette
+	map(0xb00000, 0xb00003).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff); // M6295
+	map(0xb00010, 0xb00013).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff); //
+	map(0xb00020, 0xb0002f).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);                           //
+	map(0xc00000, 0xc00001).portr("IN0");                                                                          // Inputs
+	map(0xc00002, 0xc00003).portr("IN1");                                                                          // Inputs + EEPROM
+	map(0xd00000, 0xd00000).w(FUNC(cave_state::eeprom_w));                                                         // EEPROM
 }
 
 
@@ -582,22 +566,22 @@ void cave_state::donpachi_map(address_map &map)
 
 void cave_state::esprade_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                 // ROM
-	map(0x100000, 0x10ffff).ram();                                                                 // RAM
-	map(0x300000, 0x300003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);           // YMZ280
-	map(0x400000, 0x40ffff).ram().share("spriteram.0");       // Sprites
-	map(0x500000, 0x507fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");         // Layer 0
-	map(0x600000, 0x607fff).ram().w(this, FUNC(cave_state::vram_w<1>)).share("vram.1");         // Layer 1
-	map(0x700000, 0x707fff).ram().w(this, FUNC(cave_state::vram_w<2>)).share("vram.2");         // Layer 2
-	map(0x800000, 0x80007f).writeonly().share("videoregs.0");                     // Video Regs
-	map(0x800000, 0x800007).r(this, FUNC(cave_state::cave_irq_cause_r));                                              // IRQ Cause
-	map(0x900000, 0x900005).ram().share("vctrl.0");                             // Layer 0 Control
-	map(0xa00000, 0xa00005).ram().share("vctrl.1");                             // Layer 1 Control
-	map(0xb00000, 0xb00005).ram().share("vctrl.2");                             // Layer 2 Control
-	map(0xc00000, 0xc0ffff).ram().share("paletteram.0");  // Palette
-	map(0xd00000, 0xd00001).portr("IN0");                                                   // Inputs
-	map(0xd00002, 0xd00003).portr("IN1");                                                   // Inputs + EEPROM
-	map(0xe00000, 0xe00001).w(this, FUNC(cave_state::cave_eeprom_msb_w));                                // EEPROM
+	map(0x000000, 0x0fffff).rom();                                                                              // ROM
+	map(0x100000, 0x10ffff).ram();                                                                              // RAM
+	map(0x300000, 0x300003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff); // YMZ280
+	map(0x400000, 0x40ffff).ram().share("spriteram.0");                                                         // Sprites
+	map(0x500000, 0x507fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                               // Layer 0
+	map(0x600000, 0x607fff).ram().w(FUNC(cave_state::vram_w<1>)).share("vram.1");                               // Layer 1
+	map(0x700000, 0x707fff).ram().w(FUNC(cave_state::vram_w<2>)).share("vram.2");                               // Layer 2
+	map(0x800000, 0x80007f).writeonly().share("videoregs.0");                                                   // Video Regs
+	map(0x800000, 0x800007).r(FUNC(cave_state::irq_cause_r));                                                   // IRQ Cause
+	map(0x900000, 0x900005).ram().share("vctrl.0");                                                             // Layer 0 Control
+	map(0xa00000, 0xa00005).ram().share("vctrl.1");                                                             // Layer 1 Control
+	map(0xb00000, 0xb00005).ram().share("vctrl.2");                                                             // Layer 2 Control
+	map(0xc00000, 0xc0ffff).ram().share("paletteram.0");                                                        // Palette
+	map(0xd00000, 0xd00001).portr("IN0");                                                                       // Inputs
+	map(0xd00002, 0xd00003).portr("IN1");                                                                       // Inputs + EEPROM
+	map(0xe00000, 0xe00000).w(FUNC(cave_state::eeprom_w));                                                      // EEPROM
 }
 
 
@@ -607,27 +591,27 @@ void cave_state::esprade_map(address_map &map)
 
 void cave_state::gaia_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                 // ROM
-	map(0x100000, 0x10ffff).ram();                                                                 // RAM
-	map(0x300000, 0x300003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);           // YMZ280
-	map(0x400000, 0x40ffff).ram().share("spriteram.0");       // Sprite
-	map(0x500000, 0x507fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");         // Layer 0
-	map(0x508000, 0x50ffff).ram();                                                                 // More Layer 0, Tested but not used?
-	map(0x600000, 0x607fff).ram().w(this, FUNC(cave_state::vram_w<1>)).share("vram.1");         // Layer 1
-	map(0x608000, 0x60ffff).ram();                                                                 // More Layer 1, Tested but not used?
-	map(0x700000, 0x707fff).ram().w(this, FUNC(cave_state::vram_w<2>)).share("vram.2");         // Layer 2
-	map(0x708000, 0x70ffff).ram();                                                                 // More Layer 2, Tested but not used?
-	map(0x800000, 0x80007f).writeonly().share("videoregs.0");                     // Video Regs
-	map(0x800000, 0x800007).r(this, FUNC(cave_state::cave_irq_cause_r));                                              // IRQ Cause
-	map(0x900000, 0x900005).ram().share("vctrl.0");                             // Layer 0 Control
-	map(0xa00000, 0xa00005).ram().share("vctrl.1");                             // Layer 1 Control
-	map(0xb00000, 0xb00005).ram().share("vctrl.2");                             // Layer 2 Control
-	map(0xc00000, 0xc0ffff).ram().share("paletteram.0");  // Palette
-	map(0xd00010, 0xd00011).portr("IN0");                                                    // Inputs
-	map(0xd00010, 0xd00011).w(this, FUNC(cave_state::gaia_coin_lsb_w));                                              // Coin counter only
-	map(0xd00012, 0xd00013).portr("IN1");                                                    // Inputs
-	map(0xd00014, 0xd00015).portr("DSW");                                                    // Dips
-	map(0xd00014, 0xd00015).w("watchdog", FUNC(watchdog_timer_device::reset16_w));              // Watchdog?
+	map(0x000000, 0x0fffff).rom();                                                                              // ROM
+	map(0x100000, 0x10ffff).ram();                                                                              // RAM
+	map(0x300000, 0x300003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff); // YMZ280
+	map(0x400000, 0x40ffff).ram().share("spriteram.0");                                                         // Sprite
+	map(0x500000, 0x507fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                               // Layer 0
+	map(0x508000, 0x50ffff).ram();                                                                              // More Layer 0, Tested but not used?
+	map(0x600000, 0x607fff).ram().w(FUNC(cave_state::vram_w<1>)).share("vram.1");                               // Layer 1
+	map(0x608000, 0x60ffff).ram();                                                                              // More Layer 1, Tested but not used?
+	map(0x700000, 0x707fff).ram().w(FUNC(cave_state::vram_w<2>)).share("vram.2");                               // Layer 2
+	map(0x708000, 0x70ffff).ram();                                                                              // More Layer 2, Tested but not used?
+	map(0x800000, 0x80007f).writeonly().share("videoregs.0");                                                   // Video Regs
+	map(0x800000, 0x800007).r(FUNC(cave_state::irq_cause_r));                                                   // IRQ Cause
+	map(0x900000, 0x900005).ram().share("vctrl.0");                                                             // Layer 0 Control
+	map(0xa00000, 0xa00005).ram().share("vctrl.1");                                                             // Layer 1 Control
+	map(0xb00000, 0xb00005).ram().share("vctrl.2");                                                             // Layer 2 Control
+	map(0xc00000, 0xc0ffff).ram().share("paletteram.0");                                                        // Palette
+	map(0xd00010, 0xd00011).portr("IN0");                                                                       // Inputs
+	map(0xd00011, 0xd00011).w(FUNC(cave_state::gaia_coin_w));                                                   // Coin counter only
+	map(0xd00012, 0xd00013).portr("IN1");                                                                       // Inputs
+	map(0xd00014, 0xd00015).portr("DSW");                                                                       // Dips
+	map(0xd00014, 0xd00015).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                              // Watchdog?
 }
 
 
@@ -637,24 +621,24 @@ void cave_state::gaia_map(address_map &map)
 
 void cave_state::guwange_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                 // ROM
-	map(0x200000, 0x20ffff).ram();                                                                 // RAM
-	map(0x300000, 0x30007f).writeonly().share("videoregs.0");                     // Video Regs
-	map(0x300000, 0x300007).r(this, FUNC(cave_state::cave_irq_cause_r));                                              // IRQ Cause
-	map(0x400000, 0x40ffff).ram().share("spriteram.0");       // Sprites
-	map(0x500000, 0x507fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");         // Layer 0
-	map(0x600000, 0x607fff).ram().w(this, FUNC(cave_state::vram_w<1>)).share("vram.1");         // Layer 1
-	map(0x700000, 0x707fff).ram().w(this, FUNC(cave_state::vram_w<2>)).share("vram.2");         // Layer 2
-	map(0x800000, 0x800003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);           // YMZ280
-	map(0x900000, 0x900005).ram().share("vctrl.0");                             // Layer 0 Control
-	map(0xa00000, 0xa00005).ram().share("vctrl.1");                             // Layer 1 Control
-	map(0xb00000, 0xb00005).ram().share("vctrl.2");                             // Layer 2 Control
-/**/map(0xc00000, 0xc0ffff).ram().share("paletteram.0");  // Palette
-	map(0xd00010, 0xd00011).portr("IN0");                                                    // Inputs
-	map(0xd00010, 0xd00011).w(this, FUNC(cave_state::cave_eeprom_lsb_w));                                // EEPROM
-	map(0xd00012, 0xd00013).portr("IN1");                                                    // Inputs + EEPROM
-//  AM_RANGE(0xd00012, 0xd00013) AM_WRITENOP                                                            // ?
-//  AM_RANGE(0xd00014, 0xd00015) AM_WRITENOP                                                            // ? $800068 in dfeveron ? probably Watchdog
+	map(0x000000, 0x0fffff).rom();                                                                              // ROM
+	map(0x200000, 0x20ffff).ram();                                                                              // RAM
+	map(0x300000, 0x30007f).writeonly().share("videoregs.0");                                                   // Video Regs
+	map(0x300000, 0x300007).r(FUNC(cave_state::irq_cause_r));                                                   // IRQ Cause
+	map(0x400000, 0x40ffff).ram().share("spriteram.0");                                                         // Sprites
+	map(0x500000, 0x507fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                               // Layer 0
+	map(0x600000, 0x607fff).ram().w(FUNC(cave_state::vram_w<1>)).share("vram.1");                               // Layer 1
+	map(0x700000, 0x707fff).ram().w(FUNC(cave_state::vram_w<2>)).share("vram.2");                               // Layer 2
+	map(0x800000, 0x800003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff); // YMZ280
+	map(0x900000, 0x900005).ram().share("vctrl.0");                                                             // Layer 0 Control
+	map(0xa00000, 0xa00005).ram().share("vctrl.1");                                                             // Layer 1 Control
+	map(0xb00000, 0xb00005).ram().share("vctrl.2");                                                             // Layer 2 Control
+/**/map(0xc00000, 0xc0ffff).ram().share("paletteram.0");                                                        // Palette
+	map(0xd00010, 0xd00011).portr("IN0");                                                                       // Inputs
+	map(0xd00011, 0xd00011).w(FUNC(cave_state::guwange_eeprom_w));                                              // EEPROM
+	map(0xd00012, 0xd00013).portr("IN1");                                                                       // Inputs + EEPROM
+//  map(0xd00012, 0xd00013).nopw();                                                                             // ?
+//  map(0xd00014, 0xd00015).nopw();                                                                             // ? $800068 in dfeveron ? probably Watchdog
 }
 
 
@@ -666,22 +650,22 @@ void cave_state::hotdogst_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                 // ROM
 	map(0x300000, 0x30ffff).ram();                                                                 // RAM
-	map(0x408000, 0x408fff).ram().share("paletteram.0");  // Palette
-	map(0x880000, 0x887fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");         // Layer 0
-	map(0x900000, 0x907fff).ram().w(this, FUNC(cave_state::vram_w<1>)).share("vram.1");         // Layer 1
-	map(0x980000, 0x987fff).ram().w(this, FUNC(cave_state::vram_w<2>)).share("vram.2");         // Layer 2
-	map(0xa80000, 0xa8007f).writeonly().share("videoregs.0");                     // Video Regs
-	map(0xa80000, 0xa80007).r(this, FUNC(cave_state::cave_irq_cause_r));                                              // IRQ Cause
-//  AM_RANGE(0xa8006e, 0xa8006f) AM_READ(soundlatch_ack_r)                                              // From Sound CPU
-	map(0xa8006e, 0xa8006f).w(this, FUNC(cave_state::sound_cmd_w));                                                  // To Sound CPU
-	map(0xb00000, 0xb00005).ram().share("vctrl.0");                             // Layer 0 Control
-	map(0xb80000, 0xb80005).ram().share("vctrl.1");                             // Layer 1 Control
-	map(0xc00000, 0xc00005).ram().share("vctrl.2");                             // Layer 2 Control
-	map(0xc80000, 0xc80001).portr("IN0");                                                    // Inputs
-	map(0xc80002, 0xc80003).portr("IN1");                                                    // Inputs + EEPROM
-	map(0xd00000, 0xd00001).w(this, FUNC(cave_state::hotdogst_eeprom_msb_w));                            // EEPROM
-	map(0xd00002, 0xd00003).nopw();                                                            // ???
-	map(0xf00000, 0xf0ffff).ram().share("spriteram.0");       // Sprites
+	map(0x408000, 0x408fff).ram().share("paletteram.0");                                           // Palette
+	map(0x880000, 0x887fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                  // Layer 0
+	map(0x900000, 0x907fff).ram().w(FUNC(cave_state::vram_w<1>)).share("vram.1");                  // Layer 1
+	map(0x980000, 0x987fff).ram().w(FUNC(cave_state::vram_w<2>)).share("vram.2");                  // Layer 2
+	map(0xa80000, 0xa8007f).writeonly().share("videoregs.0");                                      // Video Regs
+	map(0xa80000, 0xa80007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
+//  map(0xa8006e, 0xa8006f).r(FUNC(cave_state::soundlatch_ack_r));                                 // From Sound CPU
+	map(0xa8006e, 0xa8006f).w(FUNC(cave_state::sound_cmd_w));                                      // To Sound CPU
+	map(0xb00000, 0xb00005).ram().share("vctrl.0");                                                // Layer 0 Control
+	map(0xb80000, 0xb80005).ram().share("vctrl.1");                                                // Layer 1 Control
+	map(0xc00000, 0xc00005).ram().share("vctrl.2");                                                // Layer 2 Control
+	map(0xc80000, 0xc80001).portr("IN0");                                                          // Inputs
+	map(0xc80002, 0xc80003).portr("IN1");                                                          // Inputs + EEPROM
+	map(0xd00000, 0xd00000).w(FUNC(cave_state::hotdogst_eeprom_w));                                // EEPROM
+	map(0xd00002, 0xd00003).nopw();                                                                // ???
+	map(0xf00000, 0xf0ffff).ram().share("spriteram.0");                                            // Sprites
 }
 
 
@@ -700,10 +684,10 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 {
 	COMBINE_DATA(&m_leds[0]);
 
-	m_led[0] = BIT(data, 15);
-	m_led[1] = BIT(data, 14);
-	m_led[2] = BIT(data, 12);    // square button
-	m_led[3] = BIT(data, 11);    // round  button
+	m_led_outputs[0] = BIT(data, 15);
+	m_led_outputs[1] = BIT(data, 14);
+	m_led_outputs[2] = BIT(data, 12);    // square button
+	m_led_outputs[3] = BIT(data, 11);    // round  button
 //  machine().bookkeeping().coin_lockout_w(1, ~data & 0x0200);   // coin lockouts?
 //  machine().bookkeeping().coin_lockout_w(0, ~data & 0x0100);
 
@@ -711,16 +695,16 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 //  machine().bookkeeping().coin_counter_w(1, data & 0x0020);
 	machine().bookkeeping().coin_counter_w(0, data & 0x0010);
 
-	m_led[5] = BIT(data, 3);
-	m_led[6] = BIT(data, 2);
-	m_led[7] = BIT(data, 1);
-	m_led[8] = BIT(data, 0);
+	m_led_outputs[5] = BIT(data, 3);
+	m_led_outputs[6] = BIT(data, 2);
+	m_led_outputs[7] = BIT(data, 1);
+	m_led_outputs[8] = BIT(data, 0);
 
 	show_leds();
 }
 
 
-WRITE16_MEMBER(cave_state::korokoro_eeprom_msb_w)
+void cave_state::korokoro_eeprom_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (data & ~0x7000)
 	{
@@ -752,39 +736,39 @@ CUSTOM_INPUT_MEMBER(cave_state::korokoro_hopper_r)
 
 void cave_state::korokoro_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                                                     // ROM
-	map(0x100000, 0x107fff).w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");                 // Layer 0
-	map(0x140000, 0x140005).writeonly().share("vctrl.0");                           // Layer 0 Control
-	map(0x180000, 0x187fff).writeonly().share("spriteram.0"); // Sprites
-	map(0x1c0000, 0x1c007f).writeonly().share("videoregs.0");                         // Video Regs
-	map(0x1c0000, 0x1c0007).r(this, FUNC(cave_state::cave_irq_cause_r));                                                  // IRQ Cause
-	map(0x200000, 0x207fff).writeonly().share("paletteram.0");    // Palette
-//  AM_RANGE(0x240000, 0x240003) AM_DEVREAD8("ymz", ymz280b_device, read, 0x00ff)                           // YMZ280
-	map(0x240000, 0x240003).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff);                         // YMZ280
-	map(0x280000, 0x280001).portr("IN0");                                                        // Inputs + ???
-	map(0x280002, 0x280003).portr("IN1");                                                        // Inputs + EEPROM
-	map(0x280008, 0x280009).w(this, FUNC(cave_state::korokoro_leds_w));                                                  // Leds
-	map(0x28000a, 0x28000b).w(this, FUNC(cave_state::korokoro_eeprom_msb_w));                                // EEPROM
+	map(0x000000, 0x07ffff).rom();                                                                 // ROM
+	map(0x100000, 0x107fff).w(FUNC(cave_state::vram_w<0>)).share("vram.0");                        // Layer 0
+	map(0x140000, 0x140005).writeonly().share("vctrl.0");                                          // Layer 0 Control
+	map(0x180000, 0x187fff).writeonly().share("spriteram.0");                                      // Sprites
+	map(0x1c0000, 0x1c007f).writeonly().share("videoregs.0");                                      // Video Regs
+	map(0x1c0000, 0x1c0007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
+	map(0x200000, 0x207fff).writeonly().share("paletteram.0");                                     // Palette
+//  map(0x240000, 0x240003).r("ymz", FUNC(ymz280b_device::read)).umask16(0x00ff);                  // YMZ280
+	map(0x240000, 0x240003).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff);                 // YMZ280
+	map(0x280000, 0x280001).portr("IN0");                                                          // Inputs + ???
+	map(0x280002, 0x280003).portr("IN1");                                                          // Inputs + EEPROM
+	map(0x280008, 0x280009).w(FUNC(cave_state::korokoro_leds_w));                                  // Leds
+	map(0x28000a, 0x28000b).w(FUNC(cave_state::korokoro_eeprom_w));                                // EEPROM
 	map(0x28000c, 0x28000d).nopw();                                                                // 0 (watchdog?)
-	map(0x300000, 0x30ffff).ram();                                                                     // RAM
+	map(0x300000, 0x30ffff).ram();                                                                 // RAM
 }
 
 void cave_state::crusherm_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                                                     // ROM
-	map(0x100000, 0x107fff).w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");                 // Layer 0
-	map(0x140000, 0x140005).writeonly().share("vctrl.0");                           // Layer 0 Control
-	map(0x180000, 0x187fff).writeonly().share("spriteram.0"); // Sprites
-	map(0x200000, 0x207fff).writeonly().share("paletteram.0");    // Palette
-	map(0x240000, 0x240003).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff);                         // YMZ280
-	map(0x280000, 0x280001).portr("IN0");                                                        // Inputs + ???
-	map(0x280002, 0x280003).portr("IN1");                                                        // Inputs + EEPROM
-	map(0x280008, 0x280009).w(this, FUNC(cave_state::korokoro_leds_w));                                                  // Leds
-	map(0x28000a, 0x28000b).w(this, FUNC(cave_state::korokoro_eeprom_msb_w));                                // EEPROM
+	map(0x000000, 0x07ffff).rom();                                                                 // ROM
+	map(0x100000, 0x107fff).w(FUNC(cave_state::vram_w<0>)).share("vram.0");                        // Layer 0
+	map(0x140000, 0x140005).writeonly().share("vctrl.0");                                          // Layer 0 Control
+	map(0x180000, 0x187fff).writeonly().share("spriteram.0");                                      // Sprites
+	map(0x200000, 0x207fff).writeonly().share("paletteram.0");                                     // Palette
+	map(0x240000, 0x240003).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff);                 // YMZ280
+	map(0x280000, 0x280001).portr("IN0");                                                          // Inputs + ???
+	map(0x280002, 0x280003).portr("IN1");                                                          // Inputs + EEPROM
+	map(0x280008, 0x280009).w(FUNC(cave_state::korokoro_leds_w));                                  // Leds
+	map(0x28000a, 0x28000b).w(FUNC(cave_state::korokoro_eeprom_w));                                // EEPROM
 	map(0x28000c, 0x28000d).nopw();                                                                // 0 (watchdog?)
-	map(0x300000, 0x30007f).writeonly().share("videoregs.0");                         // Video Regs
-	map(0x300000, 0x300007).r(this, FUNC(cave_state::cave_irq_cause_r));                                                  // IRQ Cause
-	map(0x340000, 0x34ffff).ram();                                                                     // RAM
+	map(0x300000, 0x30007f).writeonly().share("videoregs.0");                                      // Video Regs
+	map(0x300000, 0x300007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
+	map(0x340000, 0x34ffff).ram();                                                                 // RAM
 }
 
 /***************************************************************************
@@ -795,20 +779,20 @@ void cave_state::mazinger_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                                 // ROM
 	map(0x100000, 0x10ffff).ram();                                                                 // RAM
-	map(0x200000, 0x20ffff).ram().share("spriteram.0");       // Sprites
-	map(0x300000, 0x30007f).writeonly().share("videoregs.0");                     // Video Regs
-	map(0x300000, 0x300007).r(this, FUNC(cave_state::cave_irq_cause_r));                                              // IRQ Cause
-	map(0x300068, 0x300069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));              // Watchdog
-	map(0x30006e, 0x30006f).rw(this, FUNC(cave_state::soundlatch_ack_r), FUNC(cave_state::sound_cmd_w));                            // From Sound CPU
-	map(0x400000, 0x407fff).ram().w(this, FUNC(cave_state::vram_8x8_w<1>)).share("vram.1");     // Layer 1
-	map(0x500000, 0x507fff).ram().w(this, FUNC(cave_state::vram_8x8_w<0>)).share("vram.0");     // Layer 0
-	map(0x600000, 0x600005).ram().share("vctrl.1");                             // Layer 1 Control
-	map(0x700000, 0x700005).ram().share("vctrl.0");                             // Layer 0 Control
-	map(0x800000, 0x800001).portr("IN0");                                                    // Inputs
-	map(0x800002, 0x800003).portr("IN1");                                                    // Inputs + EEPROM
-	map(0x900000, 0x900001).w(this, FUNC(cave_state::cave_eeprom_msb_w));                                // EEPROM
-	map(0xc08000, 0xc0ffff).ram().share("paletteram.0");  // Palette
-	map(0xd00000, 0xd7ffff).rom().region("user1", 0);   // extra data ROM
+	map(0x200000, 0x20ffff).ram().share("spriteram.0");                                            // Sprites
+	map(0x300000, 0x30007f).writeonly().share("videoregs.0");                                      // Video Regs
+	map(0x300000, 0x300007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
+	map(0x300068, 0x300069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                 // Watchdog
+	map(0x30006e, 0x30006f).rw(FUNC(cave_state::soundlatch_ack_r), FUNC(cave_state::sound_cmd_w)); // From Sound CPU
+	map(0x400000, 0x407fff).ram().w(FUNC(cave_state::vram_8x8_w<1>)).share("vram.1");              // Layer 1
+	map(0x500000, 0x507fff).ram().w(FUNC(cave_state::vram_8x8_w<0>)).share("vram.0");              // Layer 0
+	map(0x600000, 0x600005).ram().share("vctrl.1");                                                // Layer 1 Control
+	map(0x700000, 0x700005).ram().share("vctrl.0");                                                // Layer 0 Control
+	map(0x800000, 0x800001).portr("IN0");                                                          // Inputs
+	map(0x800002, 0x800003).portr("IN1");                                                          // Inputs + EEPROM
+	map(0x900000, 0x900000).w(FUNC(cave_state::eeprom_w));                                         // EEPROM
+	map(0xc08000, 0xc0ffff).ram().share("paletteram.0");                                           // Palette
+	map(0xd00000, 0xd7ffff).rom().region("user1", 0);                                              // extra data ROM
 }
 
 
@@ -821,26 +805,26 @@ void cave_state::metmqstr_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();                                                                 // ROM
 	map(0x100000, 0x17ffff).rom();                                                                 // ROM
 	map(0x200000, 0x27ffff).rom();                                                                 // ROM
-	map(0x408000, 0x408fff).ram().share("paletteram.0");  // Palette
-	map(0x600000, 0x600001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));               // Watchdog?
-	map(0x880000, 0x887fff).ram().w(this, FUNC(cave_state::vram_w<2>)).share("vram.2");         // Layer 2
+	map(0x408000, 0x408fff).ram().share("paletteram.0");                                           // Palette
+	map(0x600000, 0x600001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));                 // Watchdog?
+	map(0x880000, 0x887fff).ram().w(FUNC(cave_state::vram_w<2>)).share("vram.2");                  // Layer 2
 	map(0x888000, 0x88ffff).ram();                                                                 //
-	map(0x900000, 0x907fff).ram().w(this, FUNC(cave_state::vram_w<1>)).share("vram.1");         // Layer 1
+	map(0x900000, 0x907fff).ram().w(FUNC(cave_state::vram_w<1>)).share("vram.1");                  // Layer 1
 	map(0x908000, 0x90ffff).ram();                                                                 //
-	map(0x980000, 0x987fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");         // Layer 0
+	map(0x980000, 0x987fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                  // Layer 0
 	map(0x988000, 0x98ffff).ram();                                                                 //
-	map(0xa80000, 0xa8007f).writeonly().share("videoregs.0");                     // Video Regs
-	map(0xa80000, 0xa80007).r(this, FUNC(cave_state::cave_irq_cause_r));                                              // IRQ Cause
-	map(0xa80068, 0xa80069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));              // Watchdog?
-	map(0xa8006c, 0xa8006d).r(this, FUNC(cave_state::soundflags_ack_r)).nopw();                                  // Communication
-	map(0xa8006e, 0xa8006f).rw(this, FUNC(cave_state::soundlatch_ack_r), FUNC(cave_state::sound_cmd_w));                            // From Sound CPU
-	map(0xb00000, 0xb00005).ram().share("vctrl.2");                             // Layer 2 Control
-	map(0xb80000, 0xb80005).ram().share("vctrl.1");                             // Layer 1 Control
-	map(0xc00000, 0xc00005).ram().share("vctrl.0");                             // Layer 0 Control
-	map(0xc80000, 0xc80001).portr("IN0");                                                    // Inputs
-	map(0xc80002, 0xc80003).portr("IN1");                                                    // Inputs + EEPROM
-	map(0xd00000, 0xd00001).w(this, FUNC(cave_state::metmqstr_eeprom_msb_w));                            // EEPROM
-	map(0xf00000, 0xf0ffff).ram().share("spriteram.0");       // Sprites
+	map(0xa80000, 0xa8007f).writeonly().share("videoregs.0");                                      // Video Regs
+	map(0xa80000, 0xa80007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
+	map(0xa80068, 0xa80069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                 // Watchdog?
+	map(0xa8006c, 0xa8006d).r(FUNC(cave_state::soundflags_ack_r)).nopw();                          // Communication
+	map(0xa8006e, 0xa8006f).rw(FUNC(cave_state::soundlatch_ack_r), FUNC(cave_state::sound_cmd_w)); // From Sound CPU
+	map(0xb00000, 0xb00005).ram().share("vctrl.2");                                                // Layer 2 Control
+	map(0xb80000, 0xb80005).ram().share("vctrl.1");                                                // Layer 1 Control
+	map(0xc00000, 0xc00005).ram().share("vctrl.0");                                                // Layer 0 Control
+	map(0xc80000, 0xc80001).portr("IN0");                                                          // Inputs
+	map(0xc80002, 0xc80003).portr("IN1");                                                          // Inputs + EEPROM
+	map(0xd00000, 0xd00000).w(FUNC(cave_state::metmqstr_eeprom_w));                                // EEPROM
+	map(0xf00000, 0xf0ffff).ram().share("spriteram.0");                                            // Sprites
 }
 
 
@@ -907,17 +891,17 @@ WRITE16_MEMBER(cave_state::ppsatan_out_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
 
-		m_led[0] = BIT(data, 4);
-		m_led[1] = BIT(data, 5);
-		m_led[2] = BIT(data, 6);
-		m_led[3] = BIT(data, 7);
+		m_led_outputs[0] = BIT(data, 4);
+		m_led_outputs[1] = BIT(data, 5);
+		m_led_outputs[2] = BIT(data, 6);
+		m_led_outputs[3] = BIT(data, 7);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		m_led[4] = BIT(data, 8);
-		m_led[5] = BIT(data, 9);
-		m_led[6] = BIT(data, 10);    // not tested in service mode
-		m_led[7] = BIT(data, 11);    // not tested in service mode
+		m_led_outputs[4] = BIT(data, 8);
+		m_led_outputs[5] = BIT(data, 9);
+		m_led_outputs[6] = BIT(data, 10);    // not tested in service mode
+		m_led_outputs[7] = BIT(data, 11);    // not tested in service mode
 
 		m_oki[0]->set_rom_bank((data & 0x8000) >> 15);
 	}
@@ -927,44 +911,44 @@ WRITE16_MEMBER(cave_state::ppsatan_out_w)
 
 void cave_state::ppsatan_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                                 // ROM
-	map(0x040000, 0x04ffff).ram();                                                 // RAM
+	map(0x000000, 0x03ffff).rom();                                                                            // ROM
+	map(0x040000, 0x04ffff).ram();                                                                            // RAM
 
 	// Left Screen (Player 2)
-	map(0x080000, 0x080005).ram().share("vctrl.1");                             // Layer Control
-	map(0x100000, 0x107fff).ram().w(this, FUNC(cave_state::vram_w<1>)).share("vram.1");         // Layer
-//  AM_RANGE(0x180000, 0x1803ff) AM_RAM                                                 // Palette (Tilemaps)
-//  AM_RANGE(0x187800, 0x188fff) AM_RAM AM_SHARE("paletteram.1")                        // Palette (Sprites)
-	map(0x180000, 0x188fff).ram().share("paletteram.1");                        // Palette
-	map(0x1c0000, 0x1c7fff).ram().share("spriteram.1");                         // Sprites
-	map(0x200000, 0x200001).portr("SYSTEM");                                // DSW + (unused) EEPROM
-	map(0x200000, 0x200001).w(this, FUNC(cave_state::ppsatan_out_w));                                // Outputs + OKI banking
-	map(0x200002, 0x200003).rw(this, FUNC(cave_state::ppsatan_touch2_r), FUNC(cave_state::ppsatan_eeprom_msb_w));   // Touch Screen + (unused) EEPROM
-	map(0x200004, 0x200005).rw(this, FUNC(cave_state::ppsatan_touch1_r), FUNC(cave_state::ppsatan_io_mux_w));       // Touch Screen
-	map(0x200006, 0x200007).nopw();                                            // Lev. 2 IRQ Ack?
-	map(0x2c0000, 0x2c007f).writeonly().share("videoregs.1");                   // Video Regs
-	map(0x2c0000, 0x2c0007).r(this, FUNC(cave_state::cave_irq_cause_r));                              // IRQ Cause
-	map(0x2c0068, 0x2c0069).w("watchdog", FUNC(watchdog_timer_device::reset16_w)); // Watchdog
+	map(0x080000, 0x080005).ram().share("vctrl.1");                                                           // Layer Control
+	map(0x100000, 0x107fff).ram().w(FUNC(cave_state::vram_w<1>)).share("vram.1");                             // Layer
+//  map(0x180000, 0x1803ff).ram()                                                                             // Palette (Tilemaps)
+//  map(0x187800, 0x188fff).ram().share("paletteram.1");                                                      // Palette (Sprites)
+	map(0x180000, 0x188fff).ram().share("paletteram.1");                                                      // Palette
+	map(0x1c0000, 0x1c7fff).ram().share("spriteram.1");                                                       // Sprites
+	map(0x200000, 0x200001).portr("SYSTEM");                                                                  // DSW + (unused) EEPROM
+	map(0x200000, 0x200001).w(FUNC(cave_state::ppsatan_out_w));                                               // Outputs + OKI banking
+	map(0x200002, 0x200003).rw(FUNC(cave_state::ppsatan_touch2_r), FUNC(cave_state::ppsatan_eeprom_w));       // Touch Screen + (unused) EEPROM
+	map(0x200004, 0x200005).rw(FUNC(cave_state::ppsatan_touch1_r), FUNC(cave_state::ppsatan_io_mux_w));       // Touch Screen
+	map(0x200006, 0x200007).nopw();                                                                           // Lev. 2 IRQ Ack?
+	map(0x2c0000, 0x2c007f).writeonly().share("videoregs.1");                                                 // Video Regs
+	map(0x2c0000, 0x2c0007).r(FUNC(cave_state::irq_cause_r));                                                 // IRQ Cause
+	map(0x2c0068, 0x2c0069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                            // Watchdog
 
-	map(0x300001, 0x300001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // M6295
+	map(0x300001, 0x300001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));            // M6295
 
 	// Right Screen (Player 1)
-	map(0x480000, 0x480005).ram().share("vctrl.2");                             // Layer Control
-	map(0x500000, 0x507fff).ram().w(this, FUNC(cave_state::vram_w<2>)).share("vram.2");         // Layer
-//  AM_RANGE(0x580000, 0x5803ff) AM_RAM                                                 // Palette (Tilemaps)
-//  AM_RANGE(0x587800, 0x588fff) AM_RAM //AM_SHARE("paletteram.2")                      // Palette (Sprites)
-	map(0x580000, 0x588fff).ram().share("paletteram.2");                        // Palette
-	map(0x5c0000, 0x5c7fff).ram().share("spriteram.2");                         // Sprites
-	map(0x6c0000, 0x6c007f).writeonly().share("videoregs.2");                   // Video Regs
+	map(0x480000, 0x480005).ram().share("vctrl.2");                                                           // Layer Control
+	map(0x500000, 0x507fff).ram().w(FUNC(cave_state::vram_w<2>)).share("vram.2");                             // Layer
+//  map(0x580000, 0x5803ff).ram()                                                                             // Palette (Tilemaps)
+//  map(0x587800, 0x588fff).ram().share("paletteram.2");                                                      // Palette (Sprites)
+	map(0x580000, 0x588fff).ram().share("paletteram.2");                                                      // Palette
+	map(0x5c0000, 0x5c7fff).ram().share("spriteram.2");                                                       // Sprites
+	map(0x6c0000, 0x6c007f).writeonly().share("videoregs.2");                                                 // Video Regs
 
 	// Top Screen
-	map(0x880000, 0x880005).ram().share("vctrl.0");                             // Layer Control
-	map(0x900000, 0x907fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");         // Layer
-//  AM_RANGE(0x980000, 0x9803ff) AM_RAM                                                 // Palette (Tilemaps)
-//  AM_RANGE(0x987800, 0x988fff) AM_RAM AM_SHARE("paletteram.0")                        // Palette (Sprites)
-	map(0x980000, 0x988fff).ram().share("paletteram.0");                        // Palette
-	map(0x9c0000, 0x9c7fff).ram().share("spriteram.0");                         // Sprites
-	map(0xac0000, 0xac007f).writeonly().share("videoregs.0");                   // Video Regs
+	map(0x880000, 0x880005).ram().share("vctrl.0");                                                           // Layer Control
+	map(0x900000, 0x907fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                             // Layer
+//  map(0x980000, 0x9803ff).ram();                                                                            // Palette (Tilemaps)
+//  map(0x987800, 0x988fff).ram().share("paletteram.0");                                                      // Palette (Sprites)
+	map(0x980000, 0x988fff).ram().share("paletteram.0");                                                      // Palette
+	map(0x9c0000, 0x9c7fff).ram().share("spriteram.0");                                                       // Sprites
+	map(0xac0000, 0xac007f).writeonly().share("videoregs.0");                                                 // Video Regs
 }
 
 
@@ -997,26 +981,26 @@ WRITE16_MEMBER(cave_state::pwrinst2_vctrl_w)
 
 void cave_state::pwrinst2_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom();                                                                     // ROM
-	map(0x400000, 0x40ffff).ram();                                                                     // RAM
-	map(0x500000, 0x500001).portr("IN0");                                                        // Inputs
-	map(0x500002, 0x500003).portr("IN1");                                                        //
-	map(0x600000, 0x6fffff).rom().region("user1", 0);                                               // extra data ROM space
-	map(0x700000, 0x700001).w(this, FUNC(cave_state::cave_eeprom_msb_w));                                    // EEPROM
-	map(0x800000, 0x807fff).ram().w(this, FUNC(cave_state::vram_w<2>)).share("vram.2");             // Layer 2
-	map(0x880000, 0x887fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");             // Layer 0
-	map(0x900000, 0x907fff).ram().w(this, FUNC(cave_state::vram_w<1>)).share("vram.1");             // Layer 1
-	map(0x980000, 0x987fff).ram().w(this, FUNC(cave_state::vram_8x8_w<3>)).share("vram.3");         // Layer 3
-	map(0xa00000, 0xa0ffff).ram().share("spriteram.0");           // Sprites
-	map(0xa10000, 0xa1ffff).ram();                                                                     // Sprites?
-	map(0xa80000, 0xa8007f).ram().r(this, FUNC(cave_state::donpachi_videoregs_r)).share("videoregs.0");    // Video Regs
-	map(0xb00000, 0xb00005).ram().w(this, FUNC(cave_state::pwrinst2_vctrl_w<2>)).share("vctrl.2");       // Layer 2 Control
-	map(0xb80000, 0xb80005).ram().w(this, FUNC(cave_state::pwrinst2_vctrl_w<0>)).share("vctrl.0");       // Layer 0 Control
-	map(0xc00000, 0xc00005).ram().w(this, FUNC(cave_state::pwrinst2_vctrl_w<1>)).share("vctrl.1");       // Layer 1 Control
-	map(0xc80000, 0xc80005).ram().w(this, FUNC(cave_state::pwrinst2_vctrl_w<3>)).share("vctrl.3");       // Layer 3 Control
-	map(0xd80000, 0xd80001).r(this, FUNC(cave_state::soundlatch_ack_r));                                                  // ? From Sound CPU
-	map(0xe00000, 0xe00001).w(this, FUNC(cave_state::sound_cmd_w));                                                      // To Sound CPU
-	map(0xe80000, 0xe80001).r(this, FUNC(cave_state::pwrinst2_eeprom_r));                                 // EEPROM
+	map(0x000000, 0x1fffff).rom();                                                                 // ROM
+	map(0x400000, 0x40ffff).ram();                                                                 // RAM
+	map(0x500000, 0x500001).portr("IN0");                                                          // Inputs
+	map(0x500002, 0x500003).portr("IN1");                                                          //
+	map(0x600000, 0x6fffff).rom().region("user1", 0);                                              // extra data ROM space
+	map(0x700000, 0x700000).w(FUNC(cave_state::eeprom_w));                                         // EEPROM
+	map(0x800000, 0x807fff).ram().w(FUNC(cave_state::vram_w<2>)).share("vram.2");                  // Layer 2
+	map(0x880000, 0x887fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                  // Layer 0
+	map(0x900000, 0x907fff).ram().w(FUNC(cave_state::vram_w<1>)).share("vram.1");                  // Layer 1
+	map(0x980000, 0x987fff).ram().w(FUNC(cave_state::vram_8x8_w<3>)).share("vram.3");              // Layer 3
+	map(0xa00000, 0xa0ffff).ram().share("spriteram.0");                                            // Sprites
+	map(0xa10000, 0xa1ffff).ram();                                                                 // Sprites?
+	map(0xa80000, 0xa8007f).ram().r(FUNC(cave_state::donpachi_videoregs_r)).share("videoregs.0");  // Video Regs
+	map(0xb00000, 0xb00005).ram().w(FUNC(cave_state::pwrinst2_vctrl_w<2>)).share("vctrl.2");       // Layer 2 Control
+	map(0xb80000, 0xb80005).ram().w(FUNC(cave_state::pwrinst2_vctrl_w<0>)).share("vctrl.0");       // Layer 0 Control
+	map(0xc00000, 0xc00005).ram().w(FUNC(cave_state::pwrinst2_vctrl_w<1>)).share("vctrl.1");       // Layer 1 Control
+	map(0xc80000, 0xc80005).ram().w(FUNC(cave_state::pwrinst2_vctrl_w<3>)).share("vctrl.3");       // Layer 3 Control
+	map(0xd80000, 0xd80001).r(FUNC(cave_state::soundlatch_ack_r));                                 // ? From Sound CPU
+	map(0xe00000, 0xe00001).w(FUNC(cave_state::sound_cmd_w));                                      // To Sound CPU
+	map(0xe80000, 0xe80001).r(FUNC(cave_state::pwrinst2_eeprom_r));                                // EEPROM
 	map(0xf00000, 0xf04fff).ram().share("paletteram.0");      // Palette
 }
 
@@ -1033,31 +1017,31 @@ READ16_MEMBER(cave_state::sailormn_input0_r)
 
 void cave_state::sailormn_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                                                 // ROM
-	map(0x100000, 0x10ffff).ram();                                                                 // RAM
-	map(0x110000, 0x110001).ram();                                                                 // (agallet)
-	map(0x200000, 0x3fffff).rom();                                                                 // ROM
-	map(0x400000, 0x407fff).ram();                                                                 // (agallet)
-	map(0x408000, 0x40bfff).ram().share("paletteram.0");  // Palette
-	map(0x40c000, 0x40ffff).ram();                                                                 // (agallet)
-	map(0x410000, 0x410001).ram();                                                                 // (agallet)
-	map(0x500000, 0x50ffff).ram().share("spriteram.0");       // Sprites
-	map(0x510000, 0x510001).ram();                                                                 // (agallet)
-	map(0x600000, 0x600001).r(this, FUNC(cave_state::sailormn_input0_r));                                             // Inputs + Watchdog!
-	map(0x600002, 0x600003).portr("IN1");                                                    // Inputs + EEPROM
-	map(0x700000, 0x700001).w(this, FUNC(cave_state::sailormn_eeprom_msb_w));                            // EEPROM
-	map(0x800000, 0x807fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");         // Layer 0
-	map(0x880000, 0x887fff).ram().w(this, FUNC(cave_state::vram_w<1>)).share("vram.1");         // Layer 1
-	map(0x900000, 0x907fff).ram().w(this, FUNC(cave_state::vram_w<2>)).share("vram.2");         // Layer 2
-	map(0x908000, 0x908001).ram();                                                                 // (agallet)
-	map(0xa00000, 0xa00005).ram().share("vctrl.0");                             // Layer 0 Control
-	map(0xa80000, 0xa80005).ram().share("vctrl.1");                             // Layer 1 Control
-	map(0xb00000, 0xb00005).ram().share("vctrl.2");                             // Layer 2 Control
-	map(0xb80000, 0xb8007f).writeonly().share("videoregs.0");                     // Video Regs
-	map(0xb80000, 0xb80007).r(this, FUNC(cave_state::cave_irq_cause_r));                                              // IRQ Cause (bit 2 tested!)
-	map(0xb8006c, 0xb8006d).r(this, FUNC(cave_state::soundflags_ack_r));                                              // Communication
-	map(0xb8006e, 0xb8006f).r(this, FUNC(cave_state::soundlatch_ack_r));                                              // From Sound CPU
-	map(0xb8006e, 0xb8006f).w(this, FUNC(cave_state::sound_cmd_w));                                                  // To Sound CPU
+	map(0x000000, 0x07ffff).rom();                                                        // ROM
+	map(0x100000, 0x10ffff).ram();                                                        // RAM
+	map(0x110000, 0x110001).ram();                                                        // (agallet)
+	map(0x200000, 0x3fffff).rom();                                                        // ROM
+	map(0x400000, 0x407fff).ram();                                                        // (agallet)
+	map(0x408000, 0x40bfff).ram().share("paletteram.0");                                  // Palette
+	map(0x40c000, 0x40ffff).ram();                                                        // (agallet)
+	map(0x410000, 0x410001).ram();                                                        // (agallet)
+	map(0x500000, 0x50ffff).ram().share("spriteram.0");                                   // Sprites
+	map(0x510000, 0x510001).ram();                                                        // (agallet)
+	map(0x600000, 0x600001).r(FUNC(cave_state::sailormn_input0_r));                       // Inputs + Watchdog!
+	map(0x600002, 0x600003).portr("IN1");                                                 // Inputs + EEPROM
+	map(0x700000, 0x700000).w(FUNC(cave_state::sailormn_eeprom_w));                       // EEPROM
+	map(0x800000, 0x807fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");         // Layer 0
+	map(0x880000, 0x887fff).ram().w(FUNC(cave_state::vram_w<1>)).share("vram.1");         // Layer 1
+	map(0x900000, 0x907fff).ram().w(FUNC(cave_state::vram_w<2>)).share("vram.2");         // Layer 2
+	map(0x908000, 0x908001).ram();                                                        // (agallet)
+	map(0xa00000, 0xa00005).ram().share("vctrl.0");                                       // Layer 0 Control
+	map(0xa80000, 0xa80005).ram().share("vctrl.1");                                       // Layer 1 Control
+	map(0xb00000, 0xb00005).ram().share("vctrl.2");                                       // Layer 2 Control
+	map(0xb80000, 0xb8007f).writeonly().share("videoregs.0");                             // Video Regs
+	map(0xb80000, 0xb80007).r(FUNC(cave_state::irq_cause_r));                             // IRQ Cause (bit 2 tested!)
+	map(0xb8006c, 0xb8006d).r(FUNC(cave_state::soundflags_ack_r));                        // Communication
+	map(0xb8006e, 0xb8006f).r(FUNC(cave_state::soundlatch_ack_r));                        // From Sound CPU
+	map(0xb8006e, 0xb8006f).w(FUNC(cave_state::sound_cmd_w));                             // To Sound CPU
 }
 
 
@@ -1067,20 +1051,20 @@ void cave_state::sailormn_map(address_map &map)
 
 void cave_state::tekkencw_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                                         // ROM
-	map(0x100000, 0x10ffff).ram().share("nvram");                                       // RAM (battery)
-	map(0x200000, 0x20ffff).ram().share("spriteram.0");                                 // Sprites
-	map(0x300000, 0x307fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");                 // Layer 0
-	map(0x400000, 0x400001).portr("IN0");                                            // Inputs + EEPROM + Hopper
-	map(0x400002, 0x400003).portr("IN1");                                            // Inputs
-	map(0x500000, 0x500005).writeonly().share("vctrl.0");                               // Layer 0 Control
-	map(0x600000, 0x60ffff).ram().share("paletteram.0");                                // Palette
-	map(0x700000, 0x70007f).writeonly().share("videoregs.0");                           // Video Regs
-	map(0x700000, 0x700007).r(this, FUNC(cave_state::cave_irq_cause_r));                                      // IRQ Cause
-	map(0x700068, 0x700069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));      // Watchdog
+	map(0x000000, 0x07ffff).rom();                                                                 // ROM
+	map(0x100000, 0x10ffff).ram().share("nvram");                                                  // RAM (battery)
+	map(0x200000, 0x20ffff).ram().share("spriteram.0");                                            // Sprites
+	map(0x300000, 0x307fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                  // Layer 0
+	map(0x400000, 0x400001).portr("IN0");                                                          // Inputs + EEPROM + Hopper
+	map(0x400002, 0x400003).portr("IN1");                                                          // Inputs
+	map(0x500000, 0x500005).writeonly().share("vctrl.0");                                          // Layer 0 Control
+	map(0x600000, 0x60ffff).ram().share("paletteram.0");                                           // Palette
+	map(0x700000, 0x70007f).writeonly().share("videoregs.0");                                      // Video Regs
+	map(0x700000, 0x700007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
+	map(0x700068, 0x700069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                 // Watchdog
 	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // M6295
-	map(0xc00000, 0xc00001).w(this, FUNC(cave_state::tjumpman_leds_w));                                      // Leds + Hopper
-	map(0xe00000, 0xe00001).w(this, FUNC(cave_state::tjumpman_eeprom_lsb_w));                                // EEPROM
+	map(0xc00001, 0xc00001).w(FUNC(cave_state::tjumpman_leds_w));                                  // Leds + Hopper
+	map(0xe00001, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_w));                                // EEPROM
 }
 
 
@@ -1090,20 +1074,20 @@ void cave_state::tekkencw_map(address_map &map)
 
 void cave_state::tekkenbs_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                                         // ROM
-	map(0x100000, 0x10ffff).ram().share("nvram");                                       // RAM (battery)
-	map(0x200000, 0x20ffff).ram().share("spriteram.0");                                 // Sprites
-	map(0x300000, 0x307fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");                 // Layer 0
-	map(0x400000, 0x40ffff).ram().share("paletteram.0");                                // Palette
-	map(0x500000, 0x500005).writeonly().share("vctrl.0");                               // Layer 0 Control
-	map(0x600000, 0x600001).portr("IN0");                                            // Inputs + EEPROM + Hopper
-	map(0x600002, 0x600003).portr("IN1");                                            // Inputs
-	map(0x700000, 0x70007f).writeonly().share("videoregs.0");                           // Video Regs
-	map(0x700000, 0x700007).r(this, FUNC(cave_state::cave_irq_cause_r));                                      // IRQ Cause
-	map(0x700068, 0x700069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));      // Watchdog
+	map(0x000000, 0x07ffff).rom();                                                                 // ROM
+	map(0x100000, 0x10ffff).ram().share("nvram");                                                  // RAM (battery)
+	map(0x200000, 0x20ffff).ram().share("spriteram.0");                                            // Sprites
+	map(0x300000, 0x307fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                  // Layer 0
+	map(0x400000, 0x40ffff).ram().share("paletteram.0");                                           // Palette
+	map(0x500000, 0x500005).writeonly().share("vctrl.0");                                          // Layer 0 Control
+	map(0x600000, 0x600001).portr("IN0");                                                          // Inputs + EEPROM + Hopper
+	map(0x600002, 0x600003).portr("IN1");                                                          // Inputs
+	map(0x700000, 0x70007f).writeonly().share("videoregs.0");                                      // Video Regs
+	map(0x700000, 0x700007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
+	map(0x700068, 0x700069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                 // Watchdog
 	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // M6295
-	map(0xc00000, 0xc00001).w(this, FUNC(cave_state::tjumpman_leds_w));                                      // Leds + Hopper
-	map(0xe00000, 0xe00001).w(this, FUNC(cave_state::tjumpman_eeprom_lsb_w));                                // EEPROM
+	map(0xc00001, 0xc00001).w(FUNC(cave_state::tjumpman_leds_w));                                  // Leds + Hopper
+	map(0xe00001, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_w));                                // EEPROM
 }
 
 
@@ -1111,37 +1095,31 @@ void cave_state::tekkenbs_map(address_map &map)
                             Tobikose! Jumpman
 ***************************************************************************/
 
-WRITE16_MEMBER(cave_state::tjumpman_eeprom_lsb_w)
+void cave_state::tjumpman_eeprom_w(u8 data)
 {
-	if (data & ~0x0038)
+	if (data & ~0x38)
 		logerror("%s: Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
 
-	if (ACCESSING_BITS_0_7)  // odd address
-	{
-		// latch the bit
-		m_eeprom->di_write((data & 0x0020) >> 5);
+	// latch the bit
+	m_eeprom->di_write(BIT(data, 5));
 
-		// reset line asserted: reset.
-		m_eeprom->cs_write((data & 0x0008) ? ASSERT_LINE : CLEAR_LINE);
+	// reset line asserted: reset.
+	m_eeprom->cs_write(BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
 
-		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write((data & 0x0010) ? ASSERT_LINE : CLEAR_LINE);
-	}
+	// clock line asserted: write latch or select next bit to read
+	m_eeprom->clk_write(BIT(data, 4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(cave_state::tjumpman_leds_w)
+void cave_state::tjumpman_leds_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_led[0] = BIT(data, 0); // suru
-		m_led[1] = BIT(data, 1); // shinai
-		m_led[2] = BIT(data, 2); // payout
-		m_led[3] = BIT(data, 3); // go
-		m_led[4] = BIT(data, 4); // 1 bet
-		m_led[5] = BIT(data, 5); // medal
-		m_hopper = BIT(data, 6);  // hopper
-		m_led[6] = BIT(data, 7); // 3 bet
-	}
+	m_led_outputs[0] = BIT(data, 0); // suru
+	m_led_outputs[1] = BIT(data, 1); // shinai
+	m_led_outputs[2] = BIT(data, 2); // payout
+	m_led_outputs[3] = BIT(data, 3); // go
+	m_led_outputs[4] = BIT(data, 4); // 1 bet
+	m_led_outputs[5] = BIT(data, 5); // medal
+	m_hopper = BIT(data, 6);  // hopper
+	m_led_outputs[6] = BIT(data, 7); // 3 bet
 
 //  popmessage("led %04X", data);
 }
@@ -1154,20 +1132,20 @@ CUSTOM_INPUT_MEMBER(cave_state::tjumpman_hopper_r)
 void cave_state::tjumpman_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                                 // ROM
-	map(0x100000, 0x10ffff).ram().share("nvram");                                               // RAM (battery)
-	map(0x200000, 0x20ffff).ram().share("spriteram.0");       // Sprites
-	map(0x300000, 0x307fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");         // Layer 0
-	map(0x304000, 0x307fff).w(this, FUNC(cave_state::vram_w<0>));                                                // Layer 0 - 16x16 tiles mapped here
-	map(0x400000, 0x400005).writeonly().share("vctrl.0");                       // Layer 0 Control
-	map(0x500000, 0x50ffff).ram().share("paletteram.0");  // Palette
-	map(0x600000, 0x600001).portr("IN0");                                                    // Inputs + EEPROM + Hopper
-	map(0x600002, 0x600003).portr("IN1");                                                    // Inputs
-	map(0x700000, 0x70007f).writeonly().share("videoregs.0");                     // Video Regs
-	map(0x700000, 0x700007).r(this, FUNC(cave_state::cave_irq_cause_r));                                              // IRQ Cause
-	map(0x700068, 0x700069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));              // Watchdog
+	map(0x100000, 0x10ffff).ram().share("nvram");                                                  // RAM (battery)
+	map(0x200000, 0x20ffff).ram().share("spriteram.0");                                            // Sprites
+	map(0x300000, 0x307fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                  // Layer 0
+	map(0x304000, 0x307fff).w(FUNC(cave_state::vram_w<0>));                                        // Layer 0 - 16x16 tiles mapped here
+	map(0x400000, 0x400005).writeonly().share("vctrl.0");                                          // Layer 0 Control
+	map(0x500000, 0x50ffff).ram().share("paletteram.0");                                           // Palette
+	map(0x600000, 0x600001).portr("IN0");                                                          // Inputs + EEPROM + Hopper
+	map(0x600002, 0x600003).portr("IN1");                                                          // Inputs
+	map(0x700000, 0x70007f).writeonly().share("videoregs.0");                                      // Video Regs
+	map(0x700000, 0x700007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
+	map(0x700068, 0x700069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                 // Watchdog
 	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // M6295
-	map(0xc00000, 0xc00001).w(this, FUNC(cave_state::tjumpman_leds_w));                                              // Leds + Hopper
-	map(0xe00000, 0xe00001).w(this, FUNC(cave_state::tjumpman_eeprom_lsb_w));                            // EEPROM
+	map(0xc00001, 0xc00001).w(FUNC(cave_state::tjumpman_leds_w));                                  // Leds + Hopper
+	map(0xe00001, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_w));                                // EEPROM
 }
 
 
@@ -1175,18 +1153,15 @@ void cave_state::tjumpman_map(address_map &map)
                                    Pac-Slot
 ***************************************************************************/
 
-WRITE16_MEMBER(cave_state::pacslot_leds_w)
+void cave_state::pacslot_leds_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_led[0] = data & 0x0001; // pac-man
-		m_led[1] = data & 0x0002; // ms. pac-man
-		m_led[2] = data & 0x0004; // payout
-		m_led[3] = data & 0x0008; // start
-		m_led[4] = data & 0x0010; // bet
-		m_led[5] = data & 0x0020; // medal
-		m_hopper = data & 0x0040;  // hopper
-	}
+	m_led_outputs[0] = data & 0x0001; // pac-man
+	m_led_outputs[1] = data & 0x0002; // ms. pac-man
+	m_led_outputs[2] = data & 0x0004; // payout
+	m_led_outputs[3] = data & 0x0008; // start
+	m_led_outputs[4] = data & 0x0010; // bet
+	m_led_outputs[5] = data & 0x0020; // medal
+	m_hopper = data & 0x0040;  // hopper
 
 //  popmessage("led %04X", data);
 }
@@ -1194,19 +1169,19 @@ WRITE16_MEMBER(cave_state::pacslot_leds_w)
 void cave_state::pacslot_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                                 // ROM
-	map(0x100000, 0x10ffff).ram().share("nvram");                                               // RAM (battery)
-	map(0x200000, 0x20ffff).ram().share("spriteram.0");       // Sprites
-	map(0x300000, 0x307fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");         // Layer 0
-	map(0x400000, 0x40007f).writeonly().share("videoregs.0");                     // Video Regs
-	map(0x400000, 0x400007).r(this, FUNC(cave_state::cave_irq_cause_r));                                              // IRQ Cause
-	map(0x400068, 0x400069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));              // Watchdog
-	map(0x500000, 0x500005).writeonly().share("vctrl.0");                       // Layer 0 Control
-	map(0x600000, 0x60ffff).ram().share("paletteram.0");  // Palette
-	map(0x700000, 0x700001).portr("IN0");                                                    // Inputs + EEPROM + Hopper
-	map(0x700002, 0x700003).portr("IN1");                                                    // Inputs
+	map(0x100000, 0x10ffff).ram().share("nvram");                                                  // RAM (battery)
+	map(0x200000, 0x20ffff).ram().share("spriteram.0");                                            // Sprites
+	map(0x300000, 0x307fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                  // Layer 0
+	map(0x400000, 0x40007f).writeonly().share("videoregs.0");                                      // Video Regs
+	map(0x400000, 0x400007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
+	map(0x400068, 0x400069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                 // Watchdog
+	map(0x500000, 0x500005).writeonly().share("vctrl.0");                                          // Layer 0 Control
+	map(0x600000, 0x60ffff).ram().share("paletteram.0");                                           // Palette
+	map(0x700000, 0x700001).portr("IN0");                                                          // Inputs + EEPROM + Hopper
+	map(0x700002, 0x700003).portr("IN1");                                                          // Inputs
 	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // M6295
-	map(0xc00000, 0xc00001).w(this, FUNC(cave_state::pacslot_leds_w));                                               // Leds + Hopper
-	map(0xe00000, 0xe00001).w(this, FUNC(cave_state::tjumpman_eeprom_lsb_w));                            // EEPROM
+	map(0xc00001, 0xc00001).w(FUNC(cave_state::pacslot_leds_w));                                   // Leds + Hopper
+	map(0xe00001, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_w));                                // EEPROM
 }
 
 
@@ -1219,19 +1194,19 @@ void cave_state::pacslot_map(address_map &map)
 void cave_state::paceight_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                                 // ROM
-	map(0x100000, 0x10ffff).ram().share("nvram");                                               // RAM (battery)
-	map(0x200000, 0x20ffff).ram().share("spriteram.0");       // Sprites
-	map(0x300000, 0x307fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");         // Layer 0
-	map(0x400000, 0x40ffff).ram().share("paletteram.0");  // Palette
-	map(0x500000, 0x500001).portr("IN0");                                                    // Inputs + EEPROM + Hopper
-	map(0x500002, 0x500003).portr("IN1");                                                    // Inputs
-	map(0x600000, 0x600005).writeonly().share("vctrl.0");                       // Layer 0 Control
-	map(0x700000, 0x70007f).writeonly().share("videoregs.0");                     // Video Regs
-	map(0x700000, 0x700007).r(this, FUNC(cave_state::cave_irq_cause_r));                                              // IRQ Cause
-	map(0x700068, 0x700069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));              // Watchdog
+	map(0x100000, 0x10ffff).ram().share("nvram");                                                  // RAM (battery)
+	map(0x200000, 0x20ffff).ram().share("spriteram.0");                                            // Sprites
+	map(0x300000, 0x307fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                  // Layer 0
+	map(0x400000, 0x40ffff).ram().share("paletteram.0");                                           // Palette
+	map(0x500000, 0x500001).portr("IN0");                                                          // Inputs + EEPROM + Hopper
+	map(0x500002, 0x500003).portr("IN1");                                                          // Inputs
+	map(0x600000, 0x600005).writeonly().share("vctrl.0");                                          // Layer 0 Control
+	map(0x700000, 0x70007f).writeonly().share("videoregs.0");                                      // Video Regs
+	map(0x700000, 0x700007).r(FUNC(cave_state::irq_cause_r));                                      // IRQ Cause
+	map(0x700068, 0x700069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                 // Watchdog
 	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // M6295
-	map(0xc00000, 0xc00001).w(this, FUNC(cave_state::pacslot_leds_w));                                               // Leds + Hopper
-	map(0xe00000, 0xe00001).w(this, FUNC(cave_state::tjumpman_eeprom_lsb_w));                            // EEPROM
+	map(0xc00000, 0xc00001).w(FUNC(cave_state::pacslot_leds_w));                                   // Leds + Hopper
+	map(0xe00001, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_w));                                // EEPROM
 }
 
 /***************************************************************************
@@ -1240,18 +1215,18 @@ void cave_state::paceight_map(address_map &map)
 
 void cave_state::uopoko_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                 // ROM
-	map(0x100000, 0x10ffff).ram();                                                                 // RAM
-	map(0x300000, 0x300003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);                   // YMZ280
-	map(0x400000, 0x40ffff).ram().share("spriteram.0");       // Sprites
-	map(0x500000, 0x507fff).ram().w(this, FUNC(cave_state::vram_w<0>)).share("vram.0");         // Layer 0
-	map(0x600000, 0x60007f).writeonly().share("videoregs.0");                     // Video Regs
-	map(0x600000, 0x600007).r(this, FUNC(cave_state::cave_irq_cause_r));                                              // IRQ Cause
-	map(0x700000, 0x700005).ram().share("vctrl.0");                             // Layer 0 Control
-	map(0x800000, 0x80ffff).ram().share("paletteram.0");  // Palette
-	map(0x900000, 0x900001).portr("IN0");                                                    // Inputs
-	map(0x900002, 0x900003).portr("IN1");                                                    // Inputs + EEPROM
-	map(0xa00000, 0xa00001).w(this, FUNC(cave_state::cave_eeprom_msb_w));                                // EEPROM
+	map(0x000000, 0x0fffff).rom();                                                                              // ROM
+	map(0x100000, 0x10ffff).ram();                                                                              // RAM
+	map(0x300000, 0x300003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff); // YMZ280
+	map(0x400000, 0x40ffff).ram().share("spriteram.0");                                                         // Sprites
+	map(0x500000, 0x507fff).ram().w(FUNC(cave_state::vram_w<0>)).share("vram.0");                               // Layer 0
+	map(0x600000, 0x60007f).writeonly().share("videoregs.0");                                                   // Video Regs
+	map(0x600000, 0x600007).r(FUNC(cave_state::irq_cause_r));                                                   // IRQ Cause
+	map(0x700000, 0x700005).ram().share("vctrl.0");                                                             // Layer 0 Control
+	map(0x800000, 0x80ffff).ram().share("paletteram.0");                                                        // Palette
+	map(0x900000, 0x900001).portr("IN0");                                                                       // Inputs
+	map(0x900002, 0x900003).portr("IN1");                                                                       // Inputs + EEPROM
+	map(0xa00000, 0xa00000).w(FUNC(cave_state::eeprom_w));                                                      // EEPROM
 }
 
 
@@ -1265,7 +1240,7 @@ void cave_state::uopoko_map(address_map &map)
 ***************************************************************************/
 
 template<int Mask>
-WRITE8_MEMBER(cave_state::z80_rombank_w)
+void cave_state::z80_rombank_w(u8 data)
 {
 	if (data & ~Mask)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", m_audiocpu->pc(), data);
@@ -1274,7 +1249,7 @@ WRITE8_MEMBER(cave_state::z80_rombank_w)
 }
 
 template<int Mask>
-WRITE8_MEMBER(cave_state::oki1_bank_w)
+void cave_state::oki1_bank_w(u8 data)
 {
 	int bank1 = (data >> 0) & Mask;
 	int bank2 = (data >> 4) & Mask;
@@ -1283,7 +1258,7 @@ WRITE8_MEMBER(cave_state::oki1_bank_w)
 }
 
 template<int Mask>
-WRITE8_MEMBER(cave_state::oki2_bank_w)
+void cave_state::oki2_bank_w(u8 data)
 {
 	int bank1 = (data >> 0) & Mask;
 	int bank2 = (data >> 4) & Mask;
@@ -1311,20 +1286,20 @@ void cave_state::oki2_map(address_map &map)
 
 void cave_state::hotdogst_sound_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();                 // ROM
+	map(0x0000, 0x3fff).rom();             // ROM
 	map(0x4000, 0x7fff).bankr("z80bank");  // ROM (Banked)
-	map(0xe000, 0xffff).ram();                 // RAM
+	map(0xe000, 0xffff).ram();             // RAM
 }
 
 void cave_state::hotdogst_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(cave_state::z80_rombank_w<0x0f>));                   // ROM bank
-	map(0x30, 0x30).r(this, FUNC(cave_state::soundlatch_lo_r));                       // From Main CPU
-	map(0x40, 0x40).r(this, FUNC(cave_state::soundlatch_hi_r));                       //
-	map(0x50, 0x51).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));   //
+	map(0x00, 0x00).w(FUNC(cave_state::z80_rombank_w<0x0f>));                                // ROM bank
+	map(0x30, 0x30).r(FUNC(cave_state::soundlatch_lo_r));                                    // From Main CPU
+	map(0x40, 0x40).r(FUNC(cave_state::soundlatch_hi_r));                                    //
+	map(0x50, 0x51).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));      //
 	map(0x60, 0x60).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // M6295
-	map(0x70, 0x70).w(this, FUNC(cave_state::oki1_bank_w<0x3>));                   // Samples bank
+	map(0x70, 0x70).w(FUNC(cave_state::oki1_bank_w<0x3>));                                   // Samples bank
 }
 
 
@@ -1334,22 +1309,22 @@ void cave_state::hotdogst_sound_portmap(address_map &map)
 
 void cave_state::mazinger_sound_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();                 // ROM
+	map(0x0000, 0x3fff).rom();             // ROM
 	map(0x4000, 0x7fff).bankr("z80bank");  // ROM (Banked)
-	map(0xc000, 0xc7ff).ram();                 // RAM
-	map(0xf800, 0xffff).ram();                 // RAM
+	map(0xc000, 0xc7ff).ram();             // RAM
+	map(0xf800, 0xffff).ram();             // RAM
 }
 
 void cave_state::mazinger_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(cave_state::z80_rombank_w<0x07>));   // ROM bank
-	map(0x10, 0x10).w(this, FUNC(cave_state::soundlatch_ack_w));     // To Main CPU
-	map(0x30, 0x30).r(this, FUNC(cave_state::soundlatch_lo_r));       // From Main CPU
-	map(0x50, 0x51).w("ymsnd", FUNC(ym2203_device::write)); // YM2203
-	map(0x52, 0x53).r("ymsnd", FUNC(ym2203_device::read));   // YM2203
-	map(0x70, 0x70).w("oki1", FUNC(okim6295_device::write)); // M6295
-	map(0x74, 0x74).w(this, FUNC(cave_state::oki1_bank_w<0x3>));   // Samples bank
+	map(0x00, 0x00).w(FUNC(cave_state::z80_rombank_w<0x07>));   // ROM bank
+	map(0x10, 0x10).w(FUNC(cave_state::soundlatch_ack_w));      // To Main CPU
+	map(0x30, 0x30).r(FUNC(cave_state::soundlatch_lo_r));       // From Main CPU
+	map(0x50, 0x51).w("ymsnd", FUNC(ym2203_device::write));     // YM2203
+	map(0x52, 0x53).r("ymsnd", FUNC(ym2203_device::read));      // YM2203
+	map(0x70, 0x70).w("oki1", FUNC(okim6295_device::write));    // M6295
+	map(0x74, 0x74).w(FUNC(cave_state::oki1_bank_w<0x3>));      // Samples bank
 }
 
 
@@ -1359,23 +1334,23 @@ void cave_state::mazinger_sound_portmap(address_map &map)
 
 void cave_state::metmqstr_sound_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();                 // ROM
+	map(0x0000, 0x3fff).rom();             // ROM
 	map(0x4000, 0x7fff).bankr("z80bank");  // ROM (Banked)
-	map(0xe000, 0xffff).ram();                 // RAM
+	map(0xe000, 0xffff).ram();             // RAM
 }
 
 void cave_state::metmqstr_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(cave_state::z80_rombank_w<0x0f>));                   // Rom Bank
-	map(0x20, 0x20).r(this, FUNC(cave_state::soundflags_r));                          // Communication
-	map(0x30, 0x30).r(this, FUNC(cave_state::soundlatch_lo_r));                       // From Main CPU
-	map(0x40, 0x40).r(this, FUNC(cave_state::soundlatch_hi_r));                       //
+	map(0x00, 0x00).w(FUNC(cave_state::z80_rombank_w<0x0f>));                             // Rom Bank
+	map(0x20, 0x20).r(FUNC(cave_state::soundflags_r));                                    // Communication
+	map(0x30, 0x30).r(FUNC(cave_state::soundlatch_lo_r));                                 // From Main CPU
+	map(0x40, 0x40).r(FUNC(cave_state::soundlatch_hi_r));                                 //
 	map(0x50, 0x51).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));   // YM2151
-	map(0x60, 0x60).w("oki1", FUNC(okim6295_device::write));                // M6295 #0
-	map(0x70, 0x70).w(this, FUNC(cave_state::oki1_bank_w<0x7>));                   // Samples Bank #0
-	map(0x80, 0x80).w("oki2", FUNC(okim6295_device::write));                // M6295 #1
-	map(0x90, 0x90).w(this, FUNC(cave_state::oki2_bank_w<0x7>));                  // Samples Bank #1
+	map(0x60, 0x60).w("oki1", FUNC(okim6295_device::write));                              // M6295 #0
+	map(0x70, 0x70).w(FUNC(cave_state::oki1_bank_w<0x7>));                                // Samples Bank #0
+	map(0x80, 0x80).w("oki2", FUNC(okim6295_device::write));                              // M6295 #1
+	map(0x90, 0x90).w(FUNC(cave_state::oki2_bank_w<0x7>));                                // Samples Bank #1
 }
 
 
@@ -1385,9 +1360,9 @@ void cave_state::metmqstr_sound_portmap(address_map &map)
 
 void cave_state::pwrinst2_sound_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();                 // ROM
+	map(0x0000, 0x7fff).rom();             // ROM
 	map(0x8000, 0xbfff).bankr("z80bank");  // ROM (Banked)
-	map(0xe000, 0xffff).ram();                 // RAM
+	map(0xe000, 0xffff).ram();             // RAM
 }
 
 void cave_state::pwrinst2_sound_portmap(address_map &map)
@@ -1395,13 +1370,13 @@ void cave_state::pwrinst2_sound_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // M6295
 	map(0x08, 0x08).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  //
-	map(0x10, 0x17).w("nmk112", FUNC(nmk112_device::okibank_w));         // Samples bank
-	map(0x40, 0x41).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));   //
-	map(0x50, 0x50).w(this, FUNC(cave_state::soundlatch_ack_w));                         // To Main CPU
-//  AM_RANGE(0x51, 0x51) AM_WRITENOP                                         // ?? volume
-	map(0x80, 0x80).w(this, FUNC(cave_state::z80_rombank_w<0x07>));                       // ROM bank
-	map(0x60, 0x60).r(this, FUNC(cave_state::soundlatch_hi_r));                           // From Main CPU
-	map(0x70, 0x70).r(this, FUNC(cave_state::soundlatch_lo_r));                           //
+	map(0x10, 0x17).w("nmk112", FUNC(nmk112_device::okibank_w));                            // Samples bank
+	map(0x40, 0x41).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));     //
+	map(0x50, 0x50).w(FUNC(cave_state::soundlatch_ack_w));                                  // To Main CPU
+//  map(0x51, 0x51).nopw();                                                                 // ?? volume
+	map(0x60, 0x60).r(FUNC(cave_state::soundlatch_hi_r));                                   // From Main CPU
+	map(0x70, 0x70).r(FUNC(cave_state::soundlatch_lo_r));                                   //
+	map(0x80, 0x80).w(FUNC(cave_state::z80_rombank_w<0x07>));                               // ROM bank
 }
 
 
@@ -1411,24 +1386,24 @@ void cave_state::pwrinst2_sound_portmap(address_map &map)
 
 void cave_state::sailormn_sound_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();                                     // ROM
+	map(0x0000, 0x3fff).rom();                                 // ROM
 	map(0x4000, 0x7fff).bankr("z80bank");                      // ROM (Banked)
-	map(0xc000, 0xdfff).mirror(0x2000).ram();                   // RAM (8KB, mirrored)
+	map(0xc000, 0xdfff).mirror(0x2000).ram();                  // RAM (8KB, mirrored)
 }
 
 void cave_state::sailormn_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(cave_state::z80_rombank_w<0x1f>));                       // Rom Bank
-	map(0x10, 0x10).w(this, FUNC(cave_state::soundlatch_ack_w));                         // To Main CPU
-	map(0x20, 0x20).r(this, FUNC(cave_state::soundflags_r));                              // Communication
-	map(0x30, 0x30).r(this, FUNC(cave_state::soundlatch_lo_r));                           // From Main CPU
-	map(0x40, 0x40).r(this, FUNC(cave_state::soundlatch_hi_r));                           //
-	map(0x50, 0x51).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));       // YM2151
+	map(0x00, 0x00).w(FUNC(cave_state::z80_rombank_w<0x1f>));                               // Rom Bank
+	map(0x10, 0x10).w(FUNC(cave_state::soundlatch_ack_w));                                  // To Main CPU
+	map(0x20, 0x20).r(FUNC(cave_state::soundflags_r));                                      // Communication
+	map(0x30, 0x30).r(FUNC(cave_state::soundlatch_lo_r));                                   // From Main CPU
+	map(0x40, 0x40).r(FUNC(cave_state::soundlatch_hi_r));                                   //
+	map(0x50, 0x51).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));     // YM2151
 	map(0x60, 0x60).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // M6295 #0
-	map(0x70, 0x70).w(this, FUNC(cave_state::oki1_bank_w<0xf>));                      // Samples Bank #0
+	map(0x70, 0x70).w(FUNC(cave_state::oki1_bank_w<0xf>));                                  // Samples Bank #0
 	map(0x80, 0x80).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // M6295 #1
-	map(0xc0, 0xc0).w(this, FUNC(cave_state::oki2_bank_w<0xf>));                      // Samples Bank #1
+	map(0xc0, 0xc0).w(FUNC(cave_state::oki2_bank_w<0xf>));                                  // Samples Bank #1
 }
 
 
@@ -1462,10 +1437,7 @@ static INPUT_PORTS_START( cave )
 	PORT_SERVICE_NO_TOGGLE( 0x0200, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )  // sw? exit service mode
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )  // sw? enter & exit service mode
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")   // Player 2
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
@@ -1478,12 +1450,8 @@ static INPUT_PORTS_START( cave )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(6)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 /* Gaia Crusaders, no EEPROM. Has DIPS */
@@ -1508,11 +1476,7 @@ static INPUT_PORTS_START( gaia )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0fc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW1:1")
@@ -1629,18 +1593,8 @@ static INPUT_PORTS_START( guwange )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(6)
 	PORT_SERVICE_NO_TOGGLE( 0x0004, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff70, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -1651,35 +1605,15 @@ static INPUT_PORTS_START( korokoro )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(10)   // bit 0x0080 of leds
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 )  // round  button (choose)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 )  // square button (select in service mode / medal out in game)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0fe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 ) // service medal out?
 	PORT_SERVICE( 0x2000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service coin
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,korokoro_hopper_r, nullptr) // motor / hopper status ???
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xefff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -1695,16 +1629,13 @@ static INPUT_PORTS_START( tekkencw )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
 	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2  ) PORT_NAME( DEF_STR( No ) ) PORT_CODE(KEYCODE_N)    // shinai ("not")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Action" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10)                                   // medal (impulse needed to coin up reliably)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x87, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -1720,24 +1651,20 @@ static INPUT_PORTS_START( tekkenbs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
 	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Start" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10) // medal (impulse needed to coin up reliably)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x87, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( tjumpman )
 	PORT_START("IN0")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x06, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER   ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE(KEYCODE_Y)    // suru ("do")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
@@ -1745,9 +1672,7 @@ static INPUT_PORTS_START( tjumpman )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, nullptr)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
 	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -1770,16 +1695,13 @@ static INPUT_PORTS_START( pacslot )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state, tjumpman_hopper_r, nullptr)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
 	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME( "Ms. Pac-Man" ) PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_IMPULSE(10) // medal (impulse needed to coin up reliably)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x87, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( paceight )
@@ -1796,12 +1718,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ppsatan )
 	PORT_START("SYSTEM")   // $200000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1    )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service coin
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE2 ) // advance in service mode
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0072, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:1,2")
@@ -1861,9 +1780,9 @@ static const gfx_layout layout_8x8x6 =
 	8,8,
 	RGN_FRAC(1,1),
 	6,
-	{8,9, 0,1,2,3},
+	{STEP2(8,1),STEP4(0,1)},
 	{0*4,1*4,4*4,5*4,8*4,9*4,12*4,13*4},
-	{0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64},
+	{STEP8(0,8*8)},
 	8*8*8
 };
 
@@ -1886,9 +1805,9 @@ static const gfx_layout layout_8x8x8 =
 	8,8,
 	RGN_FRAC(1,1),
 	8,
-	{8,9,10,11, 0,1,2,3},
+	{STEP4(8,1),STEP4(0,1)},
 	{0*4,1*4,4*4,5*4,8*4,9*4,12*4,13*4},
-	{0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64},
+	{STEP8(0,8*8)},
 	8*8*8
 };
 
@@ -1933,8 +1852,8 @@ static GFXDECODE_START( gfx_ddonpach )
 	   color code and the 4000-7fff range in the color table.   */
 
 //  "sprites"
-	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x8000, 0x40 ) // [0] Layer 0
-	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4, 0x8000, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "layer0", 0, layout_8x8x4, 0x4000, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( "layer1", 0, layout_8x8x4, 0x4000, 0x40 ) // [1] Layer 1
 	GFXDECODE_ENTRY( "layer2", 0, layout_8x8x8, 0x4000, 0x40 ) // [2] Layer 2
 GFXDECODE_END
 
@@ -2064,8 +1983,8 @@ GFXDECODE_END
 
 void cave_state::machine_start()
 {
-	m_led.resolve();
-	m_vblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cave_state::cave_vblank_end), this));
+	m_led_outputs.resolve();
+	m_vblank_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cave_state::vblank_end), this));
 
 	save_item(NAME(m_soundbuf_wptr));
 	save_item(NAME(m_soundbuf_rptr));
@@ -2078,7 +1997,7 @@ void cave_state::machine_start()
 	save_item(NAME(m_agallet_vblank_irq));
 }
 
-MACHINE_RESET_MEMBER(cave_state,cave)
+void cave_state::machine_reset()
 {
 	std::fill(std::begin(m_soundbuf_data), std::end(m_soundbuf_data), 0);
 	m_soundbuf_wptr = 0;
@@ -2091,493 +2010,381 @@ MACHINE_RESET_MEMBER(cave_state,cave)
 	m_agallet_vblank_irq = 0;
 }
 
+void cave_state::add_base_config(machine_config &config)
+{
+	M68000(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_vblank_int("screen", FUNC(cave_state::interrupt));
+
+	TIMER(config, m_int_timer).configure_generic(FUNC(cave_state::vblank_start));
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(15625/271.5);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(320, 240);
+	m_screen->set_visarea(0, 320-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(cave_state::screen_update));
+
+	PALETTE(config, m_palette, FUNC(cave_state::cave_palette), 0x8000);
+}
+
+void cave_state::add_ymz(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16.9344_MHz_XTAL));
+	ymz.irq_handler().set(FUNC(cave_state::sound_irq_gen));
+	ymz.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 /***************************************************************************
                                 Dangun Feveron
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::dfeveron)
+void cave_state::dfeveron(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(dfeveron_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::dfeveron_map);
 
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dfeveron)
-	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
-	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dfeveron);
+	m_palette->set_init(FUNC(cave_state::dfeveron_palette)); // $8000 palette entries for consistency with the other games
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_2_layers)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	add_ymz(config);
+}
 
 
 /***************************************************************************
                                 Dodonpachi
 ***************************************************************************/
 
-
-MACHINE_CONFIG_START(cave_state::ddonpach)
+void cave_state::ddonpach(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(ddonpach_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::ddonpach_map);
 
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddonpach)
-	MCFG_PALETTE_ADD("palette", 0x8000 + 0x40*16)   // $400 extra entries for layers 1&2
-	MCFG_PALETTE_INIT_OWNER(cave_state,ddonpach)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddonpach);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	add_ymz(config);
+}
 
 
 /***************************************************************************
                                     Donpachi
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::donpachi)
+void cave_state::donpachi(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(donpachi_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::donpachi_map);
 
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_donpachi)
-	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
-	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_donpachi);
+	m_palette->set_init(FUNC(cave_state::dfeveron_palette)); // $8000 palette entries for consistency with the other games
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 4.224_MHz_XTAL/4, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.60)
+	OKIM6295(config, m_oki[0], 4.224_MHz_XTAL/4, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.60);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 4.224_MHz_XTAL/2, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	OKIM6295(config, m_oki[1], 4.224_MHz_XTAL/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
-	MCFG_NMK112_DISABLE_PAGEMASK(1 << 0)    // chip #0 (music) is not paged
-MACHINE_CONFIG_END
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
+	nmk112.set_page_mask(1 << 0);    // chip #0 (music) is not paged
+}
 
 
 /***************************************************************************
                                 Esprade
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::esprade)
+void cave_state::esprade(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(esprade_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::esprade_map);
 
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprade)
-	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_esprade);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	add_ymz(config);
+}
 
 
 /***************************************************************************
                                     Gaia Crusaders
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::gaia)
+void cave_state::gaia(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(gaia_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::gaia_map);
 
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
-
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
+	m_screen->set_visarea(0, 320-1, 0, 224-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprade)
-	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_esprade);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	add_ymz(config);
+}
 
 
 /***************************************************************************
                                     Guwange
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::guwange)
+void cave_state::guwange(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(guwange_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::guwange_map);
 
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_esprade)
-	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_esprade);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	add_ymz(config);
+}
 
 /***************************************************************************
                                 Hotdog Storm
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::hotdogst)
+void cave_state::hotdogst(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(hotdogst_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_clock(32_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::hotdogst_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 32_MHz_XTAL/8)
-	MCFG_DEVICE_PROGRAM_MAP(hotdogst_sound_map)
-	MCFG_DEVICE_IO_MAP(hotdogst_sound_portmap)
+	Z80(config, m_audiocpu, 32_MHz_XTAL/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cave_state::hotdogst_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &cave_state::hotdogst_sound_portmap);
 
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(384, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
+	m_screen->set_size(384, 240);
+	m_screen->set_visarea(0, 384-1, 0, 240-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hotdogst)
-	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
-	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hotdogst);
+	m_palette->set_init(FUNC(cave_state::dfeveron_palette)); // $8000 palette entries for consistency with the other games
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_16(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 32_MHz_XTAL/8)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-	MCFG_SOUND_ROUTE(2, "mono", 0.20)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 32_MHz_XTAL/8));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "mono", 0.20);
+	ymsnd.add_route(1, "mono", 0.20);
+	ymsnd.add_route(2, "mono", 0.20);
+	ymsnd.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL/16, okim6295_device::PIN7_HIGH) // pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[0], 32_MHz_XTAL/16, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->set_addrmap(0, &cave_state::oki_map);
+}
 
 
 /***************************************************************************
                                Koro Koro Quest
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::korokoro)
+void cave_state::korokoro(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(korokoro_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::korokoro_map);
 
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1-2, 0, 240-1-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
+	m_screen->set_visarea(0, 320-1-2, 0, 240-1-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_korokoro)
-	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
-	MCFG_PALETTE_INIT_OWNER(cave_state,korokoro)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_korokoro);
+	m_palette->set_init(FUNC(cave_state::korokoro_palette)); // $8000 palette entries for consistency with the other games
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
+	add_ymz(config);
+}
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(cave_state::crusherm)
+void cave_state::crusherm(machine_config &config)
+{
 	korokoro(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(crusherm_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::crusherm_map);
+}
 
 
 /***************************************************************************
                                 Mazinger Z
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::mazinger)
+void cave_state::mazinger(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(mazinger_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::mazinger_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4_MHz_XTAL) // Bidirectional communication
-	MCFG_DEVICE_PROGRAM_MAP(mazinger_sound_map)
-	MCFG_DEVICE_IO_MAP(mazinger_sound_portmap)
+	Z80(config, m_audiocpu, 4_MHz_XTAL); // Bidirectional communication
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cave_state::mazinger_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &cave_state::mazinger_sound_portmap);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(384, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
+	m_screen->set_size(384, 240);
+	m_screen->set_visarea(0, 384-1, 0, 240-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mazinger)
-	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
-	MCFG_PALETTE_INIT_OWNER(cave_state,mazinger)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mazinger);
+	m_palette->set_init(FUNC(cave_state::mazinger_palette)); // $8000 palette entries for consistency with the other games
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_16(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 4_MHz_XTAL)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-	MCFG_SOUND_ROUTE(2, "mono", 0.20)
-	MCFG_SOUND_ROUTE(3, "mono", 0.60)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 4_MHz_XTAL));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "mono", 0.20);
+	ymsnd.add_route(1, "mono", 0.20);
+	ymsnd.add_route(2, "mono", 0.20);
+	ymsnd.add_route(3, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[0], 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 2.0);
+	m_oki[0]->set_addrmap(0, &cave_state::oki_map);
+}
 
 
 /***************************************************************************
                                 Metamoqester
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::metmqstr)
+void cave_state::metmqstr(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(metmqstr_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_clock(32_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::metmqstr_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 32_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(metmqstr_sound_map)
-	MCFG_DEVICE_IO_MAP(metmqstr_sound_portmap)
+	Z80(config, m_audiocpu, 32_MHz_XTAL / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cave_state::metmqstr_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &cave_state::metmqstr_sound_portmap);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)    /* start with the watchdog armed */
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0x7d, 0x7d + 0x180-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
+	m_screen->set_size(0x200, 240);
+	m_screen->set_visarea(0x7d, 0x7d + 0x180-1, 0, 240-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_donpachi)
-	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
-	MCFG_PALETTE_INIT_OWNER(cave_state,dfeveron)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_donpachi);
+	m_palette->set_init(FUNC(cave_state::dfeveron_palette)); // $8000 palette entries for consistency with the other games
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_16(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 16_MHz_XTAL / 4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL / 4));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.6);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 32_MHz_XTAL / 16 , okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
+	OKIM6295(config, m_oki[0], 32_MHz_XTAL / 16, okim6295_device::PIN7_HIGH);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_oki[0]->set_addrmap(0, &cave_state::oki_map);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 32_MHz_XTAL / 16 , okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 32_MHz_XTAL / 16, okim6295_device::PIN7_HIGH);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_oki[1]->set_addrmap(0, &cave_state::oki2_map);
+}
 
 
 /***************************************************************************
                                    Pac-Slot
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::pacslot)
+void cave_state::pacslot(machine_config &config)
+{
+	add_base_config(config);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(pacslot_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_clock(28_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::pacslot_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	EEPROM_93C46_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
+	m_screen->set_size(0x200, 240);
+	m_screen->set_visarea(0x80, 0x80 + 0x140-1, 0, 240-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
-	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_uopoko);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
@@ -2585,21 +2392,22 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki[0], 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	// oki2 chip is present but its rom socket is unpopulated
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(cave_state::paceight)
+void cave_state::paceight(machine_config &config)
+{
 	pacslot(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(paceight_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::paceight_map);
+}
+
 /***************************************************************************
                                Poka Poka Satan
 ***************************************************************************/
@@ -2609,50 +2417,46 @@ TIMER_DEVICE_CALLBACK_MEMBER( cave_state::timer_lev2_cb )
 	m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);   // ppsatan: read touch screens
 }
 
-MACHINE_CONFIG_START(cave_state::ppsatan)
+void cave_state::ppsatan(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(ppsatan_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt_ppsatan)
+	m_maincpu->set_vblank_int("screen", FUNC(cave_state::interrupt_ppsatan));
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::ppsatan_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(1));  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_lev2", cave_state, timer_lev2_cb, attotime::from_hz(60))
+	TIMER(config, "timer_lev2").configure_periodic(FUNC(cave_state::timer_lev2_cb), attotime::from_hz(60));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)       // Top
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_ppsatan_top)
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	m_screen->set_visarea(0, 320-1, 0, 224-1);
+	m_screen->set_screen_update(FUNC(cave_state::screen_update_ppsatan_top));
+	subdevice<timer_device>("int_timer")->configure_generic(FUNC(cave_state::vblank_start));
 
-	MCFG_SCREEN_ADD("screen_left", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_ppsatan_left)
-	MCFG_TIMER_DRIVER_ADD("int_timer_left", cave_state, cave_vblank_start_left)
+	screen_device &screen_left(SCREEN(config, "screen_left", SCREEN_TYPE_RASTER));
+	screen_left.set_refresh_hz(15625/271.5);
+	screen_left.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen_left.set_size(320, 240);
+	screen_left.set_visarea(0, 320-1, 0, 224-1);
+	screen_left.set_screen_update(FUNC(cave_state::screen_update_ppsatan_left));
+	TIMER(config, "int_timer_left").configure_generic(FUNC(cave_state::vblank_start_left));
 
-	MCFG_SCREEN_ADD("screen_right", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_ppsatan_right)
-	MCFG_TIMER_DRIVER_ADD("int_timer_right", cave_state, cave_vblank_start_right)
+	screen_device &screen_right(SCREEN(config, "screen_right", SCREEN_TYPE_RASTER));
+	screen_right.set_refresh_hz(15625/271.5);
+	screen_right.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen_right.set_size(320, 240);
+	screen_right.set_visarea(0, 320-1, 0, 224-1);
+	screen_right.set_screen_update(FUNC(cave_state::screen_update_ppsatan_right));
+	TIMER(config, "int_timer_right").configure_generic(FUNC(cave_state::vblank_start_right));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ppsatan)
-	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_PALETTE_INIT_OWNER(cave_state,ppsatan)
-	MCFG_DEFAULT_LAYOUT(layout_ppsatan)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ppsatan);
+
+	m_palette->set_init(FUNC(cave_state::ppsatan_palette));
+
+	config.set_default_layout(layout_ppsatan);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
@@ -2660,10 +2464,10 @@ MACHINE_CONFIG_START(cave_state::ppsatan)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[0], 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 2.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 2.0);
+}
 
 
 /***************************************************************************
@@ -2672,59 +2476,52 @@ MACHINE_CONFIG_END
 
 /*  X1 = 12 MHz, X2 = 28 MHz, X3 = 16 MHz. OKI: / 165 mode A ; / 132 mode B */
 
-MACHINE_CONFIG_START(cave_state::pwrinst2)
+void cave_state::pwrinst2(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL) /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pwrinst2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::pwrinst2_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 2)    /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pwrinst2_sound_map)
-	MCFG_DEVICE_IO_MAP(pwrinst2_sound_portmap)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 2);    /* 8 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cave_state::pwrinst2_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &cave_state::pwrinst2_sound_portmap);
 
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0x70, 0x70 + 0x140-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
+	m_screen->set_size(0x200, 240);
+	m_screen->set_visarea(0x70, 0x70 + 0x140-1, 0, 240-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pwrinst2)
-	MCFG_PALETTE_ADD("palette", 0x8000+0x2800)
-	MCFG_PALETTE_INIT_OWNER(cave_state,pwrinst2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pwrinst2);
+	m_palette->set_entries(0x8000+0x2800);
+	m_palette->set_init(FUNC(cave_state::pwrinst2_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_4_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_16(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-	MCFG_SOUND_ROUTE(2, "mono", 0.40)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ym2203(YM2203(config, "ymsnd", 16_MHz_XTAL / 4));
+	ym2203.irq_handler().set_inputline("audiocpu", 0);
+	ym2203.add_route(0, "mono", 0.40);
+	ym2203.add_route(1, "mono", 0.40);
+	ym2203.add_route(2, "mono", 0.40);
+	ym2203.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 3_MHz_XTAL, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	OKIM6295(config, m_oki[0], 3_MHz_XTAL, okim6295_device::PIN7_LOW);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 3_MHz_XTAL, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	OKIM6295(config, m_oki[1], 3_MHz_XTAL, okim6295_device::PIN7_LOW);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
-	MCFG_NMK112_ROM0("oki1")
-	MCFG_NMK112_ROM1("oki2")
-MACHINE_CONFIG_END
+	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
+	nmk112.set_rom0_tag("oki1");
+	nmk112.set_rom1_tag("oki2");
+}
 
 
 /***************************************************************************
@@ -2738,102 +2535,83 @@ TIMER_DEVICE_CALLBACK_MEMBER( cave_state::sailormn_startup )
 
 MACHINE_RESET_MEMBER(cave_state,sailormn)
 {
-	timer_device *startup = machine().device<timer_device>("startup");
-	startup->adjust(attotime::from_usec(1000), 0, attotime::zero);
-	MACHINE_RESET_CALL_MEMBER(cave);
+	machine_reset();
+	m_startup->adjust(attotime::from_usec(1000), 0, attotime::zero);
 }
 
-MACHINE_CONFIG_START(cave_state::sailormn)
+void cave_state::sailormn(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(sailormn_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::sailormn_map);
 
 	// could be a wachdog, but if it is then our watchdog address is incorrect as there are periods where the game doesn't write it.
-	MCFG_TIMER_DRIVER_ADD("startup", cave_state, sailormn_startup)
+	TIMER(config, m_startup).configure_generic(FUNC(cave_state::sailormn_startup));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL) // Bidirectional Communication
-	MCFG_DEVICE_PROGRAM_MAP(sailormn_sound_map)
-	MCFG_DEVICE_IO_MAP(sailormn_sound_portmap)
+	Z80(config, m_audiocpu, 8_MHz_XTAL); // Bidirectional Communication
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cave_state::sailormn_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &cave_state::sailormn_sound_portmap);
 
-//  MCFG_QUANTUM_TIME(attotime::from_hz(600))
+//  config.m_minimum_quantum = attotime::from_hz(600);
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,sailormn)
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320+1, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0+1, 320+1-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
+	m_screen->set_size(320+1, 240);
+	m_screen->set_visarea(0+1, 320+1-1, 0, 240-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sailormn)
-	MCFG_PALETTE_ADD("palette", 0x8000) /* $8000 palette entries for consistency with the other games */
-	MCFG_PALETTE_INIT_OWNER(cave_state,sailormn) // 4 bit sprites, 6 bit tiles
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sailormn); // 4 bit sprites, 6 bit tiles
+	m_palette->set_init(FUNC(cave_state::sailormn_palette)); // $8000 palette entries for consistency with the other games
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,sailormn_3_layers) /* Layer 2 has 1 banked ROM */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_16(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 16_MHz_XTAL/4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL / 4));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
+	OKIM6295(config, m_oki[0], 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[0]->set_addrmap(0, &cave_state::oki_map);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, 2112000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
+	OKIM6295(config, m_oki[1], 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki[1]->set_addrmap(0, &cave_state::oki2_map);
 
 
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
                             Tekken Card World
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::tekkencw)
+void cave_state::tekkencw(machine_config &config)
+{
+	add_base_config(config);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(tekkencw_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_clock(28_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::tekkencw_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	EEPROM_93C46_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
+	m_screen->set_size(0x200, 240);
+	m_screen->set_visarea(0x80, 0x80 + 0x140-1, 0, 240-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
-	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_uopoko);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
@@ -2841,54 +2619,43 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki[0], 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	// oki2 chip spot and rom socket are both unpopulated
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(cave_state::tekkenbs)
+void cave_state::tekkenbs(machine_config &config)
+{
 	tekkencw(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tekkenbs_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::tekkenbs_map);
+}
 
 
 /***************************************************************************
                             Tobikose! Jumpman
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::tjumpman)
+void cave_state::tjumpman(machine_config &config)
+{
+	add_base_config(config);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(tjumpman_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_clock(28_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::tjumpman_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
-
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	EEPROM_93C46_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
+	m_screen->set_size(0x200, 240);
+	m_screen->set_visarea(0x80, 0x80 + 0x140-1, 0, 240-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
-	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_uopoko);
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
@@ -2896,50 +2663,35 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6295(config, m_oki[0], 28_MHz_XTAL / 28, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	// oki2 chip spot and rom socket are both unpopulated
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
                                 Uo Poko
 ***************************************************************************/
 
-MACHINE_CONFIG_START(cave_state::uopoko)
+void cave_state::uopoko(machine_config &config)
+{
+	add_base_config(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(uopoko_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::uopoko_map);
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-
-	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(15625/271.5)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cave_state, screen_update_cave)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_uopoko);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_uopoko)
-	MCFG_PALETTE_ADD("palette", 0x8000)
-
-	MCFG_PALETTE_INIT_OWNER(cave_state,cave)
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16.9344_MHz_XTAL)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, cave_state, sound_irq_gen))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	add_ymz(config);
+}
 
 
 /***************************************************************************
@@ -4528,7 +4280,7 @@ Notes:
             U82      : 27C040 EPROM
             PR12*    : 27C040 EPROMs
             PROG*    : 27C040 EPROMs
-            ALL other ROMs are soldered-in 16M 42 pin MASKROM (read as 27C160)
+            ALL other ROMs are soldered-in 16M 42 pin mask ROM (read as 27C160)
 */
 
 ROM_START( plegends )
@@ -4673,7 +4425,6 @@ BPSM.U76    23C16000    GFX
 BPSM.U77    23C16000    GFX
 
 ***************************************************************************/
-
 
 
 #define ROMS_SAILORMN \
@@ -5069,13 +4820,13 @@ ROM_START( uopoko )
 	ROM_LOAD16_BYTE( "u25.int", 0x000001, 0x080000, CRC(a1258482) SHA1(7f4adc4a6d069032aaf3d93eb60fde16b59483f8) )
 
 	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
-	ROM_LOAD( "cave_cv-02_u33.u33", 0x000000, 0x400000, CRC(5d142ad2) SHA1(f26abcf7a625a322b83df44fbd6e852bfb03663c) ) /* MASK ROM */
+	ROM_LOAD( "cave_cv-02_u33.u33", 0x000000, 0x400000, CRC(5d142ad2) SHA1(f26abcf7a625a322b83df44fbd6e852bfb03663c) ) /* mask ROM */
 
 	ROM_REGION( 0x400000, "layer0", 0 ) /* Layer 0 */
-	ROM_LOAD( "cave_cv-02_u49.u49", 0x000000, 0x400000, CRC(12fb11bb) SHA1(953df1b16b5c9a6c3eb2fdebec4669a879270e73) ) /* MASK ROM */
+	ROM_LOAD( "cave_cv-02_u49.u49", 0x000000, 0x400000, CRC(12fb11bb) SHA1(953df1b16b5c9a6c3eb2fdebec4669a879270e73) ) /* mask ROM */
 
 	ROM_REGION( 0x200000, "ymz", 0 )    /* Samples */
-	ROM_LOAD( "cave_cv-02_u4.u4", 0x000000, 0x200000, CRC(a2d0d755) SHA1(f8493ef7f367f3dc2a229ba785ac67bc5c2c54c0) ) /* MASK ROM */
+	ROM_LOAD( "cave_cv-02_u4.u4", 0x000000, 0x200000, CRC(a2d0d755) SHA1(f8493ef7f367f3dc2a229ba785ac67bc5c2c54c0) ) /* mask ROM */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-uopoko.bin", 0x0000, 0x0080, CRC(f4a24b95) SHA1(4043f0ffed24e38b4f7dbe1a5a4a9e79bdde7dfd) )
@@ -5087,21 +4838,17 @@ ROM_START( uopokoj )
 	ROM_LOAD16_BYTE( "u25.bin", 0x000001, 0x080000, CRC(68cb6211) SHA1(a6db0bc2e3e54b6992a44b7d52395917e66db49b) )
 
 	ROM_REGION( 0x400000 * 2, "sprites0", 0 )        /* Sprites: * 2 */
-	ROM_LOAD( "cave_cv-02_u33.u33", 0x000000, 0x400000, CRC(5d142ad2) SHA1(f26abcf7a625a322b83df44fbd6e852bfb03663c) ) /* MASK ROM */
+	ROM_LOAD( "cave_cv-02_u33.u33", 0x000000, 0x400000, CRC(5d142ad2) SHA1(f26abcf7a625a322b83df44fbd6e852bfb03663c) ) /* mask ROM */
 
 	ROM_REGION( 0x400000, "layer0", 0 ) /* Layer 0 */
-	ROM_LOAD( "cave_cv-02_u49.u49", 0x000000, 0x400000, CRC(12fb11bb) SHA1(953df1b16b5c9a6c3eb2fdebec4669a879270e73) ) /* MASK ROM */
+	ROM_LOAD( "cave_cv-02_u49.u49", 0x000000, 0x400000, CRC(12fb11bb) SHA1(953df1b16b5c9a6c3eb2fdebec4669a879270e73) ) /* mask ROM */
 
 	ROM_REGION( 0x200000, "ymz", 0 )    /* Samples */
-	ROM_LOAD( "cave_cv-02_u4.u4", 0x000000, 0x200000, CRC(a2d0d755) SHA1(f8493ef7f367f3dc2a229ba785ac67bc5c2c54c0) ) /* MASK ROM */
+	ROM_LOAD( "cave_cv-02_u4.u4", 0x000000, 0x200000, CRC(a2d0d755) SHA1(f8493ef7f367f3dc2a229ba785ac67bc5c2c54c0) ) /* mask ROM */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-uopoko.bin", 0x0000, 0x0080, CRC(f4a24b95) SHA1(4043f0ffed24e38b4f7dbe1a5a4a9e79bdde7dfd) )
 ROM_END
-
-
-
-
 
 
 /***************************************************************************
@@ -5157,7 +4904,6 @@ void cave_state::init_oki_bank(int chip)
 	m_okibank_hi[chip]->configure_entries(0, max, &ROM[0x00000], 0x20000);
 }
 
-
 void cave_state::init_agallet()
 {
 	init_cave();
@@ -5194,6 +4940,10 @@ void cave_state::init_ddonpach()
 	ddp_unpack_sprites(0);
 	m_spritetype[0] = 1;    // "different" sprites (no zooming?)
 	m_time_vblank_irq = 90;
+
+	/* 4bpp but Only first 16 colors are used in palette index for Layer 0, 1. */
+	m_gfxdecode->gfx(0)->set_granularity(256);
+	m_gfxdecode->gfx(1)->set_granularity(256);
 }
 
 void cave_state::init_donpachi()
@@ -5204,7 +4954,6 @@ void cave_state::init_donpachi()
 	m_spritetype[0] = 1;    // "different" sprites (no zooming?)
 	m_time_vblank_irq = 90;
 }
-
 
 void cave_state::init_esprade()
 {

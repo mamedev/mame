@@ -83,15 +83,16 @@ enum
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_corvfdc01_device::device_add_mconfig)
-	MCFG_FD1793_ADD(FDC01_FDC_TAG, XTAL(16'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc01_device, intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc01_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":0", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":1", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":2", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":3", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
-MACHINE_CONFIG_END
+void a2bus_corvfdc01_device::device_add_mconfig(machine_config &config)
+{
+	FD1793(config, m_wdfdc, 16_MHz_XTAL / 8);
+	m_wdfdc->intrq_wr_callback().set(FUNC(a2bus_corvfdc01_device::intrq_w));
+	m_wdfdc->drq_wr_callback().set(FUNC(a2bus_corvfdc01_device::drq_w));
+	FLOPPY_CONNECTOR(config, m_con1, corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con2, corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con3, corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con4, corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

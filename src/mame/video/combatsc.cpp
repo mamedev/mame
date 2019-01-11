@@ -12,40 +12,39 @@
 
 #include "includes/combatsc.h"
 
-PALETTE_INIT_MEMBER(combatsc_state,combatsc)
+void combatsc_state::combatsc_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int pal;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (pal = 0; pal < 8; pal++)
+	for (int pal = 0; pal < 8; pal++)
 	{
-		int i, clut;
+		int clut;
 
 		switch (pal)
 		{
-			default:
-			case 0: /* other sprites */
-			case 2: /* other sprites(alt) */
-			clut = 1;   /* 0 is wrong for Firing Range III targets */
+		default:
+		case 0: // other sprites
+		case 2: // other sprites(alt)
+			clut = 1;   // 0 is wrong for Firing Range III targets
 			break;
 
-			case 4: /* player sprites */
-			case 6: /* player sprites(alt) */
+		case 4: // player sprites
+		case 6: // player sprites(alt)
 			clut = 2;
 			break;
 
-			case 1: /* background */
-			case 3: /* background(alt) */
+		case 1: // background
+		case 3: // background(alt)
 			clut = 1;
 			break;
 
-			case 5: /* foreground tiles */
-			case 7: /* foreground tiles(alt) */
+		case 5: // foreground tiles
+		case 7: // foreground tiles(alt)
 			clut = 3;
 			break;
 		}
 
-		for (i = 0; i < 0x100; i++)
+		for (int i = 0; i < 0x100; i++)
 		{
 			uint8_t ctabentry;
 
@@ -60,25 +59,22 @@ PALETTE_INIT_MEMBER(combatsc_state,combatsc)
 }
 
 
-PALETTE_INIT_MEMBER(combatsc_state,combatscb)
+void combatsc_state::combatscb_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int pal;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (pal = 0; pal < 8; pal++)
+	for (int pal = 0; pal < 8; pal++)
 	{
-		int i;
-
-		for (i = 0; i < 0x100; i++)
+		for (int i = 0; i < 0x100; i++)
 		{
 			uint8_t ctabentry;
 
 			if ((pal & 1) == 0)
-				/* sprites */
+				// sprites
 				ctabentry = (pal << 4) | (~color_prom[i] & 0x0f);
 			else
-				/* chars - no lookup? */
-				ctabentry = (pal << 4) | (i & 0x0f);    /* no lookup? */
+				// chars - no lookup?
+				ctabentry = (pal << 4) | (i & 0x0f);    // no lookup?
 
 			palette.set_pen_indirect((pal << 8) | i, ctabentry);
 		}
@@ -267,8 +263,8 @@ VIDEO_START_MEMBER(combatsc_state,combatsc)
 
 	m_textlayer->set_scroll_rows(32);
 
-	save_pointer(NAME(m_spriteram[0].get()), 0x800);
-	save_pointer(NAME(m_spriteram[1].get()), 0x800);
+	save_pointer(NAME(m_spriteram[0]), 0x800);
+	save_pointer(NAME(m_spriteram[1]), 0x800);
 }
 
 VIDEO_START_MEMBER(combatsc_state,combatscb)
@@ -287,8 +283,8 @@ VIDEO_START_MEMBER(combatsc_state,combatscb)
 	m_bg_tilemap[0]->set_scroll_rows(32);
 	m_bg_tilemap[1]->set_scroll_rows(32);
 
-	save_pointer(NAME(m_spriteram[0].get()), 0x800);
-	save_pointer(NAME(m_spriteram[1].get()), 0x800);
+	save_pointer(NAME(m_spriteram[0]), 0x800);
+	save_pointer(NAME(m_spriteram[1]), 0x800);
 }
 
 /***************************************************************************

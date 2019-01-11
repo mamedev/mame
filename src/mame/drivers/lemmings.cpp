@@ -70,15 +70,15 @@ void lemmings_state::lemmings_map(address_map &map)
 	map(0x120000, 0x1207ff).ram().share("spriteram1");
 	map(0x140000, 0x1407ff).ram().share("spriteram2");
 	map(0x160000, 0x160fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x170000, 0x17000f).ram().w(this, FUNC(lemmings_state::lemmings_control_w)).share("control_data");
-	map(0x190000, 0x19000f).r(this, FUNC(lemmings_state::lemmings_trackball_r));
-	map(0x1a0000, 0x1a3fff).rw(this, FUNC(lemmings_state::lem_protection_region_0_146_r), FUNC(lemmings_state::lem_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
+	map(0x170000, 0x17000f).ram().w(FUNC(lemmings_state::lemmings_control_w)).share("control_data");
+	map(0x190000, 0x19000f).r(FUNC(lemmings_state::lemmings_trackball_r));
+	map(0x1a0000, 0x1a3fff).rw(FUNC(lemmings_state::lem_protection_region_0_146_r), FUNC(lemmings_state::lem_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
 	map(0x1c0000, 0x1c0001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); /* 1 written once a frame */
 	map(0x1e0000, 0x1e0001).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write)); /* 1 written once a frame */
-	map(0x200000, 0x201fff).ram().w(this, FUNC(lemmings_state::lemmings_vram_w)).share("vram_data");
+	map(0x200000, 0x201fff).ram().w(FUNC(lemmings_state::lemmings_vram_w)).share("vram_data");
 	map(0x202000, 0x202fff).ram();
-	map(0x300000, 0x37ffff).ram().w(this, FUNC(lemmings_state::lemmings_pixel_0_w)).share("pixel_0_data");
-	map(0x380000, 0x39ffff).ram().w(this, FUNC(lemmings_state::lemmings_pixel_1_w)).share("pixel_1_data");
+	map(0x300000, 0x37ffff).ram().w(FUNC(lemmings_state::lemmings_pixel_0_w)).share("pixel_0_data");
+	map(0x380000, 0x39ffff).ram().w(FUNC(lemmings_state::lemmings_pixel_1_w)).share("pixel_1_data");
 }
 
 /******************************************************************************/
@@ -236,34 +236,33 @@ MACHINE_CONFIG_START(lemmings_state::lemmings)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lemmings_state, screen_vblank_lemmings))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lemmings)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 1024);
 
-	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(1)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen[0], 0);
+	m_sprgen[0]->set_gfx_region(1);
+	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(0)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen[1], 0);
+	m_sprgen[1]->set_gfx_region(0);
+	m_sprgen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DECO146_ADD("ioprot")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 1))
+	DECO146PROT(config, m_deco146, 0);
+	m_deco146->port_a_cb().set_ioport("INPUTS");
+	m_deco146->port_b_cb().set_ioport("SYSTEM");
+	m_deco146->port_c_cb().set_ioport("DSW");
+	m_deco146->set_use_magic_read_address_xor(true);
+	m_deco146->soundlatch_irq_cb().set_inputline(m_audiocpu, 1);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 32220000/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32220000/9));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.45);
+	ymsnd.add_route(1, "rspeaker", 0.45);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1023924, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)

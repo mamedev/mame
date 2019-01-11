@@ -110,13 +110,13 @@ ROM_START( luxor_55_21046 )
 	ROM_REGION( 0x4000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v207" )
 	ROM_SYSTEM_BIOS( 0, "v105", "Luxor v1.05 (1984-10-04)" )
-	ROMX_LOAD( "cntr 105.6cd", 0x2000, 0x2000, CRC(44043025) SHA1(17487ca35b399bb49d4015bbeede0809db8e772f), ROM_BIOS(1) )
+	ROMX_LOAD( "cntr 105.6cd", 0x2000, 0x2000, CRC(44043025) SHA1(17487ca35b399bb49d4015bbeede0809db8e772f), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v107", "Luxor v1.07 (1985-07-03)" )
-	ROMX_LOAD( "cntr 1.07 6490318-07.6cd", 0x0000, 0x4000, CRC(db8c1c0e) SHA1(8bccd5bc72124984de529ee058df779f06d2c1d5), ROM_BIOS(2) )
+	ROMX_LOAD( "cntr 1.07 6490318-07.6cd", 0x0000, 0x4000, CRC(db8c1c0e) SHA1(8bccd5bc72124984de529ee058df779f06d2c1d5), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v108", "Luxor v1.08 (1986-03-12)" )
-	ROMX_LOAD( "cntr 108.6cd", 0x2000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d), ROM_BIOS(3) )
+	ROMX_LOAD( "cntr 108.6cd", 0x2000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "v207", "DiAB v2.07 (1987-06-24)" )
-	ROMX_LOAD( "diab 207.6cd", 0x2000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2), ROM_BIOS(4) )
+	ROMX_LOAD( "diab 207.6cd", 0x2000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2), ROM_BIOS(3) )
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "pal16r4.2a", 0x000, 0x104, NO_DUMP)
@@ -153,15 +153,15 @@ void luxor_55_21046_device::luxor_55_21046_mem(address_map &map)
 void luxor_55_21046_device::luxor_55_21046_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0c, 0x0c).mirror(0xff03).r(this, FUNC(luxor_55_21046_device::out_r));
-	map(0x1c, 0x1c).mirror(0xff03).w(this, FUNC(luxor_55_21046_device::inp_w));
-	map(0x2c, 0x2c).mirror(0xff03).w(this, FUNC(luxor_55_21046_device::_4b_w));
-	map(0x3c, 0x3c).mirror(0xff03).w(this, FUNC(luxor_55_21046_device::_9b_w));
-	map(0x4c, 0x4c).mirror(0xff03).w(this, FUNC(luxor_55_21046_device::_8a_w));
-	map(0x58, 0x58).mirror(0x0007).select(0xff00).r(this, FUNC(luxor_55_21046_device::_9a_r));
+	map(0x0c, 0x0c).mirror(0xff03).r(FUNC(luxor_55_21046_device::out_r));
+	map(0x1c, 0x1c).mirror(0xff03).w(FUNC(luxor_55_21046_device::inp_w));
+	map(0x2c, 0x2c).mirror(0xff03).w(FUNC(luxor_55_21046_device::_4b_w));
+	map(0x3c, 0x3c).mirror(0xff03).w(FUNC(luxor_55_21046_device::_9b_w));
+	map(0x4c, 0x4c).mirror(0xff03).w(FUNC(luxor_55_21046_device::_8a_w));
+	map(0x58, 0x58).mirror(0x0007).select(0xff00).r(FUNC(luxor_55_21046_device::_9a_r));
 	map(0x68, 0x6b).mirror(0xff00).r(SAB1793_TAG, FUNC(fd1793_device::read));
 	map(0x78, 0x7b).mirror(0xff00).w(SAB1793_TAG, FUNC(fd1793_device::write));
-	map(0x80, 0x80).mirror(0xff77).rw(Z80DMA_TAG, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x80, 0x80).mirror(0xff77).rw(m_dma, FUNC(z80dma_device::bus_r), FUNC(z80dma_device::bus_w));
 }
 
 
@@ -290,54 +290,60 @@ static const z80_daisy_config z80_daisy_chain[] =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(luxor_55_21046_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
-	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(luxor_55_21046_mem)
-	MCFG_DEVICE_IO_MAP(luxor_55_21046_io)
+void luxor_55_21046_device::device_add_mconfig(machine_config & config)
+{
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_daisy_config(z80_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &luxor_55_21046_device::luxor_55_21046_mem);
+	m_maincpu->set_addrmap(AS_IO, &luxor_55_21046_device::luxor_55_21046_io);
 
-	MCFG_DEVICE_ADD(Z80DMA_TAG, Z80DMA, XTAL(16'000'000)/4)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE(Z80_TAG, INPUT_LINE_HALT))
-	MCFG_Z80DMA_OUT_INT_CB(WRITELINE(*this, luxor_55_21046_device, dma_int_w))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, luxor_55_21046_device, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, luxor_55_21046_device, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, luxor_55_21046_device, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, luxor_55_21046_device, io_write_byte))
+	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dma->out_int_callback().set(FUNC(luxor_55_21046_device::dma_int_w));
+	m_dma->in_mreq_callback().set(FUNC(luxor_55_21046_device::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(luxor_55_21046_device::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(luxor_55_21046_device::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(luxor_55_21046_device::io_write_byte));
 
-	MCFG_FD1793_ADD(SAB1793_TAG, XTAL(16'000'000)/16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, luxor_55_21046_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(Z80DMA_TAG, z80dma_device, rdy_w))
-MACHINE_CONFIG_END
+	FD1793(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(FUNC(luxor_55_21046_device::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
+}
 
-MACHINE_CONFIG_START(abc830_device::device_add_mconfig)
+void abc830_device::device_add_mconfig(machine_config &config)
+{
 	luxor_55_21046_device::device_add_mconfig(config);
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525ssdd", luxor_55_21046_device::floppy_formats);
+}
 
-MACHINE_CONFIG_START(abc832_device::device_add_mconfig)
+void abc832_device::device_add_mconfig(machine_config &config)
+{
 	luxor_55_21046_device::device_add_mconfig(config);
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats);
+}
 
-MACHINE_CONFIG_START(abc834_device::device_add_mconfig)
+void abc834_device::device_add_mconfig(machine_config &config)
+{
 	luxor_55_21046_device::device_add_mconfig(config);
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats);
+}
 
-MACHINE_CONFIG_START(abc838_device::device_add_mconfig)
+void abc838_device::device_add_mconfig(machine_config &config)
+{
 	luxor_55_21046_device::device_add_mconfig(config);
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, "8dsdd", luxor_55_21046_device::floppy_formats);
+}
 
-MACHINE_CONFIG_START(abc850_floppy_device::device_add_mconfig)
+void abc850_floppy_device::device_add_mconfig(machine_config &config)
+{
 	luxor_55_21046_device::device_add_mconfig(config);
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525qd", luxor_55_21046_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, nullptr, luxor_55_21046_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, abc_floppies, "525qd", luxor_55_21046_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, abc_floppies, nullptr, luxor_55_21046_device::floppy_formats);
+}
 
 
 //-------------------------------------------------
@@ -708,11 +714,11 @@ luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, cons
 luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_abcbus_card_interface(mconfig, *this),
+	m_floppy0(*this, SAB1793_TAG":0"),
+	m_floppy1(*this, SAB1793_TAG":1"),
 	m_maincpu(*this, Z80_TAG),
 	m_dma(*this, Z80DMA_TAG),
 	m_fdc(*this, SAB1793_TAG),
-	m_floppy0(*this, SAB1793_TAG":0"),
-	m_floppy1(*this, SAB1793_TAG":1"),
 	m_floppy(nullptr),
 	m_sw1(*this, "SW1"),
 	m_sw2(*this, "SW2"),
@@ -1052,14 +1058,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 	// density select
 	m_fdc->dden_w(BIT(data, 1));
 
-	if (BIT(data, 2))
-	{
-		m_fdc->set_unscaled_clock(XTAL(16'000'000)/16);
-	}
-	else
-	{
-		m_fdc->set_unscaled_clock(XTAL(16'000'000)/8);
-	}
+	m_fdc->set_unscaled_clock(16_MHz_XTAL / (BIT(data, 2) ? 16 : 8));
 }
 
 

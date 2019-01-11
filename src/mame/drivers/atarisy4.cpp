@@ -20,6 +20,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "video/poly.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -39,9 +40,9 @@ public:
 	{
 	}
 
-	void init_laststar();
-
 	void atarisy4(machine_config &config);
+
+	void init_laststar();
 
 protected:
 	struct atarisy4_polydata
@@ -146,7 +147,7 @@ protected:
 	void dsp0_io_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_dsp0;
+	required_device<tms32010_device> m_dsp0;
 
 	required_memory_bank m_dsp0_bank1;
 
@@ -200,7 +201,7 @@ protected:
 	void dsp1_io_map(address_map &map);
 
 private:
-	required_device<cpu_device> m_dsp1;
+	required_device<tms32010_device> m_dsp1;
 	required_memory_bank m_dsp1_bank1;
 };
 
@@ -244,13 +245,13 @@ uint32_t atarisy4_state::screen_update_atarisy4(screen_device &screen, bitmap_rg
 
 	//uint32_t offset = m_gpu.dpr << 5;
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
 		uint16_t *src = &m_screen_ram[(offset + (4096 * y)) / 2];
-		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
+		uint32_t *dest = &bitmap.pix32(y, cliprect.left());
 		int x;
 
-		for (x = cliprect.min_x; x < cliprect.max_x; x += 2)
+		for (x = cliprect.left(); x < cliprect.right(); x += 2)
 		{
 			uint16_t data = *src++;
 
@@ -707,20 +708,20 @@ void atarisy4_state::main_map(address_map &map)
 	map(0x000000, 0x00ffff).ram().share("m68k_ram");
 	map(0x010000, 0x01ffff).ram();
 	map(0x580000, 0x580001).portr("JOYSTICK");
-	map(0x588000, 0x588001).r(this, FUNC(atarisy4_state::analog_r));
+	map(0x588000, 0x588001).r(FUNC(atarisy4_state::analog_r));
 	map(0x598000, 0x598001).noprw(); /* Sound board */
-	map(0x7c0000, 0x7c4fff).rw(this, FUNC(atarisy4_state::m68k_shared_1_r), FUNC(atarisy4_state::m68k_shared_1_w));
-	map(0x7f0000, 0x7f4fff).rw(this, FUNC(atarisy4_state::m68k_shared_0_r), FUNC(atarisy4_state::m68k_shared_0_w));
-	map(0x7f6000, 0x7f6001).rw(this, FUNC(atarisy4_state::dsp0_status_r), FUNC(atarisy4_state::dsp0_control_w));
+	map(0x7c0000, 0x7c4fff).rw(FUNC(atarisy4_state::m68k_shared_1_r), FUNC(atarisy4_state::m68k_shared_1_w));
+	map(0x7f0000, 0x7f4fff).rw(FUNC(atarisy4_state::m68k_shared_0_r), FUNC(atarisy4_state::m68k_shared_0_w));
+	map(0x7f6000, 0x7f6001).rw(FUNC(atarisy4_state::dsp0_status_r), FUNC(atarisy4_state::dsp0_control_w));
 	map(0xa00400, 0xbfffff).ram().share("screen_ram");
-	map(0xff8000, 0xff8fff).rw(this, FUNC(atarisy4_state::gpu_r), FUNC(atarisy4_state::gpu_w));
+	map(0xff8000, 0xff8fff).rw(FUNC(atarisy4_state::gpu_r), FUNC(atarisy4_state::gpu_w));
 }
 
 void airrace_state::airrace_map(address_map &map)
 {
 	main_map(map);
 
-	map(0x7c6000, 0x7c6001).rw(this, FUNC(airrace_state::dsp1_status_r), FUNC(airrace_state::dsp1_control_w));
+	map(0x7c6000, 0x7c6001).rw(FUNC(airrace_state::dsp1_status_r), FUNC(airrace_state::dsp1_control_w));
 }
 
 
@@ -739,7 +740,7 @@ void atarisy4_state::dsp0_map(address_map &map)
 
 void atarisy4_state::dsp0_io_map(address_map &map)
 {
-	map(0x00, 0x01).w(this, FUNC(atarisy4_state::dsp0_bank_w));
+	map(0x00, 0x01).w(FUNC(atarisy4_state::dsp0_bank_w));
 }
 
 
@@ -758,7 +759,7 @@ void airrace_state::dsp1_map(address_map &map)
 
 void airrace_state::dsp1_io_map(address_map &map)
 {
-	map(0x00, 0x01).w(this, FUNC(airrace_state::dsp1_bank_w));
+	map(0x00, 0x01).w(FUNC(airrace_state::dsp1_bank_w));
 }
 
 
@@ -806,36 +807,36 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(atarisy4_state::atarisy4)
-	MCFG_DEVICE_ADD(m_maincpu, M68000, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarisy4_state,  vblank_int)
+void atarisy4_state::atarisy4(machine_config &config)
+{
+	M68000(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarisy4_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(atarisy4_state::vblank_int));
 
-	MCFG_DEVICE_ADD(m_dsp0, TMS32010, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(dsp0_map)
-	MCFG_DEVICE_IO_MAP(dsp0_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, atarisy4_state, dsp0_bio_r))
+	TMS32010(config, m_dsp0, 16000000);
+	m_dsp0->set_addrmap(AS_PROGRAM, &atarisy4_state::dsp0_map);
+	m_dsp0->set_addrmap(AS_IO, &atarisy4_state::dsp0_io_map);
+	m_dsp0->bio().set(FUNC(atarisy4_state::dsp0_bio_r));
 
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(32000000/2, 660, 0, 512, 404, 0, 384);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_screen_update(FUNC(atarisy4_state::screen_update_atarisy4));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(32000000/2, 660, 0, 512, 404, 0, 384)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_UPDATE_DRIVER(atarisy4_state, screen_update_atarisy4)
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, m_palette).set_entries(256);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(airrace_state::airrace)
+void airrace_state::airrace(machine_config &config)
+{
 	atarisy4(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(airrace_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &airrace_state::airrace_map);
 
-	MCFG_DEVICE_ADD(m_dsp1, TMS32010, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(dsp1_map)
-	MCFG_DEVICE_IO_MAP(dsp1_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, airrace_state, dsp1_bio_r))
-MACHINE_CONFIG_END
+	TMS32010(config, m_dsp1, 16000000);
+	m_dsp1->set_addrmap(AS_PROGRAM, &airrace_state::dsp1_map);
+	m_dsp1->set_addrmap(AS_IO, &airrace_state::dsp1_io_map);
+	m_dsp1->bio().set(FUNC(airrace_state::dsp1_bio_r));
+}
 
 
 /*************************************

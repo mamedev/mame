@@ -71,13 +71,13 @@ void rocnrope_state::rocnrope_map(address_map &map)
 	map(0x4000, 0x47ff).ram();
 	map(0x4000, 0x402f).ram().share("spriteram2");
 	map(0x4400, 0x442f).ram().share("spriteram");
-	map(0x4800, 0x4bff).ram().w(this, FUNC(rocnrope_state::rocnrope_colorram_w)).share("colorram");
-	map(0x4c00, 0x4fff).ram().w(this, FUNC(rocnrope_state::rocnrope_videoram_w)).share("videoram");
+	map(0x4800, 0x4bff).ram().w(FUNC(rocnrope_state::rocnrope_colorram_w)).share("colorram");
+	map(0x4c00, 0x4fff).ram().w(FUNC(rocnrope_state::rocnrope_videoram_w)).share("videoram");
 	map(0x5000, 0x5fff).ram();
 	map(0x8000, 0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x8080, 0x8087).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x8100, 0x8100).w("timeplt_audio", FUNC(timeplt_audio_device::sound_data_w));
-	map(0x8182, 0x818d).w(this, FUNC(rocnrope_state::rocnrope_interrupt_vector_w));
+	map(0x8182, 0x818d).w(FUNC(rocnrope_state::rocnrope_interrupt_vector_w));
 	map(0x6000, 0xffff).rom();
 }
 
@@ -212,15 +212,15 @@ MACHINE_CONFIG_START(rocnrope_state::rocnrope)
 	MCFG_DEVICE_ADD("maincpu", KONAMI1, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
 	MCFG_DEVICE_PROGRAM_MAP(rocnrope_map)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B2
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, rocnrope_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, rocnrope_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, rocnrope_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, rocnrope_state, irq_mask_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // B2
+	mainlatch.q_out_cb<0>().set(FUNC(rocnrope_state::flip_screen_w));
+	mainlatch.q_out_cb<1>().set("timeplt_audio", FUNC(timeplt_audio_device::sh_irqtrigger_w));
+	mainlatch.q_out_cb<2>().set("timeplt_audio", FUNC(timeplt_audio_device::mute_w));
+	mainlatch.q_out_cb<3>().set(FUNC(rocnrope_state::coin_counter_1_w));
+	mainlatch.q_out_cb<4>().set(FUNC(rocnrope_state::coin_counter_2_w));
+	mainlatch.q_out_cb<7>().set(FUNC(rocnrope_state::irq_mask_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -229,17 +229,14 @@ MACHINE_CONFIG_START(rocnrope_state::rocnrope)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rocnrope_state, screen_update_rocnrope)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rocnrope_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rocnrope)
-	MCFG_PALETTE_ADD("palette", 16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(rocnrope_state, rocnrope)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rocnrope);
+	PALETTE(config, m_palette, FUNC(rocnrope_state::rocnrope_palette), 16*16+16*16, 32);
 
 	/* sound hardware */
-
-	MCFG_DEVICE_ADD("timeplt_audio", TIMEPLT_AUDIO)
+	TIMEPLT_AUDIO(config, "timeplt_audio");
 MACHINE_CONFIG_END
 
 /*************************************

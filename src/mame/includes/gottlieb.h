@@ -11,6 +11,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/samples.h"
 #include "machine/ldpr8210.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -28,14 +29,6 @@
 class gottlieb_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_LASERDISC_PHILIPS,
-		TIMER_LASERDISC_BIT_OFF,
-		TIMER_LASERDISC_BIT,
-		TIMER_NMI_CLEAR
-	};
-
 	gottlieb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -49,52 +42,11 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_generic_paletteram_8(*this, "paletteram")
+		, m_paletteram(*this, "paletteram")
 		, m_track_x(*this, "TRACKX")
 		, m_track_y(*this, "TRACKY")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
-
-	void qbert_knocker(uint8_t knock);
-
-	DECLARE_WRITE8_MEMBER(gottlieb_analog_reset_w);
-	DECLARE_WRITE8_MEMBER(general_output_w);
-	DECLARE_WRITE8_MEMBER(reactor_output_w);
-	DECLARE_WRITE8_MEMBER(stooges_output_w);
-	DECLARE_WRITE8_MEMBER(qbertqub_output_w);
-	DECLARE_WRITE8_MEMBER(qbert_output_w);
-	DECLARE_READ8_MEMBER(laserdisc_status_r);
-	DECLARE_WRITE8_MEMBER(laserdisc_select_w);
-	DECLARE_WRITE8_MEMBER(laserdisc_command_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_sh_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_paletteram_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_video_control_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_laserdisc_video_control_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_videoram_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_charram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(analog_delta_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
-	void init_romtiles();
-	void init_screwloo();
-	void init_vidvince();
-	void init_ramtiles();
-	void init_stooges();
-	void init_qbert();
-	void init_qbertqub();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_screwloo_bg_tile_info);
-	DECLARE_VIDEO_START(screwloo);
-	uint32_t screen_update_gottlieb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(gottlieb_interrupt);
-	TIMER_CALLBACK_MEMBER(laserdisc_philips_callback);
-	TIMER_CALLBACK_MEMBER(laserdisc_bit_off_callback);
-	TIMER_CALLBACK_MEMBER(laserdisc_bit_callback);
-	TIMER_CALLBACK_MEMBER(nmi_clear);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	inline void audio_end_state();
-	void audio_process_clock(bool logit);
-	void audio_handle_zero_crossing(const attotime &zerotime, bool logit);
-	void laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const int16_t *ch0, const int16_t *ch1);
 
 	void gottlieb_core(machine_config &config);
 	void cobram3(machine_config &config);
@@ -107,9 +59,62 @@ public:
 	void qbert_knocker(machine_config &config);
 	void gottlieb1(machine_config &config);
 	void gottlieb1_votrax(machine_config &config);
+
+	void init_romtiles();
+	void init_screwloo();
+	void init_vidvince();
+	void init_ramtiles();
+	void init_stooges();
+	void init_qbert();
+	void init_qbertqub();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(analog_delta_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
+
+private:
+	enum
+	{
+		TIMER_LASERDISC_PHILIPS,
+		TIMER_LASERDISC_BIT_OFF,
+		TIMER_LASERDISC_BIT,
+		TIMER_NMI_CLEAR
+	};
+
+	void qbert_knocker(uint8_t knock);
+
+	DECLARE_WRITE8_MEMBER(analog_reset_w);
+	void general_output_w(u8 data);
+	DECLARE_WRITE8_MEMBER(reactor_output_w);
+	DECLARE_WRITE8_MEMBER(stooges_output_w);
+	DECLARE_WRITE8_MEMBER(qbertqub_output_w);
+	DECLARE_WRITE8_MEMBER(qbert_output_w);
+	DECLARE_READ8_MEMBER(laserdisc_status_r);
+	DECLARE_WRITE8_MEMBER(laserdisc_select_w);
+	DECLARE_WRITE8_MEMBER(laserdisc_command_w);
+	void sound_w(u8 data);
+	void palette_w(offs_t offset, u8 data);
+	void video_control_w(u8 data);
+	void laserdisc_video_control_w(u8 data);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(charram_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_screwloo_bg_tile_info);
+	DECLARE_VIDEO_START(screwloo);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(interrupt);
+	TIMER_CALLBACK_MEMBER(laserdisc_philips_callback);
+	TIMER_CALLBACK_MEMBER(laserdisc_bit_off_callback);
+	TIMER_CALLBACK_MEMBER(laserdisc_bit_callback);
+	TIMER_CALLBACK_MEMBER(nmi_clear);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	inline void audio_end_state();
+	void audio_process_clock(bool logit);
+	void audio_handle_zero_crossing(const attotime &zerotime, bool logit);
+	void laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const int16_t *ch0, const int16_t *ch1);
+
 	void gottlieb_map(address_map &map);
 	void reactor_map(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -129,11 +134,11 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_generic_paletteram_8;
+	required_shared_ptr<uint8_t> m_paletteram;
 
 	optional_ioport m_track_x;
 	optional_ioport m_track_y;
-	output_finder<3> m_led;  // only used by reactor
+	output_finder<3> m_leds;  // only used by reactor
 
 	uint8_t m_knocker_prev;
 	uint8_t m_joystick_select;

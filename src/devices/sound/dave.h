@@ -13,37 +13,6 @@
 
 
 ///*************************************************************************
-//  MACROS / CONSTANTS
-///*************************************************************************
-
-
-
-///*************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-///*************************************************************************
-
-#define MCFG_DAVE_ADD(_tag, _clock, _program_map, _io_map) \
-	SPEAKER(config, "lspeaker").front_left(); \
-	SPEAKER(config, "rspeaker").front_right(); \
-	MCFG_DEVICE_ADD(_tag, DAVE, _clock) \
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25) \
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, _program_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_IO, _io_map)
-
-
-#define MCFG_DAVE_IRQ_CALLBACK(_write) \
-	devcb = &downcast<dave_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
-
-#define MCFG_DAVE_LH_CALLBACK(_write) \
-	devcb = &downcast<dave_device &>(*device).set_lh_wr_callback(DEVCB_##_write);
-
-#define MCFG_DAVE_RH_CALLBACK(_write) \
-	devcb = &downcast<dave_device &>(*device).set_rh_wr_callback(DEVCB_##_write);
-
-
-
-///*************************************************************************
 //  TYPE DEFINITIONS
 ///*************************************************************************
 
@@ -56,9 +25,9 @@ class dave_device : public device_t,
 public:
 	dave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_lh_wr_callback(Object &&cb) { return m_write_lh.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_rh_wr_callback(Object &&cb) { return m_write_rh.set_callback(std::forward<Object>(cb)); }
+	auto irq_wr() { return m_write_irq.bind(); }
+	auto lh_wr() { return m_write_lh.bind(); }
+	auto rh_wr() { return m_write_rh.bind(); }
 
 	virtual void z80_program_map(address_map &map);
 	virtual void z80_io_map(address_map &map);

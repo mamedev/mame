@@ -61,18 +61,18 @@ void tbowl_state::_6206B_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
-	map(0xa000, 0xbfff).ram().w(this, FUNC(tbowl_state::bg2videoram_w)).share("bg2videoram");
-	map(0xc000, 0xdfff).ram().w(this, FUNC(tbowl_state::bgvideoram_w)).share("bgvideoram");
-	map(0xe000, 0xefff).ram().w(this, FUNC(tbowl_state::txvideoram_w)).share("txvideoram");
+	map(0xa000, 0xbfff).ram().w(FUNC(tbowl_state::bg2videoram_w)).share("bg2videoram");
+	map(0xc000, 0xdfff).ram().w(FUNC(tbowl_state::bgvideoram_w)).share("bgvideoram");
+	map(0xe000, 0xefff).ram().w(FUNC(tbowl_state::txvideoram_w)).share("txvideoram");
 //  AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown_write) * written during start-up, not again */
 	map(0xf000, 0xf7ff).bankr("mainbank");
 	map(0xf800, 0xfbff).ram().share("shared_ram"); /* check */
-	map(0xfc00, 0xfc00).portr("P1").w(this, FUNC(tbowl_state::boardb_bankswitch_w));
+	map(0xfc00, 0xfc00).portr("P1").w(FUNC(tbowl_state::boardb_bankswitch_w));
 	map(0xfc01, 0xfc01).portr("P2");
 //  AM_RANGE(0xfc01, 0xfc01) AM_WRITE(unknown_write) /* written during start-up, not again */
 	map(0xfc02, 0xfc02).portr("P3");
 //  AM_RANGE(0xfc02, 0xfc02) AM_WRITE(unknown_write) /* written during start-up, not again */
-	map(0xfc03, 0xfc03).portr("P4").w(this, FUNC(tbowl_state::coincounter_w));
+	map(0xfc03, 0xfc03).portr("P4").w(FUNC(tbowl_state::coincounter_w));
 //  AM_RANGE(0xfc05, 0xfc05) AM_WRITE(unknown_write) /* no idea */
 //  AM_RANGE(0xfc06, 0xfc06) AM_READ(dummy_r)        /* Read During NMI */
 	map(0xfc07, 0xfc07).portr("SYSTEM");
@@ -82,14 +82,14 @@ void tbowl_state::_6206B_map(address_map &map)
 	map(0xfc0a, 0xfc0a).portr("DSW3");
 //  AM_RANGE(0xfc0a, 0xfc0a) AM_WRITE(unknown_write) /* hardly used .. */
 	map(0xfc0d, 0xfc0d).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xfc10, 0xfc10).w(this, FUNC(tbowl_state::bg2xscroll_lo));
-	map(0xfc11, 0xfc11).w(this, FUNC(tbowl_state::bg2xscroll_hi));
-	map(0xfc12, 0xfc12).w(this, FUNC(tbowl_state::bg2yscroll_lo));
-	map(0xfc13, 0xfc13).w(this, FUNC(tbowl_state::bg2yscroll_hi));
-	map(0xfc14, 0xfc14).w(this, FUNC(tbowl_state::bgxscroll_lo));
-	map(0xfc15, 0xfc15).w(this, FUNC(tbowl_state::bgxscroll_hi));
-	map(0xfc16, 0xfc16).w(this, FUNC(tbowl_state::bgyscroll_lo));
-	map(0xfc17, 0xfc17).w(this, FUNC(tbowl_state::bgyscroll_hi));
+	map(0xfc10, 0xfc10).w(FUNC(tbowl_state::bg2xscroll_lo));
+	map(0xfc11, 0xfc11).w(FUNC(tbowl_state::bg2xscroll_hi));
+	map(0xfc12, 0xfc12).w(FUNC(tbowl_state::bg2yscroll_lo));
+	map(0xfc13, 0xfc13).w(FUNC(tbowl_state::bg2yscroll_hi));
+	map(0xfc14, 0xfc14).w(FUNC(tbowl_state::bgxscroll_lo));
+	map(0xfc15, 0xfc15).w(FUNC(tbowl_state::bgxscroll_hi));
+	map(0xfc16, 0xfc16).w(FUNC(tbowl_state::bgyscroll_lo));
+	map(0xfc17, 0xfc17).w(FUNC(tbowl_state::bgyscroll_hi));
 }
 
 /* Board C */
@@ -108,9 +108,9 @@ void tbowl_state::_6206C_map(address_map &map)
 	map(0xe000, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // 2x palettes, one for each monitor?
 	map(0xf000, 0xf7ff).bankr("subbank");
 	map(0xf800, 0xfbff).ram().share("shared_ram");
-	map(0xfc00, 0xfc00).w(this, FUNC(tbowl_state::boardc_bankswitch_w));
+	map(0xfc00, 0xfc00).w(FUNC(tbowl_state::boardc_bankswitch_w));
 	map(0xfc01, 0xfc01).nopw(); /* ? */
-	map(0xfc02, 0xfc02).w(this, FUNC(tbowl_state::trigger_nmi)); /* ? */
+	map(0xfc02, 0xfc02).w(FUNC(tbowl_state::trigger_nmi)); /* ? */
 	map(0xfc03, 0xfc03).nopw(); /* ? */
 	map(0xfc06, 0xfc06).nopw(); /* ? */
 }
@@ -142,7 +142,7 @@ void tbowl_state::adpcm_int( msm5205_device *device, int num )
 		device->reset_w(1);
 	else if (m_adpcm_data[num] != -1)
 	{
-		device->data_w(m_adpcm_data[num] & 0x0f);
+		device->write_data(m_adpcm_data[num] & 0x0f);
 		m_adpcm_data[num] = -1;
 	}
 	else
@@ -150,7 +150,7 @@ void tbowl_state::adpcm_int( msm5205_device *device, int num )
 		uint8_t *ROM = memregion("adpcm")->base() + 0x10000 * num;
 
 		m_adpcm_data[num] = ROM[m_adpcm_pos[num]++];
-		device->data_w(m_adpcm_data[num] >> 4);
+		device->write_data(m_adpcm_data[num] >> 4);
 	}
 }
 
@@ -170,9 +170,9 @@ void tbowl_state::_6206A_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xd000, 0xd001).w("ym1", FUNC(ym3812_device::write));
 	map(0xd800, 0xd801).w("ym2", FUNC(ym3812_device::write));
-	map(0xe000, 0xe001).w(this, FUNC(tbowl_state::adpcm_end_w));
-	map(0xe002, 0xe003).w(this, FUNC(tbowl_state::adpcm_start_w));
-	map(0xe004, 0xe005).w(this, FUNC(tbowl_state::adpcm_vol_w));
+	map(0xe000, 0xe001).w(FUNC(tbowl_state::adpcm_end_w));
+	map(0xe002, 0xe003).w(FUNC(tbowl_state::adpcm_start_w));
+	map(0xe004, 0xe005).w(FUNC(tbowl_state::adpcm_vol_w));
 	map(0xe006, 0xe006).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 	map(0xe007, 0xe007).nopw(); // sound watchdog
 	map(0xe010, 0xe010).r(m_soundlatch, FUNC(generic_latch_8_device::read));
@@ -430,75 +430,72 @@ void tbowl_state::machine_reset()
 	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
 }
 
-MACHINE_CONFIG_START(tbowl_state::tbowl)
-
+void tbowl_state::tbowl(machine_config &config)
+{
 	/* CPU on Board '6206B' */
-	MCFG_DEVICE_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MCFG_DEVICE_PROGRAM_MAP(_6206B_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 8000000); /* NEC D70008AC-8 (Z80 Clone) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tbowl_state::_6206B_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(tbowl_state::irq0_line_hold));
 
 	/* CPU on Board '6206C' */
-	MCFG_DEVICE_ADD("sub", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MCFG_DEVICE_PROGRAM_MAP(_6206C_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", tbowl_state,  irq0_line_hold)
+	z80_device &sub(Z80(config, "sub", 8000000)); /* NEC D70008AC-8 (Z80 Clone) */
+	sub.set_addrmap(AS_PROGRAM, &tbowl_state::_6206C_map);
+	sub.set_vblank_int("lscreen", FUNC(tbowl_state::irq0_line_hold));
 
 	/* CPU on Board '6206A' */
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* Actual Z80 */
-	MCFG_DEVICE_PROGRAM_MAP(_6206A_map)
+	Z80(config, m_audiocpu, 4000000); /* Actual Z80 */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tbowl_state::_6206A_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tbowl)
-	MCFG_PALETTE_ADD("palette", 1024*2)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tbowl);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024*2).set_endianness(ENDIANNESS_BIG);
+	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
+	TECMO_SPRITE(config, m_sprgen, 0);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tbowl_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(32*8, 32*8);
+	lscreen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	lscreen.set_screen_update(FUNC(tbowl_state::screen_update_left));
+	lscreen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tbowl_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("palette")
-
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(32*8, 32*8);
+	rscreen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	rscreen.set_screen_update(FUNC(tbowl_state::screen_update_right));
+	rscreen.set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ym1", YM3812, 4000000)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	ym3812_device &ym1(YM3812(config, "ym1", 4000000));
+	ym1.irq_handler().set_inputline(m_audiocpu, 0);
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("ym2", YM3812, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	ym3812_device &ym2(YM3812(config, "ym2", 4000000));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* something for the samples? */
-	MCFG_DEVICE_ADD("msm1", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tbowl_state, adpcm_int_1))    /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MSM5205(config, m_msm1, 384000);
+	m_msm1->vck_legacy_callback().set(FUNC(tbowl_state::adpcm_int_1));    /* interrupt function */
+	m_msm1->set_prescaler_selector(msm5205_device::S48_4B);	/* 8KHz */
+	m_msm1->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tbowl_state, adpcm_int_2))    /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm2, 384000);
+	m_msm2->vck_legacy_callback().set(FUNC(tbowl_state::adpcm_int_2));    /* interrupt function */
+	m_msm2->set_prescaler_selector(msm5205_device::S48_4B);	/* 8KHz */
+	m_msm2->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /* Board Layout from readme.txt

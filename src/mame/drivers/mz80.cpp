@@ -31,6 +31,7 @@ MZ80B
 #include "emu.h"
 #include "includes/mz80.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -253,7 +254,7 @@ void mz80_state::mz80k_mem(address_map &map)
 	map(0xd000, 0xd7ff).ram().share("videoram"); // Video RAM
 	map(0xe000, 0xe003).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)); /* PPIA 8255 */
 	map(0xe004, 0xe007).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));  /* PIT 8253  */
-	map(0xe008, 0xe00b).rw(this, FUNC(mz80_state::mz80k_strobe_r), FUNC(mz80_state::mz80k_strobe_w));
+	map(0xe008, 0xe00b).rw(FUNC(mz80_state::mz80k_strobe_r), FUNC(mz80_state::mz80k_strobe_w));
 	map(0xf000, 0xf3ff).rom();
 }
 
@@ -293,8 +294,8 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80k)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz80k)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, "gfxdecode", "palette", gfx_mz80k);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();
@@ -302,19 +303,19 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz80_state, mz80k_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz80_state, mz80k_8255_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz80_state, mz80k_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz80_state, mz80k_8255_portc_w))
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(mz80_state::mz80k_8255_porta_w));
+	m_ppi->in_pb_callback().set(FUNC(mz80_state::mz80k_8255_portb_r));
+	m_ppi->in_pc_callback().set(FUNC(mz80_state::mz80k_8255_portc_r));
+	m_ppi->out_pc_callback().set(FUNC(mz80_state::mz80k_8255_portc_w));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(8'000'000)/4)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, mz80_state, pit_out0_changed))
-	MCFG_PIT8253_CLK1(XTAL(8'000'000)/256)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk2))
-	MCFG_PIT8253_CLK2(0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mz80_state, pit_out2_changed))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(XTAL(8'000'000)/4);
+	m_pit->out_handler<0>().set(FUNC(mz80_state::pit_out0_changed));
+	m_pit->set_clk<1>(XTAL(8'000'000)/256);
+	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
+	m_pit->set_clk<2>(0);
+	m_pit->out_handler<2>().set(FUNC(mz80_state::pit_out2_changed));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tempo", mz80_state, ne555_tempo_callback, attotime::from_hz(34))
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -322,28 +323,30 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mz80_state::mz80kj)
+void mz80_state::mz80kj(machine_config &config)
+{
 	mz80k(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80kj)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mz80kj)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mz80_state::mz80a)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(mz80_state::screen_update_mz80kj));
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_mz80kj);
+}
+
+void mz80_state::mz80a(machine_config &config)
+{
 	mz80k(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80a)
-MACHINE_CONFIG_END
+
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(mz80_state::screen_update_mz80a));
+}
 
 
 ROM_START( mz80k )
 	ROM_REGION( 0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "sp1002", "sp1002" )
-	ROMX_LOAD( "sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c), ROM_BIOS(1) )
+	ROMX_LOAD( "sp1002.rom",    0x0000, 0x1000, CRC(2223e677) SHA1(518ffbe2333582ab36e6d76d1e03879a246ffa1c), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "tc", "tc" )
-	ROMX_LOAD( "80ktc.rom",     0x0000, 0x1000, CRC(19ed6546) SHA1(2bbeff916c2fa8991e718070ca4195beb45e0848), ROM_BIOS(2) )
+	ROMX_LOAD( "80ktc.rom",     0x0000, 0x1000, CRC(19ed6546) SHA1(2bbeff916c2fa8991e718070ca4195beb45e0848), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v44", "v44" )
-	ROMX_LOAD( "80kv44.rom",    0x0000, 0x1000, CRC(d66af028) SHA1(718904c011dfcfcfabbb7dbdaaa35b9f3ac41baf), ROM_BIOS(3) )
+	ROMX_LOAD( "80kv44.rom",    0x0000, 0x1000, CRC(d66af028) SHA1(718904c011dfcfcfabbb7dbdaaa35b9f3ac41baf), ROM_BIOS(2) )
 	ROM_LOAD( "mz80kfdif.rom",  0xf000, 0x0400, CRC(d36505e0) SHA1(1f60027e8739313962a37edbf98172df7062df49) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )

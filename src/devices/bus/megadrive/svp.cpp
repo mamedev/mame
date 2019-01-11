@@ -333,13 +333,13 @@ void md_rom_svp_device::md_svp_ssp_map(address_map &map)
 void md_rom_svp_device::md_svp_ext_map(address_map &map)
 {
 	map.global_mask(0xf);
-	map(0*2, 0*2+1).rw(this, FUNC(md_rom_svp_device::read_pm0), FUNC(md_rom_svp_device::write_pm0));
-	map(1*2, 1*2+1).rw(this, FUNC(md_rom_svp_device::read_pm1), FUNC(md_rom_svp_device::write_pm1));
-	map(2*2, 2*2+1).rw(this, FUNC(md_rom_svp_device::read_pm2), FUNC(md_rom_svp_device::write_pm2));
-	map(3*2, 3*2+1).rw(this, FUNC(md_rom_svp_device::read_xst), FUNC(md_rom_svp_device::write_xst));
-	map(4*2, 4*2+1).rw(this, FUNC(md_rom_svp_device::read_pm4), FUNC(md_rom_svp_device::write_pm4));
-	map(6*2, 6*2+1).rw(this, FUNC(md_rom_svp_device::read_pmc), FUNC(md_rom_svp_device::write_pmc));
-	map(7*2, 7*2+1).rw(this, FUNC(md_rom_svp_device::read_al), FUNC(md_rom_svp_device::write_al));
+	map(0*2, 0*2+1).rw(FUNC(md_rom_svp_device::read_pm0), FUNC(md_rom_svp_device::write_pm0));
+	map(1*2, 1*2+1).rw(FUNC(md_rom_svp_device::read_pm1), FUNC(md_rom_svp_device::write_pm1));
+	map(2*2, 2*2+1).rw(FUNC(md_rom_svp_device::read_pm2), FUNC(md_rom_svp_device::write_pm2));
+	map(3*2, 3*2+1).rw(FUNC(md_rom_svp_device::read_xst), FUNC(md_rom_svp_device::write_xst));
+	map(4*2, 4*2+1).rw(FUNC(md_rom_svp_device::read_pm4), FUNC(md_rom_svp_device::write_pm4));
+	map(6*2, 6*2+1).rw(FUNC(md_rom_svp_device::read_pmc), FUNC(md_rom_svp_device::write_pmc));
+	map(7*2, 7*2+1).rw(FUNC(md_rom_svp_device::read_al), FUNC(md_rom_svp_device::write_al));
 }
 
 

@@ -11,8 +11,10 @@
 #pragma once
 
 #include "audio/redbaron.h"
+#include "machine/er2055.h"
 #include "machine/mathbox.h"
 #include "sound/discrete.h"
+#include "screen.h"
 
 #define BZONE_MASTER_CLOCK (XTAL(12'096'000))
 #define BZONE_CLOCK_3KHZ   (BZONE_MASTER_CLOCK / 4096)
@@ -25,6 +27,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mathbox(*this, "mathbox"),
 		m_discrete(*this, "discrete"),
+		m_screen(*this, "screen"),
 		m_startled(*this, "startled")
 	{ }
 
@@ -44,12 +47,13 @@ protected:
 	void bzone_audio(machine_config &config);
 	void bzone_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
 	optional_device<discrete_device> m_discrete;
+	required_device<screen_device> m_screen;
 	output_finder<> m_startled;
 
+private:
 	uint8_t m_analog_data;
 };
 
@@ -59,6 +63,7 @@ class redbaron_state : public bzone_state
 public:
 	redbaron_state(const machine_config &mconfig, device_type type, const char *tag) :
 		bzone_state(mconfig, type, tag),
+		m_earom(*this, "earom"),
 		m_redbaronsound(*this, "custom"),
 		m_fake_ports(*this, "FAKE%u", 1U)
 	{ }
@@ -68,12 +73,17 @@ public:
 protected:
 	DECLARE_READ8_MEMBER(redbaron_joy_r);
 	DECLARE_WRITE8_MEMBER(redbaron_joysound_w);
+	DECLARE_READ8_MEMBER(earom_read);
+	DECLARE_WRITE8_MEMBER(earom_write);
+	DECLARE_WRITE8_MEMBER(earom_control_w);
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	void redbaron_map(address_map &map);
 
 private:
+	required_device<er2055_device> m_earom;
 	required_device<redbaron_sound_device> m_redbaronsound;
 	required_ioport_array<2> m_fake_ports;
 	uint8_t m_rb_input_select;

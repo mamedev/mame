@@ -528,7 +528,7 @@ void nbmj8891_state::video_start()
 	m_screen_refresh = 1;
 
 	common_save_state();
-	save_pointer(NAME(m_videoram1.get()), width * height);
+	save_pointer(NAME(m_videoram1), width * height);
 }
 
 void nbmj8891_state::common_save_state()
@@ -547,9 +547,9 @@ void nbmj8891_state::common_save_state()
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_clutsel));
 	save_item(NAME(m_gfxdraw_mode));
-	save_pointer(NAME(m_videoram0.get()), m_screen->width() * m_screen->height());
-	save_pointer(NAME(m_palette_ptr.get()), 0x200);
-	save_pointer(NAME(m_clut.get()), 0x800);
+	save_pointer(NAME(m_videoram0), m_screen->width() * m_screen->height());
+	save_pointer(NAME(m_palette_ptr), 0x200);
+	save_pointer(NAME(m_clut), 0x800);
 	save_item(NAME(m_flipscreen_old));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(nbmj8891_state::postload), this));

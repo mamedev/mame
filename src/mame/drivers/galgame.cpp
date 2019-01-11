@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -20,11 +21,17 @@
 class galaxygame_state : public driver_device
 {
 public:
-	galaxygame_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	galaxygame_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
+	void galaxygame(machine_config &config);
+
+	void init_galaxygame();
+
+private:
 	uint16_t m_clk;
 
 	uint16_t m_x;
@@ -49,14 +56,12 @@ public:
 	DECLARE_READ16_MEMBER(y_r);
 	DECLARE_WRITE16_MEMBER(y_w);
 	DECLARE_WRITE16_MEMBER(clk_w);
-	void init_galaxygame();
 	virtual void machine_reset() override;
 	uint32_t screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxygame_irq);
 	IRQ_CALLBACK_MEMBER(galaxygame_irq_callback);
-	required_device<cpu_device> m_maincpu;
+	required_device<t11_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	void galaxygame(machine_config &config);
 	void galaxygame_map(address_map &map);
 };
 
@@ -289,12 +294,12 @@ WRITE16_MEMBER(galaxygame_state::clk_w)
 void galaxygame_state::galaxygame_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0xfec0, 0xfecf).rw(this, FUNC(galaxygame_state::ke_r), FUNC(galaxygame_state::ke_w));
-	map(0xff52, 0xff53).rw(this, FUNC(galaxygame_state::y_r), FUNC(galaxygame_state::y_w)); // 177522 Y
+	map(0xfec0, 0xfecf).rw(FUNC(galaxygame_state::ke_r), FUNC(galaxygame_state::ke_w));
+	map(0xff52, 0xff53).rw(FUNC(galaxygame_state::y_r), FUNC(galaxygame_state::y_w)); // 177522 Y
 	map(0xff54, 0xff55).portr("COINAC"); // 177524 COINAC
-	map(0xff5a, 0xff5b).rw(this, FUNC(galaxygame_state::x_r), FUNC(galaxygame_state::x_w)); // 177532 X
+	map(0xff5a, 0xff5b).rw(FUNC(galaxygame_state::x_r), FUNC(galaxygame_state::x_w)); // 177532 X
 	map(0xff5c, 0xff5d).portr("SR");     // 177534 SR
-	map(0xff66, 0xff67).w(this, FUNC(galaxygame_state::clk_w));        // 177546 KW11 line frequency clock
+	map(0xff66, 0xff67).w(FUNC(galaxygame_state::clk_w));        // 177546 KW11 line frequency clock
 }
 
 
@@ -321,26 +326,25 @@ void galaxygame_state::machine_reset()
 	m_interrupt = 0;
 }
 
-MACHINE_CONFIG_START(galaxygame_state::galaxygame)
-
-	MCFG_DEVICE_ADD("maincpu", T11, 3000000 )
-	MCFG_DEVICE_PROGRAM_MAP(galaxygame_map)
-	MCFG_T11_INITIAL_MODE(5 << 13)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(galaxygame_state, galaxygame_irq, 60)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(galaxygame_state,galaxygame_irq_callback)
+void galaxygame_state::galaxygame(machine_config &config)
+{
+	T11(config, m_maincpu, 3000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxygame_state::galaxygame_map);
+	m_maincpu->set_initial_mode(5 << 13);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxygame_state::galaxygame_irq_callback));
+	m_maincpu->set_periodic_int(FUNC(galaxygame_state::galaxygame_irq), attotime::from_hz(60));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 511)
-	MCFG_SCREEN_UPDATE_DRIVER(galaxygame_state, screen_update_galaxygame)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 512);
+	screen.set_visarea(0, 511, 0, 511);
+	screen.set_screen_update(FUNC(galaxygame_state::screen_update_galaxygame));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
-MACHINE_CONFIG_END
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+}
 
 ROM_START(galgame)
 	// Original Galaxy Game listing, the one used in the 2nd hardware revision (blue dual cabinet)

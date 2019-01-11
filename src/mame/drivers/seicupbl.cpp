@@ -20,6 +20,7 @@
 #include "machine/gen_latch.h"
 #include "machine/seicopbl.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -45,6 +46,9 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void cupsocbl(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -74,17 +78,15 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc2_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc3_tileinfo);
 
-	void cupsocbl(machine_config &config);
 	void cupsocbl_mem(address_map &map);
 	void cupsocbl_sound_mem(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	uint16_t m_layer_disable;
 };
@@ -163,18 +165,18 @@ void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 		switch (cur_pri)
 		{
 			// gumdam swamp monster l2
-			case 0: pri_mask = -256; break; 
+			case 0: pri_mask = -256; break;
 			// (players and football goal, should go above sidelines but behind portraits when there's a goal)
 			case 1: pri_mask = 0xfff0; break;
 			// masking effect for gundam l2 monster
-			case 2: pri_mask = -4; break; 
+			case 2: pri_mask = -4; break;
 			// cupsoc (radar dots)
-			case 3: pri_mask = 0x0000; break; 
+			case 3: pri_mask = 0x0000; break;
 			// gundam level 2/3 player
 			case 4: pri_mask = -32; break;
 			//case 5: pri_mask = 0; break;
 			// insert coin in gundam
-			case 6: pri_mask = 0; break; 
+			case 6: pri_mask = 0; break;
 			//case 7: pri_mask = 0; break;
 
 			default: printf("unhandled pri %d\n",cur_pri); pri_mask=0;
@@ -292,16 +294,16 @@ uint32_t seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 		m_sc_layer[i]->set_scrolly(0, m_vregs[i*2+1]);
 	}
 
-	if (!(m_layer_disable&0x0001)) 
+	if (!(m_layer_disable&0x0001))
 		m_sc_layer[0]->draw(screen, bitmap, cliprect, 0, 1);
-	
-	if (!(m_layer_disable&0x0002)) 
+
+	if (!(m_layer_disable&0x0002))
 		m_sc_layer[1]->draw(screen, bitmap, cliprect, 0, 2);
-	
-	if (!(m_layer_disable&0x0004)) 
+
+	if (!(m_layer_disable&0x0004))
 		m_sc_layer[2]->draw(screen, bitmap, cliprect, 0, 4);
-	
-	if (!(m_layer_disable&0x0008)) 
+
+	if (!(m_layer_disable&0x0008))
 		m_sc_layer[3]->draw(screen, bitmap, cliprect, 0, 8);
 
 	if (!(m_layer_disable&0x0010))
@@ -343,7 +345,7 @@ void seicupbl_state::cupsocbl_mem(address_map &map)
 //  AM_IMPORT_FROM( legionna_cop_mem )
 	map(0x000000, 0x0fffff).rom();
 	map(0x100400, 0x1005ff).rw("seibucop_boot", FUNC(seibu_cop_bootleg_device::read), FUNC(seibu_cop_bootleg_device::write));
-	map(0x10065c, 0x10065d).w(this, FUNC(seicupbl_state::layer_disable_w));
+	map(0x10065c, 0x10065d).w(FUNC(seicupbl_state::layer_disable_w));
 	map(0x100660, 0x10066f).ram().share("vregs");
 	map(0x100700, 0x100701).portr("DSW1");
 	map(0x100704, 0x100705).portr("PLAYERS12");
@@ -351,10 +353,10 @@ void seicupbl_state::cupsocbl_mem(address_map &map)
 	map(0x10070c, 0x10070d).portr("SYSTEM");
 	map(0x10071c, 0x10071d).portr("DSW2");
 	map(0x100741, 0x100741).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x100800, 0x100fff).ram().w(this, FUNC(seicupbl_state::vram_sc0_w)).share("back_data");
-	map(0x101000, 0x1017ff).ram().w(this, FUNC(seicupbl_state::vram_sc2_w)).share("fore_data");
-	map(0x101800, 0x101fff).ram().w(this, FUNC(seicupbl_state::vram_sc1_w)).share("mid_data");
-	map(0x102000, 0x102fff).ram().w(this, FUNC(seicupbl_state::vram_sc3_w)).share("textram");
+	map(0x100800, 0x100fff).ram().w(FUNC(seicupbl_state::vram_sc0_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram().w(FUNC(seicupbl_state::vram_sc2_w)).share("fore_data");
+	map(0x101800, 0x101fff).ram().w(FUNC(seicupbl_state::vram_sc1_w)).share("mid_data");
+	map(0x102000, 0x102fff).ram().w(FUNC(seicupbl_state::vram_sc3_w)).share("textram");
 	map(0x103000, 0x103fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x104000, 0x106fff).ram();
 	map(0x107000, 0x1077ff).ram().share("spriteram");
@@ -372,7 +374,7 @@ void seicupbl_state::cupsocbl_sound_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(seicupbl_state::okim_rombank_w));
+	map(0x9000, 0x9000).w(FUNC(seicupbl_state::okim_rombank_w));
 	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -562,7 +564,7 @@ MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
 	MCFG_DEVICE_PROGRAM_MAP(cupsocbl_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seicupbl_state,  irq4_line_hold) /* VBL */
 
-	MCFG_DEVICE_SEIBUCOP_BOOTLEG_ADD("seibucop_boot")
+	MCFG_DEVICE_ADD("seibucop_boot", SEIBU_COP_BOOTLEG, "maincpu")
 
 	/*Different Sound hardware*/
 	MCFG_DEVICE_ADD("audiocpu", Z80,14318180/4)
@@ -576,25 +578,24 @@ MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
 	MCFG_SCREEN_SIZE(42*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seicupbl_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	//MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	//MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(*this, seicupbl_state, tilemap_enable_w))
-	//MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(*this, seicupbl_state, tile_scroll_w))
-	//MCFG_SEIBU_CRTC_REG_1A_CB(WRITE16(*this, seicupbl_state, tile_vreg_1a_w))
+	//seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	//crtc.layer_en_callback().set(FUNC(seicupbl_state::tilemap_enable_w));
+	//crtc.layer_scroll_callback().set(FUNC(seicupbl_state::tile_scroll_w));
+	//crtc.reg_1a_callback().set(FUNC(seicupbl_state::tile_vreg_1a_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seicupbl_csb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seicupbl_csb);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 128*16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_555, 128*16);
 
 //  MCFG_VIDEO_START_OVERRIDE(seicupbl_state,cupsoc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

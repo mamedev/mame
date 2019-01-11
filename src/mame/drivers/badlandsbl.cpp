@@ -41,6 +41,7 @@
 
 #include "emu.h"
 #include "includes/badlands.h"
+#include "emupal.h"
 
 uint32_t badlandsbl_state::screen_update_badlandsbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -101,23 +102,23 @@ void badlandsbl_state::bootleg_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 
-	map(0x400000, 0x400005).rw(this, FUNC(badlandsbl_state::bootleg_shared_r), FUNC(badlandsbl_state::bootleg_shared_w));
-	map(0x400006, 0x400006).r(this, FUNC(badlandsbl_state::sound_response_r));
+	map(0x400000, 0x400005).rw(FUNC(badlandsbl_state::bootleg_shared_r), FUNC(badlandsbl_state::bootleg_shared_w));
+	map(0x400006, 0x400006).r(FUNC(badlandsbl_state::sound_response_r));
 	map(0x400008, 0x40000f).ram(); // breaks tilemap gfxs otherwise?
 	map(0x400010, 0x4000ff).ram().share("spriteram");
 
 	// sound comms?
-	map(0xfc0000, 0xfc0001).r(this, FUNC(badlandsbl_state::badlandsb_unk_r)).nopw();
+	map(0xfc0000, 0xfc0001).r(FUNC(badlandsbl_state::badlandsb_unk_r)).nopw();
 
 	map(0xfd0000, 0xfd1fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	//AM_RANGE(0xfe0000, 0xfe1fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	map(0xfe2000, 0xfe3fff).w(this, FUNC(badlandsbl_state::video_int_ack_w));
+	map(0xfe2000, 0xfe3fff).w(FUNC(badlandsbl_state::video_int_ack_w));
 
 	map(0xfe0000, 0xfe0001).nopw();
 	map(0xfe4000, 0xfe4001).portr("FE4000");
 	map(0xfe4004, 0xfe4005).portr("P1");
 	map(0xfe4006, 0xfe4007).portr("P2");
-	map(0xfe4008, 0xfe4009).w(this, FUNC(badlandsbl_state::badlands_pf_bank_w));
+	map(0xfe4008, 0xfe4009).w(FUNC(badlandsbl_state::badlands_pf_bank_w));
 	map(0xfe400c, 0xfe400d).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 
 	map(0xffc000, 0xffc3ff).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
@@ -138,7 +139,7 @@ void badlandsbl_state::bootleg_audio_map(address_map &map)
 	map(0x2000, 0x2005).ram().share("b_sharedram");
 	map(0x2006, 0x3fff).ram();
 	map(0x4000, 0xcfff).rom().region("audiorom", 0x4000);
-	map(0xd400, 0xd400).w(this, FUNC(badlandsbl_state::bootleg_main_irq_w));
+	map(0xd400, 0xd400).w(FUNC(badlandsbl_state::bootleg_main_irq_w));
 	map(0xd800, 0xd801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xe000, 0xffff).noprw(); // either RAM mirror or left-over
 }
@@ -232,18 +233,18 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 
 	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_badlandsb)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(8)
+	palette_device &palette(PALETTE(config, "palette"));
+	palette.set_format(palette_device::IRGB_1555, 256);
+	palette.set_membits(8);
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, badlands_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
-//  MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", badlands_state::s_mob_config)
-//  MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+
+//  ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, badlands_state::s_mob_config);
+//  m_mob->set_gfxdecode(m_gfxdecode);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -258,9 +259,7 @@ MACHINE_CONFIG_START(badlandsbl_state::badlandsb)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(20'000'000)/8)  /* Divisor estimated */
-	MCFG_SOUND_ROUTE(0, "mono", 0.30)
-	MCFG_SOUND_ROUTE(1, "mono", 0.30)
+	YM2151(config, "ymsnd", XTAL(20'000'000)/8).add_route(0, "mono", 0.30).add_route(1, "mono", 0.30); /* Divisor estimated */
 MACHINE_CONFIG_END
 
 

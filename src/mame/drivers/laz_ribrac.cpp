@@ -26,10 +26,12 @@ public:
 	//  ,m_maincpu(*this, "maincpu")
 	{ }
 
+	void laz_ribrac(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void laz_ribrac(machine_config &config);
 //  required_device<mcs51_cpu_device> m_maincpu;
 };
 

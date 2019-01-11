@@ -70,16 +70,16 @@ ROM_START( hardbox )
 	ROM_DEFAULT_BIOS("v2.4")
 
 	ROM_SYSTEM_BIOS( 0, "v2.3", "Version 2.3 (Corvus)" )
-	ROMX_LOAD( "295-2.3.ic3", 0x0000, 0x1000, CRC(a3eb5fc2) SHA1(39941b45b0696db928615c41c7eae18d951d9ada), ROM_BIOS(1) )
-	ROMX_LOAD( "296-2.3.ic4", 0x1000, 0x1000, CRC(fb55b058) SHA1(8f9ec313ec6beaf7b513edf39d9628e6abcc7bc3), ROM_BIOS(1) )
+	ROMX_LOAD( "295-2.3.ic3", 0x0000, 0x1000, CRC(a3eb5fc2) SHA1(39941b45b0696db928615c41c7eae18d951d9ada), ROM_BIOS(0) )
+	ROMX_LOAD( "296-2.3.ic4", 0x1000, 0x1000, CRC(fb55b058) SHA1(8f9ec313ec6beaf7b513edf39d9628e6abcc7bc3), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS( 1, "v2.4", "Version 2.4 (Corvus)" )
-	ROMX_LOAD( "289.ic3", 0x0000, 0x1000, CRC(c39e058f) SHA1(45b390d7125a40f84c7b411a479218baff079746), ROM_BIOS(2) )
-	ROMX_LOAD( "290.ic4", 0x1000, 0x1000, CRC(62f51405) SHA1(fdfa0d7b7e8d0182f2df0aa8163c790506104dcf), ROM_BIOS(2) )
+	ROMX_LOAD( "289.ic3", 0x0000, 0x1000, CRC(c39e058f) SHA1(45b390d7125a40f84c7b411a479218baff079746), ROM_BIOS(1) )
+	ROMX_LOAD( "290.ic4", 0x1000, 0x1000, CRC(62f51405) SHA1(fdfa0d7b7e8d0182f2df0aa8163c790506104dcf), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS( 2, "v3.1", "Version 3.1 (Sunol)" )
-	ROMX_LOAD( "295-3.1.ic3", 0x0000, 0x1000, CRC(654a5db1) SHA1(c40859526921e3d8bfd58fc28cc9cc64e59ec638), ROM_BIOS(3) )
-	ROMX_LOAD( "296-3.1.ic4", 0x1000, 0x1000, CRC(4c62ddc0) SHA1(151f99dc554d3762b805fc8383cf1b3e1455784f), ROM_BIOS(3) )
+	ROMX_LOAD( "295-3.1.ic3", 0x0000, 0x1000, CRC(654a5db1) SHA1(c40859526921e3d8bfd58fc28cc9cc64e59ec638), ROM_BIOS(2) )
+	ROMX_LOAD( "296-3.1.ic4", 0x1000, 0x1000, CRC(4c62ddc0) SHA1(151f99dc554d3762b805fc8383cf1b3e1455784f), ROM_BIOS(2) )
 
 	/* Note: Two sets of EPROMs were found marked only "295" and "296" but they have different contents.
 	         The version numbers listed are the ROM version reported by the HardBox diagnostics program.
@@ -131,7 +131,7 @@ void hardbox_device::hardbox_io(address_map &map)
 
 READ8_MEMBER( hardbox_device::ppi0_pa_r )
 {
-	return m_bus->dio_r() ^ 0xff;
+	return m_bus->read_dio() ^ 0xff;
 }
 
 WRITE8_MEMBER( hardbox_device::ppi0_pb_w )
@@ -257,9 +257,9 @@ WRITE8_MEMBER( hardbox_device::ppi1_pc_w )
 
 	*/
 
-	m_led[LED_A] = BIT(~data, 0);
-	m_led[LED_B] = BIT(~data, 1);
-	m_led[LED_READY] = BIT(~data, 2);
+	m_leds[LED_A] = BIT(~data, 0);
+	m_leds[LED_B] = BIT(~data, 1);
+	m_leds[LED_READY] = BIT(~data, 2);
 }
 
 
@@ -274,16 +274,16 @@ MACHINE_CONFIG_START(hardbox_device::device_add_mconfig)
 	MCFG_DEVICE_IO_MAP(hardbox_io)
 
 	// devices
-	MCFG_DEVICE_ADD(I8255_0_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, hardbox_device, ppi0_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, hardbox_device, ppi0_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, hardbox_device, ppi0_pc_r))
+	i8255_device &ppi0(I8255A(config, I8255_0_TAG));
+	ppi0.in_pa_callback().set(FUNC(hardbox_device::ppi0_pa_r));
+	ppi0.out_pb_callback().set(FUNC(hardbox_device::ppi0_pb_w));
+	ppi0.in_pc_callback().set(FUNC(hardbox_device::ppi0_pc_r));
 
-	MCFG_DEVICE_ADD(I8255_1_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, hardbox_device, ppi1_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, hardbox_device, ppi1_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, hardbox_device, ppi1_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, hardbox_device, ppi1_pc_w))
+	i8255_device &ppi1(I8255A(config, I8255_1_TAG));
+	ppi1.in_pa_callback().set(FUNC(hardbox_device::ppi1_pa_r));
+	ppi1.out_pb_callback().set(FUNC(hardbox_device::ppi1_pb_w));
+	ppi1.in_pc_callback().set(FUNC(hardbox_device::ppi1_pc_r));
+	ppi1.out_pc_callback().set(FUNC(hardbox_device::ppi1_pc_w));
 
 	MCFG_DEVICE_ADD(CORVUS_HDC_TAG, CORVUS_HDC, 0)
 	MCFG_HARDDISK_ADD("harddisk1")
@@ -344,7 +344,7 @@ hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, d
 	, device_ieee488_interface(mconfig, *this)
 	, m_maincpu(*this, Z80_TAG)
 	, m_hdc(*this, CORVUS_HDC_TAG)
-	, m_led(*this, "led%u", 0U)
+	, m_leds(*this, "led%u", 0U)
 	, m_ifc(0)
 {
 }
@@ -356,7 +356,7 @@ hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, d
 
 void hardbox_device::device_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 }
 
 

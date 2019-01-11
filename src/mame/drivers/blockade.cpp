@@ -15,6 +15,8 @@
 #include "cpu/i8085/i8085.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
+#include "emupal.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -28,8 +30,8 @@
 class blockade_state : public driver_device
 {
 public:
-	blockade_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	blockade_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -66,7 +68,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<discrete_device> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 	required_device<samples_device> m_samples;
 
 	emu_timer *m_vblank_timer;
@@ -85,16 +87,16 @@ void blockade_state::main_map(address_map &map)
 {
 	map(0x0000, 0x03ff).mirror(0x6000).rom();
 	map(0x0400, 0x07ff).mirror(0x6000).rom(); // comotion, blasto, hustle
-	map(0x8000, 0x83ff).mirror(0x6c00).ram().w(this, FUNC(blockade_state::videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).mirror(0x6c00).ram().w(FUNC(blockade_state::videoram_w)).share("videoram");
 	map(0x9000, 0x90ff).mirror(0x6f00).ram();
 }
 
 void blockade_state::main_io_map(address_map &map)
 {
-	map(0x01, 0x01).portr("IN0").w(this, FUNC(blockade_state::coin_latch_w));
-	map(0x02, 0x02).portr("IN1").w(this, FUNC(blockade_state::sound_freq_w));
-	map(0x04, 0x04).portr("IN2").w(this, FUNC(blockade_state::env_on_w));
-	map(0x08, 0x08).w(this, FUNC(blockade_state::env_off_w));
+	map(0x01, 0x01).portr("IN0").w(FUNC(blockade_state::coin_latch_w));
+	map(0x02, 0x02).portr("IN1").w(FUNC(blockade_state::sound_freq_w));
+	map(0x04, 0x04).portr("IN2").w(FUNC(blockade_state::env_on_w));
+	map(0x08, 0x08).w(FUNC(blockade_state::env_off_w));
 }
 
 
@@ -411,7 +413,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER( blockade_state::sound_freq_w )
 {
-	m_discrete->write(space, BLOCKADE_NOTE_DATA, data);
+	m_discrete->write(BLOCKADE_NOTE_DATA, data);
 	return;
 }
 
@@ -466,32 +468,33 @@ void blockade_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(blockade_state::blockade)
-	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(20'790'000) / 10)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
+void blockade_state::blockade(machine_config &config)
+{
+	I8080A(config, m_maincpu, XTAL(20'790'000) / 10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &blockade_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &blockade_state::main_io_map);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(20'790'000) / 4, 330, 0, 256, 262, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(blockade_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(20'790'000) / 4, 330, 0, 256, 262, 0, 224);
+	m_screen->set_screen_update(FUNC(blockade_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blockade)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_blockade);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(blockade_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(blockade_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, blockade_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, blockade_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 //**************************************************************************

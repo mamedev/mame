@@ -6,6 +6,9 @@
 
     6502, reverse-engineered DECO variant
 
+    Note that the "DECO CPU16" is not in fact a CPU in itself, but a custom
+    bus controller with protection features used with a standard 6502.
+
 ***************************************************************************/
 
 #include "emu.h"

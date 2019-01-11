@@ -89,40 +89,40 @@ void comx35_state::video_start()
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(comx35_state::comx35_pal_video)
-	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
-
+void comx35_state::comx35_pal_video(machine_config &config)
+{
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_CDP1869_ADD(CDP1869_TAG, cdp1869_device::DOT_CLK_PAL, cdp1869_page_ram)
-	MCFG_CDP1869_COLOR_CLOCK(cdp1869_device::COLOR_CLK_PAL)
-	MCFG_CDP1869_CHAR_PCB_READ_OWNER(comx35_state, comx35_pcb_r)
-	MCFG_CDP1869_CHAR_RAM_READ_OWNER(comx35_state, comx35_charram_r)
-	MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(comx35_state, comx35_charram_w)
-	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
-	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(*this, comx35_state, prd_w))
-	MCFG_CDP1869_SET_SCREEN(SCREEN_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	CDP1869(config, m_vis, cdp1869_device::DOT_CLK_PAL, &comx35_state::cdp1869_page_ram);
+	m_vis->add_pal_screen(config, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL);
+	m_vis->set_color_clock(cdp1869_device::COLOR_CLK_PAL);
+	m_vis->set_pcb_read_callback(FUNC(comx35_state::comx35_pcb_r));
+	m_vis->set_char_ram_read_callback(FUNC(comx35_state::comx35_charram_r));
+	m_vis->set_char_ram_write_callback(FUNC(comx35_state::comx35_charram_w));
+	m_vis->pal_ntsc_callback().set_constant(1);
+	m_vis->prd_callback().set(FUNC(comx35_state::prd_w));
+	m_vis->set_screen(SCREEN_TAG);
+	m_vis->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(comx35_state::comx35_ntsc_video)
-	MCFG_CDP1869_SCREEN_NTSC_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_NTSC)
-
+void comx35_state::comx35_ntsc_video(machine_config &config)
+{
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_CDP1869_ADD(CDP1869_TAG, cdp1869_device::DOT_CLK_NTSC, cdp1869_page_ram)
-	MCFG_CDP1869_COLOR_CLOCK(cdp1869_device::COLOR_CLK_NTSC)
-	MCFG_CDP1869_CHAR_PCB_READ_OWNER(comx35_state, comx35_pcb_r)
-	MCFG_CDP1869_CHAR_RAM_READ_OWNER(comx35_state, comx35_charram_r)
-	MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(comx35_state, comx35_charram_w)
-	MCFG_CDP1869_PAL_NTSC_CALLBACK(GND)
-	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(*this, comx35_state, prd_w))
-	MCFG_CDP1869_SET_SCREEN(SCREEN_TAG)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	CDP1869(config, m_vis, cdp1869_device::DOT_CLK_NTSC, &comx35_state::cdp1869_page_ram);
+	m_vis->add_ntsc_screen(config, SCREEN_TAG, cdp1869_device::DOT_CLK_NTSC);
+	m_vis->set_color_clock(cdp1869_device::COLOR_CLK_NTSC);
+	m_vis->set_pcb_read_callback(FUNC(comx35_state::comx35_pcb_r));
+	m_vis->set_char_ram_read_callback(FUNC(comx35_state::comx35_charram_r));
+	m_vis->set_char_ram_write_callback(FUNC(comx35_state::comx35_charram_w));
+	m_vis->pal_ntsc_callback().set_constant(0);
+	m_vis->prd_callback().set(FUNC(comx35_state::prd_w));
+	m_vis->set_screen(SCREEN_TAG);
+	m_vis->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}

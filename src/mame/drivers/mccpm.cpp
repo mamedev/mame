@@ -44,9 +44,11 @@ public:
 	{ }
 
 	void mccpm(machine_config &config);
+
+private:
 	void mccpm_io(address_map &map);
 	void mccpm_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
@@ -78,39 +80,40 @@ void mccpm_state::machine_reset()
 	memcpy(m_p_ram, bios, 0x1000);
 }
 
-MACHINE_CONFIG_START(mccpm_state::mccpm)
+void mccpm_state::mccpm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(mccpm_mem)
-	MCFG_DEVICE_IO_MAP(mccpm_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mccpm_state::mccpm_mem);
+	m_maincpu->set_addrmap(AS_IO, &mccpm_state::mccpm_io);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("sio", z80sio_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("sio", z80sio_device, rxca_w))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set("sio", FUNC(z80sio_device::txca_w));
+	uart_clock.signal_handler().append("sio", FUNC(z80sio_device::rxca_w));
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	z80sio_device& sio(Z80SIO(config, "sio", XTAL(4'000'000)));
+	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	sio.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	sio.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	sio.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsa_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxa_w));
+	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsa_w));
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(4'000'000))
-MACHINE_CONFIG_END
+	Z80PIO(config, "pio", XTAL(4'000'000));
+}
 
 /* ROM definition */
 ROM_START( mccpm )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v36", "V3.6")
-	ROMX_LOAD( "mon36.j15",   0x0000, 0x1000, CRC(9c441537) SHA1(f95bad52d9392b8fc9d9b8779b7b861672a0022b), ROM_BIOS(1))
+	ROMX_LOAD("mon36.j15",   0x0000, 0x1000, CRC(9c441537) SHA1(f95bad52d9392b8fc9d9b8779b7b861672a0022b), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v34", "V3.4")
-	ROMX_LOAD( "monhemc.bin", 0x0000, 0x1000, CRC(cae7b56e) SHA1(1f40be9491a595e6705099a452743cc0d49bfce8), ROM_BIOS(2))
+	ROMX_LOAD("monhemc.bin", 0x0000, 0x1000, CRC(cae7b56e) SHA1(1f40be9491a595e6705099a452743cc0d49bfce8), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v34a", "V3.4 (alt)")
-	ROMX_LOAD( "mc01mon.bin", 0x0000, 0x0d00, CRC(d1c89043) SHA1(f52a0ed3793dde0de74596be7339233b6a1770af), ROM_BIOS(3))
+	ROMX_LOAD("mc01mon.bin", 0x0000, 0x0d00, CRC(d1c89043) SHA1(f52a0ed3793dde0de74596be7339233b6a1770af), ROM_BIOS(2))
 ROM_END
 
 /* Driver */

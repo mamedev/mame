@@ -147,21 +147,21 @@ void suprridr_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).ram().w(this, FUNC(suprridr_state::bgram_w)).share("bgram");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(suprridr_state::fgram_w)).share("fgram");
+	map(0x8800, 0x8bff).ram().w(FUNC(suprridr_state::bgram_w)).share("bgram");
+	map(0x9000, 0x97ff).ram().w(FUNC(suprridr_state::fgram_w)).share("fgram");
 	map(0x9800, 0x983f).ram();
 	map(0x9840, 0x987f).ram().share("spriteram");
 	map(0x9880, 0x9bff).ram();
 	map(0xa000, 0xa000).portr("INPUTS");
 	map(0xa800, 0xa800).portr("SYSTEM");
-	map(0xb000, 0xb000).portr("DSW").w(this, FUNC(suprridr_state::nmi_enable_w));
-	map(0xb002, 0xb003).w(this, FUNC(suprridr_state::coin_lock_w));
-	map(0xb006, 0xb006).w(this, FUNC(suprridr_state::flipx_w));
-	map(0xb007, 0xb007).w(this, FUNC(suprridr_state::flipy_w));
+	map(0xb000, 0xb000).portr("DSW").w(FUNC(suprridr_state::nmi_enable_w));
+	map(0xb002, 0xb003).w(FUNC(suprridr_state::coin_lock_w));
+	map(0xb006, 0xb006).w(FUNC(suprridr_state::flipx_w));
+	map(0xb007, 0xb007).w(FUNC(suprridr_state::flipy_w));
 	map(0xb800, 0xb800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xc801, 0xc801).w(this, FUNC(suprridr_state::fgdisable_w));
-	map(0xc802, 0xc802).w(this, FUNC(suprridr_state::fgscrolly_w));
-	map(0xc804, 0xc804).w(this, FUNC(suprridr_state::bgscrolly_w));
+	map(0xc801, 0xc801).w(FUNC(suprridr_state::fgdisable_w));
+	map(0xc802, 0xc802).w(FUNC(suprridr_state::fgscrolly_w));
+	map(0xc804, 0xc804).w(FUNC(suprridr_state::bgscrolly_w));
 	map(0xc000, 0xefff).rom();
 }
 
@@ -333,7 +333,7 @@ MACHINE_CONFIG_START(suprridr_state::suprridr)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -342,25 +342,23 @@ MACHINE_CONFIG_START(suprridr_state::suprridr)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(suprridr_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprridr)
-	MCFG_PALETTE_ADD("palette", 96)
-	MCFG_PALETTE_INIT_OWNER(suprridr_state, suprridr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suprridr);
+	PALETTE(config, m_palette, FUNC(suprridr_state::suprridr_palette), 96);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(49'152'000)/32)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay1", XTAL(49'152'000)/32).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(49'152'000)/32)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(49'152'000)/32));
+	ay2.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
+	m_soundlatch->set_separate_acknowledge(true);
 MACHINE_CONFIG_END
 
 

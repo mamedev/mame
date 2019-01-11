@@ -42,7 +42,7 @@ void ym2612_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void ym2612_device::timer_handler(int c,int count,int clock)
 {
-	if( count == 0 )
+	if( count == 0 || clock == 0 )
 	{   /* Reset FM Timer */
 		m_timer[c]->enable(false);
 	}

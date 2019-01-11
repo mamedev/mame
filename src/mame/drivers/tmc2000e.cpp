@@ -34,6 +34,7 @@
 #include "emu.h"
 #include "includes/tmc2000e.h"
 
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -93,11 +94,11 @@ void tmc2000e_state::tmc2000e_io_map(address_map &map)
 {
 	map(0x01, 0x01).w(m_cti, FUNC(cdp1864_device::tone_latch_w));
 	map(0x02, 0x02).w(m_cti, FUNC(cdp1864_device::step_bgcolor_w));
-	map(0x03, 0x03).rw(this, FUNC(tmc2000e_state::ascii_keyboard_r), FUNC(tmc2000e_state::keyboard_latch_w));
-	map(0x04, 0x04).rw(this, FUNC(tmc2000e_state::io_r), FUNC(tmc2000e_state::io_w));
-	map(0x05, 0x05).rw(this, FUNC(tmc2000e_state::vismac_r), FUNC(tmc2000e_state::vismac_w));
-	map(0x06, 0x06).rw(this, FUNC(tmc2000e_state::floppy_r), FUNC(tmc2000e_state::floppy_w));
-	map(0x07, 0x07).portr("DSW0").w(this, FUNC(tmc2000e_state::io_select_w));
+	map(0x03, 0x03).rw(FUNC(tmc2000e_state::ascii_keyboard_r), FUNC(tmc2000e_state::keyboard_latch_w));
+	map(0x04, 0x04).rw(FUNC(tmc2000e_state::io_r), FUNC(tmc2000e_state::io_w));
+	map(0x05, 0x05).rw(FUNC(tmc2000e_state::vismac_r), FUNC(tmc2000e_state::vismac_w));
+	map(0x06, 0x06).rw(FUNC(tmc2000e_state::floppy_r), FUNC(tmc2000e_state::floppy_w));
+	map(0x07, 0x07).portr("DSW0").w(FUNC(tmc2000e_state::io_select_w));
 }
 
 /* Input Ports */
@@ -280,37 +281,41 @@ void tmc2000e_state::machine_reset()
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(tmc2000e_state::tmc2000e)
+void tmc2000e_state::tmc2000e(machine_config &config)
+{
 	// basic system hardware
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
-	MCFG_DEVICE_PROGRAM_MAP(tmc2000e_map)
-	MCFG_DEVICE_IO_MAP(tmc2000e_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, tmc2000e_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, tmc2000e_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, tmc2000e_state, ef3_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, tmc2000e_state, q_w))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(*this, tmc2000e_state, dma_w))
+	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmc2000e_state::tmc2000e_map);
+	m_maincpu->set_addrmap(AS_IO, &tmc2000e_state::tmc2000e_io_map);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(tmc2000e_state::clear_r));
+	m_maincpu->ef2_cb().set(FUNC(tmc2000e_state::ef2_r));
+	m_maincpu->ef3_cb().set(FUNC(tmc2000e_state::ef3_r));
+	m_maincpu->q_cb().set(FUNC(tmc2000e_state::q_w));
+	m_maincpu->dma_wr_cb().set(FUNC(tmc2000e_state::dma_w));
 
 	// video hardware
-	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL(1'750'000))
-	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL(1'750'000), GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1), NOOP, READLINE(*this, tmc2000e_state, rdata_r), READLINE(*this, tmc2000e_state, bdata_r), READLINE(*this, tmc2000e_state, gdata_r))
-	MCFG_CDP1864_CHROMINANCE(RES_K(2.2), RES_K(1), RES_K(5.1), RES_K(4.7)) // unverified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(SCREEN_TAG);
+	m_cti->inlace_cb().set_constant(0);
+	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
+	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
+	m_cti->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
+	m_cti->rdata_cb().set(FUNC(tmc2000e_state::rdata_r));
+	m_cti->bdata_cb().set(FUNC(tmc2000e_state::bdata_r));
+	m_cti->gdata_cb().set(FUNC(tmc2000e_state::gdata_r));
+	m_cti->set_chrominance(RES_K(2.2), RES_K(1), RES_K(5.1), RES_K(4.7)); // unverified
+	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("40K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("40K");
+}
 
 /* ROMs */
 

@@ -50,7 +50,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tmp68301(*this, "tmp68301"),
-		m_v9958(*this, "v9958"),
 		m_nichisnd(*this, "nichisnd"),
 		m_key(*this, "KEY.%u", 0),
 		m_region_maincpu(*this, "maincpu")
@@ -58,7 +57,6 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
-	required_device<v9958_device> m_v9958;
 	required_device<nichisnd_device> m_nichisnd;
 	required_ioport_array<5> m_key;
 	required_memory_region m_region_maincpu;
@@ -136,10 +134,10 @@ void csplayh5_state::csplayh5_map(address_map &map)
 
 	map(0x200000, 0x200001).portr("DSW");
 	map(0x200000, 0x200000).w(m_nichisnd, FUNC(nichisnd_device::sound_host_command_w));
-	map(0x200200, 0x200201).rw(this, FUNC(csplayh5_state::csplayh5_mux_r), FUNC(csplayh5_state::csplayh5_mux_w));
+	map(0x200200, 0x200201).rw(FUNC(csplayh5_state::csplayh5_mux_r), FUNC(csplayh5_state::csplayh5_mux_w));
 	map(0x200400, 0x200401).portr("SYSTEM");
 
-	map(0x200600, 0x200607).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write)).umask16(0x00ff);
+	map(0x200600, 0x200607).rw("v9958", FUNC(v9958_device::read), FUNC(v9958_device::write)).umask16(0x00ff);
 
 	map(0x800000, 0xbfffff).rom().region("blit_gfx", 0); // GFX ROM routes here
 
@@ -158,12 +156,12 @@ void csplayh5_state::csplayh5_sub_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 
-	map(0x02000a, 0x02000b).r(this, FUNC(csplayh5_state::test_r));
-//  map(0x020008, 0x02000f).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
+	map(0x02000a, 0x02000b).r(FUNC(csplayh5_state::test_r));
+//  map(0x020008, 0x02000f).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
 
-	map(0x040018, 0x040019).r(this, FUNC(csplayh5_state::test_r));
-	map(0x040028, 0x04002f).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0)); // correct?
-	map(0x040036, 0x040037).r(this, FUNC(csplayh5_state::test_r));
+	map(0x040018, 0x040019).r(FUNC(csplayh5_state::test_r));
+	map(0x040028, 0x04002f).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w)); // correct?
+	map(0x040036, 0x040037).r(FUNC(csplayh5_state::test_r));
 
 	map(0x078000, 0x07ffff).mirror(0xf80000).ram(); //.share("nvram");
 }
@@ -171,7 +169,7 @@ void csplayh5_state::csplayh5_sub_map(address_map &map)
 
 void csplayh5_state::csplayh5_sub_io_map(address_map &map)
 {
-	map(0x0a, 0x0b).r(this, FUNC(csplayh5_state::test_r));
+	map(0x0a, 0x0b).r(FUNC(csplayh5_state::test_r));
 }
 #endif
 
@@ -360,38 +358,40 @@ WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
 }
 
 
-MACHINE_CONFIG_START(csplayh5_state::csplayh5)
-
+void csplayh5_state::csplayh5(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
-	MCFG_DEVICE_PROGRAM_MAP(csplayh5_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301", tmp68301_device, irq_callback)
+	M68000(config, m_maincpu, 16000000); /* TMP68301-16 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &csplayh5_state::csplayh5_map);
+	m_maincpu->set_irq_acknowledge_callback("tmp68301", FUNC(tmp68301_device::irq_callback));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
+	TIMER(config, "scantimer", 0).configure_scanline(timer_device::expired_delegate(FUNC(csplayh5_state::csplayh5_irq), this), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, csplayh5_state, tmp68301_parallel_port_w))
+	TMP68301(config, m_tmp68301, 0);
+	m_tmp68301->set_cputag(m_maincpu);
+	m_tmp68301->out_parallel_callback().set(FUNC(csplayh5_state::tmp68301_parallel_port_w));
 
 #if USE_H8
-	MCFG_DEVICE_ADD("subcpu", H83002, DVD_CLOCK/2)    /* unknown divider */
-	MCFG_DEVICE_PROGRAM_MAP(csplayh5_sub_map)
-	MCFG_DEVICE_IO_MAP(csplayh5_sub_io_map)
+	h830002_device &subcpu(H83002(config, "subcpu", DVD_CLOCK/2));    /* unknown divider */
+	subcpu.set_addrmap(AS_PROGRAM, &csplayh5_state::csplayh5_sub_map);
+	subcpu.set_addrmap(AS_IO, &csplayh5_state::csplayh5_sub_io_map);
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true) // dvd
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, csplayh5_state, ide_irq))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true)); // dvd
+	ide.irq_handler().set(FUNC(csplayh5_state::ide_irq));
 #endif
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272)) // typical 9958 clock, not verified
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, csplayh5_state, csplayh5_vdp0_interrupt))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
+	v9958_device &v9958(V9958(config, "v9958", XTAL(21'477'272))); // typical 9958 clock, not verified
+	v9958.set_screen_ntsc("screen");
+	v9958.set_vram_size(0x20000);
+	v9958.int_cb().set(FUNC(csplayh5_state::csplayh5_vdp0_interrupt));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
-	MCFG_NICHISND_ADD("nichisnd")
-MACHINE_CONFIG_END
+	NICHISND(config, m_nichisnd, 0);
+}
 
 /***************************************************************************
 
@@ -446,7 +446,7 @@ void csplayh5_state::init_tsuwaku()   { general_init(0x856e/2, 0x6018); }
  */
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 #define DVD_BIOS \
 	ROM_REGION( 0x20000, "subcpu", 0 ) \
@@ -921,9 +921,9 @@ ROM_END
 ***************************************************************************/
 
 // 1995
-         GAME( 1995, csplayh1, 0,        csplayh5, csplayh5, csplayh5_state, init_csplayh1, ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
+		 GAME( 1995, csplayh1, 0,        csplayh5, csplayh5, csplayh5_state, init_csplayh1, ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", MACHINE_NOT_WORKING )
 
-         GAME( 1998, nichidvd, 0,        csplayh5, csplayh5, csplayh5_state, empty_init,    ROT0, "Nichibutsu",                           "Nichibutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
+		 GAME( 1998, nichidvd, 0,        csplayh5, csplayh5, csplayh5_state, empty_init,    ROT0, "Nichibutsu",                           "Nichibutsu High Rate DVD BIOS", MACHINE_IS_BIOS_ROOT )
 
 // 1998
 /* 01 */ GAME( 1998, mjgalpri, nichidvd, csplayh5, csplayh5, csplayh5_state, init_mjgalpri, ROT0, "Nichibutsu/Just&Just", "Mahjong Gal-pri - World Gal-con Grandprix (Japan)", MACHINE_NOT_WORKING )

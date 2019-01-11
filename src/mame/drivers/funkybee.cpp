@@ -103,12 +103,12 @@ void funkybee_state::funkybee_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xbfff).ram().w(this, FUNC(funkybee_state::funkybee_videoram_w)).share("videoram");
-	map(0xc000, 0xdfff).ram().w(this, FUNC(funkybee_state::funkybee_colorram_w)).share("colorram");
-	map(0xe000, 0xe000).w(this, FUNC(funkybee_state::funkybee_scroll_w));
+	map(0xa000, 0xbfff).ram().w(FUNC(funkybee_state::funkybee_videoram_w)).share("videoram");
+	map(0xc000, 0xdfff).ram().w(FUNC(funkybee_state::funkybee_colorram_w)).share("colorram");
+	map(0xe000, 0xe000).w(FUNC(funkybee_state::funkybee_scroll_w));
 	map(0xe800, 0xe807).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xf000, 0xf000).nopr(); /* IRQ Ack */
-	map(0xf800, 0xf800).r(this, FUNC(funkybee_state::funkybee_input_port_0_r)).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0xf800, 0xf800).r(FUNC(funkybee_state::funkybee_input_port_0_r)).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0xf801, 0xf801).portr("IN1");
 	map(0xf802, 0xf802).portr("IN2");
 }
@@ -293,13 +293,13 @@ MACHINE_CONFIG_START(funkybee_state::funkybee)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", funkybee_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, funkybee_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, funkybee_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, funkybee_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, funkybee_state, gfx_bank_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(funkybee_state::flipscreen_w));
+	mainlatch.q_out_cb<2>().set(FUNC(funkybee_state::coin_counter_1_w));
+	mainlatch.q_out_cb<3>().set(FUNC(funkybee_state::coin_counter_2_w));
+	mainlatch.q_out_cb<5>().set(FUNC(funkybee_state::gfx_bank_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -308,18 +308,17 @@ MACHINE_CONFIG_START(funkybee_state::funkybee)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12, 32*8-8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(funkybee_state, screen_update_funkybee)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funkybee)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(funkybee_state, funkybee)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_funkybee);
+	PALETTE(config, m_palette, FUNC(funkybee_state::funkybee_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, 1500000) // AY-3-8912 verified for Sky Lancer
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ay8912_device &ay8912(AY8912(config, "aysnd", 1500000)); // AY-3-8912 verified for Sky Lancer
+	ay8912.port_a_read_callback().set_ioport("DSW");
+	ay8912.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

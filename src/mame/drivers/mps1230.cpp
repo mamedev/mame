@@ -92,15 +92,16 @@ public:
 		m_maincpu(*this, CPU_TAG)
 	{ }
 
+	void mps1000(machine_config &config);
+	void mps1230(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void mps1000(machine_config &config);
-	void mps1230(machine_config &config);
 	void mps1230_map(address_map &map);
-private:
 };
 
 /***************************************************************************

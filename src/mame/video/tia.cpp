@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "tia.h"
-#include "sound/tiaintf.h"
 #include "screen.h"
 
 static const int nusiz[8][3] =
@@ -48,198 +47,197 @@ static void extend_palette(palette_device &palette) {
 	}
 }
 
-PALETTE_INIT_MEMBER(tia_ntsc_video_device, tia_ntsc)
+void tia_ntsc_video_device::tia_ntsc_palette(palette_device &palette) const
 {
-	int i, j;
-/********************************************************************
-Atari 2600 NTSC Palette Notes:
+	/********************************************************************
+	Atari 2600 NTSC Palette Notes:
 
-Palette on a modern flat panel display (LCD, LED, Plasma, etc.)
-appears different from a traditional CRT. The most outstanding
-difference is Hue 1x, the hue begin point. Hue 1x looks very
-'green' (~-60 to -45 degrees - depending on how poor or well it
-handles the signal conversion and its calibration) on a modern
-flat panel display, as opposed to 'gold' (~-33 degrees) on a CRT.
+	Palette on a modern flat panel display (LCD, LED, Plasma, etc.)
+	appears different from a traditional CRT. The most outstanding
+	difference is Hue 1x, the hue begin point. Hue 1x looks very
+	'green' (~-60 to -45 degrees - depending on how poor or well it
+	handles the signal conversion and its calibration) on a modern
+	flat panel display, as opposed to 'gold' (~-33 degrees) on a CRT.
 
-The official technical documents: "Television Interface Adaptor
-[TIA] (Model 1A)", "Atari VCS POP Field Service Manual", and
-"Stella Programmer's Guide" stipulate Hue 1x to be gold.
+	The official technical documents: "Television Interface Adaptor
+	[TIA] (Model 1A)", "Atari VCS POP Field Service Manual", and
+	"Stella Programmer's Guide" stipulate Hue 1x to be gold.
 
-The system's pot adjustment manually manipulates the degree of
-phase shift, while the system 'warming-up' will automatically
-push whatever degrees has been manually set, higher.  According
-to the Atari VCS POP Field Service Manual and system diagnostic
-and test (color) cart, instructions are provide to set the pot
-adjustment having Hue 1x and Hue 15x (F$) match or within one
-shade of each other, both a 'goldenrod'.
+	The system's pot adjustment manually manipulates the degree of
+	phase shift, while the system 'warming-up' will automatically
+	push whatever degrees has been manually set, higher.  According
+	to the Atari VCS POP Field Service Manual and system diagnostic
+	and test (color) cart, instructions are provide to set the pot
+	adjustment having Hue 1x and Hue 15x (F$) match or within one
+	shade of each other, both a 'goldenrod'.
 
-At power on, the system's phase shift appears as low as ~23
-degrees and after a considerable consistent runtime, can be as
-high as ~28 degrees.
+	At power on, the system's phase shift appears as low as ~23
+	degrees and after a considerable consistent runtime, can be as
+	high as ~28 degrees.
 
-In general, the low end of ~23 degrees lasts for several seconds,
-whereas higher values such as ~25-27 degrees are the most
-dominant during system run time.  180 degrees colorburst takes
-place at ~25.7 degrees (A near exact match of Hue 1x and 15x -
-To the naked eye they appear to be the same).
+	In general, the low end of ~23 degrees lasts for several seconds,
+	whereas higher values such as ~25-27 degrees are the most
+	dominant during system run time.  180 degrees colorburst takes
+	place at ~25.7 degrees (A near exact match of Hue 1x and 15x -
+	To the naked eye they appear to be the same).
 
-However, if the system is adjusted within the first several
-minutes of running, the warm up, consistent system run time,
-causes Hue 15x (F$) to become stronger/darker gold (More brown
-then ultimately red-brown); as well as leans Hue 14x (E$) more
-brown than green.  Once achieving a phase shift of 27.7 degrees,
-Hue 14x (E$) and Hue 15x (F$) near-exact match Hue 1x and 2x
-respectively.
+	However, if the system is adjusted within the first several
+	minutes of running, the warm up, consistent system run time,
+	causes Hue 15x (F$) to become stronger/darker gold (More brown
+	then ultimately red-brown); as well as leans Hue 14x (E$) more
+	brown than green.  Once achieving a phase shift of 27.7 degrees,
+	Hue 14x (E$) and Hue 15x (F$) near-exact match Hue 1x and 2x
+	respectively.
 
-Therefore, an ideal phase shift while accounting for properly
-calibrating a system's color palette within the first several
-minutes of it running via the pot adjustment, the reality of
-shifting while warming up, as well as maintaining differences
-between Hues 1x, 2x and 14x, 15x, would likely fall between 25.7
-and 27.7 degrees.  Phase shifts 26.2 and 26.7 places Hue 15x/F$
-between Hue 1x and Hue 2x, having 26.2 degrees leaning closer to
-Hue 1x and 26.7 degrees leaning closer to Hue 2x.
+	Therefore, an ideal phase shift while accounting for properly
+	calibrating a system's color palette within the first several
+	minutes of it running via the pot adjustment, the reality of
+	shifting while warming up, as well as maintaining differences
+	between Hues 1x, 2x and 14x, 15x, would likely fall between 25.7
+	and 27.7 degrees.  Phase shifts 26.2 and 26.7 places Hue 15x/F$
+	between Hue 1x and Hue 2x, having 26.2 degrees leaning closer to
+	Hue 1x and 26.7 degrees leaning closer to Hue 2x.
 
-The above notion would also harmonize with what has been
-documented within "Stella Programmer's Guide" for the colors of
-1x, 2x, 14x, 15x on the 2600 and 7800.  1x = Gold, 2x = Orange,
-14x (E$) = Orange-Green. 15x (F$) = Light Orange.  Color
-descriptions are best measured in the middle of the brightness
-scale.  It should be mentioned that Green-Yellow is referenced
-at Hue 13x (D$), nowhere near Hue 1x.  A Green-Yellow Hue 1x is
-how the palette is manipulated and modified (in part) under a
-modern flat panel display.
+	The above notion would also harmonize with what has been
+	documented within "Stella Programmer's Guide" for the colors of
+	1x, 2x, 14x, 15x on the 2600 and 7800.  1x = Gold, 2x = Orange,
+	14x (E$) = Orange-Green. 15x (F$) = Light Orange.  Color
+	descriptions are best measured in the middle of the brightness
+	scale.  It should be mentioned that Green-Yellow is referenced
+	at Hue 13x (D$), nowhere near Hue 1x.  A Green-Yellow Hue 1x is
+	how the palette is manipulated and modified (in part) under a
+	modern flat panel display.
 
-Additionally, the blue to red (And consequently blue to green)
-ratio proportions may appear different on a modern flat panel
-display than a CRT in some instances for the Atari 2600 system.
-Furthermore, you may have some variation of proportions even
-within the same display type.
+	Additionally, the blue to red (And consequently blue to green)
+	ratio proportions may appear different on a modern flat panel
+	display than a CRT in some instances for the Atari 2600 system.
+	Furthermore, you may have some variation of proportions even
+	within the same display type.
 
-One side effect of this on the console's palette is that some
-values of red may appear too pinkish - Too much blue to red.
-This is not the same as a traditional tint-hue control adjustment;
-rather, can be demonstrated by changing the blue ratio values
-via MESS HLSL settings.
+	One side effect of this on the console's palette is that some
+	values of red may appear too pinkish - Too much blue to red.
+	This is not the same as a traditional tint-hue control adjustment;
+	rather, can be demonstrated by changing the blue ratio values
+	via MESS HLSL settings.
 
-Lastly, the Atari 5200 & 7800 NTSC color palettes hold the same
-hue structure order and have similar appearance differences that
-are dependent upon display type.
-********************************************************************/
-/*********************************
-Phase Shift 24.7
-        {  0.000,  0.000 },
-        {  0.192, -0.127 },
-        {  0.239, -0.052 },
-        {  0.244,  0.030 },
-        {  0.201,  0.108 },
-        {  0.125,  0.166 },
-        {  0.026,  0.194 },
-        { -0.080,  0.185 },
-        { -0.169,  0.145 },
-        { -0.230,  0.077 },
-        { -0.247, -0.006 },
-        { -0.220, -0.087 },
-        { -0.152, -0.153 },
-        { -0.057, -0.189 },
-        {  0.049, -0.193 },
-        {  0.144, -0.161 }
+	Lastly, the Atari 5200 & 7800 NTSC color palettes hold the same
+	hue structure order and have similar appearance differences that
+	are dependent upon display type.
+	********************************************************************/
+	/*********************************
+	Phase Shift 24.7
+			{  0.000,  0.000 },
+			{  0.192, -0.127 },
+			{  0.239, -0.052 },
+			{  0.244,  0.030 },
+			{  0.201,  0.108 },
+			{  0.125,  0.166 },
+			{  0.026,  0.194 },
+			{ -0.080,  0.185 },
+			{ -0.169,  0.145 },
+			{ -0.230,  0.077 },
+			{ -0.247, -0.006 },
+			{ -0.220, -0.087 },
+			{ -0.152, -0.153 },
+			{ -0.057, -0.189 },
+			{  0.049, -0.193 },
+			{  0.144, -0.161 }
 
-Phase Shift 25.2
-        {  0.000,  0.000 },
-        {  0.192, -0.127 },
-        {  0.239, -0.052 },
-        {  0.244,  0.033 },
-        {  0.200,  0.113 },
-        {  0.119,  0.169 },
-        {  0.013,  0.195 },
-        { -0.094,  0.183 },
-        { -0.182,  0.136 },
-        { -0.237,  0.062 },
-        { -0.245, -0.020 },
-        { -0.210, -0.103 },
-        { -0.131, -0.164 },
-        { -0.027, -0.193 },
-        {  0.079, -0.187 },
-        {  0.169, -0.145 }
+	Phase Shift 25.2
+			{  0.000,  0.000 },
+			{  0.192, -0.127 },
+			{  0.239, -0.052 },
+			{  0.244,  0.033 },
+			{  0.200,  0.113 },
+			{  0.119,  0.169 },
+			{  0.013,  0.195 },
+			{ -0.094,  0.183 },
+			{ -0.182,  0.136 },
+			{ -0.237,  0.062 },
+			{ -0.245, -0.020 },
+			{ -0.210, -0.103 },
+			{ -0.131, -0.164 },
+			{ -0.027, -0.193 },
+			{  0.079, -0.187 },
+			{  0.169, -0.145 }
 
-Phase Shift 25.7
-        {  0.000,  0.000 },
-        {  0.192, -0.127 },
-        {  0.243, -0.049 },
-        {  0.242,  0.038 },
-        {  0.196,  0.116 },
-        {  0.109,  0.172 },
-        {  0.005,  0.196 },
-        { -0.104,  0.178 },
-        { -0.192,  0.127 },
-        { -0.241,  0.051 },
-        { -0.244, -0.037 },
-        { -0.197, -0.115 },
-        { -0.112, -0.173 },
-        { -0.004, -0.197 },
-        {  0.102, -0.179 },
-        {  0.190, -0.128 }
+	Phase Shift 25.7
+			{  0.000,  0.000 },
+			{  0.192, -0.127 },
+			{  0.243, -0.049 },
+			{  0.242,  0.038 },
+			{  0.196,  0.116 },
+			{  0.109,  0.172 },
+			{  0.005,  0.196 },
+			{ -0.104,  0.178 },
+			{ -0.192,  0.127 },
+			{ -0.241,  0.051 },
+			{ -0.244, -0.037 },
+			{ -0.197, -0.115 },
+			{ -0.112, -0.173 },
+			{ -0.004, -0.197 },
+			{  0.102, -0.179 },
+			{  0.190, -0.128 }
 
-Phase Shift 26.7
-        {  0.000,  0.000 },
-        {  0.192, -0.127 },
-        {  0.242, -0.046 },
-        {  0.240,  0.044 },
-        {  0.187,  0.125 },
-        {  0.092,  0.180 },
-        { -0.020,  0.195 },
-        { -0.128,  0.170 },
-        { -0.210,  0.107 },
-        { -0.247,  0.022 },
-        { -0.231, -0.067 },
-        { -0.166, -0.142 },
-        { -0.064, -0.188 },
-        {  0.049, -0.193 },
-        {  0.154, -0.155 },
-        {  0.227, -0.086 }
+	Phase Shift 26.7
+			{  0.000,  0.000 },
+			{  0.192, -0.127 },
+			{  0.242, -0.046 },
+			{  0.240,  0.044 },
+			{  0.187,  0.125 },
+			{  0.092,  0.180 },
+			{ -0.020,  0.195 },
+			{ -0.128,  0.170 },
+			{ -0.210,  0.107 },
+			{ -0.247,  0.022 },
+			{ -0.231, -0.067 },
+			{ -0.166, -0.142 },
+			{ -0.064, -0.188 },
+			{  0.049, -0.193 },
+			{  0.154, -0.155 },
+			{  0.227, -0.086 }
 
-Phase Shift 27.2
-        {  0.000,  0.000 },
-        {  0.192, -0.127 },
-        {  0.243, -0.044 },
-        {  0.239,  0.047 },
-        {  0.183,  0.129 },
-        {  0.087,  0.181 },
-        { -0.029,  0.195 },
-        { -0.138,  0.164 },
-        { -0.217,  0.098 },
-        { -0.246,  0.009 },
-        { -0.223, -0.081 },
-        { -0.149, -0.153 },
-        { -0.041, -0.192 },
-        {  0.073, -0.188 },
-        {  0.173, -0.142 },
-        {  0.235, -0.067 }
+	Phase Shift 27.2
+			{  0.000,  0.000 },
+			{  0.192, -0.127 },
+			{  0.243, -0.044 },
+			{  0.239,  0.047 },
+			{  0.183,  0.129 },
+			{  0.087,  0.181 },
+			{ -0.029,  0.195 },
+			{ -0.138,  0.164 },
+			{ -0.217,  0.098 },
+			{ -0.246,  0.009 },
+			{ -0.223, -0.081 },
+			{ -0.149, -0.153 },
+			{ -0.041, -0.192 },
+			{  0.073, -0.188 },
+			{  0.173, -0.142 },
+			{  0.235, -0.067 }
 
-Phase Shift 27.7
-        {  0.000,  0.000 },
-        {  0.192, -0.127 },
-        {  0.243, -0.044 },
-        {  0.238,  0.051 },
-        {  0.178,  0.134 },
-        {  0.078,  0.184 },
-        { -0.041,  0.194 },
-        { -0.151,  0.158 },
-        { -0.224,  0.087 },
-        { -0.248, -0.005 },
-        { -0.214, -0.096 },
-        { -0.131, -0.164 },
-        { -0.019, -0.195 },
-        {  0.099, -0.182 },
-        {  0.194, -0.126 },
-        {  0.244, -0.042 }
-*********************************/
+	Phase Shift 27.7
+			{  0.000,  0.000 },
+			{  0.192, -0.127 },
+			{  0.243, -0.044 },
+			{  0.238,  0.051 },
+			{  0.178,  0.134 },
+			{  0.078,  0.184 },
+			{ -0.041,  0.194 },
+			{ -0.151,  0.158 },
+			{ -0.224,  0.087 },
+			{ -0.248, -0.005 },
+			{ -0.214, -0.096 },
+			{ -0.131, -0.164 },
+			{ -0.019, -0.195 },
+			{  0.099, -0.182 },
+			{  0.194, -0.126 },
+			{  0.244, -0.042 }
+	*********************************/
 
-	static const double color[16][2] =
-/*********************************
-Phase Shift 26.2
-**********************************/
+	/*********************************
+	Phase Shift 26.2
+	**********************************/
+	static constexpr double color[16][2] =
 	{
 		{  0.000,  0.000 },
 		{  0.192, -0.127 },
@@ -259,14 +257,14 @@ Phase Shift 26.2
 		{  0.210, -0.107 }
 	};
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		double I = color[i][0];
-		double Q = color[i][1];
+		double const I = color[i][0];
+		double const Q = color[i][1];
 
-		for (j = 0; j < 8; j++)
+		for (int j = 0; j < 8; j++)
 		{
-			double Y = j / 7.0;
+			double const Y = j / 7.0;
 
 			double R = Y + 0.956 * I + 0.621 * Q;
 			double G = Y - 0.272 * I - 0.647 * Q;
@@ -284,21 +282,20 @@ Phase Shift 26.2
 			if (G > 1) G = 1;
 			if (B > 1) B = 1;
 
-			palette.set_pen_color(8 * i + j,
-				(uint8_t) (255 * R + 0.5),
-				(uint8_t) (255 * G + 0.5),
-				(uint8_t) (255 * B + 0.5));
+			palette.set_pen_color(
+					8 * i + j,
+					uint8_t(255 * R + 0.5),
+					uint8_t(255 * G + 0.5),
+					uint8_t(255 * B + 0.5));
 		}
 	}
-	extend_palette( palette );
+	extend_palette(palette);
 }
 
 
-PALETTE_INIT_MEMBER(tia_pal_video_device, tia_pal)
+void tia_pal_video_device::tia_pal_palette(palette_device &palette) const
 {
-	int i, j;
-
-	static const double color[16][2] =
+	static constexpr double color[16][2] =
 	{
 		{  0.000,  0.000 },
 		{  0.000,  0.000 },
@@ -318,14 +315,14 @@ PALETTE_INIT_MEMBER(tia_pal_video_device, tia_pal)
 		{  0.000,  0.000 }
 	};
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		double U = color[i][0];
-		double V = color[i][1];
+		double const U = color[i][0];
+		double const V = color[i][1];
 
-		for (j = 0; j < 8; j++)
+		for (int j = 0; j < 8; j++)
 		{
-			double Y = j / 7.0;
+			double const Y = j / 7.0;
 
 			double R = Y + 1.403 * V;
 			double G = Y - 0.344 * U - 0.714 * V;
@@ -343,13 +340,14 @@ PALETTE_INIT_MEMBER(tia_pal_video_device, tia_pal)
 			if (G > 1) G = 1;
 			if (B > 1) B = 1;
 
-			palette.set_pen_color(8 * i + j,
-				(uint8_t) (255 * R + 0.5),
-				(uint8_t) (255 * G + 0.5),
-				(uint8_t) (255 * B + 0.5));
+			palette.set_pen_color(
+					8 * i + j,
+					uint8_t(255 * R + 0.5),
+					uint8_t(255 * G + 0.5),
+					uint8_t(255 * B + 0.5));
 		}
 	}
-	extend_palette( palette );
+	extend_palette(palette);
 }
 
 tia_video_device::tia_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -359,6 +357,7 @@ tia_video_device::tia_video_device(const machine_config &mconfig, device_type ty
 	, m_databus_contents_cb(*this)
 	, m_vsync_cb(*this)
 	, m_maincpu(*this, "^maincpu")
+	, m_tia(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -378,10 +377,10 @@ tia_pal_video_device::tia_pal_video_device(const machine_config &mconfig, const 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(tia_pal_video_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", TIA_PALETTE_LENGTH)
-	MCFG_PALETTE_INIT_OWNER(tia_pal_video_device, tia_pal)
-MACHINE_CONFIG_END
+void tia_pal_video_device::device_add_mconfig(machine_config &config)
+{
+	PALETTE(config, "palette", FUNC(tia_pal_video_device::tia_pal_palette), TIA_PALETTE_LENGTH);
+}
 
 // device type definition
 DEFINE_DEVICE_TYPE(TIA_NTSC_VIDEO, tia_ntsc_video_device, "tia_ntsc_video", "TIA Video (NTSC)")
@@ -399,10 +398,10 @@ tia_ntsc_video_device::tia_ntsc_video_device(const machine_config &mconfig, cons
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(tia_ntsc_video_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", TIA_PALETTE_LENGTH)
-	MCFG_PALETTE_INIT_OWNER(tia_ntsc_video_device, tia_ntsc)
-MACHINE_CONFIG_END
+void tia_ntsc_video_device::device_add_mconfig(machine_config &config)
+{
+	PALETTE(config, "palette", FUNC(tia_ntsc_video_device::tia_ntsc_palette), TIA_PALETTE_LENGTH);
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -2015,7 +2014,7 @@ WRITE8_MEMBER( tia_video_device::write )
 	case 0x18: /* AUDF1 */
 	case 0x19: /* AUDV0 */
 	case 0x1A: /* AUDV1 */
-		machine().device<tia_device>("tia")->tia_sound_w(space, offset, data);
+		m_tia->tia_sound_w(space, offset, data);
 		break;
 
 	case 0x1B:

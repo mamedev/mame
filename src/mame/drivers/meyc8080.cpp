@@ -78,9 +78,12 @@ public:
 		, m_videoram_2(*this, "vram2")
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")
-		, m_lamp(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void meyc8080(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(lights_1_w);
 	DECLARE_WRITE8_MEMBER(lights_2_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
@@ -89,18 +92,16 @@ public:
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_3_w);
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_4_w);
 	uint32_t screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void meyc8080(machine_config &config);
 	void meyc8080_map(address_map &map);
 
-protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 
 	required_shared_ptr<uint8_t> m_videoram_0;
 	required_shared_ptr<uint8_t> m_videoram_1;
 	required_shared_ptr<uint8_t> m_videoram_2;
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
-	output_finder<11> m_lamp;
+	output_finder<11> m_lamps;
 };
 
 
@@ -190,11 +191,11 @@ WRITE8_MEMBER(meyc8080_state::lights_1_w)
   xxxx ----   Seems unused...
 
 */
-	m_lamp[0] = BIT(data, 0);  /* Lamp 0 */
-	m_lamp[1] = BIT(data, 1);  /* Lamp 1 */
-	m_lamp[2] = BIT(data, 2);  /* Lamp 2 */
-	m_lamp[3] = BIT(data, 3);  /* Lamp 3 */
-	m_lamp[4] = BIT(data, 4);  /* Lamp 4 */
+	m_lamps[0] = BIT(data, 0);  /* Lamp 0 */
+	m_lamps[1] = BIT(data, 1);  /* Lamp 1 */
+	m_lamps[2] = BIT(data, 2);  /* Lamp 2 */
+	m_lamps[3] = BIT(data, 3);  /* Lamp 3 */
+	m_lamps[4] = BIT(data, 4);  /* Lamp 4 */
 
 	logerror("lights 1: %02x\n", data);
 }
@@ -237,13 +238,13 @@ WRITE8_MEMBER(meyc8080_state::lights_2_w)
   xxx- ----   Unknown.
 
 */
-	m_lamp[5] = BIT(data, 0);  /* Lamp 5 */
-	m_lamp[6] = BIT(data, 1);  /* Lamp 6 */
-	m_lamp[7] = BIT(data, 2);  /* Lamp 7 */
-	m_lamp[8] = BIT(data, 3);  /* Lamp 8 */
-	m_lamp[9] = BIT(data, 4);  /* Lamp 9 */
+	m_lamps[5] = BIT(data, 0);  /* Lamp 5 */
+	m_lamps[6] = BIT(data, 1);  /* Lamp 6 */
+	m_lamps[7] = BIT(data, 2);  /* Lamp 7 */
+	m_lamps[8] = BIT(data, 3);  /* Lamp 8 */
+	m_lamps[9] = BIT(data, 4);  /* Lamp 9 */
 
-	m_lamp[10] = BIT(data, 5); /* Lamp 10 (Game-Over) */
+	m_lamps[10] = BIT(data, 5); /* Lamp 10 (Game-Over) */
 
 	logerror("lights 2: %02x\n", data);
 }
@@ -325,13 +326,13 @@ void meyc8080_state::meyc8080_map(address_map &map)
 	map(0x8000, 0x9fff).ram().share("vram2");
 //  AM_RANGE(0xa000, 0xa0ff) AM_RAM     // unknown... filled with 00's at boot time or when entering the service mode.
 	map(0xcd00, 0xcdff).ram().share("nvram");
-	map(0xf000, 0xf000).portr("BSW").w(this, FUNC(meyc8080_state::meyc8080_dac_1_w));
-	map(0xf004, 0xf004).portr("IN1").w(this, FUNC(meyc8080_state::lights_1_w));
-	map(0xf006, 0xf006).portr("IN2").w(this, FUNC(meyc8080_state::lights_2_w));
-	map(0xf008, 0xf008).w(this, FUNC(meyc8080_state::counters_w));
-	map(0xf00f, 0xf00f).w(this, FUNC(meyc8080_state::meyc8080_dac_2_w));
-	map(0xf0f0, 0xf0f0).w(this, FUNC(meyc8080_state::meyc8080_dac_3_w));
-	map(0xf0ff, 0xf0ff).w(this, FUNC(meyc8080_state::meyc8080_dac_4_w));
+	map(0xf000, 0xf000).portr("BSW").w(FUNC(meyc8080_state::meyc8080_dac_1_w));
+	map(0xf004, 0xf004).portr("IN1").w(FUNC(meyc8080_state::lights_1_w));
+	map(0xf006, 0xf006).portr("IN2").w(FUNC(meyc8080_state::lights_2_w));
+	map(0xf008, 0xf008).w(FUNC(meyc8080_state::counters_w));
+	map(0xf00f, 0xf00f).w(FUNC(meyc8080_state::meyc8080_dac_2_w));
+	map(0xf0f0, 0xf0f0).w(FUNC(meyc8080_state::meyc8080_dac_3_w));
+	map(0xf0ff, 0xf0ff).w(FUNC(meyc8080_state::meyc8080_dac_4_w));
 }
 
 
@@ -590,10 +591,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(meyc8080_state::meyc8080)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(20'000'000) / 10) // divider guessed
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(20'000'000) / 10) // divider guessed
 	MCFG_DEVICE_PROGRAM_MAP(meyc8080_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -21,6 +21,8 @@
 
 #include "video/vector.h"
 
+#include "emupal.h"
+
 
 #define MC6800_TAG          "u61"
 #define MC6820_Y_TAG        "u561"
@@ -55,6 +57,9 @@ public:
 		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
+	void tek4051(machine_config &config);
+
+private:
 	void bankswitch(uint8_t data);
 	void update_irq();
 	void update_nmi();
@@ -106,10 +111,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
 
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
-	void tek4051(machine_config &config);
 	void tek4051_mem(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
@@ -143,7 +146,6 @@ protected:
 	int m_acia_irq;
 
 	// keyboard
-	int m_kbhalt;
 	int m_kc;
 
 	// GPIB
@@ -160,9 +162,10 @@ public:
 	{ }
 
 	void tek4052(machine_config &config);
+
+private:
 	void tek4052_mem(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 

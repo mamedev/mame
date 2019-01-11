@@ -70,6 +70,7 @@ zooming might be wrong
 #include "cpu/m68000/m68000.h"
 #include "machine/vs9209.h"
 #include "sound/2610intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -79,7 +80,7 @@ zooming might be wrong
 
 void taotaido_state::machine_start()
 {
-	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
+	m_soundbank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
 }
 
 
@@ -99,7 +100,7 @@ WRITE8_MEMBER(taotaido_state::unknown_output_w)
 void taotaido_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x800000, 0x803fff).ram().w(this, FUNC(taotaido_state::bgvideoram_w)).share("bgram");  // bg ram?
+	map(0x800000, 0x803fff).ram().w(FUNC(taotaido_state::bgvideoram_w)).share("bgram");  // bg ram?
 	map(0xa00000, 0xa01fff).ram().share("spriteram");       // sprite ram
 	map(0xc00000, 0xc0ffff).ram().share("spriteram2");      // sprite tile lookup ram
 	map(0xfe0000, 0xfeffff).ram();                                     // main ram
@@ -107,12 +108,12 @@ void taotaido_state::main_map(address_map &map)
 	map(0xffe000, 0xffe3ff).ram().share("scrollram");       // rowscroll / rowselect / scroll ram
 	map(0xffff80, 0xffff9f).rw("io1", FUNC(vs9209_device::read), FUNC(vs9209_device::write)).umask16(0x00ff);
 	map(0xffffa0, 0xffffbf).rw("io2", FUNC(vs9209_device::read), FUNC(vs9209_device::write)).umask16(0x00ff);
-	map(0xffff00, 0xffff0f).w(this, FUNC(taotaido_state::tileregs_w));
+	map(0xffff00, 0xffff0f).w(FUNC(taotaido_state::tileregs_w));
 	map(0xffff10, 0xffff11).nopw();                        // unknown
 	map(0xffff20, 0xffff21).nopw();                        // unknown - flip screen related
-	map(0xffff40, 0xffff47).w(this, FUNC(taotaido_state::sprite_character_bank_select_w));
+	map(0xffff40, 0xffff47).w(FUNC(taotaido_state::spritebank_w)).share("spritebank");
 	map(0xffffc1, 0xffffc1).w(m_soundlatch, FUNC(generic_latch_8_device::write));        // seems right
-	map(0xffffe0, 0xffffe1).r(this, FUNC(taotaido_state::pending_command_r)); // guess - seems to be needed for all the sounds to work
+	map(0xffffe0, 0xffffe1).r(FUNC(taotaido_state::pending_command_r)); // guess - seems to be needed for all the sounds to work
 }
 
 /* sound cpu - same as aerofgt */
@@ -120,7 +121,7 @@ void taotaido_state::main_map(address_map &map)
 
 WRITE8_MEMBER(taotaido_state::sh_bankswitch_w)
 {
-	membank("soundbank")->set_entry(data & 0x03);
+	m_soundbank->set_entry(data & 0x03);
 }
 
 void taotaido_state::sound_map(address_map &map)
@@ -134,7 +135,7 @@ void taotaido_state::sound_port_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
-	map(0x04, 0x04).w(this, FUNC(taotaido_state::sh_bankswitch_w));
+	map(0x04, 0x04).w(FUNC(taotaido_state::sh_bankswitch_w));
 	map(0x08, 0x08).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x0c, 0x0c).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -347,66 +348,65 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(taotaido_state::taotaido)
-	MCFG_DEVICE_ADD("maincpu", M68000, 32000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taotaido_state,  irq1_line_hold)
+void taotaido_state::taotaido(machine_config &config)
+{
+	M68000(config, m_maincpu, 32000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &taotaido_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(taotaido_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,20000000/4) // ??
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_port_map)
-								/* IRQs are triggered by the YM2610 */
+	Z80(config, m_audiocpu, 20000000/4); // ??
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taotaido_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &taotaido_state::sound_port_map); /* IRQs are triggered by the YM2610 */
 
-	MCFG_DEVICE_ADD("io1", VS9209, 0)
-	MCFG_VS9209_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_VS9209_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_VS9209_IN_PORTC_CB(IOPORT("SYSTEM"))
-	MCFG_VS9209_IN_PORTD_CB(IOPORT("DSW1"))
-	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
-	MCFG_VS9209_IN_PORTF_CB(IOPORT("DSW3"))
-	MCFG_VS9209_OUT_PORTG_CB(WRITE8(*this, taotaido_state, unknown_output_w))
-	MCFG_VS9209_IN_PORTH_CB(IOPORT("JP"))
+	vs9209_device &io1(VS9209(config, "io1", 0));
+	io1.porta_input_cb().set_ioport("P1");
+	io1.portb_input_cb().set_ioport("P2");
+	io1.portc_input_cb().set_ioport("SYSTEM");
+	io1.portd_input_cb().set_ioport("DSW1");
+	io1.porte_input_cb().set_ioport("DSW2");
+	io1.portf_input_cb().set_ioport("DSW3");
+	io1.portg_output_cb().set(FUNC(taotaido_state::unknown_output_w));
+	io1.porth_input_cb().set_ioport("JP");
 
-	MCFG_DEVICE_ADD("io2", VS9209, 0)
-	MCFG_VS9209_IN_PORTA_CB(IOPORT("P3"))                   // used only by taotaida
-	MCFG_VS9209_IN_PORTB_CB(IOPORT("P4"))                   // used only by taotaida
+	vs9209_device &io2(VS9209(config, "io2", 0));
+	io2.porta_input_cb().set_ioport("P3");                   // used only by taotaida
+	io2.portb_input_cb().set_ioport("P4");                   // used only by taotaida
 
-	MCFG_DEVICE_ADD("watchdog", MB3773, 0)
+	MB3773(config, m_watchdog, 0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taotaido)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_taotaido);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taotaido_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taotaido_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(taotaido_state::screen_update));
+	screen.screen_vblank().set(FUNC(taotaido_state::screen_vblank));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x800);
 
-	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
-	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( taotaido_state, tile_callback )
-	MCFG_VSYSTEM_SPR_SET_GFXREGION(0)
-	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR(config, m_spr, 0);
+	m_spr->set_tile_indirect_cb(FUNC(taotaido_state::tile_callback), this);
+	m_spr->set_gfx_region(0);
+	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
+}
 
 
 ROM_START( taotaido )

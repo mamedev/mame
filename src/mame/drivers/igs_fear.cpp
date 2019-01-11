@@ -7,6 +7,7 @@
 #include "machine/nvram.h"
 #include "machine/pgmcrypt.h"
 #include "sound/ics2115.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -20,9 +21,12 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void igs_fear(machine_config &config);
 
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	void init_igs_fear();
+
+private:
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	//virtual void video_start();
 	virtual void video_start_igs_fear();
 	uint32_t screen_update_igs_fear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -30,7 +34,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void igs_fear(machine_config &config);
 	void igs_igs_fear_map(address_map &map);
 };
 
@@ -78,31 +81,30 @@ WRITE_LINE_MEMBER(igs_fear_state::sound_irq)
 }
 
 
-MACHINE_CONFIG_START(igs_fear_state::igs_fear)
-	MCFG_DEVICE_ADD("maincpu",ARM7, 50000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(igs_igs_fear_map)
+void igs_fear_state::igs_fear(machine_config &config)
+{
+	ARM7(config, m_maincpu, 50000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::igs_igs_fear_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(igs_fear_state::screen_update_igs_fear));
+	screen.set_palette(m_palette);
 
 	MCFG_VIDEO_START_OVERRIDE(igs_fear_state, igs_fear)
-	MCFG_SCREEN_UPDATE_DRIVER(igs_fear_state, screen_update_igs_fear)
-	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igs_fear)
+	PALETTE(config, m_palette).set_entries(0x200);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igs_fear);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_ICS2115_ADD("ics", 0)
-	MCFG_ICS2115_IRQ_CB(WRITELINE(*this, igs_fear_state, sound_irq))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
-
-MACHINE_CONFIG_END
+	ics2115_device &ics(ICS2115(config, "ics", 0));
+	ics.irq().set(FUNC(igs_fear_state::sound_irq));
+	ics.add_route(ALL_OUTPUTS, "mono", 5.0);
+}
 
 
 ROM_START( fearless )

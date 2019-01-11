@@ -39,6 +39,17 @@
 		</part>
 	</software>
 
+	<software name="smart" supported="no">
+		<description>Smart Cartridge</description>
+		<year>1987</year>
+		<publisher>Care Electronics</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<dataarea name="lorom" size="16384">
+				<rom name="smart_v2.rom" size="16384" crc="e9a8139e" sha1="26d6bbfe4b43f76be1f0cb2d96143112d3503840" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vfs">
 		<description>Video Filing System ROM Cartridge</description>
 		<year>1986</year>
@@ -46,6 +57,20 @@
 		<part name="cart" interface="bbcm_cart">
 			<dataarea name="uprom" size="16384">
 				<rom name="vfs170.rom" size="16384" crc="b124a0bb" sha1="ba31c757815cf470402d7829a70a0e1d3fb1355b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="videorom">
+		<description>VideoROM: Videodisc Player Control Software</description>
+		<year>1988</year>
+		<publisher>The Soft Option</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="VideoROM_3.1.rom" size="16384" crc="e2089d1c" sha1="32c3aed1e8dc44997a7b567da012b85687062193" offset="0" />
+			</dataarea>
+			<dataarea name="lorom" size="16384">
+				<rom name="BootROM_1.4.rom" size="16384" crc="59639755" sha1="173f619e0c794c5f2bbf1ad0beba92bce1d9716a" offset="0" />
 			</dataarea>
 		</part>
 	</software>

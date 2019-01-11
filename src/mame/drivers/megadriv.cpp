@@ -604,30 +604,26 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x)
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
-	MCFG_DEVICE_MODIFY("gen_vdp")
-	MCFG_SEGA315_5313_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
-	MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(md_cons_state, _32x_scanline_helper_callback);
-	MCFG_SEGA315_5313_32X_INTERRUPT_CB(md_cons_state, _32x_interrupt_callback);
+	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback), this);
+	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback), this);
+	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback), this);
+	m_vdp->reset_routes();
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.25)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.25)/2);
 
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
-	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
+	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
+	m_32x->set_palette_tag("gen_vdp:palette");
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
-	// we need to remove and re-add the sound system because the balance is different
-	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
+	// we need to remove and re-add the YM because the balance is different
+	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_DEVICE_REMOVE("snsnd")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
 	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
-
-	/* sound hardware */
-	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
 	MCFG_GENERIC_EXTENSIONS("32x,bin")
@@ -645,30 +641,26 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x)
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
-	MCFG_DEVICE_MODIFY("gen_vdp")
-	MCFG_SEGA315_5313_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
-	MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(md_cons_state, _32x_scanline_helper_callback);
-	MCFG_SEGA315_5313_32X_INTERRUPT_CB(md_cons_state, _32x_interrupt_callback);
+	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback), this);
+	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback), this);
+	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback), this);
+	m_vdp->reset_routes();
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.25)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.25)/2);
 
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
-	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
+	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
+	m_32x->set_palette_tag("gen_vdp:palette");
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	// we need to remove and re-add the sound system because the balance is different
-	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
+	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_DEVICE_REMOVE("snsnd")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
 	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
-
-	/* sound hardware */
-	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
 	MCFG_GENERIC_EXTENSIONS("32x,bin")
@@ -686,30 +678,26 @@ MACHINE_CONFIG_START(md_cons_state::md_32x)
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
-	MCFG_DEVICE_MODIFY("gen_vdp")
-	MCFG_SEGA315_5313_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
-	MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(md_cons_state, _32x_scanline_helper_callback);
-	MCFG_SEGA315_5313_32X_INTERRUPT_CB(md_cons_state, _32x_interrupt_callback);
+	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback), this);
+	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback), this);
+	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback), this);
+	m_vdp->reset_routes();
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.25)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.25)/2);
 
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_PAL, 0)
-	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
+	SEGA_32X_PAL(config, m_32x, (MASTER_CLOCK_PAL * 3) / 7, m_maincpu, m_scan_timer);
+	m_32x->set_palette_tag("gen_vdp:palette");
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	// we need to remove and re-add the sound system because the balance is different
-	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
+	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_DEVICE_REMOVE("snsnd")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
 	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
-
-	/* sound hardware */
-	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "_32x_cart")
 	MCFG_GENERIC_EXTENSIONS("32x,bin")
@@ -732,9 +720,9 @@ MACHINE_CONFIG_END
 	ROM_COPY( "32x_68k_bios", 0x0, 0x0, 0x100) \
 	ROM_REGION32_BE( 0x400000, "master", 0 ) /* SH2 Code */ \
 	ROM_SYSTEM_BIOS( 0, "retail", "Mars Version 1.0 (retail)" ) \
-	ROMX_LOAD( "32x_m_bios.bin", 0x000000,  0x000800, CRC(dd9c46b8) SHA1(1e5b0b2441a4979b6966d942b20cc76c413b8c5e), ROM_BIOS(1) ) \
+	ROMX_LOAD( "32x_m_bios.bin", 0x000000,  0x000800, CRC(dd9c46b8) SHA1(1e5b0b2441a4979b6966d942b20cc76c413b8c5e), ROM_BIOS(0) ) \
 	ROM_SYSTEM_BIOS( 1, "sdk", "Mars Version 1.0 (early sdk)" ) \
-	ROMX_LOAD( "32x_m_bios_sdk.bin", 0x000000,  0x000800, BAD_DUMP CRC(c7102c53) SHA1(ed73a47f186b373b8eff765f84ef26c3d9ef6cb0), ROM_BIOS(2) ) \
+	ROMX_LOAD( "32x_m_bios_sdk.bin", 0x000000,  0x000800, BAD_DUMP CRC(c7102c53) SHA1(ed73a47f186b373b8eff765f84ef26c3d9ef6cb0), ROM_BIOS(1) ) \
 	ROM_REGION32_BE( 0x400000, "slave", 0 ) /* SH2 Code */ \
 	ROM_LOAD( "32x_s_bios.bin", 0x000000,  0x000400, CRC(bfda1fe5) SHA1(4103668c1bbd66c5e24558e73d4f3f92061a109a) )
 
@@ -762,8 +750,8 @@ MACHINE_CONFIG_START(md_cons_state::genesis_scd)
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_US(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("scd_cdrom")
@@ -780,8 +768,8 @@ MACHINE_CONFIG_START(md_cons_state::md_scd)
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_EUROPE, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("scd_cdrom")
@@ -798,8 +786,8 @@ MACHINE_CONFIG_START(md_cons_state::mdj_scd)
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("scd_cdrom")
@@ -812,8 +800,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_cons_state::genesis_32x_scd)
 	genesis_32x(config);
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_US(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("scd_cdrom")
@@ -832,8 +820,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_cons_state::md_32x_scd)
 	md_32x(config);
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_EUROPE, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("scd_cdrom")
@@ -852,8 +840,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_cons_state::mdj_32x_scd)
 	mdj_32x(config);
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("scd_cdrom")
@@ -887,18 +875,18 @@ ROM_START( megacdj )
 	ROM_DEFAULT_BIOS("v100g")   // this seems the only revision where the cursor in CD menu works, allowing to boot games
 	/* Confirmed by ElBarto */
 	ROM_SYSTEM_BIOS(0, "v100s", "v1.00S")
-	ROMX_LOAD( "mpr-14088h.bin", 0x000000,  0x020000, CRC(3773d5aa) SHA1(bbf729a1aaa1667b783749299e1ad932aaf5f253), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE)
+	ROMX_LOAD( "mpr-14088h.bin", 0x000000,  0x020000, CRC(3773d5aa) SHA1(bbf729a1aaa1667b783749299e1ad932aaf5f253), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE)
 	/* Confirmed by ElBarto */
 	ROM_SYSTEM_BIOS(1, "v100g", "v1.00G")
-	ROMX_LOAD( "epr-14088b.bin", 0x000000,  0x020000, CRC(69ed6ccd) SHA1(27d11c3836506f01ee81cd142c0cd8b51abebbd2), ROM_BIOS(2) | ROM_GROUPWORD | ROM_REVERSE)
+	ROMX_LOAD( "epr-14088b.bin", 0x000000,  0x020000, CRC(69ed6ccd) SHA1(27d11c3836506f01ee81cd142c0cd8b51abebbd2), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE)
 	/* Confirmed by ElBarto */
 	ROM_SYSTEM_BIOS(2, "v100l", "v1.00L")
-	ROMX_LOAD( "mpr-14088c.bin", 0x000000,  0x020000, CRC(03134289) SHA1(d60cb5a53f26d6b13e354bc149217587f2301718), ROM_BIOS(3) | ROM_GROUPWORD | ROM_REVERSE)
+	ROMX_LOAD( "mpr-14088c.bin", 0x000000,  0x020000, CRC(03134289) SHA1(d60cb5a53f26d6b13e354bc149217587f2301718), ROM_BIOS(2) | ROM_GROUPWORD | ROM_REVERSE)
 	/* Confirmed by ElBarto */
 	ROM_SYSTEM_BIOS(3, "v100o", "v1.00O")
-	ROMX_LOAD( "epr-14088d.bin", 0x000000,  0x020000, CRC(dfa95ee9) SHA1(e13666c76fa0a2e94e2f651b26b0fd625bf55f07), ROM_BIOS(4) | ROM_GROUPWORD | ROM_REVERSE)
+	ROMX_LOAD( "epr-14088d.bin", 0x000000,  0x020000, CRC(dfa95ee9) SHA1(e13666c76fa0a2e94e2f651b26b0fd625bf55f07), ROM_BIOS(3) | ROM_GROUPWORD | ROM_REVERSE)
 	ROM_SYSTEM_BIOS(4, "v100p", "v1.00P")   // CRC: e2e70bc8 when byteswapped
-	ROMX_LOAD( "epr-14088e.bin", 0x000000,  0x020000, CRC(9d2da8f2) SHA1(4846f448160059a7da0215a5df12ca160f26dd69), ROM_BIOS(5) )
+	ROMX_LOAD( "epr-14088e.bin", 0x000000,  0x020000, CRC(9d2da8f2) SHA1(4846f448160059a7da0215a5df12ca160f26dd69), ROM_BIOS(4) )
 ROM_END
 
 /* Asia bios, when run in USA region will show :
@@ -916,29 +904,29 @@ ROM_END
 ROM_START( segacd2 )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_SYSTEM_BIOS(0, "v211x", "Model 2 v2.11X")
-	ROMX_LOAD( "mpr-15764-t.bin", 0x000000,  0x020000, CRC(2e49d72c) SHA1(328a3228c29fba244b9db2055adc1ec4f7a87e6b), ROM_BIOS(1) )
+	ROMX_LOAD( "mpr-15764-t.bin", 0x000000,  0x020000, CRC(2e49d72c) SHA1(328a3228c29fba244b9db2055adc1ec4f7a87e6b), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "v200", "Model 2 v2.00") /* verified dump */
-	ROMX_LOAD( "us_scd2_930314.bin", 0x000000,  0x020000, CRC(8af65f58) SHA1(5a8c4b91d3034c1448aac4b5dc9a6484fce51636), ROM_BIOS(2) )
+	ROMX_LOAD( "us_scd2_930314.bin", 0x000000,  0x020000, CRC(8af65f58) SHA1(5a8c4b91d3034c1448aac4b5dc9a6484fce51636), ROM_BIOS(1) )
 	/* this is reportedly a bad dump, it has many differences from the verified dump and does not boot in Kega */
-	/* ROMX_LOAD( "segacd_model2_bios_2_00_u.bin", 0x000000,  0x020000, CRC(340b4be4) SHA1(bd3ee0c8ab732468748bf98953603ce772612704), ROM_BIOS(2) ) */
+	/* ROMX_LOAD( "segacd_model2_bios_2_00_u.bin", 0x000000,  0x020000, CRC(340b4be4) SHA1(bd3ee0c8ab732468748bf98953603ce772612704), ROM_BIOS(1) ) */
 	ROM_SYSTEM_BIOS(2, "v200w", "Model 2 v2.00W")
-	ROMX_LOAD( "segacd_model2_bios_2_00w_u.bin", 0x000000,  0x020000, CRC(9f6f6276) SHA1(5adb6c3af218c60868e6b723ec47e36bbdf5e6f0), ROM_BIOS(3) )
+	ROMX_LOAD( "segacd_model2_bios_2_00w_u.bin", 0x000000,  0x020000, CRC(9f6f6276) SHA1(5adb6c3af218c60868e6b723ec47e36bbdf5e6f0), ROM_BIOS(2) )
 ROM_END
 
 /* All confirmed good dump by ElBarto */
 ROM_START( megacd2 )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_SYSTEM_BIOS(0, "v200w", "v2.00W")
-	ROMX_LOAD( "mpr-15512a.bin", 0x000000,  0x020000, CRC(53f1757c) SHA1(67bf3970ca5a05fd5ce3d6c446789c5d971b98a4), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE )
+	ROMX_LOAD( "mpr-15512a.bin", 0x000000,  0x020000, CRC(53f1757c) SHA1(67bf3970ca5a05fd5ce3d6c446789c5d971b98a4), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE )
 	ROM_SYSTEM_BIOS(1, "v200", "v2.00")
-	ROMX_LOAD( "mpr-15512.bin", 0x000000,  0x020000, CRC(cb76f114) SHA1(939f173cadc41e996a3c34498da1bf55e7e18ff8), ROM_BIOS(2) | ROM_GROUPWORD | ROM_REVERSE )
+	ROMX_LOAD( "mpr-15512.bin", 0x000000,  0x020000, CRC(cb76f114) SHA1(939f173cadc41e996a3c34498da1bf55e7e18ff8), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE )
 ROM_END
 
 /* Confirmed good dump by ElBarto */
 ROM_START( megacd2j )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_SYSTEM_BIOS(0, "v200c", "v2.00C")
-	ROMX_LOAD( "mpr-15398.bin", 0x000000,  0x020000, CRC(1e4344e6) SHA1(4d1251a6973d932e734ae5e8c6b9b55eb40e4143), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE )
+	ROMX_LOAD( "mpr-15398.bin", 0x000000,  0x020000, CRC(1e4344e6) SHA1(4d1251a6973d932e734ae5e8c6b9b55eb40e4143), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE )
 ROM_END
 
 ROM_START( aiwamcd )
@@ -950,17 +938,17 @@ ROM_END
 ROM_START( laseract )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_SYSTEM_BIOS(0, "v104", "v1.04")
-	ROMX_LOAD( "laseractive_bios_1_04_u.bin", 0x000000,  0x020000, CRC(50cd3d23) SHA1(aa811861f8874775075bd3f53008c8aaf59b07db), ROM_BIOS(1) )
+	ROMX_LOAD( "laseractive_bios_1_04_u.bin", 0x000000,  0x020000, CRC(50cd3d23) SHA1(aa811861f8874775075bd3f53008c8aaf59b07db), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "v102", "v1.02")
-	ROMX_LOAD( "laseractive_bios_1_02_u.bin", 0x000000,  0x020000, CRC(3b10cf41) SHA1(8af162223bb12fc19b414f126022910372790103), ROM_BIOS(2) )
+	ROMX_LOAD( "laseractive_bios_1_02_u.bin", 0x000000,  0x020000, CRC(3b10cf41) SHA1(8af162223bb12fc19b414f126022910372790103), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( laseractj )
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_SYSTEM_BIOS(0, "v105", "v1.05")
-	ROMX_LOAD( "mega-ld 1.05 bios.bin", 0x000000,  0x020000, CRC(474aaa44) SHA1(b3b1d880e288b6dc79eec0ff1b0480c229ec141d), ROM_BIOS(1) )
+	ROMX_LOAD( "mega-ld 1.05 bios.bin", 0x000000,  0x020000, CRC(474aaa44) SHA1(b3b1d880e288b6dc79eec0ff1b0480c229ec141d), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "v102", "v1.02")
-	ROMX_LOAD( "laseractive_bios_1_02_j.bin", 0x000000,  0x020000, CRC(00eedb3a) SHA1(26237b333db4a4c6770297fa5e655ea95840d5d9), ROM_BIOS(2) )
+	ROMX_LOAD( "laseractive_bios_1_02_j.bin", 0x000000,  0x020000, CRC(00eedb3a) SHA1(26237b333db4a4c6770297fa5e655ea95840d5d9), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( xeye )
@@ -1041,18 +1029,18 @@ ROM_START( 32x_mcdj )
 	ROM_DEFAULT_BIOS("v100g")   // this seems the only revision where the cursor in CD menu works, allowing to boot games
 	/* Confirmed by ElBarto */
 	ROM_SYSTEM_BIOS(0, "v100s", "v1.00S")
-	ROMX_LOAD( "mpr-14088h.bin", 0x000000,  0x020000, CRC(3773d5aa) SHA1(bbf729a1aaa1667b783749299e1ad932aaf5f253), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE)
+	ROMX_LOAD( "mpr-14088h.bin", 0x000000,  0x020000, CRC(3773d5aa) SHA1(bbf729a1aaa1667b783749299e1ad932aaf5f253), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE)
 	/* Confirmed by ElBarto */
 	ROM_SYSTEM_BIOS(1, "v100g", "v1.00G")
-	ROMX_LOAD( "epr-14088b.bin", 0x000000,  0x020000, CRC(69ed6ccd) SHA1(27d11c3836506f01ee81cd142c0cd8b51abebbd2), ROM_BIOS(2) | ROM_GROUPWORD | ROM_REVERSE)
+	ROMX_LOAD( "epr-14088b.bin", 0x000000,  0x020000, CRC(69ed6ccd) SHA1(27d11c3836506f01ee81cd142c0cd8b51abebbd2), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE)
 	/* Confirmed by ElBarto */
 	ROM_SYSTEM_BIOS(2, "v100l", "v1.00L")
-	ROMX_LOAD( "mpr-14088c.bin", 0x000000,  0x020000, CRC(03134289) SHA1(d60cb5a53f26d6b13e354bc149217587f2301718), ROM_BIOS(3) | ROM_GROUPWORD | ROM_REVERSE)
+	ROMX_LOAD( "mpr-14088c.bin", 0x000000,  0x020000, CRC(03134289) SHA1(d60cb5a53f26d6b13e354bc149217587f2301718), ROM_BIOS(2) | ROM_GROUPWORD | ROM_REVERSE)
 	/* Confirmed by ElBarto */
 	ROM_SYSTEM_BIOS(3, "v100o", "v1.00O")
-	ROMX_LOAD( "epr-14088d.bin", 0x000000,  0x020000, CRC(dfa95ee9) SHA1(e13666c76fa0a2e94e2f651b26b0fd625bf55f07), ROM_BIOS(4) | ROM_GROUPWORD | ROM_REVERSE)
+	ROMX_LOAD( "epr-14088d.bin", 0x000000,  0x020000, CRC(dfa95ee9) SHA1(e13666c76fa0a2e94e2f651b26b0fd625bf55f07), ROM_BIOS(3) | ROM_GROUPWORD | ROM_REVERSE)
 	ROM_SYSTEM_BIOS(4, "v100p", "v1.00P")   // CRC: e2e70bc8 when byteswapped
-	ROMX_LOAD( "epr-14088e.bin", 0x000000,  0x020000, CRC(9d2da8f2) SHA1(4846f448160059a7da0215a5df12ca160f26dd69), ROM_BIOS(5) )
+	ROMX_LOAD( "epr-14088e.bin", 0x000000,  0x020000, CRC(9d2da8f2) SHA1(4846f448160059a7da0215a5df12ca160f26dd69), ROM_BIOS(4) )
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
 	ROM_COPY( "gamecart", 0x000000, 0x0, 0x400000)

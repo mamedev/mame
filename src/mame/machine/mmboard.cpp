@@ -328,11 +328,10 @@ MACHINE_CONFIG_START(mephisto_display_modul_device::device_add_mconfig)
 	MCFG_SCREEN_VISIBLE_AREA(0, 16*6-1, 0, 9*2-3)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(mephisto_display_modul_device, lcd_palette)
+	PALETTE(config, "palette", FUNC(mephisto_display_modul_device::lcd_palette), 2);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16)
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -341,7 +340,7 @@ MACHINE_CONFIG_START(mephisto_display_modul_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 
-PALETTE_INIT_MEMBER(mephisto_display_modul_device,lcd_palette)
+void mephisto_display_modul_device::lcd_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -375,7 +374,7 @@ WRITE8_MEMBER(mephisto_display_modul_device::latch_w)
 WRITE8_MEMBER(mephisto_display_modul_device::io_w)
 {
 	if (BIT(data, 1) && !BIT(m_ctrl, 1))
-		m_lcdc->write(space, BIT(data, 0), m_latch);
+		m_lcdc->write(BIT(data, 0), m_latch);
 
 	m_beeper->set_state(BIT(data, 2) | BIT(data, 3));
 

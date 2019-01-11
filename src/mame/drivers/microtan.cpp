@@ -43,30 +43,27 @@
 
 /* Components */
 #include "cpu/m6502/m6502.h"
-#include "machine/6522via.h"
 #include "machine/mos6551.h"
-#include "sound/ay8910.h"
 #include "sound/wave.h"
 
-/* Devices */
-#include "imagedev/cassette.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-void microtan_state::microtan_map(address_map &map)
+void microtan_state::main_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
-	map(0x0200, 0x03ff).ram().w(this, FUNC(microtan_state::microtan_videoram_w)).share("videoram");
-	map(0xbc00, 0xbc00).w("ay8910.1", FUNC(ay8910_device::address_w));
-	map(0xbc01, 0xbc01).rw("ay8910.1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0xbc02, 0xbc02).w("ay8910.2", FUNC(ay8910_device::address_w));
-	map(0xbc03, 0xbc03).rw("ay8910.2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0xbfc0, 0xbfcf).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0200, 0x03ff).ram().w(FUNC(microtan_state::videoram_w)).share(m_videoram);
+	map(0xbc00, 0xbc00).w(m_ay8910[0], FUNC(ay8910_device::address_w));
+	map(0xbc01, 0xbc01).rw(m_ay8910[0], FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xbc02, 0xbc02).w(m_ay8910[1], FUNC(ay8910_device::address_w));
+	map(0xbc03, 0xbc03).rw(m_ay8910[1], FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xbfc0, 0xbfcf).rw(m_via6522[0], FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0xbfd0, 0xbfd3).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xbfe0, 0xbfef).rw(m_via6522_1, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0xbff0, 0xbfff).rw(this, FUNC(microtan_state::microtan_bffx_r), FUNC(microtan_state::microtan_bffx_w));
+	map(0xbfe0, 0xbfef).rw(m_via6522[1], FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xbff0, 0xbfff).rw(FUNC(microtan_state::bffx_r), FUNC(microtan_state::bffx_w));
 	map(0xc000, 0xe7ff).rom();
 	map(0xf000, 0xffff).rom();
 }
@@ -212,10 +209,12 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(microtan_state::microtan)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(6'000'000) / 8)  // 750 kHz
-	MCFG_DEVICE_PROGRAM_MAP(microtan_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", microtan_state,  microtan_interrupt)
+	MCFG_DEVICE_ADD(m_maincpu, M6502, 6_MHz_XTAL / 8)  // 750 kHz
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", microtan_state, interrupt)
 
+	// The 6502 IRQ line is active low and probably driven by open collector outputs (guess).
+	INPUT_MERGER_ANY_HIGH(config, m_irq_line).output_handler().set_inputline(m_maincpu, 0);
 
 	/* video hardware - include overscan */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -223,47 +222,45 @@ MACHINE_CONFIG_START(microtan_state::microtan)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(32*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*16, 16*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(microtan_state, screen_update_microtan)
+	MCFG_SCREEN_UPDATE_DRIVER(microtan_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_microtan)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
-	MCFG_DEVICE_ADD("ay8910.1", AY8910, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("ay8910.2", AY8910, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	AY8910(config, m_ay8910[0], 1000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	AY8910(config, m_ay8910[1], 1000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	/* snapshot/quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", microtan_state, microtan, "m65", 0.5)
 	MCFG_QUICKLOAD_ADD("quickload", microtan_state, microtan, "hex", 0.5)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_ADD( m_cassette )
 
 	/* acia */
-	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	mos6551_device &acia(MOS6551(config, "acia", 0));
+	acia.set_xtal(1.8432_MHz_XTAL);
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL(6'000'000) / 8)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, microtan_state, via_0_in_a))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, microtan_state, via_0_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, microtan_state, via_0_out_b))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, microtan_state, via_0_out_ca2))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, microtan_state, via_0_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, microtan_state, via_0_irq))
+	VIA6522(config, m_via6522[0], 6_MHz_XTAL / 8);
+	m_via6522[0]->readpa_handler().set(FUNC(microtan_state::via_0_in_a));
+	m_via6522[0]->writepa_handler().set(FUNC(microtan_state::via_0_out_a));
+	m_via6522[0]->writepb_handler().set(FUNC(microtan_state::via_0_out_b));
+	m_via6522[0]->ca2_handler().set(FUNC(microtan_state::via_0_out_ca2));
+	m_via6522[0]->cb2_handler().set(FUNC(microtan_state::via_0_out_cb2));
+	m_via6522[0]->irq_handler().set(m_irq_line, FUNC(input_merger_device::in_w<IRQ_VIA_0>));
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL(6'000'000) / 8)
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, microtan_state, via_1_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, microtan_state, via_1_out_b))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, microtan_state, via_1_out_ca2))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, microtan_state, via_1_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, microtan_state, via_1_irq))
+	MCFG_DEVICE_ADD(m_via6522[1], VIA6522, 6_MHz_XTAL / 8)
+	m_via6522[1]->writepa_handler().set(FUNC(microtan_state::via_1_out_a));
+	m_via6522[1]->writepb_handler().set(FUNC(microtan_state::via_1_out_b));
+	m_via6522[1]->ca2_handler().set(FUNC(microtan_state::via_1_out_ca2));
+	m_via6522[1]->cb2_handler().set(FUNC(microtan_state::via_1_out_cb2));
+	m_via6522[1]->irq_handler().set(m_irq_line, FUNC(input_merger_device::in_w<IRQ_VIA_1>));
 MACHINE_CONFIG_END
 
 ROM_START( microtan )

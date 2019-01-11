@@ -32,7 +32,7 @@ public:
 
 	void submar(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(submar_sensor0_r);
@@ -156,13 +156,13 @@ void submar_state::submar_map(address_map &map)
 void submar_state::submar_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(this, FUNC(submar_state::submar_sensor0_r), FUNC(submar_state::submar_motor_w));
-	map(0x01, 0x01).rw(this, FUNC(submar_state::submar_sensor1_r), FUNC(submar_state::submar_lamp_w));
-	map(0x02, 0x02).w(this, FUNC(submar_state::submar_solenoid_w));
-	map(0x03, 0x03).portr("DSW").w(this, FUNC(submar_state::submar_sound_w));
-	map(0x04, 0x05).w(this, FUNC(submar_state::submar_led_w));
+	map(0x00, 0x00).rw(FUNC(submar_state::submar_sensor0_r), FUNC(submar_state::submar_motor_w));
+	map(0x01, 0x01).rw(FUNC(submar_state::submar_sensor1_r), FUNC(submar_state::submar_lamp_w));
+	map(0x02, 0x02).w(FUNC(submar_state::submar_solenoid_w));
+	map(0x03, 0x03).portr("DSW").w(FUNC(submar_state::submar_sound_w));
+	map(0x04, 0x05).w(FUNC(submar_state::submar_led_w));
 	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x07, 0x07).w(this, FUNC(submar_state::submar_irq_clear_w));
+	map(0x07, 0x07).w(FUNC(submar_state::submar_irq_clear_w));
 }
 
 
@@ -230,7 +230,7 @@ MACHINE_CONFIG_START(submar_state::submar)
 	MCFG_DEVICE_PROGRAM_MAP(submar_map)
 	MCFG_DEVICE_IO_MAP(submar_portmap)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* no video! */
 

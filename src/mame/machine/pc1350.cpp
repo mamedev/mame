@@ -7,102 +7,59 @@
 #include "includes/pc1350.h"
 #include "machine/ram.h"
 
-
-
-WRITE8_MEMBER(pc1350_state::pc1350_outa)
+WRITE8_MEMBER(pc1350_state::out_b_w)
 {
-	m_outa=data;
+	m_outb = data;
 }
 
-WRITE8_MEMBER(pc1350_state::pc1350_outb)
-{
-	m_outb=data;
-}
-
-WRITE8_MEMBER(pc1350_state::pc1350_outc)
+WRITE8_MEMBER(pc1350_state::out_c_w)
 {
 }
 
-READ8_MEMBER(pc1350_state::pc1350_ina)
+READ8_MEMBER(pc1350_state::in_a_r)
 {
 	int data = m_outa;
-	int t = pc1350_keyboard_line_r(space,0);
+	int t = keyboard_line_r(space, 0);
 
-	if (t & 0x01)
-		data |= ioport("KEY0")->read();
+	for (int bit = 0; bit < 6; bit++)
+		if (BIT(t, bit))
+			data |= m_keys[bit]->read();
 
-	if (t & 0x02)
-		data |= ioport("KEY1")->read();
+	for (int bit = 0, key = 6; bit < 2; bit++, key++)
+		if (BIT(m_outa, bit))
+			data |= m_keys[key]->read();
 
-	if (t & 0x04)
-		data |= ioport("KEY2")->read();
-
-	if (t & 0x08)
-		data |= ioport("KEY3")->read();
-
-	if (t & 0x10)
-		data |= ioport("KEY4")->read();
-
-	if (t & 0x20)
-		data |= ioport("KEY5")->read();
-
-	if (m_outa & 0x01)
-		data |= ioport("KEY6")->read();
-
-	if (m_outa & 0x02)
-		data |= ioport("KEY7")->read();
-
-	if (m_outa & 0x04)
+	if (BIT(m_outa, 2))
 	{
-		data |= ioport("KEY8")->read();
+		data |= m_keys[8]->read();
 
 		/* At Power Up we fake a 'CLS' pressure */
 		if (m_power)
 			data |= 0x08;
 	}
 
-	if (m_outa & 0x08)
-		data |= ioport("KEY9")->read();
-
-	if (m_outa & 0x10)
-		data |= ioport("KEY10")->read();
+	for (int bit = 3, key = 9; bit < 5; bit++, key++)
+		if (BIT(m_outa, bit))
+			data |= m_keys[key]->read();
 
 	if (m_outa & 0xc0)
-		data |= ioport("KEY11")->read();
+		data |= m_keys[11]->read();
 
 	// missing lshift
 
 	return data;
 }
 
-READ8_MEMBER(pc1350_state::pc1350_inb)
+READ8_MEMBER(pc1350_state::in_b_r)
 {
 	return m_outb;
 }
 
-READ_LINE_MEMBER(pc1350_state::pc1350_brk)
-{
-	return (ioport("EXTRA")->read() & 0x01);
-}
-
-void pc1350_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_POWER_UP:
-		m_power=0;
-		break;
-	default:
-		assert_always(false, "Unknown id in pc1350_state::device_timer");
-	}
-}
-
 void pc1350_state::machine_start()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	pocketc_state::machine_start();
 
-	m_power = 1;
-	timer_set(attotime::from_seconds(1), TIMER_POWER_UP);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	space.install_readwrite_bank(0x6000, 0x6fff, "bank1");
 	membank("bank1")->set_base(&m_ram->pointer()[0x0000]);
@@ -127,9 +84,5 @@ void pc1350_state::machine_start()
 		space.nop_readwrite(0x2000, 0x3fff);
 	}
 
-	uint8_t *ram = memregion("maincpu")->base() + 0x2000;
-	uint8_t *cpu = m_maincpu->internal_ram();
-
-	machine().device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
-	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x5000);
+	m_ram_nvram->set_base(memregion("maincpu")->base() + 0x2000, 0x5000);
 }

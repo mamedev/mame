@@ -29,40 +29,25 @@ public:
 	fruitpc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
 		, m_isabus(*this, "isa")
-		, m_inp1(*this, "INP1")
-		, m_inp2(*this, "INP2")
-		, m_inp3(*this, "INP3")
-		, m_inp4(*this, "INP4")
+		, m_inp(*this, "INP%u", 1U)
 	{ }
 
+	void fruitpc(machine_config &config);
+
+private:
 	required_device<isa8_device> m_isabus;
-	required_ioport m_inp1;
-	required_ioport m_inp2;
-	required_ioport m_inp3;
-	required_ioport m_inp4;
+	required_ioport_array<4> m_inp;
 
 	DECLARE_READ8_MEMBER(fruit_inp_r);
 	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
 	static void fruitpc_sb_conf(device_t *device);
-	void fruitpc(machine_config &config);
 	void fruitpc_io(address_map &map);
 	void fruitpc_map(address_map &map);
 };
 
 READ8_MEMBER(fruitpc_state::fruit_inp_r)
 {
-	switch(offset)
-	{
-		case 0:
-			return m_inp1->read();
-		case 1:
-			return m_inp2->read();
-		case 2:
-			return m_inp3->read();
-		case 3:
-			return m_inp4->read();
-	}
-	return 0;
+	return m_inp[offset & 0x03]->read();
 }
 
 void fruitpc_state::fruitpc_map(address_map &map)
@@ -79,12 +64,12 @@ void fruitpc_state::fruitpc_map(address_map &map)
 void fruitpc_state::fruitpc_io(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
-	map(0x0310, 0x0313).r(this, FUNC(fruitpc_state::fruit_inp_r));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
+	map(0x0310, 0x0313).r(FUNC(fruitpc_state::fruit_inp_r));
 	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
 }
 
 static INPUT_PORTS_START( fruitpc )
@@ -138,26 +123,25 @@ MACHINE_CONFIG_START(fruitpc_state::fruitpc)
 
 	pcat_common(config);
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	/* video hardware */
 	pcvideo_vga(config);
 
-	MCFG_DEVICE_MODIFY("dma8237_1")
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, fruitpc_state, dma8237_1_dack_w))
+	m_dma8237_1->out_iow_callback<1>().set(FUNC(fruitpc_state::dma8237_1_dack_w));
 
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259_2", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259_1", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259_1", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259_1", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259_1", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259_1", pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma8237_1", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma8237_1", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma8237_1", am9517a_device, dreq3_w))
+	ISA8(config, m_isabus, 0);
+	m_isabus->set_cputag("maincpu");
+	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir2_w));
+	m_isabus->irq3_callback().set("pic8259_1", FUNC(pic8259_device::ir3_w));
+	m_isabus->irq4_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));
+	m_isabus->irq5_callback().set("pic8259_1", FUNC(pic8259_device::ir5_w));
+	m_isabus->irq6_callback().set("pic8259_1", FUNC(pic8259_device::ir6_w));
+	m_isabus->irq7_callback().set("pic8259_1", FUNC(pic8259_device::ir7_w));
+	m_isabus->drq1_callback().set("dma8237_1", FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq2_callback().set("dma8237_1", FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", fruitpc_isa8_cards, "sb15", true)

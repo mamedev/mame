@@ -157,7 +157,7 @@ WRITE_LINE_MEMBER( thomson_state::to7_set_cassette_motor )
    Bit-order is most significant bit first (unlike TO7).
 
    Double-density MO6 cassettes follow the exact same mechanism, but with
-   at double frequency (perdiods at 2400 Hz, and half-perdios at 1200 Hz).
+   at double frequency (periods at 2400 Hz, and half-periods at 1200 Hz).
 */
 
 
@@ -522,20 +522,20 @@ to7_io_line_device::to7_io_line_device(const machine_config &mconfig, const char
 
 MACHINE_CONFIG_START(to7_io_line_device::device_add_mconfig)
 	/// THIS PIO is part of CC 90-232 expansion
-	MCFG_DEVICE_ADD(THOM_PIA_IO, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, to7_io_line_device, porta_in))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, to7_io_line_device, porta_out))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
-	MCFG_PIA_CB2_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE("^mainfirq", input_merger_device, in_w<1>))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE("^mainfirq", input_merger_device, in_w<1>))
+	PIA6821(config, m_pia_io, 0);
+	m_pia_io->readpa_handler().set(FUNC(to7_io_line_device::porta_in));
+	m_pia_io->writepa_handler().set(FUNC(to7_io_line_device::porta_out));
+	m_pia_io->writepb_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pia_io->cb2_handler().set("centronics", FUNC(centronics_device::write_strobe));
+	m_pia_io->irqa_handler().set("^mainfirq", FUNC(input_merger_device::in_w<1>));
+	m_pia_io->irqb_handler().set("^mainfirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, to7_io_line_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, to7_io_line_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(*this, to7_io_line_device, write_dsr))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(FUNC(to7_io_line_device::write_rxd));
+	m_rs232->cts_handler().set(FUNC(to7_io_line_device::write_cts));
+	m_rs232->dsr_handler().set(FUNC(to7_io_line_device::write_dsr));
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(THOM_PIA_IO, pia6821_device, cb1_w))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, to7_io_line_device, write_centronics_busy))
 
@@ -1714,7 +1714,7 @@ void thomson_state::to9_set_video_mode( uint8_t data, int style )
 		break;
 
 		// undocumented, but tested on a real TO8D
-		case 0x20: thom_set_video_mode( THOM_VMODE_MO5_ALT );     break;
+        case 0x20: thom_set_video_mode( THOM_VMODE_MO5_ALT );     break;
 
 	case 0x21: thom_set_video_mode( THOM_VMODE_BITMAP4 );     break;
 
@@ -1743,6 +1743,9 @@ void thomson_state::to9_set_video_mode( uint8_t data, int style )
 
 	case 0x3f: thom_set_video_mode( THOM_VMODE_OVERLAY3 );    break;
 
+                // undocumented variant enconding for bitmap16
+        case 0x5b: thom_set_video_mode( THOM_VMODE_BITMAP16_ALT ); break;
+          
 	default:
 		logerror( "to9_set_video_mode: unknown mode $%02X tr=%i phi=%i mod=%i\n", data, (data >> 5) & 3, (data >> 3) & 2, data & 7 );
 	}

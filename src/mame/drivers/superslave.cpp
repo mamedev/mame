@@ -61,7 +61,7 @@ public:
 
 	void superslave(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void superslave_io(address_map &map);
@@ -69,13 +69,11 @@ protected:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( baud_w );
 	DECLARE_WRITE8_MEMBER( memctrl_w );
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( cmd_w );
 
-private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232a;
@@ -151,17 +149,6 @@ WRITE8_MEMBER( superslave_state::write )
 	{
 		m_ram->pointer()[offset] = data;
 	}
-}
-
-
-//-------------------------------------------------
-//  baud_w -
-//-------------------------------------------------
-
-WRITE8_MEMBER( superslave_state::baud_w )
-{
-	m_dbrg->str_w(data & 0x0f);
-	m_dbrg->stt_w(data >> 4);
 }
 
 
@@ -259,7 +246,7 @@ WRITE8_MEMBER( superslave_state::cmd_w )
 
 void superslave_state::superslave_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(superslave_state::read), FUNC(superslave_state::write));
+	map(0x0000, 0xffff).rw(FUNC(superslave_state::read), FUNC(superslave_state::write));
 }
 
 
@@ -272,13 +259,13 @@ void superslave_state::superslave_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw(Z80DART_0_TAG, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x0c, 0x0f).rw(Z80DART_1_TAG, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
-	map(0x10, 0x10).mirror(0x03).w(this, FUNC(superslave_state::baud_w));
+	map(0x10, 0x10).mirror(0x03).w(BR1941_TAG, FUNC(com8116_device::stt_str_w));
 	map(0x14, 0x17).rw(Z80PIO_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x18, 0x18).mirror(0x02).rw(AM9519_TAG, FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
 	map(0x19, 0x19).mirror(0x02).rw(AM9519_TAG, FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
-	map(0x1d, 0x1d).w(this, FUNC(superslave_state::memctrl_w));
+	map(0x1d, 0x1d).w(FUNC(superslave_state::memctrl_w));
 	map(0x1e, 0x1e).noprw(); // master communications
-	map(0x1f, 0x1f).rw(this, FUNC(superslave_state::status_r), FUNC(superslave_state::cmd_w));
+	map(0x1f, 0x1f).rw(FUNC(superslave_state::status_r), FUNC(superslave_state::cmd_w));
 }
 
 
@@ -317,11 +304,6 @@ INPUT_PORTS_END
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
-
-//-------------------------------------------------
-//  COM8116_INTERFACE( dbrg_intf )
-//-------------------------------------------------
-
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
@@ -379,72 +361,71 @@ void superslave_state::machine_reset()
 //  MACHINE_CONFIG( superslave )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(superslave_state::superslave)
+void superslave_state::superslave(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(superslave_mem)
-	MCFG_DEVICE_IO_MAP(superslave_io)
-	MCFG_Z80_DAISY_CHAIN(superslave_daisy_chain)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &superslave_state::superslave_mem);
+	m_maincpu->set_addrmap(AS_IO, &superslave_state::superslave_io);
+	m_maincpu->set_daisy_config(superslave_daisy_chain);
 
 	// devices
-	MCFG_DEVICE_ADD(AM9519_TAG, AM9519, 0)
-	MCFG_AM9519_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	am9519_device &am9519(AM9519(config, AM9519_TAG, 0));
+	am9519.out_int_callback().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(8'000'000)/2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, XTAL(8'000'000)/2));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(Z80DART_0_TAG, Z80DART, XTAL(8'000'000)/2)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80dart_device& dart0(Z80DART(config, Z80DART_0_TAG, XTAL(8'000'000)/2));
+	dart0.out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
+	dart0.out_dtra_callback().set(m_rs232a, FUNC(rs232_port_device::write_dtr));
+	dart0.out_rtsa_callback().set(m_rs232a, FUNC(rs232_port_device::write_rts));
+	dart0.out_txdb_callback().set(m_rs232b, FUNC(rs232_port_device::write_txd));
+	dart0.out_dtrb_callback().set(m_rs232b, FUNC(rs232_port_device::write_dtr));
+	dart0.out_rtsb_callback().set(m_rs232b, FUNC(rs232_port_device::write_rts));
+	dart0.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, ctsa_w))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	RS232_PORT(config, m_rs232a, default_rs232_devices, "terminal");
+	m_rs232a->rxd_handler().set(Z80DART_0_TAG, FUNC(z80dart_device::rxa_w));
+	m_rs232a->dcd_handler().set(Z80DART_0_TAG, FUNC(z80dart_device::dcda_w));
+	m_rs232a->cts_handler().set(Z80DART_0_TAG, FUNC(z80dart_device::ctsa_w));
+	m_rs232a->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, ctsb_w))
+	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
+	m_rs232b->rxd_handler().set(Z80DART_0_TAG, FUNC(z80dart_device::rxb_w));
+	m_rs232b->dcd_handler().set(Z80DART_0_TAG, FUNC(z80dart_device::dcdb_w));
+	m_rs232b->cts_handler().set(Z80DART_0_TAG, FUNC(z80dart_device::ctsb_w));
 
-	MCFG_DEVICE_ADD(Z80DART_1_TAG, Z80DART, XTAL(8'000'000)/2)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_C_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_C_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_C_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(RS232_D_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(RS232_D_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(RS232_D_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80dart_device& dart1(Z80DART(config, Z80DART_1_TAG, XTAL(8'000'000)/2));
+	dart1.out_txda_callback().set(m_rs232c, FUNC(rs232_port_device::write_txd));
+	dart1.out_dtra_callback().set(m_rs232c, FUNC(rs232_port_device::write_dtr));
+	dart1.out_rtsa_callback().set(m_rs232c, FUNC(rs232_port_device::write_rts));
+	dart1.out_txdb_callback().set(m_rs232d, FUNC(rs232_port_device::write_txd));
+	dart1.out_dtrb_callback().set(m_rs232d, FUNC(rs232_port_device::write_dtr));
+	dart1.out_rtsb_callback().set(m_rs232d, FUNC(rs232_port_device::write_rts));
+	dart1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(RS232_C_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, ctsa_w))
+	RS232_PORT(config, m_rs232c, default_rs232_devices, nullptr);
+	m_rs232c->rxd_handler().set(Z80DART_1_TAG, FUNC(z80dart_device::rxa_w));
+	m_rs232c->dcd_handler().set(Z80DART_1_TAG, FUNC(z80dart_device::dcda_w));
+	m_rs232c->cts_handler().set(Z80DART_1_TAG, FUNC(z80dart_device::ctsa_w));
 
-	MCFG_DEVICE_ADD(RS232_D_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_1_TAG, z80dart_device, ctsb_w))
+	RS232_PORT(config, m_rs232d, default_rs232_devices, nullptr);
+	m_rs232d->rxd_handler().set(Z80DART_1_TAG, FUNC(z80dart_device::rxb_w));
+	m_rs232d->dcd_handler().set(Z80DART_1_TAG, FUNC(z80dart_device::dcdb_w));
+	m_rs232d->cts_handler().set(Z80DART_1_TAG, FUNC(z80dart_device::ctsb_w));
 
-	MCFG_DEVICE_ADD(BR1941_TAG, COM8116, XTAL(5'068'800))
-	MCFG_COM8116_FR_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_0_TAG, z80dart_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_1_TAG, z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_1_TAG, z80dart_device, rxca_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(Z80DART_0_TAG, z80dart_device, rxtxcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_1_TAG, z80dart_device, rxtxcb_w))
+	COM8116(config, m_dbrg, XTAL(5'068'800));
+	m_dbrg->fr_handler().set(Z80DART_0_TAG, FUNC(z80dart_device::txca_w));
+	m_dbrg->fr_handler().append(Z80DART_0_TAG, FUNC(z80dart_device::rxca_w));
+	m_dbrg->fr_handler().append(Z80DART_1_TAG, FUNC(z80dart_device::txca_w));
+	m_dbrg->fr_handler().append(Z80DART_1_TAG, FUNC(z80dart_device::rxca_w));
+	m_dbrg->ft_handler().set(Z80DART_0_TAG, FUNC(z80dart_device::rxtxcb_w));
+	m_dbrg->ft_handler().append(Z80DART_1_TAG, FUNC(z80dart_device::rxtxcb_w));
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("128K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("128K");
+}
 
 
 

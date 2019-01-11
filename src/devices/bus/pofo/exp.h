@@ -64,13 +64,13 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_PORTFOLIO_EXPANSION_SLOT_EINT_CALLBACK(_write) \
-	devcb = &downcast<portfolio_expansion_slot_device &>(*device).set_eint_wr_callback(DEVCB_##_write);
+	downcast<portfolio_expansion_slot_device &>(*device).set_eint_wr_callback(DEVCB_##_write);
 
 #define MCFG_PORTFOLIO_EXPANSION_SLOT_NMIO_CALLBACK(_write) \
-	devcb = &downcast<portfolio_expansion_slot_device &>(*device).set_nmio_wr_callback(DEVCB_##_write);
+	downcast<portfolio_expansion_slot_device &>(*device).set_nmio_wr_callback(DEVCB_##_write);
 
 #define MCFG_PORTFOLIO_EXPANSION_SLOT_WAKE_CALLBACK(_write) \
-	devcb = &downcast<portfolio_expansion_slot_device &>(*device).set_wake_wr_callback(DEVCB_##_write);
+	downcast<portfolio_expansion_slot_device &>(*device).set_wake_wr_callback(DEVCB_##_write);
 
 
 

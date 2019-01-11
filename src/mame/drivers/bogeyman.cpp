@@ -51,14 +51,14 @@ WRITE8_MEMBER(bogeyman_state::ay8910_control_w)
 void bogeyman_state::bogeyman_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
-	map(0x1800, 0x1bff).ram().w(this, FUNC(bogeyman_state::videoram2_w)).share("videoram2");
-	map(0x1c00, 0x1fff).ram().w(this, FUNC(bogeyman_state::colorram2_w)).share("colorram2");
-	map(0x2000, 0x20ff).ram().w(this, FUNC(bogeyman_state::videoram_w)).share("videoram");
-	map(0x2100, 0x21ff).ram().w(this, FUNC(bogeyman_state::colorram_w)).share("colorram");
+	map(0x1800, 0x1bff).ram().w(FUNC(bogeyman_state::videoram2_w)).share("videoram2");
+	map(0x1c00, 0x1fff).ram().w(FUNC(bogeyman_state::colorram2_w)).share("colorram2");
+	map(0x2000, 0x20ff).ram().w(FUNC(bogeyman_state::videoram_w)).share("videoram");
+	map(0x2100, 0x21ff).ram().w(FUNC(bogeyman_state::colorram_w)).share("colorram");
 	map(0x2800, 0x2bff).ram().share("spriteram");
 	map(0x3000, 0x300f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x3800, 0x3800).portr("P1").w(this, FUNC(bogeyman_state::ay8910_control_w));
-	map(0x3801, 0x3801).portr("P2").w(this, FUNC(bogeyman_state::ay8910_latch_w));
+	map(0x3800, 0x3800).portr("P1").w(FUNC(bogeyman_state::ay8910_control_w));
+	map(0x3801, 0x3801).portr("P2").w(FUNC(bogeyman_state::ay8910_latch_w));
 	map(0x3802, 0x3802).portr("DSW1");
 	map(0x3803, 0x3803).portr("DSW2").nopw(); // ??? sound
 	map(0x4000, 0xffff).rom();
@@ -246,23 +246,20 @@ MACHINE_CONFIG_START(bogeyman_state::bogeyman)
 	// DECO video CRTC, unverified
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,8,248)
 	MCFG_SCREEN_UPDATE_DRIVER(bogeyman_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bogeyman)
-	MCFG_PALETTE_ADD("palette", 16+256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
-	MCFG_PALETTE_INIT_OWNER(bogeyman_state, bogeyman)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bogeyman);
+	PALETTE(config, m_palette, FUNC(bogeyman_state::bogeyman_palette)).set_format(palette_device::BGR_233_inverted, 16 + 256);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	// verified to be YM2149s from PCB pic
-	MCFG_DEVICE_ADD("ay1", YM2149, 1500000)  /* Verified */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, bogeyman_state, colbank_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YM2149(config, m_ay1, 1500000);  /* Verified */
+	m_ay1->port_a_write_callback().set(FUNC(bogeyman_state::colbank_w));
+	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("ay2", YM2149, 1500000)  /* Verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YM2149(config, m_ay2, 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);  /* Verified */
 MACHINE_CONFIG_END
 
 /* ROMs */

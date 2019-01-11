@@ -31,11 +31,6 @@ ToDo:
 class argo_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BOOT
-	};
-
 	argo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -43,16 +38,24 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void argo(machine_config &config);
+
+	void init_argo();
+
+private:
+	enum
+	{
+		TIMER_BOOT
+	};
+
 	DECLARE_WRITE8_MEMBER(argo_videoram_w);
 	DECLARE_READ8_MEMBER(argo_io_r);
 	DECLARE_WRITE8_MEMBER(argo_io_w);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void init_argo();
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void argo(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
@@ -150,12 +153,12 @@ void argo_state::mem_map(address_map &map)
 	map(0x0000, 0x07ff).bankrw("boot");
 	map(0x0800, 0xf7af).ram();
 	map(0xf7b0, 0xf7ff).ram().share("videoram");
-	map(0xf800, 0xffff).rom().w(this, FUNC(argo_state::argo_videoram_w));
+	map(0xf800, 0xffff).rom().w(FUNC(argo_state::argo_videoram_w));
 }
 
 void argo_state::io_map(address_map &map)
 {
-	map(0x0000, 0xFFFF).rw(this, FUNC(argo_state::argo_io_r), FUNC(argo_state::argo_io_w));
+	map(0x0000, 0xFFFF).rw(FUNC(argo_state::argo_io_r), FUNC(argo_state::argo_io_w));
 }
 
 /* Input ports */
@@ -289,7 +292,7 @@ void argo_state::init_argo()
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }
 
-uint32_t argo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t argo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t y,ra,chr,gfx;
 	uint16_t sy=0,ma=0,x;
@@ -301,7 +304,7 @@ uint32_t argo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			uint16_t *p = &bitmap.pix16(sy++);
+			uint32_t *p = &bitmap.pix32(sy++);
 
 			for (x = 1; x < 81; x++) // align x to the cursor position numbers
 			{
@@ -325,14 +328,14 @@ uint32_t argo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 					gfx = 0xff;
 
 				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
+				*p++ = BIT(gfx, 7) ? rgb_t::white() : rgb_t::black();
+				*p++ = BIT(gfx, 6) ? rgb_t::white() : rgb_t::black();
+				*p++ = BIT(gfx, 5) ? rgb_t::white() : rgb_t::black();
+				*p++ = BIT(gfx, 4) ? rgb_t::white() : rgb_t::black();
+				*p++ = BIT(gfx, 3) ? rgb_t::white() : rgb_t::black();
+				*p++ = BIT(gfx, 2) ? rgb_t::white() : rgb_t::black();
+				*p++ = BIT(gfx, 1) ? rgb_t::white() : rgb_t::black();
+				*p++ = BIT(gfx, 0) ? rgb_t::white() : rgb_t::black();
 			}
 		}
 
@@ -360,9 +363,6 @@ MACHINE_CONFIG_START(argo_state::argo)
 	MCFG_SCREEN_UPDATE_DRIVER(argo_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -14,18 +14,6 @@
 
 // I/O ports setup
 
-// max 8 4-bit R ports
-#define MCFG_HMCS40_READ_R_CB(R, _devcb) \
-	devcb = &downcast<hmcs40_cpu_device &>(*device).set_read_r##R##_callback(DEVCB_##_devcb);
-#define MCFG_HMCS40_WRITE_R_CB(R, _devcb) \
-	devcb = &downcast<hmcs40_cpu_device &>(*device).set_write_r##R##_callback(DEVCB_##_devcb);
-
-// 16-bit discrete
-#define MCFG_HMCS40_READ_D_CB(_devcb) \
-	devcb = &downcast<hmcs40_cpu_device &>(*device).set_read_d_callback(DEVCB_##_devcb);
-#define MCFG_HMCS40_WRITE_D_CB(_devcb) \
-	devcb = &downcast<hmcs40_cpu_device &>(*device).set_write_d_callback(DEVCB_##_devcb);
-
 enum
 {
 	HMCS40_INPUT_LINE_INT0 = 0,
@@ -105,27 +93,13 @@ public:
 		PORT_R7X
 	};
 
-	// configuration helpers
-	template <class Object> devcb_base &set_read_r0_callback(Object &&cb) { return m_read_r0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_r1_callback(Object &&cb) { return m_read_r1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_r2_callback(Object &&cb) { return m_read_r2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_r3_callback(Object &&cb) { return m_read_r3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_r4_callback(Object &&cb) { return m_read_r4.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_r5_callback(Object &&cb) { return m_read_r5.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_r6_callback(Object &&cb) { return m_read_r6.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_r7_callback(Object &&cb) { return m_read_r7.set_callback(std::forward<Object>(cb)); }
+	// max 8 4-bit R ports
+	template <std::size_t Bit> auto read_r() { return m_read_r[Bit].bind(); }
+	template <std::size_t Bit> auto write_r() { return m_write_r[Bit].bind(); }
 
-	template <class Object> devcb_base &set_write_r0_callback(Object &&cb) { return m_write_r0.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_r1_callback(Object &&cb) { return m_write_r1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_r2_callback(Object &&cb) { return m_write_r2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_r3_callback(Object &&cb) { return m_write_r3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_r4_callback(Object &&cb) { return m_write_r4.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_r5_callback(Object &&cb) { return m_write_r5.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_r6_callback(Object &&cb) { return m_write_r6.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_r7_callback(Object &&cb) { return m_write_r7.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_read_d_callback(Object &&cb) { return m_read_d.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_d_callback(Object &&cb) { return m_write_d.set_callback(std::forward<Object>(cb)); }
+	// 16-bit discrete
+	auto read_d() { return m_read_d.bind(); }
+	auto write_d() { return m_write_d.bind(); }
 
 protected:
 	enum
@@ -214,8 +188,8 @@ protected:
 	u16 m_d;            // D pins state
 
 	// i/o handlers
-	devcb_read8 m_read_r0, m_read_r1, m_read_r2, m_read_r3, m_read_r4, m_read_r5, m_read_r6, m_read_r7;
-	devcb_write8 m_write_r0, m_write_r1, m_write_r2, m_write_r3, m_write_r4, m_write_r5, m_write_r6, m_write_r7;
+	devcb_read8 m_read_r[8];
+	devcb_write8 m_write_r[8];
 	devcb_read16 m_read_d;
 	devcb_write16 m_write_d;
 

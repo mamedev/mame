@@ -588,36 +588,36 @@ void nds_state::nds_arm7_map(address_map &map)
 	map(0x02000000, 0x023fffff).ram().mirror(0x00400000).share("mainram");
 	map(0x03000000, 0x03007fff).mirror(0x007f8000).m(m_arm7wrambnk, FUNC(address_map_bank_device::amap32));
 	map(0x03800000, 0x0380ffff).ram().mirror(0x007f0000).share("arm7ram");
-	map(0x04000000, 0x0410ffff).rw(this, FUNC(nds_state::arm7_io_r), FUNC(nds_state::arm7_io_w));
+	map(0x04000000, 0x0410ffff).rw(FUNC(nds_state::arm7_io_r), FUNC(nds_state::arm7_io_w));
 }
 
 void nds_state::nds_arm9_map(address_map &map)
 {
 	map(0x02000000, 0x023fffff).ram().mirror(0x00400000).share("mainram");
 	map(0x03000000, 0x03007fff).mirror(0x00ff8000).m("nds9wram", FUNC(address_map_bank_device::amap32));
-	map(0x04000000, 0x0410ffff).rw(this, FUNC(nds_state::arm9_io_r), FUNC(nds_state::arm9_io_w));
+	map(0x04000000, 0x0410ffff).rw(FUNC(nds_state::arm9_io_r), FUNC(nds_state::arm9_io_w));
 	map(0xffff0000, 0xffff0fff).rom().mirror(0x1000).region("arm9", 0);
 }
 
 // ARM7 views of WRAM
 void nds_state::nds7_wram_map(address_map &map)
 {
-	map(0x00000, 0x07fff).rw(this, FUNC(nds_state::wram_arm7mirror_r), FUNC(nds_state::wram_arm7mirror_w));
-	map(0x08000, 0x0bfff).rw(this, FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
-	map(0x0c000, 0x0ffff).rw(this, FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
-	map(0x10000, 0x13fff).rw(this, FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
-	map(0x14000, 0x17fff).rw(this, FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
-	map(0x18000, 0x1ffff).rw(this, FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
+	map(0x00000, 0x07fff).rw(FUNC(nds_state::wram_arm7mirror_r), FUNC(nds_state::wram_arm7mirror_w));
+	map(0x08000, 0x0bfff).rw(FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
+	map(0x0c000, 0x0ffff).rw(FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
+	map(0x10000, 0x13fff).rw(FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
+	map(0x14000, 0x17fff).rw(FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
+	map(0x18000, 0x1ffff).rw(FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
 }
 
 // ARM9 views of WRAM
 void nds_state::nds9_wram_map(address_map &map)
 {
-	map(0x00000, 0x07fff).rw(this, FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
-	map(0x08000, 0x0bfff).rw(this, FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
-	map(0x0c000, 0x0ffff).rw(this, FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
-	map(0x10000, 0x13fff).rw(this, FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
-	map(0x14000, 0x17fff).rw(this, FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
+	map(0x00000, 0x07fff).rw(FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
+	map(0x08000, 0x0bfff).rw(FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
+	map(0x0c000, 0x0ffff).rw(FUNC(nds_state::wram_second_half_r), FUNC(nds_state::wram_second_half_w));
+	map(0x10000, 0x13fff).rw(FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
+	map(0x14000, 0x17fff).rw(FUNC(nds_state::wram_first_half_r), FUNC(nds_state::wram_first_half_w));
 	map(0x18000, 0x1ffff).noprw().nopw();       // probably actually open bus?  GBATEK describes as "random"
 }
 
@@ -970,27 +970,19 @@ TIMER_CALLBACK_MEMBER(nds_state::timer_expire)
 	}
 }
 
-MACHINE_CONFIG_START(nds_state::nds)
-	MCFG_DEVICE_ADD("arm7", ARM7, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(nds_arm7_map)
+void nds_state::nds(machine_config &config)
+{
+	ARM7(config, m_arm7, MASTER_CLOCK);
+	m_arm7->set_addrmap(AS_PROGRAM, &nds_state::nds_arm7_map);
 
-	MCFG_DEVICE_ADD("arm9", ARM946ES, MASTER_CLOCK*2)
-	MCFG_ARM_HIGH_VECTORS()
-	MCFG_DEVICE_PROGRAM_MAP(nds_arm9_map)
+	ARM946ES(config, m_arm9, MASTER_CLOCK*2);
+	m_arm9->set_high_vectors();
+	m_arm9->set_addrmap(AS_PROGRAM, &nds_state::nds_arm9_map);
 
 	// WRAM
-	MCFG_DEVICE_ADD("nds7wram", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(nds7_wram_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
-
-	MCFG_DEVICE_ADD("nds9wram", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(nds9_wram_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
-MACHINE_CONFIG_END
+	ADDRESS_MAP_BANK(config, "nds7wram").set_map(&nds_state::nds7_wram_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x8000);
+	ADDRESS_MAP_BANK(config, "nds9wram").set_map(&nds_state::nds9_wram_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x8000);
+}
 
 /* Help identifying the region and revisions of the set would be greatly appreciated! */
 ROM_START( nds )

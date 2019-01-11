@@ -226,6 +226,7 @@ DEFINE_DEVICE_TYPE(I8031, i8031_device, "i8031", "Intel I8031")
 DEFINE_DEVICE_TYPE(I8032, i8032_device, "i8032", "Intel I8032")
 DEFINE_DEVICE_TYPE(I8051, i8051_device, "i8051", "Intel I8051")
 DEFINE_DEVICE_TYPE(I8751, i8751_device, "i8751", "Intel I8751")
+DEFINE_DEVICE_TYPE(AM8753, am8753_device, "am8753", "AMD Am8753")
 DEFINE_DEVICE_TYPE(I8052, i8052_device, "i8052", "Intel I8052")
 DEFINE_DEVICE_TYPE(I8752, i8752_device, "i8752", "Intel I8752")
 DEFINE_DEVICE_TYPE(I80C31, i80c31_device, "i80c31", "Intel I80C31")
@@ -234,6 +235,8 @@ DEFINE_DEVICE_TYPE(I87C51, i87c51_device, "i87c51", "Intel I87C51")
 DEFINE_DEVICE_TYPE(I80C32, i80c32_device, "i80c32", "Intel I80C32")
 DEFINE_DEVICE_TYPE(I80C52, i80c52_device, "i80c52", "Intel I80C52")
 DEFINE_DEVICE_TYPE(I87C52, i87c52_device, "i87c52", "Intel I87C52")
+DEFINE_DEVICE_TYPE(AT89C52, at89c52_device, "at89c52", "Atmel AT89C52")
+DEFINE_DEVICE_TYPE(AT89S52, at89s52_device, "at89s52", "Atmel AT89S52")
 DEFINE_DEVICE_TYPE(AT89C4051, at89c4051_device, "at89c4051", "Atmel AT89C4051")
 DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "Dallas DS5002FP")
 
@@ -242,25 +245,15 @@ DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "Dallas DS5002FP")
     ADDRESS MAPS
 ***************************************************************************/
 
-void mcs51_cpu_device::program_12bit(address_map &map)
+void mcs51_cpu_device::program_internal(address_map &map)
 {
-	map(0x00, 0x0fff).rom();
+	if (m_rom_size > 0)
+		map(0, m_rom_size - 1).rom().region(DEVICE_SELF, 0);
 }
 
-void mcs51_cpu_device::program_13bit(address_map &map)
+void mcs51_cpu_device::data_internal(address_map &map)
 {
-	map(0x00, 0x1fff).rom();
-}
-
-void mcs51_cpu_device::data_7bit(address_map &map)
-{
-	map(0x0000, 0x007f).ram().share("scratchpad");
-	map(0x0100, 0x01ff).ram().share("sfr_ram"); /* SFR */
-}
-
-void mcs51_cpu_device::data_8bit(address_map &map)
-{
-	map(0x0000, 0x00ff).ram().share("scratchpad");
+	map(0x0000, m_ram_mask).ram().share("scratchpad");
 	map(0x0100, 0x01ff).ram().share("sfr_ram"); /* SFR */
 }
 
@@ -268,13 +261,12 @@ void mcs51_cpu_device::data_8bit(address_map &map)
 
 mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0,
-					   (program_width == 12) ? address_map_constructor(FUNC(mcs51_cpu_device::program_12bit), this) : (program_width == 13) ? address_map_constructor(FUNC(mcs51_cpu_device::program_13bit), this) : address_map_constructor())
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0,
-					(data_width == 7) ? address_map_constructor(FUNC(mcs51_cpu_device::data_7bit), this) : (data_width == 8) ? address_map_constructor(FUNC(mcs51_cpu_device::data_8bit), this) : address_map_constructor())
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(mcs51_cpu_device::program_internal), this))
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0, address_map_constructor(FUNC(mcs51_cpu_device::data_internal), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, (features & FEATURE_DS5002FP) ? 17 : 16, 0)
 	, m_pc(0)
 	, m_features(features)
+	, m_rom_size(program_width > 0 ? 1 << program_width : 0)
 	, m_ram_mask( (data_width == 8) ? 0xFF : 0x7F )
 	, m_num_interrupts(5)
 	, m_sfr_ram(*this, "sfr_ram")
@@ -308,6 +300,11 @@ i8051_device::i8051_device(const machine_config &mconfig, const char *tag, devic
 
 i8751_device::i8751_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mcs51_cpu_device(mconfig, I8751, tag, owner, clock, 12, 7)
+{
+}
+
+am8753_device::am8753_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mcs51_cpu_device(mconfig, AM8753, tag, owner, clock, 13, 7)
 {
 }
 
@@ -371,6 +368,16 @@ i80c32_device::i80c32_device(const machine_config &mconfig, const char *tag, dev
 
 i87c52_device::i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80c52_device(mconfig, I87C52, tag, owner, clock, 13, 8)
+{
+}
+
+at89c52_device::at89c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80c52_device(mconfig, AT89C52, tag, owner, clock, 13, 8)
+{
+}
+
+at89s52_device::at89s52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i80c52_device(mconfig, AT89S52, tag, owner, clock, 13, 8)
 {
 }
 
@@ -2149,7 +2156,8 @@ void mcs51_cpu_device::device_start()
 	state_add( MCS51_DPL, "DPL", DPL).noshow();
 	state_add( MCS51_IE,  "IE", IE).formatstr("%02X");
 	state_add( MCS51_IP,  "IP", IP).formatstr("%02X");
-	state_add<uint8_t>( MCS51_P0,  "P0", [this](){ return P0; }, [this](uint8_t p){ SET_P0(p); }).formatstr("%02X");
+	if (m_rom_size > 0)
+		state_add<uint8_t>( MCS51_P0,  "P0", [this](){ return P0; }, [this](uint8_t p){ SET_P0(p); }).formatstr("%02X");
 	state_add<uint8_t>( MCS51_P1,  "P1", [this](){ return P1; }, [this](uint8_t p){ SET_P1(p); }).formatstr("%02X");
 	state_add<uint8_t>( MCS51_P2,  "P2", [this](){ return P2; }, [this](uint8_t p){ SET_P2(p); }).formatstr("%02X");
 	state_add<uint8_t>( MCS51_P3,  "P3", [this](){ return P3; }, [this](uint8_t p){ SET_P3(p); }).formatstr("%02X");

@@ -40,13 +40,15 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void zapcomp(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(display_7seg_w);
 
-	void zapcomp(machine_config &config);
 	void zapcomp_io(address_map &map);
 	void zapcomp_mem(address_map &map);
-private:
+
 	uint8_t decode7seg(uint8_t data);
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -119,8 +121,8 @@ void zapcomp_state::zapcomp_mem(address_map &map)
 void zapcomp_state::zapcomp_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(zapcomp_state::keyboard_r));
-	map(0x05, 0x07).w(this, FUNC(zapcomp_state::display_7seg_w));
+	map(0x00, 0x00).r(FUNC(zapcomp_state::keyboard_r));
+	map(0x05, 0x07).w(FUNC(zapcomp_state::display_7seg_w));
 }
 
 static INPUT_PORTS_START( zapcomp )
@@ -160,7 +162,7 @@ MACHINE_CONFIG_START(zapcomp_state::zapcomp)
 	MCFG_DEVICE_IO_MAP(zapcomp_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_zapcomputer)
+	config.set_default_layout(layout_zapcomputer);
 MACHINE_CONFIG_END
 
 ROM_START( zapcomp )

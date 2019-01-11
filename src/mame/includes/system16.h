@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Phil Stroffolino, Mirko Buffoni
+#ifndef MAME_INCLUDES_SYSTEM16_H
+#define MAME_INCLUDES_SYSTEM16_H
+
+#pragma once
 
 #include "video/sega16sp.h"
 #include "machine/74157.h"
@@ -32,9 +36,59 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_adpcm_select(*this, "adpcm_select")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
+	void z80_ym2151(machine_config &config);
+	void z80_ym2151_upd7759(machine_config &config);
+	void datsu_ym2151_msm5205(machine_config &config);
+	void datsu_2x_ym2203_msm5205(machine_config &config);
+	void system16_base(machine_config &config);
+	void goldnaxeb_base(machine_config &config);
+	void passshtb(machine_config &config);
+	void goldnaxeb2(machine_config &config);
+	void beautyb(machine_config &config);
+	void goldnaxeb1(machine_config &config);
+	void mwalkbl(machine_config &config);
+	void eswatbl2(machine_config &config);
+	void ddcrewbl(machine_config &config);
+	void shdancbla(machine_config &config);
+	void astormbl(machine_config &config);
+	void astormb2(machine_config &config);
+	void passsht4b(machine_config &config);
+	void wb3bb(machine_config &config);
+	void shdancbl(machine_config &config);
+	void shinobi_datsu(machine_config &config);
+	void bayrouteb1(machine_config &config);
+	void tetrisbl(machine_config &config);
+	void eswatbl(machine_config &config);
+	void dduxbl(machine_config &config);
+	void bayrouteb2(machine_config &config);
+	void tturfbl(machine_config &config);
+	void altbeastbl(machine_config &config);
+	void system18(machine_config &config);
+
+	void init_passsht();
+	void init_wb3bbl();
+	void init_fpointbl();
+	void init_eswatbl();
+	void init_astormbl();
+	void init_sys18bl_oki();
+	void init_astormb2();
+	void init_shdancbl();
+	void init_dduxbl();
+	void init_altbeastbl();
+	void init_goldnaxeb2();
+	void init_bayrouteb1();
+	void init_beautyb();
+	void init_bayrouteb2();
+	void init_shinobl();
+	void init_tturfbl();
+	void init_goldnaxeb1();
+	void init_ddcrewbl();
+	void init_common();
+
+private:
 	DECLARE_WRITE16_MEMBER(sound_command_nmi_w);
 	DECLARE_WRITE16_MEMBER(sound_command_irq_w);
 	DECLARE_READ8_MEMBER(sound_command_irq_r);
@@ -82,25 +136,7 @@ public:
 	DECLARE_WRITE16_MEMBER(s16a_bootleg_fgscrollx_w);
 	DECLARE_WRITE16_MEMBER(s16a_bootleg_tilemapselect_w);
 	DECLARE_WRITE8_MEMBER(upd7759_bank_w);
-	void init_passsht();
-	void init_wb3bbl();
-	void init_fpointbl();
-	void init_eswatbl();
-	void init_astormbl();
-	void init_sys18bl_oki();
-	void init_astormb2();
-	void init_shdancbl();
-	void init_dduxbl();
-	void init_altbeastbl();
-	void init_goldnaxeb2();
-	void init_bayrouteb1();
-	void init_beautyb();
-	void init_bayrouteb2();
-	void init_shinobl();
-	void init_tturfbl();
-	void init_goldnaxeb1();
-	void init_ddcrewbl();
-	void init_common();
+
 	DECLARE_MACHINE_RESET(ddcrewbl);
 	TILEMAP_MAPPER_MEMBER(sys16_bg_map);
 	TILEMAP_MAPPER_MEMBER(sys16_text_map);
@@ -132,34 +168,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(datsu_msm5205_callback);
 	DECLARE_WRITE_LINE_MEMBER(shdancbl_msm5205_callback);
 	DECLARE_WRITE_LINE_MEMBER(sound_cause_nmi);
-	void z80_ym2151(machine_config &config);
-	void z80_ym2151_upd7759(machine_config &config);
-	void datsu_ym2151_msm5205(machine_config &config);
-	void datsu_2x_ym2203_msm5205(machine_config &config);
-	void system16_base(machine_config &config);
-	void goldnaxeb_base(machine_config &config);
-	void passshtb(machine_config &config);
-	void goldnaxeb2(machine_config &config);
-	void beautyb(machine_config &config);
-	void goldnaxeb1(machine_config &config);
-	void mwalkbl(machine_config &config);
-	void eswatbl2(machine_config &config);
-	void ddcrewbl(machine_config &config);
-	void shdancbla(machine_config &config);
-	void astormbl(machine_config &config);
-	void astormb2(machine_config &config);
-	void passsht4b(machine_config &config);
-	void wb3bb(machine_config &config);
-	void shdancbl(machine_config &config);
-	void shinobi_datsu(machine_config &config);
-	void bayrouteb1(machine_config &config);
-	void tetrisbl(machine_config &config);
-	void eswatbl(machine_config &config);
-	void dduxbl(machine_config &config);
-	void bayrouteb2(machine_config &config);
-	void tturfbl(machine_config &config);
-	void altbeastbl(machine_config &config);
-	void system18(machine_config &config);
+
 	void astormbl_map(address_map &map);
 	void bayrouteb1_map(address_map &map);
 	void bayrouteb2_map(address_map &map);
@@ -196,8 +205,7 @@ public:
 	void tturfbl_sound_map(address_map &map);
 	void wb3bbl_map(address_map &map);
 
-protected:
-	virtual void machine_start() override { m_led.resolve(); }
+	virtual void machine_start() override { m_leds.resolve(); }
 
 	required_shared_ptr<uint16_t> m_textram;
 	optional_shared_ptr<uint16_t> m_bg0_tileram;
@@ -293,5 +301,7 @@ protected:
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<ls157_device> m_adpcm_select;
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 };
+
+#endif // MAME_INCLUDES_SYSTEM16_H

@@ -6,40 +6,59 @@
     Driver for Midway T-unit games.
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_MIDTUNIT_H
+#define MAME_INCLUDES_MIDTUNIT_H
+
+#pragma once
 
 #include "audio/dcs.h"
 #include "audio/williams.h"
+#include "video/midtunit.h"
 
 #include "cpu/tms34010/tms34010.h"
+#include "emupal.h"
 
 
 class midtunit_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_DMA
-	};
-
-	midtunit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	midtunit_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette"),
+		m_video(*this, "video"),
 		m_dcs(*this, "dcs"),
+		m_palette(*this, "palette"),
+		m_gfxrom(*this, "gfxrom"),
 		m_cvsd_sound(*this, "cvsd"),
-		m_adpcm_sound(*this, "adpcm") ,
-		m_nvram(*this, "nvram"),
-		m_gfxrom(*this, "gfxrom") { }
+		m_adpcm_sound(*this, "adpcm"),
+		m_nvram(*this, "nvram")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
+	void tunit_core(machine_config &config);
+	void tunit_adpcm(machine_config &config);
+	void tunit_dcs(machine_config &config);
+
+	void init_mktunit();
+	void init_mkturbo();
+	void init_nbajamte();
+	void init_nbajam();
+	void init_jdreddp();
+	void init_mk2();
+
+protected:
+	void machine_reset() override;
+
+	required_device<tms340x0_device> m_maincpu;
+	required_device<midtunit_video_device> m_video;
 	optional_device<dcs_audio_device> m_dcs;
+	required_device<palette_device> m_palette;
+	required_memory_region m_gfxrom;
+
+private:
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
 	optional_device<williams_adpcm_sound_device> m_adpcm_sound;
 
 	required_shared_ptr<uint16_t> m_nvram;
-
-	required_memory_region m_gfxrom;
 
 	DECLARE_WRITE16_MEMBER(midtunit_cmos_enable_w);
 	DECLARE_WRITE16_MEMBER(midtunit_cmos_w);
@@ -58,41 +77,10 @@ public:
 	DECLARE_WRITE16_MEMBER(nbajam_prot_w);
 	DECLARE_WRITE16_MEMBER(jdredd_prot_w);
 	DECLARE_READ16_MEMBER(jdredd_prot_r);
-	DECLARE_READ16_MEMBER(midtunit_gfxrom_r);
-	DECLARE_READ16_MEMBER(midwunit_gfxrom_r);
-	DECLARE_WRITE16_MEMBER(midtunit_vram_w);
-	DECLARE_WRITE16_MEMBER(midtunit_vram_data_w);
-	DECLARE_WRITE16_MEMBER(midtunit_vram_color_w);
-	DECLARE_READ16_MEMBER(midtunit_vram_r);
-	DECLARE_READ16_MEMBER(midtunit_vram_data_r);
-	DECLARE_READ16_MEMBER(midtunit_vram_color_r);
-	DECLARE_WRITE16_MEMBER(midtunit_control_w);
-	DECLARE_WRITE16_MEMBER(midwunit_control_w);
-	DECLARE_READ16_MEMBER(midwunit_control_r);
-	DECLARE_WRITE16_MEMBER(midxunit_paletteram_w);
-	DECLARE_READ16_MEMBER(midxunit_paletteram_r);
-	DECLARE_READ16_MEMBER(midtunit_dma_r);
-	DECLARE_WRITE16_MEMBER(midtunit_dma_w);
-
-	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
-	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
-	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
-
-	void init_mktunit();
-	void init_mkturbo();
-	void init_nbajamte();
-	void init_nbajam();
-	void init_jdreddp();
-	void init_mk2();
-
-	DECLARE_MACHINE_RESET(midtunit);
-	DECLARE_VIDEO_START(midtunit);
 
 	void register_state_saving();
 	void init_tunit_generic(int sound);
 	void init_nbajam_common(int te_protection);
-
-	emu_timer *m_dma_timer;
 
 	/* CMOS-related variables */
 	uint8_t    m_cmos_write_enable;
@@ -113,12 +101,7 @@ public:
 	uint8_t    m_jdredd_prot_index;
 	uint8_t    m_jdredd_prot_max;
 
-	uint8_t m_gfx_rom_large;
-
-	void tunit_core(machine_config &config);
-	void tunit_adpcm(machine_config &config);
-	void tunit_dcs(machine_config &config);
 	void main_map(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_MIDTUNIT_H

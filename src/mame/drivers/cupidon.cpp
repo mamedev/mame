@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "machine/68340.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -84,7 +85,7 @@ void cupidon_state::cupidon_map(address_map &map)
 	map(0x0000000, 0x07fffff).rom().mirror(0x1000000);
 
 	map(0x1000000, 0x100ffff).ram();
-	map(0x1800000, 0x1800003).r(this, FUNC(cupidon_state::cupidon_return_ffffffff));
+	map(0x1800000, 0x1800003).r(FUNC(cupidon_state::cupidon_return_ffffffff));
 	map(0x2000074, 0x2000077).ram(); // port
 
 //  AM_RANGE(0x2000040, 0x200004f) AM_RAM
@@ -103,8 +104,8 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(cupidon_state::cupidon)
-	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)    // The access to 3FF00 at the start would suggest this is a 68340 so probably 16 or 25 mhz?
-	MCFG_DEVICE_PROGRAM_MAP(cupidon_map)
+	M68340(config, m_maincpu, 16000000);    // The access to 3FF00 at the start would suggest this is a 68340 so probably 16 or 25 mhz?
+	m_maincpu->set_addrmap(AS_PROGRAM, &cupidon_state::cupidon_map);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

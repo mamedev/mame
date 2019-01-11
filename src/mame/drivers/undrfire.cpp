@@ -346,7 +346,7 @@ void undrfire_state::undrfire_map(address_map &map)
 	map(0x300000, 0x303fff).ram().share("spriteram");
 //  AM_RANGE(0x304000, 0x304003) AM_RAM // debugging - doesn't change ???
 //  AM_RANGE(0x304400, 0x304403) AM_RAM // debugging - doesn't change ???
-	map(0x400000, 0x400003).w(this, FUNC(undrfire_state::motor_control_w));      /* gun vibration */
+	map(0x400000, 0x400003).w(FUNC(undrfire_state::motor_control_w));      /* gun vibration */
 	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
 	map(0x600000, 0x600007).noprw(); // space for ADC0809, not fitted on pcb
 	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
@@ -356,8 +356,8 @@ void undrfire_state::undrfire_map(address_map &map)
 	map(0x920000, 0x92000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_long_r), FUNC(tc0100scn_device::ctrl_long_w));
 	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xb00000, 0xb003ff).ram();                         /* single bytes, blending ??? */
-	map(0xd00000, 0xd00003).w(this, FUNC(undrfire_state::rotate_control_w));     /* perhaps port based rotate control? */
-	map(0xf00000, 0xf00007).r(this, FUNC(undrfire_state::undrfire_lightgun_r));   /* stick coords read at $11b2-bc */
+	map(0xd00000, 0xd00003).w(FUNC(undrfire_state::rotate_control_w));     /* perhaps port based rotate control? */
+	map(0xf00000, 0xf00007).r(FUNC(undrfire_state::undrfire_lightgun_r));   /* stick coords read at $11b2-bc */
 }
 
 
@@ -366,7 +366,7 @@ void undrfire_state::cbombers_cpua_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x21ffff).ram();
 	map(0x300000, 0x303fff).ram().share("spriteram");
-	map(0x400000, 0x400003).w(this, FUNC(undrfire_state::cbombers_cpua_ctrl_w));
+	map(0x400000, 0x400003).w(FUNC(undrfire_state::cbombers_cpua_ctrl_w));
 	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
 	map(0x600000, 0x600007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask32(0xffffffff);
 	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
@@ -377,7 +377,7 @@ void undrfire_state::cbombers_cpua_map(address_map &map)
 	map(0xa00000, 0xa0ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xb00000, 0xb0000f).ram(); /* ? */
 	map(0xc00000, 0xc00007).ram(); /* LAN controller? */
-	map(0xd00000, 0xd00003).w(this, FUNC(undrfire_state::rotate_control_w));     /* perhaps port based rotate control? */
+	map(0xd00000, 0xd00003).w(FUNC(undrfire_state::rotate_control_w));     /* perhaps port based rotate control? */
 	map(0xe00000, 0xe0ffff).ram().share("shared_ram");
 }
 
@@ -386,7 +386,7 @@ void undrfire_state::cbombers_cpub_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x400000, 0x40ffff).ram(); /* local ram */
 //  AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_device, word_w) /* Only written upon errors */
-	map(0x800000, 0x80ffff).rw(this, FUNC(undrfire_state::shared_ram_r), FUNC(undrfire_state::shared_ram_w));
+	map(0x800000, 0x80ffff).rw(FUNC(undrfire_state::shared_ram_r), FUNC(undrfire_state::shared_ram_w));
 //  AM_RANGE(0xa00000, 0xa001ff) AM_RAM /* Extra road control?? */
 }
 
@@ -571,19 +571,19 @@ MACHINE_CONFIG_START(undrfire_state::undrfire)
 	MCFG_DEVICE_PROGRAM_MAP(undrfire_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", undrfire_state,  undrfire_interrupt)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_0_CB(IOPORT("INPUTS0"))
-	MCFG_TC0510NIO_READ_1_CB(IOPORT("INPUTS1"))
-	MCFG_TC0510NIO_READ_2_CB(IOPORT("INPUTS2"))
-	MCFG_TC0510NIO_READ_3_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_INPUT(READLINE(*this, undrfire_state, frame_counter_r)) MCFG_DEVCB_BIT(0)
-	MCFG_TC0510NIO_WRITE_3_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, undrfire_state, coin_word_w))
-	MCFG_TC0510NIO_READ_7_CB(IOPORT("SYSTEM"))
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio.read_0_callback().set_ioport("INPUTS0");
+	tc0510nio.read_1_callback().set_ioport("INPUTS1");
+	tc0510nio.read_2_callback().set_ioport("INPUTS2");
+	tc0510nio.read_3_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
+	tc0510nio.read_3_callback().append(FUNC(undrfire_state::frame_counter_r)).lshift(0);
+	tc0510nio.write_3_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::clk_write)).bit(5);
+	tc0510nio.write_3_callback().append(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write)).bit(6);
+	tc0510nio.write_3_callback().append(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write)).bit(4);
+	tc0510nio.write_4_callback().set(FUNC(undrfire_state::coin_word_w));
+	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -592,28 +592,27 @@ MACHINE_CONFIG_START(undrfire_state::undrfire)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 3*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(undrfire_state, screen_update_undrfire)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_undrfire)
-	MCFG_PALETTE_ADD("palette", 16384)
-	MCFG_PALETTE_FORMAT(XRGB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_undrfire);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
-	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(2)
-	MCFG_TC0100SCN_TX_REGION(3)
-	MCFG_TC0100SCN_OFFSETS(50, 8)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn, 0);
+	m_tc0100scn->set_gfx_region(2);
+	m_tc0100scn->set_tx_region(3);
+	m_tc0100scn->set_offsets(50, 8);
+	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn->set_palette_tag(m_palette);
 
-	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
-	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(4)
-	MCFG_TC0480SCP_OFFSETS(0x24, 0)
-	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
-	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
+	TC0480SCP(config, m_tc0480scp, 0);
+	m_tc0480scp->set_gfx_region(1);
+	m_tc0480scp->set_tx_region(4);
+	m_tc0480scp->set_offsets(0x24, 0);
+	m_tc0480scp->set_offsets_tx(-1, 0);
+	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
+	TAITO_EN(config, "taito_en", 0);
 MACHINE_CONFIG_END
 
 
@@ -630,23 +629,23 @@ MACHINE_CONFIG_START(undrfire_state::cbombers)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(480))   /* CPU slices - Need to interleave Cpu's 1 & 3 */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
-	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 5))
-	MCFG_ADC0808_IN0_CB(IOPORT("STEER"))
+	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
+	adc.eoc_ff_callback().set_inputline("maincpu", 5);
+	adc.in_callback<0>().set_ioport("STEER");
 
-	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
-	MCFG_TC0510NIO_READ_0_CB(IOPORT("INPUTS0"))
-	MCFG_TC0510NIO_READ_1_CB(IOPORT("INPUTS1"))
-	MCFG_TC0510NIO_READ_2_CB(IOPORT("INPUTS2"))
-	MCFG_TC0510NIO_READ_3_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_INPUT(READLINE(*this, undrfire_state, frame_counter_r)) MCFG_DEVCB_BIT(0)
-	MCFG_TC0510NIO_WRITE_3_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(4)
-	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(*this, undrfire_state, coin_word_w))
-	MCFG_TC0510NIO_READ_7_CB(IOPORT("SYSTEM"))
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio.read_0_callback().set_ioport("INPUTS0");
+	tc0510nio.read_1_callback().set_ioport("INPUTS1");
+	tc0510nio.read_2_callback().set_ioport("INPUTS2");
+	tc0510nio.read_3_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
+	tc0510nio.read_3_callback().append(FUNC(undrfire_state::frame_counter_r)).lshift(0);
+	tc0510nio.write_3_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::clk_write)).bit(5);
+	tc0510nio.write_3_callback().append(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write)).bit(6);
+	tc0510nio.write_3_callback().append(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write)).bit(4);
+	tc0510nio.write_4_callback().set(FUNC(undrfire_state::coin_word_w));
+	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -655,29 +654,28 @@ MACHINE_CONFIG_START(undrfire_state::cbombers)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 3*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(undrfire_state, screen_update_cbombers)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cbombers)
-	MCFG_PALETTE_ADD("palette", 16384)
-	MCFG_PALETTE_FORMAT(XRGB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cbombers);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
-	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(2)
-	MCFG_TC0100SCN_TX_REGION(3)
-	MCFG_TC0100SCN_OFFSETS(50, 8)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn, 0);
+	m_tc0100scn->set_gfx_region(2);
+	m_tc0100scn->set_tx_region(3);
+	m_tc0100scn->set_offsets(50, 8);
+	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
+	m_tc0100scn->set_palette_tag(m_palette);
 
-	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
-	MCFG_TC0480SCP_GFX_REGION(1)
-	MCFG_TC0480SCP_TX_REGION(4)
-	MCFG_TC0480SCP_OFFSETS(0x24, 0)
-	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
-	MCFG_TC0480SCP_COL_BASE(4096)
-	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
+	TC0480SCP(config, m_tc0480scp, 0);
+	m_tc0480scp->set_gfx_region(1);
+	m_tc0480scp->set_tx_region(4);
+	m_tc0480scp->set_offsets(0x24, 0);
+	m_tc0480scp->set_offsets_tx(-1, 0);
+	m_tc0480scp->set_col_base(4096);
+	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("taito_en", TAITO_EN, 0)
+	TAITO_EN(config, "taito_en", 0);
 MACHINE_CONFIG_END
 
 

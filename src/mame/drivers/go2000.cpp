@@ -37,6 +37,7 @@ Notes:
 #include "machine/gen_latch.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -44,8 +45,8 @@ Notes:
 class go2000_state : public driver_device
 {
 public:
-	go2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	go2000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
 		m_maincpu(*this, "maincpu"),
@@ -53,8 +54,12 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
+	void go2000(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_videoram2;
@@ -72,7 +77,6 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void go2000(machine_config &config);
 	void go2000_map(address_map &map);
 	void go2000_sound_io(address_map &map);
 	void go2000_sound_map(address_map &map);
@@ -94,7 +98,7 @@ void go2000_state::go2000_map(address_map &map)
 	map(0x800000, 0x800fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xa00000, 0xa00001).portr("INPUTS");
 	map(0xa00002, 0xa00003).portr("DSW");
-	map(0x620002, 0x620003).w(this, FUNC(go2000_state::sound_cmd_w));
+	map(0x620002, 0x620003).w(FUNC(go2000_state::sound_cmd_w));
 //  AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP
 //  AM_RANGE(0xe00010, 0xe00011) AM_WRITENOP
 //  AM_RANGE(0xe00020, 0xe00021) AM_WRITENOP
@@ -115,8 +119,8 @@ void go2000_state::go2000_sound_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x00, 0x00).w("dac", FUNC(dac_byte_interface::write));
-	map(0x03, 0x03).w(this, FUNC(go2000_state::go2000_pcm_1_bankswitch_w));
+	map(0x00, 0x00).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x03, 0x03).w(FUNC(go2000_state::go2000_pcm_1_bankswitch_w));
 }
 
 
@@ -351,7 +355,7 @@ MACHINE_CONFIG_START(go2000_state::go2000)
 	MCFG_DEVICE_IO_MAP(go2000_sound_io)
 
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_go2000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_go2000);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -359,13 +363,12 @@ MACHINE_CONFIG_START(go2000_state::go2000)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(go2000_state, screen_update_go2000)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.25) // unknown DAC

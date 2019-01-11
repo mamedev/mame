@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -19,13 +20,14 @@ public:
 		TIMER_INTERRUPT
 	};
 
-	cball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_video_ram(*this, "video_ram") { }
+		m_video_ram(*this, "video_ram")
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -51,7 +53,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(cball);
+	void cball_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -138,7 +140,7 @@ void cball_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(cball_state, cball)
+void cball_state::cball_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80));
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
@@ -166,7 +168,7 @@ void cball_state::cpu_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 
-	map(0x0000, 0x03ff).r(this, FUNC(cball_state::wram_r)).mask(0x7f);
+	map(0x0000, 0x03ff).r(FUNC(cball_state::wram_r)).mask(0x7f);
 	map(0x0400, 0x07ff).readonly();
 	map(0x1001, 0x1001).portr("1001");
 	map(0x1003, 0x1003).portr("1003");
@@ -176,8 +178,8 @@ void cball_state::cpu_map(address_map &map)
 	map(0x2000, 0x2001).noprw();
 	map(0x2800, 0x2800).portr("2800");
 
-	map(0x0000, 0x03ff).w(this, FUNC(cball_state::wram_w)).mask(0x7f);
-	map(0x0400, 0x07ff).w(this, FUNC(cball_state::vram_w)).share("video_ram");
+	map(0x0000, 0x03ff).w(FUNC(cball_state::wram_w)).mask(0x7f);
+	map(0x0400, 0x07ff).w(FUNC(cball_state::vram_w)).share("video_ram");
 	map(0x1800, 0x1800).noprw(); /* watchdog? */
 	map(0x1810, 0x1811).noprw();
 	map(0x1820, 0x1821).noprw();
@@ -275,11 +277,11 @@ MACHINE_CONFIG_START(cball_state::cball)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(cball_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cball)
-	MCFG_PALETTE_ADD("palette", 6)
-	MCFG_PALETTE_INIT_OWNER(cball_state, cball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_cball)
+
+	PALETTE(config, m_palette, FUNC(cball_state::cball_palette), 6);
 
 	/* sound hardware */
 MACHINE_CONFIG_END

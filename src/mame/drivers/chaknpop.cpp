@@ -166,18 +166,18 @@ void chaknpop_state::chaknpop_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x8800, 0x8800).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0x8801, 0x8801).r(this, FUNC(chaknpop_state::mcu_status_r));
-	map(0x8802, 0x8802).w(this, FUNC(chaknpop_state::unknown_port_3_w));
+	map(0x8801, 0x8801).r(FUNC(chaknpop_state::mcu_status_r));
+	map(0x8802, 0x8802).w(FUNC(chaknpop_state::unknown_port_3_w));
 	map(0x8804, 0x8805).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0x8806, 0x8807).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0x8808, 0x8808).portr("DSWC");
 	map(0x8809, 0x8809).portr("P1");
 	map(0x880a, 0x880a).portr("SYSTEM");
 	map(0x880b, 0x880b).portr("P2");
-	map(0x880c, 0x880c).rw(this, FUNC(chaknpop_state::gfxmode_r), FUNC(chaknpop_state::gfxmode_w));
-	map(0x880d, 0x880d).w(this, FUNC(chaknpop_state::coinlock_w));                              // coin lock out
-	map(0x9000, 0x93ff).ram().w(this, FUNC(chaknpop_state::txram_w)).share("tx_ram");          // TX tilemap
-	map(0x9800, 0x983f).ram().w(this, FUNC(chaknpop_state::attrram_w)).share("attr_ram");      // Color attribute
+	map(0x880c, 0x880c).rw(FUNC(chaknpop_state::gfxmode_r), FUNC(chaknpop_state::gfxmode_w));
+	map(0x880d, 0x880d).w(FUNC(chaknpop_state::coinlock_w));                              // coin lock out
+	map(0x9000, 0x93ff).ram().w(FUNC(chaknpop_state::txram_w)).share("tx_ram");          // TX tilemap
+	map(0x9800, 0x983f).ram().w(FUNC(chaknpop_state::attrram_w)).share("attr_ram");      // Color attribute
 	map(0x9840, 0x98ff).ram().share("spr_ram"); // sprite
 	map(0xa000, 0xbfff).rom();
 	map(0xc000, 0xffff).bankrw("bank1");                               // bitmap plane 1-4
@@ -379,24 +379,23 @@ MACHINE_CONFIG_START(chaknpop_state::chaknpop)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(chaknpop_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chaknpop)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INIT_OWNER(chaknpop_state, chaknpop)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chaknpop);
+	PALETTE(config, m_palette, FUNC(chaknpop_state::chaknpop_palette), 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'000'000) / 12)  // Verified on PCB
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(18'000'000) / 12));  // Verified on PCB
+	ay1.port_a_read_callback().set_ioport("DSWA");
+	ay1.port_b_read_callback().set_ioport("DSWB");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'000'000) / 12)  /* Verified on PCB */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, chaknpop_state, unknown_port_1_w))   // ??
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, chaknpop_state, unknown_port_2_w))    // ??
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(18'000'000) / 12));  // Verified on PCB
+	ay2.port_a_write_callback().set(FUNC(chaknpop_state::unknown_port_1_w));   // ??
+	ay2.port_b_write_callback().set(FUNC(chaknpop_state::unknown_port_2_w));   // ??
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.10);
 MACHINE_CONFIG_END
 
 

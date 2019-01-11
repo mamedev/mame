@@ -27,40 +27,39 @@ ROM_END
 ROM_START( cpc_rs232_ams )
 	ROM_REGION( 0x4000, "exp_rom", 0 )
 	ROM_SYSTEM_BIOS( 0, "amstrad", "Amstrad RS232C interface (v1)" )
-	ROMX_LOAD( "rs232101.rom",   0x0000, 0x2000, CRC(c6eb52b2) SHA1(8a7e0a1183fdde8d07bc8827a3e159ca3022f93b), ROM_BIOS(1) )
+	ROMX_LOAD( "rs232101.rom",   0x0000, 0x2000, CRC(c6eb52b2) SHA1(8a7e0a1183fdde8d07bc8827a3e159ca3022f93b), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "mercitel", "Amstrad RS232C interface (v1) + Mercitel (v1.4)" )
-	ROMX_LOAD( "rs232mercitel14.rom",   0x0000, 0x4000, CRC(8ffb114b) SHA1(145233fe8d4db9f5265eeac767d8ee8d45d14755), ROM_BIOS(2) )
+	ROMX_LOAD( "rs232mercitel14.rom",   0x0000, 0x4000, CRC(8ffb114b) SHA1(145233fe8d4db9f5265eeac767d8ee8d45d14755), ROM_BIOS(1) )
 ROM_END
 
 // device machine config
-MACHINE_CONFIG_START(cpc_rs232_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(2000000)
-	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, cpc_rs232_device, pit_out0_w))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, cpc_rs232_device, pit_out1_w))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, cpc_rs232_device, pit_out2_w))
+void cpc_rs232_device::device_add_mconfig(machine_config &config)
+{
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(2000000);
+	m_pit->set_clk<1>(2000000);
+	m_pit->set_clk<2>(2000000);
+	m_pit->out_handler<0>().set(FUNC(cpc_rs232_device::pit_out0_w));
+	m_pit->out_handler<1>().set(FUNC(cpc_rs232_device::pit_out1_w));
+	m_pit->out_handler<2>().set(FUNC(cpc_rs232_device::pit_out2_w));
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(4'000'000))
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	Z80DART(config, m_dart, DERIVED_CLOCK(1, 1));
+	m_dart->out_txda_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_dart->out_dtra_callback().set(m_rs232, FUNC(rs232_port_device::write_dtr));
+	m_dart->out_rtsa_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232",RS232_PORT,default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("dart",z80dart_device,rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("dart",z80dart_device,dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("dart",z80dart_device,ctsa_w))
-//  MCFG_RS232_RI_HANDLER(WRITELINE("dart",z80dart_device,ria_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
+	m_rs232->dcd_handler().set(m_dart, FUNC(z80dart_device::dcda_w));
+	m_rs232->cts_handler().set(m_dart, FUNC(z80dart_device::ctsa_w));
+//  m_rs232->ri_handler().set(m_dart, FUNC(z80dart_device::ria_w));
 
 	// pass-through
-	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
-	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(WRITELINE("^", cpc_expansion_slot_device, irq_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(WRITELINE("^", cpc_expansion_slot_device, nmi_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
-
-MACHINE_CONFIG_END
+	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", DERIVED_CLOCK(1, 1), cpc_exp_cards, nullptr));
+	exp.irq_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::irq_w));
+	exp.nmi_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::nmi_w));
+	exp.romdis_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::romdis_w));  // ROMDIS
+}
 
 const tiny_rom_entry *cpc_rs232_device::device_rom_region() const
 {
@@ -104,9 +103,8 @@ cpc_ams_rs232_device::cpc_ams_rs232_device(const machine_config &mconfig, const 
 
 void cpc_rs232_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
-	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
+	address_space &space = m_slot->cpu().space(AS_IO);
 
 	space.install_readwrite_handler(0xfadc,0xfadf,read8_delegate(FUNC(cpc_rs232_device::dart_r),this),write8_delegate(FUNC(cpc_rs232_device::dart_w),this));
 	space.install_readwrite_handler(0xfbdc,0xfbdf,read8_delegate(FUNC(cpc_rs232_device::pit_r),this),write8_delegate(FUNC(cpc_rs232_device::pit_w),this));
@@ -149,10 +147,10 @@ WRITE8_MEMBER(cpc_rs232_device::dart_w)
 
 READ8_MEMBER(cpc_rs232_device::pit_r)
 {
-	return m_pit->read(space,offset);
+	return m_pit->read(offset);
 }
 
 WRITE8_MEMBER(cpc_rs232_device::pit_w)
 {
-	m_pit->write(space,offset,data);
+	m_pit->write(offset,data);
 }

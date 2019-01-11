@@ -630,7 +630,7 @@ VIDEO_START_MEMBER(pgm_state,pgm)
 
 	m_spritebufferram = make_unique_clear<uint16_t[]>(0xa00/2);
 
-	save_pointer(NAME(m_spritebufferram.get()), 0xa00/2);
+	save_pointer(NAME(m_spritebufferram), 0xa00/2);
 }
 
 uint32_t pgm_state::screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

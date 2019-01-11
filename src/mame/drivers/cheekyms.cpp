@@ -33,8 +33,8 @@ void cheekyms_state::io_map(address_map &map)
 	map(0x00, 0x00).portr("DSW");
 	map(0x01, 0x01).portr("INPUTS");
 	map(0x20, 0x3f).writeonly().share("spriteram");
-	map(0x40, 0x40).w(this, FUNC(cheekyms_state::port_40_w));
-	map(0x80, 0x80).w(this, FUNC(cheekyms_state::port_80_w)).share("port_80");
+	map(0x40, 0x40).w(FUNC(cheekyms_state::port_40_w));
+	map(0x80, 0x80).w(FUNC(cheekyms_state::port_80_w)).share("port_80");
 }
 
 
@@ -137,35 +137,13 @@ MACHINE_CONFIG_START(cheekyms_state::cheekyms)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cheekyms_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cheekyms)
-	MCFG_PALETTE_ADD("palette", 0xc0)
-	MCFG_PALETTE_INIT_OWNER(cheekyms_state, cheekyms)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cheekyms);
+	PALETTE(config, m_palette, FUNC(cheekyms_state::cheekyms_palette), 0xc0);
 
 	/* audio hardware */
-	MCFG_DEVICE_ADD("soundboard", CHEEKY_MOUSE_AUDIO, 0)
-#if 0
-	SPEAKER(config, "speaker").front_center();
-
-	MCFG_DEVICE_ADD("dac0", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("dac1", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("dac4", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("dac5", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("dac6", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("dac7", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac4", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac5", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac6", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac7", 1.0, DAC_VREF_POS_INPUT)
-#endif
+	CHEEKY_MOUSE_AUDIO(config, m_sound_board, 0);
 MACHINE_CONFIG_END
 
 

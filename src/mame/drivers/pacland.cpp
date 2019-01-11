@@ -263,19 +263,19 @@ WRITE8_MEMBER(pacland_state::irq_2_ctrl_w)
 
 void pacland_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().w(this, FUNC(pacland_state::videoram_w)).share("videoram");
-	map(0x1000, 0x1fff).ram().w(this, FUNC(pacland_state::videoram2_w)).share("videoram2");
+	map(0x0000, 0x0fff).ram().w(FUNC(pacland_state::videoram_w)).share("videoram");
+	map(0x1000, 0x1fff).ram().w(FUNC(pacland_state::videoram2_w)).share("videoram2");
 	map(0x2000, 0x37ff).ram().share("spriteram");
-	map(0x3800, 0x3801).w(this, FUNC(pacland_state::scroll0_w));
-	map(0x3a00, 0x3a01).w(this, FUNC(pacland_state::scroll1_w));
-	map(0x3c00, 0x3c00).w(this, FUNC(pacland_state::bankswitch_w));
+	map(0x3800, 0x3801).w(FUNC(pacland_state::scroll0_w));
+	map(0x3a00, 0x3a01).w(FUNC(pacland_state::scroll1_w));
+	map(0x3c00, 0x3c00).w(FUNC(pacland_state::bankswitch_w));
 	map(0x4000, 0x5fff).bankr("bank1");
 	map(0x6800, 0x6bff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));      /* PSG device, shared RAM */
-	map(0x7000, 0x7fff).w(this, FUNC(pacland_state::irq_1_ctrl_w));
+	map(0x7000, 0x7fff).w(FUNC(pacland_state::irq_1_ctrl_w));
 	map(0x7800, 0x7fff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0x8000, 0xffff).rom();
-	map(0x8000, 0x8fff).w(this, FUNC(pacland_state::subreset_w));
-	map(0x9000, 0x9fff).w(this, FUNC(pacland_state::flipscreen_w));
+	map(0x8000, 0x8fff).w(FUNC(pacland_state::subreset_w));
+	map(0x9000, 0x9fff).w(FUNC(pacland_state::flipscreen_w));
 }
 
 void pacland_state::mcu_map(address_map &map)
@@ -284,25 +284,11 @@ void pacland_state::mcu_map(address_map &map)
 	map(0x0080, 0x00ff).ram();
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));      /* PSG device, shared RAM */
 	map(0x2000, 0x3fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));     /* watchdog? */
-	map(0x4000, 0x7fff).w(this, FUNC(pacland_state::irq_2_ctrl_w));
+	map(0x4000, 0x7fff).w(FUNC(pacland_state::irq_2_ctrl_w));
 	map(0x8000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xd000, 0xd003).r(this, FUNC(pacland_state::input_r));
+	map(0xd000, 0xd003).r(FUNC(pacland_state::input_r));
 	map(0xf000, 0xffff).rom();
-}
-
-
-READ8_MEMBER(pacland_state::readFF)
-{
-	return 0xff;
-}
-
-void pacland_state::mcu_port_map(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).portr("IN2");
-	map(M6801_PORT1, M6801_PORT1).w(this, FUNC(pacland_state::coin_w));
-	map(M6801_PORT2, M6801_PORT2).r(this, FUNC(pacland_state::readFF));  /* leds won't work otherwise */
-	map(M6801_PORT2, M6801_PORT2).w(this, FUNC(pacland_state::led_w));
 }
 
 
@@ -331,7 +317,7 @@ static INPUT_PORTS_START( pacland )
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SWB:3,2,1")
-	PORT_DIPSETTING(    0xe0, "30K 80K 130K 300K 500K 1M" )     // "A"
+	PORT_DIPSETTING(    0xe0, "30K 80K 150K 300K 500K 1M" )     // "A"
 	PORT_DIPSETTING(    0x80, "30K 80K every 100K" )            // "D"
 	PORT_DIPSETTING(    0x40, "30K 80K 150K" )                  // "F"
 	PORT_DIPSETTING(    0xc0, "30K 100K 200K 400K 600K 1M" )    // "B"
@@ -427,39 +413,40 @@ WRITE_LINE_MEMBER(pacland_state::vblank_irq)
 		m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(pacland_state::pacland)
-
+void pacland_state::pacland(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(49'152'000)/32) /* 1.536 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MC6809E(config, m_maincpu, XTAL(49'152'000)/32); /* 1.536 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pacland_state::main_map);
 
-	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8) /* 6.144 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_IO_MAP(mcu_port_map)
+	HD63701(config, m_mcu, XTAL(49'152'000)/8); /* 6.144 MHz? */
+	m_mcu->set_addrmap(AS_PROGRAM, &pacland_state::mcu_map);
+	m_mcu->in_p1_cb().set_ioport("IN2");
+	m_mcu->out_p1_cb().set(FUNC(pacland_state::coin_w));
+	m_mcu->in_p2_cb().set_constant(0xff);  /* leds won't work otherwise */
+	m_mcu->out_p2_cb().set(FUNC(pacland_state::led_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synching between the MCU and the CPU */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* we need heavy synching between the MCU and the CPU */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 3*8, 39*8, 264, 2*8, 30*8)
-	MCFG_SCREEN_UPDATE_DRIVER(pacland_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pacland_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(49'152'000)/8, 384, 3*8, 39*8, 264, 2*8, 30*8);
+	m_screen->set_screen_update(FUNC(pacland_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(pacland_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pacland)
-	MCFG_PALETTE_ADD("palette", 256*4+256*4+64*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(pacland_state, pacland)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pacland);
+	PALETTE(config, m_palette, FUNC(pacland_state::pacland_palette), 256*4 + 256*4 + 64*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2/1024)
-	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	NAMCO_CUS30(config, m_cus30, XTAL(49'152'000)/2/1024);
+	m_cus30->set_voices(8);
+	m_cus30->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************

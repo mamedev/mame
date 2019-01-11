@@ -15,6 +15,7 @@
 #include "machine/deco146.h"
 #include "machine/deco104.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 
 class cninja_state : public driver_device

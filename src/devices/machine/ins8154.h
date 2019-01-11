@@ -35,45 +35,17 @@
 
 #pragma once
 
-
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_INS8154_IN_A_CB(_devcb) \
-	devcb = &downcast<ins8154_device &>(*device).set_in_a_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8154_OUT_A_CB(_devcb) \
-	devcb = &downcast<ins8154_device &>(*device).set_out_a_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8154_IN_B_CB(_devcb) \
-	devcb = &downcast<ins8154_device &>(*device).set_in_b_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8154_OUT_B_CB(_devcb) \
-	devcb = &downcast<ins8154_device &>(*device).set_out_b_callback(DEVCB_##_devcb);
-
-#define MCFG_INS8154_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<ins8154_device &>(*device).set_out_irq_callback(DEVCB_##_devcb); //currently unused
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-// ======================> ins8154_device
-
 class ins8154_device :  public device_t
 {
 public:
 	// construction/destruction
-	ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> devcb_base &set_in_a_callback(Object &&cb) { return m_in_a_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_a_callback(Object &&cb) { return m_out_a_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_b_callback(Object &&cb) { return m_in_b_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_b_callback(Object &&cb) { return m_out_b_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	auto in_a() { return m_in_a_cb.bind(); }
+	auto out_a() { return m_out_a_cb.bind(); }
+	auto in_b() { return m_in_b_cb.bind(); }
+	auto out_b() { return m_out_b_cb.bind(); }
+	auto out_irq() { return m_out_irq_cb.bind(); }
 
 	DECLARE_READ8_MEMBER( ins8154_r );
 	DECLARE_WRITE8_MEMBER( ins8154_w );

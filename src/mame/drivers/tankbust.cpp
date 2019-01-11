@@ -128,52 +128,49 @@ READ8_MEMBER(tankbust_state::debug_output_area_r)
 
 
 
-PALETTE_INIT_MEMBER(tankbust_state, tankbust)
+void tankbust_state::tankbust_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-
-	for (i = 0; i < 128; i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < 128; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-//7 6   5 4 3   2 1 0
-//bb    r r r   g g g - bad (for sure - no green for tank)
-//bb    g g g   r r r - bad (for sure - no yellow, no red)
-//gg    r r r   b b b - bad
-//gg    b b b   r r r - bad
-//rr    b b b   g g g - bad
+		//7 6   5 4 3   2 1 0
+		//bb    r r r   g g g - bad (for sure - no green for tank)
+		//bb    g g g   r r r - bad (for sure - no yellow, no red)
+		//gg    r r r   b b b - bad
+		//gg    b b b   r r r - bad
+		//rr    b b b   g g g - bad
 
-//rr    g g g   b b b - very close (green,yellow,red present)
+		//rr    g g g   b b b - very close (green,yellow,red present)
 
-//rr    r g g   g b b - bad
-//rr    r g g   b b b - bad
-//rr    g g g   b b r - bad
+		//rr    r g g   g b b - bad
+		//rr    r g g   b b b - bad
+		//rr    g g g   b b r - bad
 
-//rr    g g b   b x x - bad (x: unused)
-//rr    g g x   x b b - bad but still close
-//rr    g g r   g b b - bad but still close
-//rr    g g g   r b b - bad but still close
+		//rr    g g b   b x x - bad (x: unused)
+		//rr    g g x   x b b - bad but still close
+		//rr    g g r   g b b - bad but still close
+		//rr    g g g   r b b - bad but still close
 
+		// blue component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// red component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const r = 0x55 * bit0 + 0xaa * bit1;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 6) & 0x01;
-		bit1 = (color_prom[i] >> 7) & 0x01;
-		r = 0x55 * bit0 + 0xaa * bit1;
-
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -195,16 +192,16 @@ void tankbust_state::main_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xbfff).bankr("bank2");
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(tankbust_state::background_videoram_w)).share("videoram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(tankbust_state::background_colorram_w)).share("colorram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(tankbust_state::txtram_w)).share("txtram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(tankbust_state::background_videoram_w)).share("videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(tankbust_state::background_colorram_w)).share("colorram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(tankbust_state::txtram_w)).share("txtram");
 	map(0xd800, 0xd8ff).ram().share("spriteram");
-	map(0xe000, 0xe007).rw(this, FUNC(tankbust_state::debug_output_area_r), FUNC(tankbust_state::e0xx_w));
-	map(0xe800, 0xe800).portr("INPUTS").w(this, FUNC(tankbust_state::yscroll_w));
+	map(0xe000, 0xe007).rw(FUNC(tankbust_state::debug_output_area_r), FUNC(tankbust_state::e0xx_w));
+	map(0xe800, 0xe800).portr("INPUTS").w(FUNC(tankbust_state::yscroll_w));
 	map(0xe801, 0xe801).portr("SYSTEM");
 	map(0xe802, 0xe802).portr("DSW");
-	map(0xe801, 0xe802).w(this, FUNC(tankbust_state::xscroll_w));
-	map(0xe803, 0xe803).rw(this, FUNC(tankbust_state::some_changing_input), FUNC(tankbust_state::soundlatch_w));   /*unknown. Game expects this to change so this is not player input */
+	map(0xe801, 0xe802).w(FUNC(tankbust_state::xscroll_w));
+	map(0xe803, 0xe803).rw(FUNC(tankbust_state::some_changing_input), FUNC(tankbust_state::soundlatch_w));   /*unknown. Game expects this to change so this is not player input */
 	map(0xe804, 0xe804).nopw();    /* watchdog ? ; written in long-lasting loops */
 	map(0xf000, 0xf7ff).ram();
 	//AM_RANGE(0xf800, 0xffff) AM_READ(read_from_unmapped_memory)   /* a bug in game code ? */
@@ -356,23 +353,20 @@ MACHINE_CONFIG_START(tankbust_state::tankbust)
 	MCFG_SCREEN_VISIBLE_AREA  ( 16*8, 56*8-1, 1*8, 31*8-1 )
 //  MCFG_SCREEN_VISIBLE_AREA  (  0*8, 64*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(tankbust_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tankbust)
-
-	MCFG_PALETTE_ADD( "palette", 128 )
-	MCFG_PALETTE_INIT_OWNER(tankbust_state, tankbust)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tankbust);
+	PALETTE(config, m_palette, FUNC(tankbust_state::tankbust_palette), 128);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(14'318'181)/16)  /* Verified on PCB */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, tankbust_state, soundlatch_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, tankbust_state, soundtimer_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(14'318'181)/16));  /* Verified on PCB */
+	ay1.port_a_read_callback().set(FUNC(tankbust_state::soundlatch_r));
+	ay1.port_b_read_callback().set(FUNC(tankbust_state::soundtimer_r));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(14'318'181)/16)  /* Verified on PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	AY8910(config, "ay2", XTAL(14'318'181)/16).add_route(ALL_OUTPUTS, "mono", 0.10);  /* Verified on PCB */
 MACHINE_CONFIG_END
 
 

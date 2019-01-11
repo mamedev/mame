@@ -145,22 +145,22 @@ DECLARE_DEVICE_TYPE(IQ151CART_SLOT, iq151cart_slot_device)
 ***************************************************************************/
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ0_CB(_devcb) \
-	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_irq0_callback(DEVCB_##_devcb);
+	downcast<iq151cart_slot_device &>(*device).set_out_irq0_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ1_CB(_devcb) \
-	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_irq1_callback(DEVCB_##_devcb);
+	downcast<iq151cart_slot_device &>(*device).set_out_irq1_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ2_CB(_devcb) \
-	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
+	downcast<iq151cart_slot_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ3_CB(_devcb) \
-	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_irq3_callback(DEVCB_##_devcb);
+	downcast<iq151cart_slot_device &>(*device).set_out_irq3_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_IRQ4_CB(_devcb) \
-	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
+	downcast<iq151cart_slot_device &>(*device).set_out_irq4_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_OUT_DRQ_CB(_devcb) \
-	devcb = &downcast<iq151cart_slot_device &>(*device).set_out_drq_callback(DEVCB_##_devcb);
+	downcast<iq151cart_slot_device &>(*device).set_out_drq_callback(DEVCB_##_devcb);
 
 #define MCFG_IQ151CART_SLOT_SCREEN_TAG(screen_tag) \
 	downcast<iq151cart_slot_device &>(*device).set_screen_tag(screen_tag);

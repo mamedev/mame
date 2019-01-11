@@ -33,16 +33,16 @@ DEFINE_DEVICE_TYPE(TMS5501, tms5501_device, "tms5501", "TMS5501 Multifunction I/
 // I/O address map
 void tms5501_device::io_map(address_map &map)
 {
-	map(0x00, 0x00).r(this, FUNC(tms5501_device::rb_r));
-	map(0x01, 0x01).r(this, FUNC(tms5501_device::xi_r));
-	map(0x02, 0x02).r(this, FUNC(tms5501_device::rst_r));
-	map(0x03, 0x03).r(this, FUNC(tms5501_device::sta_r));
-	map(0x04, 0x04).w(this, FUNC(tms5501_device::cmd_w));
-	map(0x05, 0x05).w(this, FUNC(tms5501_device::rr_w));
-	map(0x06, 0x06).w(this, FUNC(tms5501_device::tb_w));
-	map(0x07, 0x07).w(this, FUNC(tms5501_device::xo_w));
-	map(0x08, 0x08).w(this, FUNC(tms5501_device::mr_w));
-	map(0x09, 0x0d).w(this, FUNC(tms5501_device::tmr_w));
+	map(0x00, 0x00).r(FUNC(tms5501_device::rb_r));
+	map(0x01, 0x01).r(FUNC(tms5501_device::xi_r));
+	map(0x02, 0x02).r(FUNC(tms5501_device::rst_r));
+	map(0x03, 0x03).r(FUNC(tms5501_device::sta_r));
+	map(0x04, 0x04).w(FUNC(tms5501_device::cmd_w));
+	map(0x05, 0x05).w(FUNC(tms5501_device::rr_w));
+	map(0x06, 0x06).w(FUNC(tms5501_device::tb_w));
+	map(0x07, 0x07).w(FUNC(tms5501_device::xo_w));
+	map(0x08, 0x08).w(FUNC(tms5501_device::mr_w));
+	map(0x09, 0x0d).w(FUNC(tms5501_device::tmr_w));
 }
 
 
@@ -58,7 +58,7 @@ void tms5501_device::io_map(address_map &map)
 tms5501_device::tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TMS5501, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
-	m_write_irq(*this),
+	m_write_int(*this),
 	m_write_xmt(*this),
 	m_read_xi(*this),
 	m_write_xo(*this),
@@ -82,7 +82,7 @@ tms5501_device::tms5501_device(const machine_config &mconfig, const char *tag, d
 void tms5501_device::device_start()
 {
 	// resolve callbacks
-	m_write_irq.resolve_safe();
+	m_write_int.resolve_safe();
 	m_write_xmt.resolve_safe();
 	m_read_xi.resolve_safe(0);
 	m_write_xo.resolve_safe();
@@ -496,11 +496,11 @@ void tms5501_device::check_interrupt()
 
 	if (m_cmd & CMD_IAE)
 	{
-		m_write_irq(state);
+		m_write_int(state);
 	}
 	else
 	{
-		m_write_irq(CLEAR_LINE);
+		m_write_int(CLEAR_LINE);
 	}
 }
 

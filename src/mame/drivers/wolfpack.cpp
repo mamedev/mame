@@ -133,35 +133,35 @@ void wolfpack_state::main_map(address_map &map)
 	map(0x0000, 0x00ff).ram().mirror(0x100);
 	map(0x1000, 0x1000).portr("INPUTS");
 	map(0x1000, 0x10ff).writeonly().share("alpha_num_ram");
-	map(0x2000, 0x2000).r(this, FUNC(wolfpack_state::misc_r));
-	map(0x2000, 0x2000).w(this, FUNC(wolfpack_state::high_explo_w));
-	map(0x2001, 0x2001).w(this, FUNC(wolfpack_state::sonar_ping_w));
-	map(0x2002, 0x2002).w(this, FUNC(wolfpack_state::sirlat_w));
-	map(0x2003, 0x2003).w(this, FUNC(wolfpack_state::pt_sound_w));
-	map(0x2004, 0x2004).w(this, FUNC(wolfpack_state::start_speech_w));
-	map(0x2005, 0x2005).w(this, FUNC(wolfpack_state::launch_torpedo_w));
-	map(0x2006, 0x2006).w(this, FUNC(wolfpack_state::low_explo_w));
-	map(0x2007, 0x2007).w(this, FUNC(wolfpack_state::screw_cont_w));
-	map(0x2008, 0x2008).w(this, FUNC(wolfpack_state::video_invert_w));
-	map(0x2009, 0x2009).w(this, FUNC(wolfpack_state::ship_reflect_w));
-	map(0x200a, 0x200a).w(this, FUNC(wolfpack_state::lamp_flash_w));
-	map(0x200c, 0x200c).w(this, FUNC(wolfpack_state::credit_w));
-	map(0x200d, 0x200d).w(this, FUNC(wolfpack_state::attract_w));
-	map(0x200e, 0x200e).w(this, FUNC(wolfpack_state::pt_pos_select_w));
-	map(0x200f, 0x200f).w(this, FUNC(wolfpack_state::warning_light_w));
+	map(0x2000, 0x2000).r(FUNC(wolfpack_state::misc_r));
+	map(0x2000, 0x2000).w(FUNC(wolfpack_state::high_explo_w));
+	map(0x2001, 0x2001).w(FUNC(wolfpack_state::sonar_ping_w));
+	map(0x2002, 0x2002).w(FUNC(wolfpack_state::sirlat_w));
+	map(0x2003, 0x2003).w(FUNC(wolfpack_state::pt_sound_w));
+	map(0x2004, 0x2004).w(FUNC(wolfpack_state::start_speech_w));
+	map(0x2005, 0x2005).w(FUNC(wolfpack_state::launch_torpedo_w));
+	map(0x2006, 0x2006).w(FUNC(wolfpack_state::low_explo_w));
+	map(0x2007, 0x2007).w(FUNC(wolfpack_state::screw_cont_w));
+	map(0x2008, 0x2008).w(FUNC(wolfpack_state::video_invert_w));
+	map(0x2009, 0x2009).w(FUNC(wolfpack_state::ship_reflect_w));
+	map(0x200a, 0x200a).w(FUNC(wolfpack_state::lamp_flash_w));
+	map(0x200c, 0x200c).w(FUNC(wolfpack_state::credit_w));
+	map(0x200d, 0x200d).w(FUNC(wolfpack_state::attract_w));
+	map(0x200e, 0x200e).w(FUNC(wolfpack_state::pt_pos_select_w));
+	map(0x200f, 0x200f).w(FUNC(wolfpack_state::warning_light_w));
 	map(0x3000, 0x3000).portr("DSW");
-	map(0x3000, 0x3000).w(this, FUNC(wolfpack_state::audamp_w));
-	map(0x3001, 0x3001).w(this, FUNC(wolfpack_state::pt_horz_w));
-	map(0x3003, 0x3003).w(this, FUNC(wolfpack_state::pt_pic_w));
-	map(0x3004, 0x3004).w(this, FUNC(wolfpack_state::word_w));
-	map(0x3007, 0x3007).w(this, FUNC(wolfpack_state::coldetres_w));
-	map(0x4000, 0x4000).w(this, FUNC(wolfpack_state::ship_h_w));
-	map(0x4001, 0x4001).w(this, FUNC(wolfpack_state::torpedo_pic_w));
-	map(0x4002, 0x4002).w(this, FUNC(wolfpack_state::ship_size_w));
-	map(0x4003, 0x4003).w(this, FUNC(wolfpack_state::ship_h_precess_w));
-	map(0x4004, 0x4004).w(this, FUNC(wolfpack_state::ship_pic_w));
-	map(0x4005, 0x4005).w(this, FUNC(wolfpack_state::torpedo_h_w));
-	map(0x4006, 0x4006).w(this, FUNC(wolfpack_state::torpedo_v_w));
+	map(0x3000, 0x3000).w(FUNC(wolfpack_state::audamp_w));
+	map(0x3001, 0x3001).w(FUNC(wolfpack_state::pt_horz_w));
+	map(0x3003, 0x3003).w(FUNC(wolfpack_state::pt_pic_w));
+	map(0x3004, 0x3004).w(FUNC(wolfpack_state::word_w));
+	map(0x3007, 0x3007).w(FUNC(wolfpack_state::coldetres_w));
+	map(0x4000, 0x4000).w(FUNC(wolfpack_state::ship_h_w));
+	map(0x4001, 0x4001).w(FUNC(wolfpack_state::torpedo_pic_w));
+	map(0x4002, 0x4002).w(FUNC(wolfpack_state::ship_size_w));
+	map(0x4003, 0x4003).w(FUNC(wolfpack_state::ship_h_precess_w));
+	map(0x4004, 0x4004).w(FUNC(wolfpack_state::ship_pic_w));
+	map(0x4005, 0x4005).w(FUNC(wolfpack_state::torpedo_h_w));
+	map(0x4006, 0x4006).w(FUNC(wolfpack_state::torpedo_v_w));
 	map(0x5000, 0x5fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x7000, 0x7fff).rom();
 	map(0x9000, 0x9000).nopr(); /* debugger ROM location? */
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(wolfpack_state::wolfpack)
 	MCFG_DEVICE_ADD("maincpu", M6502, 12096000 / 16)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -321,12 +321,10 @@ MACHINE_CONFIG_START(wolfpack_state::wolfpack)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(wolfpack_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wolfpack_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wolfpack)
-	MCFG_PALETTE_ADD("palette", 12)
-	MCFG_PALETTE_INDIRECT_ENTRIES(8)
-	MCFG_PALETTE_INIT_OWNER(wolfpack_state, wolfpack)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_wolfpack)
+	PALETTE(config, m_palette, FUNC(wolfpack_state::wolfpack_palette), 12, 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -8,7 +8,7 @@ Quiz Bisyoujo Senshi Sailor Moon    (c)1997 Banpresto
 Driver by David Haywood
 
 TODO:
- - what is the 'bios' rom for? it appears to be data tables and is very different between games but we don't map it anywhere
+ - what is the 'BIOS' ROM for? it appears to be data tables and is very different between games but we don't map it anywhere
  - convert tilemaps to devices?
 
  68020 interrupts
@@ -343,32 +343,32 @@ void macrossp_state::macrossp_map(address_map &map)
 	map(0x000000, 0x3fffff).rom();
 	map(0x800000, 0x802fff).ram().share("spriteram");
 	/* SCR A Layer */
-	map(0x900000, 0x903fff).ram().w(this, FUNC(macrossp_state::macrossp_scra_videoram_w)).share("scra_videoram");
+	map(0x900000, 0x903fff).ram().w(FUNC(macrossp_state::macrossp_scra_videoram_w)).share("scra_videoram");
 	map(0x904200, 0x9043ff).ram().share("scra_linezoom"); /* W/O? */
 	map(0x905000, 0x90500b).ram().share("scra_videoregs"); /* W/O? */
 	/* SCR B Layer */
-	map(0x908000, 0x90bfff).ram().w(this, FUNC(macrossp_state::macrossp_scrb_videoram_w)).share("scrb_videoram");
+	map(0x908000, 0x90bfff).ram().w(FUNC(macrossp_state::macrossp_scrb_videoram_w)).share("scrb_videoram");
 	map(0x90c200, 0x90c3ff).ram().share("scrb_linezoom"); /* W/O? */
 	map(0x90d000, 0x90d00b).ram().share("scrb_videoregs"); /* W/O? */
 	/* SCR C Layer */
-	map(0x910000, 0x913fff).ram().w(this, FUNC(macrossp_state::macrossp_scrc_videoram_w)).share("scrc_videoram");
+	map(0x910000, 0x913fff).ram().w(FUNC(macrossp_state::macrossp_scrc_videoram_w)).share("scrc_videoram");
 	map(0x914200, 0x9143ff).ram().share("scrc_linezoom");/* W/O? */
 	map(0x915000, 0x91500b).ram().share("scrc_videoregs"); /* W/O? */
 	/* Text Layer */
-	map(0x918000, 0x91bfff).ram().w(this, FUNC(macrossp_state::macrossp_text_videoram_w)).share("text_videoram");
+	map(0x918000, 0x91bfff).ram().w(FUNC(macrossp_state::macrossp_text_videoram_w)).share("text_videoram");
 	map(0x91c200, 0x91c3ff).ram().share("text_linezoom"); /* W/O? */
 	map(0x91d000, 0x91d00b).ram().share("text_videoregs"); /* W/O? */
 
 	map(0xa00000, 0xa03fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 
 	map(0xb00000, 0xb00003).portr("INPUTS");
-	map(0xb00004, 0xb00007).r(this, FUNC(macrossp_state::macrossp_soundstatus_r)).nopw(); // irq related?
+	map(0xb00004, 0xb00007).r(FUNC(macrossp_state::macrossp_soundstatus_r)).nopw(); // irq related?
 	map(0xb00008, 0xb0000b).nopw();    // irq related?
 	map(0xb0000c, 0xb0000f).portr("DSW").nopw();
-	map(0xb00012, 0xb00013).w(this, FUNC(macrossp_state::palette_fade_w));
+	map(0xb00012, 0xb00013).w(FUNC(macrossp_state::palette_fade_w));
 	map(0xb00020, 0xb00023).nopw();
 
-	map(0xc00000, 0xc00003).w(this, FUNC(macrossp_state::macrossp_soundcmd_w));
+	map(0xc00000, 0xc00003).w(FUNC(macrossp_state::macrossp_soundcmd_w));
 
 	map(0xf00000, 0xf1ffff).ram().share("mainram"); /* Main Ram */
 //  map(0xfe0000, 0xfe0003).noprw();
@@ -379,7 +379,7 @@ void macrossp_state::macrossp_sound_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x207fff).ram();
 	map(0x400000, 0x40007f).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write)).umask16(0x00ff);
-	map(0x600000, 0x600001).r(this, FUNC(macrossp_state::macrossp_soundcmd_r));
+	map(0x600000, 0x600001).r(FUNC(macrossp_state::macrossp_soundcmd_r));
 }
 
 /*** INPUT PORTS *************************************************************/
@@ -541,54 +541,50 @@ void macrossp_state::machine_reset()
 	m_snd_toggle = 0;
 }
 
-MACHINE_CONFIG_START(macrossp_state::macrossp)
-
+void macrossp_state::macrossp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, 50000000/2)   /* 25 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(macrossp_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", macrossp_state,  irq3_line_hold) // there are others ...
+	M68EC020(config, m_maincpu, 50000000/2);   /* 25 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &macrossp_state::macrossp_map);
+	m_maincpu->set_vblank_int("screen", FUNC(macrossp_state::irq3_line_hold)); // there are others ...
 
-	MCFG_DEVICE_ADD("audiocpu", M68000, 32000000/2)    /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(macrossp_sound_map)
-
+	M68000(config, m_audiocpu, 32000000/2);    /* 16 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &macrossp_state::macrossp_sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*16, 16*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 0*16, 15*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(macrossp_state, screen_update_macrossp)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, macrossp_state, screen_vblank_macrossp))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*16, 16*16);
+	m_screen->set_visarea(0*16, 24*16-1, 0*16, 15*16-1);
+	m_screen->set_screen_update(FUNC(macrossp_state::screen_update_macrossp));
+	m_screen->screen_vblank().set(FUNC(macrossp_state::screen_vblank_macrossp));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_macrossp)
-
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RGBX)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macrossp);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_888, 4096);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+	GENERIC_LATCH_16(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ensoniq", ES5506, 16000000)
-	MCFG_ES5506_REGION0("ensoniq.0")
-	MCFG_ES5506_REGION1("ensoniq.1")
-	MCFG_ES5506_REGION2("ensoniq.2")
-	MCFG_ES5506_REGION3("ensoniq.3")
-	MCFG_ES5506_CHANNELS(1)               /* channels */
-	MCFG_ES5506_IRQ_CB(WRITELINE(*this, macrossp_state, irqhandler))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.1)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.1)
-MACHINE_CONFIG_END
+	es5506_device &ensoniq(ES5506(config, "ensoniq", 16000000));
+	ensoniq.set_region0("ensoniq.0");
+	ensoniq.set_region1("ensoniq.1");
+	ensoniq.set_region2("ensoniq.2");
+	ensoniq.set_region3("ensoniq.3");
+	ensoniq.set_channels(1);
+	ensoniq.irq_cb().set(FUNC(macrossp_state::irqhandler));
+	ensoniq.add_route(0, "lspeaker", 0.1);
+	ensoniq.add_route(1, "rspeaker", 0.1);
+}
 
-MACHINE_CONFIG_START(macrossp_state::quizmoon)
+void macrossp_state::quizmoon(machine_config &config)
+{
 	macrossp(config);
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 24*16-1, 0*8, 14*16-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0, 24*16-1, 0*8, 14*16-1);
+}
 
 
 

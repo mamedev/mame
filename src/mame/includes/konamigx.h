@@ -3,17 +3,21 @@
 #ifndef MAME_INCLUDES_KONAMIGX_H
 #define MAME_INCLUDES_KONAMIGX_H
 
-#include "sound/k056800.h"
-#include "sound/k054539.h"
+#pragma once
+
 #include "cpu/tms57002/tms57002.h"
 #include "machine/adc083x.h"
 #include "machine/k053252.h"
 #include "machine/timer.h"
-#include "video/k054156_k054157_k056832.h"
+#include "sound/k056800.h"
+#include "sound/k054539.h"
 #include "video/k053246_k053247_k055673.h"
-#include "video/k055555.h"
-#include "video/k054338.h"
+#include "video/k053250.h"
 #include "video/k053936.h"
+#include "video/k054156_k054157_k056832.h"
+#include "video/k054338.h"
+#include "video/k055555.h"
+#include "emupal.h"
 #include "screen.h"
 
 class konamigx_state : public driver_device
@@ -32,6 +36,8 @@ public:
 		, m_k056800(*this, "k056800")
 		, m_k054539_1(*this, "k054539_1")
 		, m_k054539_2(*this, "k054539_2")
+		, m_k053250_1(*this, "k053250_1")
+		, m_k053250_2(*this, "k053250_2")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -107,7 +113,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_CALLBACK_MEMBER(boothack_callback);
-	ADC083X_INPUT_CB(adc0834_callback);
+	double adc0834_callback(uint8_t input);
 	K056832_CB_MEMBER(type2_tile_callback);
 	K056832_CB_MEMBER(alpha_tile_callback);
 	K055673_CB_MEMBER(type2_sprite_callback);
@@ -198,6 +204,8 @@ protected:
 	optional_device<k056800_device> m_k056800;
 	optional_device<k054539_device> m_k054539_1;
 	optional_device<k054539_device> m_k054539_2;
+	optional_device<k053250_device> m_k053250_1;
+	optional_device<k053250_device> m_k053250_2;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

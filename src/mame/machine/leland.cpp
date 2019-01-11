@@ -187,27 +187,27 @@ READ8_MEMBER(leland_state::dangerz_input_upper_r)
 
 static const uint8_t redline_pedal_value[8] = { 0xf0, 0xe0, 0xc0, 0xd0, 0x90, 0xb0, 0x30, 0x70 };
 
-READ8_MEMBER(leland_state::redline_pedal_1_r)
+READ8_MEMBER(redline_state::redline_pedal_1_r)
 {
-	int pedal = ioport("IN0")->read();
+	ioport_value const pedal = ioport("IN0")->read();
 	return redline_pedal_value[pedal >> 5] | 0x0f;
 }
 
 
-READ8_MEMBER(leland_state::redline_pedal_2_r)
+READ8_MEMBER(redline_state::redline_pedal_2_r)
 {
-	int pedal = ioport("IN2")->read();
+	ioport_value const pedal = ioport("IN2")->read();
 	return redline_pedal_value[pedal >> 5] | 0x0f;
 }
 
 
-READ8_MEMBER(leland_state::redline_wheel_1_r)
+READ8_MEMBER(redline_state::redline_wheel_1_r)
 {
 	return dial_compute_value(ioport("AN0")->read(), 0);
 }
 
 
-READ8_MEMBER(leland_state::redline_wheel_2_r)
+READ8_MEMBER(redline_state::redline_wheel_2_r)
 {
 	return dial_compute_value(ioport("AN1")->read(), 1);
 }
@@ -220,19 +220,19 @@ READ8_MEMBER(leland_state::redline_wheel_2_r)
  *
  *************************************/
 
-READ8_MEMBER(leland_state::offroad_wheel_1_r)
+READ8_MEMBER(redline_state::offroad_wheel_1_r)
 {
 	return dial_compute_value(ioport("AN3")->read(), 0);
 }
 
 
-READ8_MEMBER(leland_state::offroad_wheel_2_r)
+READ8_MEMBER(redline_state::offroad_wheel_2_r)
 {
 	return dial_compute_value(ioport("AN4")->read(), 1);
 }
 
 
-READ8_MEMBER(leland_state::offroad_wheel_3_r)
+READ8_MEMBER(redline_state::offroad_wheel_3_r)
 {
 	return dial_compute_value(ioport("AN5")->read(), 2);
 }
@@ -247,9 +247,7 @@ READ8_MEMBER(leland_state::offroad_wheel_3_r)
 
 READ8_MEMBER(ataxx_state::ataxx_trackball_r)
 {
-	static const char *const tracknames[] = { "AN0", "AN1", "AN2", "AN3" };
-
-	return dial_compute_value(ioport(tracknames[offset])->read(), offset);
+	return dial_compute_value(m_track_axes[offset]->read(), offset);
 }
 
 
@@ -260,30 +258,22 @@ READ8_MEMBER(ataxx_state::ataxx_trackball_r)
  *
  *************************************/
 
-READ8_MEMBER(ataxx_state::indyheat_wheel_r)
-{
-	static const char *const tracknames[] = { "AN0", "AN1", "AN2" };
-
-	return dial_compute_value(ioport(tracknames[offset])->read(), offset);
-}
-
-
 READ8_MEMBER(ataxx_state::indyheat_analog_r)
 {
 	switch (offset)
 	{
-		case 0:
-			return 0;
+	case 0:
+		return 0;
 
-		case 1:
-			return m_analog_result;
+	case 1:
+		return m_analog_result;
 
-		case 2:
-			return 0;
+	case 2:
+		return 0;
 
-		case 3:
-			logerror("Unexpected analog read(%02X)\n", 8 + offset);
-			break;
+	case 3:
+		logerror("Unexpected analog read(%02X)\n", 8 + offset);
+		break;
 	}
 	return 0xff;
 }
@@ -388,7 +378,7 @@ void ataxx_state::machine_start()
 	save_item(NAME(m_xrom1_addr));
 	save_item(NAME(m_xrom2_addr));
 	save_item(NAME(m_battery_ram_enable));
-	save_pointer(NAME(m_extra_tram.get()), ATAXX_EXTRA_TRAM_SIZE);
+	save_pointer(NAME(m_extra_tram), ATAXX_EXTRA_TRAM_SIZE);
 }
 
 
@@ -478,10 +468,15 @@ WRITE8_MEMBER(leland_state::leland_master_alt_bankswitch_w)
 			logerror("%04X:alternate_bank = %02X\n", m_master->pc(), data & 0x0f);
 	m_alternate_bank = data & 15;
 	(this->*m_update_master_bank)();
+}
+
+
+WRITE8_MEMBER(redline_state::redline_master_alt_bankswitch_w)
+{
+	leland_master_alt_bankswitch_w(space, offset, data, mem_mask);
 
 	/* sound control is in the rest */
-	if (m_sound)
-		m_sound->leland_80186_control_w(space, offset, data);
+	m_sound->leland_80186_control_w(space, offset, data, mem_mask);
 }
 
 

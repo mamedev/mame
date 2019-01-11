@@ -61,6 +61,7 @@ Keep pressed 9 and press reset to enter service mode.
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -92,7 +93,7 @@ private:
 	required_shared_ptr<uint16_t> m_vidram;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	required_device<at89c4051_device> m_mcu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -178,25 +179,25 @@ void rbmk_state::rbmk_mem(address_map &map)
 	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x9c0000, 0x9c0fff).ram().share("vidram");
-	map(0xb00000, 0xb00001).w(this, FUNC(rbmk_state::eeprom_w));
-	map(0xc00000, 0xc00001).rw(this, FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
-	map(0xc08000, 0xc08001).portr("IN1").w(this, FUNC(rbmk_state::tilebank_w));
+	map(0xb00000, 0xb00001).w(FUNC(rbmk_state::eeprom_w));
+	map(0xc00000, 0xc00001).rw(FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
+	map(0xc08000, 0xc08001).portr("IN1").w(FUNC(rbmk_state::tilebank_w));
 	map(0xc10000, 0xc10001).portr("IN2");
-	map(0xc18080, 0xc18081).r(this, FUNC(rbmk_state::unk_r));
+	map(0xc18080, 0xc18081).r(FUNC(rbmk_state::unk_r));
 	map(0xc20000, 0xc20001).portr("IN3");
-	map(0xc28000, 0xc28001).w(this, FUNC(rbmk_state::unk_w));
+	map(0xc28000, 0xc28001).w(FUNC(rbmk_state::unk_w));
 }
 
 void rbmk_state::rbspm_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x200000, 0x200001).w(this, FUNC(rbmk_state::eeprom_w)); // wrong
-	map(0x300000, 0x300001).rw(this, FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
-	map(0x308000, 0x308001).portr("IN1").w(this, FUNC(rbmk_state::tilebank_w)); // ok
+	map(0x200000, 0x200001).w(FUNC(rbmk_state::eeprom_w)); // wrong
+	map(0x300000, 0x300001).rw(FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
+	map(0x308000, 0x308001).portr("IN1").w(FUNC(rbmk_state::tilebank_w)); // ok
 	map(0x310000, 0x310001).portr("IN2");
-	map(0x318080, 0x318081).r(this, FUNC(rbmk_state::unk_r));
+	map(0x318080, 0x318081).r(FUNC(rbmk_state::unk_r));
 	map(0x320000, 0x320001).portr("IN3");
-	map(0x328000, 0x328001).w(this, FUNC(rbmk_state::unk_w));
+	map(0x328000, 0x328001).w(FUNC(rbmk_state::unk_w));
 	map(0x500000, 0x50ffff).ram();
 	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // if removed fails gfx test?
 	map(0x940000, 0x940fff).ram().share("vidram2"); // if removed fails palette test?
@@ -246,7 +247,7 @@ WRITE8_MEMBER(rbmk_state::mcu_io_mux_w)
 
 void rbmk_state::mcu_io(address_map &map)
 {
-	map(0x0ff00, 0x0ffff).rw(this, FUNC(rbmk_state::mcu_io_r), FUNC(rbmk_state::mcu_io_w));
+	map(0x0ff00, 0x0ffff).rw(FUNC(rbmk_state::mcu_io_r), FUNC(rbmk_state::mcu_io_w));
 }
 
 static INPUT_PORTS_START( rbmk )
@@ -569,12 +570,12 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_DEVICE_PROGRAM_MAP(rbmk_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbmk_state,  irq1_line_hold)
 
-	MCFG_DEVICE_ADD("mcu", AT89C4051, 22000000 / 4) // frequency isn't right
-	MCFG_DEVICE_PROGRAM_MAP(mcu_mem)
-	MCFG_DEVICE_IO_MAP(mcu_io)
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, rbmk_state, mcu_io_mux_w))
+	AT89C4051(config, m_mcu, 22000000 / 4); // frequency isn't right
+	m_mcu->set_addrmap(AS_PROGRAM, &rbmk_state::mcu_mem);
+	m_mcu->set_addrmap(AS_IO, &rbmk_state::mcu_io);
+	m_mcu->port_out_cb<3>().set(FUNC(rbmk_state::mcu_io_mux_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rbmk)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rbmk);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -582,13 +583,11 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rbmk_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -597,9 +596,9 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 22000000 / 8)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	YM2151(config, m_ymsnd, 22000000 / 8);
+	m_ymsnd->add_route(0, "lspeaker", 0.60);
+	m_ymsnd->add_route(1, "rspeaker", 0.60);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rbmk_state::rbspm)

@@ -70,6 +70,7 @@ we currently simulate this as the PIC is read protected.
 #include "cpu/nec/nec.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -82,6 +83,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")  { }
 
+	void ttchamp(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
@@ -141,7 +145,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(irq);
-	void ttchamp(machine_config &config);
 	void ttchamp_io(address_map &map);
 	void ttchamp_map(address_map &map);
 };
@@ -157,7 +160,7 @@ void ttchamp_state::machine_start()
 	m_picmodex = picmode::IDLE;
 
 	m_bakram = std::make_unique<uint8_t[]>(0x100);
-	machine().device<nvram_device>("backram")->set_base(m_bakram.get(), 0x100);
+	subdevice<nvram_device>("backram")->set_base(m_bakram.get(), 0x100);
 
 	save_item(NAME(m_paloff));
 	save_item(NAME(m_port10));
@@ -504,7 +507,7 @@ WRITE16_MEMBER(ttchamp_state::mem_w)
 
 void ttchamp_state::ttchamp_map(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(this, FUNC(ttchamp_state::mem_r), FUNC(ttchamp_state::mem_w));
+	map(0x00000, 0xfffff).rw(FUNC(ttchamp_state::mem_r), FUNC(ttchamp_state::mem_w));
 }
 
 /* Re-use same parameters as before (one-shot) */
@@ -554,19 +557,19 @@ void ttchamp_state::ttchamp_io(address_map &map)
 
 	map(0x0006, 0x0006).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0x0018, 0x0019).r(this, FUNC(ttchamp_state::blit_start_r)); // read before using bus write offset as blit parameters
-	map(0x001e, 0x001f).r(this, FUNC(ttchamp_state::port1e_r)); // read before some blit operations (but not all)
+	map(0x0018, 0x0019).r(FUNC(ttchamp_state::blit_start_r)); // read before using bus write offset as blit parameters
+	map(0x001e, 0x001f).r(FUNC(ttchamp_state::port1e_r)); // read before some blit operations (but not all)
 
-	map(0x0008, 0x0009).w(this, FUNC(ttchamp_state::paldat_w));
-	map(0x000a, 0x000b).w(this, FUNC(ttchamp_state::paloff_w)); // bit 0x8000 sometimes gets set, why?
+	map(0x0008, 0x0009).w(FUNC(ttchamp_state::paldat_w));
+	map(0x000a, 0x000b).w(FUNC(ttchamp_state::paloff_w)); // bit 0x8000 sometimes gets set, why?
 
-	map(0x0010, 0x0011).w(this, FUNC(ttchamp_state::port10_w));
+	map(0x0010, 0x0011).w(FUNC(ttchamp_state::port10_w));
 
-	map(0x0020, 0x0021).w(this, FUNC(ttchamp_state::port20_w));
+	map(0x0020, 0x0021).w(FUNC(ttchamp_state::port20_w));
 
-	map(0x0034, 0x0035).rw(this, FUNC(ttchamp_state::pic_r), FUNC(ttchamp_state::pic_w));
+	map(0x0034, 0x0035).rw(FUNC(ttchamp_state::pic_r), FUNC(ttchamp_state::pic_w));
 
-	map(0x0062, 0x0063).w(this, FUNC(ttchamp_state::port62_w));
+	map(0x0062, 0x0063).w(FUNC(ttchamp_state::port62_w));
 
 }
 
@@ -660,7 +663,7 @@ MACHINE_CONFIG_START(ttchamp_state::ttchamp)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 
-	MCFG_NVRAM_ADD_0FILL("backram")
+	NVRAM(config, "backram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
 
