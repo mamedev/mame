@@ -6,10 +6,13 @@
 
     Games supported:
         * Aladdin
+        * Bare Knuckle III
         * Mortal Kombat 3
+        * Sonic The Hedgehog 2
         * Super Street Fighter II - The New Challengers
         * Sunset Riders
         * Top Shooter
+        * Twinkle Tale
 
 
 Aladdin PCB info
@@ -96,7 +99,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
     that's why I've "blanked" player 2 inputs which are never read.
   - I've labelled the buttons the same way as in 'g_aladj' with default options.
 
-5) MegaDrive comparaison ('g_aladj' in HazeMD)
+5) MegaDrive comparison ('g_aladj' in HazeMD)
 
   - There is no "OPTIONS" menu as the difficulty is handled via the MCU / Dip Switches.
     Some code has been patched but most is still there (see the texts in the ROM ares);
@@ -191,7 +194,7 @@ connector, but of course, I can be wrong.
      |_|_|_|_|_|_|_|_|_|_|_|_|_|_|           |_|_|_|_|
 
 
-  IC1 = Surface scracthed out, don't know what is it
+  IC1 = Surface scratched out, don't know what it is
   U24 = Surface scratched out, seems like a PROM
  DIPs = Fixed as: 00001000
  ROMs = Toshiba TC574000AD
@@ -746,6 +749,9 @@ ROM_START( aladmdb )
 	ROM_LOAD16_BYTE( "m2.bin", 0x000000, 0x080000,  CRC(142a0366) SHA1(6c94aa9936cd11ccda503b52019a6721e64a32f0) )
 	ROM_LOAD16_BYTE( "m3.bin", 0x100001, 0x080000,  CRC(0feeeb19) SHA1(bd567a33077ab9997871d21736066140d50e3d70) )
 	ROM_LOAD16_BYTE( "m4.bin", 0x100000, 0x080000,  CRC(bc712661) SHA1(dfd554d000399e17b4ddc69761e572195ed4e1f0))
+
+	ROM_REGION( 0x2000, "pic", ROMREGION_ERASE00 )
+	ROM_LOAD( "pic16c57xtp", 0x0000, 0x2000, NO_DUMP )
 ROM_END
 
 ROM_START( mk3mdb ) // roms are scrambled, we take care of the address descramble in the ROM load, and the data descramble in the init
@@ -816,6 +822,14 @@ ROM_START( barek3mb )
 	ROM_LOAD16_BYTE( "2.u16", 0x200001, 0x080000,  CRC(bba4a585) SHA1(32c59729943d7b4c1a39f2a2b0dae9ce16991e9c) )
 ROM_END
 
+ROM_START( twinktmb ) // same PCB as sonic2mb, but in this one the PIC is populated
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "m2.bin", 0x000000, 0x080000,  CRC(44424f8f) SHA1(e16318bfdf869765c821c264cf9a7e6c728f7073) )
+	ROM_LOAD16_BYTE( "m1.bin", 0x000001, 0x080000,  CRC(69aa916e) SHA1(7ea6b571fd0b6494051d5846ee9b4564b7692766) )
+
+	ROM_REGION( 0x2000, "pic", ROMREGION_ERASE00 )
+	ROM_LOAD( "pic16c57xtp", 0x0000, 0x2000, NO_DUMP )
+ROM_END
 
 /*************************************
  *
@@ -963,6 +977,19 @@ void md_boot_state::init_barek3()
 	init_megadrij();
 }
 
+void md_boot_state::init_twinktmb()
+{
+	// boot vectors don't seem to be valid, so they are patched...
+	uint8_t* rom = memregion("maincpu")->base();
+	rom[0x01] = 0x00;
+
+	rom[0x04] = 0x00;
+	rom[0x07] = 0x46;
+	rom[0x06] = 0xcc;
+
+	init_megadrij();
+}
+
 /*************************************
  *
  *  Game driver(s)
@@ -976,3 +1003,4 @@ GAME( 1993, srmdb,    0, megadrvb,     srmdb,    md_boot_state, init_srmdb,    R
 GAME( 1995, topshoot, 0, md_bootleg,   topshoot, md_boot_state, init_topshoot, ROT0, "Sun Mixing",       "Top Shooter", 0)
 GAME( 1993, sonic2mb, 0, megadrvb,     aladmdb,  md_boot_state, init_aladmdb,  ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Megadrive version)", MACHINE_NOT_WORKING )
 GAME( 1994, barek3mb, 0, megadrvb,     barek3,   md_boot_state, init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Megadrive version)", 0 )
+GAME( 1993, twinktmb, 0, megadrvb,     aladmdb,  md_boot_state, init_twinktmb, ROT0, "bootleg / Sega",   "Twinkle Tale (bootleg of Megadrive version)", MACHINE_NOT_WORKING ) // inputs not hooked up, possibly go through pic?
