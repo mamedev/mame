@@ -33,6 +33,7 @@ public:
 		, m_ctc(*this, "ctc")
 		, m_fdc(*this, "fdc")
 		, m_earom(*this, "earom")
+		, m_vecprom(*this, "vecprom")
 		, m_videoram(*this, "videoram")
 		, m_chargen(*this, "chargen")
 	{
@@ -51,6 +52,8 @@ private:
 	DECLARE_WRITE16_MEMBER(mmu_write);
 	DECLARE_WRITE_LINE_MEMBER(mmu_reset_w);
 	void mmu_init_w(u16 data);
+
+	IRQ_CALLBACK_MEMBER(intack);
 
 	DECLARE_READ8_MEMBER(ctc_r);
 	DECLARE_WRITE8_MEMBER(ctc_w);
@@ -72,6 +75,7 @@ private:
 	required_device<z80ctc_device> m_ctc;
 	required_device<upd765a_device> m_fdc;
 	required_device<x2212_device> m_earom;
+	required_region_ptr<u8> m_vecprom;
 
 	required_shared_ptr<u16> m_videoram;
 	required_region_ptr<u8> m_chargen;
@@ -162,6 +166,12 @@ WRITE_LINE_MEMBER(fs3216_state::mmu_reset_w)
 void fs3216_state::mmu_init_w(u16 data)
 {
 	m_mmu_init = true;
+}
+
+IRQ_CALLBACK_MEMBER(fs3216_state::intack)
+{
+	// FIXME: not all levels are vectored this way
+	return m_vecprom[irqline];
 }
 
 READ8_MEMBER(fs3216_state::ctc_r)
@@ -267,6 +277,7 @@ void fs3216_state::fs3216(machine_config &config)
 	M68000(config, m_maincpu, 44.2368_MHz_XTAL / 8); // 5.5 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &fs3216_state::main_map);
 	m_maincpu->set_reset_callback(write_line_delegate(FUNC(fs3216_state::mmu_reset_w), this));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(fs3216_state::intack));
 
 	ADDRESS_MAP_BANK(config, m_clb);
 	m_clb->set_addrmap(0, &fs3216_state::clb_map);
@@ -319,6 +330,9 @@ ROM_START(fs3216)
 
 	ROM_REGION(0x100, "earom", 0)
 	ROM_LOAD("sn1000044-08_x2212.bin", 0x000, 0x100, CRC(2bf1fec8) SHA1(e1bdda558364415131e68443013c608bb9c01451))
+
+	ROM_REGION(0x20, "vecprom", 0)
+	ROM_LOAD("12j_74s288.bin", 0x00, 0x20, CRC(8f7bf087) SHA1(de785f7ab79f0e58e411ec5cbc42991d1d8486b1))
 
 	ROM_REGION16_BE(0x2000, "comm_a", 0)
 	ROM_LOAD16_BYTE("1896-01_c90c3cb92588a2b4bb28bcf4bb8e2023.bin", 0x0000, 0x1000, CRC(ac4cdbd2) SHA1(e448a01a9809cccfb526ac1d4e97d9be3af1e5eb))
