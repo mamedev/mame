@@ -40,7 +40,7 @@ namespace netlist
 		NETLIB_HANDLERI(clk);
 		NETLIB_HANDLERI(abcd)
 		{
-			m_abcd = (m_D() << 3) | (m_C() << 2) | (m_B() << 1) | (m_A() << 0);
+			m_abcd = static_cast<uint8_t>((m_D() << 3) | (m_C() << 2) | (m_B() << 1) | (m_A() << 0));
 		}
 
 		logic_input_t m_CLK;

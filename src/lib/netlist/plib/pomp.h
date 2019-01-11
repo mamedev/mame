@@ -18,8 +18,8 @@
 namespace plib {
 namespace omp {
 
-template <class T>
-void for_static(const int start, const int end, const T &what)
+template <typename I, class T>
+void for_static(const I start, const I end, const T &what)
 {
 #if HAS_OPENMP && USE_OPENMP
 	#pragma omp parallel
@@ -28,19 +28,19 @@ void for_static(const int start, const int end, const T &what)
 #if HAS_OPENMP && USE_OPENMP
 		#pragma omp for schedule(static)
 #endif
-		for (int i = start; i <  end; i++)
+		for (I i = start; i <  end; i++)
 			what(i);
 	}
 }
 
-inline void set_num_threads(const int threads)
+inline void set_num_threads(const std::size_t threads)
 {
 #if HAS_OPENMP && USE_OPENMP
 	omp_set_num_threads(threads);
 #endif
 }
 
-inline int get_max_threads()
+inline std::size_t get_max_threads()
 {
 #if HAS_OPENMP && USE_OPENMP
 	return omp_get_max_threads();

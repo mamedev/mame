@@ -153,7 +153,7 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_UPDATE(chip) NETLIB_HANDLER(chip, update)
 
 // FIXME: NETLIB_PARENT_UPDATE should disappear
-#define NETLIB_PARENT_UPDATE(chip) NETLIB_NAME(chip) :: update();
+#define NETLIB_PARENT_UPDATE(chip) NETLIB_NAME(chip) :: update()
 
 #define NETLIB_RESET(chip) void NETLIB_NAME(chip) :: reset(void)
 

@@ -93,17 +93,18 @@ NETLIB_UPDATE(solver)
 	/* FIXME: Needs a more elegant solution */
 	bool force_solve = (netlist().time() < netlist_time::from_double(2 * m_params.m_max_timestep));
 
-	std::size_t nthreads = std::min(m_parallel(), plib::omp::get_max_threads());
+	std::size_t nthreads = std::min(static_cast<std::size_t>(m_parallel()), plib::omp::get_max_threads());
 	std::size_t t_cnt = 0;
-	int solv[128];
-	for (int i = 0; i <  m_mat_solvers.size(); i++)
+	std::size_t solv[128];
+	for (std::size_t i = 0; i <  m_mat_solvers.size(); i++)
 		if (m_mat_solvers[i]->has_timestep_devices() || force_solve)
 			solv[t_cnt++] = i;
 
 	if (nthreads > 1 && t_cnt > 1)
 	{
 		plib::omp::set_num_threads(nthreads);
-		plib::omp::for_static(0, t_cnt, [this, &solv](int i) { ATTR_UNUSED const netlist_time ts = this->m_mat_solvers[solv[i]]->solve(); });
+		plib::omp::for_static(static_cast<std::size_t>(0), t_cnt, [this, &solv](std::size_t i)
+			{ ATTR_UNUSED const netlist_time ts = this->m_mat_solvers[solv[i]]->solve(); });
 	}
 	else
 		for (auto & solver : m_mat_solvers)

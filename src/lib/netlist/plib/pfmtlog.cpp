@@ -69,7 +69,7 @@ pfmt &pfmt::format_element(const char *l, const unsigned cfmt_spec,  ...)
 	if (pstring("duxo").find(cfmt_spec) != pstring::npos)
 	{
 		if (pstring("duxo").find(pend) == pstring::npos)
-			fmt += (pstring(l) + (char) cfmt_spec);
+			fmt += (pstring(l) + static_cast<pstring::value_type>(cfmt_spec));
 		else
 			fmt = plib::left(fmt, fmt.size() - 1) + pstring(l) + plib::right(fmt, 1);
 	}

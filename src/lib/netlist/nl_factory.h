@@ -36,6 +36,7 @@
 	{ \
 		return std::unique_ptr<factory::element_t>(plib::palloc<factory::device_element_t<ns :: NETLIB_NAME(chip)>>(name, classname, def_param, pstring(__FILE__))); \
 	} \
+	\
 	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
 
 namespace netlist {

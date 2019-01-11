@@ -83,13 +83,13 @@ NETLIST_START(base)
 	LOCAL_SOURCE(OPAMP_lib)
 	LOCAL_SOURCE(otheric_lib)
 
-	INCLUDE(diode_models);
-	INCLUDE(bjt_models);
-	INCLUDE(family_models);
-	INCLUDE(TTL74XX_lib);
-	INCLUDE(CD4XXX_lib);
-	INCLUDE(OPAMP_lib);
-	INCLUDE(otheric_lib);
+	INCLUDE(diode_models)
+	INCLUDE(bjt_models)
+	INCLUDE(family_models)
+	INCLUDE(TTL74XX_lib)
+	INCLUDE(CD4XXX_lib)
+	INCLUDE(OPAMP_lib)
+	INCLUDE(otheric_lib)
 
 NETLIST_END()
 

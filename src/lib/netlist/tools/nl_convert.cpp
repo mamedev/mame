@@ -408,7 +408,7 @@ nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert, plib::putf
 	set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
 	set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers
 	//set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
-	set_whitespace(pstring("") + ' ' + (char)9 +  (char)10 + (char)13);
+	set_whitespace(pstring("") + ' ' + static_cast<char>(9) +  static_cast<char>(10) + static_cast<char>(13));
 	/* FIXME: gnetlist doesn't print comments */
 	set_comment("/*", "*/", "//");
 	set_string_char('\'');
@@ -546,7 +546,7 @@ nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert, plib::putf8_
 	set_identifier_chars(".abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-");
 	set_number_chars("0123456789", "0123456789eE-."); //FIXME: processing of numbers
 	//set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
-	set_whitespace(pstring("") + ' ' + (char)9 + (char)10 + (char)13);
+	set_whitespace(pstring("") + ' ' + static_cast<char>(9) +  static_cast<char>(10) + static_cast<char>(13));
 	/* FIXME: gnetlist doesn't print comments */
 	set_comment("","","//"); // FIXME:needs to be confirmed
 	set_string_char('"');

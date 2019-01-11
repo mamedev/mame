@@ -199,8 +199,8 @@ double pfunction::evaluate(const std::vector<double> &values)
 			OP(SUB,  1, ST2 - ST1)
 			OP(DIV,  1, ST2 / ST1)
 			OP(POW,  1, std::pow(ST2, ST1))
-			OP(SIN,  0, std::sin(ST2));
-			OP(COS,  0, std::cos(ST2));
+			OP(SIN,  0, std::sin(ST2))
+			OP(COS,  0, std::cos(ST2))
 			case RAND:
 				stack[ptr++] = lfsr_random();
 				break;

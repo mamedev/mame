@@ -49,14 +49,14 @@ namespace netlist
 			{
 				// FIXME: Outputs are tristate. This needs to be properly implemented
 				m_DOUTQ.push(1, NLTIME_FROM_NS(20));
-				for (int i=0; i<8; i++)
+				for (std::size_t i=0; i<8; i++)
 					m_A[i].inactivate();
 				m_WEQ.inactivate();
 				m_DIN.inactivate();
 			}
 			else if (last && !m_enq)
 			{
-				for (int i=0; i<8; i++)
+				for (std::size_t i=0; i<8; i++)
 					m_A[i].activate();
 				m_WEQ.activate();
 				m_DIN.activate();

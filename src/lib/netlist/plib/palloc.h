@@ -52,7 +52,7 @@ std::unique_ptr<T> make_unique(Args&&... args)
 }
 
 template<typename BC, typename DC, typename... Args>
-static std::unique_ptr<BC> make_unique_base(Args&&... args)
+std::unique_ptr<BC> make_unique_base(Args&&... args)
 {
 	std::unique_ptr<BC> ret(new DC(std::forward<Args>(args)...));
 	return ret;

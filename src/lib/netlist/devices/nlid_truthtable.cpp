@@ -448,7 +448,7 @@ void truthtable_parser::parse(const std::vector<pstring> &truthtable)
 	{
 		if (m_out_state[i] == m_out_state.mask())
 			throw nl_exception(plib::pfmt("truthtable: found element not set {1}\n").x(i) );
-		m_out_state.set(i, m_out_state[i] | (ign[i] << m_NO));;
+		m_out_state.set(i, m_out_state[i] | (ign[i] << m_NO));
 	}
 	*m_initialized = true;
 

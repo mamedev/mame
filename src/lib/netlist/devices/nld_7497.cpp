@@ -74,9 +74,9 @@ namespace netlist
 			m_Y.push(y, out_delay_CLK_Y[y]);
 		}
 
-		int rate()
+		uint8_t rate()
 		{
-			int a = 0;
+			uint8_t a = 0;
 
 			for (std::size_t i = 0; i < 6; i++)
 				a |= (m_B[i]() << i);

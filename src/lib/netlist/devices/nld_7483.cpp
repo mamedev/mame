@@ -95,19 +95,19 @@ namespace netlist
 
 	NETLIB_HANDLER(7483, upd_a)
 	{
-		m_a = (m_A1() << 0) | (m_A2() << 1) | (m_A3() << 2) | (m_A4() << 3);
+		m_a = static_cast<uint8_t>((m_A1() << 0) | (m_A2() << 1) | (m_A3() << 2) | (m_A4() << 3));
 		NETLIB_NAME(7483)::update();
 	}
 
 	NETLIB_HANDLER(7483, upd_b)
 	{
-		m_b = (m_B1() << 0) | (m_B2() << 1) | (m_B3() << 2) | (m_B4() << 3);
+		m_b = static_cast<uint8_t>((m_B1() << 0) | (m_B2() << 1) | (m_B3() << 2) | (m_B4() << 3));
 		NETLIB_NAME(7483)::update();
 	}
 
 	inline NETLIB_UPDATE(7483)
 	{
-		uint8_t r = m_a + m_b + m_C0();
+		uint8_t r = static_cast<uint8_t>(m_a + m_b + m_C0());
 
 		if (r != m_lastr)
 		{

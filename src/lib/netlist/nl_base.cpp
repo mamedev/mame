@@ -293,8 +293,6 @@ void netlist_t::remove_dev(core_device_t *dev)
 		);
 }
 
-
-
 void netlist_t::start()
 {
 	setup().start_devices();
@@ -344,7 +342,7 @@ void netlist_t::start()
 			if (p != setup().m_param_values.end())
 			{
 				//FIXME: check for errors ...
-				double v = plib::pstonum<double>(p->second);;
+				double v = plib::pstonum<double>(p->second);
 				if (std::abs(v - std::floor(v)) > 1e-6 )
 					log().fatal(MF_1_HND_VAL_NOT_SUPPORTED, p->second);
 				d->set_hint_deactivate(v == 0.0);
